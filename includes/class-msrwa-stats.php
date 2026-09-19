@@ -101,7 +101,7 @@ final class MSRWA_Stats {
 		$per_page = min( 100, max( 1, absint( $per_page ) ) );
 		$offset = ( $page - 1 ) * $per_page;
 		if ( $owner_id ) {
-			$sql = $wpdb->prepare( "SELECT e.* FROM {$t['events']} e LEFT JOIN {$t['jobs']} j ON j.id = e.job_id WHERE (j.owner_id = %d OR e.job_id IS NULL) ORDER BY e.id DESC LIMIT %d OFFSET %d", absint( $owner_id ), $per_page, $offset );
+			$sql = $wpdb->prepare( "SELECT e.* FROM {$t['events']} e INNER JOIN {$t['jobs']} j ON j.id = e.job_id WHERE j.owner_id = %d ORDER BY e.id DESC LIMIT %d OFFSET %d", absint( $owner_id ), $per_page, $offset );
 		} else {
 			$sql = $wpdb->prepare( "SELECT * FROM {$t['events']} ORDER BY id DESC LIMIT %d OFFSET %d", $per_page, $offset );
 		}
