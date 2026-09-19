@@ -1,7 +1,7 @@
 (function () {
   'use strict';
   var button = document.getElementById('msrwa-create');
-  var testButton = document.getElementById('msrwa-test-openai');
+  var testButtons = document.querySelectorAll('.msrwa-test-provider');
   if (typeof MSRWA === 'undefined') return;
   if (button) button.addEventListener('click', function () {
     var lines = (document.getElementById('msrwa-titles').value || '').split(/\r?\n/).map(function (v) { return v.trim(); }).filter(Boolean);
@@ -16,14 +16,15 @@
       .catch(function (error) { message.textContent = error.message; })
       .finally(function () { button.disabled = false; });
   });
-  if (testButton) testButton.addEventListener('click', function () {
-    var status = document.getElementById('msrwa-openai-status');
+  Array.prototype.forEach.call(testButtons, function (testButton) { testButton.addEventListener('click', function () {
+    var provider = testButton.getAttribute('data-provider');
+    var status = document.getElementById('msrwa-' + provider + '-status');
     testButton.disabled = true;
     status.textContent = 'Test en cours…';
-    fetch(MSRWA.api + '/test/openai', { method: 'POST', headers: { 'X-WP-Nonce': MSRWA.nonce } })
+    fetch(MSRWA.api + (provider === 'openai' ? '/test/openai' : '/test/' + provider), { method: 'POST', headers: { 'X-WP-Nonce': MSRWA.nonce } })
       .then(function (response) { return response.json().then(function (data) { if (!response.ok) throw new Error(data.message || 'Échec du test'); return data; }); })
-      .then(function (data) { status.textContent = 'OpenAI OK — ' + data.model + ' — ' + (data.usage && data.usage.total_tokens ? data.usage.total_tokens + ' tokens' : 'usage indisponible'); })
+      .then(function (data) { status.textContent = provider + ' OK — ' + data.model + ' — ' + (data.usage && (data.usage.total_tokens || data.usage.input_tokens) ? (data.usage.total_tokens || data.usage.input_tokens) + ' tokens' : 'usage indisponible'); })
       .catch(function (error) { status.textContent = error.message; })
       .finally(function () { testButton.disabled = false; });
-  });
+  }); });
 }());

@@ -2,6 +2,16 @@
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
 final class MSRWA_Providers {
+	public static function connection_test( $provider ) {
+		if ( 'openai' === $provider ) { return MSRWA_OpenAI::connection_test(); }
+		$settings = MSRWA_Settings::get();
+		$model = 'gemini' === $provider ? $settings['gemini_model'] : $settings['claude_model'];
+		$result = self::text( $provider, $model, 'Return exactly READY.', 16, false );
+		if ( is_wp_error( $result ) ) { return $result; }
+		if ( 'READY' !== trim( $result['text'] ) ) { return new WP_Error( $provider . '_unexpected_output', $provider . ' a répondu, mais la sortie de test est inattendue.', array( 'status' => 502 ) ); }
+		return array( 'ok' => true, 'provider' => $provider, 'model' => $result['model'], 'usage' => $result['usage'] );
+	}
+
 	public static function text( $provider, $model, $input, $max_tokens = 1200, $search = false ) {
 		if ( 'openai' === $provider ) {
 			$tools = $search ? array( array( 'type' => 'web_search' ) ) : array();
