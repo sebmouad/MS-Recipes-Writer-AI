@@ -49,16 +49,30 @@ final class MSRWA_REST {
 	public static function create_batch( WP_REST_Request $request ) {
 		global $wpdb;
 		$payload = $request->get_json_params();
+		if ( ! is_array( $payload ) ) {
+			$raw_items = $request->get_param( 'items' );
+			$decoded_items = is_string( $raw_items ) ? json_decode( wp_unslash( $raw_items ), true ) : $raw_items;
+			$payload = array( 'items' => is_array( $decoded_items ) ? $decoded_items : array() );
+		}
 		$items = isset( $payload['items'] ) && is_array( $payload['items'] ) ? $payload['items'] : array();
 		$settings = MSRWA_Settings::get();
 		if ( empty( $items ) || count( $items ) > (int) $settings['max_batch'] ) { return new WP_Error( 'invalid_batch', 'Le lot est vide ou dépasse la limite configurée.', array( 'status' => 400 ) ); }
-		foreach ( $items as $item ) { if ( ! is_array( $item ) || '' === trim( isset( $item['title'] ) ? (string) $item['title'] : '' ) ) { return new WP_Error( 'invalid_item', 'Chaque entrée du lot doit avoir un titre.', array( 'status' => 400 ) ); } }
+		foreach ( $items as &$item ) {
+			if ( ! is_array( $item ) ) { return new WP_Error( 'invalid_item', 'Chaque entrée du lot doit être un objet.', array( 'status' => 400 ) ); }
+			if ( '' === trim( isset( $item['title'] ) ? (string) $item['title'] : '' ) && ! empty( $item['text'] ) ) {
+				$lines = preg_split( '/\r?\n/', trim( wp_strip_all_tags( (string) $item['text'] ) ) );
+				$item['title'] = sanitize_text_field( isset( $lines[0] ) ? substr( $lines[0], 0, 160 ) : '' );
+			}
+			if ( '' === trim( isset( $item['title'] ) ? (string) $item['title'] : '' ) ) { return new WP_Error( 'invalid_item', 'Ajoutez une recette ou un titre dans le texte fourni.', array( 'status' => 400 ) ); }
+		}
+		unset( $item );
 		$now = current_time( 'mysql', true );
 		$t = MSRWA_DB::tables();
 		$snapshot = $settings;
 		foreach ( array( 'openai_key', 'gemini_key', 'claude_key', 'research_fallback_key' ) as $secret ) { $snapshot[ $secret ] = ''; }
 		$wpdb->insert( $t['batches'], array( 'owner_id' => get_current_user_id(), 'status' => 'queued', 'total' => count( $items ), 'settings_snapshot' => wp_json_encode( $snapshot ), 'created_at' => $now, 'updated_at' => $now ), array( '%d', '%s', '%d', '%s', '%s', '%s' ) );
 		$batch_id = (int) $wpdb->insert_id;
+		$first_job_id = 0;
 		foreach ( $items as $item ) {
 			$title = isset( $item['title'] ) ? sanitize_text_field( $item['title'] ) : '';
 			if ( '' === $title ) { continue; }
@@ -69,10 +83,27 @@ final class MSRWA_REST {
 				if ( ! is_wp_error( $plan ) ) { $models[ $key ] = $plan; }
 			}
 			$wpdb->insert( $t['jobs'], array( 'batch_id' => $batch_id, 'owner_id' => get_current_user_id(), 'title' => $title, 'input_json' => wp_json_encode( $normalized ), 'selected_models_json' => wp_json_encode( $models ), 'status' => 'queued', 'stage' => 'intake', 'created_at' => $now, 'updated_at' => $now ), array( '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s' ) );
+			if ( ! $first_job_id ) { $first_job_id = (int) $wpdb->insert_id; }
+		}
+		$upload_errors = array();
+		$file_params = $request->get_file_params();
+		if ( $first_job_id && ! empty( $file_params ) && class_exists( 'MSRWA_Storage' ) ) {
+			$uploaded = MSRWA_Storage::store_uploads( $first_job_id, $file_params );
+			$upload_errors = isset( $uploaded['errors'] ) ? $uploaded['errors'] : array();
+			if ( ! empty( $uploaded['valid'] ) ) {
+				$input_json = $wpdb->get_var( $wpdb->prepare( "SELECT input_json FROM {$t['jobs']} WHERE id = %d", $first_job_id ) );
+				$input_data = json_decode( (string) $input_json, true );
+				$input_data = is_array( $input_data ) ? $input_data : array();
+				$input_data['reference_images'] = array_merge( isset( $input_data['reference_images'] ) && is_array( $input_data['reference_images'] ) ? $input_data['reference_images'] : array(), $uploaded['valid'] );
+				$wpdb->update( $t['jobs'], array( 'input_json' => wp_json_encode( $input_data ), 'updated_at' => current_time( 'mysql', true ) ), array( 'id' => $first_job_id ), array( '%s', '%s' ), array( '%d' ) );
+			}
+			if ( $upload_errors ) { MSRWA_DB::event( 'reference_upload_rejected', $batch_id, $first_job_id, array( 'errors' => $upload_errors ) ); }
 		}
 		MSRWA_DB::event( 'batch_created', $batch_id, 0, array( 'total' => count( $items ) ) );
 		MSRWA_Queue::schedule_batch( $batch_id );
-		return new WP_REST_Response( array( 'id' => $batch_id, 'status' => 'queued' ), 201 );
+		$response = array( 'id' => $batch_id, 'status' => 'queued' );
+		if ( $upload_errors ) { $response['reference_upload_errors'] = $upload_errors; }
+		return new WP_REST_Response( $response, 201 );
 	}
 
 	public static function get_batch( WP_REST_Request $request ) {

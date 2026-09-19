@@ -65,6 +65,29 @@ final class MSRWA_Storage {
 		return array( 'source_url' => $url, 'path' => $target, 'mime' => $mime, 'bytes' => strlen( $binary ), 'width' => absint( $size[0] ), 'height' => absint( $size[1] ), 'sha256' => hash_file( 'sha256', $target ), 'downloaded_at' => current_time( 'mysql', true ) );
 	}
 
+	public static function store_uploads( $job_id, $files ) {
+		$stored = array();
+		$errors = array();
+		$files = isset( $files['reference_files'] ) ? $files['reference_files'] : $files;
+		if ( isset( $files['name'] ) && is_array( $files['name'] ) ) {
+			$normalized = array();
+			foreach ( $files['name'] as $index => $name ) { $normalized[] = array( 'name' => $name, 'type' => $files['type'][ $index ] ?? '', 'tmp_name' => $files['tmp_name'][ $index ] ?? '', 'error' => $files['error'][ $index ] ?? UPLOAD_ERR_NO_FILE, 'size' => $files['size'][ $index ] ?? 0 ); }
+			$files = $normalized;
+		} elseif ( isset( $files['tmp_name'] ) ) { $files = array( $files ); }
+		foreach ( is_array( $files ) ? array_slice( $files, 0, 10 ) : array() as $index => $file ) {
+			$result = self::store_upload( $job_id, $file, $index );
+			if ( is_wp_error( $result ) ) { $errors[] = array( 'name' => isset( $file['name'] ) ? sanitize_file_name( $file['name'] ) : '', 'code' => $result->get_error_code(), 'message' => $result->get_error_message() ); } else { $stored[] = $result; }
+		}
+		return array( 'valid' => $stored, 'errors' => $errors );
+	}
+
+	public static function is_private_path( $path ) {
+		$dir = self::private_dir( false );
+		$file = realpath( (string) $path );
+		$dir = $dir ? realpath( $dir ) : false;
+		return $file && $dir && 0 === strpos( $file, trailingslashit( $dir ) ) && is_file( $file );
+	}
+
 	public static function purge_expired( $days = 7 ) {
 		$dir = self::private_dir( false );
 		if ( ! $dir || ! is_dir( $dir ) ) { return 0; }
@@ -91,6 +114,27 @@ final class MSRWA_Storage {
 			if ( ! filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE ) ) { return false; }
 		}
 		return true;
+	}
+
+	private static function store_upload( $job_id, $file, $index ) {
+		if ( ! is_array( $file ) || ! empty( $file['error'] ) && UPLOAD_ERR_NO_FILE !== (int) $file['error'] ) { return new WP_Error( 'reference_upload_error', 'Le téléversement de la référence a échoué.' ); }
+		$tmp = isset( $file['tmp_name'] ) ? (string) $file['tmp_name'] : '';
+		if ( ! $tmp || ! is_uploaded_file( $tmp ) || ! is_readable( $tmp ) || isset( $file['size'] ) && absint( $file['size'] ) > self::MAX_BYTES ) { return new WP_Error( 'reference_upload_invalid', 'La référence téléversée est absente ou trop volumineuse.' ); }
+		$binary = file_get_contents( $tmp );
+		if ( false === $binary || strlen( $binary ) < 128 || strlen( $binary ) > self::MAX_BYTES ) { return new WP_Error( 'reference_upload_payload_invalid', 'Le fichier téléversé est invalide.' ); }
+		$work = wp_tempnam( 'msrwa-upload-' . absint( $job_id ) );
+		if ( ! $work || false === file_put_contents( $work, $binary, LOCK_EX ) ) { return new WP_Error( 'reference_upload_temp_failed', 'Impossible de préparer la référence téléversée.' ); }
+		$size = @getimagesize( $work );
+		$mime = self::mime( $work, $size );
+		$allowed = array( 'image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp', 'image/gif' => 'gif' );
+		if ( ! is_array( $size ) || empty( $size[0] ) || empty( $size[1] ) || ! isset( $allowed[ $mime ] ) || $size[0] > self::MAX_WIDTH || $size[1] > self::MAX_HEIGHT ) { @unlink( $work ); return new WP_Error( 'reference_upload_image_invalid', 'Le fichier téléversé n’est pas une image autorisée ou ses dimensions sont excessives.' ); }
+		$dir = self::private_dir();
+		if ( ! $dir ) { @unlink( $work ); return new WP_Error( 'reference_storage_unavailable', 'Le stockage privé des références n’est pas disponible.' ); }
+		$name = 'msrwa-' . absint( $job_id ) . '-' . absint( $index ) . '-' . substr( hash( 'sha256', (string) ( $file['name'] ?? '' ) . microtime( true ) . wp_generate_uuid4() ), 0, 24 ) . '.' . $allowed[ $mime ];
+		$target = trailingslashit( $dir ) . $name;
+		if ( ! @rename( $work, $target ) && ( ! @copy( $work, $target ) || ! @unlink( $work ) ) ) { @unlink( $work ); return new WP_Error( 'reference_upload_store_failed', 'Impossible de déplacer la référence vers le stockage privé.' ); }
+		@chmod( $target, 0600 );
+		return array( 'source_url' => '', 'origin' => 'upload', 'original_name' => sanitize_file_name( $file['name'] ?? 'reference' ), 'path' => $target, 'mime' => $mime, 'bytes' => strlen( $binary ), 'width' => absint( $size[0] ), 'height' => absint( $size[1] ), 'sha256' => hash_file( 'sha256', $target ), 'downloaded_at' => current_time( 'mysql', true ) );
 	}
 
 	private static function mime( $file, $size ) {

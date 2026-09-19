@@ -83,8 +83,15 @@ final class MSRWA_Pipeline {
 		}
 		$references = isset( $input['reference_images'] ) && is_array( $input['reference_images'] ) ? array_values( $input['reference_images'] ) : array();
 		$settings = MSRWA_Settings::get();
-		$downloaded = class_exists( 'MSRWA_Storage' ) ? MSRWA_Storage::download_references( $job->id, $references, (int) $settings['max_reference_images'] ) : array( 'valid' => array(), 'errors' => array( array( 'code' => 'storage_unavailable', 'message' => 'Le stockage privé des références est indisponible.' ) ) );
+		$stored_references = array();
+		$remote_references = array();
+		foreach ( $references as $reference ) {
+			if ( is_array( $reference ) && ! empty( $reference['path'] ) && class_exists( 'MSRWA_Storage' ) && MSRWA_Storage::is_private_path( $reference['path'] ) ) { $stored_references[] = $reference; } else { $remote_references[] = $reference; }
+		}
+		$remaining_limit = max( 0, (int) $settings['max_reference_images'] - count( $stored_references ) );
+		$downloaded = class_exists( 'MSRWA_Storage' ) ? MSRWA_Storage::download_references( $job->id, $remote_references, $remaining_limit ) : array( 'valid' => array(), 'errors' => array( array( 'code' => 'storage_unavailable', 'message' => 'Le stockage privé des références est indisponible.' ) ) );
 		$reference_images = isset( $downloaded['valid'] ) && is_array( $downloaded['valid'] ) ? $downloaded['valid'] : array();
+		$reference_images = array_merge( $stored_references, $reference_images );
 		$reference_errors = isset( $downloaded['errors'] ) && is_array( $downloaded['errors'] ) ? $downloaded['errors'] : array();
 		$reference_context = array();
 		foreach ( $reference_images as $reference ) { $reference_context[] = array( 'source_url' => isset( $reference['source_url'] ) ? $reference['source_url'] : '', 'mime' => isset( $reference['mime'] ) ? $reference['mime'] : '', 'bytes' => isset( $reference['bytes'] ) ? absint( $reference['bytes'] ) : 0, 'width' => isset( $reference['width'] ) ? absint( $reference['width'] ) : 0, 'height' => isset( $reference['height'] ) ? absint( $reference['height'] ) : 0, 'sha256' => isset( $reference['sha256'] ) ? $reference['sha256'] : '' ); }
