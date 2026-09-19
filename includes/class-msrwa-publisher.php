@@ -8,7 +8,9 @@ final class MSRWA_Publisher {
 		$canonical = isset( $artifacts['canonical'] ) && is_array( $artifacts['canonical'] ) ? $artifacts['canonical'] : array();
 		if ( empty( $article['title'] ) || empty( $article['content_html'] ) ) { return new WP_Error( 'draft_content_missing', 'L’article validé ne contient pas le titre ou le contenu.' ); }
 		$post_id = absint( isset( $job->draft_post_id ) ? $job->draft_post_id : 0 );
-		$content = self::sanitize_content( (string) $article['content_html'], isset( $article['internal_links'] ) ? $article['internal_links'] : array() );
+		$link_specs = self::internal_link_specs( isset( $article['internal_links'] ) ? $article['internal_links'] : array(), isset( $artifacts['internal_link_candidates'] ) ? $artifacts['internal_link_candidates'] : array() );
+		$content = self::sanitize_content( (string) $article['content_html'], $link_specs );
+		$content = self::append_internal_links( $content, $link_specs );
 		if ( ! preg_match( '/<\w[\s\S]*>/i', $content ) ) { $content = wpautop( esc_html( $content ) ); }
 		if ( isset( $canonical['calories_estimate'] ) && '' !== (string) $canonical['calories_estimate'] ) {
 			$content .= '<p class="msrwa-nutrition-note">Valeurs nutritionnelles estimées par IA ; elles ne remplacent pas une analyse nutritionnelle professionnelle.</p>';
@@ -67,6 +69,71 @@ final class MSRWA_Publisher {
 			return in_array( $href, $allowed, true ) ? $match[0] : $match[2];
 		}, $content );
 		return $content;
+	}
+
+	private static function internal_link_specs( $article_links, $candidate_links ) {
+		$settings = MSRWA_Settings::get();
+		if ( empty( $settings['internal_links_enabled'] ) ) { return array(); }
+		$limit = min( 10, max( 0, absint( $settings['internal_links_max'] ) ) );
+		if ( 0 === $limit ) { return array(); }
+		$allowed = array();
+		foreach ( is_array( $candidate_links ) ? $candidate_links : array() as $link ) {
+			if ( is_array( $link ) ) { $allowed[] = $link; }
+		}
+		$allowed_urls = array();
+		foreach ( $allowed as $link ) {
+			$relative = self::relative_internal_url( isset( $link['url'] ) ? $link['url'] : '' );
+			if ( $relative ) { $allowed_urls[ $relative ] = true; }
+		}
+		$out = array();
+		foreach ( is_array( $article_links ) ? $article_links : array() as $link ) {
+			if ( count( $out ) >= $limit || ! is_array( $link ) ) { break; }
+			$relative = self::relative_internal_url( isset( $link['url'] ) ? $link['url'] : '' );
+			if ( ! $relative || empty( $allowed_urls[ $relative ] ) ) { continue; }
+			$title = sanitize_text_field( isset( $link['title'] ) ? $link['title'] : '' );
+			$anchor = sanitize_text_field( isset( $link['anchor'] ) ? $link['anchor'] : '' );
+			$key = md5( $relative );
+			if ( isset( $out[ $key ] ) ) { continue; }
+			$out[ $key ] = array( 'title' => $title, 'anchor' => $anchor ? $anchor : ( $title ? $title : $relative ), 'url' => $relative );
+		}
+		foreach ( $allowed as $link ) {
+			if ( count( $out ) >= $limit || ! is_array( $link ) ) { break; }
+			$relative = self::relative_internal_url( isset( $link['url'] ) ? $link['url'] : '' );
+			if ( ! $relative ) { continue; }
+			$key = md5( $relative );
+			if ( isset( $out[ $key ] ) ) { continue; }
+			$title = sanitize_text_field( isset( $link['title'] ) ? $link['title'] : '' );
+			$out[ $key ] = array( 'title' => $title, 'anchor' => $title ? $title : $relative, 'url' => $relative );
+		}
+		return array_values( $out );
+	}
+
+	private static function relative_internal_url( $url ) {
+		$url = trim( (string) $url );
+		if ( '' === $url || preg_match( '/^(?:javascript|data|vbscript):/i', $url ) ) { return ''; }
+		$scheme = wp_parse_url( $url, PHP_URL_SCHEME );
+		$host = wp_parse_url( $url, PHP_URL_HOST );
+		if ( $scheme && ! in_array( strtolower( $scheme ), array( 'http', 'https' ), true ) ) { return ''; }
+		$home_host = wp_parse_url( home_url( '/' ), PHP_URL_HOST );
+		if ( $host && $home_host && strtolower( $host ) !== strtolower( $home_host ) ) { return ''; }
+		$relative = function_exists( 'wp_make_link_relative' ) ? wp_make_link_relative( $url ) : ( wp_parse_url( $url, PHP_URL_PATH ) ?: '' );
+		if ( ! is_string( $relative ) || 0 !== strpos( $relative, '/' ) ) { return ''; }
+		return esc_url_raw( $relative );
+	}
+
+	private static function append_internal_links( $content, $links ) {
+		if ( ! is_array( $links ) || empty( $links ) ) { return $content; }
+		$items = array();
+		$heading = sanitize_text_field( MSRWA_Settings::get()['internal_links_heading'] );
+		if ( '' === $heading ) { return $content; }
+		foreach ( $links as $link ) {
+			$url = esc_url( $link['url'] );
+			$anchor = esc_html( $link['anchor'] );
+			if ( ! $url || ! $anchor || false !== strpos( $content, esc_attr( $link['url'] ) ) ) { continue; }
+			$items[] = '<li><a href="' . $url . '">' . $anchor . '</a></li>';
+		}
+		if ( empty( $items ) ) { return $content; }
+		return $content . '<section class="msrwa-internal-links" aria-labelledby="msrwa-internal-links-title"><h2 id="msrwa-internal-links-title">' . esc_html( $heading ) . '</h2><ul>' . implode( '', $items ) . '</ul></section>';
 	}
 
 	private static function write_recipe_meta( $post_id, $recipe ) {

@@ -76,7 +76,7 @@ final class MSRWA_Pipeline {
 			return;
 		}
 		$settings = MSRWA_Settings::get();
-		$prompt = $settings['prompt_recipe'] . '\nEntrée : ' . wp_json_encode( $input, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . ' Recherche : ' . wp_json_encode( isset( $artifacts['research'] ) ? $artifacts['research'] : array(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+		$prompt = $settings['prompt_recipe'] . '\n' . $settings['prompt_nutrition'] . '\nEntrée : ' . wp_json_encode( $input, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . ' Recherche : ' . wp_json_encode( isset( $artifacts['research'] ) ? $artifacts['research'] : array(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
 		$result = self::text_call( $job, $prompt, 2400, array(), false, 'canonical_recipe' );
 		self::require_result( $result );
 		$canonical = self::normalize_canonical( self::decode_json( $result['text'], 'canonical_recipe' ) );
@@ -91,14 +91,15 @@ final class MSRWA_Pipeline {
 			self::set_status( $job, 'needs_review', 'canonical_missing', 'La recette canonique n’a pas été produite.' );
 			return;
 		}
+		$settings = MSRWA_Settings::get();
 		$previous_findings = '';
 		if ( ! empty( $artifacts['review']['findings'] ) ) {
-			$previous_findings = ' Corrige également ces observations de relecture : ' . wp_json_encode( $artifacts['review']['findings'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+			$previous_findings = ' ' . $settings['prompt_correction'] . ' Corrige également ces observations de relecture : ' . wp_json_encode( $artifacts['review']['findings'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
 		}
-		$settings = MSRWA_Settings::get();
 		$links = self::internal_link_candidates( isset( $artifacts['canonical']['title'] ) ? $artifacts['canonical']['title'] : $job->title, (int) $settings['internal_links_max'] );
+		$artifacts['internal_link_candidates'] = $links;
 		$links_context = ! empty( $settings['internal_links_enabled'] ) ? '\nLiens internes autorisés : ' . wp_json_encode( $links, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . '. Utilise uniquement ces chemins relatifs, au maximum ' . (int) $settings['internal_links_max'] . ', et retourne aussi internal_links (title, url, anchor). Ne crée aucun lien si la liste est vide.' : '\nLes liens internes sont désactivés : retourne internal_links comme tableau vide.';
-		$prompt = $settings['prompt_article'] . '\nRecette canonique : ' . wp_json_encode( $artifacts['canonical'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . $links_context . $previous_findings;
+		$prompt = $settings['prompt_article'] . '\n' . $settings['prompt_seo'] . '\nRecette canonique : ' . wp_json_encode( $artifacts['canonical'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . $links_context . $previous_findings;
 		$result = self::text_call( $job, $prompt, 2800, array(), false, 'article' );
 		self::require_result( $result );
 		try {
