@@ -78,6 +78,51 @@ final class MSRWA_OpenAI {
 		return array( 'model' => $model, 'format' => $payload['output_format'], 'base64' => $b64, 'created' => isset( $body['created'] ) ? absint( $body['created'] ) : 0 );
 	}
 
+	public static function images_edit( $image_path, $prompt, $model = 'gpt-image-2.5-flare', $size = '1024x1536', $quality = 'low', $format = 'webp' ) {
+		$key = self::key();
+		if ( '' === $key ) { return new WP_Error( 'missing_openai_key', 'Aucune clé OpenAI côté serveur.', array( 'status' => 400 ) ); }
+		$catalog = MSRWA_Catalog::models();
+		if ( empty( $catalog['openai'][ $model ]['stable'] ) || empty( $catalog['openai'][ $model ]['image_generation'] ) ) { return new WP_Error( 'unsupported_openai_image_model', 'Modèle image OpenAI non autorisé.', array( 'status' => 400 ) ); }
+		if ( ! is_string( $image_path ) || ! is_readable( $image_path ) || filesize( $image_path ) > 20 * 1024 * 1024 ) { return new WP_Error( 'openai_image_input_invalid', 'Image de référence absente ou trop volumineuse.', array( 'status' => 400 ) ); }
+		$mime = function_exists( 'mime_content_type' ) ? mime_content_type( $image_path ) : '';
+		$allowed_mimes = array( 'image/png', 'image/jpeg', 'image/webp' );
+		if ( ! in_array( $mime, $allowed_mimes, true ) ) { return new WP_Error( 'openai_image_mime_invalid', 'Le format de l’image de référence n’est pas autorisé.', array( 'status' => 400 ) ); }
+		$allowed_sizes = array( '1024x1024', '1536x1024', '1024x1536' );
+		$allowed_quality = array( 'low', 'medium', 'high', 'xhigh', 'max', 'auto' );
+		$allowed_formats = array( 'png', 'jpeg', 'webp' );
+		$size = in_array( $size, $allowed_sizes, true ) ? $size : '1024x1536';
+		$quality = in_array( $quality, $allowed_quality, true ) ? $quality : 'low';
+		$format = in_array( $format, $allowed_formats, true ) ? $format : 'webp';
+		$boundary = '--------------------------' . wp_generate_password( 24, false, false );
+		$body = '';
+		$add_field = static function ( $name, $value ) use ( &$body, $boundary ) {
+			$body .= '--' . $boundary . "\r\nContent-Disposition: form-data; name=\"" . $name . "\"\r\n\r\n" . $value . "\r\n";
+		};
+		$add_file = static function ( $name, $path, $mime ) use ( &$body, $boundary ) {
+			$body .= '--' . $boundary . "\r\nContent-Disposition: form-data; name=\"" . $name . "\"; filename=\"reference" . strrchr( $path, '.' ) . "\"\r\nContent-Type: " . $mime . "\r\n\r\n" . file_get_contents( $path ) . "\r\n";
+		};
+		$add_field( 'model', $model );
+		$add_field( 'prompt', sanitize_textarea_field( $prompt ) );
+		$add_field( 'size', $size );
+		$add_field( 'quality', $quality );
+		$add_field( 'output_format', $format );
+		$add_file( 'image', $image_path, $mime );
+		$body .= '--' . $boundary . "--\r\n";
+		$response = wp_remote_post( 'https://api.openai.com/v1/images/edits', array(
+			'timeout' => 120,
+			'sslverify' => true,
+			'headers' => array( 'Authorization' => 'Bearer ' . $key, 'Content-Type' => 'multipart/form-data; boundary=' . $boundary ),
+			'body' => $body,
+		) );
+		if ( is_wp_error( $response ) ) { return new WP_Error( 'openai_image_edit_network', $response->get_error_message(), array( 'status' => 502 ) ); }
+		$code = wp_remote_retrieve_response_code( $response );
+		$decoded = json_decode( wp_remote_retrieve_body( $response ), true );
+		if ( $code < 200 || $code >= 300 ) { return new WP_Error( 'openai_image_edit_api_' . $code, isset( $decoded['error']['message'] ) ? sanitize_text_field( $decoded['error']['message'] ) : 'Réponse d’édition image OpenAI invalide.', array( 'status' => $code >= 400 && $code < 600 ? $code : 502 ) ); }
+		$b64 = isset( $decoded['data'][0]['b64_json'] ) ? (string) $decoded['data'][0]['b64_json'] : '';
+		if ( '' === $b64 ) { return new WP_Error( 'openai_image_edit_empty', 'OpenAI n’a retourné aucune image éditée.', array( 'status' => 502 ) ); }
+		return array( 'model' => $model, 'format' => $format, 'base64' => $b64, 'created' => isset( $decoded['created'] ) ? absint( $decoded['created'] ) : 0 );
+	}
+
 	private static function extract_sources( $body ) {
 		$sources = array();
 		foreach ( isset( $body['output'] ) && is_array( $body['output'] ) ? $body['output'] : array() as $item ) {

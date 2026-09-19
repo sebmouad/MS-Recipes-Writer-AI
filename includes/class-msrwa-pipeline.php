@@ -5,8 +5,9 @@ final class MSRWA_Pipeline {
 	public static function process_job( $job_id ) {
 		global $wpdb;
 		$t = MSRWA_DB::tables();
+		if ( ! MSRWA_Queue::acquire_job( $job_id ) ) { return; }
 		$job = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$t['jobs']} WHERE id = %d", $job_id ) );
-		if ( ! $job || in_array( $job->status, array( 'completed', 'cancelled', 'needs_review', 'awaiting_admin' ), true ) ) { return; }
+		if ( ! $job || in_array( $job->status, array( 'completed', 'cancelled', 'needs_review', 'awaiting_admin' ), true ) ) { MSRWA_Queue::release_job( $job_id ); return; }
 		$settings = MSRWA_Settings::get();
 		if ( empty( $settings['allow_paid_tests'] ) || (float) $settings['test_budget_usd'] <= 0 ) {
 			self::set_status( $job, 'awaiting_admin', 'paid_tests_disabled', 'Activez explicitement les tests payants et un budget supérieur à zéro.' );
@@ -23,7 +24,10 @@ final class MSRWA_Pipeline {
 				case 'canonical_recipe': self::canonical( $job, $input, $artifacts ); break;
 				case 'article': self::article( $job, $artifacts ); break;
 				case 'review': self::review( $job, $artifacts ); break;
-				case 'featured_image': self::await_image( $job ); break;
+				case 'featured_image': self::featured_image( $job, $artifacts ); break;
+				case 'facebook_image': self::facebook_image( $job, $artifacts ); break;
+				case 'final_review': self::final_review( $job, $artifacts ); break;
+				case 'draft': self::draft( $job, $artifacts ); break;
 				default: self::set_status( $job, 'needs_review', 'stage_not_implemented', 'Cette étape attend encore son adaptateur fournisseur.' );
 			}
 		} catch ( Exception $exception ) {
@@ -34,13 +38,13 @@ final class MSRWA_Pipeline {
 	private static function research( $job, $input, &$artifacts ) {
 		$settings = MSRWA_Settings::get();
 		$prompt = $settings['prompt_research'] . '\nEntrée éditeur : ' . wp_json_encode( $input, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
-		$result = MSRWA_OpenAI::responses_text( $prompt, '', 1800, array( array( 'type' => 'web_search' ) ), true );
+		$result = self::text_call( $job, $prompt, 1800, array( array( 'type' => 'web_search' ) ), true, 'research' );
 		self::require_result( $result );
 		try {
 			$artifacts['research'] = self::decode_json( $result['text'], 'research' );
 		} catch ( Exception $first_error ) {
 			$retry_prompt = $settings['prompt_research'] . '\nRéessaie en retournant un JSON compact strict, sans Markdown, sans commentaire et avec les clés recipe_facts, references et uncertainties. Entrée éditeur : ' . wp_json_encode( $input, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
-			$retry = MSRWA_OpenAI::responses_text( $retry_prompt, '', 2400, array( array( 'type' => 'web_search' ) ), true );
+			$retry = self::text_call( $job, $retry_prompt, 2400, array( array( 'type' => 'web_search' ) ), true, 'research_retry' );
 			self::require_result( $retry );
 			$artifacts['research'] = self::decode_json( $retry['text'], 'research' );
 			MSRWA_DB::event( 'research_retry', $job->batch_id, $job->id, array( 'reason' => 'invalid_json' ) );
@@ -57,7 +61,7 @@ final class MSRWA_Pipeline {
 		}
 		$settings = MSRWA_Settings::get();
 		$prompt = $settings['prompt_recipe'] . '\nEntrée : ' . wp_json_encode( $input, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . ' Recherche : ' . wp_json_encode( isset( $artifacts['research'] ) ? $artifacts['research'] : array(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
-		$result = MSRWA_OpenAI::responses_text( $prompt, '', 2400 );
+		$result = self::text_call( $job, $prompt, 2400, array(), false, 'canonical_recipe' );
 		self::require_result( $result );
 		$canonical = self::normalize_canonical( self::decode_json( $result['text'], 'canonical_recipe' ) );
 		$errors = MSRWA_Recipe::validate( $canonical );
@@ -79,12 +83,12 @@ final class MSRWA_Pipeline {
 		$links = self::internal_link_candidates( isset( $artifacts['canonical']['title'] ) ? $artifacts['canonical']['title'] : $job->title, (int) $settings['internal_links_max'] );
 		$links_context = ! empty( $settings['internal_links_enabled'] ) ? '\nLiens internes autorisés : ' . wp_json_encode( $links, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . '. Utilise uniquement ces chemins relatifs, au maximum ' . (int) $settings['internal_links_max'] . ', et retourne aussi internal_links (title, url, anchor). Ne crée aucun lien si la liste est vide.' : '\nLes liens internes sont désactivés : retourne internal_links comme tableau vide.';
 		$prompt = $settings['prompt_article'] . '\nRecette canonique : ' . wp_json_encode( $artifacts['canonical'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . $links_context . $previous_findings;
-		$result = MSRWA_OpenAI::responses_text( $prompt, '', 2800 );
+		$result = self::text_call( $job, $prompt, 2800, array(), false, 'article' );
 		self::require_result( $result );
 		try {
 			$artifacts['article'] = self::decode_json( $result['text'], 'article' );
 		} catch ( Exception $first_error ) {
-			$retry = MSRWA_OpenAI::responses_text( $prompt . '\nRéponds à nouveau avec un JSON compact strict sans Markdown ni commentaire.', '', 3000 );
+			$retry = self::text_call( $job, $prompt . '\nRéponds à nouveau avec un JSON compact strict sans Markdown ni commentaire.', 3000, array(), false, 'article_retry' );
 			self::require_result( $retry );
 			$artifacts['article'] = self::decode_json( $retry['text'], 'article' );
 		}
@@ -98,12 +102,12 @@ final class MSRWA_Pipeline {
 		}
 		$settings = MSRWA_Settings::get();
 		$prompt = $settings['prompt_review'] . '\nDeux cycles maximum sont gérés par le moteur. CANONICAL: ' . wp_json_encode( $artifacts['canonical'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . ' ARTICLE: ' . wp_json_encode( $artifacts['article'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
-		$result = MSRWA_OpenAI::responses_text( $prompt, '', 2400 );
+		$result = self::text_call( $job, $prompt, 2400, array(), false, 'review' );
 		self::require_result( $result );
 		try {
 			$review = self::decode_json( $result['text'], 'review' );
 		} catch ( Exception $first_error ) {
-			$retry = MSRWA_OpenAI::responses_text( $prompt . '\nRéponds à nouveau avec un JSON compact strict sans Markdown ni commentaire.', '', 2800 );
+			$retry = self::text_call( $job, $prompt . '\nRéponds à nouveau avec un JSON compact strict sans Markdown ni commentaire.', 2800, array(), false, 'review_retry' );
 			self::require_result( $retry );
 			$review = self::decode_json( $retry['text'], 'review' );
 		}
@@ -111,7 +115,7 @@ final class MSRWA_Pipeline {
 		if ( empty( $review['pass'] ) && (int) $job->correction_cycles < (int) $settings['max_corrections'] ) {
 			global $wpdb;
 			$t = MSRWA_DB::tables();
-			$wpdb->update( $t['jobs'], array( 'artifacts_json' => wp_json_encode( $artifacts ), 'correction_cycles' => (int) $job->correction_cycles + 1, 'stage' => 'article', 'status' => 'queued', 'updated_at' => current_time( 'mysql', true ) ), array( 'id' => $job->id ), array( '%s', '%d', '%s', '%s', '%s' ), array( '%d' ) );
+			$wpdb->update( $t['jobs'], array( 'artifacts_json' => wp_json_encode( $artifacts ), 'correction_cycles' => (int) $job->correction_cycles + 1, 'stage' => 'article', 'status' => 'queued', 'lock_token' => null, 'lock_until' => null, 'updated_at' => current_time( 'mysql', true ) ), array( 'id' => $job->id ), array( '%s', '%d', '%s', '%s', '%s', '%s', '%s' ), array( '%d' ) );
 			MSRWA_DB::event( 'review_correction_requested', $job->batch_id, $job->id, array( 'cycle' => (int) $job->correction_cycles + 1 ) );
 			MSRWA_Queue::schedule_job( $job->id );
 			return;
@@ -153,6 +157,9 @@ final class MSRWA_Pipeline {
 				if ( ! empty( $recipe[ $key ] ) && is_array( $recipe[ $key ] ) ) { $recipe['steps'] = $recipe[ $key ]; break; }
 			}
 		}
+		if ( empty( $recipe['prep_minutes'] ) && ! empty( $recipe['prep_time'] ) ) { $recipe['prep_minutes'] = self::minutes( $recipe['prep_time'] ); }
+		if ( empty( $recipe['cook_minutes'] ) && ! empty( $recipe['cook_time'] ) ) { $recipe['cook_minutes'] = self::minutes( $recipe['cook_time'] ); }
+		if ( empty( $recipe['servings'] ) && ! empty( $recipe['yield'] ) && preg_match( '/\d+/', (string) $recipe['yield'], $match ) ) { $recipe['servings'] = absint( $match[0] ); }
 		if ( ! empty( $recipe['ingredients'] ) && is_array( $recipe['ingredients'] ) ) {
 			foreach ( $recipe['ingredients'] as $index => $ingredient ) {
 				if ( ! is_array( $ingredient ) ) { $recipe['ingredients'][ $index ] = array( 'name' => sanitize_text_field( $ingredient ), 'quantity' => '', 'unit' => '' ); continue; }
@@ -170,12 +177,92 @@ final class MSRWA_Pipeline {
 		return $recipe;
 	}
 
-	private static function await_image( $job ) { self::set_status( $job, 'needs_review', 'image_provider_pending', 'La génération d’images attend son adaptateur et son budget image validé.' ); }
+	private static function minutes( $value ) {
+		$text = strtolower( (string) $value );
+		$total = 0;
+		if ( preg_match( '/(\d+)\s*(?:h|heure|heures)/u', $text, $hours ) ) { $total += 60 * absint( $hours[1] ); }
+		if ( preg_match( '/(\d+)\s*(?:m|min|minute|minutes)/u', $text, $minutes ) ) { $total += absint( $minutes[1] ); }
+		return $total ? $total : absint( $value );
+	}
+
+	private static function featured_image( $job, &$artifacts ) {
+		if ( ! empty( $artifacts['featured_image']['attachment_id'] ) ) {
+			$valid = MSRWA_Images::validate( $artifacts['featured_image'] );
+			if ( ! is_wp_error( $valid ) ) { self::advance( $job, $artifacts, 'facebook_image' ); return; }
+		}
+		$result = MSRWA_Images::featured( $job, $artifacts );
+		if ( is_wp_error( $result ) ) { self::set_status( $job, 'needs_review', $result->get_error_code(), $result->get_error_message() ); return; }
+		$artifacts['featured_image'] = $result;
+		MSRWA_DB::event( 'featured_image_created', $job->batch_id, $job->id, array( 'attachment_id' => $result['attachment_id'], 'model' => $result['model'] ) );
+		self::advance( $job, $artifacts, 'facebook_image' );
+	}
+
+	private static function facebook_image( $job, &$artifacts ) {
+		if ( ! empty( $artifacts['facebook_image']['attachment_id'] ) ) {
+			$valid = MSRWA_Images::validate( $artifacts['facebook_image'] );
+			if ( ! is_wp_error( $valid ) ) { self::advance( $job, $artifacts, 'final_review' ); return; }
+		}
+		$result = MSRWA_Images::facebook( $job, $artifacts );
+		if ( is_wp_error( $result ) ) { self::set_status( $job, 'needs_review', $result->get_error_code(), $result->get_error_message() ); return; }
+		$artifacts['facebook_image'] = $result;
+		MSRWA_DB::event( 'facebook_image_created', $job->batch_id, $job->id, array( 'attachment_id' => $result['attachment_id'], 'reference_attachment_id' => $result['reference_attachment_id'], 'model' => $result['model'] ) );
+		self::advance( $job, $artifacts, 'final_review' );
+	}
+
+	private static function final_review( $job, &$artifacts ) {
+		foreach ( array( 'featured_image', 'facebook_image' ) as $key ) {
+			if ( empty( $artifacts[ $key ] ) ) { self::set_status( $job, 'needs_review', 'image_missing', 'Une image requise est absente avant la finalisation.' ); return; }
+			$valid = MSRWA_Images::validate( $artifacts[ $key ] );
+			if ( is_wp_error( $valid ) ) { self::set_status( $job, 'needs_review', $valid->get_error_code(), $valid->get_error_message() ); return; }
+		}
+		MSRWA_DB::event( 'final_review_passed', $job->batch_id, $job->id, array( 'checks' => array( 'article', 'featured_image', 'facebook_image' ) ) );
+		self::advance( $job, $artifacts, 'draft' );
+	}
+
+	private static function draft( $job, $artifacts ) {
+		$post_id = MSRWA_Publisher::create_draft( $job, $artifacts );
+		if ( is_wp_error( $post_id ) ) { self::set_status( $job, 'needs_review', $post_id->get_error_code(), $post_id->get_error_message() ); return; }
+		global $wpdb;
+		$t = MSRWA_DB::tables();
+		$wpdb->update( $t['jobs'], array( 'status' => 'completed', 'stage' => 'draft', 'error_code' => null, 'error_message' => null, 'draft_post_id' => absint( $post_id ), 'lock_token' => null, 'lock_until' => null, 'updated_at' => current_time( 'mysql', true ) ), array( 'id' => $job->id ), array( '%s', '%s', '%s', '%s', '%d', '%s', '%s', '%s' ), array( '%d' ) );
+		MSRWA_Queue::refresh_batch( $job->batch_id );
+		MSRWA_DB::event( 'draft_completed', $job->batch_id, $job->id, array( 'post_id' => absint( $post_id ) ) );
+	}
+
+	private static function text_call( $job, $prompt, $max_tokens, $tools = array(), $required_tool = false, $operation = 'text' ) {
+		$plan = MSRWA_Router::plan( $tools ? 'web_search' : 'text' );
+		if ( is_wp_error( $plan ) ) { return $plan; }
+		$provider = $plan['provider'];
+		$model = $plan['model'];
+		$started = current_time( 'mysql', true );
+		$result = MSRWA_Providers::text( $provider, $model, $prompt, $max_tokens, ! empty( $tools ) && $required_tool );
+		$row = array(
+			'batch_id' => absint( $job->batch_id ),
+			'job_id' => absint( $job->id ),
+			'provider' => $provider,
+			'model' => is_array( $result ) && ! empty( $result['model'] ) ? $result['model'] : $model,
+			'operation' => $operation,
+			'status' => is_wp_error( $result ) ? 'failed' : 'completed',
+			'request_id' => is_array( $result ) && ! empty( $result['id'] ) ? $result['id'] : '',
+			'input_tokens' => is_array( $result ) && ! empty( $result['usage']['input_tokens'] ) ? absint( $result['usage']['input_tokens'] ) : 0,
+			'output_tokens' => is_array( $result ) && ! empty( $result['usage']['output_tokens'] ) ? absint( $result['usage']['output_tokens'] ) : 0,
+			'payload_hash' => hash( 'sha256', (string) $prompt ),
+			'error_code' => is_wp_error( $result ) ? $result->get_error_code() : '',
+			'started_at' => $started,
+			'finished_at' => current_time( 'mysql', true ),
+		);
+		$catalog = MSRWA_Catalog::models();
+		if ( isset( $catalog[ $provider ][ $row['model'] ] ) && is_array( $result ) ) {
+			$row['cost_estimate'] = ( $row['input_tokens'] * (float) $catalog[ $provider ][ $row['model'] ]['input'] + $row['output_tokens'] * (float) $catalog[ $provider ][ $row['model'] ]['output'] ) / 1000000;
+		}
+		MSRWA_DB::call( $row );
+		return $result;
+	}
 
 	private static function advance( $job, $artifacts, $stage ) {
 		global $wpdb;
 		$t = MSRWA_DB::tables();
-		$wpdb->update( $t['jobs'], array( 'artifacts_json' => wp_json_encode( $artifacts ), 'stage' => sanitize_key( $stage ), 'status' => 'queued', 'updated_at' => current_time( 'mysql', true ) ), array( 'id' => $job->id ), array( '%s', '%s', '%s', '%s' ), array( '%d' ) );
+		$wpdb->update( $t['jobs'], array( 'artifacts_json' => wp_json_encode( $artifacts ), 'stage' => sanitize_key( $stage ), 'status' => 'queued', 'lock_token' => null, 'lock_until' => null, 'updated_at' => current_time( 'mysql', true ) ), array( 'id' => $job->id ), array( '%s', '%s', '%s', '%s', '%s', '%s' ), array( '%d' ) );
 		MSRWA_DB::event( 'stage_completed', $job->batch_id, $job->id, array( 'stage' => $job->stage, 'next' => $stage ) );
 		MSRWA_Queue::schedule_job( $job->id );
 	}
@@ -183,7 +270,8 @@ final class MSRWA_Pipeline {
 	private static function set_status( $job, $status, $code, $message ) {
 		global $wpdb;
 		$t = MSRWA_DB::tables();
-		$wpdb->update( $t['jobs'], array( 'status' => sanitize_key( $status ), 'error_code' => sanitize_key( $code ), 'error_message' => sanitize_textarea_field( $message ), 'updated_at' => current_time( 'mysql', true ) ), array( 'id' => $job->id ), array( '%s', '%s', '%s', '%s' ), array( '%d' ) );
+		$wpdb->update( $t['jobs'], array( 'status' => sanitize_key( $status ), 'error_code' => sanitize_key( $code ), 'error_message' => sanitize_textarea_field( $message ), 'lock_token' => null, 'lock_until' => null, 'updated_at' => current_time( 'mysql', true ) ), array( 'id' => $job->id ), array( '%s', '%s', '%s', '%s', '%s', '%s' ), array( '%d' ) );
+		MSRWA_Queue::refresh_batch( $job->batch_id );
 		MSRWA_DB::event( 'job_' . $status, $job->batch_id, $job->id, array( 'code' => $code ) );
 	}
 

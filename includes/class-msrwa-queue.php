@@ -2,6 +2,36 @@
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
 final class MSRWA_Queue {
+	public static function acquire_job( $job_id ) {
+		global $wpdb;
+		$t = MSRWA_DB::tables();
+		$token = wp_generate_uuid4();
+		$updated = $wpdb->query( $wpdb->prepare( "UPDATE {$t['jobs']} SET lock_token = %s, lock_until = DATE_ADD(UTC_TIMESTAMP(), INTERVAL 10 MINUTE), status = 'running', attempts = attempts + 1, updated_at = %s WHERE id = %d AND status = 'queued' AND (lock_until IS NULL OR lock_until < UTC_TIMESTAMP())", $token, current_time( 'mysql', true ), absint( $job_id ) ) );
+		return $updated ? $token : false;
+	}
+
+	public static function release_job( $job_id ) {
+		global $wpdb;
+		$t = MSRWA_DB::tables();
+		$wpdb->query( $wpdb->prepare( "UPDATE {$t['jobs']} SET lock_token = NULL, lock_until = NULL WHERE id = %d", absint( $job_id ) ) );
+	}
+
+	public static function active_count() {
+		global $wpdb;
+		$t = MSRWA_DB::tables();
+		return (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$t['jobs']} WHERE status = 'running' OR (status = 'queued' AND lock_until > UTC_TIMESTAMP())" );
+	}
+
+	public static function refresh_batch( $batch_id ) {
+		global $wpdb;
+		$t = MSRWA_DB::tables();
+		$counts = $wpdb->get_row( $wpdb->prepare( "SELECT COUNT(*) AS total, SUM(status = 'completed') AS completed, SUM(status = 'cancelled') AS cancelled FROM {$t['jobs']} WHERE batch_id = %d", absint( $batch_id ) ) );
+		if ( ! $counts ) { return; }
+		$completed = (int) $counts->completed;
+		$status = ( $completed + (int) $counts->cancelled >= (int) $counts->total && (int) $counts->total > 0 ) ? 'completed' : 'running';
+		$wpdb->update( $t['batches'], array( 'status' => $status, 'completed' => $completed, 'updated_at' => current_time( 'mysql', true ) ), array( 'id' => absint( $batch_id ) ), array( '%s', '%d', '%s' ), array( '%d' ) );
+	}
+
 	public static function schedule_batch( $batch_id ) {
 		if ( function_exists( 'as_enqueue_async_action' ) ) {
 			as_enqueue_async_action( 'msrwa_process_batch', array( 'batch_id' => absint( $batch_id ) ), 'ms-recipes-writer-ai' );
@@ -28,7 +58,9 @@ final class MSRWA_Queue {
 			MSRWA_DB::event( 'batch_awaiting_admin', $batch_id, 0, array( 'reason' => 'provider_calls_require_explicit_test_budget' ) );
 			return;
 		}
-		$jobs = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM {$t['jobs']} WHERE batch_id = %d AND status = 'queued' ORDER BY id ASC LIMIT %d", $batch_id, (int) $settings['max_concurrency'] ) );
+		$slots = max( 0, (int) $settings['max_concurrency'] - self::active_count() );
+		if ( ! $slots ) { return; }
+		$jobs = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM {$t['jobs']} WHERE batch_id = %d AND status = 'queued' AND (lock_until IS NULL OR lock_until < UTC_TIMESTAMP()) ORDER BY id ASC LIMIT %d", $batch_id, $slots ) );
 		foreach ( $jobs as $job_id ) { self::schedule_job( $job_id ); }
 	}
 }

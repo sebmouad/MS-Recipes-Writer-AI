@@ -7,10 +7,12 @@ final class MSRWA_REST {
 		register_rest_route( 'msrwa/v1', '/test/openai', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_manage' ), 'callback' => array( __CLASS__, 'test_openai' ) ) );
 		register_rest_route( 'msrwa/v1', '/batches', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'create_batch' ) ) );
 		register_rest_route( 'msrwa/v1', '/batches/(?P<id>\d+)', array( 'methods' => 'GET', 'permission_callback' => array( __CLASS__, 'can_read' ), 'callback' => array( __CLASS__, 'get_batch' ) ) );
+		register_rest_route( 'msrwa/v1', '/stats', array( 'methods' => 'GET', 'permission_callback' => array( __CLASS__, 'can_read' ), 'callback' => array( __CLASS__, 'stats' ) ) );
+		register_rest_route( 'msrwa/v1', '/events', array( 'methods' => 'GET', 'permission_callback' => array( __CLASS__, 'can_read' ), 'callback' => array( __CLASS__, 'events' ) ) );
 	}
 
-	public static function can_read() { return current_user_can( 'edit_posts' ); }
-	public static function can_create() { return current_user_can( 'edit_posts' ); }
+	public static function can_read() { return current_user_can( 'msrwa_view_own' ) || current_user_can( 'msrwa_view_all' ) || current_user_can( 'manage_options' ); }
+	public static function can_create() { return current_user_can( 'msrwa_create' ) || current_user_can( 'msrwa_manage' ) || current_user_can( 'manage_options' ); }
 	public static function can_manage() { return current_user_can( 'manage_options' ); }
 
 	public static function catalog() { return rest_ensure_response( MSRWA_Catalog::models() ); }
@@ -27,9 +29,12 @@ final class MSRWA_REST {
 		$items = isset( $payload['items'] ) && is_array( $payload['items'] ) ? $payload['items'] : array();
 		$settings = MSRWA_Settings::get();
 		if ( empty( $items ) || count( $items ) > (int) $settings['max_batch'] ) { return new WP_Error( 'invalid_batch', 'Le lot est vide ou dépasse la limite configurée.', array( 'status' => 400 ) ); }
+		foreach ( $items as $item ) { if ( ! is_array( $item ) || '' === trim( isset( $item['title'] ) ? (string) $item['title'] : '' ) ) { return new WP_Error( 'invalid_item', 'Chaque entrée du lot doit avoir un titre.', array( 'status' => 400 ) ); } }
 		$now = current_time( 'mysql', true );
 		$t = MSRWA_DB::tables();
-		$wpdb->insert( $t['batches'], array( 'owner_id' => get_current_user_id(), 'status' => 'queued', 'total' => count( $items ), 'settings_snapshot' => wp_json_encode( $settings ), 'created_at' => $now, 'updated_at' => $now ), array( '%d', '%s', '%d', '%s', '%s', '%s' ) );
+		$snapshot = $settings;
+		foreach ( array( 'openai_key', 'gemini_key', 'claude_key' ) as $secret ) { $snapshot[ $secret ] = ''; }
+		$wpdb->insert( $t['batches'], array( 'owner_id' => get_current_user_id(), 'status' => 'queued', 'total' => count( $items ), 'settings_snapshot' => wp_json_encode( $snapshot ), 'created_at' => $now, 'updated_at' => $now ), array( '%d', '%s', '%d', '%s', '%s', '%s' ) );
 		$batch_id = (int) $wpdb->insert_id;
 		foreach ( $items as $item ) {
 			$title = isset( $item['title'] ) ? sanitize_text_field( $item['title'] ) : '';
@@ -56,5 +61,17 @@ final class MSRWA_REST {
 		$jobs = $wpdb->get_results( $wpdb->prepare( "SELECT id,title,status,stage,error_code,error_message,created_at,updated_at FROM {$t['jobs']} WHERE batch_id = %d ORDER BY id ASC", $id ), ARRAY_A );
 		$batch['jobs'] = $jobs;
 		return rest_ensure_response( $batch );
+	}
+
+	public static function stats( WP_REST_Request $request ) {
+		$days = absint( $request->get_param( 'days' ) ?: 7 );
+		$owner_id = current_user_can( 'msrwa_view_all' ) || current_user_can( 'manage_options' ) ? 0 : get_current_user_id();
+		return rest_ensure_response( MSRWA_Stats::summary( $days, $owner_id ) );
+	}
+
+	public static function events( WP_REST_Request $request ) {
+		$page = absint( $request->get_param( 'page' ) ?: 1 );
+		$owner_id = current_user_can( 'msrwa_view_all' ) || current_user_can( 'manage_options' ) ? 0 : get_current_user_id();
+		return rest_ensure_response( MSRWA_Stats::events( $page, 50, $owner_id ) );
 	}
 }

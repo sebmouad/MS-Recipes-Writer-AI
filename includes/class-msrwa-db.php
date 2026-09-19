@@ -9,6 +9,7 @@ final class MSRWA_DB {
 			'batches' => $prefix . 'batches',
 			'jobs'    => $prefix . 'jobs',
 			'events'  => $prefix . 'events',
+			'calls'   => $prefix . 'calls',
 		);
 	}
 
@@ -18,11 +19,15 @@ final class MSRWA_DB {
 		$charset = $wpdb->get_charset_collate();
 		$t = self::tables();
 		$sql = array(
-			"CREATE TABLE {$t['batches']} (id bigint(20) unsigned NOT NULL AUTO_INCREMENT, owner_id bigint(20) unsigned NOT NULL, status varchar(32) NOT NULL DEFAULT 'queued', total int unsigned NOT NULL DEFAULT 0, completed int unsigned NOT NULL DEFAULT 0, settings_snapshot longtext NULL, created_at datetime NOT NULL, updated_at datetime NOT NULL, PRIMARY KEY (id), KEY owner_status (owner_id,status), KEY created_at (created_at)) $charset;",
-			"CREATE TABLE {$t['jobs']} (id bigint(20) unsigned NOT NULL AUTO_INCREMENT, batch_id bigint(20) unsigned NOT NULL, owner_id bigint(20) unsigned NOT NULL, title text NOT NULL, input_json longtext NULL, canonical_json longtext NULL, artifacts_json longtext NULL, selected_models_json longtext NULL, cost_estimate decimal(12,6) NOT NULL DEFAULT 0, status varchar(32) NOT NULL DEFAULT 'queued', stage varchar(64) NOT NULL DEFAULT 'intake', correction_cycles tinyint unsigned NOT NULL DEFAULT 0, attempts tinyint unsigned NOT NULL DEFAULT 0, error_code varchar(80) NULL, error_message text NULL, lock_token varchar(64) NULL, lock_until datetime NULL, created_at datetime NOT NULL, updated_at datetime NOT NULL, PRIMARY KEY (id), KEY batch_status (batch_id,status), KEY owner_status (owner_id,status), KEY lock_until (lock_until)) $charset;",
-			"CREATE TABLE {$t['events']} (id bigint(20) unsigned NOT NULL AUTO_INCREMENT, batch_id bigint(20) unsigned NULL, job_id bigint(20) unsigned NULL, actor_id bigint(20) unsigned NULL, event_type varchar(80) NOT NULL, payload_json longtext NULL, created_at datetime NOT NULL, PRIMARY KEY (id), KEY job_event (job_id,event_type), KEY created_at (created_at)) $charset;",
+			"CREATE TABLE {$t['batches']} (\n id bigint(20) unsigned NOT NULL AUTO_INCREMENT,\n owner_id bigint(20) unsigned NOT NULL,\n status varchar(32) NOT NULL DEFAULT 'queued',\n total int unsigned NOT NULL DEFAULT 0,\n completed int unsigned NOT NULL DEFAULT 0,\n settings_snapshot longtext NULL,\n created_at datetime NOT NULL,\n updated_at datetime NOT NULL,\n PRIMARY KEY (id),\n KEY owner_status (owner_id,status),\n KEY created_at (created_at)\n) $charset;",
+			"CREATE TABLE {$t['jobs']} (\n id bigint(20) unsigned NOT NULL AUTO_INCREMENT,\n batch_id bigint(20) unsigned NOT NULL,\n owner_id bigint(20) unsigned NOT NULL,\n title text NOT NULL,\n input_json longtext NULL,\n canonical_json longtext NULL,\n artifacts_json longtext NULL,\n selected_models_json longtext NULL,\n cost_estimate decimal(12,6) NOT NULL DEFAULT 0,\n draft_post_id bigint(20) unsigned NOT NULL DEFAULT 0,\n status varchar(32) NOT NULL DEFAULT 'queued',\n stage varchar(64) NOT NULL DEFAULT 'intake',\n correction_cycles tinyint unsigned NOT NULL DEFAULT 0,\n attempts tinyint unsigned NOT NULL DEFAULT 0,\n error_code varchar(80) NULL,\n error_message text NULL,\n lock_token varchar(64) NULL,\n lock_until datetime NULL,\n created_at datetime NOT NULL,\n updated_at datetime NOT NULL,\n PRIMARY KEY (id),\n KEY batch_status (batch_id,status),\n KEY owner_status (owner_id,status),\n KEY lock_until (lock_until)\n) $charset;",
+			"CREATE TABLE {$t['events']} (\n id bigint(20) unsigned NOT NULL AUTO_INCREMENT,\n batch_id bigint(20) unsigned NULL,\n job_id bigint(20) unsigned NULL,\n actor_id bigint(20) unsigned NULL,\n event_type varchar(80) NOT NULL,\n payload_json longtext NULL,\n created_at datetime NOT NULL,\n PRIMARY KEY (id),\n KEY job_event (job_id,event_type),\n KEY created_at (created_at)\n) $charset;",
+			"CREATE TABLE {$t['calls']} (\n id bigint(20) unsigned NOT NULL AUTO_INCREMENT,\n batch_id bigint(20) unsigned NULL,\n job_id bigint(20) unsigned NULL,\n provider varchar(32) NOT NULL,\n model varchar(120) NOT NULL,\n operation varchar(64) NOT NULL,\n status varchar(32) NOT NULL,\n http_status smallint unsigned NOT NULL DEFAULT 0,\n request_id varchar(191) NULL,\n input_tokens bigint unsigned NOT NULL DEFAULT 0,\n output_tokens bigint unsigned NOT NULL DEFAULT 0,\n cost_estimate decimal(12,6) NULL,\n uncertain tinyint(1) NOT NULL DEFAULT 0,\n error_code varchar(80) NULL,\n payload_hash char(64) NULL,\n started_at datetime NOT NULL,\n finished_at datetime NULL,\n PRIMARY KEY (id),\n KEY job_status (job_id,status),\n KEY provider_model (provider,model),\n KEY started_at (started_at)\n) $charset;",
 		);
 		foreach ( $sql as $statement ) { dbDelta( $statement ); }
+		if ( ! $wpdb->get_var( $wpdb->prepare( "SHOW COLUMNS FROM {$t['jobs']} LIKE %s", 'draft_post_id' ) ) ) {
+			$wpdb->query( "ALTER TABLE {$t['jobs']} ADD COLUMN draft_post_id bigint(20) unsigned NOT NULL DEFAULT 0 AFTER cost_estimate" );
+		}
 		update_option( 'msrwa_db_version', MSRWA_VERSION, false );
 	}
 
@@ -33,5 +38,32 @@ final class MSRWA_DB {
 			'batch_id' => absint( $batch_id ), 'job_id' => absint( $job_id ), 'actor_id' => get_current_user_id(),
 			'event_type' => sanitize_key( $type ), 'payload_json' => wp_json_encode( $payload ), 'created_at' => current_time( 'mysql', true ),
 		), array( '%d', '%d', '%d', '%s', '%s', '%s' ) );
+	}
+
+	public static function call( $data ) {
+		global $wpdb;
+		$t = self::tables();
+		$allowed = array( 'batch_id', 'job_id', 'provider', 'model', 'operation', 'status', 'http_status', 'request_id', 'input_tokens', 'output_tokens', 'cost_estimate', 'uncertain', 'error_code', 'payload_hash', 'started_at', 'finished_at' );
+		$row = array();
+		$formats = array();
+		foreach ( $allowed as $key ) {
+			if ( ! array_key_exists( $key, $data ) ) { continue; }
+			$row[ $key ] = $data[ $key ];
+			$formats[] = in_array( $key, array( 'batch_id', 'job_id', 'http_status', 'input_tokens', 'output_tokens', 'uncertain' ), true ) ? '%d' : ( 'cost_estimate' === $key ? '%f' : '%s' );
+		}
+		if ( empty( $row['started_at'] ) ) { $row['started_at'] = current_time( 'mysql', true ); $formats[] = '%s'; }
+		$wpdb->insert( $t['calls'], $row, $formats );
+		if ( ! empty( $row['job_id'] ) && isset( $row['cost_estimate'] ) && null !== $row['cost_estimate'] ) {
+			$wpdb->query( $wpdb->prepare( "UPDATE {$t['jobs']} SET cost_estimate = cost_estimate + %f WHERE id = %d", (float) $row['cost_estimate'], absint( $row['job_id'] ) ) );
+		}
+		return (int) $wpdb->insert_id;
+	}
+
+	public static function purge_expired( $log_days = 30 ) {
+		global $wpdb;
+		$t = self::tables();
+		$days = max( 1, absint( $log_days ) );
+		$wpdb->query( $wpdb->prepare( "DELETE FROM {$t['events']} WHERE created_at < UTC_TIMESTAMP() - INTERVAL %d DAY", $days ) );
+		$wpdb->query( $wpdb->prepare( "DELETE FROM {$t['calls']} WHERE started_at < UTC_TIMESTAMP() - INTERVAL %d DAY", $days ) );
 	}
 }
