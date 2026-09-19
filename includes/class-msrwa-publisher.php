@@ -15,13 +15,15 @@ final class MSRWA_Publisher {
 		if ( isset( $canonical['calories_estimate'] ) && '' !== (string) $canonical['calories_estimate'] ) {
 			$content .= '<p class="msrwa-nutrition-note">Valeurs nutritionnelles estimées par IA ; elles ne remplacent pas une analyse nutritionnelle professionnelle.</p>';
 		}
+		$author_id = self::author_id( $job );
+		if ( is_wp_error( $author_id ) ) { return $author_id; }
 		$post_data = array(
 			'post_title'   => sanitize_text_field( $article['title'] ),
 			'post_content' => $content,
 			'post_excerpt' => isset( $article['excerpt'] ) ? sanitize_textarea_field( $article['excerpt'] ) : '',
 			'post_status'  => 'draft',
 			'post_type'    => 'post',
-			'post_author'  => self::author_id( $job ),
+			'post_author'  => $author_id,
 			'post_name'    => isset( $article['slug'] ) ? sanitize_title( $article['slug'] ) : sanitize_title( $article['title'] ),
 		);
 		if ( $post_id ) {
@@ -46,14 +48,49 @@ final class MSRWA_Publisher {
 		if ( ! empty( $artifacts['facebook_image']['attachment_id'] ) ) {
 			update_post_meta( $post_id, '_msrwa_facebook_image_id', absint( $artifacts['facebook_image']['attachment_id'] ) );
 		}
+		$verified = self::verify_draft( $post_id, $article, $canonical, $artifacts );
+		if ( is_wp_error( $verified ) ) { return $verified; }
 		return (int) $post_id;
 	}
 
 	private static function author_id( $job ) {
 		$owner = absint( $job->owner_id );
-		if ( $owner && get_userdata( $owner ) ) { return $owner; }
-		$admin = get_users( array( 'role' => 'administrator', 'number' => 1, 'fields' => 'ID' ) );
-		return ! empty( $admin[0] ) ? absint( $admin[0] ) : 1;
+		if ( ! $owner || ! get_userdata( $owner ) ) { return new WP_Error( 'draft_owner_missing', 'Le propriétaire du job n’existe plus ; le brouillon ne peut pas être attribué de façon sûre.' ); }
+		if ( ! user_can( $owner, 'edit_posts' ) || ( ! user_can( $owner, 'msrwa_create' ) && ! user_can( $owner, 'msrwa_manage' ) && ! user_can( $owner, 'manage_options' ) ) ) {
+			return new WP_Error( 'draft_owner_unauthorized', 'Le propriétaire du job ne possède plus les droits requis pour créer ce brouillon.' );
+		}
+		return $owner;
+	}
+
+	/**
+	 * Re-read all public integration values before a job can be marked completed.
+	 * A generated draft stays available for manual recovery when this check fails.
+	 */
+	private static function verify_draft( $post_id, $article, $canonical, $artifacts ) {
+		$post = get_post( $post_id );
+		if ( ! $post || 'draft' !== $post->post_status || 'post' !== $post->post_type ) { return new WP_Error( 'draft_write_failed', 'Le brouillon WordPress n’a pas été enregistré dans l’état attendu.' ); }
+		$mapping = MSRWA_Settings::get()['integration_mapping'];
+		foreach ( array( 'prep_minutes', 'cook_minutes', 'servings', 'calories_estimate', 'cuisine' ) as $field ) {
+			$key = isset( $mapping[ $field ] ) ? $mapping[ $field ] : '';
+			if ( ! $key || ! array_key_exists( $field, $canonical ) ) { continue; }
+			$expected = in_array( $field, array( 'prep_minutes', 'cook_minutes', 'servings', 'calories_estimate' ), true ) ? (string) absint( $canonical[ $field ] ) : sanitize_text_field( $canonical[ $field ] );
+			if ( (string) get_post_meta( $post_id, $key, true ) !== $expected ) { return new WP_Error( 'draft_recipe_meta_missing', 'Une métadonnée Recipe Card n’a pas été enregistrée correctement : ' . $field . '.' ); }
+		}
+		foreach ( array( 'seo_title', 'seo_description' ) as $field ) {
+			$key = isset( $mapping[ $field ] ) ? $mapping[ $field ] : '';
+			if ( ! $key || ! isset( $article[ $field ] ) ) { continue; }
+			$expected = 'seo_title' === $field ? sanitize_text_field( $article[ $field ] ) : sanitize_textarea_field( $article[ $field ] );
+			if ( (string) get_post_meta( $post_id, $key, true ) !== $expected ) { return new WP_Error( 'draft_seo_meta_missing', 'Une métadonnée SEO n’a pas été enregistrée correctement : ' . $field . '.' ); }
+		}
+		$featured = absint( $artifacts['featured_image']['attachment_id'] ?? 0 );
+		if ( $featured && $featured !== (int) get_post_thumbnail_id( $post_id ) ) { return new WP_Error( 'draft_featured_image_missing', 'L’image principale n’est pas correctement associée au brouillon.' ); }
+		$facebook = absint( $artifacts['facebook_image']['attachment_id'] ?? 0 );
+		$key = isset( $mapping['facebook_meta'] ) ? $mapping['facebook_meta'] : '';
+		if ( $facebook && $key ) {
+			$stored = json_decode( (string) get_post_meta( $post_id, $key, true ), true );
+			if ( ! is_array( $stored ) || absint( $stored[0]['id'] ?? 0 ) !== $facebook ) { return new WP_Error( 'draft_facebook_meta_missing', 'La référence Facebook n’a pas été enregistrée correctement.' ); }
+		}
+		return true;
 	}
 
 	private static function sanitize_content( $content, $internal_links ) {
