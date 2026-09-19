@@ -9,6 +9,10 @@ final class MSRWA_REST {
 		register_rest_route( 'msrwa/v1', '/batches', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'create_batch' ) ) );
 		register_rest_route( 'msrwa/v1', '/batches/(?P<id>\d+)', array( 'methods' => 'GET', 'permission_callback' => array( __CLASS__, 'can_read' ), 'callback' => array( __CLASS__, 'get_batch' ) ) );
 		register_rest_route( 'msrwa/v1', '/jobs/(?P<id>\d+)/retry', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_read' ), 'callback' => array( __CLASS__, 'retry_job' ) ) );
+		register_rest_route( 'msrwa/v1', '/jobs/(?P<id>\d+)/cancel', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_read' ), 'callback' => array( __CLASS__, 'cancel_job' ) ) );
+		register_rest_route( 'msrwa/v1', '/batches/(?P<id>\d+)/pause', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_read' ), 'callback' => array( __CLASS__, 'pause_batch' ) ) );
+		register_rest_route( 'msrwa/v1', '/batches/(?P<id>\d+)/resume', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_read' ), 'callback' => array( __CLASS__, 'resume_batch' ) ) );
+		register_rest_route( 'msrwa/v1', '/batches/(?P<id>\d+)/cancel', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_read' ), 'callback' => array( __CLASS__, 'cancel_batch' ) ) );
 		register_rest_route( 'msrwa/v1', '/stats', array( 'methods' => 'GET', 'permission_callback' => array( __CLASS__, 'can_read' ), 'callback' => array( __CLASS__, 'stats' ) ) );
 		register_rest_route( 'msrwa/v1', '/events', array( 'methods' => 'GET', 'permission_callback' => array( __CLASS__, 'can_read' ), 'callback' => array( __CLASS__, 'events' ) ) );
 	}
@@ -49,10 +53,10 @@ final class MSRWA_REST {
 			if ( '' === $title ) { continue; }
 			$normalized = MSRWA_Recipe::normalize_input( $item );
 			$models = array();
-			$text_plan = MSRWA_Router::plan( 'text' );
-			if ( ! is_wp_error( $text_plan ) ) { $models['text'] = $text_plan; }
-			$image_plan = MSRWA_Router::plan( 'image_generation' );
-			if ( ! is_wp_error( $image_plan ) ) { $models['featured_image'] = $image_plan; }
+			foreach ( array( 'text' => array( 'capability' => 'text', 'stage' => 'text' ), 'search' => array( 'capability' => 'web_search', 'stage' => 'search' ), 'review' => array( 'capability' => 'text', 'stage' => 'review' ), 'vision' => array( 'capability' => 'vision', 'stage' => 'review' ), 'image' => array( 'capability' => 'image_generation', 'stage' => 'image' ) ) as $key => $route ) {
+				$plan = MSRWA_Router::plan( $route['capability'], $route['stage'] );
+				if ( ! is_wp_error( $plan ) ) { $models[ $key ] = $plan; }
+			}
 			$wpdb->insert( $t['jobs'], array( 'batch_id' => $batch_id, 'owner_id' => get_current_user_id(), 'title' => $title, 'input_json' => wp_json_encode( $normalized ), 'selected_models_json' => wp_json_encode( $models ), 'status' => 'queued', 'stage' => 'intake', 'created_at' => $now, 'updated_at' => $now ), array( '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s' ) );
 		}
 		MSRWA_DB::event( 'batch_created', $batch_id, 0, array( 'total' => count( $items ) ) );
@@ -66,7 +70,7 @@ final class MSRWA_REST {
 		$id = absint( $request['id'] );
 		$batch = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$t['batches']} WHERE id = %d", $id ), ARRAY_A );
 		if ( ! $batch || (int) $batch['owner_id'] !== get_current_user_id() && ! current_user_can( 'manage_options' ) ) { return new WP_Error( 'not_found', 'Lot introuvable.', array( 'status' => 404 ) ); }
-		$jobs = $wpdb->get_results( $wpdb->prepare( "SELECT id,title,status,stage,error_code,error_message,created_at,updated_at FROM {$t['jobs']} WHERE batch_id = %d ORDER BY id ASC", $id ), ARRAY_A );
+		$jobs = $wpdb->get_results( $wpdb->prepare( "SELECT id,title,status,stage,error_code,error_message,cost_estimate,draft_post_id,attempts,correction_cycles,created_at,updated_at FROM {$t['jobs']} WHERE batch_id = %d ORDER BY id ASC", $id ), ARRAY_A );
 		$batch['jobs'] = $jobs;
 		return rest_ensure_response( $batch );
 	}
@@ -77,11 +81,50 @@ final class MSRWA_REST {
 		$id = absint( $request['id'] );
 		$job = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$t['jobs']} WHERE id = %d", $id ) );
 		if ( ! $job || ( (int) $job->owner_id !== get_current_user_id() && ! current_user_can( 'msrwa_view_all' ) && ! current_user_can( 'manage_options' ) ) ) { return new WP_Error( 'not_found', 'Job introuvable.', array( 'status' => 404 ) ); }
-		if ( ! in_array( $job->status, array( 'failed', 'needs_review', 'awaiting_input', 'uncertain', 'paused_budget' ), true ) ) { return new WP_Error( 'job_not_retryable', 'Ce job n’est pas dans un état relançable.', array( 'status' => 409 ) ); }
+		if ( ! in_array( $job->status, array( 'failed', 'needs_review', 'awaiting_input', 'uncertain', 'paused_budget', 'paused' ), true ) ) { return new WP_Error( 'job_not_retryable', 'Ce job n’est pas dans un état relançable.', array( 'status' => 409 ) ); }
 		$wpdb->update( $t['jobs'], array( 'status' => 'queued', 'error_code' => null, 'error_message' => null, 'lock_token' => null, 'lock_until' => null, 'updated_at' => current_time( 'mysql', true ) ), array( 'id' => $id ), array( '%s', '%s', '%s', '%s', '%s', '%s' ), array( '%d' ) );
 		MSRWA_DB::event( 'job_retry_requested', $job->batch_id, $id, array( 'stage' => $job->stage ) );
 		MSRWA_Queue::schedule_job( $id );
 		return rest_ensure_response( array( 'id' => $id, 'status' => 'queued', 'stage' => $job->stage ) );
+	}
+
+	public static function cancel_job( WP_REST_Request $request ) {
+		global $wpdb;
+		$t = MSRWA_DB::tables();
+		$id = absint( $request['id'] );
+		$job = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$t['jobs']} WHERE id = %d", $id ) );
+		if ( ! $job || ( (int) $job->owner_id !== get_current_user_id() && ! current_user_can( 'msrwa_view_all' ) && ! current_user_can( 'manage_options' ) ) ) { return new WP_Error( 'not_found', 'Job introuvable.', array( 'status' => 404 ) ); }
+		if ( ! MSRWA_Queue::cancel_job( $id ) ) { return new WP_Error( 'job_not_cancelled', 'Ce job est déjà terminé ou annulé.', array( 'status' => 409 ) ); }
+		return rest_ensure_response( array( 'id' => $id, 'status' => 'cancelled' ) );
+	}
+
+	private static function owned_batch( $id ) {
+		global $wpdb;
+		$t = MSRWA_DB::tables();
+		$batch = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$t['batches']} WHERE id = %d", absint( $id ) ) );
+		if ( ! $batch || (int) $batch->owner_id !== get_current_user_id() && ! current_user_can( 'msrwa_view_all' ) && ! current_user_can( 'manage_options' ) ) { return new WP_Error( 'not_found', 'Lot introuvable.', array( 'status' => 404 ) ); }
+		return $batch;
+	}
+
+	public static function pause_batch( WP_REST_Request $request ) {
+		$batch = self::owned_batch( $request['id'] );
+		if ( is_wp_error( $batch ) ) { return $batch; }
+		if ( ! MSRWA_Queue::pause_batch( $batch->id ) ) { return new WP_Error( 'batch_not_paused', 'Ce lot est déjà terminé ou annulé.', array( 'status' => 409 ) ); }
+		return rest_ensure_response( array( 'id' => (int) $batch->id, 'status' => 'paused' ) );
+	}
+
+	public static function resume_batch( WP_REST_Request $request ) {
+		$batch = self::owned_batch( $request['id'] );
+		if ( is_wp_error( $batch ) ) { return $batch; }
+		if ( ! MSRWA_Queue::resume_batch( $batch->id ) ) { return new WP_Error( 'batch_not_resumed', 'Ce lot n’est pas en pause.', array( 'status' => 409 ) ); }
+		return rest_ensure_response( array( 'id' => (int) $batch->id, 'status' => 'queued' ) );
+	}
+
+	public static function cancel_batch( WP_REST_Request $request ) {
+		$batch = self::owned_batch( $request['id'] );
+		if ( is_wp_error( $batch ) ) { return $batch; }
+		if ( ! MSRWA_Queue::cancel_batch( $batch->id ) ) { return new WP_Error( 'batch_not_cancelled', 'Ce lot est déjà terminé ou annulé.', array( 'status' => 409 ) ); }
+		return rest_ensure_response( array( 'id' => (int) $batch->id, 'status' => 'cancelled' ) );
 	}
 
 	public static function stats( WP_REST_Request $request ) {

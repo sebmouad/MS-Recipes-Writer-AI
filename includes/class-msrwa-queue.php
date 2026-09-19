@@ -6,14 +6,75 @@ final class MSRWA_Queue {
 		global $wpdb;
 		$t = MSRWA_DB::tables();
 		$token = wp_generate_uuid4();
-		$updated = $wpdb->query( $wpdb->prepare( "UPDATE {$t['jobs']} SET lock_token = %s, lock_until = DATE_ADD(UTC_TIMESTAMP(), INTERVAL 10 MINUTE), status = 'running', attempts = attempts + 1, updated_at = %s WHERE id = %d AND status IN ('queued','retry_wait') AND (lock_until IS NULL OR lock_until < UTC_TIMESTAMP())", $token, current_time( 'mysql', true ), absint( $job_id ) ) );
+		if ( ! self::acquire_slot_lock() ) { return false; }
+		try {
+			$limit = max( 1, (int) MSRWA_Settings::get()['max_concurrency'] );
+			$active = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$t['jobs']} WHERE status = 'running' AND lock_until > UTC_TIMESTAMP()" );
+			if ( $active >= $limit ) { return false; }
+			$updated = $wpdb->query( $wpdb->prepare( "UPDATE {$t['jobs']} SET lock_token = %s, lock_until = DATE_ADD(UTC_TIMESTAMP(), INTERVAL 10 MINUTE), status = 'running', attempts = attempts + 1, updated_at = %s WHERE id = %d AND status IN ('queued','retry_wait') AND (lock_until IS NULL OR lock_until < UTC_TIMESTAMP())", $token, current_time( 'mysql', true ), absint( $job_id ) ) );
+		} finally {
+			self::release_slot_lock();
+		}
 		return $updated ? $token : false;
+	}
+
+	private static function slot_lock_name() { return 'msrwa_slots_' . ( function_exists( 'get_current_blog_id' ) ? absint( get_current_blog_id() ) : 1 ); }
+
+	private static function acquire_slot_lock() {
+		global $wpdb;
+		return '1' === (string) $wpdb->get_var( $wpdb->prepare( 'SELECT GET_LOCK(%s, 2)', self::slot_lock_name() ) );
+	}
+
+	private static function release_slot_lock() {
+		global $wpdb;
+		$wpdb->get_var( $wpdb->prepare( 'SELECT RELEASE_LOCK(%s)', self::slot_lock_name() ) );
 	}
 
 	public static function release_job( $job_id ) {
 		global $wpdb;
 		$t = MSRWA_DB::tables();
 		$wpdb->query( $wpdb->prepare( "UPDATE {$t['jobs']} SET lock_token = NULL, lock_until = NULL WHERE id = %d", absint( $job_id ) ) );
+	}
+
+	public static function cancel_job( $job_id ) {
+		global $wpdb;
+		$t = MSRWA_DB::tables();
+		$updated = $wpdb->query( $wpdb->prepare( "UPDATE {$t['jobs']} SET status = 'cancelled', error_code = 'cancelled_by_user', error_message = 'Traitement annulé par l’utilisateur.', lock_token = NULL, lock_until = NULL, updated_at = %s WHERE id = %d AND status NOT IN ('completed','cancelled')", current_time( 'mysql', true ), absint( $job_id ) ) );
+		if ( $updated ) {
+			$job = $wpdb->get_row( $wpdb->prepare( "SELECT batch_id FROM {$t['jobs']} WHERE id = %d", absint( $job_id ) ) );
+			if ( $job ) { self::refresh_batch( $job->batch_id ); MSRWA_DB::event( 'job_cancelled', $job->batch_id, $job_id ); }
+		}
+		return (bool) $updated;
+	}
+
+	public static function pause_batch( $batch_id ) {
+		global $wpdb;
+		$t = MSRWA_DB::tables();
+		$now = current_time( 'mysql', true );
+		$updated = $wpdb->query( $wpdb->prepare( "UPDATE {$t['batches']} SET status = 'paused', updated_at = %s WHERE id = %d AND status NOT IN ('completed','cancelled')", $now, absint( $batch_id ) ) );
+		$wpdb->query( $wpdb->prepare( "UPDATE {$t['jobs']} SET status = 'paused', lock_token = NULL, lock_until = NULL, updated_at = %s WHERE batch_id = %d AND status IN ('queued','retry_wait','running')", $now, absint( $batch_id ) ) );
+		if ( $updated ) { MSRWA_DB::event( 'batch_paused', $batch_id ); }
+		return (bool) $updated;
+	}
+
+	public static function resume_batch( $batch_id ) {
+		global $wpdb;
+		$t = MSRWA_DB::tables();
+		$now = current_time( 'mysql', true );
+		$updated = $wpdb->query( $wpdb->prepare( "UPDATE {$t['batches']} SET status = 'queued', updated_at = %s WHERE id = %d AND status = 'paused'", $now, absint( $batch_id ) ) );
+		$wpdb->query( $wpdb->prepare( "UPDATE {$t['jobs']} SET status = 'queued', error_code = NULL, error_message = NULL, updated_at = %s WHERE batch_id = %d AND status = 'paused'", $now, absint( $batch_id ) ) );
+		if ( $updated ) { MSRWA_DB::event( 'batch_resumed', $batch_id ); self::schedule_batch( $batch_id ); }
+		return (bool) $updated;
+	}
+
+	public static function cancel_batch( $batch_id ) {
+		global $wpdb;
+		$t = MSRWA_DB::tables();
+		$now = current_time( 'mysql', true );
+		$updated = $wpdb->query( $wpdb->prepare( "UPDATE {$t['batches']} SET status = 'cancelled', updated_at = %s WHERE id = %d AND status NOT IN ('completed','cancelled')", $now, absint( $batch_id ) ) );
+		$wpdb->query( $wpdb->prepare( "UPDATE {$t['jobs']} SET status = 'cancelled', error_code = 'cancelled_by_user', error_message = 'Lot annulé par l’utilisateur.', lock_token = NULL, lock_until = NULL, updated_at = %s WHERE batch_id = %d AND status NOT IN ('completed','cancelled')", $now, absint( $batch_id ) ) );
+		if ( $updated ) { MSRWA_DB::event( 'batch_cancelled', $batch_id ); }
+		return (bool) $updated;
 	}
 
 	public static function active_count() {

@@ -9,13 +9,15 @@ final class MSRWA_Router {
 		return ( defined( $constant ) && constant( $constant ) ) || ( getenv( $constant ) ?: ! empty( $s[ $provider . '_key' ] ) );
 	}
 
-	public static function plan( $capability = 'text' ) {
+	public static function plan( $capability = 'text', $stage = '' ) {
 		$s = MSRWA_Settings::get();
+		if ( '' === $stage ) {
+			$stage = 'image_generation' === $capability ? 'image' : ( 'web_search' === $capability ? 'search' : ( 'vision' === $capability ? 'review' : 'text' ) );
+		}
 		$eligible = MSRWA_Catalog::eligible( $capability );
 		$connected = array_filter( $eligible, function ( $model ) { return self::connected( $model['provider'] ); } );
 		if ( empty( $connected ) ) { return new WP_Error( 'no_provider_available', 'Aucun fournisseur connecté possède un modèle compatible.', array( 'status' => 400 ) ); }
 		if ( 'manual' === $s['mode'] ) {
-			$stage = 'image_generation' === $capability ? 'image' : ( 'web_search' === $capability ? 'search' : ( 'vision' === $capability ? 'review' : 'text' ) );
 			$manual_id = isset( $s['manual_models'][ $stage ] ) ? $s['manual_models'][ $stage ] : '';
 			foreach ( $connected as $candidate ) {
 				if ( $candidate['provider'] . ':' . $candidate['id'] === $manual_id ) { return self::result( $candidate, 'manual', 'Modèle imposé par les réglages administrateur pour l’étape ' . $stage . '.' ); }

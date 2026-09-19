@@ -4,14 +4,14 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
 final class MSRWA_Images {
 	public static function featured( $job, $artifacts ) {
 		$settings = MSRWA_Settings::get();
-		$plan = self::image_plan( 'featured_image' );
+		$plan = self::image_plan( 'featured_image', $job );
 		if ( is_wp_error( $plan ) ) { return $plan; }
 		$budget = MSRWA_DB::budget_allows( $job, (float) $settings['image_reserve_usd'] );
 		if ( is_wp_error( $budget ) ) { return $budget; }
 		$canonical = isset( $artifacts['canonical'] ) ? $artifacts['canonical'] : array();
 		$prompt = $settings['prompt_image'] . '\nRECETTE VALIDÉE : ' . wp_json_encode( $canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
 		$result = 'openai' === $plan['provider'] ? MSRWA_OpenAI::images_generate( $prompt, $plan['model'], '1024x1024', 'low', 'webp' ) : MSRWA_Providers::image( $plan['provider'], $plan['model'], $prompt, '1024x1024' );
-		self::record_call( $job, 'featured_image', $plan['model'], $prompt, $result );
+		self::record_call( $job, 'featured_image', $plan['provider'], $plan['model'], $prompt, $result, true );
 		if ( is_wp_error( $result ) ) { return $result; }
 		$attachment_id = self::store_base64( $result['base64'], $job->title, 'Image principale générée', $result['format'] );
 		if ( is_wp_error( $attachment_id ) ) { return $attachment_id; }
@@ -20,22 +20,21 @@ final class MSRWA_Images {
 
 	public static function facebook( $job, $artifacts ) {
 		$settings = MSRWA_Settings::get();
-		$plan = self::image_plan( 'facebook_image' );
+		$plan = self::image_plan( 'facebook_image', $job );
 		if ( is_wp_error( $plan ) ) { return $plan; }
 		$budget = MSRWA_DB::budget_allows( $job, (float) $settings['image_reserve_usd'] );
 		if ( is_wp_error( $budget ) ) { return $budget; }
 		$featured_id = isset( $artifacts['featured_image']['attachment_id'] ) ? absint( $artifacts['featured_image']['attachment_id'] ) : 0;
 		$featured_file = $featured_id ? get_attached_file( $featured_id ) : '';
-		if ( 'openai' !== $plan['provider'] ) { return new WP_Error( 'image_edit_provider_pending', 'La variante Facebook avec référence nécessite encore l’adaptateur d’édition de ce fournisseur.', array( 'status' => 409 ) ); }
 		$settings = MSRWA_Settings::get();
 		$canonical = isset( $artifacts['canonical'] ) ? $artifacts['canonical'] : array();
 		$prompt = $settings['prompt_facebook_image'] . '\nRECETTE VALIDÉE : ' . wp_json_encode( $canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
 		if ( $featured_file && file_exists( $featured_file ) ) {
-			$result = MSRWA_OpenAI::images_edit( $featured_file, $prompt, $plan['model'], '1024x1536', 'low', 'webp' );
+			$result = 'openai' === $plan['provider'] ? MSRWA_OpenAI::images_edit( $featured_file, $prompt, $plan['model'], '1024x1536', 'low', 'webp' ) : MSRWA_Providers::image_edit( $plan['provider'], $plan['model'], $featured_file, $prompt, '1024x1536' );
 		} else {
-			$result = MSRWA_OpenAI::images_generate( $prompt, $plan['model'], '1024x1536', 'low', 'webp' );
+			$result = 'openai' === $plan['provider'] ? MSRWA_OpenAI::images_generate( $prompt, $plan['model'], '1024x1536', 'low', 'webp' ) : MSRWA_Providers::image( $plan['provider'], $plan['model'], $prompt, '1024x1536' );
 		}
-		self::record_call( $job, 'facebook_image', $plan['model'], $prompt, $result );
+		self::record_call( $job, 'facebook_image', $plan['provider'], $plan['model'], $prompt, $result, true );
 		if ( is_wp_error( $result ) ) { return $result; }
 		$attachment_id = self::store_base64( $result['base64'], $job->title . ' Facebook', 'Variante Facebook générée', $result['format'] );
 		if ( is_wp_error( $attachment_id ) ) { return $attachment_id; }
@@ -54,41 +53,61 @@ final class MSRWA_Images {
 
 	public static function review( $job, $image, $canonical ) {
 		$settings = MSRWA_Settings::get();
-		$plan = MSRWA_Router::plan( 'vision' );
-		if ( is_wp_error( $plan ) || 'openai' !== $plan['provider'] ) { return new WP_Error( 'image_review_pending', 'Aucun adaptateur de vision compatible n’est connecté.' ); }
+		$plan = self::vision_plan( $job );
+		if ( is_wp_error( $plan ) ) { return $plan; }
 		$file = get_attached_file( absint( $image['attachment_id'] ?? 0 ) );
 		$budget = MSRWA_DB::budget_allows( $job, 0.05 );
 		if ( is_wp_error( $budget ) ) { return $budget; }
 		$prompt = $settings['prompt_image_review'] . '\nRECETTE VALIDÉE : ' . wp_json_encode( $canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
-		$result = MSRWA_OpenAI::vision_text( $prompt, $file, $plan['model'], 1000 );
-		self::record_call( $job, 'image_review', $plan['model'], $prompt, $result );
+		$result = MSRWA_Providers::vision_text( $plan['provider'], $plan['model'], $prompt, $file, 1000 );
+		self::record_call( $job, 'image_review', $plan['provider'], $plan['model'], $prompt, $result, false );
 		if ( is_wp_error( $result ) ) { return $result; }
 		$json = json_decode( trim( (string) $result['text'] ), true );
 		if ( ! is_array( $json ) ) { $start = strpos( $result['text'], '{' ); $end = strrpos( $result['text'], '}' ); if ( false !== $start && false !== $end ) { $json = json_decode( substr( $result['text'], $start, $end - $start + 1 ), true ); } }
 		return is_array( $json ) ? $json : new WP_Error( 'image_review_invalid', 'La relecture vision n’a pas retourné un JSON valide.' );
 	}
 
-	private static function image_plan( $stage ) {
-		$plan = MSRWA_Router::plan( 'image_generation' );
+	private static function image_plan( $stage, $job = null ) {
+		$plan = self::selected_plan( $job, 'image_generation', 'image' );
 		if ( is_wp_error( $plan ) ) { return $plan; }
-		MSRWA_DB::event( 'image_model_selected', 0, 0, array( 'stage' => $stage, 'provider' => $plan['provider'], 'model' => $plan['model'] ) );
+		MSRWA_DB::event( 'image_model_selected', $job ? $job->batch_id : 0, $job ? $job->id : 0, array( 'stage' => $stage, 'provider' => $plan['provider'], 'model' => $plan['model'] ) );
 		return $plan;
 	}
 
-	private static function record_call( $job, $operation, $model, $prompt, $result ) {
+	private static function vision_plan( $job ) {
+		return self::selected_plan( $job, 'vision', 'vision' );
+	}
+
+	private static function selected_plan( $job, $capability, $stage ) {
+		$selected = $job ? json_decode( (string) $job->selected_models_json, true ) : array();
+		if ( is_array( $selected ) && ! empty( $selected[ $stage ] ) && is_array( $selected[ $stage ] ) ) {
+			$provider = sanitize_key( isset( $selected[ $stage ]['provider'] ) ? $selected[ $stage ]['provider'] : '' );
+			$model = sanitize_text_field( isset( $selected[ $stage ]['model'] ) ? $selected[ $stage ]['model'] : '' );
+			$eligible = MSRWA_Catalog::eligible( $capability );
+			if ( $provider && $model && isset( $eligible[ $provider . ':' . $model ] ) && MSRWA_Router::connected( $provider ) ) { return $selected[ $stage ]; }
+			return new WP_Error( 'selected_model_unavailable', 'Le modèle enregistré pour cette étape n’est plus disponible ou compatible.', array( 'status' => 409 ) );
+		}
+		return MSRWA_Router::plan( $capability, $stage );
+	}
+
+	private static function record_call( $job, $operation, $provider, $model, $prompt, $result, $uncertain = false ) {
 		$settings = MSRWA_Settings::get();
+		$catalog = MSRWA_Catalog::models();
+		$input_tokens = is_array( $result ) && ! empty( $result['usage']['input_tokens'] ) ? absint( $result['usage']['input_tokens'] ) : 0;
+		$output_tokens = is_array( $result ) && ! empty( $result['usage']['output_tokens'] ) ? absint( $result['usage']['output_tokens'] ) : 0;
+		$cost = $uncertain ? (float) $settings['image_reserve_usd'] : ( ( isset( $catalog[ $provider ][ $model ] ) ? ( $input_tokens * (float) $catalog[ $provider ][ $model ]['input'] + $output_tokens * (float) $catalog[ $provider ][ $model ]['output'] ) / 1000000 : 0.05 ) );
 		MSRWA_DB::call( array(
 			'batch_id' => absint( $job->batch_id ),
 			'job_id' => absint( $job->id ),
-			'provider' => 'openai',
+			'provider' => $provider,
 			'model' => $model,
 			'operation' => $operation,
 			'status' => is_wp_error( $result ) ? 'failed' : 'completed',
 			'request_id' => '',
-			'input_tokens' => is_array( $result ) && ! empty( $result['usage']['input_tokens'] ) ? absint( $result['usage']['input_tokens'] ) : 0,
-			'output_tokens' => is_array( $result ) && ! empty( $result['usage']['output_tokens'] ) ? absint( $result['usage']['output_tokens'] ) : 0,
-			'cost_estimate' => (float) $settings['image_reserve_usd'],
-			'uncertain' => 1,
+			'input_tokens' => $input_tokens,
+			'output_tokens' => $output_tokens,
+			'cost_estimate' => $cost,
+			'uncertain' => $uncertain ? 1 : 0,
 			'error_code' => is_wp_error( $result ) ? $result->get_error_code() : '',
 			'payload_hash' => hash( 'sha256', (string) $prompt ),
 			'started_at' => current_time( 'mysql', true ),

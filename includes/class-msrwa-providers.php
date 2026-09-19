@@ -23,6 +23,32 @@ final class MSRWA_Providers {
 		return new WP_Error( 'gemini_image_empty', 'Gemini n’a retourné aucune image.', array( 'status' => 502 ) );
 	}
 
+	public static function image_edit( $provider, $model, $reference_path, $prompt, $size = '1024x1536' ) {
+		if ( 'gemini' !== $provider ) { return new WP_Error( 'image_edit_provider_pending', 'L’édition image n’est pas disponible pour ce fournisseur.', array( 'status' => 409 ) ); }
+		if ( ! is_readable( $reference_path ) || filesize( $reference_path ) > 10 * 1024 * 1024 ) { return new WP_Error( 'image_reference_invalid', 'L’image de référence est absente ou dépasse la limite.', array( 'status' => 400 ) ); }
+		$mime = function_exists( 'mime_content_type' ) ? mime_content_type( $reference_path ) : 'image/jpeg';
+		if ( 0 !== strpos( (string) $mime, 'image/' ) ) { return new WP_Error( 'image_reference_mime_invalid', 'Le fichier de référence n’est pas une image.', array( 'status' => 400 ) ); }
+		$binary = file_get_contents( $reference_path );
+		if ( false === $binary ) { return new WP_Error( 'image_reference_read_failed', 'Impossible de lire l’image de référence.', array( 'status' => 400 ) ); }
+		$settings = MSRWA_Settings::get();
+		$key = defined( 'MSRWA_GEMINI_KEY' ) && MSRWA_GEMINI_KEY ? MSRWA_GEMINI_KEY : ( getenv( 'MSRWA_GEMINI_KEY' ) ?: $settings['gemini_key'] );
+		if ( ! $key ) { return new WP_Error( 'missing_gemini_key', 'Aucune clé Gemini côté serveur.', array( 'status' => 400 ) ); }
+		$payload = array( 'contents' => array( array( 'role' => 'user', 'parts' => array( array( 'inlineData' => array( 'mimeType' => $mime, 'data' => base64_encode( $binary ) ) ), array( 'text' => sanitize_textarea_field( $prompt ) ) ) ) ), 'generationConfig' => array( 'responseModalities' => array( 'IMAGE' ) ) );
+		$url = 'https://generativelanguage.googleapis.com/v1beta/models/' . rawurlencode( $model ) . ':generateContent?key=' . rawurlencode( $key );
+		$response = wp_remote_post( $url, array( 'timeout' => 120, 'sslverify' => true, 'headers' => array( 'Content-Type' => 'application/json' ), 'body' => wp_json_encode( $payload ) ) );
+		if ( is_wp_error( $response ) ) { return new WP_Error( 'gemini_image_edit_network', $response->get_error_message(), array( 'status' => 502 ) ); }
+		$code = wp_remote_retrieve_response_code( $response );
+		$body = json_decode( wp_remote_retrieve_body( $response ), true );
+		if ( $code < 200 || $code >= 300 ) { return new WP_Error( 'gemini_image_edit_api_' . $code, isset( $body['error']['message'] ) ? sanitize_text_field( $body['error']['message'] ) : 'Réponse édition image Gemini invalide.', array( 'status' => $code ) ); }
+		foreach ( (array) ( $body['candidates'][0]['content']['parts'] ?? array() ) as $part ) {
+			if ( ! empty( $part['inlineData']['data'] ) ) {
+				$format = isset( $part['inlineData']['mimeType'] ) && 'image/png' === $part['inlineData']['mimeType'] ? 'png' : 'webp';
+				return array( 'model' => $model, 'format' => $format, 'base64' => (string) $part['inlineData']['data'], 'created' => time() );
+			}
+		}
+		return new WP_Error( 'gemini_image_edit_empty', 'Gemini n’a retourné aucune variante image.', array( 'status' => 502 ) );
+	}
+
 	public static function connection_test( $provider ) {
 		if ( 'openai' === $provider ) { return MSRWA_OpenAI::connection_test(); }
 		$settings = MSRWA_Settings::get();
@@ -44,6 +70,18 @@ final class MSRWA_Providers {
 			return self::claude( $model, $input, $max_tokens );
 		}
 		return new WP_Error( 'provider_unknown', 'Fournisseur non pris en charge.', array( 'status' => 400 ) );
+	}
+
+	public static function vision_text( $provider, $model, $prompt, $image_path, $max_tokens = 1000 ) {
+		if ( ! is_readable( $image_path ) || filesize( $image_path ) > 10 * 1024 * 1024 ) { return new WP_Error( 'vision_input_invalid', 'L’image de vision est absente ou dépasse la limite.', array( 'status' => 400 ) ); }
+		$mime = function_exists( 'mime_content_type' ) ? mime_content_type( $image_path ) : 'image/jpeg';
+		if ( 0 !== strpos( (string) $mime, 'image/' ) ) { return new WP_Error( 'vision_mime_invalid', 'Le fichier de vision n’est pas une image.', array( 'status' => 400 ) ); }
+		$binary = file_get_contents( $image_path );
+		if ( false === $binary ) { return new WP_Error( 'vision_read_failed', 'Impossible de lire l’image de vision.', array( 'status' => 400 ) ); }
+		$encoded = base64_encode( $binary );
+		if ( 'gemini' === $provider ) { return self::gemini_vision( $model, $prompt, $mime, $encoded, $max_tokens ); }
+		if ( 'claude' === $provider ) { return self::claude_vision( $model, $prompt, $mime, $encoded, $max_tokens ); }
+		return MSRWA_OpenAI::vision_text( $prompt, $image_path, $model, $max_tokens );
 	}
 
 	private static function gemini( $model, $input, $max_tokens, $search ) {
@@ -69,6 +107,23 @@ final class MSRWA_Providers {
 		return array( 'id' => '', 'text' => $text, 'sources' => array(), 'usage' => isset( $body['usageMetadata'] ) ? array( 'input_tokens' => absint( $body['usageMetadata']['promptTokenCount'] ?? 0 ), 'output_tokens' => absint( $body['usageMetadata']['candidatesTokenCount'] ?? 0 ) ) : array(), 'model' => $model );
 	}
 
+	private static function gemini_vision( $model, $prompt, $mime, $encoded, $max_tokens ) {
+		$settings = MSRWA_Settings::get();
+		$key = defined( 'MSRWA_GEMINI_KEY' ) && MSRWA_GEMINI_KEY ? MSRWA_GEMINI_KEY : ( getenv( 'MSRWA_GEMINI_KEY' ) ?: $settings['gemini_key'] );
+		if ( ! $key ) { return new WP_Error( 'missing_gemini_key', 'Aucune clé Gemini côté serveur.', array( 'status' => 400 ) ); }
+		$payload = array( 'contents' => array( array( 'role' => 'user', 'parts' => array( array( 'text' => sanitize_textarea_field( $prompt ) ), array( 'inlineData' => array( 'mimeType' => $mime, 'data' => $encoded ) ) ) ) ), 'generationConfig' => array( 'maxOutputTokens' => max( 16, absint( $max_tokens ) ), 'responseMimeType' => 'application/json' ) );
+		$url = 'https://generativelanguage.googleapis.com/v1beta/models/' . rawurlencode( $model ) . ':generateContent?key=' . rawurlencode( $key );
+		$response = wp_remote_post( $url, array( 'timeout' => 60, 'sslverify' => true, 'headers' => array( 'Content-Type' => 'application/json' ), 'body' => wp_json_encode( $payload ) ) );
+		if ( is_wp_error( $response ) ) { return new WP_Error( 'gemini_vision_network', $response->get_error_message(), array( 'status' => 502 ) ); }
+		$code = wp_remote_retrieve_response_code( $response );
+		$body = json_decode( wp_remote_retrieve_body( $response ), true );
+		if ( $code < 200 || $code >= 300 ) { return new WP_Error( 'gemini_vision_api_' . $code, isset( $body['error']['message'] ) ? sanitize_text_field( $body['error']['message'] ) : 'Réponse Gemini vision invalide.', array( 'status' => $code ) ); }
+		$text = '';
+		foreach ( (array) ( $body['candidates'][0]['content']['parts'] ?? array() ) as $part ) { if ( isset( $part['text'] ) ) { $text .= (string) $part['text']; } }
+		if ( '' === trim( $text ) ) { return new WP_Error( 'gemini_vision_empty', 'Gemini vision n’a retourné aucun texte.', array( 'status' => 502 ) ); }
+		return array( 'id' => '', 'text' => $text, 'sources' => array(), 'usage' => isset( $body['usageMetadata'] ) ? array( 'input_tokens' => absint( $body['usageMetadata']['promptTokenCount'] ?? 0 ), 'output_tokens' => absint( $body['usageMetadata']['candidatesTokenCount'] ?? 0 ) ) : array(), 'model' => $model );
+	}
+
 	private static function claude( $model, $input, $max_tokens ) {
 		$settings = MSRWA_Settings::get();
 		$key = defined( 'MSRWA_CLAUDE_KEY' ) && MSRWA_CLAUDE_KEY ? MSRWA_CLAUDE_KEY : ( getenv( 'MSRWA_CLAUDE_KEY' ) ?: $settings['claude_key'] );
@@ -86,6 +141,22 @@ final class MSRWA_Providers {
 		$text = '';
 		foreach ( (array) ( $body['content'] ?? array() ) as $part ) { if ( isset( $part['text'] ) ) { $text .= (string) $part['text']; } }
 		if ( '' === trim( $text ) ) { return new WP_Error( 'claude_empty', 'Claude n’a retourné aucun texte.', array( 'status' => 502 ) ); }
+		return array( 'id' => isset( $body['id'] ) ? sanitize_text_field( $body['id'] ) : '', 'text' => $text, 'sources' => array(), 'usage' => isset( $body['usage'] ) ? array( 'input_tokens' => absint( $body['usage']['input_tokens'] ?? 0 ), 'output_tokens' => absint( $body['usage']['output_tokens'] ?? 0 ) ) : array(), 'model' => $model );
+	}
+
+	private static function claude_vision( $model, $prompt, $mime, $encoded, $max_tokens ) {
+		$settings = MSRWA_Settings::get();
+		$key = defined( 'MSRWA_CLAUDE_KEY' ) && MSRWA_CLAUDE_KEY ? MSRWA_CLAUDE_KEY : ( getenv( 'MSRWA_CLAUDE_KEY' ) ?: $settings['claude_key'] );
+		if ( ! $key ) { return new WP_Error( 'missing_claude_key', 'Aucune clé Claude côté serveur.', array( 'status' => 400 ) ); }
+		$payload = array( 'model' => $model, 'max_tokens' => max( 16, absint( $max_tokens ) ), 'messages' => array( array( 'role' => 'user', 'content' => array( array( 'type' => 'image', 'source' => array( 'type' => 'base64', 'media_type' => $mime, 'data' => $encoded ) ), array( 'type' => 'text', 'text' => sanitize_textarea_field( $prompt ) ) ) ) ) );
+		$response = wp_remote_post( 'https://api.anthropic.com/v1/messages', array( 'timeout' => 60, 'sslverify' => true, 'headers' => array( 'Content-Type' => 'application/json', 'x-api-key' => $key, 'anthropic-version' => '2023-06-01' ), 'body' => wp_json_encode( $payload ) ) );
+		if ( is_wp_error( $response ) ) { return new WP_Error( 'claude_vision_network', $response->get_error_message(), array( 'status' => 502 ) ); }
+		$code = wp_remote_retrieve_response_code( $response );
+		$body = json_decode( wp_remote_retrieve_body( $response ), true );
+		if ( $code < 200 || $code >= 300 ) { return new WP_Error( 'claude_vision_api_' . $code, isset( $body['error']['message'] ) ? sanitize_text_field( $body['error']['message'] ) : 'Réponse Claude vision invalide.', array( 'status' => $code ) ); }
+		$text = '';
+		foreach ( (array) ( $body['content'] ?? array() ) as $part ) { if ( isset( $part['text'] ) ) { $text .= (string) $part['text']; } }
+		if ( '' === trim( $text ) ) { return new WP_Error( 'claude_vision_empty', 'Claude vision n’a retourné aucun texte.', array( 'status' => 502 ) ); }
 		return array( 'id' => isset( $body['id'] ) ? sanitize_text_field( $body['id'] ) : '', 'text' => $text, 'sources' => array(), 'usage' => isset( $body['usage'] ) ? array( 'input_tokens' => absint( $body['usage']['input_tokens'] ?? 0 ), 'output_tokens' => absint( $body['usage']['output_tokens'] ?? 0 ) ) : array(), 'model' => $model );
 	}
 }
