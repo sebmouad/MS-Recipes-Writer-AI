@@ -2,6 +2,7 @@
   'use strict';
   var button = document.getElementById('msrwa-create');
   var testButtons = document.querySelectorAll('.msrwa-test-provider');
+  var batchButtons = document.querySelectorAll('.msrwa-batch-action');
   if (typeof MSRWA === 'undefined') return;
   if (button) button.addEventListener('click', function () {
     var lines = (document.getElementById('msrwa-titles').value || '').split(/\r?\n/).map(function (v) { return v.trim(); }).filter(Boolean);
@@ -26,5 +27,19 @@
       .then(function (data) { status.textContent = provider + ' OK — ' + data.model + ' — ' + (data.usage && (data.usage.total_tokens || data.usage.input_tokens) ? (data.usage.total_tokens || data.usage.input_tokens) + ' tokens' : 'usage indisponible'); })
       .catch(function (error) { status.textContent = error.message; })
       .finally(function () { testButton.disabled = false; });
+  }); });
+  Array.prototype.forEach.call(batchButtons, function (actionButton) { actionButton.addEventListener('click', function () {
+    var batchId = actionButton.getAttribute('data-batch-id');
+    var action = actionButton.getAttribute('data-action');
+    var row = actionButton.closest('tr');
+    var status = row ? row.querySelector('.msrwa-batch-status') : null;
+    if (!batchId || !action) return;
+    if ('cancel' === action && !window.confirm('Annuler ce lot ? Les appels déjà acceptés par un fournisseur peuvent rester facturés.')) return;
+    actionButton.disabled = true;
+    fetch(MSRWA.api + '/batches/' + encodeURIComponent(batchId) + '/' + encodeURIComponent(action), { method: 'POST', headers: { 'X-WP-Nonce': MSRWA.nonce } })
+      .then(function (response) { return response.json().then(function (data) { if (!response.ok) throw new Error(data.message || 'Action impossible'); return data; }); })
+      .then(function (data) { if (status) status.textContent = data.status || action; })
+      .catch(function (error) { window.alert(error.message); })
+      .finally(function () { actionButton.disabled = false; });
   }); });
 }());
