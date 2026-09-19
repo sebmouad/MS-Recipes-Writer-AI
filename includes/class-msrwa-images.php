@@ -8,13 +8,12 @@ final class MSRWA_Images {
 		if ( is_wp_error( $plan ) ) { return $plan; }
 		$budget = MSRWA_DB::budget_allows( $job, (float) $settings['image_reserve_usd'] );
 		if ( is_wp_error( $budget ) ) { return $budget; }
-		if ( 'openai' !== $plan['provider'] ) { return new WP_Error( 'image_provider_pending', 'Cet adaptateur image fournisseur n’est pas encore disponible.', array( 'status' => 409 ) ); }
 		$canonical = isset( $artifacts['canonical'] ) ? $artifacts['canonical'] : array();
 		$prompt = $settings['prompt_image'] . '\nRECETTE VALIDÉE : ' . wp_json_encode( $canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
-		$result = MSRWA_OpenAI::images_generate( $prompt, $plan['model'], '1024x1024', 'low', 'webp' );
+		$result = 'openai' === $plan['provider'] ? MSRWA_OpenAI::images_generate( $prompt, $plan['model'], '1024x1024', 'low', 'webp' ) : MSRWA_Providers::image( $plan['provider'], $plan['model'], $prompt, '1024x1024' );
 		self::record_call( $job, 'featured_image', $plan['model'], $prompt, $result );
 		if ( is_wp_error( $result ) ) { return $result; }
-		$attachment_id = self::store_base64( $result['base64'], $job->title, 'Image principale générée' );
+		$attachment_id = self::store_base64( $result['base64'], $job->title, 'Image principale générée', $result['format'] );
 		if ( is_wp_error( $attachment_id ) ) { return $attachment_id; }
 		return array( 'attachment_id' => $attachment_id, 'model' => $plan['model'], 'ratio' => $settings['featured_ratio'], 'format' => $result['format'] );
 	}
@@ -27,7 +26,7 @@ final class MSRWA_Images {
 		if ( is_wp_error( $budget ) ) { return $budget; }
 		$featured_id = isset( $artifacts['featured_image']['attachment_id'] ) ? absint( $artifacts['featured_image']['attachment_id'] ) : 0;
 		$featured_file = $featured_id ? get_attached_file( $featured_id ) : '';
-		if ( 'openai' !== $plan['provider'] ) { return new WP_Error( 'image_provider_pending', 'Cet adaptateur image fournisseur n’est pas encore disponible.', array( 'status' => 409 ) ); }
+		if ( 'openai' !== $plan['provider'] ) { return new WP_Error( 'image_edit_provider_pending', 'La variante Facebook avec référence nécessite encore l’adaptateur d’édition de ce fournisseur.', array( 'status' => 409 ) ); }
 		$settings = MSRWA_Settings::get();
 		$canonical = isset( $artifacts['canonical'] ) ? $artifacts['canonical'] : array();
 		$prompt = $settings['prompt_facebook_image'] . '\nRECETTE VALIDÉE : ' . wp_json_encode( $canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
@@ -38,7 +37,7 @@ final class MSRWA_Images {
 		}
 		self::record_call( $job, 'facebook_image', $plan['model'], $prompt, $result );
 		if ( is_wp_error( $result ) ) { return $result; }
-		$attachment_id = self::store_base64( $result['base64'], $job->title . ' Facebook', 'Variante Facebook générée' );
+		$attachment_id = self::store_base64( $result['base64'], $job->title . ' Facebook', 'Variante Facebook générée', $result['format'] );
 		if ( is_wp_error( $attachment_id ) ) { return $attachment_id; }
 		$attachment_id = self::crop_ratio( $attachment_id, $settings['facebook_ratio'] );
 		if ( is_wp_error( $attachment_id ) ) { return $attachment_id; }
@@ -97,15 +96,17 @@ final class MSRWA_Images {
 		) );
 	}
 
-	private static function store_base64( $base64, $title, $caption ) {
+	private static function store_base64( $base64, $title, $caption, $format = 'webp' ) {
 		$binary = base64_decode( (string) $base64, true );
 		if ( false === $binary || strlen( $binary ) < 128 || strlen( $binary ) > 25 * 1024 * 1024 ) { return new WP_Error( 'image_payload_invalid', 'Le fichier image généré est invalide ou dépasse la limite.' ); }
-		$tmp = wp_tempnam( sanitize_file_name( $title ) . '.webp' );
+		$format = in_array( $format, array( 'png', 'jpeg', 'webp' ), true ) ? $format : 'webp';
+		$mime = 'png' === $format ? 'image/png' : ( 'jpeg' === $format ? 'image/jpeg' : 'image/webp' );
+		$tmp = wp_tempnam( sanitize_file_name( $title ) . '.' . $format );
 		if ( ! $tmp || false === file_put_contents( $tmp, $binary ) ) { return new WP_Error( 'image_temp_failed', 'Impossible de stocker temporairement l’image générée.' ); }
 		require_once ABSPATH . 'wp-admin/includes/file.php';
 		require_once ABSPATH . 'wp-admin/includes/media.php';
 		require_once ABSPATH . 'wp-admin/includes/image.php';
-		$file = array( 'name' => sanitize_file_name( $title ) . '.webp', 'tmp_name' => $tmp, 'error' => 0, 'size' => strlen( $binary ), 'type' => 'image/webp' );
+		$file = array( 'name' => sanitize_file_name( $title ) . '.' . $format, 'tmp_name' => $tmp, 'error' => 0, 'size' => strlen( $binary ), 'type' => $mime );
 		$id = media_handle_sideload( $file, 0, $caption, array( 'post_status' => 'inherit' ) );
 		if ( is_wp_error( $id ) ) { @unlink( $tmp ); return $id; }
 		wp_update_post( array( 'ID' => $id, 'post_title' => sanitize_text_field( $title ), 'post_excerpt' => sanitize_text_field( $caption ) ) );

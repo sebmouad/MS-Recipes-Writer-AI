@@ -2,6 +2,27 @@
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
 final class MSRWA_Providers {
+	public static function image( $provider, $model, $prompt, $size = '1024x1024' ) {
+		if ( 'gemini' !== $provider ) { return new WP_Error( 'image_provider_pending', 'La génération image de ce fournisseur n’est pas disponible.', array( 'status' => 409 ) ); }
+		$settings = MSRWA_Settings::get();
+		$key = defined( 'MSRWA_GEMINI_KEY' ) && MSRWA_GEMINI_KEY ? MSRWA_GEMINI_KEY : ( getenv( 'MSRWA_GEMINI_KEY' ) ?: $settings['gemini_key'] );
+		if ( ! $key ) { return new WP_Error( 'missing_gemini_key', 'Aucune clé Gemini côté serveur.', array( 'status' => 400 ) ); }
+		$payload = array( 'contents' => array( array( 'role' => 'user', 'parts' => array( array( 'text' => sanitize_textarea_field( $prompt ) ) ) ) ), 'generationConfig' => array( 'responseModalities' => array( 'IMAGE' ) ) );
+		$url = 'https://generativelanguage.googleapis.com/v1beta/models/' . rawurlencode( $model ) . ':generateContent?key=' . rawurlencode( $key );
+		$response = wp_remote_post( $url, array( 'timeout' => 120, 'sslverify' => true, 'headers' => array( 'Content-Type' => 'application/json' ), 'body' => wp_json_encode( $payload ) ) );
+		if ( is_wp_error( $response ) ) { return new WP_Error( 'gemini_image_network', $response->get_error_message(), array( 'status' => 502 ) ); }
+		$code = wp_remote_retrieve_response_code( $response );
+		$body = json_decode( wp_remote_retrieve_body( $response ), true );
+		if ( $code < 200 || $code >= 300 ) { return new WP_Error( 'gemini_image_api_' . $code, isset( $body['error']['message'] ) ? sanitize_text_field( $body['error']['message'] ) : 'Réponse image Gemini invalide.', array( 'status' => $code ) ); }
+		foreach ( (array) ( $body['candidates'][0]['content']['parts'] ?? array() ) as $part ) {
+			if ( ! empty( $part['inlineData']['data'] ) ) {
+				$mime = isset( $part['inlineData']['mimeType'] ) ? $part['inlineData']['mimeType'] : 'image/png';
+				return array( 'model' => $model, 'format' => 'image/png' === $mime ? 'png' : 'webp', 'base64' => (string) $part['inlineData']['data'], 'created' => time() );
+			}
+		}
+		return new WP_Error( 'gemini_image_empty', 'Gemini n’a retourné aucune image.', array( 'status' => 502 ) );
+	}
+
 	public static function connection_test( $provider ) {
 		if ( 'openai' === $provider ) { return MSRWA_OpenAI::connection_test(); }
 		$settings = MSRWA_Settings::get();
