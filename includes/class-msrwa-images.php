@@ -10,10 +10,15 @@ final class MSRWA_Images {
 		if ( is_wp_error( $reservation ) ) { return $reservation; }
 		$canonical = isset( $artifacts['canonical'] ) ? $artifacts['canonical'] : array();
 		$prompt = $settings['prompt_image'] . '\nRECETTE VALIDÉE : ' . wp_json_encode( $canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . self::visual_context( $artifacts );
-		$result = 'openai' === $plan['provider'] ? MSRWA_OpenAI::images_generate( $prompt, $plan['model'], '1024x1024', 'low', 'webp' ) : MSRWA_Providers::image( $plan['provider'], $plan['model'], $prompt, '1024x1024' );
+		$size = self::native_size( $settings['featured_ratio'], '1024x1024' );
+		$quality = self::quality( $settings );
+		$format = self::format( $settings );
+		$result = 'openai' === $plan['provider'] ? MSRWA_OpenAI::images_generate( $prompt, $plan['model'], $size, $quality, $format ) : MSRWA_Providers::image( $plan['provider'], $plan['model'], $prompt, $size );
 		self::record_call( $job, 'featured_image', $plan['provider'], $plan['model'], $prompt, $result, true, $reservation );
 		if ( is_wp_error( $result ) ) { return $result; }
 		$attachment_id = self::store_base64( $result['base64'], $job->title, 'Image principale générée', $result['format'] );
+		if ( is_wp_error( $attachment_id ) ) { return $attachment_id; }
+		$attachment_id = self::crop_ratio( $attachment_id, $settings['featured_ratio'], $format );
 		if ( is_wp_error( $attachment_id ) ) { return $attachment_id; }
 		return array( 'attachment_id' => $attachment_id, 'model' => $plan['model'], 'ratio' => $settings['featured_ratio'], 'format' => $result['format'] );
 	}
@@ -29,16 +34,19 @@ final class MSRWA_Images {
 		$settings = MSRWA_Settings::get();
 		$canonical = isset( $artifacts['canonical'] ) ? $artifacts['canonical'] : array();
 		$prompt = $settings['prompt_facebook_image'] . '\nRECETTE VALIDÉE : ' . wp_json_encode( $canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . self::visual_context( $artifacts );
+		$size = self::native_size( $settings['facebook_ratio'], '1024x1536' );
+		$quality = self::quality( $settings );
+		$format = self::format( $settings );
 		if ( $featured_file && file_exists( $featured_file ) ) {
-			$result = 'openai' === $plan['provider'] ? MSRWA_OpenAI::images_edit( $featured_file, $prompt, $plan['model'], '1024x1536', 'low', 'webp' ) : MSRWA_Providers::image_edit( $plan['provider'], $plan['model'], $featured_file, $prompt, '1024x1536' );
+			$result = 'openai' === $plan['provider'] ? MSRWA_OpenAI::images_edit( $featured_file, $prompt, $plan['model'], $size, $quality, $format ) : MSRWA_Providers::image_edit( $plan['provider'], $plan['model'], $featured_file, $prompt, $size );
 		} else {
-			$result = 'openai' === $plan['provider'] ? MSRWA_OpenAI::images_generate( $prompt, $plan['model'], '1024x1536', 'low', 'webp' ) : MSRWA_Providers::image( $plan['provider'], $plan['model'], $prompt, '1024x1536' );
+			$result = 'openai' === $plan['provider'] ? MSRWA_OpenAI::images_generate( $prompt, $plan['model'], $size, $quality, $format ) : MSRWA_Providers::image( $plan['provider'], $plan['model'], $prompt, $size );
 		}
 		self::record_call( $job, 'facebook_image', $plan['provider'], $plan['model'], $prompt, $result, true, $reservation );
 		if ( is_wp_error( $result ) ) { return $result; }
 		$attachment_id = self::store_base64( $result['base64'], $job->title . ' Facebook', 'Variante Facebook générée', $result['format'] );
 		if ( is_wp_error( $attachment_id ) ) { return $attachment_id; }
-		$attachment_id = self::crop_ratio( $attachment_id, $settings['facebook_ratio'] );
+		$attachment_id = self::crop_ratio( $attachment_id, $settings['facebook_ratio'], $format );
 		if ( is_wp_error( $attachment_id ) ) { return $attachment_id; }
 		return array( 'attachment_id' => $attachment_id, 'model' => $plan['model'], 'ratio' => $settings['facebook_ratio'], 'format' => $result['format'], 'reference_attachment_id' => $featured_id );
 	}
@@ -92,6 +100,21 @@ final class MSRWA_Images {
 		);
 		if ( empty( $context['direction'] ) && empty( $context['observations'] ) ) { return ''; }
 		return '\nDIRECTION VISUELLE DE RECHERCHE (observations uniquement, sans réutiliser ni reproduire une image source) : ' . wp_json_encode( $context, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+	}
+
+	private static function native_size( $ratio, $fallback ) {
+		$sizes = array( '1:1' => '1024x1024', '3:2' => '1536x1024', '2:3' => '1024x1536', '4:5' => '1024x1536' );
+		return isset( $sizes[ $ratio ] ) ? $sizes[ $ratio ] : $fallback;
+	}
+
+	private static function quality( $settings ) {
+		$value = isset( $settings['image_quality'] ) ? $settings['image_quality'] : 'low';
+		return in_array( $value, array( 'low', 'medium', 'high', 'xhigh', 'max', 'auto' ), true ) ? $value : 'low';
+	}
+
+	private static function format( $settings ) {
+		$value = isset( $settings['image_format'] ) ? $settings['image_format'] : 'webp';
+		return in_array( $value, array( 'webp', 'jpeg', 'png' ), true ) ? $value : 'webp';
 	}
 
 	private static function vision_plan( $job ) {
@@ -153,7 +176,7 @@ final class MSRWA_Images {
 		return (int) $id;
 	}
 
-	private static function crop_ratio( $attachment_id, $ratio ) {
+	private static function crop_ratio( $attachment_id, $ratio, $format = 'webp' ) {
 		$file = get_attached_file( $attachment_id );
 		if ( ! $file || ! file_exists( $file ) ) { return new WP_Error( 'image_file_missing', 'Fichier image introuvable pour le recadrage.' ); }
 		$parts = array_map( 'absint', explode( ':', (string) $ratio ) );
@@ -168,10 +191,18 @@ final class MSRWA_Images {
 		$width = $size['width'];
 		$height = $size['height'];
 		if ( $source_ratio > $target_ratio ) { $width = (int) round( $height * $target_ratio ); } else { $height = (int) round( $width / $target_ratio ); }
+		if ( $width === (int) $size['width'] && $height === (int) $size['height'] ) { return $attachment_id; }
 		$editor->resize( $width, $height, true );
-		$saved = $editor->save( $file, 'image/webp' );
+		$format = in_array( $format, array( 'webp', 'jpeg', 'png' ), true ) ? $format : 'webp';
+		$mime = 'jpeg' === $format ? 'image/jpeg' : 'image/' . $format;
+		$target = trailingslashit( dirname( $file ) ) . sanitize_file_name( pathinfo( $file, PATHINFO_FILENAME ) . '.' . $format );
+		$saved = $editor->save( $target, $mime );
 		if ( is_wp_error( $saved ) ) { return $saved; }
-		wp_update_attachment_metadata( $attachment_id, wp_generate_attachment_metadata( $attachment_id, $file ) );
+		if ( ! empty( $saved['path'] ) && $saved['path'] !== $file && file_exists( $file ) ) { wp_delete_file( $file ); }
+		$path = ! empty( $saved['path'] ) ? $saved['path'] : $target;
+		update_attached_file( $attachment_id, $path );
+		wp_update_post( array( 'ID' => $attachment_id, 'post_mime_type' => $mime ) );
+		wp_update_attachment_metadata( $attachment_id, wp_generate_attachment_metadata( $attachment_id, $path ) );
 		return $attachment_id;
 	}
 }

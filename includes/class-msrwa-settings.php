@@ -41,6 +41,8 @@ final class MSRWA_Settings {
 			'aggregate_months'    => 12,
 			'featured_ratio'      => '1:1',
 			'facebook_ratio'      => '4:5',
+			'image_quality'       => 'low',
+			'image_format'        => 'webp',
 			'facebook_text'       => 0,
 			'internal_links_enabled' => 1,
 			'internal_links_max'     => 3,
@@ -107,9 +109,13 @@ final class MSRWA_Settings {
 			}
 		}
 		if ( isset( $raw['research_fallback_key'] ) && '' !== trim( $raw['research_fallback_key'] ) ) { $out['research_fallback_key'] = self::encrypt_secret( sanitize_text_field( $raw['research_fallback_key'] ) ); } else { $out['research_fallback_key'] = self::encrypt_secret( self::get()['research_fallback_key'] ); }
-		foreach ( array( 'openai_model', 'gemini_model', 'claude_model', 'research_provider', 'featured_ratio', 'facebook_ratio' ) as $key ) {
+		foreach ( array( 'openai_model', 'gemini_model', 'claude_model', 'research_provider' ) as $key ) {
 			if ( isset( $raw[ $key ] ) ) { $out[ $key ] = sanitize_text_field( $raw[ $key ] ); }
 		}
+		$out['featured_ratio'] = isset( $raw['featured_ratio'] ) && in_array( $raw['featured_ratio'], array( '1:1', '4:5', '3:2', '2:3' ), true ) ? $raw['featured_ratio'] : $defaults['featured_ratio'];
+		$out['facebook_ratio'] = isset( $raw['facebook_ratio'] ) && in_array( $raw['facebook_ratio'], array( '4:5', '1:1', '2:3', '3:2' ), true ) ? $raw['facebook_ratio'] : $defaults['facebook_ratio'];
+		$out['image_quality'] = isset( $raw['image_quality'] ) && in_array( $raw['image_quality'], array( 'low', 'medium', 'high', 'xhigh', 'max', 'auto' ), true ) ? $raw['image_quality'] : $defaults['image_quality'];
+		$out['image_format'] = isset( $raw['image_format'] ) && in_array( $raw['image_format'], array( 'webp', 'jpeg', 'png' ), true ) ? $raw['image_format'] : $defaults['image_format'];
 		$out['research_fallback_provider'] = isset( $raw['research_fallback_provider'] ) && in_array( $raw['research_fallback_provider'], array( 'none', 'custom_json' ), true ) ? $raw['research_fallback_provider'] : $defaults['research_fallback_provider'];
 		if ( isset( $raw['research_fallback_url'] ) ) { $out['research_fallback_url'] = esc_url_raw( $raw['research_fallback_url'] ); }
 		$catalog = MSRWA_Catalog::models();
