@@ -22,6 +22,17 @@ final class MSRWA_Queue {
 		return (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$t['jobs']} WHERE status = 'running' OR (status = 'queued' AND lock_until > UTC_TIMESTAMP())" );
 	}
 
+	public static function recover_expired() {
+		global $wpdb;
+		$t = MSRWA_DB::tables();
+		$ids = $wpdb->get_col( "SELECT id FROM {$t['jobs']} WHERE status = 'running' AND lock_until IS NOT NULL AND lock_until < UTC_TIMESTAMP() LIMIT 100" );
+		foreach ( $ids as $id ) {
+			$wpdb->update( $t['jobs'], array( 'status' => 'retry_wait', 'error_code' => 'worker_lease_expired', 'error_message' => 'Le bail du worker a expiré ; reprise planifiée.', 'lock_token' => null, 'lock_until' => null, 'updated_at' => current_time( 'mysql', true ) ), array( 'id' => absint( $id ) ), array( '%s', '%s', '%s', '%s', '%s', '%s' ), array( '%d' ) );
+			self::schedule_job( $id, 5 );
+		}
+		return count( $ids );
+	}
+
 	public static function refresh_batch( $batch_id ) {
 		global $wpdb;
 		$t = MSRWA_DB::tables();

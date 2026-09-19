@@ -26,6 +26,7 @@ final class MSRWA_Plugin {
 		add_action( 'msrwa_process_batch', array( 'MSRWA_Queue', 'process_batch' ) );
 		add_action( 'msrwa_process_job', array( 'MSRWA_Pipeline', 'process_job' ) );
 		add_action( 'msrwa_cleanup', array( 'MSRWA_DB', 'purge_expired' ) );
+		add_action( 'msrwa_cleanup', array( 'MSRWA_Queue', 'recover_expired' ) );
 		if ( is_admin() ) { MSRWA_Admin::hooks(); }
 		if ( get_option( 'msrwa_db_version' ) !== MSRWA_VERSION ) { MSRWA_DB::install(); }
 	}

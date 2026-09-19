@@ -70,15 +70,16 @@ final class MSRWA_Publisher {
 	}
 
 	private static function write_recipe_meta( $post_id, $recipe ) {
+		$mapping = MSRWA_Settings::get()['integration_mapping'];
 		$map = array(
-			'prep_minutes'    => '_recipe_prep_time',
-			'cook_minutes'    => '_recipe_cook_time',
-			'servings'        => '_recipe_servings',
-			'calories_estimate' => '_recipe_calories',
-			'cuisine'         => '_recipe_cuisine',
+			'prep_minutes'    => $mapping['prep_minutes'],
+			'cook_minutes'    => $mapping['cook_minutes'],
+			'servings'        => $mapping['servings'],
+			'calories_estimate' => $mapping['calories_estimate'],
+			'cuisine'         => $mapping['cuisine'],
 		);
 		foreach ( $map as $source => $key ) {
-			if ( isset( $recipe[ $source ] ) ) {
+			if ( $key && isset( $recipe[ $source ] ) ) {
 				$value = in_array( $source, array( 'prep_minutes', 'cook_minutes', 'servings', 'calories_estimate' ), true ) ? absint( $recipe[ $source ] ) : sanitize_text_field( $recipe[ $source ] );
 				update_post_meta( $post_id, $key, $value );
 			}
@@ -102,8 +103,9 @@ final class MSRWA_Publisher {
 	}
 
 	private static function write_seo_meta( $post_id, $article ) {
-		if ( isset( $article['seo_title'] ) ) { update_post_meta( $post_id, '_seo_title', sanitize_text_field( $article['seo_title'] ) ); }
-		if ( isset( $article['seo_description'] ) ) { update_post_meta( $post_id, '_seo_description', sanitize_textarea_field( $article['seo_description'] ) ); }
+		$mapping = MSRWA_Settings::get()['integration_mapping'];
+		if ( $mapping['seo_title'] && isset( $article['seo_title'] ) ) { update_post_meta( $post_id, $mapping['seo_title'], sanitize_text_field( $article['seo_title'] ) ); }
+		if ( $mapping['seo_description'] && isset( $article['seo_description'] ) ) { update_post_meta( $post_id, $mapping['seo_description'], sanitize_textarea_field( $article['seo_description'] ) ); }
 	}
 
 	private static function write_taxonomies( $post_id, $article ) {
@@ -116,6 +118,7 @@ final class MSRWA_Publisher {
 	}
 
 	private static function write_facebook_meta( $post_id, $article, $artifacts ) {
+		$mapping = MSRWA_Settings::get()['integration_mapping'];
 		$items = array();
 		if ( ! empty( $artifacts['facebook_image']['attachment_id'] ) ) {
 			$items[] = array( 'id' => absint( $artifacts['facebook_image']['attachment_id'] ), 'text' => '' );
@@ -123,7 +126,7 @@ final class MSRWA_Publisher {
 		if ( $items && post_type_exists( 'post' ) ) {
 			$caption = isset( $article['facebook_caption'] ) ? sanitize_textarea_field( $article['facebook_caption'] ) : '';
 			if ( $caption ) { $items[0]['text'] = $caption; }
-			update_post_meta( $post_id, 'fb_images_data', wp_json_encode( $items, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) );
+			if ( $mapping['facebook_meta'] ) { update_post_meta( $post_id, $mapping['facebook_meta'], wp_json_encode( $items, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) ); }
 		}
 	}
 }
