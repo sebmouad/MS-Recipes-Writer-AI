@@ -42,7 +42,56 @@ final class MSRWA_Stats {
 	private static function date_boundary( $value, $side ) {
 		$value = sanitize_text_field( (string) $value );
 		if ( ! preg_match( '/^\d{4}-\d{2}-\d{2}(?:[ T]\d{2}:\d{2}:\d{2})?$/', $value ) ) { return ''; }
-		return 10 === strlen( $value ) ? $value . ( 'start' === $side ? ' 00:00:00' : ' 23:59:59' ) : str_replace( 'T', ' ', $value );
+		if ( 10 !== strlen( $value ) ) { return str_replace( 'T', ' ', $value ); }
+		try {
+			$date = new DateTimeImmutable( $value . ' 00:00:00', new DateTimeZone( 'UTC' ) );
+			if ( 'end' === $side ) { $date = $date->modify( '+1 day' ); }
+			return $date->format( 'Y-m-d H:i:s' );
+		} catch ( Exception $e ) {
+			return '';
+		}
+	}
+
+	public static function export( $dataset, $from, $to, $page = 1, $per_page = 100, $owner_id = 0 ) {
+		global $wpdb;
+		$t = MSRWA_DB::tables();
+		$dataset = sanitize_key( $dataset );
+		if ( ! in_array( $dataset, array( 'jobs', 'calls', 'events' ), true ) ) { return new WP_Error( 'invalid_export_dataset', 'Jeu de données d’export invalide.', array( 'status' => 400 ) ); }
+		$from = self::date_boundary( $from, 'start' );
+		$to = self::date_boundary( $to, 'end' );
+		if ( ! $from || ! $to || $from >= $to ) { return new WP_Error( 'invalid_export_range', 'La période d’export est invalide.', array( 'status' => 400 ) ); }
+		$page = max( 1, absint( $page ) );
+		$per_page = min( 500, max( 1, absint( $per_page ) ) );
+		$offset = ( $page - 1 ) * $per_page;
+		$args = array( $from, $to );
+		$where = '';
+		$columns = array();
+		if ( 'jobs' === $dataset ) {
+			$columns = array( 'id', 'batch_id', 'owner_id', 'title', 'status', 'stage', 'correction_cycles', 'attempts', 'cost_estimate', 'draft_post_id', 'error_code', 'created_at', 'updated_at' );
+			$where = 'created_at >= %s AND created_at < %s';
+			if ( $owner_id ) { $where .= ' AND owner_id = %d'; $args[] = absint( $owner_id ); }
+			$sql = "SELECT " . implode( ',', $columns ) . " FROM {$t['jobs']} WHERE {$where} ORDER BY id ASC LIMIT %d OFFSET %d";
+		} elseif ( 'calls' === $dataset ) {
+			$columns = array( 'id', 'batch_id', 'job_id', 'provider', 'model', 'operation', 'status', 'http_status', 'request_id', 'input_tokens', 'output_tokens', 'cost_estimate', 'uncertain', 'error_code', 'started_at', 'finished_at' );
+			$where = 'started_at >= %s AND started_at < %s';
+			if ( $owner_id ) { $where .= ' AND job_id IN (SELECT id FROM ' . $t['jobs'] . ' WHERE owner_id = %d)'; $args[] = absint( $owner_id ); }
+			$sql = "SELECT " . implode( ',', $columns ) . " FROM {$t['calls']} WHERE {$where} ORDER BY id ASC LIMIT %d OFFSET %d";
+		} else {
+			$columns = array( 'id', 'batch_id', 'job_id', 'actor_id', 'event_type', 'payload_json', 'created_at' );
+			$where = 'created_at >= %s AND created_at < %s';
+			if ( $owner_id ) { $where .= ' AND (job_id IS NULL OR job_id IN (SELECT id FROM ' . $t['jobs'] . ' WHERE owner_id = %d))'; $args[] = absint( $owner_id ); }
+			$sql = "SELECT " . implode( ',', $columns ) . " FROM {$t['events']} WHERE {$where} ORDER BY id ASC LIMIT %d OFFSET %d";
+		}
+		$args[] = $per_page; $args[] = $offset;
+		$rows = $wpdb->get_results( $wpdb->prepare( $sql, $args ), ARRAY_A );
+		foreach ( $rows as &$row ) {
+			if ( isset( $row['payload_json'] ) ) {
+				$decoded = json_decode( (string) $row['payload_json'], true );
+				$row['payload'] = is_array( $decoded ) ? $decoded : array();
+				unset( $row['payload_json'] );
+			}
+		}
+		return array( 'dataset' => $dataset, 'from' => $from, 'to' => $to, 'page' => $page, 'per_page' => $per_page, 'rows' => $rows );
 	}
 
 	public static function events( $page = 1, $per_page = 50, $owner_id = 0 ) {

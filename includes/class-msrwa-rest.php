@@ -17,6 +17,7 @@ final class MSRWA_REST {
 		register_rest_route( 'msrwa/v1', '/batches/(?P<id>\d+)/cancel', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_read' ), 'callback' => array( __CLASS__, 'cancel_batch' ) ) );
 		register_rest_route( 'msrwa/v1', '/stats', array( 'methods' => 'GET', 'permission_callback' => array( __CLASS__, 'can_read' ), 'callback' => array( __CLASS__, 'stats' ) ) );
 		register_rest_route( 'msrwa/v1', '/events', array( 'methods' => 'GET', 'permission_callback' => array( __CLASS__, 'can_read' ), 'callback' => array( __CLASS__, 'events' ) ) );
+		register_rest_route( 'msrwa/v1', '/export', array( 'methods' => 'GET', 'permission_callback' => array( __CLASS__, 'can_read' ), 'callback' => array( __CLASS__, 'export' ) ) );
 	}
 
 	public static function can_read() { return current_user_can( 'msrwa_view_own' ) || current_user_can( 'msrwa_view_all' ) || current_user_can( 'manage_options' ); }
@@ -178,5 +179,34 @@ final class MSRWA_REST {
 		$page = absint( $request->get_param( 'page' ) ?: 1 );
 		$owner_id = current_user_can( 'msrwa_view_all' ) || current_user_can( 'manage_options' ) ? 0 : get_current_user_id();
 		return rest_ensure_response( MSRWA_Stats::events( $page, 50, $owner_id ) );
+	}
+
+	public static function export( WP_REST_Request $request ) {
+		$dataset = sanitize_key( $request->get_param( 'dataset' ) ?: 'jobs' );
+		$from = sanitize_text_field( $request->get_param( 'from' ) ?: gmdate( 'Y-m-d', time() - 6 * DAY_IN_SECONDS ) );
+		$to = sanitize_text_field( $request->get_param( 'to' ) ?: gmdate( 'Y-m-d' ) );
+		$page = absint( $request->get_param( 'page' ) ?: 1 );
+		$per_page = absint( $request->get_param( 'per_page' ) ?: 100 );
+		$owner_id = current_user_can( 'msrwa_view_all' ) || current_user_can( 'manage_options' ) ? 0 : get_current_user_id();
+		$result = MSRWA_Stats::export( $dataset, $from, $to, $page, $per_page, $owner_id );
+		if ( is_wp_error( $result ) ) { return $result; }
+		$format = strtolower( sanitize_key( $request->get_param( 'format' ) ?: 'json' ) );
+		if ( 'csv' !== $format ) { return rest_ensure_response( $result ); }
+		$columns = array();
+		foreach ( $result['rows'] as $row ) { $columns = array_unique( array_merge( $columns, array_keys( $row ) ) ); }
+		$handle = fopen( 'php://temp', 'r+' );
+		fputcsv( $handle, $columns );
+		foreach ( $result['rows'] as $row ) {
+			$values = array();
+			foreach ( $columns as $column ) { $value = isset( $row[ $column ] ) ? $row[ $column ] : ''; $values[] = is_array( $value ) ? wp_json_encode( $value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) : $value; }
+			fputcsv( $handle, $values );
+		}
+		rewind( $handle );
+		$csv = stream_get_contents( $handle );
+		fclose( $handle );
+		$response = new WP_REST_Response( $csv, 200 );
+		$response->header( 'Content-Type', 'text/csv; charset=utf-8' );
+		$response->header( 'Content-Disposition', 'attachment; filename=msrwa-' . $dataset . '-' . gmdate( 'Ymd-His' ) . '.csv' );
+		return $response;
 	}
 }
