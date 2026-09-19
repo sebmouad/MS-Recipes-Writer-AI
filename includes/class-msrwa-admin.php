@@ -13,6 +13,7 @@ final class MSRWA_Admin {
 		add_submenu_page( 'ms-recipes-writer-ai', 'Créer des Articles/Images', 'Créer des Articles/Images', 'edit_posts', 'ms-recipes-writer-ai', array( __CLASS__, 'page' ) );
 		add_submenu_page( 'ms-recipes-writer-ai', 'Statistiques', 'Statistiques', 'edit_posts', 'ms-recipes-writer-ai-stats', array( __CLASS__, 'stats_page' ) );
 		add_submenu_page( 'ms-recipes-writer-ai', 'Configuration', 'Configuration', 'manage_options', 'ms-recipes-writer-ai-settings', array( __CLASS__, 'settings_page' ) );
+		add_submenu_page( null, 'Détail du lot', 'Détail du lot', 'edit_posts', 'ms-recipes-writer-ai-job', array( __CLASS__, 'job_page' ) );
 	}
 
 	public static function settings() { register_setting( 'msrwa_settings', MSRWA_Settings::OPTION, array( 'sanitize_callback' => array( 'MSRWA_Settings', 'sanitize' ) ) ); }
@@ -20,6 +21,7 @@ final class MSRWA_Admin {
 	public static function assets( $hook ) {
 		if ( false === strpos( $hook, 'ms-recipes-writer-ai' ) ) { return; }
 		wp_enqueue_style( 'msrwa-admin', MSRWA_URL . 'assets/admin.css', array(), MSRWA_VERSION );
+		wp_add_inline_style( 'msrwa-admin', '.msrwa-job-kpis{grid-template-columns:repeat(4,minmax(0,1fr))}.msrwa-job-kpis strong{font-size:16px;overflow-wrap:anywhere}.msrwa-job-list{display:grid;gap:14px}.msrwa-job-card{border:1px solid #dce6ea;border-radius:11px;padding:18px;background:#fbfdfd}.msrwa-job-card header{display:flex;justify-content:space-between;gap:16px}.msrwa-job-card h3{margin:5px 0 0;font-size:17px}.msrwa-job-number{color:#607480;font-size:12px;font-weight:700;text-transform:uppercase}.msrwa-job-state{text-align:right}.msrwa-job-state span{display:block;color:#0b605b;font-weight:700;text-transform:capitalize}.msrwa-job-state small{color:#607480}.msrwa-job-meta{display:flex;flex-wrap:wrap;gap:7px 14px;margin:16px 0;color:#50636f;font-size:13px}.msrwa-job-notice{margin:14px 0;padding:12px;border-left:3px solid #d63638;border-radius:0 7px 7px 0;background:#fff5f5}.msrwa-job-notice p{margin:5px 0 0}.msrwa-job-findings{margin:14px 0;padding:12px;border-radius:7px;background:#f1f7f7}.msrwa-job-findings ul{margin:8px 0 0 18px}.msrwa-job-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.msrwa-job-action-status{font-size:13px}.msrwa-event-list{display:grid;gap:0}.msrwa-event-list>div{display:grid;grid-template-columns:minmax(180px,1fr) minmax(180px,1fr) auto;gap:10px;padding:11px 0;border-bottom:1px solid #edf1f3}.msrwa-event-list>div:last-child{border-bottom:0}.msrwa-event-list span,.msrwa-event-list small{color:#667684}@media (max-width:782px){.msrwa-job-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.msrwa-job-card header{display:block}.msrwa-job-state{text-align:left;margin-top:10px}.msrwa-event-list>div{grid-template-columns:1fr}.msrwa-job-actions{align-items:flex-start;flex-direction:column}}' );
 		wp_enqueue_script( 'msrwa-admin', MSRWA_URL . 'assets/admin.js', array(), MSRWA_VERSION, true );
 		wp_localize_script( 'msrwa-admin', 'MSRWA', array( 'api' => esc_url_raw( rest_url( 'msrwa/v1' ) ), 'nonce' => wp_create_nonce( 'wp_rest' ) ) );
 	}
@@ -33,6 +35,58 @@ final class MSRWA_Admin {
 		$recent_batches = $wpdb->get_results( "SELECT id,status,total,completed,created_at,updated_at FROM {$tables['batches']} {$owner_filter} ORDER BY id DESC LIMIT 20", ARRAY_A );
 		?>
 		<div class="wrap msrwa-wrap msrwa-create-page"><div class="msrwa-page-head"><div><h1>MS Recipes Writer</h1><p class="description">Créez des articles et des images à partir d’un seul brief culinaire.</p></div><a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=ms-recipes-writer-ai-stats' ) ); ?>">Voir les statistiques</a></div><section class="msrwa-card msrwa-composer"><h2>Créer des Articles/Images</h2><p class="description">Fournissez une recette, un titre ou des instructions. Les images peuvent être ajoutées par URL ou depuis votre ordinateur.</p><form id="msrwa-create-form" enctype="multipart/form-data" data-max-reference-images="<?php echo esc_attr( $settings['max_reference_images'] ); ?>"><label for="msrwa-recipe">Texte ou recette fournie<textarea id="msrwa-recipe" rows="12" maxlength="20000" placeholder="Exemple : Tarte aux pommes... ingrédients, étapes, temps et consignes éditoriales."></textarea></label><div class="msrwa-reference-grid"><label for="msrwa-image-urls">Images de référence — URLs<textarea id="msrwa-image-urls" rows="5" placeholder="Une URL HTTPS par ligne"></textarea><span class="description">Les URLs sont vérifiées puis stockées temporairement hors du document public.</span></label><label for="msrwa-reference-files">Images de référence — depuis l’ordinateur<input type="file" id="msrwa-reference-files" name="reference_files[]" accept="image/jpeg,image/png,image/webp,image/gif" multiple><span id="msrwa-files-help" class="description">Jusqu’à <?php echo esc_html( $settings['max_reference_images'] ); ?> images, taille maximale 10 Mo par fichier.</span></label></div><div class="msrwa-form-actions"><button type="submit" class="button button-primary button-hero" id="msrwa-create">Créer le lot</button><span id="msrwa-message" role="status" aria-live="polite"></span></div></form></section><section class="msrwa-card"><div class="msrwa-section-head"><h2>Lots récents</h2><span class="description">Les détails et contrôles restent disponibles après création.</span></div><div class="msrwa-table-scroll"><table class="widefat striped"><thead><tr><th>ID</th><th>État</th><th>Progression</th><th>Créé</th><th>Mis à jour</th><th>Actions</th></tr></thead><tbody><?php if ( empty( $recent_batches ) ) : ?><tr><td colspan="6">Aucun lot.</td></tr><?php else : foreach ( $recent_batches as $batch ) : ?><tr><td><?php echo esc_html( $batch['id'] ); ?></td><td class="msrwa-batch-status"><?php echo esc_html( $batch['status'] ); ?></td><td><?php echo esc_html( $batch['completed'] . ' / ' . $batch['total'] ); ?></td><td><?php echo esc_html( $batch['created_at'] ); ?></td><td><?php echo esc_html( $batch['updated_at'] ); ?></td><td class="msrwa-actions"><button type="button" class="button msrwa-batch-action" data-action="pause" data-batch-id="<?php echo esc_attr( $batch['id'] ); ?>">Pause</button> <button type="button" class="button msrwa-batch-action" data-action="resume" data-batch-id="<?php echo esc_attr( $batch['id'] ); ?>">Reprendre</button> <button type="button" class="button msrwa-batch-action" data-action="cancel" data-batch-id="<?php echo esc_attr( $batch['id'] ); ?>">Annuler</button></td></tr><?php endforeach; endif; ?></tbody></table></div></section></div>
+		<?php
+	}
+
+	public static function job_page() {
+		if ( ! current_user_can( 'edit_posts' ) ) { wp_die( esc_html__( 'Accès refusé.', 'ms-recipes-writer-ai' ) ); }
+		$batch_id = isset( $_GET['batch_id'] ) ? absint( $_GET['batch_id'] ) : 0;
+		if ( ! $batch_id ) { wp_die( esc_html__( 'Lot introuvable.', 'ms-recipes-writer-ai' ) ); }
+		global $wpdb;
+		$tables = MSRWA_DB::tables();
+		$batch = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$tables['batches']} WHERE id = %d", $batch_id ), ARRAY_A );
+		$can_view_all = current_user_can( 'msrwa_view_all' ) || current_user_can( 'manage_options' );
+		if ( ! $batch || (int) $batch['owner_id'] !== get_current_user_id() && ! $can_view_all ) { wp_die( esc_html__( 'Lot introuvable.', 'ms-recipes-writer-ai' ) ); }
+		$jobs = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$tables['jobs']} WHERE batch_id = %d ORDER BY id ASC", $batch_id ), ARRAY_A );
+		$events = $wpdb->get_results( $wpdb->prepare( "SELECT event_type, job_id, payload_json, created_at FROM {$tables['events']} WHERE batch_id = %d ORDER BY id DESC LIMIT 80", $batch_id ), ARRAY_A );
+		$calls = $wpdb->get_results( $wpdb->prepare( "SELECT job_id, provider, model, operation, status, input_tokens, output_tokens, cost_estimate, started_at FROM {$tables['calls']} WHERE batch_id = %d ORDER BY id DESC LIMIT 100", $batch_id ), ARRAY_A );
+		?>
+		<div class="wrap msrwa-wrap msrwa-job-page">
+			<div class="msrwa-page-head">
+				<div><h1>Détail du lot #<?php echo esc_html( $batch_id ); ?></h1><p class="description">Suivi durable des étapes, appels, coûts et actions. Les prompts, clés et chemins privés ne sont jamais affichés.</p></div>
+				<a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=ms-recipes-writer-ai' ) ); ?>">Retour aux lots</a>
+			</div>
+			<section class="msrwa-kpis msrwa-job-kpis">
+				<div><span>État du lot</span><strong><?php echo esc_html( $batch['status'] ); ?></strong></div>
+				<div><span>Progression</span><strong><?php echo esc_html( $batch['completed'] . ' / ' . $batch['total'] ); ?></strong></div>
+				<div><span>Créé</span><strong><?php echo esc_html( $batch['created_at'] ); ?></strong></div>
+				<div><span>Mis à jour</span><strong><?php echo esc_html( $batch['updated_at'] ); ?></strong></div>
+			</section>
+			<section class="msrwa-card">
+				<div class="msrwa-section-head"><div><h2>Jobs</h2><p class="description">Chaque job peut être relancé seulement dans un état compatible. Annuler empêche les étapes suivantes ; les appels déjà acceptés restent potentiellement facturés.</p></div></div>
+				<div class="msrwa-job-list">
+				<?php foreach ( $jobs as $job ) :
+					$input = json_decode( (string) $job['input_json'], true );
+					$input = is_array( $input ) ? $input : array();
+					$artifacts = json_decode( (string) $job['artifacts_json'], true );
+					$artifacts = is_array( $artifacts ) ? $artifacts : array();
+					$reference_count = ! empty( $input['reference_images'] ) && is_array( $input['reference_images'] ) ? count( $input['reference_images'] ) : 0;
+					$can_retry = in_array( $job['status'], array( 'failed', 'needs_review', 'awaiting_input', 'uncertain', 'paused_budget', 'paused', 'awaiting_admin' ), true );
+					$draft_url = ! empty( $job['draft_post_id'] ) ? get_edit_post_link( (int) $job['draft_post_id'], 'raw' ) : '';
+				?>
+					<article class="msrwa-job-card" data-job-id="<?php echo esc_attr( $job['id'] ); ?>">
+						<header><div><span class="msrwa-job-number">Job #<?php echo esc_html( $job['id'] ); ?></span><h3><?php echo esc_html( $job['title'] ); ?></h3></div><div class="msrwa-job-state"><span><?php echo esc_html( $job['status'] ); ?></span><small>Étape : <?php echo esc_html( $job['stage'] ); ?></small></div></header>
+						<div class="msrwa-job-meta"><span>Essais : <?php echo esc_html( $job['attempts'] ); ?></span><span>Corrections : <?php echo esc_html( $job['correction_cycles'] ); ?>/2</span><span>Références : <?php echo esc_html( $reference_count ); ?></span><span>Coût estimé : <?php echo esc_html( number_format_i18n( (float) $job['cost_estimate'], 4 ) ); ?> $</span></div>
+						<?php if ( ! empty( $job['error_message'] ) ) : ?><div class="msrwa-job-notice"><strong><?php echo esc_html( $job['error_code'] ?: 'Information' ); ?></strong><p><?php echo esc_html( $job['error_message'] ); ?></p></div><?php endif; ?>
+						<?php if ( ! empty( $artifacts['review']['findings'] ) && is_array( $artifacts['review']['findings'] ) ) : ?><div class="msrwa-job-findings"><strong>Dernière relecture</strong><ul><?php foreach ( array_slice( $artifacts['review']['findings'], 0, 6 ) as $finding ) : ?><li><?php echo esc_html( is_scalar( $finding ) ? $finding : wp_json_encode( $finding ) ); ?></li><?php endforeach; ?></ul></div><?php endif; ?>
+						<footer class="msrwa-job-actions"><?php if ( $draft_url ) : ?><a class="button button-primary" href="<?php echo esc_url( $draft_url ); ?>">Ouvrir le brouillon</a><?php endif; ?><?php if ( $can_retry ) : ?><button type="button" class="button msrwa-job-action" data-action="retry" data-job-id="<?php echo esc_attr( $job['id'] ); ?>">Relancer</button><?php endif; ?><?php if ( ! in_array( $job['status'], array( 'completed', 'cancelled' ), true ) ) : ?><button type="button" class="button msrwa-job-action" data-action="cancel" data-job-id="<?php echo esc_attr( $job['id'] ); ?>">Annuler le job</button><?php endif; ?><span class="msrwa-job-action-status" role="status"></span></footer>
+					</article>
+				<?php endforeach; ?>
+				</div>
+			</section>
+			<section class="msrwa-card"><div class="msrwa-section-head"><div><h2>Journal des étapes</h2><p class="description">80 événements les plus récents, sans contenu de prompt ni secrets.</p></div></div><div class="msrwa-event-list"><?php if ( empty( $events ) ) : ?><p class="description">Aucun événement enregistré.</p><?php else : foreach ( $events as $event ) : $payload = json_decode( (string) $event['payload_json'], true ); $payload = is_array( $payload ) ? $payload : array(); ?><div><strong><?php echo esc_html( $event['event_type'] ); ?></strong><span><?php echo esc_html( $event['created_at'] ); ?><?php echo $event['job_id'] ? ' — Job #' . esc_html( $event['job_id'] ) : ''; ?></span><?php if ( ! empty( $payload['code'] ) ) : ?><small><?php echo esc_html( $payload['code'] ); ?></small><?php endif; ?></div><?php endforeach; endif; ?></div></section>
+			<section class="msrwa-card"><div class="msrwa-section-head"><div><h2>Appels et coûts</h2><p class="description">Historique technique et estimation capturée pour ce lot.</p></div></div><div class="msrwa-table-scroll"><table class="widefat striped"><thead><tr><th>Job</th><th>Fournisseur</th><th>Modèle</th><th>Opération</th><th>État</th><th>Tokens</th><th>Coût</th><th>Date</th></tr></thead><tbody><?php if ( empty( $calls ) ) : ?><tr><td colspan="8">Aucun appel fournisseur à ce stade.</td></tr><?php else : foreach ( $calls as $call ) : ?><tr><td>#<?php echo esc_html( $call['job_id'] ); ?></td><td><?php echo esc_html( $call['provider'] ); ?></td><td><?php echo esc_html( $call['model'] ); ?></td><td><?php echo esc_html( $call['operation'] ); ?></td><td><?php echo esc_html( $call['status'] ); ?></td><td><?php echo esc_html( number_format_i18n( (int) $call['input_tokens'] + (int) $call['output_tokens'] ) ); ?></td><td><?php echo esc_html( number_format_i18n( (float) $call['cost_estimate'], 4 ) ); ?> $</td><td><?php echo esc_html( $call['started_at'] ); ?></td></tr><?php endforeach; endif; ?></tbody></table></div></section>
+		</div>
 		<?php
 	}
 

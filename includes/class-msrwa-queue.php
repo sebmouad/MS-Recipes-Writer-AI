@@ -60,9 +60,11 @@ final class MSRWA_Queue {
 	public static function resume_batch( $batch_id ) {
 		global $wpdb;
 		$t = MSRWA_DB::tables();
+		$settings = MSRWA_Settings::get();
+		if ( empty( $settings['allow_paid_tests'] ) || (float) $settings['test_budget_usd'] <= 0 ) { return false; }
 		$now = current_time( 'mysql', true );
-		$updated = $wpdb->query( $wpdb->prepare( "UPDATE {$t['batches']} SET status = 'queued', updated_at = %s WHERE id = %d AND status = 'paused'", $now, absint( $batch_id ) ) );
-		$wpdb->query( $wpdb->prepare( "UPDATE {$t['jobs']} SET status = 'queued', error_code = NULL, error_message = NULL, updated_at = %s WHERE batch_id = %d AND status = 'paused'", $now, absint( $batch_id ) ) );
+		$updated = $wpdb->query( $wpdb->prepare( "UPDATE {$t['batches']} SET status = 'queued', updated_at = %s WHERE id = %d AND status IN ('paused','awaiting_admin','paused_budget')", $now, absint( $batch_id ) ) );
+		$wpdb->query( $wpdb->prepare( "UPDATE {$t['jobs']} SET status = 'queued', error_code = NULL, error_message = NULL, updated_at = %s WHERE batch_id = %d AND status IN ('paused','awaiting_admin','paused_budget')", $now, absint( $batch_id ) ) );
 		if ( $updated ) { MSRWA_DB::event( 'batch_resumed', $batch_id ); self::schedule_batch( $batch_id ); }
 		return (bool) $updated;
 	}
@@ -97,11 +99,19 @@ final class MSRWA_Queue {
 	public static function refresh_batch( $batch_id ) {
 		global $wpdb;
 		$t = MSRWA_DB::tables();
-		$counts = $wpdb->get_row( $wpdb->prepare( "SELECT COUNT(*) AS total, SUM(status = 'completed') AS completed, SUM(status = 'cancelled') AS cancelled FROM {$t['jobs']} WHERE batch_id = %d", absint( $batch_id ) ) );
+		$counts = $wpdb->get_row( $wpdb->prepare( "SELECT COUNT(*) AS total, SUM(status = 'completed') AS completed, SUM(status = 'cancelled') AS cancelled, SUM(status IN ('queued','running','retry_wait')) AS active, SUM(status IN ('awaiting_admin','paused_budget')) AS awaiting_admin, SUM(status = 'paused') AS paused, SUM(status IN ('failed','needs_review','awaiting_input','uncertain')) AS needs_review FROM {$t['jobs']} WHERE batch_id = %d", absint( $batch_id ) ) );
 		if ( ! $counts ) { return; }
 		$completed = (int) $counts->completed;
-		$status = ( $completed + (int) $counts->cancelled >= (int) $counts->total && (int) $counts->total > 0 ) ? 'completed' : 'running';
+		$status = ( (int) $counts->cancelled >= (int) $counts->total && (int) $counts->total > 0 ) ? 'cancelled' : ( ( $completed + (int) $counts->cancelled >= (int) $counts->total && (int) $counts->total > 0 ) ? 'completed' : ( (int) $counts->active ? 'running' : ( (int) $counts->awaiting_admin ? 'awaiting_admin' : ( (int) $counts->paused ? 'paused' : ( (int) $counts->needs_review ? 'needs_review' : 'running' ) ) ) ) );
 		$wpdb->update( $t['batches'], array( 'status' => $status, 'completed' => $completed, 'updated_at' => current_time( 'mysql', true ) ), array( 'id' => absint( $batch_id ) ), array( '%s', '%d', '%s' ), array( '%d' ) );
+	}
+
+	public static function reconcile_batches( $limit = 500 ) {
+		global $wpdb;
+		$t = MSRWA_DB::tables();
+		$ids = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM {$t['batches']} WHERE total > 0 ORDER BY id DESC LIMIT %d", min( 1000, max( 1, absint( $limit ) ) ) ) );
+		foreach ( $ids as $id ) { self::refresh_batch( $id ); }
+		return count( $ids );
 	}
 
 	public static function schedule_batch( $batch_id ) {
@@ -129,6 +139,7 @@ final class MSRWA_Queue {
 		$settings = MSRWA_Settings::get();
 		if ( empty( $settings['allow_paid_tests'] ) || (float) $settings['test_budget_usd'] <= 0 ) {
 			$wpdb->update( $t['batches'], array( 'status' => 'awaiting_admin', 'updated_at' => current_time( 'mysql', true ) ), array( 'id' => $batch_id ), array( '%s', '%s' ), array( '%d' ) );
+			$wpdb->query( $wpdb->prepare( "UPDATE {$t['jobs']} SET status = 'awaiting_admin', error_code = 'paid_tests_disabled', error_message = 'Activez explicitement les tests payants et un budget supérieur à zéro.', updated_at = %s WHERE batch_id = %d AND status IN ('queued','retry_wait')", current_time( 'mysql', true ), $batch_id ) );
 			MSRWA_DB::event( 'batch_awaiting_admin', $batch_id, 0, array( 'reason' => 'provider_calls_require_explicit_test_budget' ) );
 			return;
 		}
