@@ -20,6 +20,9 @@ final class MSRWA_Settings {
 				'search' => 'openai:gpt-5.6-luna',
 			),
 			'research_provider'   => 'native',
+			'research_fallback_provider' => 'none',
+			'research_fallback_url' => '',
+			'research_fallback_key' => '',
 			'max_batch'           => 50,
 			'max_concurrency'     => 4,
 			'max_corrections'     => 2,
@@ -70,9 +73,12 @@ final class MSRWA_Settings {
 				$out[ $key ] = self::get()[ $key ];
 			}
 		}
+		if ( isset( $raw['research_fallback_key'] ) && '' !== trim( $raw['research_fallback_key'] ) ) { $out['research_fallback_key'] = sanitize_text_field( $raw['research_fallback_key'] ); } else { $out['research_fallback_key'] = self::get()['research_fallback_key']; }
 		foreach ( array( 'openai_model', 'gemini_model', 'claude_model', 'research_provider', 'featured_ratio', 'facebook_ratio' ) as $key ) {
 			if ( isset( $raw[ $key ] ) ) { $out[ $key ] = sanitize_text_field( $raw[ $key ] ); }
 		}
+		$out['research_fallback_provider'] = isset( $raw['research_fallback_provider'] ) && in_array( $raw['research_fallback_provider'], array( 'none', 'custom_json' ), true ) ? $raw['research_fallback_provider'] : $defaults['research_fallback_provider'];
+		if ( isset( $raw['research_fallback_url'] ) ) { $out['research_fallback_url'] = esc_url_raw( $raw['research_fallback_url'] ); }
 		$catalog = MSRWA_Catalog::models();
 		if ( isset( $raw['manual_models'] ) && is_array( $raw['manual_models'] ) ) {
 			foreach ( array( 'text', 'review', 'image', 'search' ) as $stage ) {

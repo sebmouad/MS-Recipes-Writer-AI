@@ -49,7 +49,11 @@ final class MSRWA_Pipeline {
 		$settings = MSRWA_Settings::get();
 		$prompt = $settings['prompt_research'] . '\nEntrée éditeur : ' . wp_json_encode( $input, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
 		$result = self::text_call( $job, $prompt, 1800, array( array( 'type' => 'web_search' ) ), true, 'research' );
-		self::require_result( $result );
+		if ( is_wp_error( $result ) ) {
+			$fallback = self::fallback_research( $job, isset( $input['title'] ) ? $input['title'] : '' );
+			if ( ! is_wp_error( $fallback ) ) { $result = $fallback; MSRWA_DB::event( 'research_fallback_used', $job->batch_id, $job->id ); }
+			else { self::require_result( $result ); }
+		}
 		try {
 			$artifacts['research'] = self::decode_json( $result['text'], 'research' );
 		} catch ( Exception $first_error ) {
@@ -326,6 +330,15 @@ final class MSRWA_Pipeline {
 		}
 		MSRWA_DB::call( $row );
 		if ( is_wp_error( $result ) || ! isset( $row['cost_estimate'] ) ) { MSRWA_DB::release( $reservation ); } else { MSRWA_DB::settle( $reservation, $row['cost_estimate'] ); }
+		return $result;
+	}
+
+	private static function fallback_research( $job, $query ) {
+		$reservation = MSRWA_DB::reserve( $job, 0.02, 'research_fallback' );
+		if ( is_wp_error( $reservation ) ) { return $reservation; }
+		$result = MSRWA_Providers::research_fallback( $query, 5 );
+		MSRWA_DB::call( array( 'batch_id' => absint( $job->batch_id ), 'job_id' => absint( $job->id ), 'provider' => 'external_search', 'model' => 'custom_json', 'operation' => 'research_fallback', 'status' => is_wp_error( $result ) ? 'failed' : 'completed', 'request_id' => '', 'input_tokens' => 0, 'output_tokens' => 0, 'cost_estimate' => is_wp_error( $result ) ? 0 : 0.02, 'uncertain' => 1, 'error_code' => is_wp_error( $result ) ? $result->get_error_code() : '', 'payload_hash' => hash( 'sha256', sanitize_text_field( $query ) ), 'started_at' => current_time( 'mysql', true ), 'finished_at' => current_time( 'mysql', true ) ) );
+		if ( is_wp_error( $result ) ) { MSRWA_DB::release( $reservation ); } else { MSRWA_DB::settle( $reservation, 0.02 ); }
 		return $result;
 	}
 

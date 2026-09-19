@@ -46,7 +46,7 @@ final class MSRWA_REST {
 		$now = current_time( 'mysql', true );
 		$t = MSRWA_DB::tables();
 		$snapshot = $settings;
-		foreach ( array( 'openai_key', 'gemini_key', 'claude_key' ) as $secret ) { $snapshot[ $secret ] = ''; }
+		foreach ( array( 'openai_key', 'gemini_key', 'claude_key', 'research_fallback_key' ) as $secret ) { $snapshot[ $secret ] = ''; }
 		$wpdb->insert( $t['batches'], array( 'owner_id' => get_current_user_id(), 'status' => 'queued', 'total' => count( $items ), 'settings_snapshot' => wp_json_encode( $snapshot ), 'created_at' => $now, 'updated_at' => $now ), array( '%d', '%s', '%d', '%s', '%s', '%s' ) );
 		$batch_id = (int) $wpdb->insert_id;
 		foreach ( $items as $item ) {
