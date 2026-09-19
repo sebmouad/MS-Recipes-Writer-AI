@@ -161,6 +161,16 @@ final class MSRWA_REST {
 	public static function stats( WP_REST_Request $request ) {
 		$days = absint( $request->get_param( 'days' ) ?: 7 );
 		$owner_id = current_user_can( 'msrwa_view_all' ) || current_user_can( 'manage_options' ) ? 0 : get_current_user_id();
+		$from = $request->get_param( 'from' );
+		$to = $request->get_param( 'to' );
+		if ( $from && $to ) {
+			$current = MSRWA_Stats::summary_range( $from, $to, $owner_id );
+			if ( is_wp_error( $current ) ) { return $current; }
+			$start = strtotime( $current['from'] ); $end = strtotime( $current['to'] ); $duration = max( 86400, $end - $start );
+			$previous = MSRWA_Stats::summary_range( gmdate( 'Y-m-d H:i:s', $start - $duration ), gmdate( 'Y-m-d H:i:s', $start ), $owner_id );
+			$current['previous'] = is_wp_error( $previous ) ? array() : $previous;
+			return rest_ensure_response( $current );
+		}
 		return rest_ensure_response( MSRWA_Stats::summary( $days, $owner_id ) );
 	}
 

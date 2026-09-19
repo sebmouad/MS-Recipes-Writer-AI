@@ -23,6 +23,28 @@ final class MSRWA_Stats {
 		return array( 'days' => $days, 'jobs' => $job_counts, 'total_jobs' => array_sum( $job_counts ), 'calls' => $calls, 'estimated_cost_usd' => round( $total_cost, 6 ), 'generated_at' => current_time( 'mysql', true ) );
 	}
 
+	public static function summary_range( $from, $to, $owner_id = 0 ) {
+		$from = self::date_boundary( $from, 'start' );
+		$to = self::date_boundary( $to, 'end' );
+		if ( ! $from || ! $to || $from >= $to ) { return new WP_Error( 'invalid_stats_range', 'La période statistique est invalide.', array( 'status' => 400 ) ); }
+		global $wpdb;
+		$t = MSRWA_DB::tables();
+		$where_jobs = 'created_at >= %s AND created_at < %s'; $args_jobs = array( $from, $to );
+		$where_calls = 'started_at >= %s AND started_at < %s'; $args_calls = array( $from, $to );
+		if ( $owner_id ) { $where_jobs .= ' AND owner_id = %d'; $args_jobs[] = absint( $owner_id ); $where_calls .= ' AND job_id IN (SELECT id FROM ' . $t['jobs'] . ' WHERE owner_id = %d)'; $args_calls[] = absint( $owner_id ); }
+		$jobs = $wpdb->get_results( $wpdb->prepare( "SELECT status, COUNT(*) AS count FROM {$t['jobs']} WHERE {$where_jobs} GROUP BY status", $args_jobs ), ARRAY_A );
+		$calls = $wpdb->get_results( $wpdb->prepare( "SELECT provider, model, operation, status, COUNT(*) AS count, COALESCE(SUM(cost_estimate),0) AS cost, COALESCE(SUM(input_tokens),0) AS input_tokens, COALESCE(SUM(output_tokens),0) AS output_tokens FROM {$t['calls']} WHERE {$where_calls} GROUP BY provider, model, operation, status", $args_calls ), ARRAY_A );
+		$job_counts = array(); foreach ( $jobs as $row ) { $job_counts[ $row['status'] ] = (int) $row['count']; }
+		$total_cost = 0.0; foreach ( $calls as $row ) { $total_cost += (float) $row['cost']; }
+		return array( 'from' => $from, 'to' => $to, 'jobs' => $job_counts, 'total_jobs' => array_sum( $job_counts ), 'calls' => $calls, 'estimated_cost_usd' => round( $total_cost, 6 ), 'generated_at' => current_time( 'mysql', true ) );
+	}
+
+	private static function date_boundary( $value, $side ) {
+		$value = sanitize_text_field( (string) $value );
+		if ( ! preg_match( '/^\d{4}-\d{2}-\d{2}(?:[ T]\d{2}:\d{2}:\d{2})?$/', $value ) ) { return ''; }
+		return 10 === strlen( $value ) ? $value . ( 'start' === $side ? ' 00:00:00' : ' 23:59:59' ) : str_replace( 'T', ' ', $value );
+	}
+
 	public static function events( $page = 1, $per_page = 50, $owner_id = 0 ) {
 		global $wpdb;
 		$t = MSRWA_DB::tables();
