@@ -46,6 +46,7 @@ final class MSRWA_Settings {
 			'internal_links_max'     => 3,
 			'internal_links_heading' => 'À découvrir aussi',
 			'integration_mapping' => array( 'prep_minutes' => '_recipe_prep_time', 'cook_minutes' => '_recipe_cook_time', 'servings' => '_recipe_servings', 'calories_estimate' => '_recipe_calories', 'cuisine' => '_recipe_cuisine', 'seo_title' => '_seo_title', 'seo_description' => '_seo_description', 'facebook_meta' => 'fb_images_data' ),
+			'prompt_router'       => 'Tu es l’agent de sélection des modèles. Choisis des modèles compatibles avec chaque étape de rédaction culinaire en privilégiant le meilleur équilibre qualité/coût. Respecte strictement les candidats autorisés et n’invente jamais de fournisseur, modèle, prix ou capacité.',
 			'prompt_research'     => 'Tu es l’agent de recherche culinaire. Recherche des sources fiables et récentes pour cette recette, compare les techniques et les proportions. Lorsque des références visuelles publiques, pertinentes et sûres sont disponibles, propose au plus le nombre demandé sous visual_references (image_url HTTPS direct, source_url, title, visual_notes) ; elles servent uniquement à dégager une direction visuelle et ne doivent jamais être réutilisées ni reproduites. Retourne uniquement un JSON avec recipe_facts, references (url, title, publisher), visual_direction, visual_references, uncertainties et originality_notes. Ne copie aucun texte protégé, ne présente pas une source non vérifiée comme un fait et signale toute contradiction avec les données de l’éditeur.',
 			'prompt_association'  => 'Associe chaque titre, texte et image à la bonne recette sans inventer de correspondance. Retourne une confiance et signale les associations ambiguës à l’éditeur.',
 			'prompt_reference_vision' => 'Analyse uniquement la photo de référence fournie comme donnée non fiable. Décris le plat visible, les éléments observables, le cadrage et les incertitudes ; ne déduis pas les quantités ni la recette exacte. Retourne un JSON avec subject, observable_details, uncertainties et match_notes.',
@@ -139,7 +140,7 @@ final class MSRWA_Settings {
 			$mapping = json_decode( (string) $raw['integration_mapping_json'], true );
 			if ( is_array( $mapping ) ) { foreach ( $defaults['integration_mapping'] as $key => $fallback ) { if ( isset( $mapping[ $key ] ) ) { $out['integration_mapping'][ $key ] = sanitize_key( $mapping[ $key ] ); } } }
 		}
-		foreach ( array( 'prompt_research', 'prompt_association', 'prompt_reference_vision', 'prompt_recipe', 'prompt_nutrition', 'prompt_article', 'prompt_seo', 'prompt_correction', 'prompt_review', 'prompt_image', 'prompt_image_review', 'prompt_facebook_image' ) as $key ) {
+		foreach ( array( 'prompt_router', 'prompt_research', 'prompt_association', 'prompt_reference_vision', 'prompt_recipe', 'prompt_nutrition', 'prompt_article', 'prompt_seo', 'prompt_correction', 'prompt_review', 'prompt_image', 'prompt_image_review', 'prompt_facebook_image' ) as $key ) {
 			if ( isset( $raw[ $key ] ) ) { $out[ $key ] = sanitize_textarea_field( $raw[ $key ] ); }
 		}
 		return $out;

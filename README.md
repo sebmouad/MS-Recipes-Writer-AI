@@ -4,13 +4,14 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.30` fournit un socle installable et sans appel payant automatique par défaut :
+La version `0.2.31` fournit un socle installable et sans appel payant automatique par défaut :
 
 - modes administrateur `Automatique` / `Manuel` ;
 - limites initiales de 50 recettes par lot, 4 traitements simultanés et 2 corrections ;
 - tables persistantes pour lots, jobs et événements ;
 - menu autonome **MS Recipes Writer** en trois pages : Créer des Articles/Images, Statistiques et Configuration ;
 - réglages protégés des clés API et prompts éditables ;
+- prompt du routeur de modèles également configurable, tandis que les contrôles de capacité, de budget et de schéma restent imposés par le moteur ;
 - catalogue de capacités et tarifs vérifiés des modèles OpenAI, Gemini et Claude ;
 - préfiltre de routage automatique qualité/coût et validation du schéma canonique ;
 - snapshot des réglages et modèles sélectionnés pour chaque lot et chaque job ;

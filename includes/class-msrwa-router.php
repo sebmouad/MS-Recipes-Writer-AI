@@ -53,7 +53,7 @@ final class MSRWA_Router {
 		$estimate = isset( $catalog[ $router['provider'] ][ $router['model'] ] ) ? ( 700 * (float) $catalog[ $router['provider'] ][ $router['model'] ]['output'] ) / 1000000 : 0.01;
 		$reservation = MSRWA_DB::reserve( $job, $estimate, 'model_routing' );
 		if ( is_wp_error( $reservation ) ) { return $reservation; }
-		$prompt = "Sélectionne les modèles pour un workflow de rédaction culinaire. Réponds uniquement avec un JSON compact contenant keys text, review, search, vision, image, reason. Chaque valeur doit être exactement une clé fournisseur:modèle présente dans les candidats correspondants. Choisis l’équilibre qualité/coût, respecte les capacités et n’invente rien. reason doit être une phrase courte sans raisonnement privé. CANDIDATS: " . wp_json_encode( $candidates, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+		$prompt = $settings['prompt_router'] . "\nRéponds uniquement avec un JSON compact contenant les clés text, review, search, vision, image et reason. Chaque valeur doit être exactement une clé fournisseur:modèle présente dans les candidats correspondants. reason doit être une phrase courte sans raisonnement privé. CANDIDATS: " . wp_json_encode( $candidates, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
 		$started = current_time( 'mysql', true );
 		$result = MSRWA_Providers::text( $router['provider'], $router['model'], $prompt, 700, false );
 		$input_tokens = is_array( $result ) && ! empty( $result['usage']['input_tokens'] ) ? absint( $result['usage']['input_tokens'] ) : 0;
