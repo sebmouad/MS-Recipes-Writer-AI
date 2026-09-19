@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.29` fournit un socle installable et sans appel payant automatique par défaut :
+La version `0.2.30` fournit un socle installable et sans appel payant automatique par défaut :
 
 - modes administrateur `Automatique` / `Manuel` ;
 - limites initiales de 50 recettes par lot, 4 traitements simultanés et 2 corrections ;
@@ -37,6 +37,7 @@ La version `0.2.29` fournit un socle installable et sans appel payant automatiqu
 - respect effectif des durées de rétention configurées pour les journaux et temporaires, avec protection des jobs encore actifs ou à vérifier ;
 - protection des lots mis en pause ou en attente : un worker déjà planifié ne peut plus les relancer sans action explicite ;
 - commandes administrateur visibles pour mettre en pause, reprendre ou annuler un lot, avec contrôle de propriété et avertissement sur les appels déjà acceptés ;
+- diagnostic de santé de file dans Configuration : moteur, prochain nettoyage, dernier progrès, jobs en attente/en cours/à vérifier et workers expirés, sans modifier le cron serveur ;
 - routage automatique agentique borné aux modèles connectés et vérifiés, avec coût journalisé et repli explicite vers le préfiltre déterministe si la réponse du routeur est inexploitable ;
 - historique avant/après des corrections éditoriales et provenance compacte (sources, modèles, corrections) conservée avec le brouillon final ;
 - association IA structurée pour chaque entrée, seuil de confiance, état « À confirmer » et endpoint sécurisé de confirmation éditeur avant la recherche ;

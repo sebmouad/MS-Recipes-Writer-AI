@@ -85,6 +85,35 @@ final class MSRWA_Queue {
 		return (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$t['jobs']} WHERE status = 'running' OR (status = 'queued' AND lock_until > UTC_TIMESTAMP())" );
 	}
 
+	/**
+	 * Small, read-only queue diagnostic for the Configuration screen. It does
+	 * not assume a browser visit is a cron runner and never changes a job.
+	 */
+	public static function health() {
+		global $wpdb;
+		$t = MSRWA_DB::tables();
+		$now = current_time( 'timestamp', true );
+		$next_cleanup = wp_next_scheduled( 'msrwa_cleanup' );
+		$counts = $wpdb->get_row( "SELECT SUM(status IN ('queued','retry_wait')) AS waiting, SUM(status = 'running') AS running, SUM(status = 'running' AND lock_until IS NOT NULL AND lock_until < UTC_TIMESTAMP()) AS expired, SUM(status IN ('awaiting_admin','awaiting_input','paused_budget','needs_review','failed','uncertain')) AS attention FROM {$t['jobs']}" );
+		$last_progress = $wpdb->get_var( "SELECT MAX(created_at) FROM {$t['events']} WHERE event_type IN ('batch_started','draft_completed','job_retry_scheduled','final_review_passed')" );
+		$waiting = absint( $counts->waiting ?? 0 );
+		$running = absint( $counts->running ?? 0 );
+		$expired = absint( $counts->expired ?? 0 );
+		$attention = absint( $counts->attention ?? 0 );
+		$status = $expired ? 'degraded' : ( $waiting && ! $next_cleanup ? 'warning' : 'healthy' );
+		return array(
+			'status' => $status,
+			'driver' => function_exists( 'as_enqueue_async_action' ) ? 'Action Scheduler' : 'WP-Cron',
+			'next_cleanup_at' => $next_cleanup ? gmdate( 'Y-m-d H:i:s', $next_cleanup ) : '',
+			'next_cleanup_in_seconds' => $next_cleanup ? max( 0, $next_cleanup - $now ) : 0,
+			'last_progress_at' => $last_progress ? (string) $last_progress : '',
+			'waiting' => $waiting,
+			'running' => $running,
+			'expired_workers' => $expired,
+			'needs_attention' => $attention,
+		);
+	}
+
 	public static function recover_expired() {
 		global $wpdb;
 		$t = MSRWA_DB::tables();
