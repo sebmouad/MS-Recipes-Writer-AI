@@ -6,12 +6,12 @@ final class MSRWA_Images {
 		$settings = MSRWA_Settings::get();
 		$plan = self::image_plan( 'featured_image', $job );
 		if ( is_wp_error( $plan ) ) { return $plan; }
-		$budget = MSRWA_DB::budget_allows( $job, (float) $settings['image_reserve_usd'] );
-		if ( is_wp_error( $budget ) ) { return $budget; }
+		$reservation = MSRWA_DB::reserve( $job, (float) $settings['image_reserve_usd'], 'featured_image' );
+		if ( is_wp_error( $reservation ) ) { return $reservation; }
 		$canonical = isset( $artifacts['canonical'] ) ? $artifacts['canonical'] : array();
 		$prompt = $settings['prompt_image'] . '\nRECETTE VALIDÉE : ' . wp_json_encode( $canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
 		$result = 'openai' === $plan['provider'] ? MSRWA_OpenAI::images_generate( $prompt, $plan['model'], '1024x1024', 'low', 'webp' ) : MSRWA_Providers::image( $plan['provider'], $plan['model'], $prompt, '1024x1024' );
-		self::record_call( $job, 'featured_image', $plan['provider'], $plan['model'], $prompt, $result, true );
+		self::record_call( $job, 'featured_image', $plan['provider'], $plan['model'], $prompt, $result, true, $reservation );
 		if ( is_wp_error( $result ) ) { return $result; }
 		$attachment_id = self::store_base64( $result['base64'], $job->title, 'Image principale générée', $result['format'] );
 		if ( is_wp_error( $attachment_id ) ) { return $attachment_id; }
@@ -22,8 +22,8 @@ final class MSRWA_Images {
 		$settings = MSRWA_Settings::get();
 		$plan = self::image_plan( 'facebook_image', $job );
 		if ( is_wp_error( $plan ) ) { return $plan; }
-		$budget = MSRWA_DB::budget_allows( $job, (float) $settings['image_reserve_usd'] );
-		if ( is_wp_error( $budget ) ) { return $budget; }
+		$reservation = MSRWA_DB::reserve( $job, (float) $settings['image_reserve_usd'], 'facebook_image' );
+		if ( is_wp_error( $reservation ) ) { return $reservation; }
 		$featured_id = isset( $artifacts['featured_image']['attachment_id'] ) ? absint( $artifacts['featured_image']['attachment_id'] ) : 0;
 		$featured_file = $featured_id ? get_attached_file( $featured_id ) : '';
 		$settings = MSRWA_Settings::get();
@@ -34,7 +34,7 @@ final class MSRWA_Images {
 		} else {
 			$result = 'openai' === $plan['provider'] ? MSRWA_OpenAI::images_generate( $prompt, $plan['model'], '1024x1536', 'low', 'webp' ) : MSRWA_Providers::image( $plan['provider'], $plan['model'], $prompt, '1024x1536' );
 		}
-		self::record_call( $job, 'facebook_image', $plan['provider'], $plan['model'], $prompt, $result, true );
+		self::record_call( $job, 'facebook_image', $plan['provider'], $plan['model'], $prompt, $result, true, $reservation );
 		if ( is_wp_error( $result ) ) { return $result; }
 		$attachment_id = self::store_base64( $result['base64'], $job->title . ' Facebook', 'Variante Facebook générée', $result['format'] );
 		if ( is_wp_error( $attachment_id ) ) { return $attachment_id; }
@@ -56,11 +56,11 @@ final class MSRWA_Images {
 		$plan = self::vision_plan( $job );
 		if ( is_wp_error( $plan ) ) { return $plan; }
 		$file = get_attached_file( absint( $image['attachment_id'] ?? 0 ) );
-		$budget = MSRWA_DB::budget_allows( $job, 0.05 );
-		if ( is_wp_error( $budget ) ) { return $budget; }
+		$reservation = MSRWA_DB::reserve( $job, 0.05, 'image_review' );
+		if ( is_wp_error( $reservation ) ) { return $reservation; }
 		$prompt = $settings['prompt_image_review'] . '\nRECETTE VALIDÉE : ' . wp_json_encode( $canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
 		$result = MSRWA_Providers::vision_text( $plan['provider'], $plan['model'], $prompt, $file, 1000 );
-		self::record_call( $job, 'image_review', $plan['provider'], $plan['model'], $prompt, $result, false );
+		self::record_call( $job, 'image_review', $plan['provider'], $plan['model'], $prompt, $result, false, $reservation );
 		if ( is_wp_error( $result ) ) { return $result; }
 		$json = json_decode( trim( (string) $result['text'] ), true );
 		if ( ! is_array( $json ) ) { $start = strpos( $result['text'], '{' ); $end = strrpos( $result['text'], '}' ); if ( false !== $start && false !== $end ) { $json = json_decode( substr( $result['text'], $start, $end - $start + 1 ), true ); } }
@@ -90,7 +90,7 @@ final class MSRWA_Images {
 		return MSRWA_Router::plan( $capability, $stage );
 	}
 
-	private static function record_call( $job, $operation, $provider, $model, $prompt, $result, $uncertain = false ) {
+	private static function record_call( $job, $operation, $provider, $model, $prompt, $result, $uncertain = false, $reservation = null ) {
 		$settings = MSRWA_Settings::get();
 		$catalog = MSRWA_Catalog::models();
 		$input_tokens = is_array( $result ) && ! empty( $result['usage']['input_tokens'] ) ? absint( $result['usage']['input_tokens'] ) : 0;
@@ -113,6 +113,7 @@ final class MSRWA_Images {
 			'started_at' => current_time( 'mysql', true ),
 			'finished_at' => current_time( 'mysql', true ),
 		) );
+		if ( is_wp_error( $result ) ) { MSRWA_DB::release( $reservation ); } else { MSRWA_DB::settle( $reservation, $cost ); }
 	}
 
 	private static function store_base64( $base64, $title, $caption, $format = 'webp' ) {
