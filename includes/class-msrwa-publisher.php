@@ -39,6 +39,7 @@ final class MSRWA_Publisher {
 		self::write_seo_meta( $post_id, $article );
 		self::write_taxonomies( $post_id, $article );
 		self::write_facebook_meta( $post_id, $article, $artifacts );
+		self::write_provenance( $post_id, $job, $artifacts );
 		if ( ! empty( $artifacts['featured_image']['attachment_id'] ) ) {
 			set_post_thumbnail( $post_id, absint( $artifacts['featured_image']['attachment_id'] ) );
 		}
@@ -195,5 +196,18 @@ final class MSRWA_Publisher {
 			if ( $caption ) { $items[0]['text'] = $caption; }
 			if ( $mapping['facebook_meta'] ) { update_post_meta( $post_id, $mapping['facebook_meta'], wp_json_encode( $items, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) ); }
 		}
+	}
+
+	private static function write_provenance( $post_id, $job, $artifacts ) {
+		$provenance = array(
+			'plugin_version' => defined( 'MSRWA_VERSION' ) ? MSRWA_VERSION : '',
+			'job_id' => absint( $job->id ),
+			'batch_id' => absint( $job->batch_id ),
+			'sources' => isset( $artifacts['sources'] ) && is_array( $artifacts['sources'] ) ? array_slice( $artifacts['sources'], 0, 20 ) : array(),
+			'selected_models' => json_decode( (string) $job->selected_models_json, true ),
+			'correction_history' => isset( $artifacts['correction_history'] ) && is_array( $artifacts['correction_history'] ) ? $artifacts['correction_history'] : array(),
+			'created_at' => current_time( 'mysql', true ),
+		);
+		update_post_meta( $post_id, '_msrwa_provenance', wp_json_encode( $provenance, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) );
 	}
 }

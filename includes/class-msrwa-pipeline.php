@@ -108,6 +108,9 @@ final class MSRWA_Pipeline {
 		if ( ! empty( $artifacts['review']['findings'] ) ) {
 			$previous_findings = ' ' . $settings['prompt_correction'] . ' Corrige également ces observations de relecture : ' . wp_json_encode( $artifacts['review']['findings'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
 		}
+		if ( ! empty( $artifacts['review']['corrected_artifact'] ) && is_array( $artifacts['review']['corrected_artifact'] ) ) {
+			$previous_findings .= ' Version corrigée proposée à préserver si elle est cohérente : ' . wp_json_encode( $artifacts['review']['corrected_artifact'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+		}
 		$links = self::internal_link_candidates( isset( $artifacts['canonical']['title'] ) ? $artifacts['canonical']['title'] : $job->title, (int) $settings['internal_links_max'] );
 		$artifacts['internal_link_candidates'] = $links;
 		$links_context = ! empty( $settings['internal_links_enabled'] ) ? '\nLiens internes autorisés : ' . wp_json_encode( $links, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . '. Utilise uniquement ces chemins relatifs, au maximum ' . (int) $settings['internal_links_max'] . ', et retourne aussi internal_links (title, url, anchor). Ne crée aucun lien si la liste est vide.' : '\nLes liens internes sont désactivés : retourne internal_links comme tableau vide.';
@@ -141,6 +144,10 @@ final class MSRWA_Pipeline {
 			$review = self::decode_json( $retry['text'], 'review' );
 		}
 		$artifacts['review'] = $review;
+		if ( empty( $review['pass'] ) && ! empty( $review['corrected_artifact'] ) && is_array( $review['corrected_artifact'] ) ) {
+			if ( empty( $artifacts['correction_history'] ) || ! is_array( $artifacts['correction_history'] ) ) { $artifacts['correction_history'] = array(); }
+			$artifacts['correction_history'][] = array( 'stage' => 'article', 'cycle' => (int) $job->correction_cycles + 1, 'before' => self::compact_article( $artifacts['article'] ), 'after' => self::compact_article( $review['corrected_artifact'] ), 'findings' => isset( $review['findings'] ) ? $review['findings'] : array(), 'created_at' => current_time( 'mysql', true ) );
+		}
 		if ( empty( $review['pass'] ) && (int) $job->correction_cycles < (int) $settings['max_corrections'] ) {
 			global $wpdb;
 			$t = MSRWA_DB::tables();
@@ -346,5 +353,13 @@ final class MSRWA_Pipeline {
 		}
 		if ( ! is_array( $json ) ) { throw new Exception( 'Sortie JSON invalide pour ' . $label . '.' ); }
 		return $json;
+	}
+
+	private static function compact_article( $article ) {
+		$article = is_array( $article ) ? $article : array();
+		$keys = array( 'title', 'excerpt', 'content_html', 'seo_title', 'seo_description', 'slug', 'tags', 'categories', 'recipe_meta', 'internal_links', 'facebook_caption' );
+		$out = array();
+		foreach ( $keys as $key ) { if ( array_key_exists( $key, $article ) ) { $out[ $key ] = $article[ $key ]; } }
+		return $out;
 	}
 }
