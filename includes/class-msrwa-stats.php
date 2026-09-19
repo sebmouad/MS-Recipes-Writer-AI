@@ -39,9 +39,11 @@ final class MSRWA_Stats {
 			$event_where .= ' AND (j.owner_id = %d OR b.owner_id = %d)'; $event_args[] = absint( $owner_id ); $event_args[] = absint( $owner_id );
 		}
 		$status_sql = "SELECT j.status, COUNT(*) AS count, COALESCE(SUM(j.cost_estimate),0) AS cost FROM {$t['jobs']} j WHERE {$job_where} GROUP BY j.status ORDER BY count DESC";
+		$performance_sql = "SELECT SUM(j.status = 'completed') AS completed, SUM(j.status IN ('failed','needs_review')) AS failed, COALESCE(SUM(CASE WHEN j.status = 'completed' THEN j.cost_estimate ELSE 0 END),0) AS completed_cost, AVG(CASE WHEN j.status = 'completed' THEN TIMESTAMPDIFF(SECOND, j.created_at, j.updated_at) ELSE NULL END) AS average_completed_seconds, MAX(CASE WHEN j.status = 'completed' THEN TIMESTAMPDIFF(SECOND, j.created_at, j.updated_at) ELSE NULL END) AS max_completed_seconds FROM {$t['jobs']} j WHERE {$job_where}";
 		$operation_sql = "SELECT c.operation, c.status, COUNT(*) AS count, COALESCE(SUM(c.input_tokens),0) AS input_tokens, COALESCE(SUM(c.output_tokens),0) AS output_tokens, COALESCE(SUM(c.cost_estimate),0) AS cost FROM {$t['calls']} c INNER JOIN {$t['jobs']} j ON j.id = c.job_id WHERE {$call_where} GROUP BY c.operation, c.status ORDER BY cost DESC, count DESC";
 		$event_sql = "SELECT e.event_type, COUNT(*) AS count FROM {$t['events']} e LEFT JOIN {$t['jobs']} j ON j.id = e.job_id LEFT JOIN {$t['batches']} b ON b.id = e.batch_id WHERE {$event_where} GROUP BY e.event_type ORDER BY count DESC, e.event_type ASC";
 		$statuses = $job_args ? $wpdb->get_results( $wpdb->prepare( $status_sql, $job_args ), ARRAY_A ) : $wpdb->get_results( $status_sql, ARRAY_A );
+		$performance = $job_args ? $wpdb->get_row( $wpdb->prepare( $performance_sql, $job_args ), ARRAY_A ) : $wpdb->get_row( $performance_sql, ARRAY_A );
 		$operations = $call_args ? $wpdb->get_results( $wpdb->prepare( $operation_sql, $call_args ), ARRAY_A ) : $wpdb->get_results( $operation_sql, ARRAY_A );
 		$events = $event_args ? $wpdb->get_results( $wpdb->prepare( $event_sql, $event_args ), ARRAY_A ) : $wpdb->get_results( $event_sql, ARRAY_A );
 		$editors = array();
@@ -52,7 +54,16 @@ final class MSRWA_Stats {
 				$editor['name'] = $user ? $user->display_name : sprintf( 'Utilisateur #%d', (int) $editor['owner_id'] );
 			}
 		}
-		return array( 'statuses' => $statuses, 'operations' => $operations, 'events' => $events, 'editors' => $editors );
+		$performance = is_array( $performance ) ? $performance : array();
+		$completed = absint( $performance['completed'] ?? 0 );
+		$completed_cost = (float) ( $performance['completed_cost'] ?? 0 );
+		$performance['completed'] = $completed;
+		$performance['failed'] = absint( $performance['failed'] ?? 0 );
+		$performance['completed_cost'] = $completed_cost;
+		$performance['cost_per_completed'] = $completed ? $completed_cost / $completed : 0;
+		$performance['average_completed_seconds'] = isset( $performance['average_completed_seconds'] ) ? (float) $performance['average_completed_seconds'] : 0;
+		$performance['max_completed_seconds'] = isset( $performance['max_completed_seconds'] ) ? (int) $performance['max_completed_seconds'] : 0;
+		return array( 'statuses' => $statuses, 'operations' => $operations, 'events' => $events, 'editors' => $editors, 'performance' => $performance );
 	}
 
 	public static function summary_range( $from, $to, $owner_id = 0 ) {
