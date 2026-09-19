@@ -13,6 +13,12 @@ final class MSRWA_Settings {
 			'openai_model'        => 'gpt-5.6-luna',
 			'gemini_model'        => 'gemini-3.1-flash-image',
 			'claude_model'        => 'claude-sonnet-5',
+			'manual_models'       => array(
+				'text'   => 'openai:gpt-5.6-luna',
+				'review' => 'claude:claude-sonnet-5',
+				'image'  => 'gemini:gemini-3.1-flash-image',
+				'search' => 'openai:gpt-5.6-luna',
+			),
 			'research_provider'   => 'native',
 			'max_batch'           => 50,
 			'max_concurrency'     => 4,
@@ -48,6 +54,14 @@ final class MSRWA_Settings {
 		}
 		foreach ( array( 'openai_model', 'gemini_model', 'claude_model', 'research_provider', 'featured_ratio', 'facebook_ratio' ) as $key ) {
 			if ( isset( $raw[ $key ] ) ) { $out[ $key ] = sanitize_text_field( $raw[ $key ] ); }
+		}
+		$catalog = MSRWA_Catalog::models();
+		if ( isset( $raw['manual_models'] ) && is_array( $raw['manual_models'] ) ) {
+			foreach ( array( 'text', 'review', 'image', 'search' ) as $stage ) {
+				$value = isset( $raw['manual_models'][ $stage ] ) ? sanitize_text_field( $raw['manual_models'][ $stage ] ) : $defaults['manual_models'][ $stage ];
+				list( $provider, $model ) = array_pad( explode( ':', $value, 2 ), 2, '' );
+				if ( isset( $catalog[ $provider ][ $model ] ) && ! empty( $catalog[ $provider ][ $model ]['stable'] ) ) { $out['manual_models'][ $stage ] = $provider . ':' . $model; }
+			}
 		}
 		foreach ( array( 'max_batch' => array( 1, 50 ), 'max_concurrency' => array( 1, 4 ), 'max_corrections' => array( 0, 2 ), 'log_days' => array( 1, 365 ), 'temp_days' => array( 1, 90 ), 'aggregate_months' => array( 1, 60 ) ) as $key => $limits ) {
 			$value = isset( $raw[ $key ] ) ? absint( $raw[ $key ] ) : $defaults[ $key ];

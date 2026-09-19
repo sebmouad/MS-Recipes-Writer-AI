@@ -12,6 +12,9 @@ La version `0.1.0` fournit un socle installable et sans appel payant automatique
 - écran MS Tools (ou menu autonome si MS Tools est absent) ;
 - réglages protégés des clés API et prompts éditables ;
 - catalogue de capacités et tarifs vérifiés des modèles OpenAI, Gemini et Claude ;
+- préfiltre de routage automatique qualité/coût et validation du schéma canonique ;
+- snapshot des réglages et modèles sélectionnés pour chaque lot et chaque job ;
+- sélection manuelle distincte par étape (rédaction, relecture, images, recherche) ;
 - REST local pour créer et consulter les lots ;
 - file durable qui place les lots en attente de validation du budget de test.
 

@@ -21,6 +21,8 @@ require_once MSRWA_DIR . 'includes/class-msrwa-db.php';
 require_once MSRWA_DIR . 'includes/class-msrwa-settings.php';
 require_once MSRWA_DIR . 'includes/class-msrwa-catalog.php';
 require_once MSRWA_DIR . 'includes/class-msrwa-openai.php';
+require_once MSRWA_DIR . 'includes/class-msrwa-router.php';
+require_once MSRWA_DIR . 'includes/class-msrwa-recipe.php';
 require_once MSRWA_DIR . 'includes/class-msrwa-queue.php';
 require_once MSRWA_DIR . 'includes/class-msrwa-rest.php';
 require_once MSRWA_DIR . 'includes/class-msrwa-admin.php';

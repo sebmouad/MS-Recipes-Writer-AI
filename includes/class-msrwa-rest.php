@@ -29,12 +29,18 @@ final class MSRWA_REST {
 		if ( empty( $items ) || count( $items ) > (int) $settings['max_batch'] ) { return new WP_Error( 'invalid_batch', 'Le lot est vide ou dépasse la limite configurée.', array( 'status' => 400 ) ); }
 		$now = current_time( 'mysql', true );
 		$t = MSRWA_DB::tables();
-		$wpdb->insert( $t['batches'], array( 'owner_id' => get_current_user_id(), 'status' => 'queued', 'total' => count( $items ), 'created_at' => $now, 'updated_at' => $now ), array( '%d', '%s', '%d', '%s', '%s' ) );
+		$wpdb->insert( $t['batches'], array( 'owner_id' => get_current_user_id(), 'status' => 'queued', 'total' => count( $items ), 'settings_snapshot' => wp_json_encode( $settings ), 'created_at' => $now, 'updated_at' => $now ), array( '%d', '%s', '%d', '%s', '%s', '%s' ) );
 		$batch_id = (int) $wpdb->insert_id;
 		foreach ( $items as $item ) {
 			$title = isset( $item['title'] ) ? sanitize_text_field( $item['title'] ) : '';
 			if ( '' === $title ) { continue; }
-			$wpdb->insert( $t['jobs'], array( 'batch_id' => $batch_id, 'owner_id' => get_current_user_id(), 'title' => $title, 'input_json' => wp_json_encode( $item ), 'status' => 'queued', 'stage' => 'intake', 'created_at' => $now, 'updated_at' => $now ), array( '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s' ) );
+			$normalized = MSRWA_Recipe::normalize_input( $item );
+			$models = array();
+			$text_plan = MSRWA_Router::plan( 'text' );
+			if ( ! is_wp_error( $text_plan ) ) { $models['text'] = $text_plan; }
+			$image_plan = MSRWA_Router::plan( 'image_generation' );
+			if ( ! is_wp_error( $image_plan ) ) { $models['featured_image'] = $image_plan; }
+			$wpdb->insert( $t['jobs'], array( 'batch_id' => $batch_id, 'owner_id' => get_current_user_id(), 'title' => $title, 'input_json' => wp_json_encode( $normalized ), 'selected_models_json' => wp_json_encode( $models ), 'status' => 'queued', 'stage' => 'intake', 'created_at' => $now, 'updated_at' => $now ), array( '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s' ) );
 		}
 		MSRWA_DB::event( 'batch_created', $batch_id, 0, array( 'total' => count( $items ) ) );
 		MSRWA_Queue::schedule_batch( $batch_id );

@@ -14,7 +14,8 @@ final class MSRWA_OpenAI {
 		$key = self::key();
 		if ( '' === $key ) { return new WP_Error( 'missing_openai_key', 'Aucune clé OpenAI côté serveur.', array( 'status' => 400 ) ); }
 		$settings = MSRWA_Settings::get();
-		$model = $model ? sanitize_text_field( $model ) : $settings['openai_model'];
+		$manual_text = isset( $settings['manual_models']['text'] ) ? $settings['manual_models']['text'] : '';
+		$model = $model ? sanitize_text_field( $model ) : ( 0 === strpos( $manual_text, 'openai:' ) ? substr( $manual_text, 7 ) : $settings['openai_model'] );
 		$catalog = MSRWA_Catalog::models();
 		if ( empty( $catalog['openai'][ $model ]['stable'] ) ) { return new WP_Error( 'unsupported_openai_model', 'Modèle OpenAI non autorisé par le catalogue.', array( 'status' => 400 ) ); }
 		$payload = array( 'model' => $model, 'input' => sanitize_textarea_field( $input ), 'store' => false, 'max_output_tokens' => max( 16, absint( $max_output_tokens ) ) );
