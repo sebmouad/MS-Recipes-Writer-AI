@@ -65,6 +65,17 @@ final class MSRWA_Pipeline {
 	}
 
 	private static function association( $job, $input, &$artifacts ) {
+		$routing = MSRWA_Router::agent_plan( $job );
+		if ( is_wp_error( $routing ) ) {
+			if ( preg_match( '/budget|payant|insuffisant/i', $routing->get_error_message() ) ) { throw new Exception( $routing->get_error_message() ); }
+			MSRWA_DB::event( 'router_fallback', $job->batch_id, $job->id, array( 'code' => $routing->get_error_code() ) );
+		} else {
+			global $wpdb;
+			$t = MSRWA_DB::tables();
+			$wpdb->update( $t['jobs'], array( 'selected_models_json' => wp_json_encode( $routing ), 'updated_at' => current_time( 'mysql', true ) ), array( 'id' => $job->id, 'lock_token' => $job->lock_token, 'status' => 'running' ), array( '%s', '%s' ), array( '%d', '%s', '%s' ) );
+			$job->selected_models_json = wp_json_encode( $routing );
+			MSRWA_DB::event( 'router_selected', $job->batch_id, $job->id, array( 'models' => array_map( function ( $value ) { return is_array( $value ) && isset( $value['provider'], $value['model'] ) ? $value['provider'] . ':' . $value['model'] : ''; }, $routing ), 'reason' => isset( $routing['reason'] ) ? $routing['reason'] : '' ) );
+		}
 		$references = isset( $input['reference_images'] ) && is_array( $input['reference_images'] ) ? array_values( $input['reference_images'] ) : array();
 		$artifacts['association'] = array( 'title' => isset( $input['title'] ) ? $input['title'] : '', 'reference_images' => $references, 'confidence' => empty( $input['title'] ) ? 0 : 1, 'needs_editor' => empty( $input['title'] ) );
 		if ( empty( $input['title'] ) ) { self::set_status( $job, 'awaiting_input', 'association_ambiguous', 'Un titre est nécessaire pour associer les références de ce job.' ); return; }
