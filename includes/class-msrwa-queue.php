@@ -6,7 +6,7 @@ final class MSRWA_Queue {
 		global $wpdb;
 		$t = MSRWA_DB::tables();
 		$token = wp_generate_uuid4();
-		$updated = $wpdb->query( $wpdb->prepare( "UPDATE {$t['jobs']} SET lock_token = %s, lock_until = DATE_ADD(UTC_TIMESTAMP(), INTERVAL 10 MINUTE), status = 'running', attempts = attempts + 1, updated_at = %s WHERE id = %d AND status = 'queued' AND (lock_until IS NULL OR lock_until < UTC_TIMESTAMP())", $token, current_time( 'mysql', true ), absint( $job_id ) ) );
+		$updated = $wpdb->query( $wpdb->prepare( "UPDATE {$t['jobs']} SET lock_token = %s, lock_until = DATE_ADD(UTC_TIMESTAMP(), INTERVAL 10 MINUTE), status = 'running', attempts = attempts + 1, updated_at = %s WHERE id = %d AND status IN ('queued','retry_wait') AND (lock_until IS NULL OR lock_until < UTC_TIMESTAMP())", $token, current_time( 'mysql', true ), absint( $job_id ) ) );
 		return $updated ? $token : false;
 	}
 
@@ -40,9 +40,11 @@ final class MSRWA_Queue {
 		}
 	}
 
-	public static function schedule_job( $job_id ) {
-		if ( function_exists( 'as_enqueue_async_action' ) ) { as_enqueue_async_action( 'msrwa_process_job', array( 'job_id' => absint( $job_id ) ), 'ms-recipes-writer-ai' ); }
-		else { wp_schedule_single_event( time() + 5, 'msrwa_process_job', array( absint( $job_id ) ) ); }
+	public static function schedule_job( $job_id, $delay = 0 ) {
+		$delay = max( 0, absint( $delay ) );
+		if ( $delay && function_exists( 'as_schedule_single_action' ) ) { as_schedule_single_action( time() + $delay, 'msrwa_process_job', array( 'job_id' => absint( $job_id ) ), 'ms-recipes-writer-ai' ); }
+		elseif ( function_exists( 'as_enqueue_async_action' ) && ! $delay ) { as_enqueue_async_action( 'msrwa_process_job', array( 'job_id' => absint( $job_id ) ), 'ms-recipes-writer-ai' ); }
+		else { wp_schedule_single_event( time() + max( 5, $delay ), 'msrwa_process_job', array( absint( $job_id ) ) ); }
 	}
 
 	public static function process_batch( $batch_id ) {

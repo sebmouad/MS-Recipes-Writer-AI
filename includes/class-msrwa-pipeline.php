@@ -19,7 +19,7 @@ final class MSRWA_Pipeline {
 		try {
 			switch ( $job->stage ) {
 				case 'intake': self::advance( $job, $artifacts, 'association' ); break;
-				case 'association': self::advance( $job, $artifacts, 'research' ); break;
+				case 'association': self::association( $job, $input, $artifacts ); break;
 				case 'research': self::research( $job, $input, $artifacts ); break;
 				case 'canonical_recipe': self::canonical( $job, $input, $artifacts ); break;
 				case 'article': self::article( $job, $artifacts ); break;
@@ -31,7 +31,14 @@ final class MSRWA_Pipeline {
 				default: self::set_status( $job, 'needs_review', 'stage_not_implemented', 'Cette étape attend encore son adaptateur fournisseur.' );
 			}
 		} catch ( Exception $exception ) {
-			self::set_status( $job, 'failed', 'pipeline_exception', $exception->getMessage() );
+			if ( self::retryable( $exception->getMessage() ) && (int) $job->attempts < 3 ) {
+				$delay = min( 900, 30 * ( 2 ** max( 0, (int) $job->attempts - 1 ) ) + wp_rand( 0, 15 ) );
+				$wpdb->update( $t['jobs'], array( 'status' => 'retry_wait', 'error_code' => 'retry_scheduled', 'error_message' => sanitize_textarea_field( $exception->getMessage() ), 'lock_token' => null, 'lock_until' => null, 'updated_at' => current_time( 'mysql', true ) ), array( 'id' => $job->id ), array( '%s', '%s', '%s', '%s', '%s', '%s' ), array( '%d' ) );
+				MSRWA_DB::event( 'job_retry_scheduled', $job->batch_id, $job->id, array( 'delay' => $delay, 'attempt' => (int) $job->attempts ) );
+				MSRWA_Queue::schedule_job( $job->id, $delay );
+			} else {
+				self::set_status( $job, 'failed', 'pipeline_exception', $exception->getMessage() );
+			}
 		}
 	}
 
@@ -52,6 +59,13 @@ final class MSRWA_Pipeline {
 		}
 		$artifacts['sources'] = $result['sources'];
 		self::advance( $job, $artifacts, 'canonical_recipe' );
+	}
+
+	private static function association( $job, $input, &$artifacts ) {
+		$references = isset( $input['reference_images'] ) && is_array( $input['reference_images'] ) ? array_values( $input['reference_images'] ) : array();
+		$artifacts['association'] = array( 'title' => isset( $input['title'] ) ? $input['title'] : '', 'reference_images' => $references, 'confidence' => empty( $input['title'] ) ? 0 : 1, 'needs_editor' => empty( $input['title'] ) );
+		if ( empty( $input['title'] ) ) { self::set_status( $job, 'awaiting_input', 'association_ambiguous', 'Un titre est nécessaire pour associer les références de ce job.' ); return; }
+		self::advance( $job, $artifacts, 'research' );
 	}
 
 	private static function canonical( $job, $input, &$artifacts ) {
@@ -279,6 +293,8 @@ final class MSRWA_Pipeline {
 	}
 
 	private static function require_result( $result ) { if ( is_wp_error( $result ) ) { throw new Exception( $result->get_error_message() ); } }
+
+	private static function retryable( $message ) { return (bool) preg_match( '/\b(?:429|500|502|503|504)\b|timeout|timed out|temporarily|rate limit|réseau|network/i', (string) $message ); }
 
 	private static function decode_json( $text, $label ) {
 		$json = json_decode( trim( (string) $text ), true );

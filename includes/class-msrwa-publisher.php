@@ -8,7 +8,7 @@ final class MSRWA_Publisher {
 		$canonical = isset( $artifacts['canonical'] ) && is_array( $artifacts['canonical'] ) ? $artifacts['canonical'] : array();
 		if ( empty( $article['title'] ) || empty( $article['content_html'] ) ) { return new WP_Error( 'draft_content_missing', 'L’article validé ne contient pas le titre ou le contenu.' ); }
 		$post_id = absint( isset( $job->draft_post_id ) ? $job->draft_post_id : 0 );
-		$content = wp_kses_post( (string) $article['content_html'] );
+		$content = self::sanitize_content( (string) $article['content_html'], isset( $article['internal_links'] ) ? $article['internal_links'] : array() );
 		if ( ! preg_match( '/<\w[\s\S]*>/i', $content ) ) { $content = wpautop( esc_html( $content ) ); }
 		if ( isset( $canonical['calories_estimate'] ) && '' !== (string) $canonical['calories_estimate'] ) {
 			$content .= '<p class="msrwa-nutrition-note">Valeurs nutritionnelles estimées par IA ; elles ne remplacent pas une analyse nutritionnelle professionnelle.</p>';
@@ -51,6 +51,22 @@ final class MSRWA_Publisher {
 		if ( $owner && get_userdata( $owner ) ) { return $owner; }
 		$admin = get_users( array( 'role' => 'administrator', 'number' => 1, 'fields' => 'ID' ) );
 		return ! empty( $admin[0] ) ? absint( $admin[0] ) : 1;
+	}
+
+	private static function sanitize_content( $content, $internal_links ) {
+		$content = wp_kses_post( $content );
+		if ( ! preg_match( '/<\w[\s\S]*>/i', $content ) ) { return wpautop( esc_html( $content ) ); }
+		$content = preg_replace( '/<h1\b[^>]*>(.*?)<\/h1>/is', '$1', $content );
+		$allowed = array();
+		foreach ( is_array( $internal_links ) ? $internal_links : array() as $link ) {
+			$url = is_array( $link ) && isset( $link['url'] ) ? (string) $link['url'] : '';
+			$allowed[] = function_exists( 'wp_make_link_relative' ) ? wp_make_link_relative( $url ) : ( wp_parse_url( $url, PHP_URL_PATH ) ?: '' );
+		}
+		$content = preg_replace_callback( '/<a\b[^>]*href=["\']([^"\']+)["\'][^>]*>(.*?)<\/a>/is', function ( $match ) use ( $allowed ) {
+			$href = function_exists( 'wp_make_link_relative' ) ? wp_make_link_relative( $match[1] ) : ( wp_parse_url( $match[1], PHP_URL_PATH ) ?: '' );
+			return in_array( $href, $allowed, true ) ? $match[0] : $match[2];
+		}, $content );
+		return $content;
 	}
 
 	private static function write_recipe_meta( $post_id, $recipe ) {
