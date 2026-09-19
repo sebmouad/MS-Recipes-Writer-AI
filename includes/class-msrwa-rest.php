@@ -10,6 +10,7 @@ final class MSRWA_REST {
 		register_rest_route( 'msrwa/v1', '/batches/(?P<id>\d+)', array( 'methods' => 'GET', 'permission_callback' => array( __CLASS__, 'can_read' ), 'callback' => array( __CLASS__, 'get_batch' ) ) );
 		register_rest_route( 'msrwa/v1', '/jobs/(?P<id>\d+)/retry', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_read' ), 'callback' => array( __CLASS__, 'retry_job' ) ) );
 		register_rest_route( 'msrwa/v1', '/jobs/(?P<id>\d+)/cancel', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_read' ), 'callback' => array( __CLASS__, 'cancel_job' ) ) );
+		register_rest_route( 'msrwa/v1', '/jobs/(?P<id>\d+)/association', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_read' ), 'callback' => array( __CLASS__, 'resolve_association' ) ) );
 		register_rest_route( 'msrwa/v1', '/batches/(?P<id>\d+)/pause', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_read' ), 'callback' => array( __CLASS__, 'pause_batch' ) ) );
 		register_rest_route( 'msrwa/v1', '/batches/(?P<id>\d+)/resume', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_read' ), 'callback' => array( __CLASS__, 'resume_batch' ) ) );
 		register_rest_route( 'msrwa/v1', '/batches/(?P<id>\d+)/cancel', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_read' ), 'callback' => array( __CLASS__, 'cancel_batch' ) ) );
@@ -96,6 +97,27 @@ final class MSRWA_REST {
 		if ( ! $job || ( (int) $job->owner_id !== get_current_user_id() && ! current_user_can( 'msrwa_view_all' ) && ! current_user_can( 'manage_options' ) ) ) { return new WP_Error( 'not_found', 'Job introuvable.', array( 'status' => 404 ) ); }
 		if ( ! MSRWA_Queue::cancel_job( $id ) ) { return new WP_Error( 'job_not_cancelled', 'Ce job est déjà terminé ou annulé.', array( 'status' => 409 ) ); }
 		return rest_ensure_response( array( 'id' => $id, 'status' => 'cancelled' ) );
+	}
+
+	public static function resolve_association( WP_REST_Request $request ) {
+		global $wpdb;
+		$t = MSRWA_DB::tables();
+		$id = absint( $request['id'] );
+		$job = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$t['jobs']} WHERE id = %d", $id ) );
+		if ( ! $job || ( (int) $job->owner_id !== get_current_user_id() && ! current_user_can( 'msrwa_view_all' ) && ! current_user_can( 'manage_options' ) ) ) { return new WP_Error( 'not_found', 'Job introuvable.', array( 'status' => 404 ) ); }
+		if ( 'awaiting_input' !== $job->status || 'association' !== $job->stage ) { return new WP_Error( 'association_not_pending', 'Ce job n’attend pas une confirmation d’association.', array( 'status' => 409 ) ); }
+		$payload = $request->get_json_params();
+		if ( empty( $payload['confirmed'] ) ) { return new WP_Error( 'association_confirmation_required', 'La confirmation explicite est requise.', array( 'status' => 400 ) ); }
+		$artifacts = json_decode( (string) $job->artifacts_json, true );
+		$artifacts = is_array( $artifacts ) ? $artifacts : array();
+		$artifacts['association'] = isset( $artifacts['association'] ) && is_array( $artifacts['association'] ) ? $artifacts['association'] : array();
+		$artifacts['association']['editor_confirmed'] = true;
+		$artifacts['association']['needs_editor'] = false;
+		$updated = $wpdb->update( $t['jobs'], array( 'artifacts_json' => wp_json_encode( $artifacts ), 'status' => 'queued', 'error_code' => null, 'error_message' => null, 'lock_token' => null, 'lock_until' => null, 'updated_at' => current_time( 'mysql', true ) ), array( 'id' => $id, 'status' => 'awaiting_input' ), array( '%s', '%s', '%s', '%s', '%s', '%s', '%s' ), array( '%d', '%s' ) );
+		if ( ! $updated ) { return new WP_Error( 'association_update_failed', 'La confirmation n’a pas pu être enregistrée.', array( 'status' => 409 ) ); }
+		MSRWA_DB::event( 'association_confirmed', $job->batch_id, $id );
+		MSRWA_Queue::schedule_job( $id );
+		return rest_ensure_response( array( 'id' => $id, 'status' => 'queued', 'stage' => 'association' ) );
 	}
 
 	private static function owned_batch( $id ) {

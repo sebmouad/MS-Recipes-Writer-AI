@@ -65,6 +65,7 @@ final class MSRWA_Pipeline {
 	}
 
 	private static function association( $job, $input, &$artifacts ) {
+		if ( ! empty( $artifacts['association']['editor_confirmed'] ) ) { self::advance( $job, $artifacts, 'research' ); return; }
 		$routing = MSRWA_Router::agent_plan( $job );
 		if ( is_wp_error( $routing ) ) {
 			if ( preg_match( '/budget|payant|insuffisant/i', $routing->get_error_message() ) ) { throw new Exception( $routing->get_error_message() ); }
@@ -77,8 +78,29 @@ final class MSRWA_Pipeline {
 			MSRWA_DB::event( 'router_selected', $job->batch_id, $job->id, array( 'models' => array_map( function ( $value ) { return is_array( $value ) && isset( $value['provider'], $value['model'] ) ? $value['provider'] . ':' . $value['model'] : ''; }, $routing ), 'reason' => isset( $routing['reason'] ) ? $routing['reason'] : '' ) );
 		}
 		$references = isset( $input['reference_images'] ) && is_array( $input['reference_images'] ) ? array_values( $input['reference_images'] ) : array();
-		$artifacts['association'] = array( 'title' => isset( $input['title'] ) ? $input['title'] : '', 'reference_images' => $references, 'confidence' => empty( $input['title'] ) ? 0 : 1, 'needs_editor' => empty( $input['title'] ) );
-		if ( empty( $input['title'] ) ) { self::set_status( $job, 'awaiting_input', 'association_ambiguous', 'Un titre est nécessaire pour associer les références de ce job.' ); return; }
+		$settings = MSRWA_Settings::get();
+		$association = array( 'title' => isset( $input['title'] ) ? $input['title'] : '', 'reference_images' => $references, 'confidence' => empty( $input['title'] ) ? 0 : 1, 'needs_editor' => empty( $input['title'] ), 'notes' => array() );
+		if ( ! empty( $input['title'] ) ) {
+			$association_prompt = $settings['prompt_association'] . '\nRetourne uniquement un JSON avec title, confidence (0 à 1), needs_editor (boolean), matched_reference_indexes et notes. Ne prétends pas voir une image si elle n’est pas directement fournie comme entrée vision. TITRE : ' . wp_json_encode( $input['title'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . ' TEXTE : ' . wp_json_encode( substr( (string) ( $input['source_text'] ?? '' ), 0, 8000 ), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . ' IMAGES DE RÉFÉRENCE (URL non téléchargées à cette étape) : ' . wp_json_encode( $references, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+			$result = self::text_call( $job, $association_prompt, 900, array(), false, 'association' );
+			if ( is_wp_error( $result ) ) { throw new Exception( $result->get_error_message() ); }
+			try {
+				$decoded = self::decode_json( $result['text'], 'association' );
+				$association['confidence'] = min( 1, max( 0, (float) ( $decoded['confidence'] ?? $association['confidence'] ) ) );
+				$association['needs_editor'] = ! empty( $decoded['needs_editor'] ) || $association['confidence'] < 0.65;
+				$association['matched_reference_indexes'] = isset( $decoded['matched_reference_indexes'] ) && is_array( $decoded['matched_reference_indexes'] ) ? array_values( array_map( 'absint', $decoded['matched_reference_indexes'] ) ) : array();
+				$association['notes'] = array();
+				if ( isset( $decoded['notes'] ) ) {
+					$notes = is_array( $decoded['notes'] ) ? $decoded['notes'] : array( $decoded['notes'] );
+					foreach ( $notes as $note ) { if ( is_scalar( $note ) && '' !== trim( (string) $note ) ) { $association['notes'][] = sanitize_text_field( $note ); } }
+				}
+			} catch ( Exception $error ) {
+				$association['notes'][] = 'Réponse d’association non structurée ; validation déterministe conservée.';
+				MSRWA_DB::event( 'association_fallback', $job->batch_id, $job->id, array( 'reason' => 'invalid_json' ) );
+			}
+		}
+		$artifacts['association'] = $association;
+		if ( empty( $input['title'] ) || ! empty( $association['needs_editor'] ) ) { self::set_status( $job, 'awaiting_input', 'association_ambiguous', 'L’association de cette entrée doit être confirmée par l’éditeur.' ); return; }
 		self::advance( $job, $artifacts, 'research' );
 	}
 
