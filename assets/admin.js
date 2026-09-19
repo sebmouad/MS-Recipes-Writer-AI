@@ -134,16 +134,6 @@
     });
   });
 
-  Array.prototype.forEach.call(document.querySelectorAll('.msrwa-actions'), function (actions) {
-    var batchButton = actions.querySelector('.msrwa-batch-action[data-batch-id]');
-    if (!batchButton || actions.querySelector('.msrwa-batch-details')) return;
-    var link = document.createElement('a');
-    link.className = 'button msrwa-batch-details';
-    link.textContent = 'Détails';
-    link.href = window.location.pathname + '?page=ms-recipes-writer-ai-job&batch_id=' + encodeURIComponent(batchButton.getAttribute('data-batch-id'));
-    actions.insertBefore(link, actions.firstChild);
-  });
-
   Array.prototype.forEach.call(document.querySelectorAll('.msrwa-job-action'), function (button) {
     button.addEventListener('click', function () {
       var jobId = button.getAttribute('data-job-id');
@@ -152,12 +142,19 @@
       var status = card ? card.querySelector('.msrwa-job-action-status') : null;
       if (!jobId || !action) return;
       if (action === 'cancel' && !window.confirm('Annuler ce job ? Les appels déjà acceptés par un fournisseur peuvent rester facturés.')) return;
+      if (action === 'association' && !window.confirm('Confirmer cette association et reprendre le job ?')) return;
       button.disabled = true;
       setMessage(status, 'Action en cours…', false);
-      request('/jobs/' + encodeURIComponent(jobId) + '/' + encodeURIComponent(action), { method: 'POST' })
+      var requestOptions = { method: 'POST' };
+      if (action === 'association') {
+        requestOptions.headers = { 'Content-Type': 'application/json' };
+        requestOptions.body = JSON.stringify({ confirmed: true });
+      }
+      request('/jobs/' + encodeURIComponent(jobId) + '/' + encodeURIComponent(action), requestOptions)
         .then(function (result) {
-          setMessage(status, action === 'retry' ? 'Relance planifiée.' : 'Job annulé.', false);
-          if (action === 'retry' && card) card.querySelector('.msrwa-job-state span').textContent = result.status || 'queued';
+          var labels = { retry: 'Relance planifiée.', cancel: 'Job annulé.', association: 'Association confirmée ; reprise planifiée.' };
+          setMessage(status, labels[action] || 'Action enregistrée.', false);
+          if ((action === 'retry' || action === 'association') && card) card.querySelector('.msrwa-job-state span').textContent = result.status || 'queued';
         })
         .catch(function (error) { setMessage(status, error.message, true); })
         .finally(function () { button.disabled = false; });
