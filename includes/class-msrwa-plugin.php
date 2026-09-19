@@ -21,6 +21,7 @@ final class MSRWA_Plugin {
 	public static function boot() {
 		add_action( 'rest_api_init', array( 'MSRWA_REST', 'register' ) );
 		add_action( 'msrwa_process_batch', array( 'MSRWA_Queue', 'process_batch' ) );
+		add_action( 'msrwa_process_job', array( 'MSRWA_Pipeline', 'process_job' ) );
 		if ( is_admin() ) { MSRWA_Admin::hooks(); }
 		if ( get_option( 'msrwa_db_version' ) !== MSRWA_VERSION ) { MSRWA_DB::install(); }
 	}

@@ -1,0 +1,201 @@
+<?php
+if ( ! defined( 'ABSPATH' ) ) { exit; }
+
+final class MSRWA_Pipeline {
+	public static function process_job( $job_id ) {
+		global $wpdb;
+		$t = MSRWA_DB::tables();
+		$job = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$t['jobs']} WHERE id = %d", $job_id ) );
+		if ( ! $job || in_array( $job->status, array( 'completed', 'cancelled', 'needs_review', 'awaiting_admin' ), true ) ) { return; }
+		$settings = MSRWA_Settings::get();
+		if ( empty( $settings['allow_paid_tests'] ) || (float) $settings['test_budget_usd'] <= 0 ) {
+			self::set_status( $job, 'awaiting_admin', 'paid_tests_disabled', 'Activez explicitement les tests payants et un budget supérieur à zéro.' );
+			return;
+		}
+		$input = json_decode( (string) $job->input_json, true );
+		$artifacts = json_decode( (string) $job->artifacts_json, true );
+		$artifacts = is_array( $artifacts ) ? $artifacts : array();
+		try {
+			switch ( $job->stage ) {
+				case 'intake': self::advance( $job, $artifacts, 'association' ); break;
+				case 'association': self::advance( $job, $artifacts, 'research' ); break;
+				case 'research': self::research( $job, $input, $artifacts ); break;
+				case 'canonical_recipe': self::canonical( $job, $input, $artifacts ); break;
+				case 'article': self::article( $job, $artifacts ); break;
+				case 'review': self::review( $job, $artifacts ); break;
+				case 'featured_image': self::await_image( $job ); break;
+				default: self::set_status( $job, 'needs_review', 'stage_not_implemented', 'Cette étape attend encore son adaptateur fournisseur.' );
+			}
+		} catch ( Exception $exception ) {
+			self::set_status( $job, 'failed', 'pipeline_exception', $exception->getMessage() );
+		}
+	}
+
+	private static function research( $job, $input, &$artifacts ) {
+		$settings = MSRWA_Settings::get();
+		$prompt = $settings['prompt_research'] . '\nEntrée éditeur : ' . wp_json_encode( $input, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+		$result = MSRWA_OpenAI::responses_text( $prompt, '', 1800, array( array( 'type' => 'web_search' ) ), true );
+		self::require_result( $result );
+		try {
+			$artifacts['research'] = self::decode_json( $result['text'], 'research' );
+		} catch ( Exception $first_error ) {
+			$retry_prompt = $settings['prompt_research'] . '\nRéessaie en retournant un JSON compact strict, sans Markdown, sans commentaire et avec les clés recipe_facts, references et uncertainties. Entrée éditeur : ' . wp_json_encode( $input, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+			$retry = MSRWA_OpenAI::responses_text( $retry_prompt, '', 2400, array( array( 'type' => 'web_search' ) ), true );
+			self::require_result( $retry );
+			$artifacts['research'] = self::decode_json( $retry['text'], 'research' );
+			MSRWA_DB::event( 'research_retry', $job->batch_id, $job->id, array( 'reason' => 'invalid_json' ) );
+			$result = $retry;
+		}
+		$artifacts['sources'] = $result['sources'];
+		self::advance( $job, $artifacts, 'canonical_recipe' );
+	}
+
+	private static function canonical( $job, $input, &$artifacts ) {
+		if ( ! is_array( $input ) || empty( $input['title'] ) ) {
+			self::set_status( $job, 'needs_review', 'input_missing', 'Les données de recette fournies sont incomplètes.' );
+			return;
+		}
+		$settings = MSRWA_Settings::get();
+		$prompt = $settings['prompt_recipe'] . '\nEntrée : ' . wp_json_encode( $input, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . ' Recherche : ' . wp_json_encode( isset( $artifacts['research'] ) ? $artifacts['research'] : array(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+		$result = MSRWA_OpenAI::responses_text( $prompt, '', 2400 );
+		self::require_result( $result );
+		$canonical = self::normalize_canonical( self::decode_json( $result['text'], 'canonical_recipe' ) );
+		$errors = MSRWA_Recipe::validate( $canonical );
+		if ( $errors ) { self::set_status( $job, 'needs_review', 'canonical_invalid', wp_json_encode( $errors ) ); return; }
+		$artifacts['canonical'] = $canonical;
+		self::advance( $job, $artifacts, 'article' );
+	}
+
+	private static function article( $job, &$artifacts ) {
+		if ( empty( $artifacts['canonical'] ) || ! is_array( $artifacts['canonical'] ) ) {
+			self::set_status( $job, 'needs_review', 'canonical_missing', 'La recette canonique n’a pas été produite.' );
+			return;
+		}
+		$previous_findings = '';
+		if ( ! empty( $artifacts['review']['findings'] ) ) {
+			$previous_findings = ' Corrige également ces observations de relecture : ' . wp_json_encode( $artifacts['review']['findings'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+		}
+		$settings = MSRWA_Settings::get();
+		$links = self::internal_link_candidates( isset( $artifacts['canonical']['title'] ) ? $artifacts['canonical']['title'] : $job->title, (int) $settings['internal_links_max'] );
+		$links_context = ! empty( $settings['internal_links_enabled'] ) ? '\nLiens internes autorisés : ' . wp_json_encode( $links, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . '. Utilise uniquement ces chemins relatifs, au maximum ' . (int) $settings['internal_links_max'] . ', et retourne aussi internal_links (title, url, anchor). Ne crée aucun lien si la liste est vide.' : '\nLes liens internes sont désactivés : retourne internal_links comme tableau vide.';
+		$prompt = $settings['prompt_article'] . '\nRecette canonique : ' . wp_json_encode( $artifacts['canonical'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . $links_context . $previous_findings;
+		$result = MSRWA_OpenAI::responses_text( $prompt, '', 2800 );
+		self::require_result( $result );
+		try {
+			$artifacts['article'] = self::decode_json( $result['text'], 'article' );
+		} catch ( Exception $first_error ) {
+			$retry = MSRWA_OpenAI::responses_text( $prompt . '\nRéponds à nouveau avec un JSON compact strict sans Markdown ni commentaire.', '', 3000 );
+			self::require_result( $retry );
+			$artifacts['article'] = self::decode_json( $retry['text'], 'article' );
+		}
+		self::advance( $job, $artifacts, 'review' );
+	}
+
+	private static function review( $job, &$artifacts ) {
+		if ( empty( $artifacts['canonical'] ) || ! is_array( $artifacts['canonical'] ) || empty( $artifacts['article'] ) || ! is_array( $artifacts['article'] ) ) {
+			self::set_status( $job, 'needs_review', 'article_missing', 'La recette canonique ou l’article à relire est absent.' );
+			return;
+		}
+		$settings = MSRWA_Settings::get();
+		$prompt = $settings['prompt_review'] . '\nDeux cycles maximum sont gérés par le moteur. CANONICAL: ' . wp_json_encode( $artifacts['canonical'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . ' ARTICLE: ' . wp_json_encode( $artifacts['article'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+		$result = MSRWA_OpenAI::responses_text( $prompt, '', 2400 );
+		self::require_result( $result );
+		try {
+			$review = self::decode_json( $result['text'], 'review' );
+		} catch ( Exception $first_error ) {
+			$retry = MSRWA_OpenAI::responses_text( $prompt . '\nRéponds à nouveau avec un JSON compact strict sans Markdown ni commentaire.', '', 2800 );
+			self::require_result( $retry );
+			$review = self::decode_json( $retry['text'], 'review' );
+		}
+		$artifacts['review'] = $review;
+		if ( empty( $review['pass'] ) && (int) $job->correction_cycles < (int) $settings['max_corrections'] ) {
+			global $wpdb;
+			$t = MSRWA_DB::tables();
+			$wpdb->update( $t['jobs'], array( 'artifacts_json' => wp_json_encode( $artifacts ), 'correction_cycles' => (int) $job->correction_cycles + 1, 'stage' => 'article', 'status' => 'queued', 'updated_at' => current_time( 'mysql', true ) ), array( 'id' => $job->id ), array( '%s', '%d', '%s', '%s', '%s' ), array( '%d' ) );
+			MSRWA_DB::event( 'review_correction_requested', $job->batch_id, $job->id, array( 'cycle' => (int) $job->correction_cycles + 1 ) );
+			MSRWA_Queue::schedule_job( $job->id );
+			return;
+		}
+		if ( empty( $review['pass'] ) ) { self::set_status( $job, 'needs_review', 'review_failed', 'La relecture reste négative après la limite de corrections.' ); return; }
+		self::advance( $job, $artifacts, 'featured_image' );
+	}
+
+	private static function internal_link_candidates( $title, $limit ) {
+		$limit = min( 10, max( 0, absint( $limit ) ) );
+		if ( 0 === $limit || ! function_exists( 'get_posts' ) ) { return array(); }
+		$posts = get_posts( array( 'post_type' => 'post', 'post_status' => 'publish', 's' => sanitize_text_field( $title ), 'posts_per_page' => $limit, 'no_found_rows' => true ) );
+		if ( count( $posts ) < $limit ) {
+			$fallback = get_posts( array( 'post_type' => 'post', 'post_status' => 'publish', 'posts_per_page' => $limit, 'orderby' => 'date', 'order' => 'DESC', 'no_found_rows' => true ) );
+			$seen = array();
+			foreach ( $posts as $post ) { $seen[ (int) $post->ID ] = true; }
+			foreach ( $fallback as $post ) { if ( empty( $seen[ (int) $post->ID ] ) ) { $posts[] = $post; } if ( count( $posts ) >= $limit ) { break; } }
+		}
+		$out = array();
+		foreach ( $posts as $post ) {
+			$url = get_permalink( $post );
+			if ( ! $url ) { continue; }
+			$relative_url = function_exists( 'wp_make_link_relative' ) ? wp_make_link_relative( $url ) : ( wp_parse_url( $url, PHP_URL_PATH ) ?: '/' );
+			$out[] = array( 'title' => get_the_title( $post ), 'url' => esc_url_raw( $relative_url ) );
+			if ( count( $out ) >= $limit ) { break; }
+		}
+		return $out;
+	}
+
+	private static function normalize_canonical( $recipe ) {
+		$recipe = is_array( $recipe ) ? $recipe : array();
+		if ( empty( $recipe['title'] ) ) {
+			foreach ( array( 'titre', 'name', 'nom', 'recipe_title' ) as $key ) {
+				if ( ! empty( $recipe[ $key ] ) ) { $recipe['title'] = sanitize_text_field( $recipe[ $key ] ); break; }
+			}
+		}
+		if ( empty( $recipe['steps'] ) ) {
+			foreach ( array( 'etapes', 'étapes', 'preparation', 'préparation', 'instructions' ) as $key ) {
+				if ( ! empty( $recipe[ $key ] ) && is_array( $recipe[ $key ] ) ) { $recipe['steps'] = $recipe[ $key ]; break; }
+			}
+		}
+		if ( ! empty( $recipe['ingredients'] ) && is_array( $recipe['ingredients'] ) ) {
+			foreach ( $recipe['ingredients'] as $index => $ingredient ) {
+				if ( ! is_array( $ingredient ) ) { $recipe['ingredients'][ $index ] = array( 'name' => sanitize_text_field( $ingredient ), 'quantity' => '', 'unit' => '' ); continue; }
+				if ( empty( $ingredient['name'] ) ) {
+					foreach ( array( 'ingredient', 'ingrédient', 'nom' ) as $key ) { if ( ! empty( $ingredient[ $key ] ) ) { $recipe['ingredients'][ $index ]['name'] = sanitize_text_field( $ingredient[ $key ] ); break; } }
+				}
+				if ( empty( $ingredient['quantity'] ) ) {
+					foreach ( array( 'quantite', 'quantité', 'amount' ) as $key ) { if ( isset( $ingredient[ $key ] ) ) { $recipe['ingredients'][ $index ]['quantity'] = sanitize_text_field( $ingredient[ $key ] ); break; } }
+				}
+				if ( empty( $ingredient['unit'] ) ) {
+					foreach ( array( 'unite', 'unité', 'unités' ) as $key ) { if ( isset( $ingredient[ $key ] ) ) { $recipe['ingredients'][ $index ]['unit'] = sanitize_text_field( $ingredient[ $key ] ); break; } }
+				}
+			}
+		}
+		return $recipe;
+	}
+
+	private static function await_image( $job ) { self::set_status( $job, 'needs_review', 'image_provider_pending', 'La génération d’images attend son adaptateur et son budget image validé.' ); }
+
+	private static function advance( $job, $artifacts, $stage ) {
+		global $wpdb;
+		$t = MSRWA_DB::tables();
+		$wpdb->update( $t['jobs'], array( 'artifacts_json' => wp_json_encode( $artifacts ), 'stage' => sanitize_key( $stage ), 'status' => 'queued', 'updated_at' => current_time( 'mysql', true ) ), array( 'id' => $job->id ), array( '%s', '%s', '%s', '%s' ), array( '%d' ) );
+		MSRWA_DB::event( 'stage_completed', $job->batch_id, $job->id, array( 'stage' => $job->stage, 'next' => $stage ) );
+		MSRWA_Queue::schedule_job( $job->id );
+	}
+
+	private static function set_status( $job, $status, $code, $message ) {
+		global $wpdb;
+		$t = MSRWA_DB::tables();
+		$wpdb->update( $t['jobs'], array( 'status' => sanitize_key( $status ), 'error_code' => sanitize_key( $code ), 'error_message' => sanitize_textarea_field( $message ), 'updated_at' => current_time( 'mysql', true ) ), array( 'id' => $job->id ), array( '%s', '%s', '%s', '%s' ), array( '%d' ) );
+		MSRWA_DB::event( 'job_' . $status, $job->batch_id, $job->id, array( 'code' => $code ) );
+	}
+
+	private static function require_result( $result ) { if ( is_wp_error( $result ) ) { throw new Exception( $result->get_error_message() ); } }
+
+	private static function decode_json( $text, $label ) {
+		$json = json_decode( trim( (string) $text ), true );
+		if ( ! is_array( $json ) ) {
+			$start = strpos( $text, '{' ); $end = strrpos( $text, '}' );
+			if ( false !== $start && false !== $end ) { $json = json_decode( substr( $text, $start, $end - $start + 1 ), true ); }
+		}
+		if ( ! is_array( $json ) ) { throw new Exception( 'Sortie JSON invalide pour ' . $label . '.' ); }
+		return $json;
+	}
+}
