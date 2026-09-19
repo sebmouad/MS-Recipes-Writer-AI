@@ -31,6 +31,14 @@
     var submit = document.getElementById('msrwa-create');
     var message = document.getElementById('msrwa-message');
 
+    if (recipe && !document.getElementById('msrwa-batch-help')) {
+      var batchHelp = document.createElement('span');
+      batchHelp.id = 'msrwa-batch-help';
+      batchHelp.className = 'description';
+      batchHelp.textContent = 'Pour créer plusieurs recettes dans un lot, séparez-les par une ligne --- . Les références sont ensuite associées automatiquement et les ambiguïtés sont signalées.';
+      recipe.parentNode.appendChild(batchHelp);
+    }
+
     function selectedFilesMessage() {
       if (!files || !fileHelp) return;
       var count = files.files ? files.files.length : 0;
@@ -63,9 +71,16 @@
         }
       }
 
-      var firstLine = text.split(/\r?\n/).map(function (line) { return line.trim(); }).filter(Boolean)[0] || 'Recette à rédiger';
+      var recipes = text.split(/\r?\n\s*---+\s*(?:\r?\n|$)/).map(function (entry) { return entry.trim(); }).filter(Boolean);
+      if (!recipes.length) {
+        setMessage(message, 'Ajoutez au moins une recette valide.', true);
+        return;
+      }
       var data = new FormData();
-      data.append('items', JSON.stringify([{ title: firstLine.slice(0, 160), text: text, images: urls }]));
+      data.append('items', JSON.stringify(recipes.map(function (entry) {
+        var title = entry.split(/\r?\n/).map(function (line) { return line.trim(); }).filter(Boolean)[0] || 'Recette à rédiger';
+        return { title: title.slice(0, 160), text: entry, images: urls };
+      })));
       selected.forEach(function (file) { data.append('reference_files[]', file, file.name); });
 
       submit.disabled = true;
@@ -73,7 +88,7 @@
       request('/batches', { method: 'POST', body: data })
         .then(function (result) {
           var suffix = result.reference_upload_errors && result.reference_upload_errors.length ? ' Certaines images ont été refusées : ' + result.reference_upload_errors.map(function (error) { return error.message; }).join(' ') : '';
-          setMessage(message, 'Lot #' + result.id + ' créé. Les étapes restantes se poursuivent en arrière-plan.' + suffix, !!suffix);
+          setMessage(message, 'Lot #' + result.id + ' créé avec ' + (result.total || recipes.length) + ' recette(s). Les étapes restantes se poursuivent en arrière-plan.' + suffix, !!suffix);
           if (!suffix) {
             recipe.value = '';
             imageUrls.value = '';
