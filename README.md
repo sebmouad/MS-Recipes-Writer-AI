@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.0` fournit un socle installable et sans appel payant automatique par défaut :
+La version `0.2.1` fournit un socle installable et sans appel payant automatique par défaut :
 
 - modes administrateur `Automatique` / `Manuel` ;
 - limites initiales de 50 recettes par lot, 4 traitements simultanés et 2 corrections ;
@@ -19,6 +19,7 @@ La version `0.2.0` fournit un socle installable et sans appel payant automatique
 - suggestions de liens internes depuis les recettes locales publiées, sous forme de chemins relatifs et avec une limite administrable ;
 - adaptateurs OpenAI Responses et Image API testés localement avec sorties JSON et WebP temporaires ;
 - génération de l’image principale puis variante Facebook référencée, validation mécanique des médias et création idempotente d’un brouillon WordPress ;
+- adaptateurs texte OpenAI, Gemini et Claude, budget par recette/jour/mois avec réserve image et statistiques des appels sans secret ;
 - REST local pour créer et consulter les lots ;
 - file durable qui place les lots en attente de validation du budget de test.
 

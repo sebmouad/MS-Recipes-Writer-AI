@@ -234,6 +234,10 @@ final class MSRWA_Pipeline {
 		if ( is_wp_error( $plan ) ) { return $plan; }
 		$provider = $plan['provider'];
 		$model = $plan['model'];
+		$catalog = MSRWA_Catalog::models();
+		$estimate = isset( $catalog[ $provider ][ $model ] ) ? ( ( max( 16, absint( $max_tokens ) ) * (float) $catalog[ $provider ][ $model ]['output'] ) / 1000000 ) + ( $tools ? 0.02 : 0.005 ) : 0.05;
+		$budget = MSRWA_DB::budget_allows( $job, $estimate );
+		if ( is_wp_error( $budget ) ) { MSRWA_DB::event( 'budget_blocked', $job->batch_id, $job->id, array( 'operation' => $operation, 'reason' => $budget->get_error_code(), 'estimate' => $estimate ) ); return $budget; }
 		$started = current_time( 'mysql', true );
 		$result = MSRWA_Providers::text( $provider, $model, $prompt, $max_tokens, ! empty( $tools ) && $required_tool );
 		$row = array(
@@ -251,7 +255,6 @@ final class MSRWA_Pipeline {
 			'started_at' => $started,
 			'finished_at' => current_time( 'mysql', true ),
 		);
-		$catalog = MSRWA_Catalog::models();
 		if ( isset( $catalog[ $provider ][ $row['model'] ] ) && is_array( $result ) ) {
 			$row['cost_estimate'] = ( $row['input_tokens'] * (float) $catalog[ $provider ][ $row['model'] ]['input'] + $row['output_tokens'] * (float) $catalog[ $provider ][ $row['model'] ]['output'] ) / 1000000;
 		}

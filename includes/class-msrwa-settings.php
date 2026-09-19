@@ -25,6 +25,10 @@ final class MSRWA_Settings {
 			'max_corrections'     => 2,
 			'allow_paid_tests'    => 0,
 			'test_budget_usd'     => 0,
+			'per_recipe_budget_usd' => 0,
+			'daily_budget_usd'    => 0,
+			'monthly_budget_usd'  => 0,
+			'image_reserve_usd'   => 1,
 			'log_days'            => 30,
 			'temp_days'           => 7,
 			'aggregate_months'    => 12,
@@ -76,6 +80,8 @@ final class MSRWA_Settings {
 		}
 		$out['allow_paid_tests'] = empty( $raw['allow_paid_tests'] ) ? 0 : 1;
 		$out['test_budget_usd'] = isset( $raw['test_budget_usd'] ) ? min( 1000, max( 0, (float) $raw['test_budget_usd'] ) ) : $defaults['test_budget_usd'];
+		foreach ( array( 'per_recipe_budget_usd', 'daily_budget_usd', 'monthly_budget_usd' ) as $key ) { $out[ $key ] = isset( $raw[ $key ] ) ? min( 100000, max( 0, (float) $raw[ $key ] ) ) : $defaults[ $key ]; }
+		$out['image_reserve_usd'] = isset( $raw['image_reserve_usd'] ) ? min( 1000, max( 0.01, (float) $raw['image_reserve_usd'] ) ) : $defaults['image_reserve_usd'];
 		$out['facebook_text'] = empty( $raw['facebook_text'] ) ? 0 : 1;
 		$out['internal_links_enabled'] = empty( $raw['internal_links_enabled'] ) ? 0 : 1;
 		$out['internal_links_max'] = isset( $raw['internal_links_max'] ) ? min( 10, max( 0, absint( $raw['internal_links_max'] ) ) ) : $defaults['internal_links_max'];

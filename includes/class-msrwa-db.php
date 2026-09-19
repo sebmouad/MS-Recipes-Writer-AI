@@ -66,4 +66,27 @@ final class MSRWA_DB {
 		$wpdb->query( $wpdb->prepare( "DELETE FROM {$t['events']} WHERE created_at < UTC_TIMESTAMP() - INTERVAL %d DAY", $days ) );
 		$wpdb->query( $wpdb->prepare( "DELETE FROM {$t['calls']} WHERE started_at < UTC_TIMESTAMP() - INTERVAL %d DAY", $days ) );
 	}
+
+	public static function budget_used( $job_id = 0, $period = '' ) {
+		global $wpdb;
+		$t = self::tables();
+		$where = '1=1';
+		$args = array();
+		if ( $job_id ) { $where .= ' AND job_id = %d'; $args[] = absint( $job_id ); }
+		if ( 'day' === $period ) { $where .= ' AND started_at >= UTC_DATE()'; }
+		if ( 'month' === $period ) { $where .= ' AND started_at >= DATE_FORMAT(UTC_DATE(), \'%Y-%m-01\')'; }
+		$sql = "SELECT COALESCE(SUM(cost_estimate),0) FROM {$t['calls']} WHERE {$where}";
+		return (float) ( $args ? $wpdb->get_var( $wpdb->prepare( $sql, $args ) ) : $wpdb->get_var( $sql ) );
+	}
+
+	public static function budget_allows( $job, $estimate ) {
+		$settings = MSRWA_Settings::get();
+		if ( empty( $settings['allow_paid_tests'] ) || (float) $settings['test_budget_usd'] <= 0 ) { return new WP_Error( 'paid_tests_disabled', 'Les appels payants nécessitent un budget de test explicite.' ); }
+		$estimate = max( 0, (float) $estimate );
+		if ( (float) $settings['test_budget_usd'] > 0 && self::budget_used() + $estimate > (float) $settings['test_budget_usd'] ) { return new WP_Error( 'test_budget_exceeded', 'Le budget de test disponible est insuffisant.' ); }
+		if ( (float) $settings['per_recipe_budget_usd'] > 0 && self::budget_used( $job->id ) + $estimate > (float) $settings['per_recipe_budget_usd'] ) { return new WP_Error( 'recipe_budget_exceeded', 'Le budget de cette recette est insuffisant.' ); }
+		if ( (float) $settings['daily_budget_usd'] > 0 && self::budget_used( 0, 'day' ) + $estimate > (float) $settings['daily_budget_usd'] ) { return new WP_Error( 'daily_budget_exceeded', 'Le budget quotidien est insuffisant.' ); }
+		if ( (float) $settings['monthly_budget_usd'] > 0 && self::budget_used( 0, 'month' ) + $estimate > (float) $settings['monthly_budget_usd'] ) { return new WP_Error( 'monthly_budget_exceeded', 'Le budget mensuel est insuffisant.' ); }
+		return true;
+	}
 }

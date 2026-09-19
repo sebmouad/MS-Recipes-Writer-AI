@@ -6,6 +6,8 @@ final class MSRWA_Images {
 		$settings = MSRWA_Settings::get();
 		$plan = self::image_plan( 'featured_image' );
 		if ( is_wp_error( $plan ) ) { return $plan; }
+		$budget = MSRWA_DB::budget_allows( $job, (float) $settings['image_reserve_usd'] );
+		if ( is_wp_error( $budget ) ) { return $budget; }
 		if ( 'openai' !== $plan['provider'] ) { return new WP_Error( 'image_provider_pending', 'Cet adaptateur image fournisseur n’est pas encore disponible.', array( 'status' => 409 ) ); }
 		$canonical = isset( $artifacts['canonical'] ) ? $artifacts['canonical'] : array();
 		$prompt = $settings['prompt_image'] . '\nRECETTE VALIDÉE : ' . wp_json_encode( $canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
@@ -21,6 +23,8 @@ final class MSRWA_Images {
 		$settings = MSRWA_Settings::get();
 		$plan = self::image_plan( 'facebook_image' );
 		if ( is_wp_error( $plan ) ) { return $plan; }
+		$budget = MSRWA_DB::budget_allows( $job, (float) $settings['image_reserve_usd'] );
+		if ( is_wp_error( $budget ) ) { return $budget; }
 		$featured_id = isset( $artifacts['featured_image']['attachment_id'] ) ? absint( $artifacts['featured_image']['attachment_id'] ) : 0;
 		$featured_file = $featured_id ? get_attached_file( $featured_id ) : '';
 		if ( 'openai' !== $plan['provider'] ) { return new WP_Error( 'image_provider_pending', 'Cet adaptateur image fournisseur n’est pas encore disponible.', array( 'status' => 409 ) ); }
@@ -57,6 +61,7 @@ final class MSRWA_Images {
 	}
 
 	private static function record_call( $job, $operation, $model, $prompt, $result ) {
+		$settings = MSRWA_Settings::get();
 		MSRWA_DB::call( array(
 			'batch_id' => absint( $job->batch_id ),
 			'job_id' => absint( $job->id ),
@@ -65,6 +70,7 @@ final class MSRWA_Images {
 			'operation' => $operation,
 			'status' => is_wp_error( $result ) ? 'failed' : 'completed',
 			'request_id' => '',
+			'cost_estimate' => (float) $settings['image_reserve_usd'],
 			'uncertain' => 1,
 			'error_code' => is_wp_error( $result ) ? $result->get_error_code() : '',
 			'payload_hash' => hash( 'sha256', (string) $prompt ),
