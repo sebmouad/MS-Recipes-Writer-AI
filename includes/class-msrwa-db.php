@@ -68,6 +68,8 @@ final class MSRWA_DB {
 		$wpdb->query( $wpdb->prepare( "DELETE FROM {$t['events']} WHERE created_at < UTC_TIMESTAMP() - INTERVAL %d DAY", $days ) );
 		$wpdb->query( $wpdb->prepare( "DELETE FROM {$t['calls']} WHERE started_at < UTC_TIMESTAMP() - INTERVAL %d DAY", $days ) );
 		$wpdb->query( "DELETE FROM {$t['reservations']} WHERE status = 'reserved' AND expires_at < UTC_TIMESTAMP()" );
+		$settings = class_exists( 'MSRWA_Settings' ) ? MSRWA_Settings::get() : array();
+		if ( class_exists( 'MSRWA_Storage' ) ) { MSRWA_Storage::purge_expired( isset( $settings['temp_days'] ) ? $settings['temp_days'] : 7 ); }
 	}
 
 	public static function budget_used( $job_id = 0, $period = '' ) {

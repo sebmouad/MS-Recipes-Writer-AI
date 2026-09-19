@@ -83,9 +83,14 @@ final class MSRWA_Pipeline {
 		}
 		$references = isset( $input['reference_images'] ) && is_array( $input['reference_images'] ) ? array_values( $input['reference_images'] ) : array();
 		$settings = MSRWA_Settings::get();
-		$association = array( 'title' => isset( $input['title'] ) ? $input['title'] : '', 'reference_images' => $references, 'confidence' => empty( $input['title'] ) ? 0 : 1, 'needs_editor' => empty( $input['title'] ), 'notes' => array() );
+		$downloaded = class_exists( 'MSRWA_Storage' ) ? MSRWA_Storage::download_references( $job->id, $references, (int) $settings['max_reference_images'] ) : array( 'valid' => array(), 'errors' => array( array( 'code' => 'storage_unavailable', 'message' => 'Le stockage privé des références est indisponible.' ) ) );
+		$reference_images = isset( $downloaded['valid'] ) && is_array( $downloaded['valid'] ) ? $downloaded['valid'] : array();
+		$reference_errors = isset( $downloaded['errors'] ) && is_array( $downloaded['errors'] ) ? $downloaded['errors'] : array();
+		$reference_context = array();
+		foreach ( $reference_images as $reference ) { $reference_context[] = array( 'source_url' => isset( $reference['source_url'] ) ? $reference['source_url'] : '', 'mime' => isset( $reference['mime'] ) ? $reference['mime'] : '', 'bytes' => isset( $reference['bytes'] ) ? absint( $reference['bytes'] ) : 0, 'width' => isset( $reference['width'] ) ? absint( $reference['width'] ) : 0, 'height' => isset( $reference['height'] ) ? absint( $reference['height'] ) : 0, 'sha256' => isset( $reference['sha256'] ) ? $reference['sha256'] : '' ); }
+		$association = array( 'title' => isset( $input['title'] ) ? $input['title'] : '', 'reference_images' => $reference_images, 'reference_errors' => $reference_errors, 'confidence' => empty( $input['title'] ) ? 0 : 1, 'needs_editor' => empty( $input['title'] ), 'notes' => array(), 'visual_analysis' => array() );
 		if ( ! empty( $input['title'] ) ) {
-			$association_prompt = $settings['prompt_association'] . '\nRetourne uniquement un JSON avec title, confidence (0 à 1), needs_editor (boolean), matched_reference_indexes et notes. Ne prétends pas voir une image si elle n’est pas directement fournie comme entrée vision. TITRE : ' . wp_json_encode( $input['title'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . ' TEXTE : ' . wp_json_encode( substr( (string) ( $input['source_text'] ?? '' ), 0, 8000 ), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . ' IMAGES DE RÉFÉRENCE (URL non téléchargées à cette étape) : ' . wp_json_encode( $references, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+			$association_prompt = $settings['prompt_association'] . '\nRetourne uniquement un JSON avec title, confidence (0 à 1), needs_editor (boolean), matched_reference_indexes et notes. Ne prétends pas voir une image si elle n’est pas directement fournie comme entrée vision. TITRE : ' . wp_json_encode( $input['title'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . ' TEXTE : ' . wp_json_encode( substr( (string) ( $input['source_text'] ?? '' ), 0, 8000 ), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . ' RÉFÉRENCES TÉLÉCHARGÉES ET VALIDÉES : ' . wp_json_encode( $reference_context, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
 			$result = self::text_call( $job, $association_prompt, 900, array(), false, 'association' );
 			if ( is_wp_error( $result ) ) { throw new Exception( $result->get_error_message() ); }
 			try {
@@ -102,6 +107,14 @@ final class MSRWA_Pipeline {
 				$association['notes'][] = 'Réponse d’association non structurée ; validation déterministe conservée.';
 				MSRWA_DB::event( 'association_fallback', $job->batch_id, $job->id, array( 'reason' => 'invalid_json' ) );
 			}
+			foreach ( $reference_images as $reference ) {
+				if ( empty( $reference['path'] ) || empty( $settings['prompt_reference_vision'] ) ) { continue; }
+				$vision_prompt = $settings['prompt_reference_vision'] . '\nTITRE FOURNI : ' . wp_json_encode( $input['title'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . '\nURL SOURCE (provenance uniquement) : ' . wp_json_encode( $reference['source_url'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+				$vision = self::vision_call( $job, $vision_prompt, $reference['path'], 'reference_vision' );
+				if ( is_wp_error( $vision ) ) { $association['reference_errors'][] = array( 'url' => $reference['source_url'], 'code' => $vision->get_error_code(), 'message' => $vision->get_error_message() ); continue; }
+				try { $analysis = self::decode_json( $vision['text'], 'reference_vision' ); } catch ( Exception $e ) { $analysis = array( 'summary' => sanitize_textarea_field( substr( (string) $vision['text'], 0, 2000 ) ), 'uncertainties' => array( 'La vision n’a pas retourné le schéma JSON attendu.' ) ); }
+				$association['visual_analysis'][] = array( 'source_url' => $reference['source_url'], 'analysis' => $analysis );
+			}
 		}
 		$artifacts['association'] = $association;
 		if ( empty( $input['title'] ) || ! empty( $association['needs_editor'] ) ) { self::set_status( $job, 'awaiting_input', 'association_ambiguous', 'L’association de cette entrée doit être confirmée par l’éditeur.' ); return; }
@@ -114,7 +127,7 @@ final class MSRWA_Pipeline {
 			return;
 		}
 		$settings = MSRWA_Settings::get();
-		$prompt = $settings['prompt_recipe'] . '\n' . $settings['prompt_nutrition'] . '\nEntrée : ' . wp_json_encode( $input, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . ' Recherche : ' . wp_json_encode( isset( $artifacts['research'] ) ? $artifacts['research'] : array(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+		$prompt = $settings['prompt_recipe'] . '\n' . $settings['prompt_nutrition'] . '\nEntrée : ' . wp_json_encode( $input, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . ' Recherche : ' . wp_json_encode( isset( $artifacts['research'] ) ? $artifacts['research'] : array(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . ' Analyse visuelle de référence (observations, jamais preuve de quantités) : ' . wp_json_encode( isset( $artifacts['association']['visual_analysis'] ) ? $artifacts['association']['visual_analysis'] : array(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
 		$result = self::text_call( $job, $prompt, 2400, array(), false, 'canonical_recipe' );
 		self::require_result( $result );
 		$canonical = self::normalize_canonical( self::decode_json( $result['text'], 'canonical_recipe' ) );
@@ -330,6 +343,24 @@ final class MSRWA_Pipeline {
 		}
 		MSRWA_DB::call( $row );
 		if ( is_wp_error( $result ) || ! isset( $row['cost_estimate'] ) ) { MSRWA_DB::release( $reservation ); } else { MSRWA_DB::settle( $reservation, $row['cost_estimate'] ); }
+		return $result;
+	}
+
+	private static function vision_call( $job, $prompt, $path, $operation ) {
+		$plan = self::selected_plan( $job, 'vision', 'vision' );
+		if ( is_wp_error( $plan ) ) { return $plan; }
+		$settings = MSRWA_Settings::get();
+		$catalog = MSRWA_Catalog::models();
+		$estimate = isset( $settings['vision_reserve_usd'] ) ? (float) $settings['vision_reserve_usd'] : 0.05;
+		$reservation = MSRWA_DB::reserve( $job, $estimate, $operation );
+		if ( is_wp_error( $reservation ) ) { return $reservation; }
+		$started = current_time( 'mysql', true );
+		$result = MSRWA_Providers::vision_text( $plan['provider'], $plan['model'], $prompt, $path, 1200 );
+		$input_tokens = is_array( $result ) && ! empty( $result['usage']['input_tokens'] ) ? absint( $result['usage']['input_tokens'] ) : 0;
+		$output_tokens = is_array( $result ) && ! empty( $result['usage']['output_tokens'] ) ? absint( $result['usage']['output_tokens'] ) : 0;
+		$cost = isset( $catalog[ $plan['provider'] ][ $plan['model'] ] ) && is_array( $result ) ? ( $input_tokens * (float) $catalog[ $plan['provider'] ][ $plan['model'] ]['input'] + $output_tokens * (float) $catalog[ $plan['provider'] ][ $plan['model'] ]['output'] ) / 1000000 : $estimate;
+		MSRWA_DB::call( array( 'batch_id' => absint( $job->batch_id ), 'job_id' => absint( $job->id ), 'provider' => $plan['provider'], 'model' => is_array( $result ) && ! empty( $result['model'] ) ? $result['model'] : $plan['model'], 'operation' => $operation, 'status' => is_wp_error( $result ) ? 'failed' : 'completed', 'request_id' => is_array( $result ) && ! empty( $result['id'] ) ? $result['id'] : '', 'input_tokens' => $input_tokens, 'output_tokens' => $output_tokens, 'cost_estimate' => $cost, 'uncertain' => is_wp_error( $result ) ? 0 : 1, 'error_code' => is_wp_error( $result ) ? $result->get_error_code() : '', 'payload_hash' => hash( 'sha256', (string) $prompt ), 'started_at' => $started, 'finished_at' => current_time( 'mysql', true ) ) );
+		if ( is_wp_error( $result ) ) { MSRWA_DB::release( $reservation ); } else { MSRWA_DB::settle( $reservation, $cost ); }
 		return $result;
 	}
 
