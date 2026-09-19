@@ -58,7 +58,19 @@ final class MSRWA_Settings {
 
 	public static function get() {
 		$value = get_option( self::OPTION, array() );
-		return wp_parse_args( is_array( $value ) ? $value : array(), self::defaults() );
+		$out = wp_parse_args( is_array( $value ) ? $value : array(), self::defaults() );
+		foreach ( array( 'openai_key', 'gemini_key', 'claude_key', 'research_fallback_key' ) as $key ) { $out[ $key ] = self::decrypt_secret( isset( $out[ $key ] ) ? $out[ $key ] : '' ); }
+		return $out;
+	}
+
+	public static function upgrade_secrets() {
+		$raw = get_option( self::OPTION, array() );
+		if ( ! is_array( $raw ) || ! self::crypto_available() ) { return; }
+		$changed = false;
+		foreach ( array( 'openai_key', 'gemini_key', 'claude_key', 'research_fallback_key' ) as $key ) {
+			if ( ! empty( $raw[ $key ] ) && 0 !== strpos( (string) $raw[ $key ], 'enc:v1:' ) ) { $encrypted = self::encrypt_secret( $raw[ $key ] ); if ( $encrypted ) { $raw[ $key ] = $encrypted; $changed = true; } }
+		}
+		if ( $changed ) { update_option( self::OPTION, $raw, false ); }
 	}
 
 	public static function sanitize( $raw ) {
@@ -68,12 +80,12 @@ final class MSRWA_Settings {
 		$out['mode'] = in_array( isset( $raw['mode'] ) ? $raw['mode'] : '', array( 'automatic', 'manual' ), true ) ? $raw['mode'] : $defaults['mode'];
 		foreach ( array( 'openai_key', 'gemini_key', 'claude_key' ) as $key ) {
 			if ( isset( $raw[ $key ] ) && '' !== trim( $raw[ $key ] ) ) {
-				$out[ $key ] = sanitize_text_field( $raw[ $key ] );
+				$out[ $key ] = self::encrypt_secret( sanitize_text_field( $raw[ $key ] ) );
 			} else {
-				$out[ $key ] = self::get()[ $key ];
+				$out[ $key ] = self::encrypt_secret( self::get()[ $key ] );
 			}
 		}
-		if ( isset( $raw['research_fallback_key'] ) && '' !== trim( $raw['research_fallback_key'] ) ) { $out['research_fallback_key'] = sanitize_text_field( $raw['research_fallback_key'] ); } else { $out['research_fallback_key'] = self::get()['research_fallback_key']; }
+		if ( isset( $raw['research_fallback_key'] ) && '' !== trim( $raw['research_fallback_key'] ) ) { $out['research_fallback_key'] = self::encrypt_secret( sanitize_text_field( $raw['research_fallback_key'] ) ); } else { $out['research_fallback_key'] = self::encrypt_secret( self::get()['research_fallback_key'] ); }
 		foreach ( array( 'openai_model', 'gemini_model', 'claude_model', 'research_provider', 'featured_ratio', 'facebook_ratio' ) as $key ) {
 			if ( isset( $raw[ $key ] ) ) { $out[ $key ] = sanitize_text_field( $raw[ $key ] ); }
 		}
@@ -107,5 +119,26 @@ final class MSRWA_Settings {
 			if ( isset( $raw[ $key ] ) ) { $out[ $key ] = sanitize_textarea_field( $raw[ $key ] ); }
 		}
 		return $out;
+	}
+
+	private static function crypto_available() { return function_exists( 'openssl_encrypt' ) && function_exists( 'openssl_decrypt' ) && function_exists( 'wp_salt' ); }
+
+	private static function crypto_key() { return hash( 'sha256', wp_salt( 'auth' ) . '|' . ( defined( 'AUTH_KEY' ) ? AUTH_KEY : '' ) . '|' . ( defined( 'SECURE_AUTH_KEY' ) ? SECURE_AUTH_KEY : '' ), true ); }
+
+	private static function encrypt_secret( $value ) {
+		$value = (string) $value;
+		if ( '' === $value || 0 === strpos( $value, 'enc:v1:' ) || ! self::crypto_available() ) { return $value; }
+		$iv = openssl_random_pseudo_bytes( 16 );
+		$cipher = openssl_encrypt( $value, 'AES-256-CBC', self::crypto_key(), OPENSSL_RAW_DATA, $iv );
+		return false === $cipher ? $value : 'enc:v1:' . base64_encode( $iv . $cipher );
+	}
+
+	private static function decrypt_secret( $value ) {
+		$value = (string) $value;
+		if ( 0 !== strpos( $value, 'enc:v1:' ) || ! self::crypto_available() ) { return $value; }
+		$decoded = base64_decode( substr( $value, 7 ), true );
+		if ( false === $decoded || strlen( $decoded ) <= 16 ) { return ''; }
+		$plain = openssl_decrypt( substr( $decoded, 16 ), 'AES-256-CBC', self::crypto_key(), OPENSSL_RAW_DATA, substr( $decoded, 0, 16 ) );
+		return false === $plain ? '' : $plain;
 	}
 }
