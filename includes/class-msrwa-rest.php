@@ -4,6 +4,7 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
 final class MSRWA_REST {
 	public static function register() {
 		register_rest_route( 'msrwa/v1', '/catalog', array( 'methods' => 'GET', 'permission_callback' => array( __CLASS__, 'can_read' ), 'callback' => array( __CLASS__, 'catalog' ) ) );
+		register_rest_route( 'msrwa/v1', '/catalog/sync', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_manage' ), 'callback' => array( __CLASS__, 'sync_catalog' ) ) );
 		register_rest_route( 'msrwa/v1', '/test/openai', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_manage' ), 'callback' => array( __CLASS__, 'test_openai' ) ) );
 		register_rest_route( 'msrwa/v1', '/test/(?P<provider>gemini|claude)', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_manage' ), 'callback' => array( __CLASS__, 'test_provider' ) ) );
 		register_rest_route( 'msrwa/v1', '/batches', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'create_batch' ) ) );
@@ -22,7 +23,15 @@ final class MSRWA_REST {
 	public static function can_create() { return current_user_can( 'msrwa_create' ) || current_user_can( 'msrwa_manage' ) || current_user_can( 'manage_options' ); }
 	public static function can_manage() { return current_user_can( 'manage_options' ); }
 
-	public static function catalog() { return rest_ensure_response( MSRWA_Catalog::models() ); }
+	public static function catalog() { return rest_ensure_response( array( 'models' => MSRWA_Catalog::models(), 'status' => MSRWA_Catalog::status() ) ); }
+
+	public static function sync_catalog( WP_REST_Request $request ) {
+		$provider = sanitize_key( $request->get_param( 'provider' ) ?: 'openai' );
+		$result = MSRWA_Catalog::sync( $provider );
+		if ( is_wp_error( $result ) ) { return $result; }
+		MSRWA_DB::event( 'catalog_synced', 0, 0, array( 'provider' => $provider, 'count' => $result['count'] ) );
+		return rest_ensure_response( $result );
+	}
 
 	public static function test_openai() {
 		$result = MSRWA_OpenAI::connection_test();

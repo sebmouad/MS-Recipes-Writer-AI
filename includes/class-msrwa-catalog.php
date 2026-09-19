@@ -2,6 +2,7 @@
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
 final class MSRWA_Catalog {
+	const STATE_OPTION = 'msrwa_catalog_state';
 	public static function models() {
 		return array(
 			'openai' => array(
@@ -24,11 +25,44 @@ final class MSRWA_Catalog {
 
 	public static function eligible( $capability = 'text' ) {
 		$out = array();
+		$state = function_exists( 'get_option' ) ? get_option( self::STATE_OPTION, array() ) : array();
 		foreach ( self::models() as $provider => $models ) {
+			$known_ids = ! empty( $state[ $provider ]['available_ids'] ) && is_array( $state[ $provider ]['available_ids'] ) ? array_flip( $state[ $provider ]['available_ids'] ) : array();
 			foreach ( $models as $id => $model ) {
-				if ( ! empty( $model['stable'] ) && ! empty( $model[ $capability ] ) ) { $out[ $provider . ':' . $id ] = $model + array( 'provider' => $provider, 'id' => $id ); }
+				if ( ! empty( $model['stable'] ) && ! empty( $model[ $capability ] ) && ( empty( $known_ids ) || isset( $known_ids[ $id ] ) ) ) { $out[ $provider . ':' . $id ] = $model + array( 'provider' => $provider, 'id' => $id ); }
 			}
 		}
 		return $out;
+	}
+
+	public static function status() { return function_exists( 'get_option' ) ? get_option( self::STATE_OPTION, array() ) : array(); }
+
+	public static function sync( $provider ) {
+		$provider = sanitize_key( $provider );
+		if ( ! in_array( $provider, array( 'openai', 'gemini' ), true ) ) { return new WP_Error( 'catalog_sync_unsupported', 'La synchronisation automatique de ce fournisseur n’est pas disponible.' ); }
+		if ( 'openai' === $provider ) {
+			$key = MSRWA_OpenAI::key();
+			if ( ! $key ) { return new WP_Error( 'missing_openai_key', 'Aucune clé OpenAI côté serveur.' ); }
+			$response = wp_remote_get( 'https://api.openai.com/v1/models', array( 'timeout' => 20, 'sslverify' => true, 'headers' => array( 'Authorization' => 'Bearer ' . $key ) ) );
+		} else {
+			$s = MSRWA_Settings::get();
+			$key = defined( 'MSRWA_GEMINI_KEY' ) && MSRWA_GEMINI_KEY ? MSRWA_GEMINI_KEY : ( getenv( 'MSRWA_GEMINI_KEY' ) ?: $s['gemini_key'] );
+			if ( ! $key ) { return new WP_Error( 'missing_gemini_key', 'Aucune clé Gemini côté serveur.' ); }
+			$response = wp_remote_get( 'https://generativelanguage.googleapis.com/v1beta/models?key=' . rawurlencode( $key ), array( 'timeout' => 20, 'sslverify' => true ) );
+		}
+		if ( is_wp_error( $response ) ) { return new WP_Error( 'catalog_sync_network', $response->get_error_message(), array( 'status' => 502 ) ); }
+		$code = wp_remote_retrieve_response_code( $response );
+		$body = json_decode( wp_remote_retrieve_body( $response ), true );
+		if ( $code < 200 || $code >= 300 || ! is_array( $body ) ) { return new WP_Error( 'catalog_sync_response', 'La réponse du catalogue fournisseur est invalide.', array( 'status' => $code ?: 502 ) ); }
+		$rows = 'openai' === $provider ? ( isset( $body['data'] ) && is_array( $body['data'] ) ? $body['data'] : array() ) : ( isset( $body['models'] ) && is_array( $body['models'] ) ? $body['models'] : array() );
+		$ids = array();
+		foreach ( $rows as $row ) {
+			$id = 'openai' === $provider ? ( isset( $row['id'] ) ? $row['id'] : '' ) : ( isset( $row['name'] ) ? preg_replace( '#^models/#', '', $row['name'] ) : '' );
+			if ( $id ) { $ids[] = sanitize_text_field( $id ); }
+		}
+		$state = self::status();
+		$state[ $provider ] = array( 'available_ids' => array_values( array_unique( $ids ) ), 'checked_at' => current_time( 'mysql', true ), 'status' => 'ok' );
+		update_option( self::STATE_OPTION, $state, false );
+		return array( 'provider' => $provider, 'count' => count( $ids ), 'checked_at' => $state[ $provider ]['checked_at'] );
 	}
 }

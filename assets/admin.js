@@ -3,6 +3,7 @@
   var button = document.getElementById('msrwa-create');
   var testButtons = document.querySelectorAll('.msrwa-test-provider');
   var batchButtons = document.querySelectorAll('.msrwa-batch-action');
+  var providerCard = document.querySelector('.msrwa-test-provider');
   if (typeof MSRWA === 'undefined') return;
   if (button) button.addEventListener('click', function () {
     var lines = (document.getElementById('msrwa-titles').value || '').split(/\r?\n/).map(function (v) { return v.trim(); }).filter(Boolean);
@@ -42,4 +43,22 @@
       .catch(function (error) { window.alert(error.message); })
       .finally(function () { actionButton.disabled = false; });
   }); });
+  if (providerCard) {
+    var syncWrap = document.createElement('p');
+    var syncSelect = document.createElement('select');
+    syncSelect.innerHTML = '<option value="openai">OpenAI</option><option value="gemini">Gemini</option>';
+    var syncButton = document.createElement('button');
+    syncButton.type = 'button'; syncButton.className = 'button'; syncButton.textContent = 'Synchroniser le catalogue'; syncButton.style.marginLeft = '6px';
+    var syncStatus = document.createElement('span'); syncStatus.setAttribute('role', 'status'); syncStatus.style.marginLeft = '8px';
+    syncWrap.appendChild(syncSelect); syncWrap.appendChild(syncButton); syncWrap.appendChild(syncStatus); providerCard.closest('p').parentNode.appendChild(syncWrap);
+    syncButton.addEventListener('click', function () {
+      syncButton.disabled = true; syncStatus.textContent = 'Synchronisation…';
+      var provider = syncSelect.value;
+      fetch(MSRWA.api + '/catalog/sync?provider=' + encodeURIComponent(provider), { method: 'POST', headers: { 'X-WP-Nonce': MSRWA.nonce } })
+        .then(function (response) { return response.json().then(function (data) { if (!response.ok) throw new Error(data.message || 'Échec de synchronisation'); return data; }); })
+        .then(function (data) { syncStatus.textContent = provider + ' : ' + data.count + ' modèles vérifiés.'; })
+        .catch(function (error) { syncStatus.textContent = error.message; })
+        .finally(function () { syncButton.disabled = false; });
+    });
+  }
 }());
