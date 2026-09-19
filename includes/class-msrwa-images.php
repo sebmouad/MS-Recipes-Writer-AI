@@ -9,7 +9,7 @@ final class MSRWA_Images {
 		$reservation = MSRWA_DB::reserve( $job, (float) $settings['image_reserve_usd'], 'featured_image' );
 		if ( is_wp_error( $reservation ) ) { return $reservation; }
 		$canonical = isset( $artifacts['canonical'] ) ? $artifacts['canonical'] : array();
-		$prompt = $settings['prompt_image'] . '\nRECETTE VALIDÉE : ' . wp_json_encode( $canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+		$prompt = $settings['prompt_image'] . '\nRECETTE VALIDÉE : ' . wp_json_encode( $canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . self::visual_context( $artifacts );
 		$result = 'openai' === $plan['provider'] ? MSRWA_OpenAI::images_generate( $prompt, $plan['model'], '1024x1024', 'low', 'webp' ) : MSRWA_Providers::image( $plan['provider'], $plan['model'], $prompt, '1024x1024' );
 		self::record_call( $job, 'featured_image', $plan['provider'], $plan['model'], $prompt, $result, true, $reservation );
 		if ( is_wp_error( $result ) ) { return $result; }
@@ -28,7 +28,7 @@ final class MSRWA_Images {
 		$featured_file = $featured_id ? get_attached_file( $featured_id ) : '';
 		$settings = MSRWA_Settings::get();
 		$canonical = isset( $artifacts['canonical'] ) ? $artifacts['canonical'] : array();
-		$prompt = $settings['prompt_facebook_image'] . '\nRECETTE VALIDÉE : ' . wp_json_encode( $canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+		$prompt = $settings['prompt_facebook_image'] . '\nRECETTE VALIDÉE : ' . wp_json_encode( $canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . self::visual_context( $artifacts );
 		if ( $featured_file && file_exists( $featured_file ) ) {
 			$result = 'openai' === $plan['provider'] ? MSRWA_OpenAI::images_edit( $featured_file, $prompt, $plan['model'], '1024x1536', 'low', 'webp' ) : MSRWA_Providers::image_edit( $plan['provider'], $plan['model'], $featured_file, $prompt, '1024x1536' );
 		} else {
@@ -72,6 +72,26 @@ final class MSRWA_Images {
 		if ( is_wp_error( $plan ) ) { return $plan; }
 		MSRWA_DB::event( 'image_model_selected', $job ? $job->batch_id : 0, $job ? $job->id : 0, array( 'stage' => $stage, 'provider' => $plan['provider'], 'model' => $plan['model'] ) );
 		return $plan;
+	}
+
+	/**
+	 * Research and user references establish a visual direction only. Source media
+	 * is never sent to an image generator as a reusable asset.
+	 */
+	private static function visual_context( $artifacts ) {
+		$research = isset( $artifacts['research'] ) && is_array( $artifacts['research'] ) ? $artifacts['research'] : array();
+		$visual = isset( $artifacts['visual_research']['references'] ) && is_array( $artifacts['visual_research']['references'] ) ? $artifacts['visual_research']['references'] : array();
+		$observations = array();
+		foreach ( array_slice( $visual, 0, 10 ) as $reference ) {
+			if ( is_array( $reference ) && ! empty( $reference['analysis'] ) ) { $observations[] = $reference['analysis']; }
+		}
+		$context = array(
+			'direction' => isset( $research['visual_direction'] ) ? $research['visual_direction'] : array(),
+			'observations' => $observations,
+			'rule' => 'Use these as abstract visual guidance only. Do not reproduce, imitate closely, include branding from, or claim affiliation with any reference image or source.',
+		);
+		if ( empty( $context['direction'] ) && empty( $context['observations'] ) ) { return ''; }
+		return '\nDIRECTION VISUELLE DE RECHERCHE (observations uniquement, sans réutiliser ni reproduire une image source) : ' . wp_json_encode( $context, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
 	}
 
 	private static function vision_plan( $job ) {

@@ -65,7 +65,39 @@ final class MSRWA_Pipeline {
 			$result = $retry;
 		}
 		$artifacts['sources'] = $result['sources'];
+		$artifacts['visual_research'] = self::visual_research( $job, $artifacts['research'], $settings );
 		self::advance( $job, $artifacts, 'canonical_recipe' );
+	}
+
+	/**
+	 * Converts optional web-search image candidates into private, bounded visual
+	 * observations. A candidate is never used as a generated-image input.
+	 */
+	private static function visual_research( $job, $research, $settings ) {
+		$out = array( 'enabled' => ! empty( $settings['visual_reference_search'] ), 'references' => array(), 'errors' => array() );
+		$limit = min( 10, max( 0, absint( $settings['visual_reference_max'] ) ) );
+		if ( empty( $out['enabled'] ) || ! $limit || ! is_array( $research ) || empty( $research['visual_references'] ) || ! is_array( $research['visual_references'] ) ) {
+			if ( ! empty( $out['enabled'] ) && ! $limit ) { $out['reason'] = 'limit_zero'; }
+			return $out;
+		}
+		$candidates = array();
+		foreach ( array_slice( $research['visual_references'], 0, $limit ) as $candidate ) {
+			$url = is_array( $candidate ) ? ( $candidate['image_url'] ?? $candidate['url'] ?? '' ) : $candidate;
+			$url = esc_url_raw( (string) $url );
+			if ( $url ) { $candidates[] = array( 'url' => $url ); }
+		}
+		if ( empty( $candidates ) || ! class_exists( 'MSRWA_Storage' ) ) { $out['reason'] = empty( $candidates ) ? 'no_safe_candidate' : 'storage_unavailable'; return $out; }
+		$downloaded = MSRWA_Storage::download_references( $job->id, $candidates, $limit );
+		$out['errors'] = isset( $downloaded['errors'] ) && is_array( $downloaded['errors'] ) ? $downloaded['errors'] : array();
+		foreach ( isset( $downloaded['valid'] ) && is_array( $downloaded['valid'] ) ? $downloaded['valid'] : array() as $reference ) {
+			$prompt = $settings['prompt_reference_vision'] . '\nCette image provient d’une recherche web et ne peut servir que de référence abstraite, jamais d’actif à réutiliser ou à reproduire. Décris seulement les choix visuels génériques. TITRE DE RECETTE : ' . wp_json_encode( $job->title, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+			$vision = self::vision_call( $job, $prompt, $reference['path'], 'visual_research_vision' );
+			if ( is_wp_error( $vision ) ) { $out['errors'][] = array( 'url' => $reference['source_url'], 'code' => $vision->get_error_code(), 'message' => $vision->get_error_message() ); continue; }
+			try { $analysis = self::decode_json( $vision['text'], 'visual_research_vision' ); } catch ( Exception $e ) { $analysis = array( 'summary' => sanitize_textarea_field( substr( (string) $vision['text'], 0, 2000 ) ), 'uncertainties' => array( 'La vision n’a pas retourné le schéma JSON attendu.' ) ); }
+			$out['references'][] = array( 'source_url' => esc_url_raw( $reference['source_url'] ), 'analysis' => $analysis, 'sha256' => sanitize_text_field( $reference['sha256'] ?? '' ) );
+		}
+		MSRWA_DB::event( 'visual_research_completed', $job->batch_id, $job->id, array( 'analyzed' => count( $out['references'] ), 'errors' => count( $out['errors'] ) ) );
+		return $out;
 	}
 
 	private static function association( $job, $input, &$artifacts ) {
@@ -134,7 +166,8 @@ final class MSRWA_Pipeline {
 			return;
 		}
 		$settings = MSRWA_Settings::get();
-		$prompt = $settings['prompt_recipe'] . '\n' . $settings['prompt_nutrition'] . '\nEntrée : ' . wp_json_encode( $input, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . ' Recherche : ' . wp_json_encode( isset( $artifacts['research'] ) ? $artifacts['research'] : array(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . ' Analyse visuelle de référence (observations, jamais preuve de quantités) : ' . wp_json_encode( isset( $artifacts['association']['visual_analysis'] ) ? $artifacts['association']['visual_analysis'] : array(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+		$visual_observations = array_merge( isset( $artifacts['association']['visual_analysis'] ) && is_array( $artifacts['association']['visual_analysis'] ) ? $artifacts['association']['visual_analysis'] : array(), isset( $artifacts['visual_research']['references'] ) && is_array( $artifacts['visual_research']['references'] ) ? $artifacts['visual_research']['references'] : array() );
+		$prompt = $settings['prompt_recipe'] . '\n' . $settings['prompt_nutrition'] . '\nEntrée : ' . wp_json_encode( $input, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . ' Recherche : ' . wp_json_encode( isset( $artifacts['research'] ) ? $artifacts['research'] : array(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . ' Analyse visuelle de référence (observations, jamais preuve de quantités) : ' . wp_json_encode( $visual_observations, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
 		$result = self::text_call( $job, $prompt, 2400, array(), false, 'canonical_recipe' );
 		self::require_result( $result );
 		$canonical = self::normalize_canonical( self::decode_json( $result['text'], 'canonical_recipe' ) );
