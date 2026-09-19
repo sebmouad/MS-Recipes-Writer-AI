@@ -70,7 +70,7 @@ final class MSRWA_REST {
 		$id = absint( $request['id'] );
 		$job = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$t['jobs']} WHERE id = %d", $id ) );
 		if ( ! $job || ( (int) $job->owner_id !== get_current_user_id() && ! current_user_can( 'msrwa_view_all' ) && ! current_user_can( 'manage_options' ) ) ) { return new WP_Error( 'not_found', 'Job introuvable.', array( 'status' => 404 ) ); }
-		if ( ! in_array( $job->status, array( 'failed', 'needs_review', 'awaiting_input', 'uncertain' ), true ) ) { return new WP_Error( 'job_not_retryable', 'Ce job n’est pas dans un état relançable.', array( 'status' => 409 ) ); }
+		if ( ! in_array( $job->status, array( 'failed', 'needs_review', 'awaiting_input', 'uncertain', 'paused_budget' ), true ) ) { return new WP_Error( 'job_not_retryable', 'Ce job n’est pas dans un état relançable.', array( 'status' => 409 ) ); }
 		$wpdb->update( $t['jobs'], array( 'status' => 'queued', 'error_code' => null, 'error_message' => null, 'lock_token' => null, 'lock_until' => null, 'updated_at' => current_time( 'mysql', true ) ), array( 'id' => $id ), array( '%s', '%s', '%s', '%s', '%s', '%s' ), array( '%d' ) );
 		MSRWA_DB::event( 'job_retry_requested', $job->batch_id, $id, array( 'stage' => $job->stage ) );
 		MSRWA_Queue::schedule_job( $id );

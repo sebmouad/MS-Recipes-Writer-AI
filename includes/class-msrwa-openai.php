@@ -59,6 +59,37 @@ final class MSRWA_OpenAI {
 		return array( 'ok' => true, 'model' => $result['model'], 'request_id' => $result['id'], 'usage' => $result['usage'] );
 	}
 
+	public static function vision_text( $prompt, $image_path, $model = '', $max_output_tokens = 800 ) {
+		$key = self::key();
+		if ( '' === $key || ! is_readable( $image_path ) || filesize( $image_path ) > 10 * 1024 * 1024 ) { return new WP_Error( 'vision_input_invalid', 'Clé ou image de vision indisponible.', array( 'status' => 400 ) ); }
+		$model = $model ? sanitize_text_field( $model ) : 'gpt-5.6-luna';
+		$catalog = MSRWA_Catalog::models();
+		if ( empty( $catalog['openai'][ $model ]['stable'] ) || empty( $catalog['openai'][ $model ]['vision'] ) ) { return new WP_Error( 'unsupported_openai_vision_model', 'Modèle de vision OpenAI non autorisé.', array( 'status' => 400 ) ); }
+		$mime = function_exists( 'mime_content_type' ) ? mime_content_type( $image_path ) : 'image/jpeg';
+		if ( 0 !== strpos( $mime, 'image/' ) ) { return new WP_Error( 'vision_mime_invalid', 'MIME image non autorisé.', array( 'status' => 400 ) ); }
+		$payload = array(
+			'model' => $model,
+			'input' => array(
+				array(
+					'role' => 'user',
+					'content' => array(
+						array( 'type' => 'input_text', 'text' => sanitize_textarea_field( $prompt ) ),
+						array( 'type' => 'input_image', 'image_url' => 'data:' . $mime . ';base64,' . base64_encode( file_get_contents( $image_path ) ) ),
+					),
+				),
+			),
+			'store' => false,
+			'max_output_tokens' => max( 16, absint( $max_output_tokens ) ),
+		);
+		$response = wp_remote_post( 'https://api.openai.com/v1/responses', array( 'timeout' => 60, 'sslverify' => true, 'headers' => array( 'Authorization' => 'Bearer ' . $key, 'Content-Type' => 'application/json' ), 'body' => wp_json_encode( $payload ) ) );
+		if ( is_wp_error( $response ) ) { return new WP_Error( 'openai_vision_network', $response->get_error_message(), array( 'status' => 502 ) ); }
+		$code = wp_remote_retrieve_response_code( $response );
+		$body = json_decode( wp_remote_retrieve_body( $response ), true );
+		if ( $code < 200 || $code >= 300 ) { return new WP_Error( 'openai_vision_api_' . $code, isset( $body['error']['message'] ) ? sanitize_text_field( $body['error']['message'] ) : 'Réponse vision OpenAI invalide.', array( 'status' => $code ) ); }
+		$text = self::extract_text( $body );
+		return array( 'id' => isset( $body['id'] ) ? sanitize_text_field( $body['id'] ) : '', 'text' => $text, 'usage' => isset( $body['usage'] ) ? $body['usage'] : array(), 'model' => $model );
+	}
+
 	public static function images_generate( $prompt, $model = 'gpt-image-2.5-flare', $size = '1024x1024', $quality = 'low', $format = 'webp' ) {
 		$key = self::key();
 		if ( '' === $key ) { return new WP_Error( 'missing_openai_key', 'Aucune clé OpenAI côté serveur.', array( 'status' => 400 ) ); }

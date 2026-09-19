@@ -31,7 +31,9 @@ final class MSRWA_Pipeline {
 				default: self::set_status( $job, 'needs_review', 'stage_not_implemented', 'Cette étape attend encore son adaptateur fournisseur.' );
 			}
 		} catch ( Exception $exception ) {
-			if ( self::retryable( $exception->getMessage() ) && (int) $job->attempts < 3 ) {
+			if ( preg_match( '/budget|payant|insuffisant/i', $exception->getMessage() ) ) {
+				self::set_status( $job, 'paused_budget', 'budget_blocked', $exception->getMessage() );
+			} elseif ( self::retryable( $exception->getMessage() ) && (int) $job->attempts < 3 ) {
 				$delay = min( 900, 30 * ( 2 ** max( 0, (int) $job->attempts - 1 ) ) + wp_rand( 0, 15 ) );
 				$wpdb->update( $t['jobs'], array( 'status' => 'retry_wait', 'error_code' => 'retry_scheduled', 'error_message' => sanitize_textarea_field( $exception->getMessage() ), 'lock_token' => null, 'lock_until' => null, 'updated_at' => current_time( 'mysql', true ) ), array( 'id' => $job->id ), array( '%s', '%s', '%s', '%s', '%s', '%s' ), array( '%d' ) );
 				MSRWA_DB::event( 'job_retry_scheduled', $job->batch_id, $job->id, array( 'delay' => $delay, 'attempt' => (int) $job->attempts ) );
@@ -228,6 +230,10 @@ final class MSRWA_Pipeline {
 			if ( empty( $artifacts[ $key ] ) ) { self::set_status( $job, 'needs_review', 'image_missing', 'Une image requise est absente avant la finalisation.' ); return; }
 			$valid = MSRWA_Images::validate( $artifacts[ $key ] );
 			if ( is_wp_error( $valid ) ) { self::set_status( $job, 'needs_review', $valid->get_error_code(), $valid->get_error_message() ); return; }
+			$review = MSRWA_Images::review( $job, $artifacts[ $key ], isset( $artifacts['canonical'] ) ? $artifacts['canonical'] : array() );
+			if ( is_wp_error( $review ) ) { self::set_status( $job, 'needs_review', $review->get_error_code(), $review->get_error_message() ); return; }
+			$artifacts['image_reviews'][ $key ] = $review;
+			if ( isset( $review['pass'] ) && empty( $review['pass'] ) ) { self::set_status( $job, 'needs_review', 'image_review_failed', 'La relecture image a détecté un défaut à vérifier.' ); return; }
 		}
 		MSRWA_DB::event( 'final_review_passed', $job->batch_id, $job->id, array( 'checks' => array( 'article', 'featured_image', 'facebook_image' ) ) );
 		self::advance( $job, $artifacts, 'draft' );

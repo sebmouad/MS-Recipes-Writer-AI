@@ -53,6 +53,22 @@ final class MSRWA_Images {
 		return true;
 	}
 
+	public static function review( $job, $image, $canonical ) {
+		$settings = MSRWA_Settings::get();
+		$plan = MSRWA_Router::plan( 'vision' );
+		if ( is_wp_error( $plan ) || 'openai' !== $plan['provider'] ) { return new WP_Error( 'image_review_pending', 'Aucun adaptateur de vision compatible n’est connecté.' ); }
+		$file = get_attached_file( absint( $image['attachment_id'] ?? 0 ) );
+		$budget = MSRWA_DB::budget_allows( $job, 0.05 );
+		if ( is_wp_error( $budget ) ) { return $budget; }
+		$prompt = $settings['prompt_image_review'] . '\nRECETTE VALIDÉE : ' . wp_json_encode( $canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+		$result = MSRWA_OpenAI::vision_text( $prompt, $file, $plan['model'], 1000 );
+		self::record_call( $job, 'image_review', $plan['model'], $prompt, $result );
+		if ( is_wp_error( $result ) ) { return $result; }
+		$json = json_decode( trim( (string) $result['text'] ), true );
+		if ( ! is_array( $json ) ) { $start = strpos( $result['text'], '{' ); $end = strrpos( $result['text'], '}' ); if ( false !== $start && false !== $end ) { $json = json_decode( substr( $result['text'], $start, $end - $start + 1 ), true ); } }
+		return is_array( $json ) ? $json : new WP_Error( 'image_review_invalid', 'La relecture vision n’a pas retourné un JSON valide.' );
+	}
+
 	private static function image_plan( $stage ) {
 		$plan = MSRWA_Router::plan( 'image_generation' );
 		if ( is_wp_error( $plan ) ) { return $plan; }
@@ -70,6 +86,8 @@ final class MSRWA_Images {
 			'operation' => $operation,
 			'status' => is_wp_error( $result ) ? 'failed' : 'completed',
 			'request_id' => '',
+			'input_tokens' => is_array( $result ) && ! empty( $result['usage']['input_tokens'] ) ? absint( $result['usage']['input_tokens'] ) : 0,
+			'output_tokens' => is_array( $result ) && ! empty( $result['usage']['output_tokens'] ) ? absint( $result['usage']['output_tokens'] ) : 0,
 			'cost_estimate' => (float) $settings['image_reserve_usd'],
 			'uncertain' => 1,
 			'error_code' => is_wp_error( $result ) ? $result->get_error_code() : '',

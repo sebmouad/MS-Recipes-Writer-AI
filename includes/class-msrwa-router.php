@@ -3,9 +3,10 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
 
 final class MSRWA_Router {
 	public static function connected( $provider ) {
-		if ( 'openai' === $provider && ( defined( 'MSRWA_OPENAI_KEY' ) || getenv( 'MSRWA_OPENAI_KEY' ) ) ) { return true; }
+		if ( 'openai' === $provider ) { return class_exists( 'MSRWA_OpenAI' ) ? '' !== trim( MSRWA_OpenAI::key() ) : ( ( defined( 'MSRWA_OPENAI_KEY' ) && MSRWA_OPENAI_KEY ) || (bool) getenv( 'MSRWA_OPENAI_KEY' ) ); }
 		$s = MSRWA_Settings::get();
-		return ! empty( $s[ $provider . '_key' ] );
+		$constant = 'MSRWA_' . strtoupper( $provider ) . '_KEY';
+		return ( defined( $constant ) && constant( $constant ) ) || ( getenv( $constant ) ?: ! empty( $s[ $provider . '_key' ] ) );
 	}
 
 	public static function plan( $capability = 'text' ) {
