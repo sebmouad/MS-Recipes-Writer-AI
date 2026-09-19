@@ -133,7 +133,9 @@ final class MSRWA_Queue {
 		global $wpdb;
 		$t = MSRWA_DB::tables();
 		$batch = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$t['batches']} WHERE id = %d", $batch_id ) );
-		if ( ! $batch || in_array( $batch->status, array( 'cancelled', 'completed' ), true ) ) { return; }
+		// A previously scheduled worker must not silently undo a user pause or
+		// resume a batch that is waiting for an explicit decision.
+		if ( ! $batch || in_array( $batch->status, array( 'cancelled', 'completed', 'paused', 'awaiting_admin', 'paused_budget', 'needs_review' ), true ) ) { return; }
 		$wpdb->update( $t['batches'], array( 'status' => 'running', 'updated_at' => current_time( 'mysql', true ) ), array( 'id' => $batch_id ), array( '%s', '%s' ), array( '%d' ) );
 		MSRWA_DB::event( 'batch_started', $batch_id, 0, array( 'stage' => 'intake' ) );
 		$settings = MSRWA_Settings::get();

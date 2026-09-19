@@ -61,14 +61,15 @@ final class MSRWA_DB {
 		return (int) $wpdb->insert_id;
 	}
 
-	public static function purge_expired( $log_days = 30 ) {
+	public static function purge_expired( $log_days = null ) {
 		global $wpdb;
 		$t = self::tables();
-		$days = max( 1, absint( $log_days ) );
+		$settings = class_exists( 'MSRWA_Settings' ) ? MSRWA_Settings::get() : array();
+		$days = null === $log_days ? ( isset( $settings['log_days'] ) ? absint( $settings['log_days'] ) : 30 ) : absint( $log_days );
+		$days = max( 1, $days );
 		$wpdb->query( $wpdb->prepare( "DELETE FROM {$t['events']} WHERE created_at < UTC_TIMESTAMP() - INTERVAL %d DAY", $days ) );
 		$wpdb->query( $wpdb->prepare( "DELETE FROM {$t['calls']} WHERE started_at < UTC_TIMESTAMP() - INTERVAL %d DAY", $days ) );
 		$wpdb->query( "DELETE FROM {$t['reservations']} WHERE status = 'reserved' AND expires_at < UTC_TIMESTAMP()" );
-		$settings = class_exists( 'MSRWA_Settings' ) ? MSRWA_Settings::get() : array();
 		if ( class_exists( 'MSRWA_Storage' ) ) { MSRWA_Storage::purge_expired( isset( $settings['temp_days'] ) ? $settings['temp_days'] : 7 ); }
 	}
 
