@@ -73,6 +73,21 @@ final class MSRWA_Settings {
 		if ( $changed ) { update_option( self::OPTION, $raw, false ); }
 	}
 
+	public static function upgrade_defaults() {
+		$raw = get_option( self::OPTION, array() );
+		if ( ! is_array( $raw ) ) { $raw = array(); }
+		$defaults = self::defaults();
+		$changed = false;
+		foreach ( $defaults as $key => $value ) {
+			if ( ! array_key_exists( $key, $raw ) ) { $raw[ $key ] = $value; $changed = true; }
+		}
+		foreach ( array( 'manual_models', 'integration_mapping' ) as $group ) {
+			if ( ! is_array( $raw[ $group ] ) ) { $raw[ $group ] = array(); $changed = true; }
+			foreach ( $defaults[ $group ] as $key => $value ) { if ( ! array_key_exists( $key, $raw[ $group ] ) ) { $raw[ $group ][ $key ] = $value; $changed = true; } }
+		}
+		if ( $changed ) { update_option( self::OPTION, $raw, false ); }
+	}
+
 	public static function sanitize( $raw ) {
 		$raw = is_array( $raw ) ? $raw : array();
 		$defaults = self::defaults();
