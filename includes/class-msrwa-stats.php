@@ -23,6 +23,38 @@ final class MSRWA_Stats {
 		return array( 'days' => $days, 'jobs' => $job_counts, 'total_jobs' => array_sum( $job_counts ), 'calls' => $calls, 'estimated_cost_usd' => round( $total_cost, 6 ), 'generated_at' => current_time( 'mysql', true ) );
 	}
 
+	public static function details( $days = 7, $owner_id = 0 ) {
+		global $wpdb;
+		$t = MSRWA_DB::tables();
+		$days = min( 365, max( 1, absint( $days ) ) );
+		$job_where = "j.created_at >= UTC_TIMESTAMP() - INTERVAL {$days} DAY";
+		$call_where = "c.started_at >= UTC_TIMESTAMP() - INTERVAL {$days} DAY";
+		$event_where = "e.created_at >= UTC_TIMESTAMP() - INTERVAL {$days} DAY";
+		$job_args = array();
+		$call_args = array();
+		$event_args = array();
+		if ( $owner_id ) {
+			$job_where .= ' AND j.owner_id = %d'; $job_args[] = absint( $owner_id );
+			$call_where .= ' AND j.owner_id = %d'; $call_args[] = absint( $owner_id );
+			$event_where .= ' AND (j.owner_id = %d OR b.owner_id = %d)'; $event_args[] = absint( $owner_id ); $event_args[] = absint( $owner_id );
+		}
+		$status_sql = "SELECT j.status, COUNT(*) AS count, COALESCE(SUM(j.cost_estimate),0) AS cost FROM {$t['jobs']} j WHERE {$job_where} GROUP BY j.status ORDER BY count DESC";
+		$operation_sql = "SELECT c.operation, c.status, COUNT(*) AS count, COALESCE(SUM(c.input_tokens),0) AS input_tokens, COALESCE(SUM(c.output_tokens),0) AS output_tokens, COALESCE(SUM(c.cost_estimate),0) AS cost FROM {$t['calls']} c INNER JOIN {$t['jobs']} j ON j.id = c.job_id WHERE {$call_where} GROUP BY c.operation, c.status ORDER BY cost DESC, count DESC";
+		$event_sql = "SELECT e.event_type, COUNT(*) AS count FROM {$t['events']} e LEFT JOIN {$t['jobs']} j ON j.id = e.job_id LEFT JOIN {$t['batches']} b ON b.id = e.batch_id WHERE {$event_where} GROUP BY e.event_type ORDER BY count DESC, e.event_type ASC";
+		$statuses = $job_args ? $wpdb->get_results( $wpdb->prepare( $status_sql, $job_args ), ARRAY_A ) : $wpdb->get_results( $status_sql, ARRAY_A );
+		$operations = $call_args ? $wpdb->get_results( $wpdb->prepare( $operation_sql, $call_args ), ARRAY_A ) : $wpdb->get_results( $operation_sql, ARRAY_A );
+		$events = $event_args ? $wpdb->get_results( $wpdb->prepare( $event_sql, $event_args ), ARRAY_A ) : $wpdb->get_results( $event_sql, ARRAY_A );
+		$editors = array();
+		if ( ! $owner_id ) {
+			$editors = $wpdb->get_results( "SELECT j.owner_id, COUNT(*) AS jobs, SUM(j.status = 'completed') AS completed, COALESCE(SUM(j.cost_estimate),0) AS cost FROM {$t['jobs']} j WHERE j.created_at >= UTC_TIMESTAMP() - INTERVAL {$days} DAY GROUP BY j.owner_id ORDER BY cost DESC, jobs DESC", ARRAY_A );
+			foreach ( $editors as &$editor ) {
+				$user = get_userdata( (int) $editor['owner_id'] );
+				$editor['name'] = $user ? $user->display_name : sprintf( 'Utilisateur #%d', (int) $editor['owner_id'] );
+			}
+		}
+		return array( 'statuses' => $statuses, 'operations' => $operations, 'events' => $events, 'editors' => $editors );
+	}
+
 	public static function summary_range( $from, $to, $owner_id = 0 ) {
 		$from = self::date_boundary( $from, 'start' );
 		$to = self::date_boundary( $to, 'end' );
@@ -79,7 +111,7 @@ final class MSRWA_Stats {
 		} else {
 			$columns = array( 'id', 'batch_id', 'job_id', 'actor_id', 'event_type', 'payload_json', 'created_at' );
 			$where = 'created_at >= %s AND created_at < %s';
-			if ( $owner_id ) { $where .= ' AND (job_id IS NULL OR job_id IN (SELECT id FROM ' . $t['jobs'] . ' WHERE owner_id = %d))'; $args[] = absint( $owner_id ); }
+			if ( $owner_id ) { $where .= ' AND (job_id IN (SELECT id FROM ' . $t['jobs'] . ' WHERE owner_id = %d) OR batch_id IN (SELECT id FROM ' . $t['batches'] . ' WHERE owner_id = %d))'; $args[] = absint( $owner_id ); $args[] = absint( $owner_id ); }
 			$sql = "SELECT " . implode( ',', $columns ) . " FROM {$t['events']} WHERE {$where} ORDER BY id ASC LIMIT %d OFFSET %d";
 		}
 		$args[] = $per_page; $args[] = $offset;
@@ -101,7 +133,7 @@ final class MSRWA_Stats {
 		$per_page = min( 100, max( 1, absint( $per_page ) ) );
 		$offset = ( $page - 1 ) * $per_page;
 		if ( $owner_id ) {
-			$sql = $wpdb->prepare( "SELECT e.* FROM {$t['events']} e INNER JOIN {$t['jobs']} j ON j.id = e.job_id WHERE j.owner_id = %d ORDER BY e.id DESC LIMIT %d OFFSET %d", absint( $owner_id ), $per_page, $offset );
+			$sql = $wpdb->prepare( "SELECT e.* FROM {$t['events']} e LEFT JOIN {$t['jobs']} j ON j.id = e.job_id LEFT JOIN {$t['batches']} b ON b.id = e.batch_id WHERE j.owner_id = %d OR b.owner_id = %d ORDER BY e.id DESC LIMIT %d OFFSET %d", absint( $owner_id ), absint( $owner_id ), $per_page, $offset );
 		} else {
 			$sql = $wpdb->prepare( "SELECT * FROM {$t['events']} ORDER BY id DESC LIMIT %d OFFSET %d", $per_page, $offset );
 		}
