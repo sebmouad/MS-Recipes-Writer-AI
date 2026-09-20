@@ -3,6 +3,7 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
 
 final class MSRWA_REST {
 	public static function register() {
+		add_filter( 'rest_post_dispatch', array( __CLASS__, 'no_store' ), 10, 3 );
 		register_rest_route( 'msrwa/v1', '/catalog', array( 'methods' => 'GET', 'permission_callback' => array( __CLASS__, 'can_read' ), 'callback' => array( __CLASS__, 'catalog' ) ) );
 		register_rest_route( 'msrwa/v1', '/catalog/sync', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_manage' ), 'callback' => array( __CLASS__, 'sync_catalog' ) ) );
 		register_rest_route( 'msrwa/v1', '/test/openai', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_manage' ), 'callback' => array( __CLASS__, 'test_openai' ) ) );
@@ -18,6 +19,22 @@ final class MSRWA_REST {
 		register_rest_route( 'msrwa/v1', '/stats', array( 'methods' => 'GET', 'permission_callback' => array( __CLASS__, 'can_read' ), 'callback' => array( __CLASS__, 'stats' ) ) );
 		register_rest_route( 'msrwa/v1', '/events', array( 'methods' => 'GET', 'permission_callback' => array( __CLASS__, 'can_read' ), 'callback' => array( __CLASS__, 'events' ) ) );
 		register_rest_route( 'msrwa/v1', '/export', array( 'methods' => 'GET', 'permission_callback' => array( __CLASS__, 'can_read' ), 'callback' => array( __CLASS__, 'export' ) ) );
+	}
+
+	/**
+	 * Page caches treat an application-password request as a guest request and
+	 * can store the answer for everyone, so every response in this namespace
+	 * declares itself private. Verified on a LiteSpeed host serving a cached
+	 * catalogue to anonymous visitors.
+	 */
+	public static function no_store( $response, $server, $request ) {
+		if ( ! $response instanceof WP_REST_Response ) { return $response; }
+		if ( 0 !== strpos( ltrim( (string) $request->get_route(), '/' ), 'msrwa/' ) ) { return $response; }
+		$response->header( 'Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0, private' );
+		$response->header( 'Pragma', 'no-cache' );
+		$response->header( 'X-LiteSpeed-Cache-Control', 'no-cache' );
+		$response->header( 'X-Accel-Expires', '0' );
+		return $response;
 	}
 
 	public static function can_read() { return current_user_can( 'msrwa_view_own' ) || current_user_can( 'msrwa_view_all' ) || current_user_can( 'manage_options' ); }
