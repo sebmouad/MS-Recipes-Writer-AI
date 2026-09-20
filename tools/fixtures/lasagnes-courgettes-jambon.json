@@ -1,0 +1,68 @@
+{
+  "title": "Lasagnes de courgettes au jambon et béchamel gratinées",
+  "text": "Lasagnes familiales alternant courgettes, jambon, feuilles de lasagnes et béchamel, terminées par un fromage gratiné. Détailler comment éviter un plat aqueux et réussir la cuisson des pâtes.",
+  "editor_input": {
+    "type": "article",
+    "title": "Lasagnes de courgettes au jambon et béchamel gratinées",
+    "text": "Lasagnes familiales alternant courgettes, jambon, feuilles de lasagnes et béchamel, terminées par un fromage gratiné. Détailler comment éviter un plat aqueux et réussir la cuisson des pâtes.",
+    "images": []
+  },
+  "research": {
+    "dish_identity": { "name": "Lasagnes de courgettes au jambon et béchamel", "confidence": "élevée", "evidence": "Le titre et l'article éditeur décrivent les couches principales." },
+    "ingredient_facts": [
+      { "source_url": "https://example.test/courgettes", "text": "Les courgettes contiennent beaucoup d'eau et gagnent à être précuites avant le montage." },
+      { "source_url": "https://example.test/bechamel", "text": "Une béchamel nappante aide à lier les couches sans détremper les pâtes." }
+    ],
+    "preparation_facts": [
+      { "source_url": "https://example.test/lasagnes-montage", "text": "La sauce doit toucher les feuilles de lasagnes pour qu'elles s'hydratent régulièrement." },
+      { "source_url": "https://example.test/lasagnes-repos", "text": "Un repos de 10 minutes après cuisson facilite une découpe nette." }
+    ],
+    "food_safety": [
+      { "source_url": "https://example.test/restes", "text": "Les restes cuits se conservent au froid dans un récipient fermé et doivent être réchauffés à cœur." }
+    ],
+    "references": [
+      { "url": "https://example.test/lasagnes-montage", "title": "Monter et cuire des lasagnes", "publisher": "École culinaire de test" }
+    ],
+    "visual_references": [
+      { "image_url": "https://example.test/images/lasagnes-courgettes.jpg", "source_url": "https://example.test/lasagnes-courgettes", "title": "Lasagnes de courgettes gratinées" }
+    ],
+    "visual_observations": [
+      { "image_url": "https://example.test/images/lasagnes-courgettes.jpg", "source_url": "https://example.test/lasagnes-courgettes", "observable_details": "Part rectangulaire montrant des couches de pâte, courgette et sauce claire.", "composition": "Part servie devant le plat à gratin.", "colours": "Dessus doré, intérieur crème et vert pâle.", "textures": "Croûte gratinée et couches moelleuses qui se tiennent.", "uncertainties": "La photographie ne permet pas d'identifier le fromage ou l'assaisonnement." }
+    ],
+    "uncertainties": ["L'épaisseur des courgettes influence leur temps de précuisson."],
+    "originality_notes": ["La description visuelle ne déduit aucun ingrédient non visible."]
+  },
+  "canonical": {
+    "title": "Lasagnes de courgettes au jambon et béchamel",
+    "servings": 6,
+    "prep_minutes": 35,
+    "cook_minutes": 45,
+    "total_minutes": 80,
+    "cuisine": "Familiale",
+    "difficulty": "Facile",
+    "calories_estimate": 490,
+    "ingredients": [
+      { "name": "Feuilles de lasagnes", "quantity": "12", "unit": "pièces" },
+      { "name": "Courgettes", "quantity": "3", "unit": "pièces" },
+      { "name": "Jambon blanc", "quantity": "6", "unit": "tranches" },
+      { "name": "Lait", "quantity": "75", "unit": "cl" },
+      { "name": "Beurre", "quantity": "60", "unit": "g" },
+      { "name": "Farine", "quantity": "60", "unit": "g" },
+      { "name": "Fromage râpé", "quantity": "120", "unit": "g" }
+    ],
+    "steps": [
+      { "text": "Couper les courgettes en tranches de 5 mm et les poêler 10 minutes jusqu'à évaporation de leur eau." },
+      { "text": "Faire fondre le beurre puis incorporer la farine pendant 1 minute." },
+      { "text": "Verser progressivement le lait en fouettant jusqu'à obtenir une béchamel nappante." },
+      { "text": "Alterner béchamel, feuilles de lasagnes, courgettes et jambon dans le plat." },
+      { "text": "Terminer par la béchamel et le fromage râpé." },
+      { "text": "Cuire 35 minutes à 180 °C puis laisser reposer 10 minutes avant de découper." }
+    ],
+    "equipment": ["Plat à gratin de 30 × 20 cm", "Grande poêle", "Casserole", "Fouet"],
+    "notes": ["Bien évaporer l'eau des courgettes évite des lasagnes liquides."],
+    "faq": [{ "question": "Comment éviter que les lasagnes de courgettes rendent de l'eau ?", "answer": "Précuisez les courgettes jusqu'à évaporation de leur eau avant de monter les couches dans le plat." }],
+    "keywords": ["lasagnes de courgettes", "jambon", "béchamel", "gratin"],
+    "food_safety": ["Conserver les restes au réfrigérateur dans un récipient fermé et les réchauffer à cœur."],
+    "uncertainties": []
+  }
+}

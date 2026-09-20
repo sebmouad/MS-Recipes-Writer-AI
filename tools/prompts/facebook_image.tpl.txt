@@ -21,7 +21,7 @@ LAYOUT:
 • Keep the same bowl, mold, plate, and visual consistency across all steps
 • Smooth visual progression from ingredients to final plated recipe
 
-THE SIX STEPS MUST COME FROM THE ARTICLE ITSELF, in order, using the real ingredients and the real gestures described. Never invent a step the recipe does not contain.
+THE {{facebook_steps}} SECTIONS MUST COME FROM THE CANONICAL RECIPE, in order, using its real ingredients and gestures. Use the supplied RESEARCH PACKAGE for supported appearance and doneness cues. Never copy a source photograph, infer hidden ingredients from it, or invent a step.
 
 IMAGES TO INCLUDE:
 
@@ -55,6 +55,6 @@ QUALITY:
 • Clean composition
 • Consistent colors and lighting
 
-The final image must look exactly like a professional Pinterest recipe tutorial collage showing all preparation stages of the recipe.
+The final image must look like a professional mobile recipe tutorial collage showing the important preparation stages of this recipe.
 
-Consistency: same dish, same colours, same crockery and same lighting in all six sections, ending on the finished recipe exactly as described in the final visual notes.
+Consistency: same dish, colours, crockery and lighting in every section, ending on the finished recipe as supported by the research package's real-image observations.

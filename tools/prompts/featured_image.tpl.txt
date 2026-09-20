@@ -2,7 +2,9 @@ Create a highly realistic premium food photograph of the finished, ready-to-serv
 
 The image must look like a real professional photograph made for a recipe website: not an illustration, not a render, not a generated-looking picture.
 
-Priority of information: the final visual notes written from the completed article outrank any earlier description. Use the recipe title, the exact ingredients and those notes to decide what is on the plate.
+Use the supplied RESEARCH PACKAGE as the visual source of truth. Its visual observations come from real, unedited source photographs and may guide dish form, doneness cues, texture, colour, plating, vessel, light and camera angle. Do not copy any reference image or reproduce its distinctive composition.
+
+The canonical recipe controls the dish identity and ingredients. Never infer or add a hidden ingredient, quantity or preparation step from a photograph.
 
 Required visual quality:
 - photorealistic food photography;

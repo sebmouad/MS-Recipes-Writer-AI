@@ -1,0 +1,68 @@
+{
+  "title": "Daube de bœuf à la provençale facile, mijotée au vin rouge et aux légumes",
+  "text": "Rédiger une recette familiale de daube de bœuf provençale au vin rouge, avec carottes, oignons et aromates. Expliquer la marinade, le choix du morceau, le mijotage, la conservation et le réchauffage.",
+  "editor_input": {
+    "type": "title",
+    "title": "Daube de bœuf à la provençale facile, mijotée au vin rouge et aux légumes",
+    "text": "",
+    "images": []
+  },
+  "research": {
+    "dish_identity": { "name": "Daube de bœuf à la provençale", "confidence": "élevée", "evidence": "Le titre éditeur identifie le plat et sa méthode de cuisson." },
+    "ingredient_facts": [
+      { "source_url": "https://example.test/daube-morceaux", "text": "Le paleron et le gîte conviennent au mijotage grâce à leur tissu conjonctif." },
+      { "source_url": "https://example.test/daube-vin", "text": "Un vin rouge sec et fruité convient à la marinade et à la cuisson." }
+    ],
+    "preparation_facts": [
+      { "source_url": "https://example.test/daube-cuisson", "text": "Une cuisson douce et couverte de 3 heures permet d'attendrir les morceaux." },
+      { "source_url": "https://example.test/daube-marinade", "text": "La viande peut mariner une nuit au réfrigérateur avec le vin et les aromates." }
+    ],
+    "food_safety": [
+      { "source_url": "https://example.test/securite-refroidissement", "text": "Le plat doit être refroidi rapidement puis conservé au réfrigérateur dans un récipient fermé." }
+    ],
+    "references": [
+      { "url": "https://example.test/daube-cuisson", "title": "Réussir une viande braisée", "publisher": "École culinaire de test" }
+    ],
+    "visual_references": [
+      { "image_url": "https://example.test/images/daube-provencale.jpg", "source_url": "https://example.test/daube", "title": "Daube de bœuf provençale" }
+    ],
+    "visual_observations": [
+      { "image_url": "https://example.test/images/daube-provencale.jpg", "source_url": "https://example.test/daube", "observable_details": "Morceaux de bœuf nappés d'une sauce sombre avec carottes visibles.", "composition": "Cocotte sombre vue de trois quarts.", "colours": "Brun profond, orange et vert discret.", "textures": "Sauce brillante et épaisse, viande aux fibres souples.", "uncertainties": "La photographie ne prouve ni le vin employé ni le temps de cuisson." }
+    ],
+    "uncertainties": ["La durée de marinade varie selon les sources."],
+    "originality_notes": ["Les faits sont reformulés et les observations restent limitées aux éléments visibles."]
+  },
+  "canonical": {
+    "title": "Daube de bœuf à la provençale",
+    "servings": 6,
+    "prep_minutes": 30,
+    "cook_minutes": 180,
+    "total_minutes": 210,
+    "cuisine": "Provençale",
+    "difficulty": "Facile",
+    "calories_estimate": 520,
+    "ingredients": [
+      { "name": "Paleron de bœuf", "quantity": "1,2", "unit": "kg" },
+      { "name": "Vin rouge sec", "quantity": "75", "unit": "cl" },
+      { "name": "Carottes", "quantity": "4", "unit": "pièces" },
+      { "name": "Oignons", "quantity": "2", "unit": "pièces" },
+      { "name": "Ail", "quantity": "3", "unit": "gousses" },
+      { "name": "Huile d'olive", "quantity": "2", "unit": "cuillères à soupe" },
+      { "name": "Bouquet garni", "quantity": "1", "unit": "pièce" }
+    ],
+    "steps": [
+      { "text": "Faire mariner le bœuf avec le vin, les carottes, les oignons, l'ail et le bouquet garni une nuit au réfrigérateur." },
+      { "text": "Égoutter et sécher les morceaux de bœuf en conservant la marinade." },
+      { "text": "Colorer le bœuf dans l'huile d'olive jusqu'à obtenir une croûte brune." },
+      { "text": "Ajouter les légumes égouttés et les faire revenir 5 minutes." },
+      { "text": "Verser la marinade, couvrir et porter à très léger frémissement." },
+      { "text": "Mijoter 3 heures à couvert jusqu'à ce que la viande se défasse à la fourchette." }
+    ],
+    "equipment": ["Grande cocotte avec couvercle", "Saladier", "Écumoire"],
+    "notes": ["La daube est encore meilleure réchauffée le lendemain."],
+    "faq": [{ "question": "Quel morceau de bœuf choisir pour une daube ?", "answer": "Le paleron ou le gîte supportent une cuisson longue et deviennent fondants sans se dessécher." }],
+    "keywords": ["daube de bœuf", "provence", "vin rouge", "plat mijoté"],
+    "food_safety": ["Faire mariner la viande au réfrigérateur.", "Refroidir rapidement les restes avant réfrigération."],
+    "uncertainties": ["Le temps de marinade n'est pas inclus dans total_minutes."]
+  }
+}

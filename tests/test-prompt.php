@@ -35,4 +35,15 @@ $unknown = MSRWA_Prompt::compile( 'Keep {{words_total}} and drop {{not_a_variabl
 msrwa_test_missing( $unknown, '{{', 'No placeholder may survive compilation.' );
 msrwa_test_missing( $unknown, 'not_a_variable', 'An unknown variable must not leak into the prompt.' );
 
+// The standalone lab keeps one research-centred contract per active stage.
+require_once dirname( __DIR__ ) . '/tools/lib/steps.php';
+$lab_steps = lab_steps();
+msrwa_test_assert( array( 'research', 'canonical_recipe', 'article', 'review', 'fact_check', 'proofread' ) === array_keys( $lab_steps ), 'The lab must expose only the active text pipeline.' );
+$lab_prompts = glob( dirname( __DIR__ ) . '/tools/prompts/*.txt' );
+msrwa_test_assert( 8 === count( $lab_prompts ), 'The lab must keep one maintained prompt for six text and two image stages.' );
+$brief = lab_brief( 'tarte-pommes' );
+$article_input = lab_build_input( 'article', lab_prompt( 'article' ), $brief, array() );
+msrwa_test_contains( $article_input, 'RESEARCH PACKAGE:', 'The article lab input must carry the shared research package.' );
+msrwa_test_contains( $article_input, 'visual_observations', 'Real-image observations must reach the article contract.' );
+
 msrwa_test_done( 'MSRWA prompt compiler contracts' );

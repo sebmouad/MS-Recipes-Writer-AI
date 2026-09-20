@@ -41,47 +41,35 @@ function lab_steps() {
 	$s = lab_settings();
 	return array(
 		'research' => array(
-			'prompts' => array( 'prompt_research' ), 'json' => true, 'max_output' => (int) $s['research_max_output_tokens'],
+			'prompts' => array( 'prompt_research' ), 'file' => 'research.en.txt', 'json' => true, 'max_output' => (int) $s['research_max_output_tokens'],
 			'tools' => array( array( 'type' => 'web_search' ) ),
-			'expects' => 'JSON with recipe_facts, references, uncertainties',
+			'expects' => 'a sourced research package: ingredients, method and real-image observations',
 		),
 		'canonical_recipe' => array(
-			'prompts' => array( 'prompt_recipe', 'prompt_nutrition' ), 'json' => true, 'max_output' => (int) $s['canonical_max_output_tokens'],
+			'prompts' => array( 'prompt_recipe', 'prompt_nutrition' ), 'file' => 'canonical_recipe.en.txt', 'json' => true, 'max_output' => (int) $s['canonical_max_output_tokens'],
 			'expects' => 'a recipe passing MSRWA_Recipe::validate',
 		),
 		'article' => array(
-			'prompts' => array( 'prompt_article', 'prompt_seo' ), 'json' => true, 'max_output' => max( (int) $s['article_max_output_tokens'], MSRWA_Cost::output_budget( $s['quality_max_words'] ) ),
+			'prompts' => array( 'prompt_article', 'prompt_seo' ), 'file' => 'article.tpl.txt', 'json' => true, 'max_output' => max( (int) $s['article_max_output_tokens'], MSRWA_Cost::output_budget( $s['quality_max_words'] ) ),
 			'expects' => 'an article passing MSRWA_Quality plus the required outline',
 		),
 		'review' => array(
-			'prompts' => array( 'prompt_review' ), 'json' => true, 'max_output' => (int) $s['review_max_output_tokens'],
-			'expects' => 'JSON with pass, findings, corrected_artifact',
-		),
-		'article_full' => array(
-			'prompts' => array( 'prompt_article' ), 'json' => true, 'max_output' => 16000,
-			'expects' => 'the canonical recipe and the complete article in one call',
+			'prompts' => array( 'prompt_review' ), 'file' => 'review.en.txt', 'json' => true, 'max_output' => (int) $s['review_max_output_tokens'],
+			'expects' => 'a research-grounded verdict and precise findings',
 		),
 		'fact_check' => array(
-			'prompts' => array( 'prompt_review' ), 'json' => true, 'max_output' => 4000,
+			'prompts' => array( 'prompt_review' ), 'file' => 'fact_check.en.txt', 'json' => true, 'max_output' => 4000,
 			'expects' => 'only the passages the sources contradict, quoted verbatim',
 		),
 		'proofread' => array(
-			'prompts' => array( 'prompt_correction' ), 'json' => true, 'max_output' => max( (int) $s['article_max_output_tokens'], MSRWA_Cost::output_budget( $s['quality_max_words'] ) ),
+			'prompts' => array( 'prompt_correction' ), 'file' => 'proofread.en.txt', 'json' => true, 'max_output' => max( (int) $s['article_max_output_tokens'], MSRWA_Cost::output_budget( $s['quality_max_words'] ) ),
 			'expects' => 'the same article with its French corrected and every figure untouched',
-		),
-		'article_part1' => array(
-			'prompts' => array( 'prompt_article' ), 'json' => true, 'max_output' => 6000,
-			'expects' => 'page one: intro, ingredients and their role, choice, substitutions, equipment, plus continuity_context',
-		),
-		'article_part2' => array(
-			'prompts' => array( 'prompt_article' ), 'json' => true, 'max_output' => 6000,
-			'expects' => 'page two: preparation, mistakes, storage, variants, serving, FAQ, conclusion',
 		),
 	);
 }
 
 /** The prompt under test: a candidate variant, or the shipped default. */
-function lab_prompt( $step, $variant = '' ) {
+function lab_prompt( $step, $variant = '', $shipped = false ) {
 	if ( '' !== $variant ) {
 		$file = __DIR__ . '/../prompts/' . $step . '.' . $variant . '.txt';
 		if ( ! file_exists( $file ) ) { fwrite( STDERR, "No such variant: {$file}\n" ); exit( 2 ); }
@@ -93,10 +81,52 @@ function lab_prompt( $step, $variant = '' ) {
 		}
 		return $text;
 	}
+	if ( ! $shipped ) {
+		$file = __DIR__ . '/../prompts/' . lab_steps()[ $step ]['file'];
+		$text = trim( file_get_contents( $file ) );
+		if ( false !== strpos( $text, '{{' ) ) {
+			lab_boot();
+			return MSRWA_Prompt::compile( $text, lab_settings() );
+		}
+		return $text;
+	}
 	$settings = lab_settings();
 	$parts = array();
 	foreach ( lab_steps()[ $step ]['prompts'] as $key ) { $parts[] = (string) $settings[ $key ]; }
 	return trim( implode( "\n", $parts ) );
+}
+
+/** Normalizes title-, article- and image-led editor briefs into one contract. */
+function lab_editor_brief( $brief ) {
+	if ( isset( $brief['editor_input'] ) && is_array( $brief['editor_input'] ) ) { return $brief['editor_input']; }
+	return array(
+		'type' => 'article',
+		'title' => (string) ( $brief['title'] ?? '' ),
+		'text' => (string) ( $brief['text'] ?? '' ),
+		'images' => array_values( (array) ( $brief['images'] ?? array() ) ),
+	);
+}
+
+/** Loads a saved research run or the fixture package. Downstream stages share it unchanged. */
+function lab_research_package( $brief, $options = array() ) {
+	$file = (string) ( $options['research'] ?? '' );
+	if ( '' === $file ) { return is_array( $brief['research'] ?? null ) ? $brief['research'] : array(); }
+	if ( ! file_exists( $file ) ) { fwrite( STDERR, "No such research package: {$file}\n" ); exit( 2 ); }
+	$data = json_decode( file_get_contents( $file ), true );
+	if ( isset( $data['output'] ) && is_string( $data['output'] ) ) { $data = MSRWA_Json::decode( $data['output'] ); }
+	if ( ! is_array( $data ) ) { fwrite( STDERR, "Research package is not valid JSON: {$file}\n" ); exit( 2 ); }
+	return $data;
+}
+
+/** Loads the saved canonical step when supplied, otherwise the fixture recipe. */
+function lab_canonical_recipe( $brief, $options = array() ) {
+	$file = (string) ( $options['canonical'] ?? '' );
+	if ( '' === $file ) { return is_array( $brief['canonical'] ?? null ) ? $brief['canonical'] : array(); }
+	if ( ! file_exists( $file ) ) { fwrite( STDERR, "No such canonical recipe: {$file}\n" ); exit( 2 ); }
+	$data = json_decode( file_get_contents( $file ), true );
+	if ( isset( $data['output'] ) && is_string( $data['output'] ) ) { $data = MSRWA_Json::decode( $data['output'] ); }
+	if ( ! is_array( $data ) ) { fwrite( STDERR, "Canonical recipe is not valid JSON: {$file}\n" ); exit( 2 ); }
+	return $data;
 }
 
 function lab_brief( $name ) {
@@ -111,58 +141,41 @@ function lab_brief( $name ) {
 function lab_build_input( $step, $prompt, $brief, $options ) {
 	$settings = lab_settings();
 	$encode = static function ( $value ) { return json_encode( $value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ); };
+	$editor = lab_editor_brief( $brief );
+	$research = lab_research_package( $brief, $options );
+	$canonical = lab_canonical_recipe( $brief, $options );
 	if ( 'research' === $step ) {
-		return $prompt . "\nEntrée éditeur : " . $encode( array( 'title' => $brief['title'], 'source_text' => $brief['text'] ) );
+		return $prompt . "\nEDITOR BRIEF: " . $encode( $editor );
 	}
 	if ( 'canonical_recipe' === $step ) {
-		return $prompt . "\nEntrée : " . $encode( array( 'title' => $brief['title'], 'source_text' => $brief['text'] ) )
-			. ' Recherche : ' . $encode( $brief['research'] ?? array() );
-	}
-	if ( 'article_full' === $step ) {
-		return $prompt . "\nBRIEF: " . $encode( array( 'title' => $brief['title'], 'source_text' => $brief['text'] ) )
-			. "\nRESEARCH: " . $encode( $brief['research'] ?? array() );
+		return $prompt . "\nEDITOR BRIEF: " . $encode( $editor ) . "\nRESEARCH PACKAGE: " . $encode( $research );
 	}
 	if ( 'article' === $step ) {
 		lab_boot();
 		return $prompt . MSRWA_Quality::prompt_contract( $settings )
-			. "\nRecette canonique : " . $encode( $brief['canonical'] ?? array() )
-			. "\nRecherche : " . $encode( $brief['research'] ?? array() );
+			. "\nRecette canonique : " . $encode( $canonical )
+			. "\nRESEARCH PACKAGE: " . $encode( $research );
 	}
 	if ( 'review' === $step ) {
-		return $prompt . "\nCANONICAL RECIPE: " . $encode( $brief['canonical'] ?? array() )
+		return $prompt . "\nCANONICAL RECIPE: " . $encode( $canonical )
+			. "\nRESEARCH PACKAGE: " . $encode( $research )
 			. "\nARTICLE: " . $encode( lab_article_under_test( $options ) );
 	}
 	if ( 'fact_check' === $step ) {
-		return $prompt . "\nRESEARCH SOURCES: " . $encode( $brief['research'] ?? array() )
-			. "\nCANONICAL RECIPE: " . $encode( $brief['canonical'] ?? array() )
+		return $prompt . "\nRESEARCH PACKAGE: " . $encode( $research )
+			. "\nCANONICAL RECIPE: " . $encode( $canonical )
 			. "\nARTICLE: " . $encode( lab_article_under_test( $options )['content_html'] ?? '' );
 	}
 	if ( 'proofread' === $step ) {
-		return $prompt . "\nARTICLE TO CORRECT: " . $encode( lab_article_under_test( $options )['content_html'] ?? '' );
-	}
-	if ( 'article_part1' === $step ) {
-		return $prompt . "\nRECETTE CANONIQUE : " . $encode( $brief['canonical'] ?? array() )
-			. "\nRECHERCHE : " . $encode( $brief['research'] ?? array() );
-	}
-	if ( 'article_part2' === $step ) {
-		$handoff = $options['handoff'] ?? '';
-		if ( '' !== $handoff && file_exists( $handoff ) ) {
-			$previous = json_decode( file_get_contents( $handoff ), true );
-			$decoded = json_decode( (string) ( $previous['output'] ?? '' ), true );
-			$handoff = (string) ( $decoded['continuity_context'] ?? '' );
-			$part1_html = (string) ( $decoded['content_html'] ?? '' );
-		} else {
-			$part1_html = '';
-		}
-		return $prompt . "\nRECETTE CANONIQUE : " . $encode( $brief['canonical'] ?? array() )
-			. "\nCONTEXTE DE CONTINUITÉ DE LA PARTIE 1 : " . $handoff
-			. "\nTITRES DÉJÀ TRAITÉS EN PARTIE 1 : " . $encode( lab_headings( $part1_html ) );
+		return $prompt . "\nRESEARCH PACKAGE: " . $encode( $research )
+			. "\nCANONICAL RECIPE: " . $encode( $canonical )
+			. "\nARTICLE TO CORRECT: " . $encode( lab_article_under_test( $options )['content_html'] ?? '' );
 	}
 	return $prompt;
 }
 
 /** Scores an answer against the contract of its step. */
-function lab_score( $step, $text, $brief ) {
+function lab_score( $step, $text, $brief, $options = array() ) {
 	lab_boot();
 	$settings = lab_settings();
 	$checks = array();
@@ -171,12 +184,17 @@ function lab_score( $step, $text, $brief ) {
 	$json = is_array( $json ) ? $json : array();
 
 	if ( 'research' === $step ) {
-		foreach ( array( 'recipe_facts', 'references', 'uncertainties' ) as $key ) {
+		foreach ( array( 'ingredient_facts', 'preparation_facts', 'references', 'visual_references', 'visual_observations', 'uncertainties' ) as $key ) {
 			$checks[ $key ] = array( 'pass' => isset( $json[ $key ] ) && is_array( $json[ $key ] ), 'detail' => isset( $json[ $key ] ) ? count( (array) $json[ $key ] ) . ' entries' : 'missing' );
 		}
 		$sourced = 0;
 		foreach ( (array) ( $json['references'] ?? array() ) as $reference ) { if ( ! empty( $reference['url'] ) ) { $sourced++; } }
 		$checks['references carry a URL'] = array( 'pass' => $sourced > 0, 'detail' => $sourced . ' with a URL' );
+		$real_images = 0;
+		foreach ( (array) ( $json['visual_references'] ?? array() ) as $reference ) {
+			if ( preg_match( '#^https://#i', (string) ( $reference['image_url'] ?? '' ) ) && preg_match( '#^https://#i', (string) ( $reference['source_url'] ?? '' ) ) ) { $real_images++; }
+		}
+		$checks['real image provenance'] = array( 'pass' => $real_images > 0, 'detail' => $real_images . ' image references with HTTPS image and source URLs' );
 	}
 
 	if ( 'canonical_recipe' === $step ) {
@@ -186,14 +204,8 @@ function lab_score( $step, $text, $brief ) {
 		$checks['steps'] = array( 'pass' => count( (array) ( $json['steps'] ?? array() ) ) >= (int) $settings['quality_min_steps'], 'detail' => count( (array) ( $json['steps'] ?? array() ) ) . ' steps' );
 	}
 
-	if ( 'article_full' === $step || 'article' === $step ) {
-		$canonical = 'article_full' === $step ? ( $json['recipe'] ?? array() ) : ( $brief['canonical'] ?? array() );
-		if ( 'article_full' === $step ) {
-			$errors = MSRWA_Recipe::validate( $canonical );
-			$checks['recipe schema'] = array( 'pass' => empty( $errors ), 'detail' => $errors ? implode( ', ', array_keys( $errors ) ) : 'valid' );
-			$times_ok = (int) ( $canonical['prep_minutes'] ?? 0 ) + (int) ( $canonical['cook_minutes'] ?? 0 ) <= (int) ( $canonical['total_minutes'] ?? 0 );
-			$checks['times add up'] = array( 'pass' => $times_ok, 'detail' => (int) ( $canonical['prep_minutes'] ?? 0 ) . ' + ' . (int) ( $canonical['cook_minutes'] ?? 0 ) . ' vs ' . (int) ( $canonical['total_minutes'] ?? 0 ) . ' total' );
-		}
+	if ( 'article' === $step ) {
+		$canonical = lab_canonical_recipe( $brief, $options );
 		$quality = MSRWA_Quality::evaluate( $json, $canonical, $settings );
 		$checks['quality gate'] = array( 'pass' => ! empty( $quality['pass'] ), 'detail' => 'score ' . (int) $quality['score'] . '/100' . ( empty( $quality['blockers'] ) ? '' : ', blocked on ' . implode( ', ', $quality['blockers'] ) ) );
 		$words = (int) ( $quality['metrics']['words'] ?? 0 );
@@ -222,40 +234,8 @@ function lab_score( $step, $text, $brief ) {
 		$checks['fields the plugin needs'] = array( 'pass' => empty( $absent ), 'detail' => $absent ? 'missing: ' . implode( ', ', $absent ) : count( $fields ) . ' fields present' );
 	}
 
-	if ( 'article_part1' === $step || 'article_part2' === $step ) {
-		$content = (string) ( $json['content_html'] ?? '' );
-		$words = preg_match_all( '/\p{L}+(?:[’\'-]\p{L}+)*/u', strip_tags( $content ) );
-		$target = 'article_part1' === $step ? 1500 : 1300;
-		$checks['words'] = array( 'pass' => $words >= $target * 0.85, 'detail' => $words . ' / ' . $target . ' expected' );
-		$accents = lab_accent_density( $content );
-		$checks['French typography'] = array( 'pass' => $accents >= 12, 'detail' => sprintf( '%.1f accented characters per 1000', $accents ) );
-		$headings = lab_headings( $content );
-		$checks['headings'] = array( 'pass' => count( $headings ) >= 4, 'detail' => count( $headings ) . ' headings' );
-		$sections = 'article_part1' === $step
-			? array( 'ingrédients' => array( 'ingredient' ), 'choix' => array( 'choisir', 'choix', 'selection' ), 'substitutions' => array( 'substitut', 'remplacer' ), 'matériel' => array( 'materiel', 'equipement', 'ustensile' ) )
-			: array( 'préparation' => array( 'preparation', 'etape' ), 'erreurs' => array( 'erreur', 'eviter' ), 'conservation' => array( 'conservation', 'conserver' ), 'variantes' => array( 'variante', 'version' ), 'service' => array( 'service', 'servir', 'accompagn' ), 'faq' => array( 'faq', 'question' ) );
-		$missing = array();
-		foreach ( $sections as $section => $synonyms ) {
-			$found = false;
-			foreach ( $synonyms as $synonym ) { foreach ( $headings as $heading ) { if ( false !== strpos( lab_fold( $heading ), $synonym ) ) { $found = true; break 2; } } }
-			if ( ! $found ) { $missing[] = $section; }
-		}
-		$checks['required sections'] = array( 'pass' => empty( $missing ), 'detail' => $missing ? 'missing: ' . implode( ', ', $missing ) : 'all present' );
-		if ( 'article_part1' === $step ) {
-			$handoff = (string) ( $json['continuity_context'] ?? '' );
-			$complete = false !== strpos( $handoff, 'INGREDIENTS:' ) && false !== strpos( $handoff, 'A_NE_PAS_CONTREDIRE:' );
-			$checks['continuity handoff'] = array( 'pass' => $complete, 'detail' => $complete ? strlen( $handoff ) . ' chars' : 'missing or incomplete' );
-			$checks['no preparation steps'] = array( 'pass' => ! preg_match( '/<h[23][^>]*>[^<]*(préparation de la recette|étape par étape)/iu', $content ), 'detail' => 'preparation left to page two' );
-		} else {
-			$opens = preg_match( '/^\s*<h2[^>]*>\s*Préparation de la recette étape par étape/iu', trim( $content ) );
-			$checks['opens on the preparation'] = array( 'pass' => (bool) $opens, 'detail' => $opens ? 'exact opening heading' : 'wrong opening' );
-			$checks['faq field'] = array( 'pass' => isset( $json['faq'] ) && count( (array) $json['faq'] ) >= 3, 'detail' => count( (array) ( $json['faq'] ?? array() ) ) . ' entries' );
-			$checks['visual notes'] = array( 'pass' => mb_strlen( (string) ( $json['visual_final_notes'] ?? '' ) ) >= 200, 'detail' => mb_strlen( (string) ( $json['visual_final_notes'] ?? '' ) ) . ' chars for the image prompt' );
-		}
-	}
-
 	if ( 'fact_check' === $step ) {
-		$article = (string) ( lab_article_under_test( array() )['content_html'] ?? '' );
+		$article = (string) ( lab_article_under_test( $options )['content_html'] ?? '' );
 		$plain = html_entity_decode( strip_tags( $article ), ENT_QUOTES, 'UTF-8' );
 		$checks['verdict is boolean'] = array( 'pass' => array_key_exists( 'pass', $json ) && is_bool( $json['pass'] ), 'detail' => isset( $json['pass'] ) ? var_export( $json['pass'], true ) : 'missing' );
 		$corrections = (array) ( $json['corrections'] ?? array() );
@@ -273,7 +253,7 @@ function lab_score( $step, $text, $brief ) {
 	}
 
 	if ( 'proofread' === $step ) {
-		$original = (string) ( lab_article_under_test( array() )['content_html'] ?? '' );
+		$original = (string) ( lab_article_under_test( $options )['content_html'] ?? '' );
 		$corrected = (string) ( $json['content_html'] ?? '' );
 		$checks['returns the article'] = array( 'pass' => mb_strlen( $corrected ) > 0.7 * mb_strlen( $original ), 'detail' => mb_strlen( $corrected ) . ' vs ' . mb_strlen( $original ) . ' characters' );
 		$before_headings = count( lab_headings( $original ) );
@@ -366,7 +346,7 @@ function lab_article_under_test( $options ) {
 	if ( null !== $article ) { return $article; }
 	$file = $options['article'] ?? '';
 	if ( '' === $file ) {
-		$candidates = glob( __DIR__ . '/../runs/article-v4-*.json' );
+		$candidates = glob( __DIR__ . '/../runs/article-*.json' );
 		sort( $candidates );
 		$file = $candidates ? $candidates[0] : '';
 	}

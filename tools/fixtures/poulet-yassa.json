@@ -1,13 +1,31 @@
 {
   "title": "Poulet yassa sénégalais",
   "text": "Poulet yassa sénégalais : poulet mariné au citron et à la moutarde, oignons fondants longuement compotés, servi avec du riz blanc. Marinade, cuisson des oignons, équilibre acidité, variantes et conservation.",
+  "editor_input": {
+    "type": "title",
+    "title": "Poulet yassa sénégalais",
+    "text": "",
+    "images": []
+  },
   "research": {
-    "recipe_facts": [
-      { "source": "https://example.test/yassa", "text": "La marinade au citron et à la moutarde agit au minimum 4 heures, idéalement une nuit." },
-      { "source": "https://example.test/oignons", "text": "Les oignons représentent au moins le même poids que le poulet et compotent 30 à 40 minutes à feu doux." }
+    "dish_identity": { "name": "Poulet yassa sénégalais", "confidence": "élevée", "evidence": "Le titre éditeur identifie le plat." },
+    "ingredient_facts": [
+      { "source_url": "https://example.test/oignons", "text": "Les oignons représentent au moins le même poids que le poulet." }
+    ],
+    "preparation_facts": [
+      { "source_url": "https://example.test/yassa", "text": "La marinade au citron et à la moutarde agit au minimum 4 heures, idéalement une nuit." },
+      { "source_url": "https://example.test/oignons", "text": "Les oignons compotent 30 à 40 minutes à feu doux." }
     ],
     "references": [ { "url": "https://example.test/yassa", "title": "Yassa traditionnel" } ],
-    "uncertainties": ["Le piment est facultatif selon les familles."]
+    "food_safety": [],
+    "visual_references": [
+      { "image_url": "https://example.test/images/yassa.jpg", "source_url": "https://example.test/yassa", "title": "Poulet yassa" }
+    ],
+    "visual_observations": [
+      { "image_url": "https://example.test/images/yassa.jpg", "source_url": "https://example.test/yassa", "observable_details": "Morceaux de poulet dorés couverts d'oignons fondants.", "composition": "Plat de service avec riz blanc à côté.", "colours": "Brun doré, ivoire et blanc.", "textures": "Poulet coloré et oignons souples.", "uncertainties": "Les ingrédients non visibles ne peuvent pas être confirmés." }
+    ],
+    "uncertainties": ["Le piment est facultatif selon les familles."],
+    "originality_notes": ["Les observations décrivent seulement les éléments visibles."]
   },
   "canonical": {
     "title": "Poulet yassa sénégalais",
@@ -38,6 +56,8 @@
     "equipment": ["Grande cocotte", "Saladier", "Presse-agrumes"],
     "notes": ["Le piment reste entier pour parfumer sans piquer."],
     "faq": [{ "question": "Peut-on utiliser du blanc de poulet ?", "answer": "Oui, mais réduisez le mijotage à 12 minutes pour éviter une viande sèche." }],
-    "keywords": ["poulet yassa", "sénégal", "citron"]
+    "keywords": ["poulet yassa", "sénégal", "citron"],
+    "food_safety": ["Faire mariner le poulet au réfrigérateur.", "Cuire le poulet à cœur avant de servir."],
+    "uncertainties": ["Le temps de marinade n'est pas inclus dans total_minutes."]
   }
 }

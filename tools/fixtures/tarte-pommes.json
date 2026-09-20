@@ -1,17 +1,34 @@
 {
   "title": "Tarte aux pommes normande",
   "text": "Tarte aux pommes normande traditionnelle : pâte brisée maison, pommes fondantes, appareil à la crème et calvados. Préciser le choix des pommes, les substitutions, le matériel, les erreurs fréquentes, la conservation et des variantes plus légères.",
+  "editor_input": {
+    "type": "article",
+    "title": "Tarte aux pommes normande",
+    "text": "Tarte aux pommes normande traditionnelle : pâte brisée maison, pommes fondantes, appareil à la crème et calvados. Préciser le choix des pommes, les substitutions, le matériel, les erreurs fréquentes, la conservation et des variantes plus légères.",
+    "images": []
+  },
   "research": {
-    "recipe_facts": [
-      { "source": "https://example.test/pommes", "text": "Les pommes Reinette et Boskoop tiennent la cuisson et gardent une acidité qui équilibre la crème." },
-      { "source": "https://example.test/pate", "text": "Une pâte brisée repose au moins 30 minutes au froid pour limiter la rétractation à la cuisson." },
-      { "source": "https://example.test/cuisson", "text": "La cuisson se fait à 180 °C chaleur tournante, 35 à 45 minutes selon l'épaisseur de l'appareil." }
+    "dish_identity": { "name": "Tarte aux pommes normande", "confidence": "élevée", "evidence": "Le titre et le texte éditeur concordent." },
+    "ingredient_facts": [
+      { "source_url": "https://example.test/pommes", "text": "Les pommes Reinette et Boskoop tiennent la cuisson et gardent une acidité qui équilibre la crème." }
+    ],
+    "preparation_facts": [
+      { "source_url": "https://example.test/pate", "text": "Une pâte brisée repose au moins 30 minutes au froid pour limiter la rétractation à la cuisson." },
+      { "source_url": "https://example.test/cuisson", "text": "La cuisson se fait à 180 °C chaleur tournante, 35 à 45 minutes selon l'épaisseur de l'appareil." }
     ],
     "references": [
       { "url": "https://example.test/pommes", "title": "Choisir ses pommes à cuire" },
       { "url": "https://example.test/cuisson", "title": "Cuisson des tartes aux fruits" }
     ],
-    "uncertainties": ["Les temps varient selon le four ; vérifier la coloration."]
+    "food_safety": [],
+    "visual_references": [
+      { "image_url": "https://example.test/images/tarte-pommes.jpg", "source_url": "https://example.test/tarte", "title": "Tarte aux pommes normande" }
+    ],
+    "visual_observations": [
+      { "image_url": "https://example.test/images/tarte-pommes.jpg", "source_url": "https://example.test/tarte", "observable_details": "Pommes disposées en rosace sur une tarte ronde.", "composition": "Vue de trois quarts, tarte entière centrée.", "colours": "Pommes dorées et pâte brun clair.", "textures": "Bords croustillants et appareil pris.", "uncertainties": "La photographie ne permet pas d'identifier les quantités." }
+    ],
+    "uncertainties": ["Les temps varient selon le four ; vérifier la coloration."],
+    "originality_notes": ["Les faits sont reformulés et les observations visuelles restent descriptives."]
   },
   "canonical": {
     "title": "Tarte aux pommes normande",
@@ -42,7 +59,9 @@
     "equipment": ["Moule à tarte de 28 cm", "Économe", "Fouet"],
     "notes": ["Servir tiède pour que l'appareil reste fondant."],
     "faq": [{ "question": "Peut-on préparer la tarte la veille ?", "answer": "Oui, elle se conserve 48 heures au réfrigérateur et se réchauffe 10 minutes à 150 °C." }],
-    "keywords": ["tarte aux pommes", "normande", "calvados"]
+    "keywords": ["tarte aux pommes", "normande", "calvados"],
+    "food_safety": ["Conserver la tarte au réfrigérateur en raison de l'appareil aux œufs et à la crème."],
+    "uncertainties": ["Le repos de la pâte n'est pas inclus dans total_minutes."]
   },
   "article": {
     "title": "Tarte aux pommes normande",
