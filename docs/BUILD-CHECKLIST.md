@@ -87,6 +87,24 @@ cost) in the task before changing anything.
   the per-step rich result is not available; and no `aggregateRating` or `video`,
   which cannot be produced honestly.
 
+- [~] **A16 — Final approval (owner-approved, 2026-09-20).** The fifth agreed
+  prompt, and the only one with nothing behind it: the plugin's
+  `prompt_image_review` was never a lab step and judged one image at a time, so
+  the delivered report signed its visuals off by eye and applied the text
+  reviews' corrections by hand. `tools/approval-lab.php` now sends the article
+  and both images in one call via `lab_call_judge`, and `lab_score_approval`
+  scores the verdict on nine contracts.
+  Four calibration defects were found and fixed against real artifacts: realism
+  and fidelity shared a rule (an image scored "good" while its own summary named
+  an absent ingredient); background styling was then read as an ingredient; a
+  documented accompaniment (rice with yassa) was blocked; and everything became
+  blocking — 17 blocking findings on one tarte, which is not a gate. Severity is
+  now defined explicitly. Both briefs finish at 9/9, ~22s, $0.005, refusing for
+  the right reasons with no false positives.
+  *Awaiting real verification:* the step exists in the lab and the prompt ships
+  in `prompt_final_approval`, but the engine does not call it yet — that is phase
+  B. Measured on OpenAI medium only; the other eight cells are unmeasured.
+
 - [~] **A4 — Review.** Written in English; findings must name the section to patch. *Original:* **A4 — Review.** Returns a boolean verdict plus findings that name the
   **section to patch**, never a full rewrite instruction.
 - [~] **A5 — Fact check** (new step). Written; scored on whether it quotes the article verbatim rather than inventing a sentence to correct. *Original:* **A5 — Fact check** (new step). Compares the finished article to the

@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.53` est un socle installable : file persistante, pipeline de
+La version `0.2.54` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.
@@ -20,6 +20,43 @@ Le plugin est en cours de refonte éditoriale et budgétaire :
 Les coûts affichés sont des estimations calculées avec le catalogue configuré,
 non une facture fournisseur. `completed` signifie que le traitement est terminé,
 jamais qu’un texte est validé éditorialement.
+
+## Version 0.2.54
+
+**L'étape d'approbation finale existe.** C'était la seule des cinq étapes
+convenues sans rien derrière : le plugin possédait `prompt_image_review`, jamais
+mesuré, qui jugeait une image à la fois. Dans le rapport livré, les visuels
+étaient validés « contrôle visuel manuel », à l'œil, et les corrections demandées
+par les relectures étaient appliquées à la main.
+
+Un seul appel voit désormais l'article et les deux images **ensemble** — le seul
+moment où les trois peuvent être confrontés. Il rend un verdict par artefact, le
+réalisme jugé à part de la fidélité, le nombre de panneaux réellement comptés,
+et des constats citant la phrase exacte en faute.
+
+Réglé contre de vrais artefacts, quatre itérations mesurées :
+
+1. Le réalisme et la fidélité étaient dans la même règle : le juge validait une
+   image « bonne » tout en décrivant un ingrédient absent. Séparés.
+2. Trop strict ensuite : une plante en pot du décor était signalée comme
+   ingrédient. Le décor n'est plus un constat.
+3. Trop strict encore : le riz blanc bloquait, alors que le yassa se sert avec du
+   riz et que la recherche le confirme. Un accompagnement documenté n'est plus un
+   constat.
+4. Tout devenait « bloquant » — 17 constats bloquants sur une tarte. Une porte qui
+   ne s'ouvre jamais ne sert à rien. La sévérité est maintenant définie : 17
+   constats sont devenus 3, dont 2 bloquants.
+
+Résultat sur deux plats, `gpt-5.6-luna`, 9/9 à chaque fois, ~22s et $0.005 :
+refus motivé des deux côtés — une garniture verte absente de la recette sur le
+dernier panneau du collage, et une rupture de vaisselle entre le collage et
+l'image mise en avant. Aucun faux positif sur le riz, le laurier, le piment ni
+le décor.
+
+- `approval_max_output_tokens` (6 000) : le premier essai s'est terminé en
+  `incomplete` à 3 000.
+- Le score refusait de sanctionner une réponse illisible : trois contrôles
+  passaient sur zéro constat. Une réponse illisible échoue désormais partout.
 
 ## Version 0.2.53
 

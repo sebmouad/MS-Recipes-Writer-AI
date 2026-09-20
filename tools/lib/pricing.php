@@ -48,6 +48,13 @@ function lab_tiers() {
 	);
 }
 
+/** The model a provider and tier resolve to. */
+function lab_model( $provider, $tier ) {
+	$tiers = lab_tiers();
+	if ( ! isset( $tiers[ $tier ][ $provider ] ) ) { fwrite( STDERR, "Unknown provider/tier: {$provider}/{$tier}\n" ); exit( 2 ); }
+	return $tiers[ $tier ][ $provider ];
+}
+
 function lab_price( $provider, $model, $usage ) {
 	$rates = lab_rates();
 	if ( ! isset( $rates[ $provider ][ $model ] ) ) { return null; }

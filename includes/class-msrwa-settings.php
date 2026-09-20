@@ -72,6 +72,7 @@ final class MSRWA_Settings {
 			'router_max_output_tokens' => 700,
 			'vision_max_output_tokens' => 1200,
 			'image_review_max_output_tokens' => 1000,
+			'approval_max_output_tokens' => 6000,
 			'article_pagination_enabled' => 1,
 			'generate_featured_image' => 1,
 			'generate_facebook_image' => 1,
@@ -114,6 +115,55 @@ OUTPUT — a valid JSON object only, no Markdown, with exactly these keys:
 			'prompt_correction'  => 'Corrige les défauts signalés par la relecture, en conservant les éléments déjà validés. Retourne uniquement un article complet au même schéma, sans historique ni commentaire de correction. Si une observation concerne les quantités ou temps canoniques, conserve les valeurs de la recette canonique transmise : le moteur corrige la recette dans une étape distincte.',
 			'prompt_review'       => 'Tu es le relecteur IA indépendant. Évalue réellement la qualité des informations culinaires de la recette et de l’article : exactitude des ingrédients, quantités, étapes, températures et temps ; cohérence culinaire ; sécurité ; utilité pratique ; fidélité à la recette fournie et aux sources. Les métriques de longueur et de structure sont seulement des signaux techniques, jamais la mesure de qualité. Retourne un JSON compact avec pass (booléen), verdict (good|needs_review|bad), quality_summary (phrase courte), findings (severity, field, reason, fix), corrected_artifact (objet vide) et uncertainties (tableau). pass ne vaut true que si le verdict est good. Ne réécris pas l’article. Refuse les contradictions factuelles, les conseils dangereux, les informations inventées ou inutilisables. Ne pénalise pas une préférence de style ni une incertitude explicitement signalée.',
 			'prompt_image'        => 'Tu es un photographe culinaire professionnel. Génère une image principale carrée 1:1, ultra réaliste et appétissante, fidèle aux ingrédients, aux textures et au dressage de la recette validée. Lumière naturelle, composition premium, arrière-plan propre, aucune personne, aucun texte, aucun logo, aucun filigrane. Respecte strictement les proportions et ne montre que le plat demandé. N’ajoute aucune garniture absente de la recette, notamment sucre glace, glaçage, herbes ou fruits. Toute part servie doit rester entièrement visible dans le cadre.',
+			'prompt_final_approval' => 'You are the independent editor who signs off, or refuses to sign off, before anything reaches a reader. You see the finished article and both finished images together, which is the only point in the process where the three can be checked against one another.
+
+You did not write any of this. Approving something that should not ship costs more than refusing something that should.
+
+WHAT YOU RECEIVE:
+- the canonical recipe, which is the reference for every figure;
+- the research package, including observations taken from real photographs of this dish;
+- the complete article;
+- the featured image, 1024x1024;
+- the Facebook image, 1024x1536, a 6-panel preparation collage.
+
+WHAT YOU CHECK, and nothing else:
+
+1. AGREEMENT BETWEEN THE THREE. The dish in the featured image, the dish in the last Facebook panel, and the dish the article describes must be the same dish: same ingredients visible, same colour, same vessel family, same degree of doneness. A difference here is blocking — it is the failure a reader notices first.
+
+2. IMAGE REALISM — is it a believable photograph? Blocking: food that looks moulded, waxy or plastic; anatomy that cannot exist, such as a fused hand, a spoon passing through a plate, a mismatched cut of meat; duplicated or melted utensils; impossible shadows or reflections; a light source that contradicts the shadows; visible generation artifacts; text, logo, watermark or packaging anywhere. Not blocking on its own: a stylised background, an unusually clean surface, an ambitious plating. Realism is about whether the photograph could exist, never about whether it shows the right dish — that is the next check.
+
+3. IMAGE FIDELITY — is it this recipe? Apply this to EVERY image, the featured one and every panel of the collage alike. Name each food item that is part of the dish — on the plate, in the pan, or among the ingredients laid out for it — then find it in the canonical ingredient list. Styling that is plainly not part of the dish is not an ingredient and is never a finding: a potted plant, a herb pot, a bottle, a tea towel, a board or a bowl in the background. Anything visible that is not on that list is blocking, and it is blocking wherever it appears: a herb, a leaf, a spice, a chilli, a citrus wedge, a sauce, a side dish. An accompaniment is judged differently from an ingredient: a side the recipe or the research says the dish is served with — rice, bread, a salad — is correct and is never a finding, even though it is not in the ingredient list. It becomes a finding only when nothing in the recipe, the article or the research mentions it. Being appetising does not excuse it, and a realistic photograph of the wrong dish is still the wrong dish — an image can be "good" for realism and "bad" here in the same breath.
+Then check the appearance against the research observations. A dish that looks better than the observations describe is the wrong dish, and that is a finding.
+
+4. THE FACEBOOK COLLAGE SPECIFICALLY. Exactly 6 panels; each panel one real moment of this recipe in order; the same crockery and lighting throughout; a final panel showing the finished dish. A panel that invents a step, or repeats one, is blocking.
+
+5. THE ARTICLE AGAINST THE RECIPE. Every quantity, temperature and duration in the prose must match the canonical recipe. A figure that contradicts it is blocking. A figure the recipe simply does not mention — a preheating time, a resting minute, a tin size given as a variant, a thickness — is ordinary cooking detail, and at most minor. Quote the exact sentence at fault — never paraphrase it, or the correction cannot be applied.
+
+6. WHAT THE ARTICLE CLAIMS. Separate three cases, and do not collapse them:
+- The research CONTRADICTS the claim → blocking.
+- The research is SILENT on the claim, and it is a normal piece of cooking knowledge a competent cook would state — why acid balances cream, why fruit is dried before baking, what to serve alongside → not a finding at all. An article may not only repeat its sources.
+- The research is SILENT and the claim is specific, checkable and consequential — a named variety\'s sugar content, a temperature that changes the result, a health or safety statement → minor.
+
+SEVERITY — apply it strictly, because a verdict where everything is blocking is worth nothing to the person who has to act on it:
+- BLOCKING means a reader is misled or the dish fails: a figure contradicting the recipe, an ingredient visible that is not in it, a claim the sources contradict, an image that is not this dish, a collage that breaks its own sequence.
+- MINOR means a reader is fine but an editor would improve it.
+- If you would not hold the publication back for it, it is minor.
+
+RULES:
+- Judge only what is present. Never infer an ingredient you cannot see, and never mark an image down for something outside the frame.
+- Every finding names where it is, what is wrong, and the smallest change that fixes it.
+- Do not rewrite the article and do not propose a new image prompt. You decide; someone else repairs.
+- `approved` is true only when nothing is blocking. Reservations without blockers still approve, and say why.
+- Write every human-readable value in French.
+
+OUTPUT — a valid JSON object only, no Markdown, with exactly these keys:
+- "approved": boolean, true only when no finding has severity "blocking"
+- "article": {"verdict": "good|reservations|bad", "summary": one sentence}
+- "featured_image": {"verdict": "good|reservations|bad", "realism": "good|reservations|bad", "summary": one sentence}
+- "facebook_image": {"verdict": "good|reservations|bad", "realism": "good|reservations|bad", "panels_counted": integer, "summary": one sentence}
+- "consistency": {"verdict": "good|reservations|bad", "summary": one sentence on whether the three show one dish}
+- "findings": array of {"target": "article|featured_image|facebook_image|consistency", "severity": "blocking|minor", "quote": the exact sentence at fault or "" for an image, "reason": what is wrong, "fix": the smallest change that repairs it}
+- "uncertainties": array of strings naming what you could not verify from what you were given',
 			'prompt_image_review' => 'Tu es un directeur artistique culinaire indépendant. Évalue réellement le réalisme photographique et la fidélité de cette image à la recette validée. Retourne uniquement un JSON avec pass (boolean), verdict (good|needs_review|bad), realism (good|needs_review|bad), quality_summary (phrase courte), findings (severity, reason, fix), subject_match et uncertainties. pass ne vaut true que si verdict et realism sont good. Vérifie plat, ingrédients visibles, textures, proportions, éclairage, ombres, anatomie des aliments, cadrage, ratio, artefacts, texte, logo et filigrane. Ne déduis pas de détails invisibles.',
 			'prompt_image_correction' => 'Corrige uniquement les défauts visuels signalés ci-dessous tout en conservant la recette validée, le ratio demandé, une photographie culinaire réaliste, et l’absence de texte, logo ou filigrane. Ne copie ni ne reproduis une image de référence.',
 			'prompt_facebook_image' => 'Crée un tutoriel culinaire original en exactement six panneaux cohérents, fidèle à la recette, sans texte, logo ni filigrane.',
@@ -218,7 +268,7 @@ OUTPUT — a valid JSON object only, no Markdown, with exactly these keys:
 	}
 
 	public static function prompt_labels() {
-		return array( 'prompt_router' => 'Sélection automatique des modèles', 'prompt_research' => 'Recherche web', 'prompt_association' => 'Association', 'prompt_reference_vision' => 'Analyse vision des références', 'prompt_recipe' => 'Recette canonique', 'prompt_nutrition' => 'Nutrition estimée', 'prompt_article' => 'Article et métadonnées', 'prompt_internal_links' => 'Liens contextuels dans l’article', 'prompt_seo' => 'SEO', 'prompt_correction' => 'Correction', 'prompt_review' => 'Relecture et correction', 'prompt_image' => 'Image principale', 'prompt_image_review' => 'Contrôle image', 'prompt_image_correction' => 'Correction image', 'prompt_facebook_image' => 'Image Facebook' );
+		return array( 'prompt_router' => 'Sélection automatique des modèles', 'prompt_research' => 'Recherche web', 'prompt_association' => 'Association', 'prompt_reference_vision' => 'Analyse vision des références', 'prompt_recipe' => 'Recette canonique', 'prompt_nutrition' => 'Nutrition estimée', 'prompt_article' => 'Article et métadonnées', 'prompt_internal_links' => 'Liens contextuels dans l’article', 'prompt_seo' => 'SEO', 'prompt_correction' => 'Correction', 'prompt_review' => 'Relecture et correction', 'prompt_image' => 'Image principale', 'prompt_image_review' => 'Contrôle image', 'prompt_final_approval' => 'Approbation finale : article et images ensemble', 'prompt_image_correction' => 'Correction image', 'prompt_facebook_image' => 'Image Facebook' );
 	}
 
 	public static function prompt_versions() {
@@ -307,7 +357,7 @@ OUTPUT — a valid JSON object only, no Markdown, with exactly these keys:
 		$out['article_pagination_split_percent'] = isset( $raw['article_pagination_split_percent'] ) ? min( 70, max( 30, absint( $raw['article_pagination_split_percent'] ) ) ) : $defaults['article_pagination_split_percent'];
 		$out['internal_links_max'] = isset( $raw['internal_links_max'] ) ? min( 10, max( 0, absint( $raw['internal_links_max'] ) ) ) : $defaults['internal_links_max'];
 		$out['quality_min_score'] = isset( $raw['quality_min_score'] ) ? min( 100, max( 1, absint( $raw['quality_min_score'] ) ) ) : $defaults['quality_min_score'];
-		foreach ( array( 'quality_min_words' => array( 300, 8000 ), 'quality_max_words' => array( 500, 10000 ), 'quality_min_headings' => array( 3, 80 ), 'quality_min_paragraphs' => array( 5, 150 ), 'quality_min_ingredients' => array( 1, 50 ), 'quality_min_steps' => array( 1, 40 ), 'article_max_output_tokens' => array( 1000, 20000 ), 'review_max_output_tokens' => array( 500, 10000 ), 'research_max_output_tokens' => array( 500, 10000 ), 'research_facts_max' => array( 3, 30 ), 'research_references_max' => array( 1, 20 ), 'association_max_output_tokens' => array( 200, 5000 ), 'canonical_max_output_tokens' => array( 500, 10000 ), 'router_max_output_tokens' => array( 100, 3000 ), 'vision_max_output_tokens' => array( 200, 5000 ), 'image_review_max_output_tokens' => array( 200, 5000 ) ) as $key => $limits ) {
+		foreach ( array( 'quality_min_words' => array( 300, 8000 ), 'quality_max_words' => array( 500, 10000 ), 'quality_min_headings' => array( 3, 80 ), 'quality_min_paragraphs' => array( 5, 150 ), 'quality_min_ingredients' => array( 1, 50 ), 'quality_min_steps' => array( 1, 40 ), 'article_max_output_tokens' => array( 1000, 20000 ), 'review_max_output_tokens' => array( 500, 10000 ), 'research_max_output_tokens' => array( 500, 10000 ), 'research_facts_max' => array( 3, 30 ), 'research_references_max' => array( 1, 20 ), 'association_max_output_tokens' => array( 200, 5000 ), 'canonical_max_output_tokens' => array( 500, 10000 ), 'router_max_output_tokens' => array( 100, 3000 ), 'vision_max_output_tokens' => array( 200, 5000 ), 'image_review_max_output_tokens' => array( 200, 5000 ), 'approval_max_output_tokens' => array( 1000, 16000 ) ) as $key => $limits ) {
 			$value = isset( $raw[ $key ] ) ? absint( $raw[ $key ] ) : $defaults[ $key ];
 			$out[ $key ] = min( $limits[1], max( $limits[0], $value ) );
 		}

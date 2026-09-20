@@ -185,6 +185,61 @@ function lab_call_vision( $provider, $model, $image, $context, $max_tokens = 900
 	return array( 'text' => $text, 'usage' => array( 'input_tokens' => (int) ( $body['usage']['input_tokens'] ?? 0 ), 'output_tokens' => (int) ( $body['usage']['output_tokens'] ?? 0 ) ) );
 }
 
+/**
+ * Judges several images against one instruction in a single call. Separate from
+ * lab_call_vision because the jobs differ: that one observes one source photo as
+ * untrusted evidence, this one compares the finished artifacts to each other, and
+ * seeing them together is the whole point — the article, the featured image and
+ * the collage can only be checked for agreement in one call.
+ *
+ * $images is a list of array( 'label' => string, 'mime' => string, 'data' => base64 ).
+ */
+function lab_call_judge( $provider, $model, $instruction, $images, $max_tokens = 2500 ) {
+	if ( 'openai' === $provider ) {
+		$content = array( array( 'type' => 'input_text', 'text' => $instruction ) );
+		foreach ( $images as $image ) {
+			$content[] = array( 'type' => 'input_text', 'text' => 'IMAGE — ' . $image['label'] );
+			$content[] = array( 'type' => 'input_image', 'image_url' => 'data:' . $image['mime'] . ';base64,' . $image['data'] );
+		}
+		$payload = array( 'model' => $model, 'store' => false, 'max_output_tokens' => $max_tokens, 'input' => array( array( 'role' => 'user', 'content' => $content ) ), 'text' => array( 'format' => array( 'type' => 'json_object' ) ) );
+		$result = lab_http( 'https://api.openai.com/v1/responses', array( 'Content-Type: application/json', 'Authorization: Bearer ' . lab_provider_key( 'openai' ) ), $payload );
+		if ( 200 !== $result['status'] ) { return array( 'error' => 'judge HTTP ' . $result['status'] . ': ' . substr( $result['raw'], 0, 200 ), 'seconds' => $result['seconds'], 'usage' => array() ); }
+		$body = json_decode( $result['raw'], true );
+		$text = '';
+		foreach ( (array) ( $body['output'] ?? array() ) as $item ) { foreach ( (array) ( $item['content'] ?? array() ) as $part ) { if ( isset( $part['text'] ) ) { $text .= $part['text']; } } }
+		return array( 'text' => lab_utf8( $text ), 'status' => $body['status'] ?? '', 'seconds' => $result['seconds'], 'usage' => array( 'input_tokens' => (int) ( $body['usage']['input_tokens'] ?? 0 ), 'output_tokens' => (int) ( $body['usage']['output_tokens'] ?? 0 ) ) );
+	}
+	if ( 'gemini' === $provider ) {
+		$parts = array( array( 'text' => $instruction ) );
+		foreach ( $images as $image ) {
+			$parts[] = array( 'text' => 'IMAGE — ' . $image['label'] );
+			$parts[] = array( 'inline_data' => array( 'mime_type' => $image['mime'], 'data' => $image['data'] ) );
+		}
+		$payload = array( 'contents' => array( array( 'role' => 'user', 'parts' => $parts ) ), 'generationConfig' => array( 'maxOutputTokens' => $max_tokens, 'responseMimeType' => 'application/json' ) );
+		$url = 'https://generativelanguage.googleapis.com/v1beta/models/' . rawurlencode( $model ) . ':generateContent';
+		$result = lab_http( $url, array( 'Content-Type: application/json', 'x-goog-api-key: ' . lab_provider_key( 'gemini' ) ), $payload );
+		if ( 200 !== $result['status'] ) { return array( 'error' => 'judge HTTP ' . $result['status'] . ': ' . substr( $result['raw'], 0, 200 ), 'seconds' => $result['seconds'], 'usage' => array() ); }
+		$body = json_decode( $result['raw'], true );
+		$text = '';
+		foreach ( (array) ( $body['candidates'][0]['content']['parts'] ?? array() ) as $part ) { if ( isset( $part['text'] ) ) { $text .= $part['text']; } }
+		$usage = $body['usageMetadata'] ?? array();
+		return array( 'text' => lab_utf8( $text ), 'status' => $body['candidates'][0]['finishReason'] ?? '', 'seconds' => $result['seconds'], 'usage' => array( 'input_tokens' => (int) ( $usage['promptTokenCount'] ?? 0 ), 'output_tokens' => (int) ( $usage['candidatesTokenCount'] ?? 0 ) ) );
+	}
+	$content = array();
+	foreach ( $images as $image ) {
+		$content[] = array( 'type' => 'text', 'text' => 'IMAGE — ' . $image['label'] );
+		$content[] = array( 'type' => 'image', 'source' => array( 'type' => 'base64', 'media_type' => $image['mime'], 'data' => $image['data'] ) );
+	}
+	$content[] = array( 'type' => 'text', 'text' => $instruction . "\n\nReturn only a valid JSON object, with no Markdown fence and no commentary." );
+	$payload = array( 'model' => $model, 'max_tokens' => $max_tokens, 'messages' => array( array( 'role' => 'user', 'content' => $content ) ) );
+	$result = lab_http( 'https://api.anthropic.com/v1/messages', array( 'Content-Type: application/json', 'x-api-key: ' . lab_provider_key( 'claude' ), 'anthropic-version: 2023-06-01' ), $payload );
+	if ( 200 !== $result['status'] ) { return array( 'error' => 'judge HTTP ' . $result['status'] . ': ' . substr( $result['raw'], 0, 200 ), 'seconds' => $result['seconds'], 'usage' => array() ); }
+	$body = json_decode( $result['raw'], true );
+	$text = '';
+	foreach ( (array) ( $body['content'] ?? array() ) as $block ) { if ( 'text' === ( $block['type'] ?? '' ) ) { $text .= $block['text']; } }
+	return array( 'text' => lab_utf8( $text ), 'status' => $body['stop_reason'] ?? '', 'seconds' => $result['seconds'], 'usage' => array( 'input_tokens' => (int) ( $body['usage']['input_tokens'] ?? 0 ), 'output_tokens' => (int) ( $body['usage']['output_tokens'] ?? 0 ) ) );
+}
+
 /** Replaces search-model guesses with observations made from the cited bytes. */
 function lab_enrich_research_images( $provider, $model, $package, $limit = 3 ) {
 	$package['visual_observations'] = array();

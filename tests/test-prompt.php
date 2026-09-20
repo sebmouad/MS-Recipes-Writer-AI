@@ -40,7 +40,7 @@ require_once dirname( __DIR__ ) . '/tools/lib/steps.php';
 $lab_steps = lab_steps();
 msrwa_test_assert( array( 'research', 'canonical_recipe', 'article', 'review', 'fact_check', 'proofread' ) === array_keys( $lab_steps ), 'The lab must expose only the active text pipeline.' );
 $lab_prompts = glob( dirname( __DIR__ ) . '/tools/prompts/*.txt' );
-msrwa_test_assert( 8 === count( $lab_prompts ), 'The lab must keep one maintained prompt for six text and two image stages.' );
+msrwa_test_assert( 9 === count( $lab_prompts ), 'The lab must keep one maintained prompt for six text stages, two image stages and the final approval.' );
 $brief = lab_brief( 'tarte-pommes' );
 $article_input = lab_build_input( 'article', lab_prompt( 'article' ), $brief, array() );
 msrwa_test_contains( $article_input, 'RESEARCH PACKAGE:', 'The article lab input must carry the shared research package.' );

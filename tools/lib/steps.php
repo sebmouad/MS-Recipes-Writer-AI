@@ -184,6 +184,62 @@ function lab_build_input( $step, $prompt, $brief, $options ) {
 	return $prompt;
 }
 
+/**
+ * Scores an approval verdict. The risk here is not a missing key but a judge that
+ * waves everything through, so the checks demand a verdict per artifact, a panel
+ * count it actually made, and findings precise enough to act on: a blocking
+ * finding that refuses to approve, and a quote on every article finding, since a
+ * paraphrase cannot be applied to the text.
+ */
+function lab_score_approval( $verdict, $image_count, $expected_panels ) {
+	$checks = array();
+	$readable = is_array( $verdict ) && ! empty( $verdict );
+	$checks['valid JSON'] = array( 'pass' => $readable, 'detail' => $readable ? count( $verdict ) . ' keys' : 'not parseable' );
+	$verdict = $readable ? $verdict : array();
+
+	$checks['approved is a boolean'] = array( 'pass' => isset( $verdict['approved'] ) && is_bool( $verdict['approved'] ), 'detail' => isset( $verdict['approved'] ) ? var_export( $verdict['approved'], true ) : 'missing' );
+
+	$verdicts = array( 'good', 'reservations', 'bad' );
+	$missing = array();
+	foreach ( array( 'article', 'featured_image', 'facebook_image', 'consistency' ) as $target ) {
+		$value = (string) ( $verdict[ $target ]['verdict'] ?? '' );
+		if ( ! in_array( $value, $verdicts, true ) ) { $missing[] = $target; }
+	}
+	$checks['a verdict per artifact'] = array( 'pass' => empty( $missing ), 'detail' => $missing ? 'missing or invalid: ' . implode( ', ', $missing ) : '4 verdicts' );
+
+	$realism = array();
+	foreach ( array( 'featured_image', 'facebook_image' ) as $target ) {
+		if ( ! in_array( (string) ( $verdict[ $target ]['realism'] ?? '' ), $verdicts, true ) ) { $realism[] = $target; }
+	}
+	$checks['realism judged separately'] = array( 'pass' => empty( $realism ), 'detail' => $realism ? 'missing: ' . implode( ', ', $realism ) : 'both images' );
+
+	// The judge must count the panels it was shown, not repeat the number asked for.
+	$panels = $verdict['facebook_image']['panels_counted'] ?? null;
+	$checks['collage panels counted'] = array( 'pass' => is_int( $panels ) && $panels > 0, 'detail' => null === $panels ? 'missing' : $panels . ' counted, ' . $expected_panels . ' expected' );
+
+	$findings = array_values( array_filter( (array) ( $verdict['findings'] ?? array() ), 'is_array' ) );
+	$blocking = 0;
+	$unquoted = 0;
+	$bad_target = 0;
+	$targets = array( 'article', 'featured_image', 'facebook_image', 'consistency' );
+	foreach ( $findings as $finding ) {
+		if ( 'blocking' === ( $finding['severity'] ?? '' ) ) { $blocking++; }
+		if ( ! in_array( (string) ( $finding['target'] ?? '' ), $targets, true ) ) { $bad_target++; }
+		if ( 'article' === ( $finding['target'] ?? '' ) && '' === trim( (string) ( $finding['quote'] ?? '' ) ) ) { $unquoted++; }
+		if ( '' === trim( (string) ( $finding['fix'] ?? '' ) ) ) { $unquoted++; }
+	}
+	$checks['findings are addressed'] = array( 'pass' => $readable && 0 === $bad_target, 'detail' => $bad_target ? $bad_target . ' with no valid target' : count( $findings ) . ' findings' );
+	$checks['findings are actionable'] = array( 'pass' => $readable && 0 === $unquoted, 'detail' => $unquoted ? $unquoted . ' without a quote or a fix' : 'every finding carries a fix' );
+
+	// A blocking finding and an approval cannot both stand.
+	$coherent = $readable && ! ( $blocking > 0 && ! empty( $verdict['approved'] ) );
+	$checks['approval matches findings'] = array( 'pass' => $coherent, 'detail' => $coherent ? ( $blocking . ' blocking, approved ' . var_export( ! empty( $verdict['approved'] ), true ) ) : 'approved despite ' . $blocking . ' blocking findings' );
+
+	$checks['uncertainties reported'] = array( 'pass' => isset( $verdict['uncertainties'] ) && is_array( $verdict['uncertainties'] ), 'detail' => isset( $verdict['uncertainties'] ) ? count( (array) $verdict['uncertainties'] ) . ' entries' : 'missing' );
+
+	return $checks;
+}
+
 /** Scores an answer against the contract of its step. */
 function lab_score( $step, $text, $brief, $options = array() ) {
 	lab_boot();
