@@ -1,6 +1,9 @@
 <?php
 // Run with wp eval-file on localhost only. Fixtures are rolled back, no API calls.
-if ( ! defined( 'WP_CLI' ) || ! WP_CLI || 'localhost' !== wp_parse_url( home_url(), PHP_URL_HOST ) ) { throw new RuntimeException( 'Local WP-CLI only.' ); }
+// Integration fixture: needs a real WordPress on localhost, so the offline
+// runner reports it as skipped instead of failing.
+if ( ! defined( 'WP_CLI' ) || ! WP_CLI ) { echo "SKIP tests/test-draft-integration.php needs local WP-CLI\n"; return; }
+if ( 'localhost' !== wp_parse_url( home_url(), PHP_URL_HOST ) ) { echo "SKIP tests/test-draft-integration.php runs on localhost only\n"; return; }
 global $wpdb;
 $tables = MSRWA_DB::tables();
 $admins = get_users( array( 'role' => 'administrator', 'number' => 1 ) );

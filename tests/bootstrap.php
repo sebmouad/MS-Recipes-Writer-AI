@@ -1,0 +1,149 @@
+<?php
+/**
+ * Shared harness for the offline test suite.
+ *
+ * It declares just enough of WordPress for plugin classes to run in plain PHP:
+ * constants, escaping, capability and formatting helpers, plus a recording
+ * $wpdb. Every helper is guarded so a test may define its own first.
+ *
+ * Capabilities come from $GLOBALS['msrwa_test_caps']; set them with
+ * msrwa_test_as_editor() or msrwa_test_as_admin() before exercising a screen.
+ */
+
+if ( ! defined( 'ABSPATH' ) ) { define( 'ABSPATH', dirname( __DIR__ ) . '/' ); }
+if ( ! defined( 'ARRAY_A' ) ) { define( 'ARRAY_A', 'ARRAY_A' ); }
+if ( ! defined( 'MSRWA_VERSION' ) ) { define( 'MSRWA_VERSION', '0.0.0-test' ); }
+if ( ! defined( 'MSRWA_DIR' ) ) { define( 'MSRWA_DIR', dirname( __DIR__ ) . '/' ); }
+if ( ! defined( 'MSRWA_URL' ) ) { define( 'MSRWA_URL', 'https://example.test/wp-content/plugins/ms-recipes-writer-ai/' ); }
+if ( ! defined( 'HOUR_IN_SECONDS' ) ) { define( 'HOUR_IN_SECONDS', 3600 ); }
+if ( ! defined( 'DAY_IN_SECONDS' ) ) { define( 'DAY_IN_SECONDS', 86400 ); }
+
+$GLOBALS['msrwa_test_caps'] = array( 'edit_posts' );
+$GLOBALS['msrwa_test_user'] = 7;
+$GLOBALS['msrwa_test_failures'] = array();
+
+function msrwa_test_as_editor( $user_id = 7 ) { $GLOBALS['msrwa_test_caps'] = array( 'edit_posts', 'msrwa_create', 'msrwa_view_own' ); $GLOBALS['msrwa_test_user'] = $user_id; }
+function msrwa_test_as_admin( $user_id = 1 ) { $GLOBALS['msrwa_test_caps'] = array( 'edit_posts', 'msrwa_create', 'msrwa_manage', 'msrwa_view_all', 'manage_options' ); $GLOBALS['msrwa_test_user'] = $user_id; }
+
+/** Records a failed expectation instead of stopping, so one run reports everything. */
+function msrwa_test_assert( $condition, $message ) {
+	if ( ! $condition ) { $GLOBALS['msrwa_test_failures'][] = $message; }
+	return (bool) $condition;
+}
+
+function msrwa_test_contains( $haystack, $needle, $message ) { return msrwa_test_assert( false !== strpos( (string) $haystack, (string) $needle ), $message ); }
+function msrwa_test_missing( $haystack, $needle, $message ) { return msrwa_test_assert( false === strpos( (string) $haystack, (string) $needle ), $message ); }
+
+/** Prints the result and sets the exit code the runner reads. */
+function msrwa_test_done( $label ) {
+	if ( empty( $GLOBALS['msrwa_test_failures'] ) ) { echo $label . " OK\n"; exit( 0 ); }
+	foreach ( $GLOBALS['msrwa_test_failures'] as $failure ) { fwrite( STDERR, 'FAIL: ' . $failure . "\n" ); }
+	exit( 1 );
+}
+
+if ( ! function_exists( 'esc_html' ) ) { function esc_html( $value ) { return htmlspecialchars( (string) $value, ENT_QUOTES ); } }
+if ( ! function_exists( 'esc_attr' ) ) { function esc_attr( $value ) { return htmlspecialchars( (string) $value, ENT_QUOTES ); } }
+if ( ! function_exists( 'esc_textarea' ) ) { function esc_textarea( $value ) { return htmlspecialchars( (string) $value, ENT_QUOTES ); } }
+if ( ! function_exists( 'esc_url' ) ) { function esc_url( $value ) { return (string) $value; } }
+if ( ! function_exists( 'esc_url_raw' ) ) { function esc_url_raw( $value ) { return (string) $value; } }
+if ( ! function_exists( 'esc_html__' ) ) { function esc_html__( $value, $domain = '' ) { return $value; } }
+if ( ! function_exists( 'esc_html_e' ) ) { function esc_html_e( $value, $domain = '' ) { echo $value; } }
+if ( ! function_exists( '__' ) ) { function __( $value, $domain = '' ) { return $value; } }
+if ( ! function_exists( 'wp_kses_post' ) ) { function wp_kses_post( $value ) { return (string) $value; } }
+if ( ! function_exists( 'wp_strip_all_tags' ) ) { function wp_strip_all_tags( $value ) { return strip_tags( (string) $value ); } }
+if ( ! function_exists( 'strip_shortcodes' ) ) { function strip_shortcodes( $value ) { return (string) $value; } }
+if ( ! function_exists( 'wpautop' ) ) { function wpautop( $value ) { return '<p>' . (string) $value . '</p>'; } }
+if ( ! function_exists( 'sanitize_text_field' ) ) { function sanitize_text_field( $value ) { return trim( strip_tags( (string) $value ) ); } }
+if ( ! function_exists( 'sanitize_textarea_field' ) ) { function sanitize_textarea_field( $value ) { return trim( strip_tags( (string) $value ) ); } }
+if ( ! function_exists( 'sanitize_key' ) ) { function sanitize_key( $value ) { return preg_replace( '/[^a-z0-9_\-]/', '', strtolower( (string) $value ) ); } }
+if ( ! function_exists( 'sanitize_title' ) ) { function sanitize_title( $value ) { return trim( preg_replace( '/[^a-z0-9]+/', '-', strtolower( (string) $value ) ), '-' ); } }
+if ( ! function_exists( 'sanitize_user' ) ) { function sanitize_user( $value ) { return preg_replace( '/[^A-Za-z0-9_.\-]/', '', (string) $value ); } }
+if ( ! function_exists( 'absint' ) ) { function absint( $value ) { return abs( (int) $value ); } }
+if ( ! function_exists( 'wp_unslash' ) ) { function wp_unslash( $value ) { return $value; } }
+if ( ! function_exists( 'wp_slash' ) ) { function wp_slash( $value ) { return $value; } }
+if ( ! function_exists( 'wp_json_encode' ) ) { function wp_json_encode( $value, $flags = 0 ) { return json_encode( $value, $flags ); } }
+if ( ! function_exists( 'wp_rand' ) ) { function wp_rand( $min = 0, $max = 1 ) { return $min; } }
+if ( ! function_exists( 'wp_generate_uuid4' ) ) { function wp_generate_uuid4() { return '00000000-0000-4000-8000-000000000000'; } }
+if ( ! function_exists( 'current_time' ) ) { function current_time( $type = 'mysql', $gmt = 0 ) { return 'timestamp' === $type ? 1789000000 : '2026-09-20 12:00:00'; } }
+if ( ! function_exists( 'number_format_i18n' ) ) { function number_format_i18n( $value, $decimals = 0 ) { return number_format( (float) $value, $decimals ); } }
+if ( ! function_exists( 'human_time_diff' ) ) { function human_time_diff( $from, $to = 0 ) { return max( 0, (int) round( abs( $to - $from ) / 60 ) ) . ' min'; } }
+if ( ! function_exists( 'current_user_can' ) ) { function current_user_can( $capability ) { return in_array( $capability, (array) $GLOBALS['msrwa_test_caps'], true ); } }
+if ( ! function_exists( 'get_current_user_id' ) ) { function get_current_user_id() { return (int) $GLOBALS['msrwa_test_user']; } }
+if ( ! function_exists( 'user_can' ) ) { function user_can( $user, $capability ) { return current_user_can( $capability ); } }
+if ( ! function_exists( 'get_userdata' ) ) { function get_userdata( $user_id ) { return (object) array( 'ID' => (int) $user_id, 'display_name' => 'Éditeur ' . (int) $user_id ); } }
+if ( ! function_exists( 'wp_die' ) ) { function wp_die( $message = '' ) { throw new RuntimeException( (string) $message ); } }
+if ( ! function_exists( 'admin_url' ) ) { function admin_url( $path = '' ) { return 'https://example.test/wp-admin/' . ltrim( (string) $path, '/' ); } }
+if ( ! function_exists( 'add_query_arg' ) ) { function add_query_arg( $args, $url = '' ) { return $url . ( false === strpos( (string) $url, '?' ) ? '?' : '&' ) . http_build_query( (array) $args ); } }
+if ( ! function_exists( 'get_edit_post_link' ) ) { function get_edit_post_link( $post_id, $context = '' ) { return $post_id ? 'https://example.test/wp-admin/post.php?post=' . (int) $post_id . '&action=edit' : null; } }
+if ( ! function_exists( 'get_permalink' ) ) { function get_permalink( $post_id ) { return 'https://example.test/?p=' . (int) $post_id; } }
+if ( ! function_exists( 'get_post_status' ) ) { function get_post_status( $post_id ) { return 'draft'; } }
+if ( ! function_exists( 'selected' ) ) { function selected( $selected, $current = true, $echo = true ) { $result = (string) $selected === (string) $current ? " selected='selected'" : ''; if ( $echo ) { echo $result; } return $result; } }
+if ( ! function_exists( 'checked' ) ) { function checked( $checked, $current = true, $echo = true ) { $result = (string) $checked === (string) $current ? " checked='checked'" : ''; if ( $echo ) { echo $result; } return $result; } }
+if ( ! function_exists( 'submit_button' ) ) { function submit_button( $text = '' ) { echo '<button type="submit">' . esc_html( $text ) . '</button>'; } }
+if ( ! function_exists( 'wp_nonce_field' ) ) { function wp_nonce_field( $action = '' ) { echo '<input type="hidden" name="_wpnonce" value="test">'; } }
+if ( ! function_exists( 'paginate_links' ) ) {
+	function paginate_links( $args ) {
+		$out = '';
+		for ( $page = 1; $page <= (int) $args['total']; $page++ ) {
+			$out .= '<a class="page-numbers' . ( $page === (int) $args['current'] ? ' current' : '' ) . '" href="' . str_replace( '%#%', $page, $args['base'] ) . '">' . $page . '</a>';
+		}
+		return $out;
+	}
+}
+if ( ! function_exists( 'wp_next_scheduled' ) ) { function wp_next_scheduled( $hook ) { return 1789003600; } }
+if ( ! function_exists( 'add_action' ) ) { function add_action( ...$args ) { return true; } }
+if ( ! function_exists( 'add_meta_box' ) ) { function add_meta_box( ...$args ) { return true; } }
+if ( ! function_exists( 'is_wp_error' ) ) { function is_wp_error( $value ) { return $value instanceof WP_Error; } }
+if ( ! class_exists( 'WP_Error' ) ) {
+	class WP_Error {
+		private $code; private $message; private $data;
+		public function __construct( $code = '', $message = '', $data = null ) { $this->code = $code; $this->message = $message; $this->data = $data; }
+		public function get_error_code() { return $this->code; }
+		public function get_error_message() { return $this->message; }
+		public function get_error_data() { return $this->data; }
+	}
+}
+
+require_once __DIR__ . '/lib/class-fake-wpdb.php';
+$GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
+
+/** Loads plugin classes by short name, in dependency order. */
+function msrwa_test_load( ...$classes ) {
+	foreach ( $classes as $class ) { require_once dirname( __DIR__ ) . '/includes/class-msrwa-' . $class . '.php'; }
+}
+
+/** Minimal settings double; pass overrides for the keys a test cares about. */
+function msrwa_test_settings( $overrides = array() ) {
+	$GLOBALS['msrwa_test_settings'] = array_merge( array(
+		'mode' => 'automatic', 'max_batch' => 50, 'max_concurrency' => 4, 'max_corrections' => 2,
+		'max_reference_images' => 5, 'quality_min_score' => 90, 'quality_min_words' => 2000,
+		'quality_max_words' => 4200, 'quality_min_headings' => 12, 'quality_min_paragraphs' => 28,
+		'quality_min_ingredients' => 6, 'quality_min_steps' => 6, 'internal_links_max' => 3,
+		'target_cost_usd' => 0.1, 'log_days' => 30,
+	), $overrides );
+}
+msrwa_test_settings();
+
+if ( ! class_exists( 'MSRWA_Settings' ) ) {
+	class MSRWA_Settings {
+		const FORM_FIELD = 'msrwa_settings';
+		public static function get() { return $GLOBALS['msrwa_test_settings']; }
+	}
+}
+
+if ( ! class_exists( 'MSRWA_DB' ) ) {
+	class MSRWA_DB {
+		public static function tables() {
+			$tables = array();
+			foreach ( array( 'batches', 'jobs', 'events', 'calls', 'reservations', 'settings', 'settings_history', 'providers', 'models', 'prompts', 'artifacts', 'snapshots' ) as $table ) {
+				$tables[ $table ] = 'wp_msrwa_' . $table;
+			}
+			return $tables;
+		}
+		public static function event( ...$args ) { return true; }
+		public static function snapshot( ...$args ) { return 1; }
+		public static function store_artifact( ...$args ) { return 1; }
+		public static function store_artifacts( ...$args ) { return true; }
+		public static function store_article_quality( ...$args ) { return true; }
+	}
+}
