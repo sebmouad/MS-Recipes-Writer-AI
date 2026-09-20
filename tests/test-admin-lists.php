@@ -2,7 +2,7 @@
 // Rendering contracts for the Articles and Jobs screens: scoping, filters,
 // pagination and escaping. No database, no WordPress, no network.
 require __DIR__ . '/bootstrap.php';
-msrwa_test_load( 'recipe', 'publisher', 'presentation', 'lists', 'admin' );
+msrwa_test_load( 'recipe', 'publisher', 'presentation', 'lists', 'queue', 'admin' );
 
 $artifacts = wp_json_encode( array(
 	'article' => array( 'content_html' => '<p>Recette.</p>' ),
@@ -23,8 +23,9 @@ $job_row = array(
 	'post_status' => 'publish', 'post_title' => 'Tarte aux pommes', 'post_date' => '2026-09-20 09:30:00',
 );
 
-function msrwa_test_render( $query, $job_row ) {
+function msrwa_test_render( $query, $job_row, $health = array() ) {
 	$wpdb = new MSRWA_Fake_Wpdb();
+	if ( $health ) { $wpdb->on( "SUM(status IN ('queued','retry_wait'))", array( (object) $health ) ); }
 	$wpdb->default_var( 3 )
 		->on( 'FROM wp_msrwa_jobs j LEFT JOIN', array( $job_row ) )
 		->on( 'FROM wp_msrwa_calls', array( array( 'job_id' => 9, 'calls' => 6, 'input_tokens' => 1200, 'output_tokens' => 3400, 'cost' => 0.1234, 'uncertain' => 0, 'failures' => 1, 'first_call' => '2026-09-20 09:01:00', 'last_call' => '2026-09-20 09:29:00' ) ) )
@@ -74,5 +75,24 @@ msrwa_test_contains( $jobs['html'], 'msrwa-batch-action', 'Batch controls must s
 $GLOBALS['msrwa_test_caps'] = array( 'edit_posts', 'msrwa_view_all', 'manage_options' );
 $paged = msrwa_test_render( array( 'page' => 'ms-recipes-writer-ai', 'msrwa_view' => 'articles', 'msrwa_per_page' => '20', 'msrwa_paged' => '2' ), $job_row );
 msrwa_test_missing( $paged['html'], 'msrwa-pagination', 'Three rows over twenty per page must not paginate.' );
+
+// A job that can be relaunched offers the action; a finished one does not.
+$retryable_row = array_merge( $job_row, array( 'status' => 'needs_review', 'quality_passed' => 0 ) );
+$actionable = msrwa_test_render( array( 'page' => 'ms-recipes-writer-ai', 'msrwa_view' => 'jobs' ), $retryable_row );
+msrwa_test_contains( $actionable['html'], 'msrwa-job-action" data-action="retry"', 'A job waiting for review must be relaunchable from the list.' );
+msrwa_test_contains( $actionable['html'], 'msrwa-job-action" data-action="cancel"', 'An unfinished job must be cancellable from the list.' );
+$finished = msrwa_test_render( array( 'page' => 'ms-recipes-writer-ai', 'msrwa_view' => 'jobs' ), $job_row );
+msrwa_test_missing( $finished['html'], 'msrwa-job-action" data-action="retry"', 'A completed job must not offer a relaunch.' );
+msrwa_test_missing( $finished['html'], 'msrwa-job-action" data-action="cancel"', 'A completed job must not offer a cancellation.' );
+
+// An association waiting on the editor is confirmable where they already are.
+$association = msrwa_test_render( array( 'page' => 'ms-recipes-writer-ai', 'msrwa_view' => 'jobs' ), array_merge( $job_row, array( 'status' => 'awaiting_input', 'stage' => 'association' ) ) );
+msrwa_test_contains( $association['html'], 'msrwa-job-action" data-action="association"', 'A pending association must be confirmable from the list.' );
+
+// The queue notice stays quiet while the queue is healthy and speaks when it is not.
+msrwa_test_missing( $finished['html'], 'msrwa-queue-notice', 'A healthy queue must not warn anyone.' );
+$stalled = msrwa_test_render( array( 'page' => 'ms-recipes-writer-ai', 'msrwa_view' => 'jobs' ), $job_row, array( 'waiting' => 5, 'running' => 0, 'expired' => 2, 'attention' => 1 ) );
+msrwa_test_contains( $stalled['html'], 'msrwa-queue-notice', 'Interrupted workers must be reported on the screen editors use.' );
+msrwa_test_contains( $stalled['html'], 'interrompu', 'The notice must say what happened.' );
 
 msrwa_test_done( 'MSRWA admin list contracts' );

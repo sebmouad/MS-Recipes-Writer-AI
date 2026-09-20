@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.40` fournit un socle installable DB-first :
+La version `0.2.41` fournit un socle installable DB-first :
 
 - modes administrateur `Automatique` / `Manuel` ;
 - limites initiales de 50 recettes par lot, 4 traitements simultanés et 2 corrections ;
@@ -27,6 +27,8 @@ La version `0.2.40` fournit un socle installable DB-first :
 - page de création organisée en deux onglets : **Articles** par défaut, avec la qualité mesurée sur chaque article produit, puis **Jobs** pour le traitement complet ;
 - listes complètes et paginées, filtrables par recherche, publication, qualité, état, étape, période et tri ; chaque éditeur ne voit que ses propres articles et jobs, les administrateurs disposent en plus d’un filtre Auteur ;
 - verdict qualité enregistré sur l’article lui-même, ce qui permet de filtrer et de trier sans recalculer les artefacts ;
+- actions de relance, d’annulation et de confirmation d’association accessibles depuis la liste des jobs, et alerte de file d’attente sur l’écran de création ;
+- suite de tests hors ligne et intégration continue, avec documentation d’architecture, feuille de route et guide de test versionnés dans le dépôt ;
 - vue détaillée protégée par lot : jobs, étapes, erreurs, relecture, appels, coûts et ouverture du brouillon ;
 - confirmation explicite et accessible d’une association ambiguë depuis le détail du job, avec reprise contrôlée ;
 - réconciliation automatique des statuts de lots (terminé, annulé, à vérifier, attente de budget) et reprise explicite après validation du budget ;
@@ -62,6 +64,14 @@ La version `0.2.40` fournit un socle installable DB-first :
 - file durable avec budgets opérationnels par recette, jour et mois.
 
 Les appels fournisseurs restent déclenchés uniquement par les jobs créés par un éditeur autorisé et soumis aux limites budgétaires. Aucune clé n’est incluse dans le dépôt.
+
+## Version 0.2.41
+
+- Actions par job directement dans la liste : relance, annulation et confirmation d’association, avec les mêmes garde-fous que le détail du lot.
+- Avertissement de file d’attente sur l’écran de création lorsque des traitements sont interrompus ou que la planification WordPress ne tourne plus ; détail réservé aux administrateurs.
+- Statistiques alignées sur le verdict de livraison : taux de contrôles réussis par article, distinct du taux de conformité structurelle, et score moyen lu sur le verdict enregistré.
+- Suite de tests hors ligne outillée : `php tests/run.php` (lint + tests), harnais partagé `tests/bootstrap.php`, double `$wpdb` enregistreur, intégration continue PHP 7.4/8.1/8.3.
+- Documentation de reprise dans le dépôt : `CLAUDE.md`, `docs/ARCHITECTURE.md`, `docs/ROADMAP.md`, `docs/TESTING.md`.
 
 ## Version 0.2.40
 

@@ -49,18 +49,20 @@ final class MSRWA_Stats {
 		$recent_sql = "SELECT j.id,j.batch_id,j.title,j.status,j.stage,j.artifacts_json,j.draft_post_id,j.quality_score,j.quality_passed,j.quality_checked_at,j.cost_estimate,j.correction_cycles,j.attempts,j.retry_attempts,j.created_at,j.updated_at,a.content_json AS quality_json FROM {$t['jobs']} j LEFT JOIN {$t['artifacts']} a ON a.job_id = j.id AND a.artifact_key = 'quality_report' AND a.status = 'current' WHERE {$job_where} ORDER BY j.id DESC LIMIT 25";
 		$recent_jobs = $job_args ? $wpdb->get_results( $wpdb->prepare( $recent_sql, $job_args ), ARRAY_A ) : $wpdb->get_results( $recent_sql, ARRAY_A );
 		// Quality is measured on the articles produced, never on jobs that produced none.
-		$quality_sql = "SELECT j.cost_estimate,a.content_json AS quality_json FROM {$t['jobs']} j LEFT JOIN {$t['artifacts']} a ON a.job_id = j.id AND a.artifact_key = 'quality_report' AND a.status = 'current' WHERE {$job_where} AND j.draft_post_id > 0";
+		$quality_sql = "SELECT j.cost_estimate,j.quality_score,j.quality_passed,j.quality_checked_at,a.content_json AS quality_json FROM {$t['jobs']} j LEFT JOIN {$t['artifacts']} a ON a.job_id = j.id AND a.artifact_key = 'quality_report' AND a.status = 'current' WHERE {$job_where} AND j.draft_post_id > 0";
 		$quality_rows = $job_args ? $wpdb->get_results( $wpdb->prepare( $quality_sql, $job_args ), ARRAY_A ) : $wpdb->get_results( $quality_sql, ARRAY_A );
-		$quality = array( 'articles' => count( $quality_rows ), 'evaluated' => 0, 'passed' => 0, 'score_total' => 0, 'words_total' => 0, 'within_target_cost' => 0 );
+		$quality = array( 'articles' => count( $quality_rows ), 'evaluated' => 0, 'passed' => 0, 'approved' => 0, 'score_total' => 0, 'words_total' => 0, 'within_target_cost' => 0 );
 		$target_cost = (float) ( MSRWA_Settings::get()['target_cost_usd'] ?? 0.10 );
 		foreach ( $quality_rows as $quality_row ) {
 			$report = json_decode( (string) $quality_row['quality_json'], true );
 			if ( is_array( $report ) && $report ) {
 				$quality['evaluated']++;
 				$quality['passed'] += empty( $report['pass'] ) ? 0 : 1;
-				$quality['score_total'] += (float) ( $report['score'] ?? 0 );
+				$quality['score_total'] += (float) ( null !== $quality_row['quality_score'] ? $quality_row['quality_score'] : ( $report['score'] ?? 0 ) );
 				$quality['words_total'] += (int) ( $report['metrics']['words'] ?? 0 );
 			}
+			// The delivery verdict, not the structural gate: what an editor is shown.
+			$quality['approved'] += empty( $quality_row['quality_passed'] ) ? 0 : 1;
 			if ( (float) $quality_row['cost_estimate'] <= $target_cost ) { $quality['within_target_cost']++; }
 		}
 		foreach ( $recent_jobs as &$recent ) {
@@ -75,6 +77,7 @@ final class MSRWA_Stats {
 		$quality['average_score'] = $quality['evaluated'] ? $quality['score_total'] / $quality['evaluated'] : 0;
 		$quality['average_words'] = $quality['evaluated'] ? $quality['words_total'] / $quality['evaluated'] : 0;
 		$quality['pass_rate'] = $quality['evaluated'] ? 100 * $quality['passed'] / $quality['evaluated'] : 0;
+		$quality['approval_rate'] = $quality['articles'] ? 100 * $quality['approved'] / $quality['articles'] : 0;
 		$quality['target_cost_usd'] = $target_cost;
 		$editors = array();
 		if ( ! $owner_id ) {

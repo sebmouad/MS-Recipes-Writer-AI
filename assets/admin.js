@@ -136,8 +136,8 @@
     button.addEventListener('click', function () {
       var jobId = button.getAttribute('data-job-id');
       var action = button.getAttribute('data-action');
-      var card = button.closest('.msrwa-job-card');
-      var status = card ? card.querySelector('.msrwa-job-action-status') : null;
+      var container = button.closest('.msrwa-job-card, .msrwa-row-details, tr');
+      var status = container ? container.querySelector('.msrwa-job-action-status') : null;
       if (!jobId || !action) return;
       if (action === 'cancel' && !window.confirm('Annuler ce job ? Les appels déjà acceptés par un fournisseur peuvent rester facturés.')) return;
       if (action === 'association' && !window.confirm('Confirmer cette association et reprendre le job ?')) return;
@@ -152,7 +152,7 @@
         .then(function (result) {
           var labels = { retry: 'Relance planifiée.', cancel: 'Job annulé.', association: 'Association confirmée ; reprise planifiée.' };
           setMessage(status, labels[action] || 'Action enregistrée.', false);
-          window.location.reload();
+          window.setTimeout(function () { window.location.reload(); }, 600);
         })
         .catch(function (error) { setMessage(status, error.message, true); })
         .finally(function () { button.disabled = false; });
