@@ -19,7 +19,10 @@ editors about cost, quality or data.
 - Articles and Jobs lists: full pagination, search, publication/quality/state/
   stage/period filters, per-editor scoping, administrator author filter, whole
   job record per row.
-- Offline test suite plus CI on PHP 7.4/8.1/8.3.
+- Offline test suite plus CI on PHP 7.4/8.1/8.3, with regression tests for the
+  admin lists, statistics and queue scheduling.
+- Queue drains a whole batch: free slots are refilled as jobs finish and an
+  unclaimed job re-schedules itself instead of being dropped.
 
 ## Next — ordered
 
@@ -32,29 +35,20 @@ editors about cost, quality or data.
    integration path (`wp eval-file` or a MySQL service in CI) covering the
    migration, the list queries and the batch lifecycle. This is the largest
    remaining risk to a production release.
-3. **Per-row job actions.** Retry and cancel are only reachable from the batch
-   detail screen. Surface them in the Jobs list (REST endpoints already exist)
-   with the same confirmation rules.
-4. **Queue visibility for editors.** `MSRWA_Queue::health()` is only on the
-   Configuration screen. Show a banner on the main screen when jobs are
-   waiting with no scheduler progress, so a stalled cron is not read as a
-   plugin failure.
-5. **Migration cost.** The quality backfill runs in 200-row chunks during
+3. **Migration cost.** The quality backfill runs in 200-row chunks during
    `install()`. On a large install it should become a scheduled task with a
    resume cursor.
-6. **Stats alignment.** The Statistiques screen still measures the structural
-   gate ("Structure conforme") while the lists show the editorial verdict, and
-   its "Jobs récents" table now duplicates the Jobs tab. Decide one vocabulary
-   and remove the duplicate.
-7. **Retention and privacy.** `purge_expired()` deletes events and calls by
+4. **Retention and privacy.** `purge_expired()` deletes events and calls by
    age; artifacts and snapshots grow without bound. Add a retention policy per
    artifact kind and document what a site owner keeps.
 
 ## Known gaps and risks
 
-- **Unaudited modules.** `class-msrwa-pipeline.php`, `class-msrwa-settings.php`,
+- **Unaudited modules.** `class-msrwa-settings.php`,
   `class-msrwa-images.php`, `class-msrwa-storage.php` and the provider
-  adapters have not had a line-by-line review. Read before trusting.
+  adapters have not had a line-by-line review. `class-msrwa-pipeline.php` was
+  read end to end in the 0.2.42 audit but has no offline coverage of its stage
+  machine; that is the next test to write.
 - **Cron dependency.** Without Action Scheduler, progress depends on WP-Cron;
   a site with `DISABLE_WP_CRON` and no system cron silently stops processing.
 - **Cost estimates** come from the catalogue captured at call time. They are

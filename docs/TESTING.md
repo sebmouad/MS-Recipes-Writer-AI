@@ -22,6 +22,7 @@ The runner exits non-zero when a lint or a test fails; CI
 | `test-presentation.php` | Public state vocabulary, article quality (stored and artifact based), batch aggregation over articles |
 | `test-lists.php` | Filter sanitization, capability scoping, prepared parameters, quality filter mapping |
 | `test-admin-lists.php` | Rendering of both lists: scoping in SQL, filters applied, escaping, batch controls, pagination |
+| `test-queue.php` | Batches keep draining past the concurrency limit, expired leases free their slot, an unclaimed job is re-scheduled |
 | `test-version.php` | Plugin header, `MSRWA_VERSION`, README version and changelog agree; every class keeps its direct-access guard |
 | `test-draft-integration.php` | Draft creation against a real site. Skipped by the runner; run with `wp eval-file` on localhost |
 
