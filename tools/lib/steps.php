@@ -11,7 +11,7 @@ function lab_boot() {
 	if ( $booted ) { return; }
 	$booted = true;
 	require_once dirname( __DIR__, 2 ) . '/tests/bootstrap.php';
-	foreach ( array( 'recipe', 'quality', 'catalog', 'images', 'prompt' ) as $class ) {
+	foreach ( array( 'recipe', 'quality', 'catalog', 'images', 'prompt', 'json', 'cost' ) as $class ) {
 		require_once dirname( __DIR__, 2 ) . '/includes/class-msrwa-' . $class . '.php';
 	}
 }
@@ -50,7 +50,7 @@ function lab_steps() {
 			'expects' => 'a recipe passing MSRWA_Recipe::validate',
 		),
 		'article' => array(
-			'prompts' => array( 'prompt_article', 'prompt_seo' ), 'json' => true, 'max_output' => max( 6000, (int) $s['article_max_output_tokens'] ),
+			'prompts' => array( 'prompt_article', 'prompt_seo' ), 'json' => true, 'max_output' => max( (int) $s['article_max_output_tokens'], MSRWA_Cost::output_budget( $s['quality_max_words'] ) ),
 			'expects' => 'an article passing MSRWA_Quality plus the required outline',
 		),
 		'review' => array(
@@ -66,7 +66,7 @@ function lab_steps() {
 			'expects' => 'only the passages the sources contradict, quoted verbatim',
 		),
 		'proofread' => array(
-			'prompts' => array( 'prompt_correction' ), 'json' => true, 'max_output' => 14000,
+			'prompts' => array( 'prompt_correction' ), 'json' => true, 'max_output' => max( (int) $s['article_max_output_tokens'], MSRWA_Cost::output_budget( $s['quality_max_words'] ) ),
 			'expects' => 'the same article with its French corrected and every figure untouched',
 		),
 		'article_part1' => array(
@@ -166,7 +166,7 @@ function lab_score( $step, $text, $brief ) {
 	lab_boot();
 	$settings = lab_settings();
 	$checks = array();
-	$json = json_decode( trim( (string) $text ), true );
+	$json = MSRWA_Json::decode( $text );
 	$checks['valid JSON'] = array( 'pass' => is_array( $json ), 'detail' => is_array( $json ) ? count( $json ) . ' keys' : 'not parseable' );
 	$json = is_array( $json ) ? $json : array();
 

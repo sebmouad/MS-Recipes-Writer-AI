@@ -19,6 +19,26 @@ final class MSRWA_Cost {
 	/** French prose costs about 1.6 tokens per word once punctuation is counted. */
 	const TOKENS_PER_WORD = 1.6;
 
+	/**
+	 * Written output costs more per word than plain prose: the HTML tags, the
+	 * JSON escaping and the metadata fields around the body all bill. Measured
+	 * over fifteen real article answers on 2026-09-20 — 1.88 tokens per word at
+	 * best, 3.97 on a model that also bills its reasoning — so the band below is
+	 * the observed floor and ceiling rather than an assumption.
+	 */
+	const WRITTEN_TOKENS_PER_WORD_MIN = 2.0;
+	const WRITTEN_TOKENS_PER_WORD_MAX = 4.0;
+
+	/**
+	 * The output ceiling a written step must be given. Sending less truncates the
+	 * answer, which is billed in full and scores zero: an 8000-token cap against a
+	 * 2800-word target cost $0.086 on Sonnet 5 and $0.164 on a proofreading call,
+	 * both stopped at max_tokens.
+	 */
+	public static function output_budget( $words_max ) {
+		return (int) ceil( max( 1, (int) $words_max ) * self::WRITTEN_TOKENS_PER_WORD_MAX / 500 ) * 500;
+	}
+
 	public static function buckets() { return array( 'article', 'featured', 'facebook', 'other' ); }
 
 	/**
@@ -41,10 +61,10 @@ final class MSRWA_Cost {
 			'reference_vision' => array( 'bucket' => 'other', 'capability' => 'vision', 'stage' => 'review', 'prompts' => array( 'prompt_reference_vision' ), 'context' => 800, 'output' => (int) ( $s['vision_max_output_tokens'] ?? 1200 ), 'repeats' => 0, 'enabled' => true, 'occurrences_min' => 0, 'occurrences_max' => $references ),
 			'research' => array( 'bucket' => 'other', 'capability' => 'web_search', 'stage' => 'search', 'prompts' => array( 'prompt_research' ), 'context' => 1200, 'output' => (int) ( $s['research_max_output_tokens'] ?? 4000 ), 'repeats' => 0, 'enabled' => true, 'tool' => true ),
 			'canonical_recipe' => array( 'bucket' => 'article', 'capability' => 'text', 'stage' => 'text', 'prompts' => array( 'prompt_recipe', 'prompt_nutrition' ), 'context' => 3000, 'output' => (int) ( $s['canonical_max_output_tokens'] ?? 2600 ), 'repeats' => $corrections, 'enabled' => true ),
-			'article' => array( 'bucket' => 'article', 'capability' => 'text', 'stage' => 'text', 'prompts' => array( 'prompt_article', 'prompt_seo', 'prompt_internal_links' ), 'context' => 4000, 'output_min' => (int) round( $words_min * self::TOKENS_PER_WORD ), 'output_max' => (int) round( $words_max * self::TOKENS_PER_WORD ), 'repeats' => $corrections, 'enabled' => true ),
+			'article' => array( 'bucket' => 'article', 'capability' => 'text', 'stage' => 'text', 'prompts' => array( 'prompt_article', 'prompt_seo', 'prompt_internal_links' ), 'context' => 4000, 'output_min' => (int) round( $words_min * self::WRITTEN_TOKENS_PER_WORD_MIN ), 'output_max' => (int) round( $words_max * self::WRITTEN_TOKENS_PER_WORD_MAX ), 'repeats' => $corrections, 'enabled' => true ),
 			'review' => array( 'bucket' => 'article', 'capability' => 'text', 'stage' => 'review', 'prompts' => array( 'prompt_review' ), 'context_words' => true, 'context' => 2000, 'output' => (int) ( $s['review_max_output_tokens'] ?? 3000 ), 'repeats' => $corrections, 'enabled' => true ),
 			'fact_check' => array( 'bucket' => 'article', 'capability' => 'text', 'stage' => 'review', 'prompts' => array( 'prompt_review' ), 'context_words' => true, 'context' => 2000, 'output' => (int) ( $s['review_max_output_tokens'] ?? 3000 ), 'repeats' => $corrections, 'enabled' => ! empty( $s['fact_check_enabled'] ) ),
-			'proofreading' => array( 'bucket' => 'article', 'capability' => 'text', 'stage' => 'review', 'prompts' => array( 'prompt_correction' ), 'context_words' => true, 'context' => 500, 'output_min' => (int) round( $words_min * self::TOKENS_PER_WORD ), 'output_max' => (int) round( $words_max * self::TOKENS_PER_WORD ), 'repeats' => 0, 'enabled' => ! empty( $s['proofreading_enabled'] ) ),
+			'proofreading' => array( 'bucket' => 'article', 'capability' => 'text', 'stage' => 'review', 'prompts' => array( 'prompt_correction' ), 'context_words' => true, 'context' => 500, 'output_min' => (int) round( $words_min * self::WRITTEN_TOKENS_PER_WORD_MIN ), 'output_max' => (int) round( $words_max * self::WRITTEN_TOKENS_PER_WORD_MAX ), 'repeats' => 0, 'enabled' => ! empty( $s['proofreading_enabled'] ) ),
 			'featured_image' => array( 'bucket' => 'featured', 'capability' => 'image_generation', 'stage' => 'image', 'prompts' => array( 'prompt_image' ), 'context' => 600, 'image' => 'featured', 'repeats' => $corrections, 'enabled' => true ),
 			'featured_image_review' => array( 'bucket' => 'featured', 'capability' => 'vision', 'stage' => 'review', 'prompts' => array( 'prompt_image_review' ), 'context' => 800, 'output' => (int) ( $s['image_review_max_output_tokens'] ?? 1000 ), 'repeats' => $corrections, 'enabled' => true ),
 			'facebook_image' => array( 'bucket' => 'facebook', 'capability' => 'image_generation', 'stage' => 'image', 'prompts' => array( 'prompt_facebook_image' ), 'context' => 600, 'image' => 'facebook', 'repeats' => $corrections, 'enabled' => true ),

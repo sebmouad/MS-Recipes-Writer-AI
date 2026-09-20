@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.49` est un socle installable : file persistante, pipeline de
+La version `0.2.50` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.
@@ -20,6 +20,24 @@ Le plugin est en cours de refonte éditoriale et budgétaire :
 Les coûts affichés sont des estimations calculées avec le catalogue configuré,
 non une facture fournisseur. `completed` signifie que le traitement est terminé,
 jamais qu’un texte est validé éditorialement.
+
+## Version 0.2.50
+
+Corrige deux pertes de résultat mesurées sur de vraies réponses de modèles, le
+20/09/2026.
+
+- **Lecture du JSON.** `MSRWA_Json` répare ce qu'un modèle écrit réellement :
+  une phrase avant l'objet (Opus 5 en recherche web), un retour à la ligne brut
+  laissé dans une chaîne de 18 Ko (Sonnet 5 sur `content_html`), une clôture
+  Markdown. Une réponse tronquée reste une erreur. Les deux appels perdus du
+  laboratoire passent désormais : recherche 0/5 → 5/5.
+- **Plafond de sortie.** 8 000 jetons ne suffisent pas pour 2 800 mots : la
+  mesure sur quinze articles réels donne 2,0 jetons par mot au mieux et 3,97 sur
+  un modèle qui facture son raisonnement. Le plafond se déduit désormais du
+  nombre de mots visé (`MSRWA_Cost::output_budget`), et l'estimation de coût
+  utilise la même fourchette mesurée au lieu de 1,6 jeton par mot.
+- `quality_max_words` passe de 2 400 à 3 600 : la valeur livrée était inférieure
+  au minimum exigé de 2 800.
 
 ## Version 0.2.49
 

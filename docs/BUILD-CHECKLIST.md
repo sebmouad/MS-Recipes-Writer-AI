@@ -72,6 +72,22 @@ cost) in the task before changing anything.
   `visual_final_notes` the article writes about itself. Awaiting owner validation
   before promotion. *Original wording:* **A7 — Images.** Featured and Facebook prompts: appetising, faithful to
   the recipe, no text in the image, no invented dish.
+- [x] **A11 — Model answers that do not parse (found 2026-09-20).** Two of the
+  54 matrix cells scored zero for a reason that was ours, not the prompt's:
+  Opus 5 wrote "I'll research this dish now." before the object, and Sonnet 5
+  left a raw newline inside an 18 KB `content_html` string. `MSRWA_Json` repairs
+  both and still fails on a truncated answer; `tests/test-json.php` carries the
+  captured payloads. Re-ran research on Claude high: 0/5 → **5/5**, 42s, $0.1875.
+- [x] **A12 — The output ceiling was below the word target (found 2026-09-20).**
+  `article_max_output_tokens` shipped at 8 000 while the quality gate demands
+  2 800 words. Measured over fifteen real article answers: 1.88 tokens per word
+  at best, 3.97 on a model billing its reasoning. Every truncation was billed in
+  full and scored zero — $0.086 on one article call, $0.164 on a proofreading
+  call. The ceiling now derives from the word target
+  (`MSRWA_Cost::output_budget`), the cost estimate uses the same measured band
+  instead of 1.6 tokens per word, and `quality_max_words` was raised from 2 400,
+  which was below the 2 800 minimum it was meant to cap.
+
 - [ ] **A9 — Prompt templates (owner directive, 2026-09-20).** Prompts are
   templates compiled from the settings by `MSRWA_Prompt`, used by the lab and
   the engine alike: word count, one or two pages, page-two opening heading,

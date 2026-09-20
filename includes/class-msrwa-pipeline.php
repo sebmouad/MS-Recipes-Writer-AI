@@ -577,15 +577,7 @@ final class MSRWA_Pipeline {
 
 	private static function retryable( $message ) { return (bool) preg_match( '/\b(?:429|500|502|503|504)\b|timeout|timed out|temporarily|rate limit|réseau|network/i', (string) $message ); }
 
-	private static function decode_json( $text, $label ) {
-		$json = json_decode( trim( (string) $text ), true );
-		if ( ! is_array( $json ) ) {
-			$start = strpos( $text, '{' ); $end = strrpos( $text, '}' );
-			if ( false !== $start && false !== $end ) { $json = json_decode( substr( $text, $start, $end - $start + 1 ), true ); }
-		}
-		if ( ! is_array( $json ) ) { throw new Exception( 'Sortie JSON invalide pour ' . $label . '.' ); }
-		return $json;
-	}
+	private static function decode_json( $text, $label ) { return MSRWA_Json::decode_or_fail( $text, $label ); }
 
 	private static function compact_article( $article ) {
 		$article = is_array( $article ) ? $article : array();
