@@ -27,7 +27,7 @@ final class MSRWA_Catalog {
 		$t = MSRWA_DB::tables();
 		$now = current_time( 'mysql', true );
 		$providers = array(
-			'openai' => array( 'label' => 'OpenAI', 'adapter' => 'MSRWA_OpenAI', 'capabilities' => array( 'text', 'vision', 'web_search', 'image_generation' ), 'api' => array( 'base_url' => 'https://api.openai.com/v1', 'responses_path' => '/responses', 'models_path' => '/models', 'image_generation_path' => '/images/generations', 'image_edit_path' => '/images/edits', 'timeout_text' => 60, 'timeout_image' => 120, 'auth' => 'bearer' ) ),
+			'openai' => array( 'label' => 'OpenAI', 'adapter' => 'MSRWA_OpenAI', 'capabilities' => array( 'text', 'vision', 'web_search', 'image_generation' ), 'api' => array( 'base_url' => 'https://api.openai.com/v1', 'responses_path' => '/responses', 'models_path' => '/models', 'image_generation_path' => '/images/generations', 'image_edit_path' => '/images/edits', 'timeout_text' => 180, 'timeout_image' => 120, 'auth' => 'bearer' ) ),
 			'gemini' => array( 'label' => 'Google Gemini', 'adapter' => 'MSRWA_Providers', 'capabilities' => array( 'text', 'vision', 'web_search', 'image_generation' ), 'api' => array( 'base_url' => 'https://generativelanguage.googleapis.com', 'generate_path' => '/v1beta/models/{model}:generateContent', 'models_path' => '/v1beta/models', 'timeout_text' => 60, 'timeout_image' => 120, 'auth' => 'query_key' ) ),
 			'claude' => array( 'label' => 'Anthropic Claude', 'adapter' => 'MSRWA_Providers', 'capabilities' => array( 'text', 'vision', 'web_search' ), 'api' => array( 'base_url' => 'https://api.anthropic.com', 'messages_path' => '/v1/messages', 'api_version' => '2023-06-01', 'timeout_text' => 60, 'auth' => 'x-api-key' ) ),
 		);

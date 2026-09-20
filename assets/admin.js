@@ -128,7 +128,7 @@
       if (action === 'cancel' && !window.confirm('Annuler ce lot ? Les appels déjà acceptés par un fournisseur peuvent rester facturés.')) return;
       button.disabled = true;
       request('/batches/' + encodeURIComponent(batchId) + '/' + encodeURIComponent(action), { method: 'POST' })
-        .then(function (result) { if (status) status.textContent = result.status || action; })
+        .then(function () { window.location.reload(); })
         .catch(function (error) { window.alert(error.message); })
         .finally(function () { button.disabled = false; });
     });
@@ -154,7 +154,7 @@
         .then(function (result) {
           var labels = { retry: 'Relance planifiée.', cancel: 'Job annulé.', association: 'Association confirmée ; reprise planifiée.' };
           setMessage(status, labels[action] || 'Action enregistrée.', false);
-          if ((action === 'retry' || action === 'association') && card) card.querySelector('.msrwa-job-state span').textContent = result.status || 'queued';
+          window.location.reload();
         })
         .catch(function (error) { setMessage(status, error.message, true); })
         .finally(function () { button.disabled = false; });

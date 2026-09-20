@@ -38,6 +38,12 @@ final class MSRWA_Recipe {
 		if ( ! array_key_exists( 'cook_minutes', $recipe ) || ! is_numeric( $recipe['cook_minutes'] ) || (int) $recipe['cook_minutes'] < 0 ) { $errors['cook_minutes'] = 'Temps de cuisson numérique requis, avec 0 pour une recette sans cuisson.'; }
 		if ( empty( $recipe['cuisine'] ) ) { $errors['cuisine'] = 'Cuisine requise.'; }
 		if ( empty( $recipe['calories_estimate'] ) || ! is_numeric( $recipe['calories_estimate'] ) ) { $errors['calories_estimate'] = 'Calories estimées numériques requises.'; }
+		if ( empty( $recipe['difficulty'] ) ) { $errors['difficulty'] = 'Difficulté requise.'; }
+		if ( empty( $recipe['equipment'] ) || ! is_array( $recipe['equipment'] ) ) { $errors['equipment'] = 'Liste d’équipement requise.'; }
+		if ( empty( $recipe['notes'] ) ) { $errors['notes'] = 'Notes culinaires requises.'; }
+		if ( empty( $recipe['faq'] ) || ! is_array( $recipe['faq'] ) ) { $errors['faq'] = 'FAQ structurée requise.'; }
+		if ( empty( $recipe['keywords'] ) || ! is_array( $recipe['keywords'] ) ) { $errors['keywords'] = 'Mots-clés requis.'; }
+		if ( empty( $recipe['food_safety'] ) ) { $errors['food_safety'] = 'Consignes de sécurité alimentaire requises.'; }
 		foreach ( isset( $recipe['ingredients'] ) && is_array( $recipe['ingredients'] ) ? $recipe['ingredients'] : array() as $index => $ingredient ) {
 			if ( ! is_array( $ingredient ) || empty( $ingredient['name'] ) ) { $errors[ 'ingredient_' . $index ] = 'Chaque ingrédient doit avoir un nom.'; }
 		}

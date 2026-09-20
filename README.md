@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.36` fournit un socle installable DB-first :
+La version `0.2.37` fournit un socle installable DB-first :
 
 - modes administrateur `Automatique` / `Manuel` ;
 - limites initiales de 50 recettes par lot, 4 traitements simultanés et 2 corrections ;
@@ -31,7 +31,7 @@ La version `0.2.36` fournit un socle installable DB-first :
 - statistiques de coût par brouillon terminé et durée moyenne des jobs terminés, plus export CSV visible du journal d’événements ;
 - lots multi-recettes depuis les deux champs existants, via une séparation `---`, avec références visuelles partagées puis association IA par recette ;
 - recherche visuelle web administrable : les références publiques sûres sont téléchargées temporairement hors du document root, analysées pour dégager une direction artistique, puis employées comme observations abstraites — jamais copiées ni fournies comme actif à l’image générée ;
-- contrôle vision structuré des deux images avant la création du brouillon, avec blocage si un défaut est confirmé ;
+- contrôle vision structuré des deux images ; les défauts non résolus sont signalés dans le brouillon pour relecture humaine ;
 - jusqu’à deux corrections automatiques par image, déclenchées uniquement après une relecture négative et avec les défauts conservés dans le détail du job ; une correction de l’image principale régénère aussi sa variante Facebook ;
 - gate éditorial déterministe avant la relecture IA : contrat qualité autonome configurable, score sur 100, seuils de longueur/structure/recette/SEO et retour automatique en correction ;
 - contrat Recipe Card complet (temps, portions, calories estimées, cuisine, difficulté, ingrédients, étapes, équipement, notes, FAQ et mots-clés) avec mapping administrable ;
@@ -59,6 +59,19 @@ La version `0.2.36` fournit un socle installable DB-first :
 - file durable avec budgets opérationnels par recette, jour et mois.
 
 Les appels fournisseurs restent déclenchés uniquement par les jobs créés par un éditeur autorisé et soumis aux limites budgétaires. Aucune clé n’est incluse dans le dépôt.
+
+## Version 0.2.37
+
+- État simplifié (`encours`, `completed`, `canceled`, `error`) distinct de la qualité (verdict et score de structure en %). `completed` indique la fin du traitement, pas une validation éditoriale. Les pauses et actions requises restent signalées ; une réponse fournisseur incertaine ne vaut pas réussite.
+- Sauvegarde du contenu disponible en brouillon pour les jobs à vérifier, échoués, suspendus pour budget ou à résultat fournisseur incertain ; aucune publication automatique.
+- Rapport privé de relecture dans le détail du job et l’éditeur : score de structure, observations éditoriales et images manquantes. Un score élevé ne vaut pas validation culinaire.
+- Reprise sans doublon et protection des articles qui ne sont plus des brouillons.
+- Division en deux pages activable, avec respect des limites HTML ; maintien du contenu non divisé lorsqu’un brouillon partiel est trop court.
+- Corrections bornées par élément, préservation des images remplacées et diagnostics API sans secrets ni données binaires.
+- Requêtes de recherche bornées et comptabilisées ; suspension après un résultat texte incertain pour éviter une relance payante automatique.
+- Conservation du collage Facebook complet avec ajustement configurable et mesure des durées des appels images.
+
+Les coûts affichés sont des estimations calculées avec le catalogue configuré, non une facture fournisseur. Un appel interrompu peut avoir été facturé. La validation éditoriale et les tests complets des fournisseurs restent nécessaires avant utilisation en production.
 
 ## Installation locale
 

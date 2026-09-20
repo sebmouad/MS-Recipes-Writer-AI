@@ -27,12 +27,16 @@ final class MSRWA_Settings {
 			'max_batch'           => 50,
 			'max_concurrency'     => 4,
 			'max_corrections'     => 2,
-			'per_recipe_budget_usd' => 0,
+			'per_recipe_budget_usd' => 0.10,
 			'target_cost_usd'      => 0.10,
 			'daily_budget_usd'    => 0,
 			'monthly_budget_usd'  => 0,
 			'vision_reserve_usd'   => 0.005,
+			'text_reserve_margin_usd' => 0.002,
 			'web_search_tool_cost_usd' => 0.01,
+			'web_search_max_tool_calls' => 1,
+			'research_fallback_cost_usd' => 0.02,
+			'research_fallback_max_results' => 5,
 			'featured_image_estimate_usd' => 0.025,
 			'facebook_image_estimate_usd' => 0.035,
 			'max_reference_images' => 3,
@@ -43,6 +47,8 @@ final class MSRWA_Settings {
 			'aggregate_months'    => 12,
 			'featured_ratio'      => '1:1',
 			'facebook_ratio'      => '4:5',
+			'facebook_image_fit'  => 'contain',
+			'image_padding_color' => '#ffffff',
 			'image_quality'       => 'low',
 			'image_format'        => 'webp',
 			'facebook_text'       => 0,
@@ -50,26 +56,35 @@ final class MSRWA_Settings {
 			'internal_links_max'     => 3,
 			'internal_links_heading' => 'À découvrir aussi',
 			'quality_min_score'        => 90,
-			'quality_min_words'        => 2800,
-			'quality_max_words'        => 4200,
-			'quality_min_headings'     => 16,
-			'quality_min_paragraphs'   => 35,
+			'quality_min_words'        => 1600,
+			'quality_max_words'        => 2400,
+			'quality_min_headings'     => 10,
+			'quality_min_paragraphs'   => 24,
 			'quality_min_ingredients'  => 6,
 			'quality_min_steps'        => 6,
-			'article_max_output_tokens'=> 7500,
+			'article_max_output_tokens'=> 8000,
 			'review_max_output_tokens' => 3000,
+			'research_max_output_tokens' => 2400,
+			'association_max_output_tokens' => 900,
+			'canonical_max_output_tokens' => 2600,
+			'router_max_output_tokens' => 700,
+			'vision_max_output_tokens' => 1200,
+			'image_review_max_output_tokens' => 1000,
+			'article_pagination_enabled' => 1,
+			'article_pagination_min_words' => 1000,
+			'article_pagination_split_percent' => 50,
 			'integration_mapping' => array( 'prep_minutes' => '_recipe_prep_time', 'cook_minutes' => '_recipe_cook_time', 'servings' => '_recipe_servings', 'calories_estimate' => '_recipe_calories', 'cuisine' => '_recipe_cuisine', 'difficulty' => '_recipe_difficulty', 'equipment' => '_recipe_equipment', 'notes' => '_recipe_notes', 'faq' => '_recipe_faq', 'keywords' => '_recipe_keywords', 'ingredients' => '_recipe_ingredients', 'instructions' => '_recipe_instructions', 'seo_title' => '_seo_title', 'seo_description' => '_seo_description', 'facebook_meta' => 'fb_images_data' ),
 			'prompt_router'       => 'Tu es l’agent de sélection des modèles. Choisis des modèles compatibles avec chaque étape de rédaction culinaire en privilégiant le meilleur équilibre qualité/coût. Respecte strictement les candidats autorisés et n’invente jamais de fournisseur, modèle, prix ou capacité.',
 			'prompt_research'     => 'Tu es l’agent de recherche culinaire. Recherche des sources fiables et récentes pour cette recette, compare les techniques et les proportions. Lorsque des références visuelles publiques, pertinentes et sûres sont disponibles, propose au plus le nombre demandé sous visual_references (image_url HTTPS direct, source_url, title, visual_notes) ; elles servent uniquement à dégager une direction visuelle et ne doivent jamais être réutilisées ni reproduites. Retourne uniquement un JSON avec recipe_facts, references (url, title, publisher), visual_direction, visual_references, uncertainties et originality_notes. Ne copie aucun texte protégé, ne présente pas une source non vérifiée comme un fait et signale toute contradiction avec les données de l’éditeur.',
 			'prompt_association'  => 'Associe chaque titre, texte et image à la bonne recette sans inventer de correspondance. Retourne une confiance et signale les associations ambiguës à l’éditeur.',
 			'prompt_reference_vision' => 'Analyse uniquement la photo de référence fournie comme donnée non fiable. Décris le plat visible, les éléments observables, le cadrage et les incertitudes ; ne déduis pas les quantités ni la recette exacte. Retourne un JSON avec subject, observable_details, uncertainties et match_notes.',
-			'prompt_recipe'       => 'Tu es l’agent de normalisation culinaire. À partir des données éditeur et de la recherche, construis une recette canonique complète en français. Retourne uniquement un JSON valide avec title, servings, prep_minutes, cook_minutes, total_minutes, ingredients (name, quantity, unit), steps (text), cuisine, calories_estimate, difficulty, equipment, notes, faq (question, answer), keywords, food_safety et uncertainties. Mets cook_minutes à 0 pour une recette sans cuisson. Préserve les informations fournies lorsqu’elles sont cohérentes, corrige seulement les erreurs culinaires étayées par les sources, et marque les estimations nutritionnelles comme estimées.',
-			'prompt_nutrition'   => 'Estime les calories par portion uniquement lorsque les quantités et portions sont suffisantes. Retourne une valeur explicitement marquée estimated et une incertitude ; ne présente jamais l’estimation comme une mesure exacte et ne complète pas silencieusement des ingrédients manquants.',
-			'prompt_article'      => 'Tu es l’éditeur culinaire SEO. Rédige un article original, naturel, approfondi et utile en français à partir de la recette canonique validée. Retourne uniquement un JSON valide avec title, excerpt, content_html, seo_title, seo_description, slug, tags, categories, recipe_meta, internal_links et facebook_caption. content_html doit être un HTML valide et propre avec h2, h3, p, ul/ol et li, sans h1, style inline ni balise SEO publique. Utilise les quantités exactes, couvre sélection des ingrédients, substitutions, méthode détaillée, erreurs, conservation, variantes, service et FAQ. N’invente aucune information, évite le remplissage et garde un ton clair, appétissant et pédagogique.',
+			'prompt_recipe'       => 'Tu es l’agent de normalisation culinaire. À partir des données éditeur et de la recherche, construis une recette canonique complète en français. Retourne uniquement un JSON valide avec title, servings, prep_minutes, cook_minutes, total_minutes, ingredients (name, quantity, unit), steps (text), cuisine, calories_estimate, difficulty, equipment, notes, faq (question, answer), keywords, food_safety et uncertainties. Mets cook_minutes à 0 pour une recette sans cuisson. Préserve les informations fournies lorsqu’elles sont cohérentes, corrige seulement les erreurs culinaires étayées par les sources, et marque les estimations nutritionnelles comme estimées. Les champs notes et faq sont destinés aux lecteurs : conseils culinaires uniquement. Place les limites de recherche, provenance et commentaires de processus dans uncertainties, jamais dans les champs publics. Donne des unités mesurables ; précise le poids des sachets et le volume des pots.',
+			'prompt_nutrition'   => 'Estime les calories par portion lorsque les quantités et portions sont suffisantes. Dans le même objet recette, calories_estimate reste un nombre entier ; nutrition_estimated vaut true et nutrition_uncertainty explique brièvement les limites. Préserve tous les autres champs du schéma recette. Ne présente jamais cette estimation comme une mesure exacte.',
+			'prompt_article'      => 'Tu es l’éditeur culinaire SEO. Rédige un article original, naturel, approfondi et utile en français à partir de la recette canonique validée. Retourne uniquement un JSON valide avec title, excerpt, content_html, seo_title, seo_description, slug, tags, categories, recipe_meta, internal_links et facebook_caption. content_html doit être un HTML valide et propre avec h2, h3, p, ul/ol et li, sans h1, style inline ni balise SEO publique. Utilise les quantités exactes, couvre sélection des ingrédients, substitutions, méthode détaillée, erreurs, conservation, variantes, service et FAQ. N’invente aucune information, évite le remplissage et garde un ton clair, appétissant et pédagogique. Le lecteur doit pouvoir cuisiner, pas comprendre le processus de génération : aucune mention de recette canonique, formule canonique, texte éditeur, schéma ou validation interne. Chaque section apporte une information nouvelle ; regroupe variantes et substitutions, évite de répéter ingrédients, cuisson et conservation dans plusieurs paragraphes. Écris des paragraphes développés et fluides plutôt que multiplier les intertitres. Une FAQ répond uniquement aux questions non déjà résolues.',
 			'prompt_seo'         => 'Optimise uniquement les champs SEO demandés à partir de la recette validée. Le titre et la description doivent rester fidèles, naturels, non trompeurs et distincts de l’extrait. Ne produis aucune balise publique ni donnée inventée.',
-			'prompt_correction'  => 'Corrige seulement les défauts signalés par la relecture, en conservant les éléments déjà validés. Retourne un article complet au même schéma et conserve un historique avant/après des champs modifiés.',
-			'prompt_review'       => 'Tu es le relecteur qualité principal. Vérifie uniquement la recette canonique et l’article à ce stade : ingrédients, quantités, étapes, temps, portions, sécurité alimentaire, langue française, HTML, métadonnées SEO, originalité et absence de répétitions. Les images seront contrôlées séparément plus tard : ne signale jamais leur absence ici. Retourne uniquement un JSON avec pass obligatoirement booléen, findings (severity, field, reason, fix), corrected_artifact et uncertainties. Toute correction doit être justifiée ; ne valide pas une contradiction non résolue.',
-			'prompt_image'        => 'Tu es un photographe culinaire professionnel. Génère une image principale carrée 1:1, ultra réaliste et appétissante, fidèle aux ingrédients, aux textures et au dressage de la recette validée. Lumière naturelle, composition premium, arrière-plan propre, aucune personne, aucun texte, aucun logo, aucun filigrane. Respecte strictement les proportions et ne montre que le plat demandé.',
+			'prompt_correction'  => 'Corrige les défauts signalés par la relecture, en conservant les éléments déjà validés. Retourne uniquement un article complet au même schéma, sans historique ni commentaire de correction. Si une observation concerne les quantités ou temps canoniques, conserve les valeurs de la recette canonique transmise : le moteur corrige la recette dans une étape distincte.',
+			'prompt_review'       => 'Tu es le relecteur qualité principal. Vérifie recette canonique et article : ingrédients, quantités, étapes, temps, portions, sécurité alimentaire, langue française, HTML, métadonnées SEO et répétitions. Retourne un JSON compact avec pass (booléen), findings (severity, field, reason, fix), corrected_artifact (objet vide) et uncertainties (tableau). Ne réécris pas l’article : l’agent de correction reçoit tes observations. Signale les défauts concrets, pas les préférences stylistiques. Les images sont contrôlées à une étape séparée. Valide si les informations sont cohérentes et utilisables ; refuse les contradictions factuelles ou dangereuses. Refuse aussi le jargon de production dans les champs publics (recette canonique, formule canonique, texte éditeur), les longs passages répétitifs sans utilité (un rappel bref de sécurité ou de cuisson est acceptable) et les consignes invitant à goûter une pâte crue. Le champ canonical.uncertainties est privé : ne le traite jamais comme du contenu public. recipe_meta vide est normal, le moteur écrit les métadonnées depuis canonical. La FAQ de l’article peut compléter celle de la fiche sans reprendre les mêmes questions. Ne transforme pas une préférence de style ni une incertitude conditionnelle en défaut bloquant.',
+			'prompt_image'        => 'Tu es un photographe culinaire professionnel. Génère une image principale carrée 1:1, ultra réaliste et appétissante, fidèle aux ingrédients, aux textures et au dressage de la recette validée. Lumière naturelle, composition premium, arrière-plan propre, aucune personne, aucun texte, aucun logo, aucun filigrane. Respecte strictement les proportions et ne montre que le plat demandé. N’ajoute aucune garniture absente de la recette, notamment sucre glace, glaçage, herbes ou fruits. Toute part servie doit rester entièrement visible dans le cadre.',
 			'prompt_image_review' => 'Évalue cette image culinaire par rapport à la recette validée. Retourne uniquement un JSON avec pass (boolean), findings (severity, reason, fix), subject_match, visual_quality et uncertainties. Vérifie le plat, les ingrédients visibles, le cadrage, le ratio, les artefacts et l’absence de texte, logo ou filigrane. Ne déduis pas des détails invisibles.',
 			'prompt_image_correction' => 'Corrige uniquement les défauts visuels signalés ci-dessous tout en conservant la recette validée, le ratio demandé, une photographie culinaire réaliste, et l’absence de texte, logo ou filigrane. Ne copie ni ne reproduis une image de référence.',
 			'prompt_facebook_image' => "Act as a professional food photographer and Pinterest content creator.\n\nCreate a high-quality step-by-step food collage showing the complete preparation process of this recipe.\n\nSTYLE:\n\n• Ultra realistic food photography\n• Bright natural lighting\n• Clean modern kitchen aesthetic\n• Soft shadows and realistic textures\n• Elegant Pinterest-style composition\n• Premium food magazine look\n• Soft pastel or white background\n• Slight top-down angle\n• Highly appetizing and realistic\n\nLAYOUT:\n\n• Create a vertical collage with 6 square sections (2 columns × 3 rows)\n• Each image represents one important step of the recipe\n• Keep the same bowl, mold, plate, and visual consistency across all steps\n• Smooth visual progression from ingredients to final plated recipe\n\nIMAGES TO INCLUDE:\n\n1. Preparing the base or arranging ingredients\n2. Mixing cream, batter, sauce, or filling\n3. First assembly step\n4. Second assembly step\n5. Final decoration or topping\n6. Final finished recipe beautifully presented and sliced/opened\n\nFOOD DETAILS:\n\n• Ingredients must look fresh and realistic\n• Creams, sauces, fruits, chocolate, cheese, etc. should have rich texture\n• Add realistic cooking details (powdered sugar, glossy fruits, melted cheese, herbs, crumbs, steam if needed)\n• Keep proportions realistic\n\nTEXT:\n\n• No text\n• No watermark\n• No logo\n• No labels\n\nQUALITY:\n\n• Ultra detailed\n• Professional culinary photography\n• Pinterest viral aesthetic\n• 4K realistic rendering\n• Clean composition\n• Consistent colors and lighting\n\nThe final image must look exactly like a professional Pinterest recipe tutorial collage showing all preparation stages of the recipe.",
@@ -227,6 +242,8 @@ final class MSRWA_Settings {
 		$out['facebook_ratio'] = isset( $raw['facebook_ratio'] ) && in_array( $raw['facebook_ratio'], array( '4:5', '1:1', '2:3', '3:2' ), true ) ? $raw['facebook_ratio'] : $defaults['facebook_ratio'];
 		$out['image_quality'] = isset( $raw['image_quality'] ) && in_array( $raw['image_quality'], array( 'low', 'medium', 'high', 'xhigh', 'max', 'auto' ), true ) ? $raw['image_quality'] : $defaults['image_quality'];
 		$out['image_format'] = isset( $raw['image_format'] ) && in_array( $raw['image_format'], array( 'webp', 'jpeg', 'png' ), true ) ? $raw['image_format'] : $defaults['image_format'];
+		$out['facebook_image_fit'] = isset( $raw['facebook_image_fit'] ) && in_array( $raw['facebook_image_fit'], array( 'contain', 'cover' ), true ) ? $raw['facebook_image_fit'] : $defaults['facebook_image_fit'];
+		$out['image_padding_color'] = isset( $raw['image_padding_color'] ) && preg_match( '/^#[a-f0-9]{6}$/i', $raw['image_padding_color'] ) ? strtolower( $raw['image_padding_color'] ) : $defaults['image_padding_color'];
 		$out['research_fallback_provider'] = isset( $raw['research_fallback_provider'] ) && in_array( $raw['research_fallback_provider'], array( 'none', 'custom_json' ), true ) ? $raw['research_fallback_provider'] : $defaults['research_fallback_provider'];
 		if ( isset( $raw['research_fallback_url'] ) ) { $out['research_fallback_url'] = esc_url_raw( $raw['research_fallback_url'] ); }
 		$catalog = MSRWA_Catalog::models();
@@ -237,13 +254,16 @@ final class MSRWA_Settings {
 				if ( isset( $catalog[ $provider ][ $model ] ) && ! empty( $catalog[ $provider ][ $model ]['stable'] ) ) { $out['manual_models'][ $stage ] = $provider . ':' . $model; }
 			}
 		}
-		foreach ( array( 'max_batch' => array( 1, 50 ), 'max_concurrency' => array( 1, 4 ), 'max_corrections' => array( 0, 2 ), 'log_days' => array( 1, 365 ), 'temp_days' => array( 1, 90 ), 'aggregate_months' => array( 1, 60 ) ) as $key => $limits ) {
+		foreach ( array( 'max_batch' => array( 1, 50 ), 'max_concurrency' => array( 1, 4 ), 'max_corrections' => array( 0, 2 ), 'log_days' => array( 1, 365 ), 'temp_days' => array( 1, 90 ), 'aggregate_months' => array( 1, 60 ), 'research_fallback_max_results' => array( 1, 10 ) ) as $key => $limits ) {
 			$value = isset( $raw[ $key ] ) ? absint( $raw[ $key ] ) : $defaults[ $key ];
 			$out[ $key ] = min( $limits[1], max( $limits[0], $value ) );
 		}
 		foreach ( array( 'per_recipe_budget_usd', 'target_cost_usd', 'daily_budget_usd', 'monthly_budget_usd' ) as $key ) { $out[ $key ] = isset( $raw[ $key ] ) ? min( 100000, max( 0, (float) $raw[ $key ] ) ) : $defaults[ $key ]; }
 		$out['vision_reserve_usd'] = isset( $raw['vision_reserve_usd'] ) ? min( 1000, max( 0.001, (float) $raw['vision_reserve_usd'] ) ) : $defaults['vision_reserve_usd'];
+		$out['text_reserve_margin_usd'] = isset( $raw['text_reserve_margin_usd'] ) ? min( 1000, max( 0, (float) $raw['text_reserve_margin_usd'] ) ) : $defaults['text_reserve_margin_usd'];
 		$out['web_search_tool_cost_usd'] = isset( $raw['web_search_tool_cost_usd'] ) ? min( 1000, max( 0, (float) $raw['web_search_tool_cost_usd'] ) ) : $defaults['web_search_tool_cost_usd'];
+		$out['web_search_max_tool_calls'] = isset( $raw['web_search_max_tool_calls'] ) ? min( 10, max( 1, absint( $raw['web_search_max_tool_calls'] ) ) ) : $defaults['web_search_max_tool_calls'];
+		$out['research_fallback_cost_usd'] = isset( $raw['research_fallback_cost_usd'] ) ? min( 1000, max( 0, (float) $raw['research_fallback_cost_usd'] ) ) : $defaults['research_fallback_cost_usd'];
 		$out['featured_image_estimate_usd'] = isset( $raw['featured_image_estimate_usd'] ) ? min( 1000, max( 0.001, (float) $raw['featured_image_estimate_usd'] ) ) : $defaults['featured_image_estimate_usd'];
 		$out['facebook_image_estimate_usd'] = isset( $raw['facebook_image_estimate_usd'] ) ? min( 1000, max( 0.001, (float) $raw['facebook_image_estimate_usd'] ) ) : $defaults['facebook_image_estimate_usd'];
 		$out['max_reference_images'] = isset( $raw['max_reference_images'] ) ? min( 10, max( 0, absint( $raw['max_reference_images'] ) ) ) : $defaults['max_reference_images'];
@@ -251,10 +271,13 @@ final class MSRWA_Settings {
 		$out['visual_reference_max'] = isset( $raw['visual_reference_max'] ) ? min( 10, max( 0, absint( $raw['visual_reference_max'] ) ) ) : $defaults['visual_reference_max'];
 		$out['facebook_text'] = empty( $raw['facebook_text'] ) ? 0 : 1;
 		$out['internal_links_enabled'] = empty( $raw['internal_links_enabled'] ) ? 0 : 1;
+		$out['article_pagination_enabled'] = empty( $raw['article_pagination_enabled'] ) ? 0 : 1;
+		$out['article_pagination_min_words'] = isset( $raw['article_pagination_min_words'] ) ? min( 8000, max( 300, absint( $raw['article_pagination_min_words'] ) ) ) : $defaults['article_pagination_min_words'];
+		$out['article_pagination_split_percent'] = isset( $raw['article_pagination_split_percent'] ) ? min( 70, max( 30, absint( $raw['article_pagination_split_percent'] ) ) ) : $defaults['article_pagination_split_percent'];
 		$out['internal_links_max'] = isset( $raw['internal_links_max'] ) ? min( 10, max( 0, absint( $raw['internal_links_max'] ) ) ) : $defaults['internal_links_max'];
 		$out['internal_links_heading'] = isset( $raw['internal_links_heading'] ) ? sanitize_text_field( $raw['internal_links_heading'] ) : $defaults['internal_links_heading'];
 		$out['quality_min_score'] = isset( $raw['quality_min_score'] ) ? min( 100, max( 1, absint( $raw['quality_min_score'] ) ) ) : $defaults['quality_min_score'];
-		foreach ( array( 'quality_min_words' => array( 300, 8000 ), 'quality_max_words' => array( 500, 10000 ), 'quality_min_headings' => array( 3, 80 ), 'quality_min_paragraphs' => array( 5, 150 ), 'quality_min_ingredients' => array( 1, 50 ), 'quality_min_steps' => array( 1, 40 ), 'article_max_output_tokens' => array( 1000, 20000 ), 'review_max_output_tokens' => array( 500, 10000 ) ) as $key => $limits ) {
+		foreach ( array( 'quality_min_words' => array( 300, 8000 ), 'quality_max_words' => array( 500, 10000 ), 'quality_min_headings' => array( 3, 80 ), 'quality_min_paragraphs' => array( 5, 150 ), 'quality_min_ingredients' => array( 1, 50 ), 'quality_min_steps' => array( 1, 40 ), 'article_max_output_tokens' => array( 1000, 20000 ), 'review_max_output_tokens' => array( 500, 10000 ), 'research_max_output_tokens' => array( 500, 10000 ), 'association_max_output_tokens' => array( 200, 5000 ), 'canonical_max_output_tokens' => array( 500, 10000 ), 'router_max_output_tokens' => array( 100, 3000 ), 'vision_max_output_tokens' => array( 200, 5000 ), 'image_review_max_output_tokens' => array( 200, 5000 ) ) as $key => $limits ) {
 			$value = isset( $raw[ $key ] ) ? absint( $raw[ $key ] ) : $defaults[ $key ];
 			$out[ $key ] = min( $limits[1], max( $limits[0], $value ) );
 		}
@@ -262,6 +285,8 @@ final class MSRWA_Settings {
 		if ( isset( $raw['integration_mapping_json'] ) ) {
 			$mapping = json_decode( (string) $raw['integration_mapping_json'], true );
 			if ( is_array( $mapping ) ) { foreach ( $defaults['integration_mapping'] as $key => $fallback ) { if ( isset( $mapping[ $key ] ) ) { $out['integration_mapping'][ $key ] = sanitize_key( $mapping[ $key ] ); } } }
+		} elseif ( isset( $raw['integration_mapping'] ) && is_array( $raw['integration_mapping'] ) ) {
+			foreach ( $defaults['integration_mapping'] as $key => $fallback ) { if ( isset( $raw['integration_mapping'][ $key ] ) ) { $out['integration_mapping'][ $key ] = sanitize_key( $raw['integration_mapping'][ $key ] ); } }
 		}
 		foreach ( array( 'prompt_router', 'prompt_research', 'prompt_association', 'prompt_reference_vision', 'prompt_recipe', 'prompt_nutrition', 'prompt_article', 'prompt_seo', 'prompt_correction', 'prompt_review', 'prompt_image', 'prompt_image_review', 'prompt_image_correction', 'prompt_facebook_image' ) as $key ) {
 			if ( isset( $raw[ $key ] ) ) { $out[ $key ] = sanitize_textarea_field( $raw[ $key ] ); }

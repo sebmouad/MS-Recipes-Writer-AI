@@ -8,12 +8,13 @@ function esc_url_raw( $value ) { return filter_var( $value, FILTER_SANITIZE_URL 
 function absint( $value ) { return abs( (int) $value ); }
 function wp_strip_all_tags( $value ) { return strip_tags( (string) $value ); }
 function strip_shortcodes( $value ) { return (string) $value; }
-function is_wp_error( $value ) { return false; }
+function is_wp_error( $value ) { return $value instanceof WP_Error; }
 class WP_Error { public function __construct() {} }
 require dirname( __DIR__ ) . '/includes/class-msrwa-catalog.php';
 require dirname( __DIR__ ) . '/includes/class-msrwa-recipe.php';
 require dirname( __DIR__ ) . '/includes/class-msrwa-router.php';
 require dirname( __DIR__ ) . '/includes/class-msrwa-quality.php';
+require dirname( __DIR__ ) . '/includes/class-msrwa-publisher.php';
 
 class MSRWA_Settings {
 	public static function get() {
@@ -37,4 +38,11 @@ $quality = MSRWA_Quality::evaluate( $article, $canonical );
 if ( empty( $quality['pass'] ) || 100 !== $quality['score'] ) { throw new RuntimeException( 'Quality gate passing contract failed.' ); }
 $article['content_html'] = '<h2>Recette</h2><p>Trop court.</p>';
 if ( ! empty( MSRWA_Quality::evaluate( $article, $canonical )['pass'] ) ) { throw new RuntimeException( 'Quality gate rejection contract failed.' ); }
+$pagination_method = new ReflectionMethod( 'MSRWA_Publisher', 'apply_pagination' );
+$paginated = $pagination_method->invoke( null, $content, array( 'article_pagination_enabled' => 1, 'article_pagination_min_words' => 1000, 'article_pagination_split_percent' => 50 ) );
+if ( ! is_string( $paginated ) || 1 !== substr_count( $paginated, '<!--nextpage-->' ) ) { throw new RuntimeException( 'Two-page pagination contract failed.' ); }
+$single_page = $pagination_method->invoke( null, $paginated, array( 'article_pagination_enabled' => 0 ) );
+if ( ! is_string( $single_page ) || false !== strpos( $single_page, '<!--nextpage-->' ) ) { throw new RuntimeException( 'Pagination disable contract failed.' ); }
+$nested = $pagination_method->invoke( null, '<section>' . $content . '</section>', array( 'article_pagination_enabled' => 1, 'article_pagination_min_words' => 1000 ) );
+if ( ! is_wp_error( $nested ) ) { throw new RuntimeException( 'Pagination split inside an unclosed container.' ); }
 echo "MSRWA contracts OK\n";

@@ -10,7 +10,7 @@ final class MSRWA_OpenAI {
 		return ! empty( $settings['openai_key'] ) ? (string) $settings['openai_key'] : '';
 	}
 
-	public static function responses_text( $input, $model = '', $max_output_tokens = 512, $tools = array(), $required_tool = false ) {
+	public static function responses_text( $input, $model = '', $max_output_tokens = 512, $tools = array(), $required_tool = false, $json_output = false ) {
 		$key = self::key();
 		if ( '' === $key ) { return new WP_Error( 'missing_openai_key', 'Aucune clé OpenAI côté serveur.', array( 'status' => 400 ) ); }
 		$settings = MSRWA_Settings::get();
@@ -18,9 +18,12 @@ final class MSRWA_OpenAI {
 		$model = $model ? sanitize_text_field( $model ) : ( 0 === strpos( $manual_text, 'openai:' ) ? substr( $manual_text, 7 ) : $settings['openai_model'] );
 		$catalog = MSRWA_Catalog::models();
 		if ( empty( $catalog['openai'][ $model ]['stable'] ) ) { return new WP_Error( 'unsupported_openai_model', 'Modèle OpenAI non autorisé par le catalogue.', array( 'status' => 400 ) ); }
-		$payload = array( 'model' => $model, 'input' => sanitize_textarea_field( $input ), 'store' => false, 'max_output_tokens' => max( 16, absint( $max_output_tokens ) ) );
+		// Keep structured content intact; JSON encoding handles transport escaping.
+		$payload = array( 'model' => $model, 'input' => (string) $input, 'store' => false, 'max_output_tokens' => max( 16, absint( $max_output_tokens ) ) );
+		if ( $json_output && ! $tools ) { $payload['text'] = array( 'format' => array( 'type' => 'json_object' ) ); }
 		if ( $tools ) {
 			$payload['tools'] = array_values( $tools );
+			$payload['max_tool_calls'] = max( 1, absint( $settings['web_search_max_tool_calls'] ) );
 			if ( $required_tool ) { $payload['tool_choice'] = 'required'; }
 			$payload['include'] = array( 'web_search_call.action.sources' );
 		}
@@ -40,7 +43,9 @@ final class MSRWA_OpenAI {
 			return new WP_Error( 'openai_api_' . $code, $message, array( 'status' => $code >= 400 && $code < 600 ? $code : 502 ) );
 		}
 		$text = self::extract_text( $body );
-		return array( 'id' => isset( $body['id'] ) ? sanitize_text_field( $body['id'] ) : '', 'text' => $text, 'sources' => self::extract_sources( $body ), 'usage' => isset( $body['usage'] ) && is_array( $body['usage'] ) ? $body['usage'] : array(), 'model' => $model );
+		$tool_calls = array_values( array_filter( (array) ( $body['output'] ?? array() ), static function ( $item ) { return 'web_search_call' === ( $item['type'] ?? '' ); } ) );
+		$search_calls = count( array_filter( $tool_calls, static function ( $item ) { return 'search' === ( $item['action']['type'] ?? '' ); } ) );
+		return array( 'id' => isset( $body['id'] ) ? sanitize_text_field( $body['id'] ) : '', 'text' => $text, 'search_calls' => $search_calls, 'tool_calls' => $tool_calls, 'sources' => self::extract_sources( $body ), 'usage' => isset( $body['usage'] ) && is_array( $body['usage'] ) ? $body['usage'] : array(), 'model' => $model, 'response_status' => sanitize_key( $body['status'] ?? 'completed' ), 'incomplete_details' => isset( $body['incomplete_details'] ) && is_array( $body['incomplete_details'] ) ? $body['incomplete_details'] : array() );
 	}
 
 	public static function extract_text( $body ) {

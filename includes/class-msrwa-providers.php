@@ -97,12 +97,12 @@ final class MSRWA_Providers {
 		return true;
 	}
 
-	public static function text( $provider, $model, $input, $max_tokens = 1200, $search = false ) {
+	public static function text( $provider, $model, $input, $max_tokens = 1200, $search = false, $json_output = false ) {
 		if ( 'openai' === $provider ) {
 			$tools = $search ? array( array( 'type' => 'web_search' ) ) : array();
-			return MSRWA_OpenAI::responses_text( $input, $model, $max_tokens, $tools, $search );
+			return MSRWA_OpenAI::responses_text( $input, $model, $max_tokens, $tools, $search, $json_output );
 		}
-		if ( 'gemini' === $provider ) { return self::gemini( $model, $input, $max_tokens, $search ); }
+		if ( 'gemini' === $provider ) { return self::gemini( $model, $input, $max_tokens, $search, $json_output ); }
 		if ( 'claude' === $provider ) {
 			if ( $search ) { return new WP_Error( 'claude_search_pending', 'La recherche native Claude doit être activée et vérifiée dans le compte.', array( 'status' => 409 ) ); }
 			return self::claude( $model, $input, $max_tokens );
@@ -122,7 +122,7 @@ final class MSRWA_Providers {
 		return MSRWA_OpenAI::vision_text( $prompt, $image_path, $model, $max_tokens );
 	}
 
-	private static function gemini( $model, $input, $max_tokens, $search ) {
+	private static function gemini( $model, $input, $max_tokens, $search, $json_output ) {
 		$settings = MSRWA_Settings::get();
 		$key = defined( 'MSRWA_GEMINI_KEY' ) && MSRWA_GEMINI_KEY ? MSRWA_GEMINI_KEY : ( getenv( 'MSRWA_GEMINI_KEY' ) ?: $settings['gemini_key'] );
 		if ( ! $key ) { return new WP_Error( 'missing_gemini_key', 'Aucune clé Gemini côté serveur.', array( 'status' => 400 ) ); }
@@ -130,8 +130,9 @@ final class MSRWA_Providers {
 			'contents' => array(
 				array( 'role' => 'user', 'parts' => array( array( 'text' => sanitize_textarea_field( $input ) ) ) ),
 			),
-			'generationConfig' => array( 'maxOutputTokens' => max( 16, absint( $max_tokens ) ), 'responseMimeType' => 'application/json' ),
+			'generationConfig' => array( 'maxOutputTokens' => max( 16, absint( $max_tokens ) ) ),
 		);
+		if ( $json_output ) { $payload['generationConfig']['responseMimeType'] = 'application/json'; }
 		if ( $search ) { $payload['tools'] = array( array( 'google_search' => new stdClass() ) ); }
 		$url = self::gemini_endpoint( $model, $key );
 		if ( is_wp_error( $url ) ) { return $url; }

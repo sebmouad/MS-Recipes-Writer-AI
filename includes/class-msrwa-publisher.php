@@ -2,12 +2,22 @@
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
 final class MSRWA_Publisher {
-	public static function create_draft( $job, $artifacts ) {
+	public static function create_draft( $job, $artifacts, $allow_partial = false ) {
 		global $wpdb;
 		$article = isset( $artifacts['article'] ) && is_array( $artifacts['article'] ) ? $artifacts['article'] : array();
 		$canonical = isset( $artifacts['canonical'] ) && is_array( $artifacts['canonical'] ) ? $artifacts['canonical'] : array();
-		if ( empty( $article['title'] ) || empty( $article['content_html'] ) ) { return new WP_Error( 'draft_content_missing', 'L’article validé ne contient pas le titre ou le contenu.' ); }
-		$post_id = absint( isset( $job->draft_post_id ) ? $job->draft_post_id : 0 );
+		if ( $allow_partial && empty( $article['title'] ) ) { $article['title'] = $job->title; }
+		if ( $allow_partial && empty( $article['content_html'] ) ) {
+			$input = json_decode( (string) $job->input_json, true );
+			$article['content_html'] = wpautop( esc_html( (string) ( $input['source_text'] ?? $input['text'] ?? '' ) ) );
+		}
+		if ( empty( $article['title'] ) || ( ! $allow_partial && empty( $article['content_html'] ) ) ) { return new WP_Error( 'draft_content_missing', 'L’article ne contient pas le titre ou le contenu.' ); }
+		// Re-read the link in case a previous write succeeded before its worker stopped.
+		$post_id = absint( $wpdb->get_var( $wpdb->prepare( 'SELECT draft_post_id FROM ' . MSRWA_DB::tables()['jobs'] . ' WHERE id=%d', $job->id ) ) );
+		if ( $post_id ) {
+			$existing = get_post( $post_id );
+			if ( ! $existing || 'draft' !== $existing->post_status ) { return new WP_Error( 'draft_not_editable', 'Le contenu lié n’est plus un brouillon ; aucune modification automatique effectuée.' ); }
+		}
 		$link_specs = self::internal_link_specs( isset( $article['internal_links'] ) ? $article['internal_links'] : array(), isset( $artifacts['internal_link_candidates'] ) ? $artifacts['internal_link_candidates'] : array() );
 		$content = self::sanitize_content( (string) $article['content_html'], $link_specs );
 		$content = self::append_internal_links( $content, $link_specs );
@@ -15,6 +25,11 @@ final class MSRWA_Publisher {
 		if ( isset( $canonical['calories_estimate'] ) && '' !== (string) $canonical['calories_estimate'] ) {
 			$content .= '<p class="msrwa-nutrition-note">Valeurs nutritionnelles estimées par IA ; elles ne remplacent pas une analyse nutritionnelle professionnelle.</p>';
 		}
+		$paginated = self::apply_pagination( $content, MSRWA_Settings::get() );
+		if ( is_wp_error( $paginated ) ) {
+			if ( ! $allow_partial ) { return $paginated; }
+			$artifacts['delivery_findings'][] = array( 'severity' => 'warning', 'field' => 'pagination', 'reason' => $paginated->get_error_message() );
+		} else { $content = $paginated; }
 		$author_id = self::author_id( $job );
 		if ( is_wp_error( $author_id ) ) { return $author_id; }
 		$post_data = array(
@@ -42,15 +57,33 @@ final class MSRWA_Publisher {
 		self::write_taxonomies( $post_id, $article );
 		self::write_facebook_meta( $post_id, $article, $artifacts );
 		self::write_provenance( $post_id, $job, $artifacts );
+		$report = self::editorial_report( $artifacts, $allow_partial );
+		MSRWA_DB::store_artifact( $job->id, $job->batch_id, 'editorial_review', $report );
+		update_post_meta( $post_id, '_msrwa_job_id', absint( $job->id ) );
 		if ( ! empty( $artifacts['featured_image']['attachment_id'] ) ) {
 			set_post_thumbnail( $post_id, absint( $artifacts['featured_image']['attachment_id'] ) );
 		}
 		if ( ! empty( $artifacts['facebook_image']['attachment_id'] ) ) {
 			update_post_meta( $post_id, '_msrwa_facebook_image_id', absint( $artifacts['facebook_image']['attachment_id'] ) );
 		}
+		if ( $allow_partial ) { return (int) $post_id; }
 		$verified = self::verify_draft( $post_id, $article, $canonical, $artifacts );
 		if ( is_wp_error( $verified ) ) { return $verified; }
 		return (int) $post_id;
+	}
+
+	public static function editorial_report( $artifacts, $requires_review = false ) {
+		$quality = (array) ( $artifacts['quality_report'] ?? array() );
+		$findings = array_merge( (array) ( $quality['findings'] ?? array() ), (array) ( $artifacts['review']['findings'] ?? array() ), (array) ( $artifacts['delivery_findings'] ?? array() ) );
+		foreach ( array( 'featured_image', 'facebook_image' ) as $key ) {
+			if ( empty( $artifacts[ $key ]['attachment_id'] ) ) { $requires_review = true; $findings[] = array( 'severity' => 'warning', 'field' => $key, 'reason' => 'Image non disponible.' ); }
+			foreach ( (array) ( $artifacts['image_reviews'][ $key ]['findings'] ?? array() ) as $finding ) { if ( is_array( $finding ) ) { $finding['field'] = $key; $findings[] = $finding; } }
+			if ( true !== ( $artifacts['image_reviews'][ $key ]['pass'] ?? null ) ) { $requires_review = true; }
+		}
+		if ( empty( $quality['pass'] ) || true !== ( $artifacts['review']['pass'] ?? null ) || empty( $artifacts['article']['content_html'] ) ) { $requires_review = true; }
+		$unique = array();
+		foreach ( $findings as $finding ) { if ( is_array( $finding ) ) { $unique[ hash( 'sha256', wp_json_encode( $finding ) ) ] = $finding; } }
+		return array( 'status' => $requires_review ? 'needs_review' : 'checks_passed', 'score' => isset( $quality['score'] ) ? (int) $quality['score'] : null, 'article_available' => ! empty( $artifacts['article']['content_html'] ), 'text_review_passed' => true === ( $artifacts['review']['pass'] ?? null ), 'findings' => array_values( $unique ), 'metrics' => $quality['metrics'] ?? array(), 'generated_at' => current_time( 'mysql', true ) );
 	}
 
 	private static function author_id( $job ) {
@@ -69,6 +102,10 @@ final class MSRWA_Publisher {
 	private static function verify_draft( $post_id, $article, $canonical, $artifacts ) {
 		$post = get_post( $post_id );
 		if ( ! $post || 'draft' !== $post->post_status || 'post' !== $post->post_type ) { return new WP_Error( 'draft_write_failed', 'Le brouillon WordPress n’a pas été enregistré dans l’état attendu.' ); }
+		$settings = MSRWA_Settings::get();
+		$page_breaks = substr_count( (string) $post->post_content, '<!--nextpage-->' );
+		if ( ! empty( $settings['article_pagination_enabled'] ) && 1 !== $page_breaks ) { return new WP_Error( 'draft_pagination_missing', 'La division de l’article en deux pages n’a pas été enregistrée correctement.' ); }
+		if ( empty( $settings['article_pagination_enabled'] ) && 0 !== $page_breaks ) { return new WP_Error( 'draft_pagination_unexpected', 'Une division de page est présente alors que ce réglage est désactivé.' ); }
 		$mapping = MSRWA_Settings::get()['integration_mapping'];
 		foreach ( array( 'prep_minutes', 'cook_minutes', 'servings', 'calories_estimate', 'cuisine', 'difficulty' ) as $field ) {
 			$key = isset( $mapping[ $field ] ) ? $mapping[ $field ] : '';
@@ -91,6 +128,41 @@ final class MSRWA_Publisher {
 			if ( ! is_array( $stored ) || absint( $stored[0]['id'] ?? 0 ) !== $facebook ) { return new WP_Error( 'draft_facebook_meta_missing', 'La référence Facebook n’a pas été enregistrée correctement.' ); }
 		}
 		return true;
+	}
+
+	private static function apply_pagination( $content, $settings ) {
+		$content = preg_replace( '/\s*<!--\s*nextpage\s*-->\s*/i', "\n", (string) $content );
+		if ( empty( $settings['article_pagination_enabled'] ) ) { return $content; }
+		$words = preg_match_all( '/\p{L}+(?:[’\'-]\p{L}+)*/u', wp_strip_all_tags( $content ) );
+		$minimum = max( 300, absint( $settings['article_pagination_min_words'] ?? 1000 ) );
+		if ( $words < $minimum ) { return new WP_Error( 'article_too_short_for_pagination', 'L’article est trop court pour être divisé proprement en deux pages.' ); }
+		$ratio = min( 70, max( 30, absint( $settings['article_pagination_split_percent'] ?? 50 ) ) ) / 100;
+		if ( ! class_exists( 'DOMDocument' ) ) { return new WP_Error( 'article_parser_missing', 'L’extension DOM est nécessaire pour diviser le contenu sans casser le HTML.' ); }
+		$document = new DOMDocument( '1.0', 'UTF-8' );
+		$previous_errors = libxml_use_internal_errors( true );
+		$document->loadHTML( '<?xml encoding="UTF-8"><html><body><div id="msrwa-pagination-root">' . $content . '</div></body></html>', LIBXML_NONET );
+		libxml_clear_errors();
+		libxml_use_internal_errors( $previous_errors );
+		$root = $document->getElementById( 'msrwa-pagination-root' );
+		if ( ! $root ) { return new WP_Error( 'article_parser_failed', 'Impossible de déterminer les limites du contenu.' ); }
+		$content = '';
+		$boundaries = array();
+		foreach ( $root->childNodes as $node ) {
+			if ( $node instanceof DOMElement ) { $boundaries[] = array( 'offset' => strlen( $content ), 'tag' => strtolower( $node->tagName ) ); }
+			$content .= $document->saveHTML( $node );
+		}
+		$target = (int) round( strlen( $content ) * $ratio );
+		$candidates = array();
+		foreach ( array( array( 'h2' ), array( 'h3', 'section', 'article', 'div' ), array( 'p', 'ul', 'ol' ) ) as $tags ) {
+			foreach ( $boundaries as $boundary ) {
+				if ( in_array( $boundary['tag'], $tags, true ) && $boundary['offset'] > strlen( $content ) * 0.30 && $boundary['offset'] < strlen( $content ) * 0.75 ) { $candidates[] = $boundary['offset']; }
+			}
+			if ( $candidates ) { break; }
+		}
+		if ( ! $candidates ) { return new WP_Error( 'article_pagination_boundary_missing', 'Aucun intertitre sûr ne permet de diviser cet article en deux pages.' ); }
+		usort( $candidates, static function ( $a, $b ) use ( $target ) { return abs( $a - $target ) <=> abs( $b - $target ); } );
+		$offset = (int) reset( $candidates );
+		return substr( $content, 0, $offset ) . "\n<!--nextpage-->\n" . substr( $content, $offset );
 	}
 
 	private static function sanitize_content( $content, $internal_links ) {

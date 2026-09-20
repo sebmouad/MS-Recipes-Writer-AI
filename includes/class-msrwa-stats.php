@@ -39,14 +39,14 @@ final class MSRWA_Stats {
 			$event_where .= ' AND (j.owner_id = %d OR b.owner_id = %d)'; $event_args[] = absint( $owner_id ); $event_args[] = absint( $owner_id );
 		}
 		$status_sql = "SELECT j.status, COUNT(*) AS count, COALESCE(SUM(j.cost_estimate),0) AS cost FROM {$t['jobs']} j WHERE {$job_where} GROUP BY j.status ORDER BY count DESC";
-		$performance_sql = "SELECT SUM(j.status = 'completed') AS completed, SUM(j.status IN ('failed','needs_review')) AS failed, COALESCE(SUM(CASE WHEN j.status = 'completed' THEN j.cost_estimate ELSE 0 END),0) AS completed_cost, AVG(CASE WHEN j.status = 'completed' THEN TIMESTAMPDIFF(SECOND, j.created_at, j.updated_at) ELSE NULL END) AS average_completed_seconds, MAX(CASE WHEN j.status = 'completed' THEN TIMESTAMPDIFF(SECOND, j.created_at, j.updated_at) ELSE NULL END) AS max_completed_seconds FROM {$t['jobs']} j WHERE {$job_where}";
+		$performance_sql = "SELECT SUM(j.status IN ('completed','needs_review')) AS completed, SUM(j.status IN ('failed','needs_review')) AS failed, COALESCE(SUM(CASE WHEN j.status IN ('completed','needs_review') THEN j.cost_estimate ELSE 0 END),0) AS completed_cost, AVG(CASE WHEN j.status IN ('completed','needs_review') THEN TIMESTAMPDIFF(SECOND, j.created_at, j.updated_at) ELSE NULL END) AS average_completed_seconds, MAX(CASE WHEN j.status IN ('completed','needs_review') THEN TIMESTAMPDIFF(SECOND, j.created_at, j.updated_at) ELSE NULL END) AS max_completed_seconds FROM {$t['jobs']} j WHERE {$job_where}";
 		$operation_sql = "SELECT c.operation, c.status, COUNT(*) AS count, COALESCE(SUM(c.input_tokens),0) AS input_tokens, COALESCE(SUM(c.output_tokens),0) AS output_tokens, COALESCE(SUM(c.cost_estimate),0) AS cost FROM {$t['calls']} c INNER JOIN {$t['jobs']} j ON j.id = c.job_id WHERE {$call_where} GROUP BY c.operation, c.status ORDER BY cost DESC, count DESC";
 		$event_sql = "SELECT e.event_type, COUNT(*) AS count FROM {$t['events']} e LEFT JOIN {$t['jobs']} j ON j.id = e.job_id LEFT JOIN {$t['batches']} b ON b.id = e.batch_id WHERE {$event_where} GROUP BY e.event_type ORDER BY count DESC, e.event_type ASC";
 		$statuses = $job_args ? $wpdb->get_results( $wpdb->prepare( $status_sql, $job_args ), ARRAY_A ) : $wpdb->get_results( $status_sql, ARRAY_A );
 		$performance = $job_args ? $wpdb->get_row( $wpdb->prepare( $performance_sql, $job_args ), ARRAY_A ) : $wpdb->get_row( $performance_sql, ARRAY_A );
 		$operations = $call_args ? $wpdb->get_results( $wpdb->prepare( $operation_sql, $call_args ), ARRAY_A ) : $wpdb->get_results( $operation_sql, ARRAY_A );
 		$events = $event_args ? $wpdb->get_results( $wpdb->prepare( $event_sql, $event_args ), ARRAY_A ) : $wpdb->get_results( $event_sql, ARRAY_A );
-		$recent_sql = "SELECT j.id,j.batch_id,j.title,j.status,j.stage,j.cost_estimate,j.correction_cycles,j.attempts,j.created_at,j.updated_at,a.content_json AS quality_json FROM {$t['jobs']} j LEFT JOIN {$t['artifacts']} a ON a.job_id = j.id AND a.artifact_key = 'quality_report' AND a.status = 'current' WHERE {$job_where} ORDER BY j.id DESC LIMIT 25";
+		$recent_sql = "SELECT j.id,j.batch_id,j.title,j.status,j.stage,j.artifacts_json,j.cost_estimate,j.correction_cycles,j.attempts,j.retry_attempts,j.created_at,j.updated_at,a.content_json AS quality_json FROM {$t['jobs']} j LEFT JOIN {$t['artifacts']} a ON a.job_id = j.id AND a.artifact_key = 'quality_report' AND a.status = 'current' WHERE {$job_where} ORDER BY j.id DESC LIMIT 25";
 		$recent_jobs = $job_args ? $wpdb->get_results( $wpdb->prepare( $recent_sql, $job_args ), ARRAY_A ) : $wpdb->get_results( $recent_sql, ARRAY_A );
 		$quality_sql = "SELECT j.cost_estimate,a.content_json AS quality_json FROM {$t['jobs']} j LEFT JOIN {$t['artifacts']} a ON a.job_id = j.id AND a.artifact_key = 'quality_report' AND a.status = 'current' WHERE {$job_where}";
 		$quality_rows = $job_args ? $wpdb->get_results( $wpdb->prepare( $quality_sql, $job_args ), ARRAY_A ) : $wpdb->get_results( $quality_sql, ARRAY_A );
@@ -65,6 +65,9 @@ final class MSRWA_Stats {
 		foreach ( $recent_jobs as &$recent ) {
 			$report = json_decode( (string) $recent['quality_json'], true );
 			$recent['quality'] = is_array( $report ) ? $report : array();
+			$recent['display_quality'] = MSRWA_Presentation::quality( $recent );
+			$recent['display_status'] = MSRWA_Presentation::state( $recent['status'] );
+			unset( $recent['artifacts_json'] );
 			unset( $recent['quality_json'] );
 		}
 		unset( $recent );
@@ -74,7 +77,7 @@ final class MSRWA_Stats {
 		$quality['target_cost_usd'] = $target_cost;
 		$editors = array();
 		if ( ! $owner_id ) {
-			$editors = $wpdb->get_results( "SELECT j.owner_id, COUNT(*) AS jobs, SUM(j.status = 'completed') AS completed, COALESCE(SUM(j.cost_estimate),0) AS cost FROM {$t['jobs']} j WHERE j.created_at >= UTC_TIMESTAMP() - INTERVAL {$days} DAY GROUP BY j.owner_id ORDER BY cost DESC, jobs DESC", ARRAY_A );
+			$editors = $wpdb->get_results( "SELECT j.owner_id, COUNT(*) AS jobs, SUM(j.status IN ('completed','needs_review')) AS completed, COALESCE(SUM(j.cost_estimate),0) AS cost FROM {$t['jobs']} j WHERE j.created_at >= UTC_TIMESTAMP() - INTERVAL {$days} DAY GROUP BY j.owner_id ORDER BY cost DESC, jobs DESC", ARRAY_A );
 			foreach ( $editors as &$editor ) {
 				$user = get_userdata( (int) $editor['owner_id'] );
 				$editor['name'] = $user ? $user->display_name : sprintf( 'Utilisateur #%d', (int) $editor['owner_id'] );
@@ -136,7 +139,7 @@ final class MSRWA_Stats {
 		$where = '';
 		$columns = array();
 		if ( 'jobs' === $dataset ) {
-			$columns = array( 'id', 'batch_id', 'owner_id', 'title', 'status', 'stage', 'correction_cycles', 'attempts', 'cost_estimate', 'draft_post_id', 'error_code', 'created_at', 'updated_at' );
+			$columns = array( 'id', 'batch_id', 'owner_id', 'title', 'status', 'stage', 'correction_cycles', 'attempts', 'retry_attempts', 'cost_estimate', 'draft_post_id', 'error_code', 'created_at', 'updated_at' );
 			$where = 'created_at >= %s AND created_at < %s';
 			if ( $owner_id ) { $where .= ' AND owner_id = %d'; $args[] = absint( $owner_id ); }
 			$sql = "SELECT " . implode( ',', $columns ) . " FROM {$t['jobs']} WHERE {$where} ORDER BY id ASC LIMIT %d OFFSET %d";
