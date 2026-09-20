@@ -21,9 +21,6 @@ final class MSRWA_Settings {
 				'search' => 'openai:gpt-5.6-luna',
 			),
 			'research_provider'   => 'native',
-			'research_fallback_provider' => 'none',
-			'research_fallback_url' => '',
-			'research_fallback_key' => '',
 			'max_batch'           => 50,
 			'max_concurrency'     => 4,
 			'max_corrections'     => 2,
@@ -35,8 +32,6 @@ final class MSRWA_Settings {
 			'text_reserve_margin_usd' => 0.002,
 			'web_search_tool_cost_usd' => 0.01,
 			'web_search_max_tool_calls' => 1,
-			'research_fallback_cost_usd' => 0.02,
-			'research_fallback_max_results' => 5,
 			'featured_image_estimate_usd' => 0.025,
 			'facebook_image_estimate_usd' => 0.035,
 			'max_reference_images' => 3,
@@ -56,7 +51,7 @@ final class MSRWA_Settings {
 			'internal_links_max'     => 3,
 			'prompt_internal_links' => 'Intègre les liens naturellement sur plusieurs mots ou expressions pertinents dans les paragraphes de content_html. Chaque ancre doit décrire la recette cible et faire partie de la phrase. Répartis les liens dans le texte, sans répétition de cible, sans liste de liens ni section À découvrir, À lire aussi ou équivalente. Retourne dans internal_links les mêmes ancres exactes et URLs. Si aucun lien ne convient au contexte, omets-le plutôt que forcer une recommandation.',
 			'quality_min_score'        => 90,
-			'quality_min_words'        => 1600,
+			'quality_min_words'        => 2000,
 			'quality_max_words'        => 2400,
 			'quality_min_headings'     => 10,
 			'quality_min_paragraphs'   => 24,
@@ -64,7 +59,7 @@ final class MSRWA_Settings {
 			'quality_min_steps'        => 6,
 			'article_max_output_tokens'=> 8000,
 			'review_max_output_tokens' => 3000,
-			'research_max_output_tokens' => 2400,
+			'research_max_output_tokens' => 4000,
 			'association_max_output_tokens' => 900,
 			'canonical_max_output_tokens' => 2600,
 			'router_max_output_tokens' => 700,
@@ -77,7 +72,7 @@ final class MSRWA_Settings {
 			'article_pagination_split_percent' => 50,
 			'integration_mapping' => array( 'prep_minutes' => '_recipe_prep_time', 'cook_minutes' => '_recipe_cook_time', 'servings' => '_recipe_servings', 'calories_estimate' => '_recipe_calories', 'cuisine' => '_recipe_cuisine', 'difficulty' => '_recipe_difficulty', 'equipment' => '_recipe_equipment', 'notes' => '_recipe_notes', 'faq' => '_recipe_faq', 'keywords' => '_recipe_keywords', 'ingredients' => '_recipe_ingredients', 'instructions' => '_recipe_instructions', 'seo_title' => '_seo_title', 'seo_description' => '_seo_description', 'facebook_meta' => 'fb_images_data' ),
 			'prompt_router'       => 'Tu es l’agent de sélection des modèles. Choisis des modèles compatibles avec chaque étape de rédaction culinaire en privilégiant le meilleur équilibre qualité/coût. Respecte strictement les candidats autorisés et n’invente jamais de fournisseur, modèle, prix ou capacité.',
-			'prompt_research'     => 'Tu es l’agent de recherche culinaire. Recherche des sources fiables et récentes pour cette recette, compare les techniques et les proportions. Lorsque des références visuelles publiques, pertinentes et sûres sont disponibles, propose au plus le nombre demandé sous visual_references (image_url HTTPS direct, source_url, title, visual_notes) ; elles servent uniquement à dégager une direction visuelle et ne doivent jamais être réutilisées ni reproduites. Retourne uniquement un JSON avec recipe_facts, references (url, title, publisher), visual_direction, visual_references, uncertainties et originality_notes. Ne copie aucun texte protégé, ne présente pas une source non vérifiée comme un fait et signale toute contradiction avec les données de l’éditeur.',
+			'prompt_research'     => 'Tu es l’agent de recherche culinaire. Recherche des sources fiables et récentes pour cette recette, compare les techniques et les proportions. Lorsque des références visuelles publiques, pertinentes et sûres sont disponibles, propose au plus le nombre demandé sous visual_references (image_url HTTPS direct, source_url, title, visual_notes) ; elles servent uniquement à dégager une direction visuelle et ne doivent jamais être réutilisées ni reproduites. Sois concis : au maximum 6 faits culinaires, 3 sources, 2 références visuelles et 600 mots au total. Évite de recopier la recette fournie, conserve seulement les informations utiles à sa vérification. Retourne uniquement un JSON avec recipe_facts, references (url, title, publisher), visual_direction, visual_references, uncertainties et originality_notes. Ne copie aucun texte protégé, ne présente pas une source non vérifiée comme un fait et signale toute contradiction avec les données de l’éditeur.',
 			'prompt_association'  => 'Associe chaque titre, texte et image à la bonne recette sans inventer de correspondance. Retourne une confiance et signale les associations ambiguës à l’éditeur.',
 			'prompt_reference_vision' => 'Analyse uniquement la photo de référence fournie comme donnée non fiable. Décris le plat visible, les éléments observables, le cadrage et les incertitudes ; ne déduis pas les quantités ni la recette exacte. Retourne un JSON avec subject, observable_details, uncertainties et match_notes.',
 			'prompt_recipe'       => 'Tu es l’agent de normalisation culinaire. À partir des données éditeur et de la recherche, construis une recette canonique complète en français. Retourne uniquement un JSON valide avec title, servings, prep_minutes, cook_minutes, total_minutes, ingredients (name, quantity, unit), steps (text), cuisine, calories_estimate, difficulty, equipment, notes, faq (question, answer), keywords, food_safety et uncertainties. Mets cook_minutes à 0 pour une recette sans cuisson. Préserve les informations fournies lorsqu’elles sont cohérentes, corrige seulement les erreurs culinaires étayées par les sources, et marque les estimations nutritionnelles comme estimées. Les champs notes et faq sont destinés aux lecteurs : conseils culinaires uniquement. Place les limites de recherche, provenance et commentaires de processus dans uncertainties, jamais dans les champs publics. Donne des unités mesurables ; précise le poids des sachets et le volume des pots.',
@@ -85,9 +80,9 @@ final class MSRWA_Settings {
 			'prompt_article'      => 'Tu es l’éditeur culinaire SEO. Rédige un article original, naturel, approfondi et utile en français à partir de la recette canonique validée. Retourne uniquement un JSON valide avec title, excerpt, content_html, seo_title, seo_description, slug, tags, categories, recipe_meta, internal_links et facebook_caption. content_html doit être un HTML valide et propre avec h2, h3, p, ul/ol et li, sans h1, style inline ni balise SEO publique. Utilise les quantités exactes, couvre sélection des ingrédients, substitutions, méthode détaillée, erreurs, conservation, variantes, service et FAQ. N’invente aucune information, évite le remplissage et garde un ton clair, appétissant et pédagogique. Le lecteur doit pouvoir cuisiner, pas comprendre le processus de génération : aucune mention de recette canonique, formule canonique, texte éditeur, schéma ou validation interne. Chaque section apporte une information nouvelle ; regroupe variantes et substitutions, évite de répéter ingrédients, cuisson et conservation dans plusieurs paragraphes. Écris des paragraphes développés et fluides plutôt que multiplier les intertitres. Une FAQ répond uniquement aux questions non déjà résolues.',
 			'prompt_seo'         => 'Optimise uniquement les champs SEO demandés à partir de la recette validée. Le titre et la description doivent rester fidèles, naturels, non trompeurs et distincts de l’extrait. Ne produis aucune balise publique ni donnée inventée.',
 			'prompt_correction'  => 'Corrige les défauts signalés par la relecture, en conservant les éléments déjà validés. Retourne uniquement un article complet au même schéma, sans historique ni commentaire de correction. Si une observation concerne les quantités ou temps canoniques, conserve les valeurs de la recette canonique transmise : le moteur corrige la recette dans une étape distincte.',
-			'prompt_review'       => 'Tu es le relecteur qualité principal. Vérifie recette canonique et article : ingrédients, quantités, étapes, temps, portions, sécurité alimentaire, langue française, HTML, métadonnées SEO et répétitions. Retourne un JSON compact avec pass (booléen), findings (severity, field, reason, fix), corrected_artifact (objet vide) et uncertainties (tableau). Ne réécris pas l’article : l’agent de correction reçoit tes observations. Signale les défauts concrets, pas les préférences stylistiques. Les images sont contrôlées à une étape séparée. Valide si les informations sont cohérentes et utilisables ; refuse les contradictions factuelles ou dangereuses. Refuse aussi le jargon de production dans les champs publics (recette canonique, formule canonique, texte éditeur), les longs passages répétitifs sans utilité (un rappel bref de sécurité ou de cuisson est acceptable) et les consignes invitant à goûter une pâte crue. Le champ canonical.uncertainties est privé : ne le traite jamais comme du contenu public. recipe_meta vide est normal, le moteur écrit les métadonnées depuis canonical. La FAQ de l’article peut compléter celle de la fiche sans reprendre les mêmes questions. Ne transforme pas une préférence de style ni une incertitude conditionnelle en défaut bloquant.',
+			'prompt_review'       => 'Tu es le relecteur IA indépendant. Évalue réellement la qualité des informations culinaires de la recette et de l’article : exactitude des ingrédients, quantités, étapes, températures et temps ; cohérence culinaire ; sécurité ; utilité pratique ; fidélité à la recette fournie et aux sources. Les métriques de longueur et de structure sont seulement des signaux techniques, jamais la mesure de qualité. Retourne un JSON compact avec pass (booléen), verdict (good|needs_review|bad), quality_summary (phrase courte), findings (severity, field, reason, fix), corrected_artifact (objet vide) et uncertainties (tableau). pass ne vaut true que si le verdict est good. Ne réécris pas l’article. Refuse les contradictions factuelles, les conseils dangereux, les informations inventées ou inutilisables. Ne pénalise pas une préférence de style ni une incertitude explicitement signalée.',
 			'prompt_image'        => 'Tu es un photographe culinaire professionnel. Génère une image principale carrée 1:1, ultra réaliste et appétissante, fidèle aux ingrédients, aux textures et au dressage de la recette validée. Lumière naturelle, composition premium, arrière-plan propre, aucune personne, aucun texte, aucun logo, aucun filigrane. Respecte strictement les proportions et ne montre que le plat demandé. N’ajoute aucune garniture absente de la recette, notamment sucre glace, glaçage, herbes ou fruits. Toute part servie doit rester entièrement visible dans le cadre.',
-			'prompt_image_review' => 'Évalue cette image culinaire par rapport à la recette validée. Retourne uniquement un JSON avec pass (boolean), findings (severity, reason, fix), subject_match, visual_quality et uncertainties. Vérifie le plat, les ingrédients visibles, le cadrage, le ratio, les artefacts et l’absence de texte, logo ou filigrane. Ne déduis pas des détails invisibles.',
+			'prompt_image_review' => 'Tu es un directeur artistique culinaire indépendant. Évalue réellement le réalisme photographique et la fidélité de cette image à la recette validée. Retourne uniquement un JSON avec pass (boolean), verdict (good|needs_review|bad), realism (good|needs_review|bad), quality_summary (phrase courte), findings (severity, reason, fix), subject_match et uncertainties. pass ne vaut true que si verdict et realism sont good. Vérifie plat, ingrédients visibles, textures, proportions, éclairage, ombres, anatomie des aliments, cadrage, ratio, artefacts, texte, logo et filigrane. Ne déduis pas de détails invisibles.',
 			'prompt_image_correction' => 'Corrige uniquement les défauts visuels signalés ci-dessous tout en conservant la recette validée, le ratio demandé, une photographie culinaire réaliste, et l’absence de texte, logo ou filigrane. Ne copie ni ne reproduis une image de référence.',
 			'prompt_facebook_image' => "Act as a professional food photographer and Pinterest content creator.\n\nCreate a high-quality step-by-step food collage showing the complete preparation process of this recipe.\n\nSTYLE:\n\n• Ultra realistic food photography\n• Bright natural lighting\n• Clean modern kitchen aesthetic\n• Soft shadows and realistic textures\n• Elegant Pinterest-style composition\n• Premium food magazine look\n• Soft pastel or white background\n• Slight top-down angle\n• Highly appetizing and realistic\n\nLAYOUT:\n\n• Create a vertical collage with 6 square sections (2 columns × 3 rows)\n• Each image represents one important step of the recipe\n• Keep the same bowl, mold, plate, and visual consistency across all steps\n• Smooth visual progression from ingredients to final plated recipe\n\nIMAGES TO INCLUDE:\n\n1. Preparing the base or arranging ingredients\n2. Mixing cream, batter, sauce, or filling\n3. First assembly step\n4. Second assembly step\n5. Final decoration or topping\n6. Final finished recipe beautifully presented and sliced/opened\n\nFOOD DETAILS:\n\n• Ingredients must look fresh and realistic\n• Creams, sauces, fruits, chocolate, cheese, etc. should have rich texture\n• Add realistic cooking details (powdered sugar, glossy fruits, melted cheese, herbs, crumbs, steam if needed)\n• Keep proportions realistic\n\nTEXT:\n\n• No text\n• No watermark\n• No logo\n• No labels\n\nQUALITY:\n\n• Ultra detailed\n• Professional culinary photography\n• Pinterest viral aesthetic\n• 4K realistic rendering\n• Clean composition\n• Consistent colors and lighting\n\nThe final image must look exactly like a professional Pinterest recipe tutorial collage showing all preparation stages of the recipe.",
 		);
@@ -114,7 +109,7 @@ final class MSRWA_Settings {
 		}
 		$out = array_intersect_key( wp_parse_args( $stored, $defaults ), $defaults );
 		foreach ( $prompt_keys as $key ) { if ( empty( $out[ $key ] ) ) { $out[ $key ] = $defaults[ $key ]; } }
-		foreach ( array( 'openai_key', 'gemini_key', 'claude_key', 'research_fallback_key' ) as $key ) { $out[ $key ] = self::decrypt_secret( isset( $out[ $key ] ) ? $out[ $key ] : '' ); }
+		foreach ( array( 'openai_key', 'gemini_key', 'claude_key' ) as $key ) { $out[ $key ] = self::decrypt_secret( isset( $out[ $key ] ) ? $out[ $key ] : '' ); }
 		return $out;
 	}
 
@@ -204,7 +199,7 @@ final class MSRWA_Settings {
 		return $wpdb->get_results( $wpdb->prepare( "SELECT group_name,setting_key,changed_by,change_source,created_at FROM {$t['settings_history']} ORDER BY id DESC LIMIT %d", min( 500, max( 1, absint( $limit ) ) ) ), ARRAY_A );
 	}
 
-	private static function is_secret( $key ) { return in_array( $key, array( 'openai_key', 'gemini_key', 'claude_key', 'research_fallback_key' ), true ); }
+	private static function is_secret( $key ) { return in_array( $key, array( 'openai_key', 'gemini_key', 'claude_key' ), true ); }
 
 	private static function secret_for_save( $key, $raw_value = null ) {
 		global $wpdb;
@@ -234,7 +229,7 @@ final class MSRWA_Settings {
 		$defaults = self::defaults();
 		$out = $defaults;
 		$out['mode'] = in_array( isset( $raw['mode'] ) ? $raw['mode'] : '', array( 'automatic', 'manual' ), true ) ? $raw['mode'] : $defaults['mode'];
-		foreach ( array( 'openai_key', 'gemini_key', 'claude_key', 'research_fallback_key' ) as $key ) {
+		foreach ( array( 'openai_key', 'gemini_key', 'claude_key' ) as $key ) {
 			$out[ $key ] = self::secret_for_save( $key, $raw[ $key ] ?? null );
 		}
 		foreach ( array( 'openai_model', 'gemini_model', 'claude_model', 'research_provider' ) as $key ) {
@@ -246,8 +241,6 @@ final class MSRWA_Settings {
 		$out['image_format'] = isset( $raw['image_format'] ) && in_array( $raw['image_format'], array( 'webp', 'jpeg', 'png' ), true ) ? $raw['image_format'] : $defaults['image_format'];
 		$out['facebook_image_fit'] = isset( $raw['facebook_image_fit'] ) && in_array( $raw['facebook_image_fit'], array( 'contain', 'cover' ), true ) ? $raw['facebook_image_fit'] : $defaults['facebook_image_fit'];
 		$out['image_padding_color'] = isset( $raw['image_padding_color'] ) && preg_match( '/^#[a-f0-9]{6}$/i', $raw['image_padding_color'] ) ? strtolower( $raw['image_padding_color'] ) : $defaults['image_padding_color'];
-		$out['research_fallback_provider'] = isset( $raw['research_fallback_provider'] ) && in_array( $raw['research_fallback_provider'], array( 'none', 'custom_json' ), true ) ? $raw['research_fallback_provider'] : $defaults['research_fallback_provider'];
-		if ( isset( $raw['research_fallback_url'] ) ) { $out['research_fallback_url'] = esc_url_raw( $raw['research_fallback_url'] ); }
 		$catalog = MSRWA_Catalog::models();
 		if ( isset( $raw['manual_models'] ) && is_array( $raw['manual_models'] ) ) {
 			foreach ( array( 'text', 'review', 'image', 'search' ) as $stage ) {
@@ -256,7 +249,7 @@ final class MSRWA_Settings {
 				if ( isset( $catalog[ $provider ][ $model ] ) && ! empty( $catalog[ $provider ][ $model ]['stable'] ) ) { $out['manual_models'][ $stage ] = $provider . ':' . $model; }
 			}
 		}
-		foreach ( array( 'max_batch' => array( 1, 50 ), 'max_concurrency' => array( 1, 4 ), 'max_corrections' => array( 0, 2 ), 'log_days' => array( 1, 365 ), 'temp_days' => array( 1, 90 ), 'aggregate_months' => array( 1, 60 ), 'research_fallback_max_results' => array( 1, 10 ) ) as $key => $limits ) {
+		foreach ( array( 'max_batch' => array( 1, 50 ), 'max_concurrency' => array( 1, 4 ), 'max_corrections' => array( 0, 2 ), 'log_days' => array( 1, 365 ), 'temp_days' => array( 1, 90 ), 'aggregate_months' => array( 1, 60 ) ) as $key => $limits ) {
 			$value = isset( $raw[ $key ] ) ? absint( $raw[ $key ] ) : $defaults[ $key ];
 			$out[ $key ] = min( $limits[1], max( $limits[0], $value ) );
 		}
@@ -265,7 +258,6 @@ final class MSRWA_Settings {
 		$out['text_reserve_margin_usd'] = isset( $raw['text_reserve_margin_usd'] ) ? min( 1000, max( 0, (float) $raw['text_reserve_margin_usd'] ) ) : $defaults['text_reserve_margin_usd'];
 		$out['web_search_tool_cost_usd'] = isset( $raw['web_search_tool_cost_usd'] ) ? min( 1000, max( 0, (float) $raw['web_search_tool_cost_usd'] ) ) : $defaults['web_search_tool_cost_usd'];
 		$out['web_search_max_tool_calls'] = isset( $raw['web_search_max_tool_calls'] ) ? min( 10, max( 1, absint( $raw['web_search_max_tool_calls'] ) ) ) : $defaults['web_search_max_tool_calls'];
-		$out['research_fallback_cost_usd'] = isset( $raw['research_fallback_cost_usd'] ) ? min( 1000, max( 0, (float) $raw['research_fallback_cost_usd'] ) ) : $defaults['research_fallback_cost_usd'];
 		$out['featured_image_estimate_usd'] = isset( $raw['featured_image_estimate_usd'] ) ? min( 1000, max( 0.001, (float) $raw['featured_image_estimate_usd'] ) ) : $defaults['featured_image_estimate_usd'];
 		$out['facebook_image_estimate_usd'] = isset( $raw['facebook_image_estimate_usd'] ) ? min( 1000, max( 0.001, (float) $raw['facebook_image_estimate_usd'] ) ) : $defaults['facebook_image_estimate_usd'];
 		$out['max_reference_images'] = isset( $raw['max_reference_images'] ) ? min( 10, max( 0, absint( $raw['max_reference_images'] ) ) ) : $defaults['max_reference_images'];

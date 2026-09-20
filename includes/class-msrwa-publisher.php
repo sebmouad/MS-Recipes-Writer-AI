@@ -57,9 +57,15 @@ final class MSRWA_Publisher {
 		self::write_taxonomies( $post_id, $article );
 		self::write_facebook_meta( $post_id, $article, $artifacts );
 		self::write_provenance( $post_id, $job, $artifacts );
+		// Recheck the current length limits before delivery, including partial drafts.
+		$artifacts['length_findings'] = MSRWA_Quality::length_findings( $article );
 		$report = self::editorial_report( $artifacts, $allow_partial );
 		MSRWA_DB::store_artifact( $job->id, $job->batch_id, 'editorial_review', $report );
-		MSRWA_DB::store_article_quality( $job->id, $report );
+		MSRWA_DB::store_quality_verdicts( $job->id, array(
+			'article_quality'  => $report['article_quality'] ?? 'unknown',
+			'featured_quality' => $report['featured_quality'] ?? 'unknown',
+			'facebook_quality' => $report['facebook_quality'] ?? 'unknown',
+		) );
 		update_post_meta( $post_id, '_msrwa_job_id', absint( $job->id ) );
 		if ( ! empty( $artifacts['featured_image']['attachment_id'] ) ) {
 			set_post_thumbnail( $post_id, absint( $artifacts['featured_image']['attachment_id'] ) );
@@ -74,19 +80,28 @@ final class MSRWA_Publisher {
 	}
 
 	public static function editorial_report( $artifacts, $requires_review = false ) {
-		$quality = (array) ( $artifacts['quality_report'] ?? array() );
-		$findings = array_merge( (array) ( $quality['findings'] ?? array() ), (array) ( $artifacts['review']['findings'] ?? array() ), (array) ( $artifacts['delivery_findings'] ?? array() ) );
-		foreach ( array( 'featured_image', 'facebook_image' ) as $key ) {
-			if ( isset( $artifacts['output_options'][ 'generate_' . $key ] ) && ! $artifacts['output_options'][ 'generate_' . $key ] ) { continue; }
-			if ( empty( $artifacts[ $key ]['attachment_id'] ) ) { $requires_review = true; $findings[] = array( 'severity' => 'warning', 'field' => $key, 'reason' => 'Image non disponible.' ); }
-			foreach ( (array) ( $artifacts['image_reviews'][ $key ]['findings'] ?? array() ) as $finding ) { if ( is_array( $finding ) ) { $finding['field'] = $key; $findings[] = $finding; } }
-			if ( true !== ( $artifacts['image_reviews'][ $key ]['pass'] ?? null ) ) { $requires_review = true; }
+		$review = (array) ( $artifacts['review'] ?? array() );
+		$article_quality = self::ai_verdict( $review['verdict'] ?? null );
+		$findings = array_merge( (array) ( $review['findings'] ?? array() ), (array) ( $artifacts['delivery_findings'] ?? array() ), (array) ( $artifacts['length_findings'] ?? array() ) );
+		if ( ! empty( $artifacts['length_findings'] ) ) { $requires_review = true; }
+		$verdicts = array( 'article_quality' => $article_quality );
+		$summaries = array( 'article' => $review['quality_summary'] ?? '' );
+		foreach ( array( 'featured_image' => 'featured_quality', 'facebook_image' => 'facebook_quality' ) as $key => $column ) {
+			if ( isset( $artifacts['output_options'][ 'generate_' . $key ] ) && ! $artifacts['output_options'][ 'generate_' . $key ] ) { $verdicts[ $column ] = 'not_generated'; continue; }
+			$image_review = (array) ( $artifacts['image_reviews'][ $key ] ?? array() );
+			$verdicts[ $column ] = self::ai_verdict( $image_review['realism'] ?? null );
+			$summaries[ $key ] = $image_review['quality_summary'] ?? '';
+			if ( empty( $artifacts[ $key ]['attachment_id'] ) ) { $requires_review = true; $verdicts[ $column ] = 'unknown'; $findings[] = array( 'severity' => 'warning', 'field' => $key, 'reason' => 'Image non disponible.' ); }
+			foreach ( (array) ( $image_review['findings'] ?? array() ) as $finding ) { if ( is_array( $finding ) ) { $finding['field'] = $key; $findings[] = $finding; } }
+			if ( 'good' !== $verdicts[ $column ] || true !== ( $image_review['pass'] ?? null ) ) { $requires_review = true; }
 		}
-		if ( empty( $quality['pass'] ) || true !== ( $artifacts['review']['pass'] ?? null ) || empty( $artifacts['article']['content_html'] ) ) { $requires_review = true; }
+		if ( 'good' !== $article_quality || true !== ( $review['pass'] ?? null ) || empty( $artifacts['article']['content_html'] ) ) { $requires_review = true; }
 		$unique = array();
 		foreach ( $findings as $finding ) { if ( is_array( $finding ) ) { $unique[ hash( 'sha256', wp_json_encode( $finding ) ) ] = $finding; } }
-		return array( 'status' => $requires_review ? 'needs_review' : 'checks_passed', 'score' => isset( $quality['score'] ) ? (int) $quality['score'] : null, 'article_available' => ! empty( $artifacts['article']['content_html'] ), 'text_review_passed' => true === ( $artifacts['review']['pass'] ?? null ), 'findings' => array_values( $unique ), 'metrics' => $quality['metrics'] ?? array(), 'generated_at' => current_time( 'mysql', true ) );
+		return $verdicts + array( 'status' => $requires_review ? 'needs_review' : 'checks_passed', 'summaries' => $summaries, 'article_available' => ! empty( $artifacts['article']['content_html'] ), 'text_review_passed' => 'good' === $article_quality && true === ( $review['pass'] ?? null ), 'findings' => array_values( $unique ), 'generated_at' => current_time( 'mysql', true ) );
 	}
+
+	private static function ai_verdict( $value ) { return is_string( $value ) && in_array( $value, array( 'good', 'needs_review', 'bad' ), true ) ? $value : 'unknown'; }
 
 	private static function author_id( $job ) {
 		$owner = absint( $job->owner_id );

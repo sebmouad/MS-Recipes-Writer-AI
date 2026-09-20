@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.44` fournit un socle installable DB-first :
+La version `0.2.45` fournit un socle installable DB-first :
 
 - modes administrateur `Automatique` / `Manuel` ;
 - limites initiales de 50 recettes par lot, 4 traitements simultanés et 2 corrections ;
@@ -38,7 +38,7 @@ La version `0.2.44` fournit un socle installable DB-first :
 - recherche visuelle web administrable : les références publiques sûres sont téléchargées temporairement hors du document root, analysées pour dégager une direction artistique, puis employées comme observations abstraites — jamais copiées ni fournies comme actif à l’image générée ;
 - contrôle vision structuré des deux images ; les défauts non résolus sont signalés dans le brouillon pour relecture humaine ;
 - jusqu’à deux corrections automatiques par image, déclenchées uniquement après une relecture négative et avec les défauts conservés dans le détail du job ; une correction de l’image principale régénère aussi sa variante Facebook ;
-- gate éditorial déterministe avant la relecture IA : contrat qualité autonome configurable, score sur 100, seuils de longueur/structure/recette/SEO et retour automatique en correction ;
+- relecture IA systématique du contenu et du réalisme des images, avec trois verdicts textuels distincts ; objectifs de longueur conservés séparément pour les corrections ;
 - contrat Recipe Card complet (temps, portions, calories estimées, cuisine, difficulté, ingrédients, étapes, équipement, notes, FAQ et mots-clés) avec mapping administrable ;
 - budget image séparé pour l’image principale et Facebook, coût de recherche web explicite et usage token image exploité lorsqu’il est fourni par l’API ;
 - mapping administrable des métadonnées Theme/Facebook, récupération des workers expirés et conservation de données par défaut lors de la désinstallation ;
@@ -53,7 +53,6 @@ La version `0.2.44` fournit un socle installable DB-first :
 - routage automatique agentique borné aux modèles connectés et vérifiés, avec coût journalisé et repli explicite vers le préfiltre déterministe si la réponse du routeur est inexploitable ;
 - historique avant/après des corrections éditoriales et provenance compacte (sources, modèles, corrections) conservée avec le brouillon final ;
 - association IA structurée pour chaque entrée, seuil de confiance, état « À confirmer » et endpoint sécurisé de confirmation éditeur avant la recherche ;
-- recherche de secours JSON configurable, désactivée par défaut, avec validation HTTPS/DNS publique, budget et journalisation séparés ;
 - clés API chiffrées au repos avec les sels WordPress lorsque OpenSSL est disponible, migration des anciennes valeurs et recours aux variables d’environnement ;
 - synchronisation manuelle des identifiants accessibles OpenAI/Gemini, état daté du catalogue et exclusion des modèles confirmés absents du compte ;
 - statistiques REST sur plage de dates avec période précédente pour les comparaisons personnalisées, en plus du raccourci par nombre de jours ;
@@ -64,6 +63,13 @@ La version `0.2.44` fournit un socle installable DB-first :
 - file durable avec budgets opérationnels par recette, jour et mois.
 
 Les appels fournisseurs restent déclenchés uniquement par les jobs créés par un éditeur autorisé et soumis aux limites budgétaires. Aucune clé n’est incluse dans le dépôt.
+
+## Version 0.2.45
+
+- Recherche externe de secours supprimée.
+- Relecture IA du contenu et du réalisme des deux images, avec verdicts textuels distincts.
+- Objectifs de longueur contrôlés séparément et conservés pour les corrections ; minimum par défaut de 2 000 mots, maximum de 2 400 mots, configurables. Nouvelle vérification à la création du brouillon.
+- Routage automatique limité aux fournisseurs connectés et aux capacités prises en charge.
 
 ## Version 0.2.44
 

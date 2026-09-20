@@ -1,7 +1,7 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
-/** Public admin vocabulary, independent from worker recovery states. */
+/** Public administration vocabulary. AI verdicts are textual, never synthetic percentages. */
 final class MSRWA_Presentation {
 	public static function state( $status ) {
 		if ( in_array( $status, array( 'cancelled', 'canceled' ), true ) ) { return 'canceled'; }
@@ -10,76 +10,42 @@ final class MSRWA_Presentation {
 		return 'encours';
 	}
 
-	/** True once the job produced an article: a saved draft or a generated article artifact. */
-	public static function has_article( $job, $artifacts = null ) {
-		$job = (array) $job;
-		if ( ! empty( $job['draft_post_id'] ) || ! empty( $job['quality_checked_at'] ) ) { return true; }
-		if ( null === $artifacts ) { $artifacts = json_decode( (string) ( $job['artifacts_json'] ?? '' ), true ); }
-		return is_array( $artifacts ) && ! empty( $artifacts['article']['content_html'] );
+	public static function verdict( $value, $fallback = 'unknown' ) {
+		$value = strtolower( preg_replace( '/[^a-z_]/', '', (string) $value ) );
+		$labels = array( 'good' => 'Bon', 'needs_review' => 'À vérifier', 'bad' => 'Mauvais', 'unknown' => 'Non évalué', 'not_generated' => 'Non générée' );
+		if ( ! isset( $labels[ $value ] ) ) { $value = $fallback; }
+		return array( 'code' => $value, 'label' => $labels[ $value ] ?? $labels['unknown'] );
 	}
 
-	/**
-	 * Reads the article measurement from the job row when it was stored there,
-	 * and falls back to the artifacts a detail screen already loaded.
-	 */
-	private static function measurement( $job, $artifacts ) {
-		if ( ! empty( $job['quality_checked_at'] ) ) {
-			return array( 'score' => null === ( $job['quality_score'] ?? null ) || '' === (string) $job['quality_score'] ? null : max( 0, min( 100, (int) $job['quality_score'] ) ), 'passed' => ! empty( $job['quality_passed'] ) );
-		}
-		$report = MSRWA_Publisher::editorial_report( $artifacts );
-		return array( 'score' => isset( $report['score'] ) ? max( 0, min( 100, (int) $report['score'] ) ) : null, 'passed' => 'checks_passed' === $report['status'] );
+	public static function render_verdict( $value ) {
+		$verdict = self::verdict( $value );
+		echo '<span class="msrwa-quality-badge msrwa-quality-' . esc_attr( $verdict['code'] ) . '">' . esc_html( $verdict['label'] ) . '</span>';
 	}
 
-	/** Quality of the article produced by a job. A job without an article carries no quality. */
+	/** Compatibility summary used by job and batch pages. */
 	public static function quality( $job ) {
 		$job = (array) $job;
-		$status = $job['status'] ?? '';
-		$artifacts = json_decode( (string) ( $job['artifacts_json'] ?? '' ), true );
-		$artifacts = is_array( $artifacts ) ? $artifacts : array();
-		$notes = array( 'paused' => 'En pause — reprise manuelle', 'paused_budget' => 'Budget insuffisant — action requise', 'awaiting_input' => 'Confirmation requise', 'awaiting_admin' => 'Décision administrateur requise', 'retry_wait' => 'Nouvelle tentative planifiée', 'uncertain' => 'Résultat fournisseur à vérifier avant relance', 'failed' => 'Traitement arrêté — consulter les erreurs' );
-		$note = $notes[ $status ] ?? '';
-		if ( ! self::has_article( $job, $artifacts ) ) { return array( 'code' => 'none', 'label' => 'Aucun article', 'score' => null, 'note' => $note, 'evaluated' => 0, 'total' => 0 ); }
-		$measured = self::measurement( $job, $artifacts );
-		$score = $measured['score'];
-		$code = 'pending'; $label = 'Non évalué';
-		if ( 'uncertain' === $status ) { $code = 'uncertain'; $label = 'Incertain'; }
-		elseif ( 'failed' === $status ) { $code = 'incomplete'; $label = 'Incomplet'; }
-		elseif ( in_array( $status, array( 'completed', 'needs_review' ), true ) ) {
-			$code = 'completed' === $status && $measured['passed'] ? 'good' : 'review';
-			$label = 'good' === $code ? 'Bon' : 'À vérifier';
-		} elseif ( null !== $score && 'canceled' !== self::state( $status ) ) { $label = 'Évaluation en cours'; }
-		return array( 'code' => $code, 'label' => $label, 'score' => $score, 'note' => $note, 'evaluated' => null === $score ? 0 : 1, 'total' => 1 );
-	}
-
-	/** Batch state from every job, quality averaged over the articles the batch produced. */
-	public static function batch( $jobs ) {
-		$states = array(); $scores = array(); $articles = 0;
-		$quality = array( 'code' => 'none', 'label' => 'Aucun article', 'score' => null, 'note' => '', 'evaluated' => 0, 'total' => 0 );
-		$rank = array( 'good' => 0, 'pending' => 1, 'review' => 2, 'incomplete' => 3, 'uncertain' => 4 );
-		$worst = -1; $notes = array();
-		foreach ( $jobs as $job ) {
-			$state = self::state( $job['status'] ); $states[] = $state;
-			if ( 'canceled' === $state ) { continue; }
-			$q = self::quality( $job );
-			if ( $q['note'] ) { $notes[] = $q['note']; }
-			if ( ! $q['total'] ) { continue; }
-			$articles++;
-			if ( null !== $q['score'] ) { $scores[] = $q['score']; }
-			if ( $rank[ $q['code'] ] > $worst ) { $quality['code'] = $q['code']; $quality['label'] = $q['label']; $worst = $rank[ $q['code'] ]; }
+		$value = $job['article_quality'] ?? '';
+		if ( ! $value && ! empty( $job['artifacts_json'] ) ) {
+			$artifacts = json_decode( (string) $job['artifacts_json'], true );
+			$value = is_array( $artifacts ) ? ( $artifacts['review']['verdict'] ?? '' ) : '';
 		}
-		$state = ! $states || in_array( 'encours', $states, true ) ? 'encours' : ( count( array_unique( $states ) ) === 1 && 'canceled' === $states[0] ? 'canceled' : 'completed' );
-		if ( 'encours' !== $state && in_array( 'error', $states, true ) ) { $state = 'error'; }
-		$quality['score'] = $scores ? (int) round( array_sum( $scores ) / count( $scores ) ) : null;
-		$quality['evaluated'] = count( $scores );
-		$quality['total'] = $articles;
-		$quality['note'] = implode( ' · ', array_unique( $notes ) );
-		return array( 'state' => $state, 'quality' => $quality, 'finished' => count( array_filter( $states, static function ( $s ) { return 'encours' !== $s; } ) ) );
+		$verdict = self::verdict( $value );
+		return array( 'code' => $verdict['code'], 'label' => $verdict['label'], 'score' => null, 'note' => '', 'evaluated' => 'unknown' === $verdict['code'] ? 0 : 1, 'total' => 1 );
 	}
 
-	public static function render_quality( $quality ) {
-		echo '<span class="msrwa-quality-badge msrwa-quality-' . esc_attr( $quality['code'] ) . '">' . esc_html( $quality['label'] ) . '</span>';
-		echo '<span class="msrwa-quality-score" title="Score des contrôles de structure de l’article, et non garantie éditoriale">' . ( null === $quality['score'] ? '—' : esc_html( $quality['score'] ) . ' %' ) . '</span>';
-		if ( $quality['total'] > 1 ) { echo '<small class="msrwa-quality-note">Moyenne · ' . esc_html( $quality['evaluated'] . '/' . $quality['total'] ) . ' articles évalués</small>'; }
-		if ( $quality['note'] ) { echo '<small class="msrwa-quality-note">' . esc_html( $quality['note'] ) . '</small>'; }
+	public static function render_quality( $quality ) { self::render_verdict( is_array( $quality ) ? ( $quality['code'] ?? '' ) : $quality ); }
+
+	public static function batch( $jobs ) {
+		$states = array(); $worst = 'good'; $rank = array( 'good' => 0, 'unknown' => 1, 'needs_review' => 2, 'bad' => 3 );
+		foreach ( $jobs as $job ) {
+			$states[] = self::state( $job['status'] ?? '' );
+			$q = self::quality( $job );
+			if ( ( $rank[ $q['code'] ] ?? 1 ) > ( $rank[ $worst ] ?? 0 ) ) { $worst = $q['code']; }
+		}
+		$state = ! $states || in_array( 'encours', $states, true ) ? 'encours' : ( in_array( 'error', $states, true ) ? 'error' : 'completed' );
+		if ( $states && array( 'canceled' ) === array_values( array_unique( $states ) ) ) { $state = 'canceled'; }
+		if ( ! $jobs ) { $worst = 'unknown'; }
+		return array( 'state' => $state, 'quality' => self::quality( array( 'article_quality' => $worst ) ), 'finished' => count( array_filter( $states, static function ( $s ) { return 'encours' !== $s; } ) ) );
 	}
 }

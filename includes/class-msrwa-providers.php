@@ -61,41 +61,6 @@ final class MSRWA_Providers {
 		return array( 'ok' => true, 'provider' => $provider, 'model' => $result['model'], 'usage' => $result['usage'] );
 	}
 
-	public static function research_fallback( $query, $max_results = 5 ) {
-		$settings = MSRWA_Settings::get();
-		if ( 'custom_json' !== $settings['research_fallback_provider'] ) { return new WP_Error( 'research_fallback_disabled', 'La recherche de secours est désactivée.' ); }
-		$url = esc_url_raw( $settings['research_fallback_url'] );
-		if ( ! self::safe_external_endpoint( $url ) ) { return new WP_Error( 'research_fallback_url_invalid', 'L’URL du service de recherche de secours doit être HTTPS et publique.', array( 'status' => 400 ) ); }
-		$headers = array( 'Content-Type' => 'application/json', 'Accept' => 'application/json' );
-		if ( ! empty( $settings['research_fallback_key'] ) ) { $headers['Authorization'] = 'Bearer ' . $settings['research_fallback_key']; }
-		$response = wp_remote_post( $url, array( 'timeout' => 12, 'redirection' => 0, 'sslverify' => true, 'headers' => $headers, 'body' => wp_json_encode( array( 'query' => sanitize_text_field( $query ), 'max_results' => min( 10, max( 1, absint( $max_results ) ) ) ) ) ) );
-		if ( is_wp_error( $response ) ) { return new WP_Error( 'research_fallback_network', $response->get_error_message(), array( 'status' => 502 ) ); }
-		$code = wp_remote_retrieve_response_code( $response );
-		$body = json_decode( wp_remote_retrieve_body( $response ), true );
-		if ( $code < 200 || $code >= 300 || ! is_array( $body ) ) { return new WP_Error( 'research_fallback_response', 'Le service de recherche de secours a retourné une réponse invalide.', array( 'status' => $code ?: 502 ) ); }
-		$rows = isset( $body['results'] ) && is_array( $body['results'] ) ? $body['results'] : array();
-		$sources = array(); $facts = array();
-		foreach ( array_slice( $rows, 0, 10 ) as $row ) {
-			if ( ! is_array( $row ) ) { continue; }
-			$row_url = isset( $row['url'] ) ? esc_url_raw( $row['url'] ) : '';
-			if ( ! $row_url || ! preg_match( '#^https://#i', $row_url ) ) { continue; }
-			$title = sanitize_text_field( isset( $row['title'] ) ? $row['title'] : '' );
-			$content = sanitize_textarea_field( isset( $row['content'] ) ? $row['content'] : ( isset( $row['snippet'] ) ? $row['snippet'] : '' ) );
-			$sources[] = array( 'url' => $row_url, 'title' => $title );
-			if ( $content ) { $facts[] = array( 'source' => $row_url, 'text' => $content ); }
-		}
-		return array( 'id' => '', 'text' => wp_json_encode( array( 'recipe_facts' => $facts, 'references' => $sources, 'uncertainties' => array( 'Recherche fournie par un service externe configurable ; vérifiez les sources.' ) ), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ), 'sources' => $sources, 'usage' => array(), 'model' => 'custom_json' );
-	}
-
-	private static function safe_external_endpoint( $url ) {
-		if ( ! $url || ! preg_match( '#^https://#i', $url ) ) { return false; }
-		$host = wp_parse_url( $url, PHP_URL_HOST );
-		if ( ! $host || preg_match( '/(?:^|\.)localhost$|\.local$/i', $host ) ) { return false; }
-		$ips = filter_var( $host, FILTER_VALIDATE_IP ) ? array( $host ) : ( function_exists( 'gethostbynamel' ) ? (array) gethostbynamel( $host ) : array() );
-		if ( empty( $ips ) ) { return false; }
-		foreach ( $ips as $ip ) { if ( ! filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE ) ) { return false; } }
-		return true;
-	}
 
 	public static function text( $provider, $model, $input, $max_tokens = 1200, $search = false, $json_output = false ) {
 		if ( 'openai' === $provider ) {

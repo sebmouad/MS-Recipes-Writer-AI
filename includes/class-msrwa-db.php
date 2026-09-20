@@ -35,7 +35,7 @@ final class MSRWA_DB {
 			"CREATE TABLE {$t['artifacts']} (\n id bigint(20) unsigned NOT NULL AUTO_INCREMENT,\n batch_id bigint(20) unsigned NOT NULL DEFAULT 0,\n job_id bigint(20) unsigned NOT NULL,\n artifact_key varchar(120) NOT NULL,\n version int unsigned NOT NULL DEFAULT 1,\n status varchar(32) NOT NULL DEFAULT 'current',\n content_json longtext NULL,\n content_hash char(64) NOT NULL,\n created_by bigint(20) unsigned NOT NULL DEFAULT 0,\n created_at datetime NOT NULL,\n PRIMARY KEY (id),\n UNIQUE KEY job_artifact_version (job_id,artifact_key,version),\n KEY job_current (job_id,status),\n KEY batch_id (batch_id)\n) $charset;",
 			"CREATE TABLE {$t['snapshots']} (\n id bigint(20) unsigned NOT NULL AUTO_INCREMENT,\n batch_id bigint(20) unsigned NOT NULL DEFAULT 0,\n job_id bigint(20) unsigned NOT NULL DEFAULT 0,\n snapshot_type varchar(80) NOT NULL,\n version int unsigned NOT NULL DEFAULT 1,\n data_json longtext NULL,\n data_hash char(64) NOT NULL,\n created_at datetime NOT NULL,\n PRIMARY KEY (id),\n UNIQUE KEY target_snapshot_version (batch_id,job_id,snapshot_type,version),\n KEY job_type (job_id,snapshot_type),\n KEY batch_type (batch_id,snapshot_type)\n) $charset;",
 			"CREATE TABLE {$t['batches']} (\n id bigint(20) unsigned NOT NULL AUTO_INCREMENT,\n owner_id bigint(20) unsigned NOT NULL,\n status varchar(32) NOT NULL DEFAULT 'queued',\n total int unsigned NOT NULL DEFAULT 0,\n completed int unsigned NOT NULL DEFAULT 0,\n settings_snapshot longtext NULL,\n created_at datetime NOT NULL,\n updated_at datetime NOT NULL,\n PRIMARY KEY (id),\n KEY owner_status (owner_id,status),\n KEY created_at (created_at)\n) $charset;",
-			"CREATE TABLE {$t['jobs']} (\n id bigint(20) unsigned NOT NULL AUTO_INCREMENT,\n batch_id bigint(20) unsigned NOT NULL,\n owner_id bigint(20) unsigned NOT NULL,\n title text NOT NULL,\n input_json longtext NULL,\n canonical_json longtext NULL,\n artifacts_json longtext NULL,\n selected_models_json longtext NULL,\n cost_estimate decimal(12,6) NOT NULL DEFAULT 0,\n draft_post_id bigint(20) unsigned NOT NULL DEFAULT 0,\n quality_score smallint unsigned NULL,\n quality_passed tinyint(1) NOT NULL DEFAULT 0,\n quality_checked_at datetime NULL,\n status varchar(32) NOT NULL DEFAULT 'queued',\n stage varchar(64) NOT NULL DEFAULT 'intake',\n correction_cycles tinyint unsigned NOT NULL DEFAULT 0,\n correction_cycles_json longtext NULL,\n attempts tinyint unsigned NOT NULL DEFAULT 0,\n retry_attempts tinyint unsigned NOT NULL DEFAULT 0,\n error_code varchar(80) NULL,\n error_message text NULL,\n lock_token varchar(64) NULL,\n lock_until datetime NULL,\n created_at datetime NOT NULL,\n updated_at datetime NOT NULL,\n PRIMARY KEY (id),\n KEY batch_status (batch_id,status),\n KEY owner_status (owner_id,status),\n KEY owner_article (owner_id,draft_post_id),\n KEY lock_until (lock_until)\n) $charset;",
+			"CREATE TABLE {$t['jobs']} (\n id bigint(20) unsigned NOT NULL AUTO_INCREMENT,\n batch_id bigint(20) unsigned NOT NULL,\n owner_id bigint(20) unsigned NOT NULL,\n title text NOT NULL,\n input_json longtext NULL,\n canonical_json longtext NULL,\n artifacts_json longtext NULL,\n selected_models_json longtext NULL,\n cost_estimate decimal(12,6) NOT NULL DEFAULT 0,\n draft_post_id bigint(20) unsigned NOT NULL DEFAULT 0,\n article_quality varchar(20) NULL,\n featured_quality varchar(20) NULL,\n facebook_quality varchar(20) NULL,\n quality_score smallint unsigned NULL,\n quality_passed tinyint(1) NOT NULL DEFAULT 0,\n quality_checked_at datetime NULL,\n status varchar(32) NOT NULL DEFAULT 'queued',\n stage varchar(64) NOT NULL DEFAULT 'intake',\n correction_cycles tinyint unsigned NOT NULL DEFAULT 0,\n correction_cycles_json longtext NULL,\n attempts tinyint unsigned NOT NULL DEFAULT 0,\n retry_attempts tinyint unsigned NOT NULL DEFAULT 0,\n error_code varchar(80) NULL,\n error_message text NULL,\n lock_token varchar(64) NULL,\n lock_until datetime NULL,\n created_at datetime NOT NULL,\n updated_at datetime NOT NULL,\n PRIMARY KEY (id),\n KEY batch_status (batch_id,status),\n KEY owner_status (owner_id,status),\n KEY owner_article (owner_id,draft_post_id),\n KEY lock_until (lock_until)\n) $charset;",
 			"CREATE TABLE {$t['events']} (\n id bigint(20) unsigned NOT NULL AUTO_INCREMENT,\n batch_id bigint(20) unsigned NULL,\n job_id bigint(20) unsigned NULL,\n actor_id bigint(20) unsigned NULL,\n event_type varchar(80) NOT NULL,\n payload_json longtext NULL,\n created_at datetime NOT NULL,\n PRIMARY KEY (id),\n KEY job_event (job_id,event_type),\n KEY created_at (created_at)\n) $charset;",
 			"CREATE TABLE {$t['calls']} (\n id bigint(20) unsigned NOT NULL AUTO_INCREMENT,\n batch_id bigint(20) unsigned NULL,\n job_id bigint(20) unsigned NULL,\n provider varchar(32) NOT NULL,\n model varchar(120) NOT NULL,\n operation varchar(64) NOT NULL,\n status varchar(32) NOT NULL,\n http_status smallint unsigned NOT NULL DEFAULT 0,\n request_id varchar(191) NULL,\n input_tokens bigint unsigned NOT NULL DEFAULT 0,\n output_tokens bigint unsigned NOT NULL DEFAULT 0,\n cost_estimate decimal(12,6) NULL,\n uncertain tinyint(1) NOT NULL DEFAULT 0,\n error_code varchar(80) NULL,\n request_json longtext NULL,\n response_json longtext NULL,\n payload_hash char(64) NULL,\n started_at datetime NOT NULL,\n finished_at datetime NULL,\n PRIMARY KEY (id),\n KEY job_status (job_id,status),\n KEY provider_model (provider,model),\n KEY started_at (started_at)\n) $charset;",
 			"CREATE TABLE {$t['reservations']} (\n id bigint(20) unsigned NOT NULL AUTO_INCREMENT,\n token char(36) NOT NULL,\n batch_id bigint(20) unsigned NOT NULL,\n job_id bigint(20) unsigned NOT NULL,\n operation varchar(64) NOT NULL,\n amount decimal(12,6) NOT NULL DEFAULT 0,\n settled_amount decimal(12,6) NULL,\n status varchar(16) NOT NULL DEFAULT 'reserved',\n expires_at datetime NOT NULL,\n created_at datetime NOT NULL,\n updated_at datetime NOT NULL,\n PRIMARY KEY (id),\n UNIQUE KEY token (token),\n KEY job_status (job_id,status),\n KEY status_expiry (status,expires_at)\n) $charset;",
@@ -46,6 +46,9 @@ final class MSRWA_DB {
 			'quality_score' => "ALTER TABLE {$t['jobs']} ADD COLUMN quality_score smallint unsigned NULL AFTER draft_post_id",
 			'quality_passed' => "ALTER TABLE {$t['jobs']} ADD COLUMN quality_passed tinyint(1) NOT NULL DEFAULT 0 AFTER quality_score",
 			'quality_checked_at' => "ALTER TABLE {$t['jobs']} ADD COLUMN quality_checked_at datetime NULL AFTER quality_passed",
+			'article_quality' => "ALTER TABLE {$t['jobs']} ADD COLUMN article_quality varchar(20) NULL AFTER draft_post_id",
+			'featured_quality' => "ALTER TABLE {$t['jobs']} ADD COLUMN featured_quality varchar(20) NULL AFTER article_quality",
+			'facebook_quality' => "ALTER TABLE {$t['jobs']} ADD COLUMN facebook_quality varchar(20) NULL AFTER featured_quality",
 		);
 		foreach ( $columns as $column => $statement ) {
 			if ( ! $wpdb->get_var( $wpdb->prepare( "SHOW COLUMNS FROM {$t['jobs']} LIKE %s", $column ) ) ) { $wpdb->query( $statement ); }
@@ -105,16 +108,34 @@ final class MSRWA_DB {
 
 	/** The article verdict lives on the job row so lists can filter and sort on it. */
 	public static function store_article_quality( $job_id, $report ) {
+		return self::store_quality_verdicts( $job_id, array( 'article_quality' => self::legacy_article_verdict( $report ) ) );
+	}
+
+	/** Persist independent AI verdicts for article information and both image outputs. */
+	public static function store_quality_verdicts( $job_id, $verdicts ) {
 		global $wpdb;
-		$report = is_array( $report ) ? $report : array();
-		$score = isset( $report['score'] ) && null !== $report['score'] ? max( 0, min( 100, (int) $report['score'] ) ) : null;
+		$allowed = array( 'good', 'needs_review', 'bad', 'unknown', 'not_generated' );
+		$row = array(); $formats = array();
+		foreach ( array( 'article_quality', 'featured_quality', 'facebook_quality' ) as $key ) {
+			if ( ! array_key_exists( $key, (array) $verdicts ) ) { continue; }
+			$value = sanitize_key( (string) $verdicts[ $key ] );
+			$row[ $key ] = in_array( $value, $allowed, true ) ? $value : 'unknown'; $formats[] = '%s';
+		}
+		if ( ! $row ) { return false; }
+		$row['quality_checked_at'] = current_time( 'mysql', true ); $formats[] = '%s';
 		return (bool) $wpdb->update(
 			self::tables()['jobs'],
-			array( 'quality_score' => $score, 'quality_passed' => 'checks_passed' === ( $report['status'] ?? '' ) ? 1 : 0, 'quality_checked_at' => current_time( 'mysql', true ) ),
+			$row,
 			array( 'id' => absint( $job_id ) ),
-			array( '%d', '%d', '%s' ),
+			$formats,
 			array( '%d' )
 		);
+	}
+
+	private static function legacy_article_verdict( $report ) {
+		$report = is_array( $report ) ? $report : array();
+		if ( isset( $report['article_quality'] ) ) { return $report['article_quality']; }
+		return 'checks_passed' === ( $report['status'] ?? '' ) ? 'good' : 'needs_review';
 	}
 
 	public static function system_value( $key, $default = '' ) {

@@ -2,6 +2,19 @@
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
 final class MSRWA_Quality {
+	/** Missing/malformed AI evidence never becomes a positive verdict. */
+	public static function normalize_review( $review, $image = false ) {
+		$review = is_array( $review ) ? $review : array();
+		$allowed = array( 'good', 'needs_review', 'bad' );
+		foreach ( $image ? array( 'verdict', 'realism' ) : array( 'verdict' ) as $key ) {
+			if ( ! isset( $review[ $key ] ) || ! is_string( $review[ $key ] ) || ! in_array( $review[ $key ], $allowed, true ) ) { $review[ $key ] = 'unknown'; }
+		}
+		$review['pass'] = true === ( $review['pass'] ?? false ) && 'good' === $review['verdict'] && ( ! $image || 'good' === $review['realism'] );
+		foreach ( array( 'findings', 'uncertainties', 'corrected_artifact' ) as $key ) { $review[ $key ] = isset( $review[ $key ] ) && is_array( $review[ $key ] ) ? $review[ $key ] : array(); }
+		$review['quality_summary'] = isset( $review['quality_summary'] ) && is_string( $review['quality_summary'] ) ? sanitize_text_field( $review['quality_summary'] ) : '';
+		return $review;
+	}
+
 	public static function benchmark( $settings = null ) {
 		$settings = is_array( $settings ) ? $settings : MSRWA_Settings::get();
 		return array(
@@ -18,6 +31,15 @@ final class MSRWA_Quality {
 		$settings = is_array( $settings ) ? $settings : MSRWA_Settings::get();
 		$benchmark = self::benchmark( $settings );
 		return "\nCONTRAT QUALITÉ MESURABLE : rédige entre " . (int) $benchmark['words'] . ' et ' . (int) ( $settings['quality_max_words'] ?? 4200 ) . ' mots utiles, avec au moins ' . (int) $benchmark['headings'] . ' titres h2/h3, ' . (int) $benchmark['paragraphs'] . ' paragraphes, ' . (int) $benchmark['ingredients'] . ' ingrédients lorsque la recette le justifie et ' . (int) $benchmark['steps'] . " étapes. Évite le remplissage, les répétitions et les promesses non étayées. Le JSON doit respecter exactement le schéma demandé et content_html doit être du HTML valide. Inclure choix des ingrédients, substitutions sûres, méthode détaillée, erreurs à éviter, conservation, variantes, service, FAQ et conclusion utile. Retourne recipe_meta comme objet vide : les métadonnées sont reprises directement de la recette canonique par le moteur. Respecte 35–70 caractères pour seo_title, 120–170 pour seo_description et 120–260 pour excerpt. Préfère le bas de la plage de longueur sans passer sous le minimum.";
+	}
+
+	public static function length_findings( $article, $settings = null ) {
+		$settings = is_array( $settings ) ? $settings : MSRWA_Settings::get();
+		$words = self::word_count( (string) ( $article['content_html'] ?? '' ) );
+		$min = (int) $settings['quality_min_words'];
+		$max = (int) $settings['quality_max_words'];
+		if ( $words >= $min && $words <= $max ) { return array(); }
+		return array( array( 'severity' => 'warning', 'field' => 'article_length', 'reason' => sprintf( 'Article : %d mots ; objectif : %d–%d mots.', $words, $min, $max ), 'fix' => 'Respecter la plage de longueur configurée avec des explications utiles, sans répétition ni remplissage.' ) );
 	}
 
 	public static function evaluate( $article, $canonical, $settings = null ) {

@@ -48,5 +48,5 @@ if ( 5 !== count( $conditions["params"] ) ) { throw new RuntimeException( 'Prepa
 
 // Quality filters map to the stored article verdict.
 $good = MSRWA_Lists::conditions( MSRWA_Lists::sanitize_args( array( 'msrwa_view' => 'articles', 'msrwa_quality' => 'good' ) ) )['where'];
-if ( false === strpos( implode( '', $good ), 'quality_passed = 1' ) ) { throw new RuntimeException( 'The passing verdict must read the stored column.' ); }
+if ( false === strpos( implode( '', $good ), "article_quality = 'good'" ) ) { throw new RuntimeException( 'The passing verdict must read the stored AI verdict.' ); }
 echo "MSRWA list filter contracts OK\n";

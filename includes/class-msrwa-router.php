@@ -44,7 +44,7 @@ final class MSRWA_Router {
 		foreach ( array( 'text' => 'text', 'review' => 'text', 'search' => 'web_search', 'vision' => 'vision', 'image' => 'image_generation' ) as $stage => $capability ) {
 			$candidates[ $stage ] = array();
 			foreach ( MSRWA_Catalog::eligible( $capability ) as $key => $model ) {
-				if ( self::connected( $model['provider'] ) ) { $candidates[ $stage ][ $key ] = array( 'label' => $model['label'], 'input' => (float) $model['input'], 'output' => (float) $model['output'] ); }
+				if ( self::connected( $model['provider'] ) ) { $candidates[ $stage ][ $key ] = array( 'label' => $model['label'], 'input_per_million' => (float) $model['input'], 'output_per_million' => (float) $model['output'], 'source' => $model['source'] ?? '', 'verified_at' => $model['verified_at'] ?? '' ); }
 			}
 		}
 		$router = isset( $selected['text'] ) && is_array( $selected['text'] ) ? $selected['text'] : self::plan( 'text', 'text' );
@@ -52,6 +52,7 @@ final class MSRWA_Router {
 		$catalog = MSRWA_Catalog::models();
 		$max_tokens = absint( $settings['router_max_output_tokens'] );
 		$prompt = $settings['prompt_router'] . "\nRéponds uniquement avec un JSON compact contenant les clés text, review, search, vision, image et reason. Chaque valeur doit être exactement une clé fournisseur:modèle présente dans les candidats correspondants. reason doit être une phrase courte sans raisonnement privé. Budget recette complète, deux images comprises (USD) : " . (float) $settings['per_recipe_budget_usd'] . '. CANDIDATS: ' . wp_json_encode( $candidates, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+		$prompt .= '\nCONTEXTE : ' . wp_json_encode( array( 'recipe' => $job->title, 'article_words' => array( $settings['quality_min_words'], $settings['quality_max_words'] ), 'article_max_output_tokens' => $settings['article_max_output_tokens'], 'review_max_output_tokens' => $settings['review_max_output_tokens'], 'image_estimates_usd' => array( $settings['featured_image_estimate_usd'], $settings['facebook_image_estimate_usd'] ), 'search_tool_cost_usd' => $settings['web_search_tool_cost_usd'] ), JSON_UNESCAPED_UNICODE );
 		$estimate = isset( $catalog[ $router['provider'] ][ $router['model'] ] ) ? ( strlen( $prompt ) * (float) $catalog[ $router['provider'] ][ $router['model'] ]['input'] + $max_tokens * (float) $catalog[ $router['provider'] ][ $router['model'] ]['output'] ) / 1000000 + (float) $settings['text_reserve_margin_usd'] : 0.01;
 		$reservation = MSRWA_DB::reserve( $job, $estimate, 'model_routing' );
 		if ( is_wp_error( $reservation ) ) { return $reservation; }
@@ -76,7 +77,9 @@ final class MSRWA_Router {
 				$plan[ $stage ] = self::result( $eligible_by_stage[ $stage ][ $key ], 'automatic_agent', 'Choisi par le routeur automatique parmi les candidats vérifiés.' );
 			}
 		}
-		if ( empty( $plan['text'] ) ) { return new WP_Error( 'router_no_text_model', 'Le routeur n’a pas sélectionné de modèle texte autorisé.', array( 'status' => 502 ) ); }
+		foreach ( $candidates as $stage => $available ) {
+			if ( $available && empty( $plan[ $stage ] ) ) { return new WP_Error( 'router_incomplete_plan', 'Le routeur n’a pas sélectionné de modèle autorisé pour : ' . $stage . '.', array( 'status' => 502 ) ); }
+		}
 		$plan['reason'] = isset( $decoded['reason'] ) ? sanitize_text_field( $decoded['reason'] ) : 'Sélection automatique vérifiée par le catalogue.';
 		return $plan;
 	}

@@ -14,7 +14,7 @@ $artifacts = wp_json_encode( array(
 ) );
 $job_row = array(
 	'id' => 9, 'batch_id' => 3, 'owner_id' => 7, 'title' => 'Tarte <script>alert(1)</script>', 'status' => 'completed',
-	'stage' => 'review', 'draft_post_id' => 44, 'quality_score' => 93, 'quality_passed' => 1,
+	'stage' => 'review', 'draft_post_id' => 44, 'article_quality' => 'good', 'featured_quality' => 'good', 'facebook_quality' => 'needs_review', 'quality_score' => 93, 'quality_passed' => 1,
 	'quality_checked_at' => '2026-09-20 11:00:00', 'cost_estimate' => '0.1234', 'correction_cycles' => 1,
 	'correction_cycles_json' => '{"article":1}', 'attempts' => 2, 'retry_attempts' => 0,
 	'error_code' => 'quality_gate', 'error_message' => 'Article trop court.', 'artifacts_json' => $artifacts,
@@ -44,10 +44,11 @@ msrwa_test_as_admin( 1 );
 $admin = msrwa_test_render( array( 'page' => 'ms-recipes-writer-ai', 'msrwa_view' => 'articles', 'msrwa_status' => 'publish', 'msrwa_search' => 'tarte', 'msrwa_author' => '7', 'msrwa_quality' => 'good', 'msrwa_days' => '30' ), $job_row );
 msrwa_test_contains( $admin['sql'], 'j.draft_post_id > 0', 'The articles list must only read rows that produced an article.' );
 msrwa_test_contains( $admin['sql'], "p.post_status = 'publish'", 'The publication filter must reach the query.' );
-msrwa_test_contains( $admin['sql'], 'quality_passed = 1', 'The quality filter must read the stored verdict.' );
+msrwa_test_contains( $admin['sql'], "article_quality = 'good'", 'The quality filter must read the stored AI verdict.' );
 msrwa_test_contains( $admin['sql'], 'j.owner_id = 7', 'The administrator author filter must reach the query.' );
 msrwa_test_contains( $admin['html'], 'name="msrwa_author"', 'Administrators need the author filter.' );
 msrwa_test_contains( $admin['html'], 'msrwa-quality-good', 'The stored verdict must be rendered as a badge.' );
+msrwa_test_contains( $admin['html'], 'msrwa-quality-needs_review', 'The dedicated Facebook realism verdict must be rendered.' );
 msrwa_test_contains( $admin['html'], 'msrwa-post-status-publish', 'The publication state must be rendered.' );
 msrwa_test_missing( $admin['html'], '<script>alert(1)</script>', 'Job titles must be escaped.' );
 

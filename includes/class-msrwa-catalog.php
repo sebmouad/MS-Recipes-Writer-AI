@@ -92,9 +92,12 @@ final class MSRWA_Catalog {
 		$enabled_providers = array();
 		foreach ( self::providers() as $provider_row ) { if ( ! empty( $provider_row['enabled'] ) ) { $enabled_providers[ $provider_row['provider_key'] ] = true; } }
 		foreach ( self::models() as $provider => $models ) {
+			// The Claude transport currently implements text and vision, not native search.
+			if ( 'claude' === $provider && 'web_search' === $capability ) { continue; }
 			if ( $enabled_providers && empty( $enabled_providers[ $provider ] ) ) { continue; }
 			$known_ids = ! empty( $state[ $provider ]['available_ids'] ) && is_array( $state[ $provider ]['available_ids'] ) ? array_flip( $state[ $provider ]['available_ids'] ) : array();
 			foreach ( $models as $id => $model ) {
+				if ( 'vision' === $capability && empty( $model['text'] ) ) { continue; }
 				if ( ! empty( $model['stable'] ) && ! empty( $model[ $capability ] ) && ( empty( $known_ids ) || isset( $known_ids[ $id ] ) ) ) { $out[ $provider . ':' . $id ] = $model + array( 'provider' => $provider, 'id' => $id ); }
 			}
 		}

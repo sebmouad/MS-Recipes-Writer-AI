@@ -11,7 +11,7 @@ final class MSRWA_Lists {
 	const PER_PAGE_CHOICES = array( 20, 50, 100 );
 
 	public static function quality_labels() {
-		return array( 'good' => 'Bon', 'review' => 'À vérifier', 'incomplete' => 'Incomplet', 'uncertain' => 'Incertain', 'pending' => 'Non évalué', 'none' => 'Aucun article' );
+		return array( 'good' => 'Bon', 'review' => 'À vérifier', 'bad' => 'Mauvais', 'pending' => 'Non évalué', 'none' => 'Aucun article' );
 	}
 
 	public static function state_labels() {
@@ -24,7 +24,7 @@ final class MSRWA_Lists {
 	}
 
 	public static function order_labels() {
-		return array( 'recent' => 'Plus récents', 'oldest' => 'Plus anciens', 'updated' => 'Mise à jour récente', 'score' => 'Score décroissant', 'cost' => 'Coût décroissant', 'title' => 'Titre A→Z' );
+		return array( 'recent' => 'Plus récents', 'oldest' => 'Plus anciens', 'updated' => 'Mise à jour récente', 'score' => 'Qualité contenu', 'cost' => 'Coût décroissant', 'title' => 'Titre A→Z' );
 	}
 
 	/** The pipeline owns the stage vocabulary; the filter follows it. */
@@ -66,7 +66,7 @@ final class MSRWA_Lists {
 			'view'        => $view,
 			'search'      => trim( mb_substr( $value( 'msrwa_search' ), 0, 120 ) ),
 			'post_status' => isset( self::post_status_labels()[ $status ] ) ? $status : '',
-			'quality'     => in_array( $quality, array( 'good', 'review', 'incomplete', 'uncertain', 'pending' ), true ) ? $quality : '',
+			'quality'     => in_array( $quality, array( 'good', 'review', 'bad', 'pending' ), true ) ? $quality : '',
 			'state'       => isset( self::state_labels()[ $state ] ) ? $state : '',
 			'stage'       => in_array( $stage, self::stages(), true ) ? $stage : '',
 			'author'      => $can_view_all ? absint( $value( 'msrwa_author' ) ) : get_current_user_id(),
@@ -103,11 +103,10 @@ final class MSRWA_Lists {
 		}
 		if ( ! empty( $args['quality'] ) ) {
 			$quality = array(
-				'good'       => "(j.status = 'completed' AND j.quality_passed = 1)",
-				'review'     => "(j.status IN ('completed','needs_review') AND NOT (j.status = 'completed' AND j.quality_passed = 1))",
-				'incomplete' => "j.status = 'failed'",
-				'uncertain'  => "j.status = 'uncertain'",
-				'pending'    => "j.status NOT IN ('completed','needs_review','failed','uncertain','cancelled','canceled')",
+				'good'       => "j.article_quality = 'good'",
+				'review'     => "j.article_quality = 'needs_review'",
+				'bad'        => "j.article_quality = 'bad'",
+				'pending'    => "(j.article_quality IS NULL OR j.article_quality = 'unknown')",
 			);
 			$where[] = $quality[ $args['quality'] ];
 		}
@@ -123,7 +122,7 @@ final class MSRWA_Lists {
 			'recent'  => 'j.id DESC',
 			'oldest'  => 'j.id ASC',
 			'updated' => 'j.updated_at DESC, j.id DESC',
-			'score'   => 'j.quality_score IS NULL, j.quality_score DESC, j.id DESC',
+			'score'   => "FIELD(j.article_quality,'good','needs_review','bad','unknown','not_generated') ASC, j.id DESC",
 			'cost'    => 'j.cost_estimate DESC, j.id DESC',
 			'title'   => 'j.title ASC, j.id DESC',
 		);
@@ -142,7 +141,7 @@ final class MSRWA_Lists {
 		$per_page = (int) $args['per_page'];
 		$pages = max( 1, (int) ceil( $total / $per_page ) );
 		$paged = min( max( 1, (int) $args['paged'] ), $pages );
-		$columns = 'j.id,j.batch_id,j.owner_id,j.title,j.status,j.stage,j.draft_post_id,j.quality_score,j.quality_passed,j.quality_checked_at,j.cost_estimate,j.correction_cycles,j.correction_cycles_json,j.attempts,j.retry_attempts,j.error_code,j.error_message,j.selected_models_json,j.created_at,j.updated_at,p.post_status,p.post_title,p.post_date';
+		$columns = 'j.id,j.batch_id,j.owner_id,j.title,j.status,j.stage,j.draft_post_id,j.article_quality,j.featured_quality,j.facebook_quality,j.quality_score,j.quality_passed,j.quality_checked_at,j.cost_estimate,j.correction_cycles,j.correction_cycles_json,j.attempts,j.retry_attempts,j.error_code,j.error_message,j.selected_models_json,j.created_at,j.updated_at,p.post_status,p.post_title,p.post_date';
 		$sql = "SELECT {$columns} {$from} {$clause} ORDER BY " . self::order_clause( $args['order'] ) . ' LIMIT %d OFFSET %d';
 		$params = array_merge( $conditions['params'], array( $per_page, ( $paged - 1 ) * $per_page ) );
 		$rows = $wpdb->get_results( $wpdb->prepare( $sql, $params ), ARRAY_A );

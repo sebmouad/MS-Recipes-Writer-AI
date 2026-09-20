@@ -69,13 +69,16 @@ final class MSRWA_Images {
 		$reservation = MSRWA_DB::reserve( $job, (float) $settings['vision_reserve_usd'], 'image_review' );
 		if ( is_wp_error( $reservation ) ) { return $reservation; }
 		$prompt = $settings['prompt_image_review'] . '\nRECETTE VALIDÉE : ' . wp_json_encode( $canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+		$purpose = ( $image['purpose'] ?? '' ) === 'facebook_image' ? 'facebook_image' : 'featured_image';
+		$prompt .= '\nUSAGE : ' . $purpose . '\nCONSIGNES VISUELLES : ' . $settings[ 'facebook_image' === $purpose ? 'prompt_facebook_image' : 'prompt_image' ];
 		$started = current_time( 'mysql', true );
 		$result = MSRWA_Providers::vision_text( $plan['provider'], $plan['model'], $prompt, $file, absint( $settings['image_review_max_output_tokens'] ) );
 		self::record_call( $job, 'image_review', $plan['provider'], $plan['model'], $prompt, $result, false, $reservation, $started );
 		if ( is_wp_error( $result ) ) { return $result; }
 		$json = json_decode( trim( (string) $result['text'] ), true );
 		if ( ! is_array( $json ) ) { $start = strpos( $result['text'], '{' ); $end = strrpos( $result['text'], '}' ); if ( false !== $start && false !== $end ) { $json = json_decode( substr( $result['text'], $start, $end - $start + 1 ), true ); } }
-		return is_array( $json ) ? $json : new WP_Error( 'image_review_invalid', 'La relecture vision n’a pas retourné un JSON valide.' );
+		if ( ! is_array( $json ) ) { return new WP_Error( 'image_review_invalid', 'La relecture vision n’a pas retourné un JSON valide.' ); }
+		return MSRWA_Quality::normalize_review( $json, true );
 	}
 
 	private static function image_plan( $stage, $job = null ) {

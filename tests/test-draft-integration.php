@@ -27,7 +27,7 @@ try {
 	if ( false !== strpos( $post->post_content, 'Rédaction interrompue' ) ) { throw new RuntimeException( 'Private report leaked to article.' ); }
 	if ( $post_id !== MSRWA_Publisher::create_draft( $job, array(), true ) ) { throw new RuntimeException( 'Duplicate draft.' ); }
 	ob_start(); MSRWA_Admin::render_editorial_meta_box( get_post( $post_id ) ); $html = ob_get_clean();
-	if ( false === strpos( $html, 'Score de structure' ) || false === strpos( $html, 'Non évalué' ) ) { throw new RuntimeException( 'Partial report missing.' ); }
+	if ( false === strpos( $html, 'Contenu' ) || false === strpos( $html, 'Non évalué' ) || false !== strpos( $html, 'Score de structure' ) ) { throw new RuntimeException( 'Partial AI report missing.' ); }
 	// Mimic an already-published row without firing publication hooks.
 	$wpdb->update( $wpdb->posts, array( 'post_status' => 'publish' ), array( 'ID' => $post_id ) ); clean_post_cache( $post_id );
 	$result = MSRWA_Publisher::create_draft( $job, array(), true );
