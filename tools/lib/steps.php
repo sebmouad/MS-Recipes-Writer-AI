@@ -109,6 +109,7 @@ function lab_editor_brief( $brief ) {
 
 /** Loads a saved research run or the fixture package. Downstream stages share it unchanged. */
 function lab_research_package( $brief, $options = array() ) {
+	lab_boot();
 	$file = (string) ( $options['research'] ?? '' );
 	if ( '' === $file ) { return is_array( $brief['research'] ?? null ) ? $brief['research'] : array(); }
 	if ( ! file_exists( $file ) ) { fwrite( STDERR, "No such research package: {$file}\n" ); exit( 2 ); }
@@ -120,6 +121,7 @@ function lab_research_package( $brief, $options = array() ) {
 
 /** Loads the saved canonical step when supplied, otherwise the fixture recipe. */
 function lab_canonical_recipe( $brief, $options = array() ) {
+	lab_boot();
 	$file = (string) ( $options['canonical'] ?? '' );
 	if ( '' === $file ) { return is_array( $brief['canonical'] ?? null ) ? $brief['canonical'] : array(); }
 	if ( ! file_exists( $file ) ) { fwrite( STDERR, "No such canonical recipe: {$file}\n" ); exit( 2 ); }
@@ -152,9 +154,17 @@ function lab_build_input( $step, $prompt, $brief, $options ) {
 	}
 	if ( 'article' === $step ) {
 		lab_boot();
+		$feedback = array();
+		$feedback_file = (string) ( $options['feedback'] ?? '' );
+		if ( '' !== $feedback_file && file_exists( $feedback_file ) ) {
+			$saved = json_decode( file_get_contents( $feedback_file ), true );
+			$feedback = MSRWA_Json::decode( (string) ( $saved['output'] ?? '' ) );
+			$feedback = is_array( $feedback ) ? $feedback : array();
+		}
 		return $prompt . MSRWA_Quality::prompt_contract( $settings )
 			. "\nRecette canonique : " . $encode( $canonical )
-			. "\nRESEARCH PACKAGE: " . $encode( $research );
+			. "\nRESEARCH PACKAGE: " . $encode( $research )
+			. ( $feedback ? "\nREVIEW FINDINGS TO CORRECT IN THE COMPLETE RETURNED ARTICLE: " . $encode( $feedback ) : '' );
 	}
 	if ( 'review' === $step ) {
 		return $prompt . "\nCANONICAL RECIPE: " . $encode( $canonical )
@@ -195,6 +205,8 @@ function lab_score( $step, $text, $brief, $options = array() ) {
 			if ( preg_match( '#^https://#i', (string) ( $reference['image_url'] ?? '' ) ) && preg_match( '#^https://#i', (string) ( $reference['source_url'] ?? '' ) ) ) { $real_images++; }
 		}
 		$checks['real image provenance'] = array( 'pass' => $real_images > 0, 'detail' => $real_images . ' image references with HTTPS image and source URLs' );
+		$observed = count( (array) ( $json['visual_observations'] ?? array() ) );
+		$checks['images inspected'] = array( 'pass' => $observed > 0, 'detail' => $observed . ' visual observations extracted from image bytes' );
 	}
 
 	if ( 'canonical_recipe' === $step ) {

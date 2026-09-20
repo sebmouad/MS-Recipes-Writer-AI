@@ -34,7 +34,8 @@ final class MSRWA_Images {
 		$featured_file = $featured_id ? get_attached_file( $featured_id ) : '';
 		$settings = MSRWA_Settings::get();
 		$canonical = isset( $artifacts['canonical'] ) ? $artifacts['canonical'] : array();
-		$prompt = $settings['prompt_facebook_image'] . '\nRECETTE VALIDÉE : ' . wp_json_encode( $canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . self::visual_context( $artifacts ) . self::correction_context( $artifacts, 'facebook_image', $settings );
+		$facebook_prompt = MSRWA_Prompt::compile( $settings['prompt_facebook_image'], $settings );
+		$prompt = $facebook_prompt . '\nRECETTE VALIDÉE : ' . wp_json_encode( $canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . self::visual_context( $artifacts ) . self::correction_context( $artifacts, 'facebook_image', $settings );
 		$size = self::native_size( $settings['facebook_ratio'], '1024x1536' );
 		$quality = self::quality( $settings );
 		$format = self::format( $settings );
@@ -70,7 +71,8 @@ final class MSRWA_Images {
 		if ( is_wp_error( $reservation ) ) { return $reservation; }
 		$prompt = $settings['prompt_image_review'] . '\nRECETTE VALIDÉE : ' . wp_json_encode( $canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
 		$purpose = ( $image['purpose'] ?? '' ) === 'facebook_image' ? 'facebook_image' : 'featured_image';
-		$prompt .= '\nUSAGE : ' . $purpose . '\nCONSIGNES VISUELLES : ' . $settings[ 'facebook_image' === $purpose ? 'prompt_facebook_image' : 'prompt_image' ];
+		$visual_prompt = $settings[ 'facebook_image' === $purpose ? 'prompt_facebook_image' : 'prompt_image' ];
+		$prompt .= '\nUSAGE : ' . $purpose . '\nCONSIGNES VISUELLES : ' . MSRWA_Prompt::compile( $visual_prompt, $settings );
 		$started = current_time( 'mysql', true );
 		$result = MSRWA_Providers::vision_text( $plan['provider'], $plan['model'], $prompt, $file, absint( $settings['image_review_max_output_tokens'] ) );
 		self::record_call( $job, 'image_review', $plan['provider'], $plan['model'], $prompt, $result, false, $reservation, $started );

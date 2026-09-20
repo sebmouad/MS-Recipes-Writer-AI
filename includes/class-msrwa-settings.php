@@ -6,7 +6,7 @@ final class MSRWA_Settings {
 	const SCOPE = 'global';
 
 	public static function defaults() {
-		return array(
+		$defaults = array(
 			'mode'                => 'automatic',
 			'openai_key'          => '',
 			'gemini_key'          => '',
@@ -41,7 +41,7 @@ final class MSRWA_Settings {
 			'temp_days'           => 7,
 			'aggregate_months'    => 12,
 			'featured_ratio'      => '1:1',
-			'facebook_ratio'      => '4:5',
+			'facebook_ratio'      => '2:3',
 			'facebook_image_fit'  => 'contain',
 			'image_padding_color' => '#ffffff',
 			'image_quality'       => 'low',
@@ -89,8 +89,11 @@ final class MSRWA_Settings {
 			'prompt_image'        => 'Tu es un photographe culinaire professionnel. Génère une image principale carrée 1:1, ultra réaliste et appétissante, fidèle aux ingrédients, aux textures et au dressage de la recette validée. Lumière naturelle, composition premium, arrière-plan propre, aucune personne, aucun texte, aucun logo, aucun filigrane. Respecte strictement les proportions et ne montre que le plat demandé. N’ajoute aucune garniture absente de la recette, notamment sucre glace, glaçage, herbes ou fruits. Toute part servie doit rester entièrement visible dans le cadre.',
 			'prompt_image_review' => 'Tu es un directeur artistique culinaire indépendant. Évalue réellement le réalisme photographique et la fidélité de cette image à la recette validée. Retourne uniquement un JSON avec pass (boolean), verdict (good|needs_review|bad), realism (good|needs_review|bad), quality_summary (phrase courte), findings (severity, reason, fix), subject_match et uncertainties. pass ne vaut true que si verdict et realism sont good. Vérifie plat, ingrédients visibles, textures, proportions, éclairage, ombres, anatomie des aliments, cadrage, ratio, artefacts, texte, logo et filigrane. Ne déduis pas de détails invisibles.',
 			'prompt_image_correction' => 'Corrige uniquement les défauts visuels signalés ci-dessous tout en conservant la recette validée, le ratio demandé, une photographie culinaire réaliste, et l’absence de texte, logo ou filigrane. Ne copie ni ne reproduis une image de référence.',
-			'prompt_facebook_image' => "Act as a professional food photographer and Pinterest content creator.\n\nCreate a high-quality step-by-step food collage showing the complete preparation process of this recipe.\n\nSTYLE:\n\n• Ultra realistic food photography\n• Bright natural lighting\n• Clean modern kitchen aesthetic\n• Soft shadows and realistic textures\n• Elegant Pinterest-style composition\n• Premium food magazine look\n• Soft pastel or white background\n• Slight top-down angle\n• Highly appetizing and realistic\n\nLAYOUT:\n\n• Create a vertical collage with 6 square sections (2 columns × 3 rows)\n• Each image represents one important step of the recipe\n• Keep the same bowl, mold, plate, and visual consistency across all steps\n• Smooth visual progression from ingredients to final plated recipe\n\nIMAGES TO INCLUDE:\n\n1. Preparing the base or arranging ingredients\n2. Mixing cream, batter, sauce, or filling\n3. First assembly step\n4. Second assembly step\n5. Final decoration or topping\n6. Final finished recipe beautifully presented and sliced/opened\n\nFOOD DETAILS:\n\n• Ingredients must look fresh and realistic\n• Creams, sauces, fruits, chocolate, cheese, etc. should have rich texture\n• Add realistic cooking details (powdered sugar, glossy fruits, melted cheese, herbs, crumbs, steam if needed)\n• Keep proportions realistic\n\nTEXT:\n\n• No text\n• No watermark\n• No logo\n• No labels\n\nQUALITY:\n\n• Ultra detailed\n• Professional culinary photography\n• Pinterest viral aesthetic\n• 4K realistic rendering\n• Clean composition\n• Consistent colors and lighting\n\nThe final image must look exactly like a professional Pinterest recipe tutorial collage showing all preparation stages of the recipe.",
+			'prompt_facebook_image' => 'Crée un tutoriel culinaire original en exactement six panneaux cohérents, fidèle à la recette, sans texte, logo ni filigrane.',
 		);
+		$facebook_prompt = dirname( __DIR__ ) . '/tools/prompts/facebook_image.tpl.txt';
+		if ( is_readable( $facebook_prompt ) ) { $defaults['prompt_facebook_image'] = trim( file_get_contents( $facebook_prompt ) ); }
+		return $defaults;
 	}
 
 	public static function get() {

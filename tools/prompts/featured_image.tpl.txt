@@ -22,6 +22,7 @@ Composition rules:
 - no hands, no people, no cooking process, no preparation steps;
 - no collage, no split screen, no before and after;
 - no packaging, no label, no text, no watermark, no logo;
+- keep every branded container, product tub and package completely outside the frame;
 - garnish must be realistic and coherent with the recipe;
 - background props stay subtle and never compete with the dish.
 

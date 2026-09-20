@@ -11,7 +11,7 @@ RULES:
 - Steps are ordered, each one a single action with its sign of success. Never merge three gestures into one step.
 - Use only ingredients and method details supported by the editor brief or research package. Invent nothing, and never pad the list to look complete.
 - Research visual observations may confirm visible appearance, texture and plating only. Never derive quantities, ingredients or hidden preparation steps from an image.
-- calories_estimate is per serving, an honest approximation, never a precise claim.
+- calories_estimate is an integer number of kcal per serving. It is an honest approximation, never a precise claim; put uncertainty in "uncertainties", not in this numeric field.
 - If the research contradicts itself, choose the safest value for the cook and record the doubt in "uncertainties".
 - food_safety states the handling rules this dish actually needs: core temperatures, raw-egg or raw-fish handling, cooling and reheating limits, allergens present. Never leave it generic.
 

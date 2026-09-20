@@ -34,7 +34,6 @@ function lab_http( $url, $headers, $payload, $timeout = 600 ) {
 	$raw = curl_exec( $ch );
 	$status = (int) curl_getinfo( $ch, CURLINFO_RESPONSE_CODE );
 	$error = curl_error( $ch );
-	curl_close( $ch );
 	return array( 'status' => $status, 'raw' => (string) $raw, 'error' => $error, 'seconds' => round( microtime( true ) - $started, 1 ) );
 }
 
@@ -130,7 +129,6 @@ function lab_fetch_image( $url ) {
 	$status = (int) curl_getinfo( $ch, CURLINFO_RESPONSE_CODE );
 	$mime = strtolower( trim( (string) curl_getinfo( $ch, CURLINFO_CONTENT_TYPE ) ) );
 	$error = curl_error( $ch );
-	curl_close( $ch );
 	if ( false === $ok || 200 !== $status || '' !== $error ) { return array( 'error' => $error ?: 'image HTTP ' . $status ); }
 	$mime = trim( strtok( $mime, ';' ) );
 	if ( ! in_array( $mime, array( 'image/jpeg', 'image/png', 'image/webp', 'image/gif' ), true ) ) { return array( 'error' => 'unsupported image type ' . $mime ); }

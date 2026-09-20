@@ -124,6 +124,8 @@ $run = array(
 	'seconds' => $result['seconds'], 'usage' => $result['usage'], 'cost_usd' => $cost,
 	'status' => $result['status'], 'scores' => $scores, 'output' => $result['text'], 'prompt' => $prompt,
 );
+$runs_directory = __DIR__ . '/runs';
+if ( ! is_dir( $runs_directory ) && ! mkdir( $runs_directory, 0775, true ) ) { fwrite( STDERR, "Could not create {$runs_directory}.\n" ); exit( 1 ); }
 $path = __DIR__ . '/runs/' . $step . '-' . $source . '-' . $provider . '-' . ( $tier ?: 'x' ) . '-' . gmdate( 'Ymd-His' ) . '.json';
 file_put_contents( $path, json_encode( $run, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) );
 

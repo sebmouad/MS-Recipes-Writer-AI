@@ -45,5 +45,12 @@ $brief = lab_brief( 'tarte-pommes' );
 $article_input = lab_build_input( 'article', lab_prompt( 'article' ), $brief, array() );
 msrwa_test_contains( $article_input, 'RESEARCH PACKAGE:', 'The article lab input must carry the shared research package.' );
 msrwa_test_contains( $article_input, 'visual_observations', 'Real-image observations must reach the article contract.' );
+$facebook_template = file_get_contents( dirname( __DIR__ ) . '/tools/prompts/facebook_image.tpl.txt' );
+$facebook_prompt = MSRWA_Prompt::compile( $facebook_template, lab_settings() );
+msrwa_test_contains( $facebook_prompt, 'One vertical 2:3 canvas at 1024x1536', 'The Facebook benchmark must compile to the dominant reference geometry.' );
+msrwa_test_contains( $facebook_prompt, 'EXACTLY 6 panels', 'The Facebook collage must require a strict six-panel grid.' );
+msrwa_test_contains( $facebook_prompt, 'FINISHED BATCH', 'The Facebook storyboard must reserve a whole-dish result shot.' );
+msrwa_test_contains( $facebook_prompt, 'HERO SERVING', 'The Facebook storyboard must finish with an interior-revealing serving.' );
+msrwa_test_contains( $facebook_prompt, 'do not sample mechanically', 'The Facebook storyboard must select visual transformations instead of evenly spaced steps.' );
 
 msrwa_test_done( 'MSRWA prompt compiler contracts' );

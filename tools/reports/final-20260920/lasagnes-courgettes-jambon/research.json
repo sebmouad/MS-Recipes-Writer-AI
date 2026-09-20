@@ -1,0 +1,232 @@
+{
+    "dish_identity": {
+        "name": "Lasagnes de courgettes au jambon et à la béchamel gratinées",
+        "confidence": "élevée",
+        "evidence": "Le titre éditorial et les sources concordent sur une alternance de courgettes, jambon, feuilles de lasagnes, béchamel et fromage gratiné. Sources : https://www.fleurymichon.fr/recettes/lasagnes-jambon-courgettes ; https://www.guydemarle.com/recettes/lasagnes-courgettes-jambon-42347"
+    },
+    "ingredient_facts": [
+        {
+            "source_url": "https://www.fleurymichon.fr/recettes/lasagnes-jambon-courgettes",
+            "text": "Pour 4 personnes, une version utilise 8 tranches de jambon, 2 courgettes, 500 ml de béchamel, 200 g de fromage râpé et 1 cuillère à soupe d'huile d'olive."
+        },
+        {
+            "source_url": "https://www.fleurymichon.fr/recettes/lasagnes-jambon-courgettes",
+            "text": "La béchamel maison est donnée dans un ratio de 50 g de beurre, 50 g de farine et 500 ml de lait."
+        },
+        {
+            "source_url": "https://www.guydemarle.com/recettes/lasagnes-courgettes-jambon-42347",
+            "text": "Une version pour 6 personnes prévoit 4 courgettes, 1 oignon, 60 g de beurre, 60 g de farine, 900 ml de lait et 4 tranches de jambon."
+        },
+        {
+            "source_url": "https://www.platetrecette.fr/lasagnes-aux-courgettes-et-au-jambon-avec-thermomix/",
+            "text": "Une version pour 6 personnes utilise 250 g de feuilles de lasagne précuites, 600 g de courgettes, 150 g de jambon, 500 g de lait, 40 g de beurre, 50 g de farine, 100 g de parmesan, 125 g de mozzarella et 50 g de gruyère."
+        },
+        {
+            "source_url": "https://www.fleurymichon.fr/recettes/lasagnes-jambon-courgettes",
+            "text": "Le fromage râpé est ajouté généreusement sur la dernière couche de béchamel pour le gratin."
+        },
+        {
+            "source_url": "https://www.fleurymichon.fr/recettes/lasagnes-jambon-courgettes",
+            "text": "Sel, poivre et noix de muscade servent à assaisonner les courgettes et la béchamel."
+        }
+    ],
+    "preparation_facts": [
+        {
+            "source_url": "https://www.fleurymichon.fr/recettes/lasagnes-jambon-courgettes",
+            "text": "Préchauffer le four à 180 °C."
+        },
+        {
+            "source_url": "https://www.fleurymichon.fr/recettes/lasagnes-jambon-courgettes",
+            "text": "Couper les courgettes en fines rondelles et les faire revenir environ 5 minutes à feu moyen jusqu'à légère coloration."
+        },
+        {
+            "source_url": "https://www.guydemarle.com/recettes/lasagnes-courgettes-jambon-42347",
+            "text": "Une autre méthode commence par faire revenir un oignon jusqu'à coloration, puis les courgettes pendant quelques minutes."
+        },
+        {
+            "source_url": "https://www.platetrecette.fr/lasagnes-aux-courgettes-et-au-jambon-avec-thermomix/",
+            "text": "Pour limiter l'eau, les courgettes peuvent être précuites à la vapeur pendant 15 minutes puis bien égouttées."
+        },
+        {
+            "source_url": "https://www.platetrecette.fr/lasagnes-aux-courgettes-et-au-jambon-avec-thermomix/",
+            "text": "Après précuisson, presser légèrement les courgettes dans du papier absorbant ou un torchon avant le montage."
+        },
+        {
+            "source_url": "https://www.fleurymichon.fr/recettes/lasagnes-jambon-courgettes",
+            "text": "Pour la béchamel, former un roux avec le beurre et la farine pendant 1 à 2 minutes, puis incorporer progressivement le lait en fouettant jusqu'à épaississement."
+        },
+        {
+            "source_url": "https://www.guydemarle.com/recettes/lasagnes-courgettes-jambon-42347",
+            "text": "Commencer le montage par une fine couche de béchamel au fond du plat."
+        },
+        {
+            "source_url": "https://www.fleurymichon.fr/recettes/lasagnes-jambon-courgettes",
+            "text": "Alterner les feuilles de lasagnes, les courgettes, le jambon et la béchamel, puis terminer par la béchamel et le fromage."
+        },
+        {
+            "source_url": "https://www.guydemarle.com/recettes/lasagnes-courgettes-jambon-42347",
+            "text": "Une version intercale aussi du gruyère râpé dans les couches et termine par des feuilles de lasagnes, de la béchamel et du fromage."
+        },
+        {
+            "source_url": "https://www.fleurymichon.fr/recettes/lasagnes-jambon-courgettes",
+            "text": "Cuire environ 30 à 40 minutes à 180 °C, jusqu'à ce que le dessus soit doré et que les pâtes soient cuites à cœur."
+        },
+        {
+            "source_url": "https://www.guydemarle.com/recettes/lasagnes-courgettes-jambon-42347",
+            "text": "Une autre source indique 1 heure à 180 °C, ce qui constitue une durée plus longue que les 30 à 40 minutes annoncées ailleurs."
+        },
+        {
+            "source_url": "https://www.fleurymichon.fr/recettes/lasagnes-jambon-courgettes",
+            "text": "Laisser reposer quelques minutes avant de découper afin de stabiliser les couches."
+        }
+    ],
+    "food_safety": [
+        {
+            "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/steps-keep-food-safe",
+            "text": "Les restes et les gratins doivent atteindre 74 °C à cœur lors du réchauffage."
+        },
+        {
+            "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/leftovers-and-food-safety",
+            "text": "Réfrigérer les restes dans les 2 heures suivant la cuisson, ou dans l'heure si la température ambiante dépasse 32 °C."
+        },
+        {
+            "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/leftovers-and-food-safety",
+            "text": "Répartir le gratin en portions ou contenants peu profonds pour accélérer son refroidissement."
+        },
+        {
+            "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/leftovers-and-food-safety",
+            "text": "Conserver les restes au réfrigérateur pendant 3 à 4 jours ou les congeler pendant 3 à 4 mois."
+        },
+        {
+            "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/steps-keep-food-safe",
+            "text": "Maintenir le plat chaud à au moins 60 °C s'il doit attendre avant le service."
+        }
+    ],
+    "references": [
+        {
+            "url": "https://www.fleurymichon.fr/recettes/lasagnes-jambon-courgettes",
+            "title": "Lasagnes Jambon & Courgettes",
+            "publisher": "Fleury Michon"
+        },
+        {
+            "url": "https://www.guydemarle.com/recettes/lasagnes-courgettes-jambon-42347",
+            "title": "Lasagnes Courgettes / Jambon",
+            "publisher": "Guy Demarle"
+        },
+        {
+            "url": "https://www.platetrecette.fr/lasagnes-aux-courgettes-et-au-jambon-avec-thermomix/",
+            "title": "Lasagnes aux courgettes et au jambon avec Thermomix",
+            "publisher": "Plat et Recette"
+        },
+        {
+            "url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/leftovers-and-food-safety",
+            "title": "Leftovers and Food Safety",
+            "publisher": "USDA Food Safety and Inspection Service"
+        },
+        {
+            "url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/steps-keep-food-safe",
+            "title": "Keep Food Safe! Food Safety Basics",
+            "publisher": "USDA Food Safety and Inspection Service"
+        }
+    ],
+    "visual_references": [
+        {
+            "image_url": "https://www.fleurymichon.fr/sites/default/files/styles/information_card_desktop/public/telechargements/images/galerie/2025-03/%40EmilieBesler-88-Modifier-1.jpg.webp?h=95320c6c&itok=568xLNtP",
+            "source_url": "https://www.fleurymichon.fr/recettes/lasagnes-jambon-courgettes",
+            "title": "Lasagnes Jambon & Courgettes"
+        },
+        {
+            "image_url": "https://www.platetrecette.fr/wp-content/uploads/2018/05/lasagnes-aux-courgettes-et-au-jambon-avec-Thermomix.jpg",
+            "source_url": "https://www.platetrecette.fr/lasagnes-aux-courgettes-et-au-jambon-avec-thermomix/",
+            "title": "Lasagnes aux courgettes et au jambon avec Thermomix"
+        }
+    ],
+    "visual_observations": [
+        {
+            "image_url": "https://www.fleurymichon.fr/sites/default/files/styles/information_card_desktop/public/telechargements/images/galerie/2025-03/%40EmilieBesler-88-Modifier-1.jpg.webp?h=95320c6c&itok=568xLNtP",
+            "source_url": "https://www.fleurymichon.fr/recettes/lasagnes-jambon-courgettes",
+            "observable_details": [
+                "Un plat blanc rectangulaire à angles arrondis contient un gratin découpé, avec une part retirée sur le bord avant.",
+                "La surface supérieure est dorée et parsemée de petites touches vertes.",
+                "La coupe laisse voir plusieurs couches superposées, comprenant des feuilles pâles, des éléments roses et des morceaux verts courbés.",
+                "Le plat est posé sur un tissu vert froissé.",
+                "Une cuillère en bois se trouve au premier plan à droite.",
+                "À l’arrière-plan, on distingue un oignon brun et une partie d’un autre bulbe.",
+                "Des fleurs claires apparaissent dans la partie supérieure droite.",
+                "Un emballage vert et blanc partiellement visible se trouve à droite, avec des fragments de texte tels que « Flex »."
+            ],
+            "composition": "Vue rapprochée en légère plongée, centrée sur le plat. Le plat occupe la majeure partie de l’image, avec la coupe visible au premier plan. Le tissu, la cuillère, les bulbes, les fleurs et l’emballage encadrent la préparation.",
+            "couleurs": [
+                "Blanc et crème pour le plat et les couches claires",
+                "Doré, jaune et brun pour la surface gratinée",
+                "Rose pâle dans certaines couches intérieures",
+                "Vert pour les morceaux visibles, le tissu et l’emballage",
+                "Brun clair pour la cuillère et le fond en bois",
+                "Tons mauves et blancs pour les fleurs"
+            ],
+            "textures": [
+                "Surface supérieure irrégulière, gratinée et légèrement boursouflée",
+                "Couches intérieures nettes et superposées sur la tranche coupée",
+                "Tissu épais, mat et froissé",
+                "Cuillère en bois lisse avec des variations de grain",
+                "Fond en bois présentant des marques et des veinures visibles"
+            ],
+            "incertainties": [
+                "La nature exacte des couches roses, vertes et pâles n’est pas identifiable avec certitude à partir de l’image seule.",
+                "Le texte de l’emballage est partiellement masqué et illisible.",
+                "La profondeur et la quantité exactes des couches ne peuvent pas être déterminées précisément."
+            ]
+        },
+        {
+            "image_url": "https://www.platetrecette.fr/wp-content/uploads/2018/05/lasagnes-aux-courgettes-et-au-jambon-avec-Thermomix.jpg",
+            "source_url": "https://www.platetrecette.fr/lasagnes-aux-courgettes-et-au-jambon-avec-thermomix/",
+            "observable_details": [
+                "L’image montre deux vues d’un plat dans un montage côte à côte.",
+                "À gauche, un plat rectangulaire blanc à bords hauts contient une préparation cuite et gratinée.",
+                "À droite, une portion est présentée dans une assiette blanche, avec plusieurs couches visibles.",
+                "Des éléments verts en fines lamelles ou petits morceaux sont visibles à la surface et entre les couches.",
+                "Des zones rosées pâles et blanchâtres apparaissent entre les couches."
+            ],
+            "composition": [
+                "La vue de gauche est un gros plan du plat rectangulaire presque entièrement visible.",
+                "La vue de droite est un gros plan d’une part découpée, montrant une structure stratifiée.",
+                "Le plat de gauche repose sur une surface textile grise.",
+                "L’arrière-plan est peu visible et flou."
+            ],
+            "couleurs": [
+                "Blanc et crème dominants.",
+                "Vert clair à vert foncé par endroits.",
+                "Quelques zones dorées et brun clair sur la surface.",
+                "Présence de tons rosés pâles dans les couches.",
+                "Assiette et plat principalement blancs."
+            ],
+            "textures": [
+                "Surface supérieure irrégulière, crémeuse et légèrement dorée.",
+                "Couches internes souples et superposées.",
+                "Morceaux ou lamelles verts visibles dans la préparation.",
+                "Bords du plat lisses et brillants.",
+                "Certaines zones présentent un aspect humide ou nappé."
+            ],
+            "incertitudes": [
+                "La nature exacte des éléments visibles, notamment les parties vertes et rosées, ne peut pas être déterminée avec certitude à partir de l’image seule.",
+                "Le nombre exact de couches et les proportions des éléments ne sont pas déterminables.",
+                "La méthode de préparation et l’utilisation éventuelle d’un appareil ne sont pas visibles.",
+                "La température, la texture intérieure complète et le goût ne peuvent pas être déduits de la photographie."
+            ]
+        }
+    ],
+    "uncertainties": [
+        "La quantité de feuilles de lasagnes n'est pas indiquée dans la recette Fleury Michon, alors qu'une autre version donne 250 g pour 6 personnes.",
+        "Les sources divergent sur la durée de cuisson : environ 30 à 40 minutes à 180 °C dans une recette, contre 1 heure à 180 °C dans une autre.",
+        "La précuisson des courgettes varie : sautées 5 minutes, revenues avec un oignon, ou cuites à la vapeur 15 minutes puis égouttées.",
+        "Les proportions de béchamel ne sont pas uniformes : 50 g de beurre, 50 g de farine et 500 ml de lait dans une source, contre 60 g, 60 g et 900 ml dans une autre.",
+        "Aucune source consultée ne fixe une taille unique de plat ni une épaisseur standard pour les couches.",
+        "Les photographies montrent le résultat visuel mais ne permettent pas de confirmer les quantités, la cuisson exacte des pâtes ou la composition de chaque couche."
+    ],
+    "originality_notes": [
+        "Les informations ont été reformulées en faits courts et actionnables sans reproduire la prose des sources.",
+        "Les quantités et durées divergentes sont conservées comme divergences plutôt que fusionnées ou moyennées.",
+        "Les photographies sont citées comme références visuelles externes ; aucun détail d'ingrédient ou de quantité n'a été déduit d'une image.",
+        "Aucune recette finale ni texte d'article n'est fourni : le paquet sert de base documentaire aux équipes recette, rédaction, image et contrôle qualité."
+    ]
+}
