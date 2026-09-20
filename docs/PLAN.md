@@ -14,6 +14,24 @@ written than MS-Cook-Writer-AI, produce several recipes in one batch, never
 ship writing mistakes, and let you see what each recipe will cost before you
 spend it. Editors only write and publish; administrators control everything.
 
+## How it is being built
+
+Three stages, in this order:
+
+1. **Prove the prompts.** Each writing step is tested directly against the AI,
+   with no WordPress involved, until it produces what we agreed: the right
+   length, every required section, correct facts, clean French. The winning
+   prompts are then stored in the plugin.
+2. **Build the whole plugin** on those prompts: generation engine, screens,
+   menus, costs, security and access rights, as one complete first version.
+3. **Deploy on the site**, measure, and improve what the real runs show.
+
+A measurement from the current code, for reference: one recipe took over ten
+minutes, of which only five were actual AI work — the rest was the plugin
+waiting between steps — and the article was rewritten four times. The reference
+plugin does article plus image in about sixty seconds. Fixing that is the first
+build task.
+
 ## The six milestones
 
 ### ☐ 1. Know the cost before spending it

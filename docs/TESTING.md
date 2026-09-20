@@ -1,17 +1,25 @@
 # Testing
 
-Two layers. Both are required before a checklist task may be marked done.
+Three layers. Each answers a different question, and all three gate a task.
 
-| Layer | Runs | Needs | Purpose |
+| Layer | Question | Runs | Needs |
 | --- | --- | --- | --- |
-| **Offline** `tests/` | every push, CI | nothing | contracts and regressions, fast |
-| **Real** `tests/real/` | on demand | WordPress, MySQL, provider keys | proves it works for real, with real money |
+| **Prompt lab** `tools/` | does the prompt produce the required result? | while tuning a prompt | an API key |
+| **Offline** `tests/` | does the code keep its contracts? | every push, CI | nothing |
+| **Real** `tests/real/` | does it work on a real site, for real money? | before ticking a task | WordPress + app password |
 
 ```bash
-php tests/run.php            # offline: lint + every offline test
-php tests/run.php lists      # filter by filename fragment
-php tests/real/run.php       # real: preflight, then run what it can
+php tools/prompt-lab.php run article   # prompt lab, see tools/README.md
+php tests/run.php                      # offline: lint + every offline test
+php tests/run.php lists                # filter by filename fragment
+php tests/real/run.php                 # real: preflight, then run what it can
 ```
+
+The prompt lab needs no WordPress and no database: it calls the API directly,
+assembles the input exactly as the pipeline does, and scores the answer with
+the plugin's own quality gate. Prompts proven there are promoted into the
+defaults in `includes/class-msrwa-settings.php`, which seed the `prompts`
+table.
 
 The offline runner exits non-zero on any lint or test failure; CI
 (`.github/workflows/ci.yml`) runs it on PHP 7.4, 8.1 and 8.3.
@@ -31,6 +39,7 @@ in the shell profile or the site's `wp-config.php`.
 | `MSRWA_GEMINI_KEY` | Google Gemini key | only if Gemini is in the routing |
 | `MSRWA_CLAUDE_KEY` | Anthropic key | only if Claude is in the routing |
 | `MSRWA_TEST_BUDGET_USD` | Maximum a single real run may spend, for example `2.00` | every real test that calls a provider |
+| `OPENAI_API_KEY` | OpenAI key used by the prompt lab only | `tools/prompt-lab.php` |
 
 A real test that would exceed `MSRWA_TEST_BUDGET_USD` refuses to start. Each
 run prints what it spent.

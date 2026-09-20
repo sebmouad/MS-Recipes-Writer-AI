@@ -1,0 +1,54 @@
+{
+  "title": "Tarte aux pommes normande",
+  "text": "Tarte aux pommes normande traditionnelle : pâte brisée maison, pommes fondantes, appareil à la crème et calvados. Préciser le choix des pommes, les substitutions, le matériel, les erreurs fréquentes, la conservation et des variantes plus légères.",
+  "research": {
+    "recipe_facts": [
+      { "source": "https://example.test/pommes", "text": "Les pommes Reinette et Boskoop tiennent la cuisson et gardent une acidité qui équilibre la crème." },
+      { "source": "https://example.test/pate", "text": "Une pâte brisée repose au moins 30 minutes au froid pour limiter la rétractation à la cuisson." },
+      { "source": "https://example.test/cuisson", "text": "La cuisson se fait à 180 °C chaleur tournante, 35 à 45 minutes selon l'épaisseur de l'appareil." }
+    ],
+    "references": [
+      { "url": "https://example.test/pommes", "title": "Choisir ses pommes à cuire" },
+      { "url": "https://example.test/cuisson", "title": "Cuisson des tartes aux fruits" }
+    ],
+    "uncertainties": ["Les temps varient selon le four ; vérifier la coloration."]
+  },
+  "canonical": {
+    "title": "Tarte aux pommes normande",
+    "servings": 8,
+    "prep_minutes": 30,
+    "cook_minutes": 40,
+    "total_minutes": 70,
+    "cuisine": "Française",
+    "difficulty": "Facile",
+    "calories_estimate": 320,
+    "ingredients": [
+      { "name": "Pâte brisée", "quantity": "1", "unit": "rouleau" },
+      { "name": "Pommes Reinette", "quantity": "6", "unit": "pièces" },
+      { "name": "Crème fraîche épaisse", "quantity": "20", "unit": "cl" },
+      { "name": "Œufs", "quantity": "2", "unit": "pièces" },
+      { "name": "Sucre", "quantity": "80", "unit": "g" },
+      { "name": "Calvados", "quantity": "2", "unit": "cuillères à soupe" },
+      { "name": "Beurre", "quantity": "20", "unit": "g" }
+    ],
+    "steps": [
+      { "text": "Foncer le moule avec la pâte et piquer le fond à la fourchette." },
+      { "text": "Éplucher les pommes, les couper en quartiers réguliers." },
+      { "text": "Disposer les pommes en rosace sur le fond de tarte." },
+      { "text": "Battre les œufs avec le sucre, la crème et le calvados." },
+      { "text": "Verser l'appareil sur les pommes et parsemer de beurre." },
+      { "text": "Enfourner 40 minutes à 180 °C jusqu'à coloration dorée." }
+    ],
+    "equipment": ["Moule à tarte de 28 cm", "Économe", "Fouet"],
+    "notes": ["Servir tiède pour que l'appareil reste fondant."],
+    "faq": [{ "question": "Peut-on préparer la tarte la veille ?", "answer": "Oui, elle se conserve 48 heures au réfrigérateur et se réchauffe 10 minutes à 150 °C." }],
+    "keywords": ["tarte aux pommes", "normande", "calvados"]
+  },
+  "article": {
+    "title": "Tarte aux pommes normande",
+    "content_html": "<h2>Une tarte normande fondante</h2><p>Texte de test volontairement court, utilisé seulement pour la relecture.</p>",
+    "excerpt": "Une tarte aux pommes normande à la crème et au calvados, fondante et simple à réussir chez soi sans matériel particulier.",
+    "seo_title": "Tarte aux pommes normande : la recette fondante au calvados",
+    "seo_description": "Réussir la tarte aux pommes normande : choix des pommes, appareil à la crème et au calvados, cuisson, conservation et variantes plus légères."
+  }
+}
