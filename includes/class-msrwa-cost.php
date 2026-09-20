@@ -124,7 +124,7 @@ final class MSRWA_Cost {
 			if ( ! empty( $step['context_words'] ) ) { $input_tokens += (int) round( max( 1, (int) ( $s['quality_min_words'] ?? 2000 ) ) * self::TOKENS_PER_WORD ); }
 			if ( isset( $step['image'] ) ) {
 				$size = self::image_size( $step['image'], $s );
-				$quality = (string) ( $s['image_quality'] ?? 'medium' );
+				$quality = MSRWA_Images::quality( $s, $step['image'] );
 				$once = self::image_price( $model_row, $size, $quality, $input_tokens );
 				$detail = array( 'bucket' => $step['bucket'], 'model' => $model_row['id'] ?? '', 'size' => $size, 'quality' => $quality, 'input_tokens' => $input_tokens, 'output_tokens' => self::image_tokens( $model_row, $size, $quality ) );
 			} else {

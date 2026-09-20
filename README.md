@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.54` est un socle installable : file persistante, pipeline de
+La version `0.2.55` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.
@@ -20,6 +20,35 @@ Le plugin est en cours de refonte éditoriale et budgétaire :
 Les coûts affichés sont des estimations calculées avec le catalogue configuré,
 non une facture fournisseur. `completed` signifie que le traitement est terminé,
 jamais qu’un texte est validé éditorialement.
+
+## Version 0.2.55
+
+**La qualité se règle image par image, `medium` par défaut pour les deux.**
+Les deux visuels n'ont ni le même coût ni le même rôle : une seule case
+« Qualité OpenAI » les traitait pourtant ensemble, et elle était livrée sur
+`low`.
+
+Mesuré le 20/09/2026, `gpt-image-2.5-flare`, image principale 1024×1024 :
+
+| Qualité | Jetons image | Temps | Coût |
+|---|---:|---:|---:|
+| `low` | 196 | 8,7 s | 0,0104 $ |
+| `medium` | 439 | 10,1 s | 0,0177 $ |
+| `high` | 1 756 | 18,0 s | 0,0572 $ |
+
+Le rapport livré était généré en `high` : 0,0708 $ pour l'image principale et
+0,0662 $ pour le collage, soit 0,137 $ — **74 % du coût total de 0,1856 $**. En
+`medium`, les deux ensemble reviennent à 0,038 $.
+
+- Un sélecteur par image dans l'écran de réglages, avec les coûts mesurés
+  affichés sous le champ.
+- L'estimation budgétaire lit désormais la qualité propre à chaque image ; elle
+  appliquait une valeur unique aux deux, donc elle se trompait dès que les deux
+  différaient.
+- L'ancienne clé `image_quality` reste lue en repli : un site déjà configuré
+  garde son choix.
+- Le laboratoire lit la valeur livrée au lieu d'un `medium` codé en dur, sinon
+  il ne mesure pas ce qui part en production.
 
 ## Version 0.2.54
 

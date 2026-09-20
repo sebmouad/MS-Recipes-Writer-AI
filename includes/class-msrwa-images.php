@@ -11,7 +11,7 @@ final class MSRWA_Images {
 		$canonical = isset( $artifacts['canonical'] ) ? $artifacts['canonical'] : array();
 		$prompt = $settings['prompt_image'] . '\nRECETTE VALIDÉE : ' . wp_json_encode( $canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . self::visual_context( $artifacts ) . self::correction_context( $artifacts, 'featured_image', $settings );
 		$size = self::native_size( $settings['featured_ratio'], '1024x1024' );
-		$quality = self::quality( $settings );
+		$quality = self::quality( $settings, 'featured' );
 		$format = self::format( $settings );
 		$started = current_time( 'mysql', true );
 		$result = 'openai' === $plan['provider'] ? MSRWA_OpenAI::images_generate( $prompt, $plan['model'], $size, $quality, $format ) : MSRWA_Providers::image( $plan['provider'], $plan['model'], $prompt, $size );
@@ -37,7 +37,7 @@ final class MSRWA_Images {
 		$facebook_prompt = MSRWA_Prompt::compile( $settings['prompt_facebook_image'], $settings );
 		$prompt = $facebook_prompt . '\nRECETTE VALIDÉE : ' . wp_json_encode( $canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . self::visual_context( $artifacts ) . self::correction_context( $artifacts, 'facebook_image', $settings );
 		$size = self::native_size( $settings['facebook_ratio'], '1024x1536' );
-		$quality = self::quality( $settings );
+		$quality = self::quality( $settings, 'facebook' );
 		$format = self::format( $settings );
 		$started = current_time( 'mysql', true );
 		if ( $featured_file && file_exists( $featured_file ) ) {
@@ -122,9 +122,20 @@ final class MSRWA_Images {
 		return isset( $sizes[ $ratio ] ) ? $sizes[ $ratio ] : $fallback;
 	}
 
-	private static function quality( $settings ) {
-		$value = isset( $settings['image_quality'] ) ? $settings['image_quality'] : 'low';
-		return in_array( $value, array( 'low', 'medium', 'high', 'xhigh', 'max', 'auto' ), true ) ? $value : 'low';
+	/** The qualities the image API accepts, in ascending cost. */
+	public static function qualities() { return array( 'low', 'medium', 'high', 'xhigh', 'max', 'auto' ); }
+
+	/**
+	 * Quality for one of the two images. They are priced independently and judged
+	 * independently, so the administrator sets each. `image_quality` is read as a
+	 * fallback for sites configured before the split.
+	 */
+	public static function quality( $settings, $kind = 'featured' ) {
+		foreach ( array( $kind . '_image_quality', 'image_quality' ) as $key ) {
+			$value = isset( $settings[ $key ] ) ? (string) $settings[ $key ] : '';
+			if ( in_array( $value, self::qualities(), true ) ) { return $value; }
+		}
+		return 'medium';
 	}
 
 	private static function format( $settings ) {

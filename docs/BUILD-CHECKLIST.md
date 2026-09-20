@@ -105,6 +105,19 @@ cost) in the task before changing anything.
   in `prompt_final_approval`, but the engine does not call it yet — that is phase
   B. Measured on OpenAI medium only; the other eight cells are unmeasured.
 
+- [~] **A17 — Image quality per image (owner directive, 2026-09-20).** Images were
+  74% of the measured $0.1856 per recipe, and a single setting governed both.
+  The administrator now sets each, defaulting to `medium`. Measured on
+  `gpt-image-2.5-flare` at 1024×1024: `low` 196 tokens / 8.7s / $0.0104,
+  `medium` 439 / 10.1s / $0.0177, `high` 1756 / 18.0s / $0.0572. The delivered
+  report ran `high` ($0.137 for the pair); `medium` costs $0.038 for the pair.
+  The estimate now prices each image at its own quality — it previously applied
+  one value to both, so it was wrong whenever they differed — and the lab reads
+  the shipped value instead of a hard-coded `medium`.
+  *Not yet decided:* whether `medium` output is editorially equal to `high`.
+  Both were generated and look strong, but nothing has judged them against each
+  other — the approval step (A16) can now do exactly that.
+
 - [~] **A4 — Review.** Written in English; findings must name the section to patch. *Original:* **A4 — Review.** Returns a boolean verdict plus findings that name the
   **section to patch**, never a full rewrite instruction.
 - [~] **A5 — Fact check** (new step). Written; scored on whether it quotes the article verbatim rather than inventing a sentence to correct. *Original:* **A5 — Fact check** (new step). Compares the finished article to the

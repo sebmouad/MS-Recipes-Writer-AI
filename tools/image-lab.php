@@ -53,7 +53,7 @@ if ( 'facebook' === $kind ) {
 
 $settings = lab_settings();
 $size = MSRWA_Images::native_size( 'featured' === $kind ? $settings['featured_ratio'] : $settings['facebook_ratio'], 'featured' === $kind ? '1024x1024' : '1024x1536' );
-$quality = $options['quality'] ?? 'medium';
+$quality = $options['quality'] ?? MSRWA_Images::quality( $settings, $kind );
 $model = $options['model'] ?? 'gpt-image-2.5-flare';
 $format = $options['format'] ?? 'webp';
 $runs_directory = __DIR__ . '/runs';

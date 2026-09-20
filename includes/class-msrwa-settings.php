@@ -44,7 +44,9 @@ final class MSRWA_Settings {
 			'facebook_ratio'      => '2:3',
 			'facebook_image_fit'  => 'contain',
 			'image_padding_color' => '#ffffff',
-			'image_quality'       => 'low',
+			'featured_image_quality' => 'medium',
+			'facebook_image_quality' => 'medium',
+			'image_quality'       => 'medium',
 			'image_format'        => 'webp',
 			'facebook_text'       => 0,
 			'internal_links_enabled' => 1,
@@ -322,7 +324,9 @@ OUTPUT — a valid JSON object only, no Markdown, with exactly these keys:
 		}
 		$out['featured_ratio'] = isset( $raw['featured_ratio'] ) && in_array( $raw['featured_ratio'], array( '1:1', '4:5', '3:2', '2:3' ), true ) ? $raw['featured_ratio'] : $defaults['featured_ratio'];
 		$out['facebook_ratio'] = isset( $raw['facebook_ratio'] ) && in_array( $raw['facebook_ratio'], array( '4:5', '1:1', '2:3', '3:2' ), true ) ? $raw['facebook_ratio'] : $defaults['facebook_ratio'];
-		$out['image_quality'] = isset( $raw['image_quality'] ) && in_array( $raw['image_quality'], array( 'low', 'medium', 'high', 'xhigh', 'max', 'auto' ), true ) ? $raw['image_quality'] : $defaults['image_quality'];
+		foreach ( array( 'image_quality', 'featured_image_quality', 'facebook_image_quality' ) as $key ) {
+			$out[ $key ] = isset( $raw[ $key ] ) && in_array( $raw[ $key ], MSRWA_Images::qualities(), true ) ? $raw[ $key ] : $defaults[ $key ];
+		}
 		$out['image_format'] = isset( $raw['image_format'] ) && in_array( $raw['image_format'], array( 'webp', 'jpeg', 'png' ), true ) ? $raw['image_format'] : $defaults['image_format'];
 		$out['facebook_image_fit'] = isset( $raw['facebook_image_fit'] ) && in_array( $raw['facebook_image_fit'], array( 'contain', 'cover' ), true ) ? $raw['facebook_image_fit'] : $defaults['facebook_image_fit'];
 		$out['image_padding_color'] = isset( $raw['image_padding_color'] ) && preg_match( '/^#[a-f0-9]{6}$/i', $raw['image_padding_color'] ) ? strtolower( $raw['image_padding_color'] ) : $defaults['image_padding_color'];

@@ -20,6 +20,14 @@ class MSRWA_Images {
 		$sizes = array( '1:1' => '1024x1024', '3:2' => '1536x1024', '2:3' => '1024x1536', '4:5' => '1024x1536' );
 		return $sizes[ $ratio ] ?? $fallback;
 	}
+	public static function qualities() { return array( 'low', 'medium', 'high', 'xhigh', 'max', 'auto' ); }
+	public static function quality( $settings, $kind = 'featured' ) {
+		foreach ( array( $kind . '_image_quality', 'image_quality' ) as $key ) {
+			$value = isset( $settings[ $key ] ) ? (string) $settings[ $key ] : '';
+			if ( in_array( $value, self::qualities(), true ) ) { return $value; }
+		}
+		return 'medium';
+	}
 }
 MSRWA_Catalog::$models = array( 'openai' => array(
 	'text-1'  => array( 'text' => true, 'input' => 1.0, 'output' => 10.0 ),
