@@ -67,8 +67,25 @@ if ( isset( $result['error'] ) ) { fwrite( STDERR, 'Image error after ' . $resul
 
 $image_tokens = (int) ( $result['usage']['output_tokens'] ?? 0 );
 $cost = lab_price( 'openai', $model, $result['usage'] );
+$run_path = preg_replace( '/\.[a-z0-9]+$/i', '.json', $destination );
+$run = array(
+	'step' => $kind . '_image',
+	'provider' => 'openai',
+	'model' => $model,
+	'size' => $size,
+	'quality' => $quality,
+	'format' => $format,
+	'seconds' => $result['seconds'],
+	'usage' => $result['usage'],
+	'cost_usd' => $cost,
+	'bytes' => $result['bytes'],
+	'image_path' => $result['path'],
+	'prompt' => $prompt,
+);
+file_put_contents( $run_path, json_encode( $run, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) );
 printf( "%-20s %s\n", 'time', $result['seconds'] . 's' );
 printf( "%-20s %s\n", 'file', $result['path'] );
+printf( "%-20s %s\n", 'run', $run_path );
 printf( "%-20s %s KB\n", 'weight', number_format( $result['bytes'] / 1024, 1 ) );
 printf( "%-20s %d\n", 'image tokens', $image_tokens );
 printf( "%-20s %s\n", 'cost', null === $cost ? 'unknown rate' : sprintf( '$%.4f', $cost ) );
