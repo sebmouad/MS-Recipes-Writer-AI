@@ -33,4 +33,14 @@ msrwa_test_assert( null === MSRWA_Json::decode( '{"content_html":"<p>Coupé au m
 msrwa_test_assert( null === MSRWA_Json::decode( 'Je ne peux pas répondre.' ), 'An answer with no JSON at all must fail.' );
 msrwa_test_assert( null === MSRWA_Json::decode( '' ), 'An empty answer must fail.' );
 
+// An answer stopped at max_tokens is cut mid-character. Sonnet 5 billed 14 500
+// output tokens on 2026-09-20 and the answer was stored empty, because one
+// broken character makes json_encode return false for the whole string.
+$cut = "{\"content_html\":\"<p>Tarte normande fondante\xC3";
+msrwa_test_assert( false === json_encode( array( 'text' => $cut ) ), 'The captured tail really does break json_encode.' );
+$clean = MSRWA_Json::valid_utf8( $cut );
+msrwa_test_assert( false !== json_encode( array( 'text' => $clean ) ), 'Scrubbing must make the answer storable.' );
+msrwa_test_contains( $clean, 'Tarte normande fondante', 'Scrubbing must keep everything the model did finish.' );
+msrwa_test_assert( 'Crème brûlée' === MSRWA_Json::valid_utf8( 'Crème brûlée' ), 'Valid accented French must pass through untouched.' );
+
 msrwa_test_done( 'json' );

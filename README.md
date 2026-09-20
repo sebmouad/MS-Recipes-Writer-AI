@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.50` est un socle installable : file persistante, pipeline de
+La version `0.2.51` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.
@@ -20,6 +20,19 @@ Le plugin est en cours de refonte éditoriale et budgétaire :
 Les coûts affichés sont des estimations calculées avec le catalogue configuré,
 non une facture fournisseur. `completed` signifie que le traitement est terminé,
 jamais qu’un texte est validé éditorialement.
+
+## Version 0.2.51
+
+Une réponse coupée à `max_tokens` se termine au milieu d'un caractère UTF-8, et
+ce seul caractère cassé fait échouer `json_encode` sur toute la chaîne : Sonnet 5
+a facturé 14 500 jetons de sortie le 20/09/2026 et la réponse a été enregistrée
+vide. `MSRWA_Json::valid_utf8` nettoie la fin d'une réponse tronquée avant
+lecture et avant enregistrement, dans le moteur comme au laboratoire.
+
+**Ce que cela ne corrige pas :** sur l'étape article, Sonnet 5 dépasse encore le
+plafond de 14 500 jetons. Le raisonnement étendu n'est pas en cause (vérifié :
+`thinking_tokens` à 0 par défaut) ; le modèle écrit simplement beaucoup plus
+long. À trancher avant la phase B.
 
 ## Version 0.2.50
 

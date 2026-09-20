@@ -13,7 +13,8 @@ final class MSRWA_Json {
 
 	/** Returns the decoded array, or null when the text cannot be read as one. */
 	public static function decode( $text ) {
-		$text = trim( (string) $text );
+		$text = self::valid_utf8( (string) $text );
+		$text = trim( $text );
 		if ( '' === $text ) { return null; }
 		foreach ( array( $text, self::unfence( $text ), self::slice( $text ) ) as $candidate ) {
 			if ( '' === $candidate ) { continue; }
@@ -30,6 +31,18 @@ final class MSRWA_Json {
 		$json = self::decode( $text );
 		if ( null === $json ) { throw new Exception( 'Sortie JSON invalide pour ' . $label . '.' ); }
 		return $json;
+	}
+
+	/**
+	 * Drops byte sequences that are not valid UTF-8. An answer stopped at
+	 * max_tokens is cut mid-character, and that single broken character makes
+	 * json_encode return false for the whole string — a 14 500-token answer was
+	 * billed and stored as an empty one before this.
+	 */
+	public static function valid_utf8( $text ) {
+		$text = (string) $text;
+		if ( '' === $text || preg_match( '//u', $text ) ) { return $text; }
+		return (string) preg_replace( '/[\x00-\x08\x0B\x0C\x0E-\x1F]*$/', '', mb_convert_encoding( $text, 'UTF-8', 'UTF-8' ) );
 	}
 
 	private static function unfence( $text ) {

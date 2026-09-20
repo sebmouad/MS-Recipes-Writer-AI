@@ -6,6 +6,12 @@
  * Every adapter returns: text, usage{input_tokens,output_tokens}, model, seconds.
  */
 
+/** An answer cut at max_tokens ends mid-character; that alone loses the whole string on encode. */
+function lab_utf8( $text ) {
+	lab_boot();
+	return MSRWA_Json::valid_utf8( $text );
+}
+
 function lab_provider_key( $provider ) {
 	$names = array( 'openai' => array( 'OPENAI_API_KEY', 'MSRWA_OPENAI_KEY' ), 'gemini' => array( 'GEMINI_API_KEY', 'MSRWA_GEMINI_KEY' ), 'claude' => array( 'ANTHROPIC_API_KEY', 'MSRWA_CLAUDE_KEY' ) );
 	foreach ( $names[ $provider ] ?? array() as $name ) {
@@ -54,7 +60,7 @@ function lab_call_openai( $model, $input, $max_tokens, $json_output, $tools ) {
 			foreach ( (array) ( $item['content'] ?? array() ) as $content ) { if ( isset( $content['text'] ) && is_string( $content['text'] ) ) { $text .= $content['text']; } }
 		}
 	}
-	return array( 'text' => $text, 'usage' => array( 'input_tokens' => (int) ( $body['usage']['input_tokens'] ?? 0 ), 'output_tokens' => (int) ( $body['usage']['output_tokens'] ?? 0 ) ), 'model' => $body['model'] ?? $model, 'status' => $body['status'] ?? '', 'seconds' => $result['seconds'] );
+	return array( 'text' => lab_utf8( $text ), 'usage' => array( 'input_tokens' => (int) ( $body['usage']['input_tokens'] ?? 0 ), 'output_tokens' => (int) ( $body['usage']['output_tokens'] ?? 0 ) ), 'model' => $body['model'] ?? $model, 'status' => $body['status'] ?? '', 'seconds' => $result['seconds'] );
 }
 
 function lab_call_gemini( $model, $input, $max_tokens, $json_output, $tools ) {
@@ -71,7 +77,7 @@ function lab_call_gemini( $model, $input, $max_tokens, $json_output, $tools ) {
 	$text = '';
 	foreach ( (array) ( $body['candidates'][0]['content']['parts'] ?? array() ) as $part ) { if ( isset( $part['text'] ) ) { $text .= $part['text']; } }
 	$usage = $body['usageMetadata'] ?? array();
-	return array( 'text' => $text, 'usage' => array( 'input_tokens' => (int) ( $usage['promptTokenCount'] ?? 0 ), 'output_tokens' => (int) ( $usage['candidatesTokenCount'] ?? 0 ) ), 'model' => $model, 'status' => $body['candidates'][0]['finishReason'] ?? '', 'seconds' => $result['seconds'] );
+	return array( 'text' => lab_utf8( $text ), 'usage' => array( 'input_tokens' => (int) ( $usage['promptTokenCount'] ?? 0 ), 'output_tokens' => (int) ( $usage['candidatesTokenCount'] ?? 0 ) ), 'model' => $model, 'status' => $body['candidates'][0]['finishReason'] ?? '', 'seconds' => $result['seconds'] );
 }
 
 function lab_call_claude( $model, $input, $max_tokens, $json_output, $tools ) {
@@ -87,5 +93,5 @@ function lab_call_claude( $model, $input, $max_tokens, $json_output, $tools ) {
 	$text = '';
 	foreach ( (array) ( $body['content'] ?? array() ) as $block ) { if ( 'text' === ( $block['type'] ?? '' ) ) { $text .= $block['text']; } }
 	$text = preg_replace( '/^```(?:json)?\s*|\s*```$/m', '', trim( $text ) );
-	return array( 'text' => $text, 'usage' => array( 'input_tokens' => (int) ( $body['usage']['input_tokens'] ?? 0 ), 'output_tokens' => (int) ( $body['usage']['output_tokens'] ?? 0 ) ), 'model' => $body['model'] ?? $model, 'status' => $body['stop_reason'] ?? '', 'seconds' => $result['seconds'] );
+	return array( 'text' => lab_utf8( $text ), 'usage' => array( 'input_tokens' => (int) ( $body['usage']['input_tokens'] ?? 0 ), 'output_tokens' => (int) ( $body['usage']['output_tokens'] ?? 0 ) ), 'model' => $body['model'] ?? $model, 'status' => $body['stop_reason'] ?? '', 'seconds' => $result['seconds'] );
 }

@@ -88,6 +88,20 @@ cost) in the task before changing anything.
   instead of 1.6 tokens per word, and `quality_max_words` was raised from 2 400,
   which was below the 2 800 minimum it was meant to cap.
 
+- [x] **A13 — A truncated answer was stored as an empty one (found 2026-09-20).**
+  An answer stopped at `max_tokens` ends mid-character; that one broken UTF-8
+  sequence makes `json_encode` return false for the whole string. Sonnet 5 billed
+  14 500 output tokens on the article step and the saved answer was zero bytes,
+  which reads as "the model returned nothing" when it returned an article.
+  `MSRWA_Json::valid_utf8` scrubs the tail before reading and before storing.
+- [ ] **A14 — Sonnet 5 exceeds any article ceiling we have tried.** 8 000 then
+  14 500 output tokens, both `max_tokens`, 148s and $0.15 on the second. Extended
+  thinking is ruled out — a control call returns `thinking_tokens: 0`, so the
+  default is off. The model is simply writing far longer than the 2 800-word
+  brief asks. Decide before phase B: cap Claude's article role to Haiku 4.5,
+  which passed 8/10 at $0.043, or add an explicit upper word bound to the prompt
+  and re-measure. Not a blocker for OpenAI or Gemini, which both complete.
+
 - [ ] **A9 — Prompt templates (owner directive, 2026-09-20).** Prompts are
   templates compiled from the settings by `MSRWA_Prompt`, used by the lab and
   the engine alike: word count, one or two pages, page-two opening heading,
