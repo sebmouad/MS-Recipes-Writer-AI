@@ -8,11 +8,11 @@ final class MSRWA_Catalog {
 				'gpt-5.6-luna' => array( 'label' => 'GPT-5.6 Luna', 'stable' => true, 'text' => true, 'vision' => true, 'web_search' => true, 'image_generation' => false, 'input' => 0.20, 'output' => 1.20, 'source' => 'https://developers.openai.com/api/docs/models/gpt-5.6-luna' ),
 				'gpt-5.6-terra' => array( 'label' => 'GPT-5.6 Terra', 'stable' => true, 'text' => true, 'vision' => true, 'web_search' => true, 'image_generation' => false, 'input' => 2.00, 'output' => 12.00, 'source' => 'https://developers.openai.com/api/docs/models/gpt-5.6-terra' ),
 				'gpt-5.6-sol' => array( 'label' => 'GPT-5.6 Sol', 'stable' => true, 'text' => true, 'vision' => true, 'web_search' => true, 'image_generation' => false, 'input' => 4.00, 'output' => 20.00, 'source' => 'https://developers.openai.com/api/docs/models/gpt-5.6-sol' ),
-				'gpt-image-2.5-flare' => array( 'label' => 'GPT Image 2.5 Flare', 'stable' => true, 'text' => false, 'vision' => true, 'web_search' => false, 'image_generation' => true, 'input' => 5.00, 'image_input' => 8.00, 'output' => 30.00, 'source' => 'https://developers.openai.com/api/docs/models/gpt-image-2.5-flare' ),
-				'gpt-image-2.5-sunburst' => array( 'label' => 'GPT Image 2.5 Sunburst', 'stable' => true, 'text' => false, 'vision' => true, 'web_search' => false, 'image_generation' => true, 'input' => 5.00, 'image_input' => 8.00, 'output' => 30.00, 'source' => 'https://developers.openai.com/api/docs/models/gpt-image-2.5-sunburst' ),
+				'gpt-image-2.5-flare' => array( 'label' => 'GPT Image 2.5 Flare', 'stable' => true, 'text' => false, 'vision' => true, 'web_search' => false, 'image_generation' => true, 'image_tokens' => array( '1024x1024' => array( 'low' => 272, 'medium' => 1056, 'high' => 4160 ), '1024x1536' => array( 'low' => 408, 'medium' => 1584, 'high' => 6240 ), '1536x1024' => array( 'low' => 400, 'medium' => 1568, 'high' => 6208 ) ), 'input' => 5.00, 'image_input' => 8.00, 'output' => 30.00, 'source' => 'https://developers.openai.com/api/docs/models/gpt-image-2.5-flare' ),
+				'gpt-image-2.5-sunburst' => array( 'label' => 'GPT Image 2.5 Sunburst', 'stable' => true, 'text' => false, 'vision' => true, 'web_search' => false, 'image_generation' => true, 'image_tokens' => array( '1024x1024' => array( 'low' => 272, 'medium' => 1056, 'high' => 4160 ), '1024x1536' => array( 'low' => 408, 'medium' => 1584, 'high' => 6240 ), '1536x1024' => array( 'low' => 400, 'medium' => 1568, 'high' => 6208 ) ), 'input' => 5.00, 'image_input' => 8.00, 'output' => 30.00, 'source' => 'https://developers.openai.com/api/docs/models/gpt-image-2.5-sunburst' ),
 			),
 			'gemini' => array(
-				'gemini-3.1-flash-image' => array( 'label' => 'Gemini 3.1 Flash Image', 'stable' => true, 'text' => true, 'vision' => true, 'web_search' => true, 'image_generation' => true, 'input' => 0.50, 'output' => 3.00, 'source' => 'https://ai.google.dev/gemini-api/docs/image-generation' ),
+				'gemini-3.1-flash-image' => array( 'label' => 'Gemini 3.1 Flash Image', 'stable' => true, 'text' => true, 'vision' => true, 'web_search' => true, 'image_generation' => true, 'image_tokens' => array( '1024x1024' => array( 'low' => 272, 'medium' => 1056, 'high' => 4160 ), '1024x1536' => array( 'low' => 408, 'medium' => 1584, 'high' => 6240 ), '1536x1024' => array( 'low' => 400, 'medium' => 1568, 'high' => 6208 ) ), 'input' => 0.50, 'output' => 3.00, 'source' => 'https://ai.google.dev/gemini-api/docs/image-generation' ),
 				'gemini-3.5-flash' => array( 'label' => 'Gemini 3.5 Flash', 'stable' => true, 'text' => true, 'vision' => true, 'web_search' => true, 'image_generation' => false, 'input' => 1.50, 'output' => 9.00, 'source' => 'https://ai.google.dev/gemini-api/docs/pricing' ),
 			),
 			'claude' => array(
@@ -46,7 +46,7 @@ final class MSRWA_Catalog {
 			foreach ( $models as $model_id => $model ) {
 				$capabilities = array();
 				foreach ( array( 'text', 'vision', 'web_search', 'image_generation' ) as $capability ) { $capabilities[ $capability ] = ! empty( $model[ $capability ] ); }
-				$pricing = array( 'input' => (float) ( $model['input'] ?? 0 ), 'output' => (float) ( $model['output'] ?? 0 ), 'image_input' => (float) ( $model['image_input'] ?? 0 ), 'currency' => 'USD', 'unit' => 'million_tokens' );
+				$pricing = array( 'input' => (float) ( $model['input'] ?? 0 ), 'output' => (float) ( $model['output'] ?? 0 ), 'image_input' => (float) ( $model['image_input'] ?? 0 ), 'image_tokens' => isset( $model['image_tokens'] ) ? $model['image_tokens'] : array(), 'currency' => 'USD', 'unit' => 'million_tokens' );
 				$api = array( 'identifier' => $model_id );
 				$sql = "INSERT INTO {$t['models']} (provider_key,model_id,label,stable,enabled,capabilities_json,pricing_json,api_specifics_json,source_url,verified_at,created_at,updated_at) VALUES (%s,%s,%s,%d,1,%s,%s,%s,%s,%s,%s,%s) ON DUPLICATE KEY UPDATE model_id=VALUES(model_id)";
 				$wpdb->query( $wpdb->prepare( $sql, $provider, $model_id, $model['label'], empty( $model['stable'] ) ? 0 : 1, wp_json_encode( $capabilities ), wp_json_encode( $pricing ), wp_json_encode( $api ), $model['source'], $now, $now, $now ) );
@@ -81,6 +81,10 @@ final class MSRWA_Catalog {
 			$model['source'] = $row['source_url'];
 			$model['verified_at'] = $row['verified_at'];
 			$model['api_specifics'] = is_array( $api ) ? $api : array();
+			if ( ! empty( $model['image_generation'] ) && empty( $model['image_tokens'] ) ) {
+				$seeded = self::defaults();
+				$model['image_tokens'] = $seeded[ $row['provider_key'] ][ $row['model_id'] ]['image_tokens'] ?? array();
+			}
 			$out[ $row['provider_key'] ][ $row['model_id'] ] = $model;
 		}
 		return $out;
@@ -150,6 +154,18 @@ final class MSRWA_Catalog {
 		return min( 300, max( 5, absint( $config[ $key ] ?? $fallback ) ) );
 	}
 
+	/** Generated-image token counts, per size and quality, as the administrator corrected them. */
+	private static function sanitize_image_tokens( $raw ) {
+		$out = array();
+		foreach ( (array) $raw as $size => $qualities ) {
+			if ( ! preg_match( '/^\d{3,5}x\d{3,5}$/', (string) $size ) || ! is_array( $qualities ) ) { continue; }
+			foreach ( array( 'low', 'medium', 'high' ) as $quality ) {
+				if ( isset( $qualities[ $quality ] ) && '' !== $qualities[ $quality ] ) { $out[ $size ][ $quality ] = max( 0, (int) $qualities[ $quality ] ); }
+			}
+		}
+		return $out;
+	}
+
 	public static function save_admin( $raw ) {
 		global $wpdb;
 		$t = MSRWA_DB::tables();
@@ -166,7 +182,8 @@ final class MSRWA_Catalog {
 		foreach ( $models as $provider => $provider_models ) {
 			foreach ( $provider_models as $model_id => $model ) {
 				$data = isset( $raw['models'][ $provider ][ $model_id ] ) && is_array( $raw['models'][ $provider ][ $model_id ] ) ? $raw['models'][ $provider ][ $model_id ] : array();
-				$pricing = array( 'input' => max( 0, (float) ( $data['input'] ?? $model['input'] ?? 0 ) ), 'output' => max( 0, (float) ( $data['output'] ?? $model['output'] ?? 0 ) ), 'image_input' => max( 0, (float) ( $data['image_input'] ?? $model['image_input'] ?? 0 ) ), 'currency' => 'USD', 'unit' => 'million_tokens' );
+				$pricing = array( 'input' => max( 0, (float) ( $data['input'] ?? $model['input'] ?? 0 ) ), 'output' => max( 0, (float) ( $data['output'] ?? $model['output'] ?? 0 ) ), 'image_input' => max( 0, (float) ( $data['image_input'] ?? $model['image_input'] ?? 0 ) ), 'currency' => 'USD', 'unit' => 'million_tokens'  );
+				$pricing['image_tokens'] = self::sanitize_image_tokens( $data['image_tokens'] ?? ( $model['image_tokens'] ?? array() ) );
 				$capabilities = array();
 				foreach ( array( 'text', 'vision', 'web_search', 'image_generation' ) as $capability ) { $capabilities[ $capability ] = ! empty( $data[ $capability ] ); }
 				$api_specifics = isset( $data['api_specifics'] ) && is_array( $data['api_specifics'] ) ? $data['api_specifics'] : ( $model['api_specifics'] ?? array() );

@@ -114,7 +114,8 @@ final class MSRWA_Images {
 		return '\nCORRECTION IMAGE : ' . $settings['prompt_image_correction'] . '\nDÉFAUTS À CORRIGER : ' . wp_json_encode( $context, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
 	}
 
-	private static function native_size( $ratio, $fallback ) {
+	/** Size actually requested from the provider. Shared with MSRWA_Cost so the estimate matches. */
+	public static function native_size( $ratio, $fallback ) {
 		$sizes = array( '1:1' => '1024x1024', '3:2' => '1536x1024', '2:3' => '1024x1536', '4:5' => '1024x1536' );
 		return isset( $sizes[ $ratio ] ) ? $sizes[ $ratio ] : $fallback;
 	}

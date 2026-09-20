@@ -40,7 +40,7 @@ how to run each layer.
 
 Replaces flat per-stage constants with amounts derived from tokens and prices.
 
-- [ ] **T1.1 — Step cost model.** New `MSRWA_Cost`: for each pipeline step,
+- [~] **T1.1 — Step cost model.** New `MSRWA_Cost`: for each pipeline step,
   compute expected input and output tokens from the configured word counts,
   outline size, prompt lengths and output limits, then price them with the
   catalogue rate of the model that step would use.
@@ -49,7 +49,7 @@ Replaces flat per-stage constants with amounts derived from tokens and prices.
   price follows the model rate; an unknown model yields no fabricated price.
   *Done when:* a step's estimate equals tokens × catalogue rate, verifiably.
 
-- [ ] **T1.2 — Image price table.** Image APIs bill per image, not per token.
+- [~] **T1.2 — Image price table.** Image APIs bill per image, not per token.
   Add price per (provider, model, size, quality) to the catalogue, with the
   admin able to correct it and a source URL per row.
   *Files:* `includes/class-msrwa-catalog.php`, `includes/class-msrwa-cost.php`,
@@ -57,7 +57,7 @@ Replaces flat per-stage constants with amounts derived from tokens and prices.
   *Offline test:* a 1024×1024 and a 1024×1536 entry price differently; a
   missing entry is reported as unknown, never as zero.
 
-- [ ] **T1.3 — Four buckets, min and max.** `MSRWA_Cost::estimate()` returns
+- [~] **T1.3 — Four buckets, min and max.** `MSRWA_Cost::estimate()` returns
   `article`, `featured`, `facebook`, `other`, each with `min` and `max`, plus a
   recipe total. *min* = every step passes first try on its standard model;
   *max* = every step escalates and uses every correction cycle.
@@ -193,7 +193,11 @@ Replaces flat per-stage constants with amounts derived from tokens and prices.
 Tasks built and covered offline but not yet verified on a real site. Move them
 to `[x]` once their real test has run.
 
-*(empty)*
+- **T1.1 / T1.2 / T1.3** — `MSRWA_Cost` prices every step from tokens times the
+  catalogue rate, the catalogue carries editable generated-image token counts
+  per size and quality, and the estimate reports four buckets with a minimum
+  and a maximum. Offline coverage in `tests/test-cost.php`. Real verification
+  needs T1.4 (the settings screen showing the numbers) to be visible.
 
 ## Decisions this checklist encodes
 
