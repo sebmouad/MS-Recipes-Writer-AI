@@ -12,7 +12,26 @@ function lab_utf8( $text ) {
 	return MSRWA_Json::valid_utf8( $text );
 }
 
+/** Loads only the three lab credentials from a local, git-ignored file. */
+function lab_load_local_env() {
+	static $loaded = false;
+	if ( $loaded ) { return; }
+	$loaded = true;
+	$file = dirname( __DIR__, 2 ) . '/.env.local';
+	if ( ! is_readable( $file ) ) { return; }
+	$allowed = array( 'OPENAI_API_KEY', 'GEMINI_API_KEY', 'ANTHROPIC_API_KEY' );
+	foreach ( file( $file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES ) as $line ) {
+		if ( ! preg_match( '/^([A-Z][A-Z0-9_]*)=(.*)$/', trim( $line ), $match ) || ! in_array( $match[1], $allowed, true ) || false !== getenv( $match[1] ) ) { continue; }
+		$value = trim( $match[2] );
+		if ( strlen( $value ) >= 2 && ( ( '"' === $value[0] && '"' === substr( $value, -1 ) ) || ( "'" === $value[0] && "'" === substr( $value, -1 ) ) ) ) { $value = substr( $value, 1, -1 ); }
+		if ( '' === $value ) { continue; }
+		putenv( $match[1] . '=' . $value );
+		$_ENV[ $match[1] ] = $value;
+	}
+}
+
 function lab_provider_key( $provider ) {
+	lab_load_local_env();
 	$names = array( 'openai' => array( 'OPENAI_API_KEY', 'MSRWA_OPENAI_KEY' ), 'gemini' => array( 'GEMINI_API_KEY', 'MSRWA_GEMINI_KEY' ), 'claude' => array( 'ANTHROPIC_API_KEY', 'MSRWA_CLAUDE_KEY' ) );
 	foreach ( $names[ $provider ] ?? array() as $name ) {
 		$value = (string) getenv( $name );
