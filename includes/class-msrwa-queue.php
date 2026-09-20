@@ -18,6 +18,20 @@ final class MSRWA_Queue {
 		return $updated ? $token : false;
 	}
 
+	/**
+	 * A worker that found every slot taken must come back, otherwise the job it
+	 * was scheduled for is dropped. Only a job still waiting is re-scheduled, so
+	 * a paused, cancelled or running job is left alone.
+	 */
+	public static function requeue_unclaimed( $job_id, $delay = 60 ) {
+		global $wpdb;
+		$t = MSRWA_DB::tables();
+		$waiting = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$t['jobs']} WHERE id = %d AND status IN ('queued','retry_wait') AND (lock_until IS NULL OR lock_until < UTC_TIMESTAMP())", absint( $job_id ) ) );
+		if ( ! $waiting ) { return false; }
+		self::schedule_job( $job_id, max( 5, absint( $delay ) ) );
+		return true;
+	}
+
 	private static function slot_lock_name() { return 'msrwa_slots_' . ( function_exists( 'get_current_blog_id' ) ? absint( get_current_blog_id() ) : 1 ); }
 
 	private static function acquire_slot_lock() {
@@ -77,10 +91,29 @@ final class MSRWA_Queue {
 		return (bool) $updated;
 	}
 
+	/** Jobs holding a live lease. An expired lease frees its slot for the next job. */
 	public static function active_count() {
 		global $wpdb;
 		$t = MSRWA_DB::tables();
-		return (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$t['jobs']} WHERE status = 'running' OR (status = 'queued' AND lock_until > UTC_TIMESTAMP())" );
+		return (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$t['jobs']} WHERE status = 'running' AND lock_until IS NOT NULL AND lock_until > UTC_TIMESTAMP()" );
+	}
+
+	/**
+	 * Schedules the jobs a batch still has waiting, up to the free concurrency
+	 * slots. Without this a batch larger than the concurrency limit would stop
+	 * after its first wave: nothing else ever picks the remaining jobs up.
+	 */
+	public static function fill_slots( $batch_id ) {
+		global $wpdb;
+		$t = MSRWA_DB::tables();
+		$batch_id = absint( $batch_id );
+		$status = $wpdb->get_var( $wpdb->prepare( "SELECT status FROM {$t['batches']} WHERE id = %d", $batch_id ) );
+		if ( ! $status || in_array( $status, array( 'completed', 'cancelled', 'paused', 'awaiting_admin', 'paused_budget' ), true ) ) { return 0; }
+		$slots = max( 0, (int) MSRWA_Settings::get()['max_concurrency'] - self::active_count() );
+		if ( ! $slots ) { return 0; }
+		$ids = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM {$t['jobs']} WHERE batch_id = %d AND status IN ('queued','retry_wait') AND (lock_until IS NULL OR lock_until < UTC_TIMESTAMP()) ORDER BY id ASC LIMIT %d", $batch_id, $slots ) );
+		foreach ( $ids as $id ) { self::schedule_job( $id ); }
+		return count( $ids );
 	}
 
 	/**
@@ -126,11 +159,12 @@ final class MSRWA_Queue {
 	public static function refresh_batch( $batch_id ) {
 		global $wpdb;
 		$t = MSRWA_DB::tables();
-		$counts = $wpdb->get_row( $wpdb->prepare( "SELECT COUNT(*) AS total, SUM(status = 'completed') AS completed, SUM(status = 'cancelled') AS cancelled, SUM(status IN ('queued','running','retry_wait')) AS active, SUM(status IN ('awaiting_admin','paused_budget')) AS awaiting_admin, SUM(status = 'paused') AS paused, SUM(status IN ('failed','needs_review','awaiting_input','uncertain')) AS needs_review FROM {$t['jobs']} WHERE batch_id = %d", absint( $batch_id ) ) );
+		$counts = $wpdb->get_row( $wpdb->prepare( "SELECT COUNT(*) AS total, SUM(status = 'completed') AS completed, SUM(status = 'cancelled') AS cancelled, SUM(status IN ('queued','running','retry_wait')) AS active, SUM(status IN ('queued','retry_wait')) AS waiting, SUM(status IN ('awaiting_admin','paused_budget')) AS awaiting_admin, SUM(status = 'paused') AS paused, SUM(status IN ('failed','needs_review','awaiting_input','uncertain')) AS needs_review FROM {$t['jobs']} WHERE batch_id = %d", absint( $batch_id ) ) );
 		if ( ! $counts ) { return; }
 		$completed = (int) $counts->completed;
 		$status = ( (int) $counts->cancelled >= (int) $counts->total && (int) $counts->total > 0 ) ? 'cancelled' : ( ( $completed + (int) $counts->cancelled >= (int) $counts->total && (int) $counts->total > 0 ) ? 'completed' : ( (int) $counts->active ? 'running' : ( (int) $counts->awaiting_admin ? 'awaiting_admin' : ( (int) $counts->paused ? 'paused' : ( (int) $counts->needs_review ? 'needs_review' : 'running' ) ) ) ) );
 		$wpdb->update( $t['batches'], array( 'status' => $status, 'completed' => $completed, 'updated_at' => current_time( 'mysql', true ) ), array( 'id' => absint( $batch_id ) ), array( '%s', '%d', '%s' ), array( '%d' ) );
+		if ( (int) $counts->waiting ) { self::fill_slots( $batch_id ); }
 	}
 
 	public static function reconcile_batches( $limit = 500 ) {
@@ -165,10 +199,6 @@ final class MSRWA_Queue {
 		if ( ! $batch || in_array( $batch->status, array( 'cancelled', 'completed', 'paused', 'awaiting_admin', 'paused_budget', 'needs_review' ), true ) ) { return; }
 		$wpdb->update( $t['batches'], array( 'status' => 'running', 'updated_at' => current_time( 'mysql', true ) ), array( 'id' => $batch_id ), array( '%s', '%s' ), array( '%d' ) );
 		MSRWA_DB::event( 'batch_started', $batch_id, 0, array( 'stage' => 'intake' ) );
-		$settings = MSRWA_Settings::get();
-		$slots = max( 0, (int) $settings['max_concurrency'] - self::active_count() );
-		if ( ! $slots ) { return; }
-		$jobs = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM {$t['jobs']} WHERE batch_id = %d AND status = 'queued' AND (lock_until IS NULL OR lock_until < UTC_TIMESTAMP()) ORDER BY id ASC LIMIT %d", $batch_id, $slots ) );
-		foreach ( $jobs as $job_id ) { self::schedule_job( $job_id ); }
+		self::fill_slots( $batch_id );
 	}
 }

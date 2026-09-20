@@ -5,7 +5,7 @@ final class MSRWA_Pipeline {
 	public static function process_job( $job_id ) {
 		global $wpdb;
 		$t = MSRWA_DB::tables();
-		if ( ! MSRWA_Queue::acquire_job( $job_id ) ) { return; }
+		if ( ! MSRWA_Queue::acquire_job( $job_id ) ) { MSRWA_Queue::requeue_unclaimed( $job_id ); return; }
 		$job = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$t['jobs']} WHERE id = %d", $job_id ) );
 		if ( ! $job || in_array( $job->status, array( 'completed', 'cancelled', 'needs_review', 'awaiting_admin' ), true ) ) { MSRWA_Queue::release_job( $job_id ); return; }
 		$input = json_decode( (string) $job->input_json, true );
