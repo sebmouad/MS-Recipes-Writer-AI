@@ -106,7 +106,7 @@ final class MSRWA_OpenAI {
 		if ( $code < 200 || $code >= 300 ) { return new WP_Error( 'openai_image_api_' . $code, isset( $body['error']['message'] ) ? sanitize_text_field( $body['error']['message'] ) : 'Réponse image OpenAI invalide.', array( 'status' => $code >= 400 && $code < 600 ? $code : 502 ) ); }
 		$b64 = isset( $body['data'][0]['b64_json'] ) ? (string) $body['data'][0]['b64_json'] : '';
 		if ( '' === $b64 ) { return new WP_Error( 'openai_image_empty', 'OpenAI n’a retourné aucune image.', array( 'status' => 502 ) ); }
-		return array( 'model' => $model, 'format' => $payload['output_format'], 'base64' => $b64, 'created' => isset( $body['created'] ) ? absint( $body['created'] ) : 0 );
+		return array( 'model' => $model, 'format' => $payload['output_format'], 'base64' => $b64, 'created' => isset( $body['created'] ) ? absint( $body['created'] ) : 0, 'usage' => isset( $body['usage'] ) && is_array( $body['usage'] ) ? $body['usage'] : array() );
 	}
 
 	public static function images_edit( $image_path, $prompt, $model = 'gpt-image-2.5-flare', $size = '1024x1536', $quality = 'low', $format = 'webp' ) {
@@ -151,7 +151,7 @@ final class MSRWA_OpenAI {
 		if ( $code < 200 || $code >= 300 ) { return new WP_Error( 'openai_image_edit_api_' . $code, isset( $decoded['error']['message'] ) ? sanitize_text_field( $decoded['error']['message'] ) : 'Réponse d’édition image OpenAI invalide.', array( 'status' => $code >= 400 && $code < 600 ? $code : 502 ) ); }
 		$b64 = isset( $decoded['data'][0]['b64_json'] ) ? (string) $decoded['data'][0]['b64_json'] : '';
 		if ( '' === $b64 ) { return new WP_Error( 'openai_image_edit_empty', 'OpenAI n’a retourné aucune image éditée.', array( 'status' => 502 ) ); }
-		return array( 'model' => $model, 'format' => $format, 'base64' => $b64, 'created' => isset( $decoded['created'] ) ? absint( $decoded['created'] ) : 0 );
+		return array( 'model' => $model, 'format' => $format, 'base64' => $b64, 'created' => isset( $decoded['created'] ) ? absint( $decoded['created'] ) : 0, 'usage' => isset( $decoded['usage'] ) && is_array( $decoded['usage'] ) ? $decoded['usage'] : array() );
 	}
 
 	private static function extract_sources( $body ) {

@@ -6,7 +6,7 @@ final class MSRWA_Images {
 		$settings = MSRWA_Settings::get();
 		$plan = self::image_plan( 'featured_image', $job );
 		if ( is_wp_error( $plan ) ) { return $plan; }
-		$reservation = MSRWA_DB::reserve( $job, (float) $settings['image_reserve_usd'], 'featured_image' );
+		$reservation = MSRWA_DB::reserve( $job, (float) $settings['featured_image_estimate_usd'], 'featured_image' );
 		if ( is_wp_error( $reservation ) ) { return $reservation; }
 		$canonical = isset( $artifacts['canonical'] ) ? $artifacts['canonical'] : array();
 		$prompt = $settings['prompt_image'] . '\nRECETTE VALIDÉE : ' . wp_json_encode( $canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . self::visual_context( $artifacts ) . self::correction_context( $artifacts, 'featured_image', $settings );
@@ -27,7 +27,7 @@ final class MSRWA_Images {
 		$settings = MSRWA_Settings::get();
 		$plan = self::image_plan( 'facebook_image', $job );
 		if ( is_wp_error( $plan ) ) { return $plan; }
-		$reservation = MSRWA_DB::reserve( $job, (float) $settings['image_reserve_usd'], 'facebook_image' );
+		$reservation = MSRWA_DB::reserve( $job, (float) $settings['facebook_image_estimate_usd'], 'facebook_image' );
 		if ( is_wp_error( $reservation ) ) { return $reservation; }
 		$featured_id = isset( $artifacts['featured_image']['attachment_id'] ) ? absint( $artifacts['featured_image']['attachment_id'] ) : 0;
 		$featured_file = $featured_id ? get_attached_file( $featured_id ) : '';
@@ -144,7 +144,19 @@ final class MSRWA_Images {
 		$catalog = MSRWA_Catalog::models();
 		$input_tokens = is_array( $result ) && ! empty( $result['usage']['input_tokens'] ) ? absint( $result['usage']['input_tokens'] ) : 0;
 		$output_tokens = is_array( $result ) && ! empty( $result['usage']['output_tokens'] ) ? absint( $result['usage']['output_tokens'] ) : 0;
-		$cost = $uncertain ? (float) $settings['image_reserve_usd'] : ( ( isset( $catalog[ $provider ][ $model ] ) ? ( $input_tokens * (float) $catalog[ $provider ][ $model ]['input'] + $output_tokens * (float) $catalog[ $provider ][ $model ]['output'] ) / 1000000 : 0.05 ) );
+		$is_image = in_array( $operation, array( 'featured_image', 'facebook_image' ), true );
+		$fallback_cost = 'facebook_image' === $operation ? (float) $settings['facebook_image_estimate_usd'] : ( 'featured_image' === $operation ? (float) $settings['featured_image_estimate_usd'] : (float) $settings['vision_reserve_usd'] );
+		$has_usage = $input_tokens || $output_tokens;
+		if ( $has_usage && isset( $catalog[ $provider ][ $model ] ) ) {
+			$model_cost = $catalog[ $provider ][ $model ];
+			$text_input = isset( $result['usage']['input_tokens_details']['text_tokens'] ) ? absint( $result['usage']['input_tokens_details']['text_tokens'] ) : $input_tokens;
+			$image_input = isset( $result['usage']['input_tokens_details']['image_tokens'] ) ? absint( $result['usage']['input_tokens_details']['image_tokens'] ) : 0;
+			$cost = ( $text_input * (float) $model_cost['input'] + $image_input * (float) ( $model_cost['image_input'] ?? $model_cost['input'] ) + $output_tokens * (float) $model_cost['output'] ) / 1000000;
+			$uncertain = false;
+		} else {
+			$cost = $fallback_cost;
+			$uncertain = $is_image || $uncertain;
+		}
 		MSRWA_DB::call( array(
 			'batch_id' => absint( $job->batch_id ),
 			'job_id' => absint( $job->id ),

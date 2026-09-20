@@ -70,7 +70,7 @@ final class MSRWA_Publisher {
 		$post = get_post( $post_id );
 		if ( ! $post || 'draft' !== $post->post_status || 'post' !== $post->post_type ) { return new WP_Error( 'draft_write_failed', 'Le brouillon WordPress n’a pas été enregistré dans l’état attendu.' ); }
 		$mapping = MSRWA_Settings::get()['integration_mapping'];
-		foreach ( array( 'prep_minutes', 'cook_minutes', 'servings', 'calories_estimate', 'cuisine' ) as $field ) {
+		foreach ( array( 'prep_minutes', 'cook_minutes', 'servings', 'calories_estimate', 'cuisine', 'difficulty' ) as $field ) {
 			$key = isset( $mapping[ $field ] ) ? $mapping[ $field ] : '';
 			if ( ! $key || ! array_key_exists( $field, $canonical ) ) { continue; }
 			$expected = in_array( $field, array( 'prep_minutes', 'cook_minutes', 'servings', 'calories_estimate' ), true ) ? (string) absint( $canonical[ $field ] ) : sanitize_text_field( $canonical[ $field ] );
@@ -182,6 +182,7 @@ final class MSRWA_Publisher {
 			'servings'        => $mapping['servings'],
 			'calories_estimate' => $mapping['calories_estimate'],
 			'cuisine'         => $mapping['cuisine'],
+			'difficulty'      => $mapping['difficulty'],
 		);
 		foreach ( $map as $source => $key ) {
 			if ( $key && isset( $recipe[ $source ] ) ) {
@@ -201,10 +202,20 @@ final class MSRWA_Publisher {
 		foreach ( isset( $recipe['steps'] ) && is_array( $recipe['steps'] ) ? $recipe['steps'] : array() as $step ) {
 			$steps[] = sanitize_textarea_field( is_array( $step ) ? ( $step['text'] ?? ( $step['step'] ?? '' ) ) : $step );
 		}
-		update_post_meta( $post_id, '_recipe_ingredients', implode( "\n", array_filter( $ingredients ) ) );
-		update_post_meta( $post_id, '_recipe_instructions', implode( "\n", array_filter( $steps ) ) );
+		if ( ! empty( $mapping['ingredients'] ) ) { update_post_meta( $post_id, $mapping['ingredients'], implode( "\n", array_filter( $ingredients ) ) ); }
+		if ( ! empty( $mapping['instructions'] ) ) { update_post_meta( $post_id, $mapping['instructions'], implode( "\n", array_filter( $steps ) ) ); }
 		if ( isset( $recipe['calories_estimate'] ) ) { update_post_meta( $post_id, '_recipe_calories_estimated', '1' ); }
-		if ( ! empty( $recipe['keywords'] ) ) { update_post_meta( $post_id, '_recipe_keywords', sanitize_text_field( is_array( $recipe['keywords'] ) ? implode( ', ', $recipe['keywords'] ) : $recipe['keywords'] ) ); }
+		if ( ! empty( $recipe['keywords'] ) && ! empty( $mapping['keywords'] ) ) { update_post_meta( $post_id, $mapping['keywords'], sanitize_text_field( is_array( $recipe['keywords'] ) ? implode( ', ', $recipe['keywords'] ) : $recipe['keywords'] ) ); }
+		if ( ! empty( $recipe['equipment'] ) && ! empty( $mapping['equipment'] ) ) { update_post_meta( $post_id, $mapping['equipment'], sanitize_textarea_field( is_array( $recipe['equipment'] ) ? implode( "\n", $recipe['equipment'] ) : $recipe['equipment'] ) ); }
+		if ( ! empty( $recipe['notes'] ) && ! empty( $mapping['notes'] ) ) { update_post_meta( $post_id, $mapping['notes'], sanitize_textarea_field( is_array( $recipe['notes'] ) ? implode( "\n", $recipe['notes'] ) : $recipe['notes'] ) ); }
+		if ( ! empty( $recipe['faq'] ) && ! empty( $mapping['faq'] ) ) {
+			$faq = array();
+			foreach ( is_array( $recipe['faq'] ) ? $recipe['faq'] : array() as $item ) {
+				if ( ! is_array( $item ) || empty( $item['question'] ) || empty( $item['answer'] ) ) { continue; }
+				$faq[] = array( 'question' => sanitize_text_field( $item['question'] ), 'answer' => sanitize_textarea_field( $item['answer'] ) );
+			}
+			if ( $faq ) { update_post_meta( $post_id, $mapping['faq'], wp_json_encode( $faq, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) ); }
+		}
 	}
 
 	private static function write_seo_meta( $post_id, $article ) {

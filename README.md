@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.34` fournit un socle installable et sans appel payant automatique par défaut :
+La version `0.2.35` fournit un socle installable et sans appel payant automatique par défaut :
 
 - modes administrateur `Automatique` / `Manuel` ;
 - limites initiales de 50 recettes par lot, 4 traitements simultanés et 2 corrections ;
@@ -33,6 +33,9 @@ La version `0.2.34` fournit un socle installable et sans appel payant automatiqu
 - recherche visuelle web administrable : les références publiques sûres sont téléchargées temporairement hors du document root, analysées pour dégager une direction artistique, puis employées comme observations abstraites — jamais copiées ni fournies comme actif à l’image générée ;
 - contrôle vision structuré des deux images avant la création du brouillon, avec blocage si un défaut est confirmé ;
 - jusqu’à deux corrections automatiques par image, déclenchées uniquement après une relecture négative et avec les défauts conservés dans le détail du job ; une correction de l’image principale régénère aussi sa variante Facebook ;
+- gate éditorial déterministe avant la relecture IA : comparaison configurable avec les publications récentes d’un auteur de référence, score sur 100, seuils de longueur/structure/recette/SEO et retour automatique en correction ;
+- contrat Recipe Card complet (temps, portions, calories estimées, cuisine, difficulté, ingrédients, étapes, équipement, notes, FAQ et mots-clés) avec mapping administrable ;
+- budget image séparé pour l’image principale et Facebook, coût de recherche web explicite et usage token image exploité lorsqu’il est fourni par l’API ;
 - mapping administrable des métadonnées Theme/Facebook, récupération des workers expirés et conservation de données par défaut lors de la désinstallation ;
 - tests de connectivité séparés pour OpenAI, Gemini et Claude depuis les réglages administrateur ;
 - génération d’image principale Gemini native lorsque ce fournisseur est choisi ; l’édition Facebook avec référence reste explicitement réservée aux adaptateurs compatibles ;

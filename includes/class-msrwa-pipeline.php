@@ -193,13 +193,14 @@ final class MSRWA_Pipeline {
 		$links = self::internal_link_candidates( isset( $artifacts['canonical']['title'] ) ? $artifacts['canonical']['title'] : $job->title, (int) $settings['internal_links_max'] );
 		$artifacts['internal_link_candidates'] = $links;
 		$links_context = ! empty( $settings['internal_links_enabled'] ) ? '\nLiens internes autorisés : ' . wp_json_encode( $links, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . '. Utilise uniquement ces chemins relatifs, au maximum ' . (int) $settings['internal_links_max'] . ', et retourne aussi internal_links (title, url, anchor). Ne crée aucun lien si la liste est vide.' : '\nLes liens internes sont désactivés : retourne internal_links comme tableau vide.';
-		$prompt = $settings['prompt_article'] . '\n' . $settings['prompt_seo'] . '\nRecette canonique : ' . wp_json_encode( $artifacts['canonical'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . $links_context . $previous_findings;
-		$result = self::text_call( $job, $prompt, 2800, array(), false, 'article' );
+		$prompt = $settings['prompt_article'] . '\n' . $settings['prompt_seo'] . MSRWA_Quality::prompt_contract( $settings ) . '\nRecette canonique : ' . wp_json_encode( $artifacts['canonical'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . $links_context . $previous_findings;
+		$article_tokens = max( 1000, absint( $settings['article_max_output_tokens'] ) );
+		$result = self::text_call( $job, $prompt, $article_tokens, array(), false, 'article' );
 		self::require_result( $result );
 		try {
 			$artifacts['article'] = self::decode_json( $result['text'], 'article' );
 		} catch ( Exception $first_error ) {
-			$retry = self::text_call( $job, $prompt . '\nRéponds à nouveau avec un JSON compact strict sans Markdown ni commentaire.', 3000, array(), false, 'article_retry' );
+			$retry = self::text_call( $job, $prompt . '\nRéponds à nouveau avec un JSON compact strict sans Markdown ni commentaire.', $article_tokens, array(), false, 'article_retry' );
 			self::require_result( $retry );
 			$artifacts['article'] = self::decode_json( $retry['text'], 'article' );
 		}
@@ -212,15 +213,27 @@ final class MSRWA_Pipeline {
 			return;
 		}
 		$settings = MSRWA_Settings::get();
-		$prompt = $settings['prompt_review'] . '\nDeux cycles maximum sont gérés par le moteur. CANONICAL: ' . wp_json_encode( $artifacts['canonical'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . ' ARTICLE: ' . wp_json_encode( $artifacts['article'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
-		$result = self::text_call( $job, $prompt, 2400, array(), false, 'review' );
-		self::require_result( $result );
-		try {
-			$review = self::decode_json( $result['text'], 'review' );
-		} catch ( Exception $first_error ) {
-			$retry = self::text_call( $job, $prompt . '\nRéponds à nouveau avec un JSON compact strict sans Markdown ni commentaire.', 2800, array(), false, 'review_retry' );
-			self::require_result( $retry );
-			$review = self::decode_json( $retry['text'], 'review' );
+		$quality = MSRWA_Quality::evaluate( $artifacts['article'], $artifacts['canonical'], $settings );
+		$artifacts['quality_report'] = $quality;
+		MSRWA_DB::event( 'quality_gate_evaluated', $job->batch_id, $job->id, array( 'score' => $quality['score'], 'pass' => $quality['pass'], 'words' => $quality['metrics']['words'], 'target_words' => $quality['benchmark']['words'] ) );
+		if ( empty( $quality['pass'] ) ) {
+			$review = array( 'pass' => false, 'findings' => $quality['findings'], 'corrected_artifact' => array(), 'uncertainties' => array(), 'source' => 'deterministic_quality_gate' );
+		} else {
+			$prompt = $settings['prompt_review'] . '\nLa limite configurée est de ' . absint( $settings['max_corrections'] ) . ' cycles. CONTRÔLE DÉTERMINISTE : ' . wp_json_encode( $quality, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . ' CANONICAL: ' . wp_json_encode( $artifacts['canonical'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . ' ARTICLE: ' . wp_json_encode( $artifacts['article'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+			$review_tokens = max( 500, absint( $settings['review_max_output_tokens'] ) );
+			$result = self::text_call( $job, $prompt, $review_tokens, array(), false, 'review' );
+			self::require_result( $result );
+			try {
+				$review = self::decode_json( $result['text'], 'review' );
+			} catch ( Exception $first_error ) {
+				$retry = self::text_call( $job, $prompt . '\nRéponds à nouveau avec un JSON compact strict sans Markdown ni commentaire.', $review_tokens, array(), false, 'review_retry' );
+				self::require_result( $retry );
+				$review = self::decode_json( $retry['text'], 'review' );
+			}
+			if ( ! array_key_exists( 'pass', $review ) || ! is_bool( $review['pass'] ) ) {
+				$review['pass'] = false;
+				$review['findings'] = array_merge( isset( $review['findings'] ) && is_array( $review['findings'] ) ? $review['findings'] : array(), array( array( 'severity' => 'blocking', 'field' => 'review_schema', 'reason' => 'Le relecteur n’a pas retourné pass comme booléen.', 'fix' => 'Retourner le schéma JSON demandé.' ) ) );
+			}
 		}
 		$artifacts['review'] = $review;
 		if ( empty( $review['pass'] ) && ! empty( $review['corrected_artifact'] ) && is_array( $review['corrected_artifact'] ) ) {
@@ -276,6 +289,12 @@ final class MSRWA_Pipeline {
 		if ( empty( $recipe['prep_minutes'] ) && ! empty( $recipe['prep_time'] ) ) { $recipe['prep_minutes'] = self::minutes( $recipe['prep_time'] ); }
 		if ( empty( $recipe['cook_minutes'] ) && ! empty( $recipe['cook_time'] ) ) { $recipe['cook_minutes'] = self::minutes( $recipe['cook_time'] ); }
 		if ( empty( $recipe['servings'] ) && ! empty( $recipe['yield'] ) && preg_match( '/\d+/', (string) $recipe['yield'], $match ) ) { $recipe['servings'] = absint( $match[0] ); }
+		if ( ! array_key_exists( 'cook_minutes', $recipe ) && ! empty( $recipe['no_cook'] ) ) { $recipe['cook_minutes'] = 0; }
+		if ( empty( $recipe['calories_estimate'] ) ) {
+			foreach ( array( 'calories', 'calories_per_serving', 'estimated_calories' ) as $key ) { if ( isset( $recipe[ $key ] ) && preg_match( '/\d+/', (string) $recipe[ $key ], $match ) ) { $recipe['calories_estimate'] = absint( $match[0] ); break; } }
+		}
+		if ( empty( $recipe['difficulty'] ) ) { foreach ( array( 'difficulte', 'difficulté', 'level' ) as $key ) { if ( ! empty( $recipe[ $key ] ) ) { $recipe['difficulty'] = sanitize_text_field( $recipe[ $key ] ); break; } } }
+		if ( ! isset( $recipe['total_minutes'] ) && isset( $recipe['prep_minutes'], $recipe['cook_minutes'] ) ) { $recipe['total_minutes'] = absint( $recipe['prep_minutes'] ) + absint( $recipe['cook_minutes'] ); }
 		if ( ! empty( $recipe['ingredients'] ) && is_array( $recipe['ingredients'] ) ) {
 			foreach ( $recipe['ingredients'] as $index => $ingredient ) {
 				if ( ! is_array( $ingredient ) ) { $recipe['ingredients'][ $index ] = array( 'name' => sanitize_text_field( $ingredient ), 'quantity' => '', 'unit' => '' ); continue; }
@@ -290,6 +309,13 @@ final class MSRWA_Pipeline {
 				}
 			}
 		}
+		if ( ! empty( $recipe['steps'] ) && is_array( $recipe['steps'] ) ) {
+			foreach ( $recipe['steps'] as $index => $step ) {
+				if ( is_string( $step ) ) { $recipe['steps'][ $index ] = array( 'text' => sanitize_textarea_field( $step ) ); }
+				elseif ( is_array( $step ) && empty( $step['text'] ) ) { foreach ( array( 'instruction', 'description', 'etape', 'étape' ) as $key ) { if ( ! empty( $step[ $key ] ) ) { $recipe['steps'][ $index ]['text'] = sanitize_textarea_field( $step[ $key ] ); break; } } }
+			}
+		}
+		if ( isset( $recipe['instructions'] ) && $recipe['instructions'] === $recipe['steps'] ) { unset( $recipe['instructions'] ); }
 		return $recipe;
 	}
 
@@ -381,7 +407,9 @@ final class MSRWA_Pipeline {
 		$provider = $plan['provider'];
 		$model = $plan['model'];
 		$catalog = MSRWA_Catalog::models();
-		$estimate = isset( $catalog[ $provider ][ $model ] ) ? ( ( max( 16, absint( $max_tokens ) ) * (float) $catalog[ $provider ][ $model ]['output'] ) / 1000000 ) + ( $tools ? 0.02 : 0.005 ) : 0.05;
+		$settings = MSRWA_Settings::get();
+		$tool_cost = $tools ? (float) $settings['web_search_tool_cost_usd'] : 0;
+		$estimate = isset( $catalog[ $provider ][ $model ] ) ? ( ( max( 16, absint( $max_tokens ) ) * (float) $catalog[ $provider ][ $model ]['output'] ) / 1000000 ) + $tool_cost + 0.005 : 0.05;
 		$reservation = MSRWA_DB::reserve( $job, $estimate, $operation );
 		if ( is_wp_error( $reservation ) ) { MSRWA_DB::event( 'budget_blocked', $job->batch_id, $job->id, array( 'operation' => $operation, 'reason' => $reservation->get_error_code(), 'estimate' => $estimate ) ); return $reservation; }
 		$started = current_time( 'mysql', true );
@@ -402,7 +430,7 @@ final class MSRWA_Pipeline {
 			'finished_at' => current_time( 'mysql', true ),
 		);
 		if ( isset( $catalog[ $provider ][ $row['model'] ] ) && is_array( $result ) ) {
-			$row['cost_estimate'] = ( $row['input_tokens'] * (float) $catalog[ $provider ][ $row['model'] ]['input'] + $row['output_tokens'] * (float) $catalog[ $provider ][ $row['model'] ]['output'] ) / 1000000;
+			$row['cost_estimate'] = ( $row['input_tokens'] * (float) $catalog[ $provider ][ $row['model'] ]['input'] + $row['output_tokens'] * (float) $catalog[ $provider ][ $row['model'] ]['output'] ) / 1000000 + $tool_cost;
 		}
 		MSRWA_DB::call( $row );
 		if ( is_wp_error( $result ) || ! isset( $row['cost_estimate'] ) ) { MSRWA_DB::release( $reservation ); } else { MSRWA_DB::settle( $reservation, $row['cost_estimate'] ); }
