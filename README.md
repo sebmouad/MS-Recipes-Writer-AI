@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.38` fournit un socle installable DB-first :
+La version `0.2.39` fournit un socle installable DB-first :
 
 - modes administrateur `Automatique` / `Manuel` ;
 - limites initiales de 50 recettes par lot, 4 traitements simultanés et 2 corrections ;
@@ -24,6 +24,7 @@ La version `0.2.38` fournit un socle installable DB-first :
 - vérification des droits actuels du propriétaire avant création du brouillon, puis relecture des métadonnées Recipe Card, SEO, image principale et Facebook écrites en base avant de terminer le job ;
 - adaptateurs texte OpenAI, Gemini et Claude, budget par recette/jour/mois avec réserve image et statistiques des appels sans secret ;
 - formulaire de création réduit à deux entrées : texte/recette et images de référence par URLs HTTPS ou téléversement local privé ;
+- page de création organisée en deux onglets : **Articles** par défaut, avec la qualité mesurée sur chaque article produit, puis **Jobs** pour l’avancement des traitements et des lots ;
 - vue détaillée protégée par lot : jobs, étapes, erreurs, relecture, appels, coûts et ouverture du brouillon ;
 - confirmation explicite et accessible d’une association ambiguë depuis le détail du job, avec reprise contrôlée ;
 - réconciliation automatique des statuts de lots (terminé, annulé, à vérifier, attente de budget) et reprise explicite après validation du budget ;
@@ -59,6 +60,12 @@ La version `0.2.38` fournit un socle installable DB-first :
 - file durable avec budgets opérationnels par recette, jour et mois.
 
 Les appels fournisseurs restent déclenchés uniquement par les jobs créés par un éditeur autorisé et soumis aux limites budgétaires. Aucune clé n’est incluse dans le dépôt.
+
+## Version 0.2.39
+
+- Qualité rattachée à l’article produit : un job sans article n’affiche plus de verdict, et la moyenne d’un lot porte sur ses articles.
+- Page de création en deux onglets : liste des articles par défaut, avec ouverture du brouillon et détail du job, puis onglet Jobs pour les jobs et les lots.
+- Statistiques qualité calculées sur les articles produits : nombre d’articles, score de structure moyen, conformité, mots moyens et articles sous coût cible.
 
 ## Version 0.2.38
 
