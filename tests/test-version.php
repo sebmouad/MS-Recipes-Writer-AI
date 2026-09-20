@@ -6,7 +6,7 @@ $plugin = file_get_contents( $root . '/ms-recipes-writer-ai.php' );
 $readme = file_get_contents( $root . '/README.md' );
 preg_match( '/^\s*\*\s*Version:\s*([0-9.]+)\s*$/m', $plugin, $header );
 preg_match( "/define\(\s*'MSRWA_VERSION',\s*'([0-9.]+)'\s*\)/", $plugin, $constant );
-preg_match( '/La version `([0-9.]+)` fournit/', $readme, $documented );
+preg_match( '/La version `([0-9.]+)`/', $readme, $documented );
 $failures = array();
 if ( empty( $header[1] ) || empty( $constant[1] ) ) { $failures[] = 'Version header or constant missing.'; }
 elseif ( $header[1] !== $constant[1] ) { $failures[] = 'Plugin header ' . $header[1] . ' does not match MSRWA_VERSION ' . $constant[1] . '.'; }

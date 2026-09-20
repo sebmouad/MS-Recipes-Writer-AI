@@ -1,34 +1,46 @@
 # Testing
 
-The suite runs offline: no WordPress, no database, no network, no API keys.
-It exists so a change can be proven before it reaches a site.
+Two layers. Both are required before a checklist task may be marked done.
+
+| Layer | Runs | Needs | Purpose |
+| --- | --- | --- | --- |
+| **Offline** `tests/` | every push, CI | nothing | contracts and regressions, fast |
+| **Real** `tests/real/` | on demand | WordPress, MySQL, provider keys | proves it works for real, with real money |
 
 ```bash
-php tests/run.php            # lint every PHP file, then run every test
-php tests/run.php lists      # only tests whose filename contains "lists"
+php tests/run.php            # offline: lint + every offline test
+php tests/run.php lists      # filter by filename fragment
+php tests/real/run.php       # real: preflight, then run what it can
 ```
 
-The runner exits non-zero when a lint or a test fails; CI
-(`.github/workflows/ci.yml`) runs exactly this command on PHP 7.4, 8.1 and 8.3.
+The offline runner exits non-zero on any lint or test failure; CI
+(`.github/workflows/ci.yml`) runs it on PHP 7.4, 8.1 and 8.3.
 
-## What each test covers
+## Credentials
 
-| File | Covers |
-| --- | --- |
-| `test-contracts.php` | Catalogue eligibility, input normalization, stage transitions, router plan, quality gate pass and rejection |
-| `test-openai-contracts.php` | Request shape and response parsing of the OpenAI transport, offline |
-| `test-inline-links.php` | Internal links stay inside paragraphs, no external target, no nested anchor |
-| `test-editorial-report.php` | A partial draft never gets a passing verdict; a structural score never hides a failed review |
-| `test-presentation.php` | Public state vocabulary, article quality (stored and artifact based), batch aggregation over articles |
-| `test-lists.php` | Filter sanitization, capability scoping, prepared parameters, quality filter mapping |
-| `test-admin-lists.php` | Rendering of both lists: scoping in SQL, filters applied, escaping, batch controls, pagination |
-| `test-queue.php` | Batches keep draining past the concurrency limit, expired leases free their slot, an unclaimed job is re-scheduled |
-| `test-version.php` | Plugin header, `MSRWA_VERSION`, README version and changelog agree; every class keeps its direct-access guard |
-| `test-draft-integration.php` | Draft creation against a real site. Skipped by the runner; run with `wp eval-file` on localhost |
+Real tests read everything from the environment. **Never commit a key, and
+never paste one into a chat message.** Set them where the runtime can read
+them: for Claude Code on the web, in the environment's variables; on a server,
+in the shell profile or the site's `wp-config.php`.
 
-## Writing a test
+| Variable | What it is | Needed for |
+| --- | --- | --- |
+| `MSRWA_TEST_WP_PATH` | Absolute path to a WordPress installation with the plugin active | every real test |
+| `MSRWA_TEST_SITE_URL` | Public or local URL of that site | draft and JSON-LD checks |
+| `MSRWA_OPENAI_KEY` | OpenAI key with access to text, images and web search | writing, images, research |
+| `MSRWA_GEMINI_KEY` | Google Gemini key | only if Gemini is in the routing |
+| `MSRWA_CLAUDE_KEY` | Anthropic key | only if Claude is in the routing |
+| `MSRWA_TEST_BUDGET_USD` | Maximum a single real run may spend, for example `2.00` | every real test that calls a provider |
 
-Start from the shared harness. It declares the WordPress functions the plugin
+A real test that would exceed `MSRWA_TEST_BUDGET_USD` refuses to start. Each
+run prints what it spent.
+
+Use a **staging site**, never production: real tests create posts, jobs and
+attachments.
+
+## Writing an offline test
+
+Start from the shared harness: it declares the WordPress functions the plugin
 touches, a recording `$wpdb`, capability helpers and assertions.
 
 ```php
@@ -48,32 +60,65 @@ msrwa_test_done( 'MSRWA my contract' );
 Harness API:
 
 - `msrwa_test_load( 'lists', 'admin', … )` — require plugin classes by short name.
-- `msrwa_test_as_editor()` / `msrwa_test_as_admin()` — set capabilities and the current user.
+- `msrwa_test_as_editor()` / `msrwa_test_as_admin()` — capabilities and current user.
 - `msrwa_test_settings( array( 'max_corrections' => 0 ) )` — override the settings double.
-- `$GLOBALS['wpdb']->on( $needle, $rows )` — return rows for queries containing `$needle`;
-  `->default_var( 3 )` sets what `get_var()` (counts) returns; `->log()` and
-  `->matching()` expose the recorded SQL.
+- `$GLOBALS['wpdb']->on( $needle, $rows )` — rows for queries containing `$needle`;
+  `->default_var( 3 )` sets what `get_var()` returns; `->log()` and `->matching()`
+  expose recorded SQL. Register the **narrowest** needle first: the first match wins.
 - `msrwa_test_assert()`, `msrwa_test_contains()`, `msrwa_test_missing()` record
-  failures without stopping, so one run reports every problem.
+  failures without stopping, so one run reports everything.
 - `msrwa_test_done( 'label' )` prints the result and sets the exit code.
 
-Failure messages state the rule being protected, not the mechanics: they are
-read by whoever broke the rule months later.
+## Writing a real test
 
-## Conventions that keep the suite honest
+Put it in `tests/real/`, named `test-<subject>.php`. It runs inside a real
+WordPress through WP-CLI, so every WordPress and plugin function is available
+for real.
 
-- Assert behaviour, not implementation. SQL assertions check the clause that
-  enforces a rule (`j.owner_id = 7`), not the whole statement.
-- Every new rule in `docs/ARCHITECTURE.md` under *Invariants* deserves a test.
-- When fixing a bug, add the case that fails before the fix.
-- Verify a test can fail: break the code, run it, restore. A test that never
-  fails protects nothing.
+```php
+<?php
+// tests/real/test-example.php — run by tests/real/run.php
+msrwa_real_require( 'openai' );            // skips cleanly if the key is absent
+$budget = msrwa_real_budget();             // refuses to run past the cap
 
-## Known gaps
+$batch = msrwa_real_create_batch( 'Tarte aux pommes …' );
+msrwa_real_wait( $batch, 900 );            // drive the queue, bounded
 
-- No test executes real SQL, so schema and index changes are unverified until
-  a real site runs the migration.
-- The pipeline stage machine, image generation and provider adapters beyond
-  the OpenAI transport have no offline coverage.
-- No browser-level check of the admin screens; rendering tests assert markup
-  fragments only.
+$job = msrwa_real_job( $batch );
+msrwa_real_assert( $job['draft_post_id'] > 0, 'A draft must exist.' );
+msrwa_real_report( $batch );               // prints cost, tokens, verdict
+```
+
+Rules for real tests:
+
+- **Clean up**: delete the posts, attachments, jobs and batches created, unless
+  the test is asked to keep them for inspection.
+- **Bounded**: never loop without a deadline; the queue is asynchronous.
+- **Honest**: report the real cost, and fail loudly rather than skipping a
+  provider error.
+- **Idempotent**: safe to run twice in a row.
+
+## What is covered today
+
+| File | Covers |
+| --- | --- |
+| `test-contracts.php` | Catalogue eligibility, input normalization, stage transitions, router plan, quality gate |
+| `test-openai-contracts.php` | OpenAI transport request shape and response parsing, offline |
+| `test-inline-links.php` | Internal links stay inside paragraphs, no external target, no nested anchor |
+| `test-editorial-report.php` | A partial draft never gets a passing verdict; a score never hides a failed review |
+| `test-ai-quality.php` | Independent content and image verdicts |
+| `test-presentation.php` | Public state vocabulary, article quality, batch aggregation over articles |
+| `test-lists.php` | Filter sanitization, capability scoping, prepared parameters, quality filter mapping |
+| `test-admin-lists.php` | List rendering: scoping in SQL, filters, escaping, row actions, queue notice |
+| `test-stats.php` | Article-scoped quality statistics, delivery verdict versus structural gate |
+| `test-queue.php` | Batch draining past the concurrency limit, slot accounting, re-scheduling |
+| `test-version.php` | Plugin header, constant, README changelog and direct-access guards agree |
+| `test-draft-integration.php` | Draft creation on a real site; skipped offline |
+
+## Gaps
+
+- No offline test executes SQL: schema and index changes are only proven by a
+  real migration.
+- The pipeline stage machine, image generation and the Gemini and Claude
+  adapters have no offline coverage.
+- `tests/real/` is scaffolding until the credentials above exist.

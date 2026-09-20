@@ -3,9 +3,15 @@
 WordPress plugin, PHP, no build step. It generates culinary articles with AI
 providers, measures them, and hands editors a draft.
 
-Read [`docs/SPEC.md`](docs/SPEC.md) for what the plugin must become,
-[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) before changing behaviour, and
-[`docs/ROADMAP.md`](docs/ROADMAP.md) before choosing what to work on.
+Two documents drive the work:
+
+- [`docs/PLAN.md`](docs/PLAN.md) — the six milestones in plain language, for
+  the site owner.
+- [`docs/BUILD-CHECKLIST.md`](docs/BUILD-CHECKLIST.md) — the task list to
+  execute, with the tests each task needs and the rule for marking it done.
+
+[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) describes the code as it exists;
+read it before changing behaviour.
 
 ## Commands
 
@@ -56,13 +62,16 @@ hardest:
 
 ## Shipping a change
 
-1. Write or extend a test in `tests/` (see `docs/TESTING.md`).
+1. Write or extend a test in `tests/`, and a real test in `tests/real/` when
+   the change touches WordPress, the database or a provider (see
+   `docs/TESTING.md`).
 2. `php tests/run.php` — green, including lint.
 3. Bump the version in `ms-recipes-writer-ai.php` (header **and**
    `MSRWA_VERSION`), add a `## Version x.y.z` section to `README.md`. The
    version triggers the database migration, so never reuse one.
-4. Update `docs/ARCHITECTURE.md` if an invariant moved, `docs/ROADMAP.md` if
-   the plan moved.
+4. Tick the task in `docs/BUILD-CHECKLIST.md` in the same commit, and update
+   `docs/ARCHITECTURE.md` if an invariant moved. A task is `[x]` only after its
+   real test ran; `[~]` while it is covered offline only.
 5. Commit one behaviour at a time, message in the imperative, body explaining
    why.
 

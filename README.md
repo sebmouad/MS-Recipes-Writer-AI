@@ -4,65 +4,22 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.45` fournit un socle installable DB-first :
+La version `0.2.45` est un socle installable : file persistante, pipeline de
+génération, contrôle qualité déterministe, budgets, images et écrans
+d’administration. Le détail des fonctionnalités livrées se trouve dans
+l’historique des versions ci-dessous.
 
-- modes administrateur `Automatique` / `Manuel` ;
-- limites initiales de 50 recettes par lot, 4 traitements simultanés et 2 corrections ;
-- tables persistantes pour lots, jobs et événements ;
-- menu autonome **MS Recipes Writer** en trois pages : Créer des Articles/Images, Statistiques et Configuration ;
-- réglages protégés des clés API et prompts éditables ;
-- prompt du routeur de modèles également configurable, tandis que les contrôles de capacité, de budget et de schéma restent imposés par le moteur ;
-- catalogue de capacités et tarifs vérifiés des modèles OpenAI, Gemini et Claude ;
-- préfiltre de routage automatique qualité/coût et validation du schéma canonique ;
-- snapshot des réglages et modèles sélectionnés pour chaque lot et chaque job ;
-- sélection manuelle distincte par étape (rédaction, relecture, images, recherche) ;
-- pipeline persistant association → recherche web → recette canonique → article → relecture, avec deux corrections maximum ;
-- suggestions de liens internes depuis les recettes locales publiées, sous forme de chemins relatifs et avec une limite administrable ; insertion sur les expressions pertinentes déjà présentes dans les paragraphes, sans section dédiée ;
-- adaptateurs OpenAI Responses et Image API testés localement avec sorties JSON et WebP temporaires ;
-- génération de l’image principale puis variante Facebook référencée, validation mécanique des médias et création idempotente d’un brouillon WordPress ;
-- ratios, qualité OpenAI et format de sortie administrables pour l’image principale et Facebook, avec recadrage non étiré et cohérence MIME/extension après transformation ;
-- vérification des droits actuels du propriétaire avant création du brouillon, puis relecture des métadonnées Recipe Card, SEO, image principale et Facebook écrites en base avant de terminer le job ;
-- adaptateurs texte OpenAI, Gemini et Claude, budget par recette/jour/mois avec réserve image et statistiques des appels sans secret ;
-- formulaire de création réduit à deux entrées : texte/recette et images de référence par URLs HTTPS ou téléversement local privé ;
-- page de création organisée en deux onglets : **Articles** par défaut, avec la qualité mesurée sur chaque article produit, puis **Jobs** pour le traitement complet ;
-- listes complètes et paginées, filtrables par recherche, publication, qualité, état, étape, période et tri ; chaque éditeur ne voit que ses propres articles et jobs, les administrateurs disposent en plus d’un filtre Auteur ;
-- verdict qualité enregistré sur l’article lui-même, ce qui permet de filtrer et de trier sans recalculer les artefacts ;
-- actions de relance, d’annulation et de confirmation d’association accessibles depuis la liste des jobs, et alerte de file d’attente sur l’écran de création ;
-- suite de tests hors ligne et intégration continue, avec documentation d’architecture, feuille de route et guide de test versionnés dans le dépôt ;
-- vue détaillée protégée par lot : jobs, étapes, erreurs, relecture, appels, coûts et ouverture du brouillon ;
-- confirmation explicite et accessible d’une association ambiguë depuis le détail du job, avec reprise contrôlée ;
-- réconciliation automatique des statuts de lots (terminé, annulé, à vérifier, attente de budget) et reprise explicite après validation du budget ;
-- statistiques détaillées par fonctionnalité, état, événement et éditeur, avec périmètre automatiquement limité pour chaque éditeur ;
-- statistiques de coût par brouillon terminé et durée moyenne des jobs terminés, plus export CSV visible du journal d’événements ;
-- lots multi-recettes depuis les deux champs existants, via une séparation `---`, avec références visuelles partagées puis association IA par recette ;
-- recherche visuelle web administrable : les références publiques sûres sont téléchargées temporairement hors du document root, analysées pour dégager une direction artistique, puis employées comme observations abstraites — jamais copiées ni fournies comme actif à l’image générée ;
-- contrôle vision structuré des deux images ; les défauts non résolus sont signalés dans le brouillon pour relecture humaine ;
-- jusqu’à deux corrections automatiques par image, déclenchées uniquement après une relecture négative et avec les défauts conservés dans le détail du job ; une correction de l’image principale régénère aussi sa variante Facebook ;
-- relecture IA systématique du contenu et du réalisme des images, avec trois verdicts textuels distincts ; objectifs de longueur conservés séparément pour les corrections ;
-- contrat Recipe Card complet (temps, portions, calories estimées, cuisine, difficulté, ingrédients, étapes, équipement, notes, FAQ et mots-clés) avec mapping administrable ;
-- budget image séparé pour l’image principale et Facebook, coût de recherche web explicite et usage token image exploité lorsqu’il est fourni par l’API ;
-- mapping administrable des métadonnées Theme/Facebook, récupération des workers expirés et conservation de données par défaut lors de la désinstallation ;
-- tests de connectivité séparés pour OpenAI, Gemini et Claude depuis les réglages administrateur ;
-- génération d’image principale Gemini native lorsque ce fournisseur est choisi ; l’édition Facebook avec référence reste explicitement réservée aux adaptateurs compatibles ;
-- instantané des modèles par étape dans chaque job, adaptateurs vision Gemini/Claude/OpenAI et contrôles REST pause/reprise/annulation avec protection contre les écritures d’un worker expiré ;
-- réservations budgétaires atomiques expirables par appel, règlement/libération après retour fournisseur et nettoyage des réservations abandonnées ;
-- respect effectif des durées de rétention configurées pour les journaux et temporaires, avec protection des jobs encore actifs ou à vérifier ;
-- protection des lots mis en pause ou en attente : un worker déjà planifié ne peut plus les relancer sans action explicite ;
-- commandes administrateur visibles pour mettre en pause, reprendre ou annuler un lot, avec contrôle de propriété et avertissement sur les appels déjà acceptés ;
-- diagnostic de santé de file dans Configuration : moteur, prochain nettoyage, dernier progrès, jobs en attente/en cours/à vérifier et workers expirés, sans modifier le cron serveur ;
-- routage automatique agentique borné aux modèles connectés et vérifiés, avec coût journalisé et repli explicite vers le préfiltre déterministe si la réponse du routeur est inexploitable ;
-- historique avant/après des corrections éditoriales et provenance compacte (sources, modèles, corrections) conservée avec le brouillon final ;
-- association IA structurée pour chaque entrée, seuil de confiance, état « À confirmer » et endpoint sécurisé de confirmation éditeur avant la recherche ;
-- clés API chiffrées au repos avec les sels WordPress lorsque OpenSSL est disponible, migration des anciennes valeurs et recours aux variables d’environnement ;
-- synchronisation manuelle des identifiants accessibles OpenAI/Gemini, état daté du catalogue et exclusion des modèles confirmés absents du compte ;
-- statistiques REST sur plage de dates avec période précédente pour les comparaisons personnalisées, en plus du raccourci par nombre de jours ;
-- exports paginés CSV/JSON des jobs, appels et événements, avec filtrage par période et respect de la visibilité éditeur/admin ;
-- téléchargement sécurisé des images de référence vers un stockage privé hors document root, analyse vision budgétée, provenance et nettoyage des temporaires ;
-- migration non destructive des réglages ajoutés par les versions successives, sans écraser les personnalisations existantes ;
-- REST local pour créer et consulter les lots ;
-- file durable avec budgets opérationnels par recette, jour et mois.
+Le plugin est en cours de refonte éditoriale et budgétaire :
 
-Les appels fournisseurs restent déclenchés uniquement par les jobs créés par un éditeur autorisé et soumis aux limites budgétaires. Aucune clé n’est incluse dans le dépôt.
+- [`docs/PLAN.md`](docs/PLAN.md) — ce qui est construit, en clair.
+- [`docs/BUILD-CHECKLIST.md`](docs/BUILD-CHECKLIST.md) — les tâches à réaliser,
+  leurs tests et leur critère d’achèvement.
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — le code tel qu’il existe.
+- [`docs/TESTING.md`](docs/TESTING.md) — suite hors ligne et tests réels.
+
+Les coûts affichés sont des estimations calculées avec le catalogue configuré,
+non une facture fournisseur. `completed` signifie que le traitement est terminé,
+jamais qu’un texte est validé éditorialement.
 
 ## Version 0.2.45
 
