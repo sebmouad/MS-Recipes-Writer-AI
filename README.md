@@ -23,31 +23,34 @@ jamais qu’un texte est validé éditorialement.
 
 ## Version 0.2.52
 
-La recherche produit désormais une **référence visuelle** : ce à quoi le plat
-fini ressemble réellement, observé dans les photographies des sources trouvées,
-et non une image réutilisée. Six facettes — couleur, surface, texture, dressage,
-garniture, repères de cuisson — descendent ensuite dans la recette canonique,
-l'article, l'image mise en avant et le visuel Facebook, où elles priment sur
-l'idée que le modèle se fait du plat.
+La recherche devient la source d'une **apparence vérifiée** plutôt que devinée.
+Elle cite des photographies réelles du plat — jamais générées, retouchées ni
+composées — et le laboratoire télécharge chaque image citée pour l'analyser
+octet par octet ; ce que la vision y observe descend ensuite dans la recette
+canonique, l'article et les deux prompts d'image.
 
-Mesuré le 20/09/2026 sur deux plats, `gpt-5.6-luna` : 8/8 sur la recherche
-(44,9s / 0,0152 $ et 37,2s / 0,0124 $), puis 10/10 sur l'article, `visual_final_notes`
-compris — la seule vérification qui échouait encore sur les neuf cellules
-d'article. Les notes finales reprennent la référence sans la contredire :
-grand plat rond métallique, riz blanc aux grains séparés, oignons brun doré
-brillants, aucune garniture ajoutée.
+**Aucune photographie n'est republiée.** L'image sert à regarder, pas à
+illustrer : les observations remplacent la photo, qui reste à son auteur. Une
+observation ne peut établir qu'une apparence — jamais un ingrédient caché, une
+quantité ni une étape de préparation.
 
-- `tools/prompts/research.tpl.txt` et `canonical_recipe.tpl.txt` sont des
-  gabarits compilés depuis les réglages, comme l'article et les deux images.
+- `prompt_research` livré correspond enfin au prompt mesuré au laboratoire : il
+  exige la provenance (`image_url` et `source_url` en HTTPS) et interdit de
+  deviner l'apparence depuis un extrait de recherche.
+- `tests/test-visual-reference.php` vérifie que la recette, l'article et la
+  relecture reçoivent encore le dossier de recherche. Une étape qui cesse de le
+  recevoir n'échoue pas : elle invente une apparence sans rien signaler.
+- `docs/LAB-RESULTS.md` consigne les 51 appels réels déjà mesurés — modèle,
+  durée, coût, score, cause d'arrêt — pour que chaque chiffre soit reproductible
+  ou contestable.
 - `research_facts_max` et `research_references_max` deviennent réglables.
-- `docs/LAB-RESULTS.md` consigne les 51 appels réels mesurés : modèle, durée,
-  coût, score, cause d'arrêt.
-- `tests/test-visual-reference.php` vérifie que chaque étape reçoit encore la
-  référence — une étape qui cesse de la recevoir invente une apparence sans rien
-  signaler.
 
-**Aucune photographie trouvée n'est republiée.** Les notes remplacent l'image ;
-les images restent celles de leurs auteurs.
+Une approche concurrente, mesurée puis écartée le même jour, faisait décrire les
+photographies au modèle de mémoire, en six facettes nommées. Elle obtenait 8/8
+sur deux plats et amenait l'article à 10/10, `visual_final_notes` compris — la
+seule vérification qui échouait encore sur les neuf cellules d'article. Lire les
+octets reste une preuve plus solide qu'un modèle décrivant une page consultée.
+Le raisonnement est conservé dans `docs/BUILD-CHECKLIST.md`, tâche A3.
 
 ## Version 0.2.51
 

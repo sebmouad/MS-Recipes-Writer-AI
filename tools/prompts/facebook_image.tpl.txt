@@ -1,62 +1,73 @@
-Act as a professional food photographer and Pinterest content creator.
+You are a commercial food photographer, food stylist and visual recipe editor.
 
-Create a high-quality step-by-step food collage showing the complete preparation process of this recipe, output as {{image_format}}.
+Create one original premium Facebook recipe tutorial collage in {{image_format}}. It must be understandable without captions and look like six photographs from one real cooking session—not six unrelated images and not an AI contact sheet.
 
-STYLE:
+OUTPUT GEOMETRY — NON-NEGOTIABLE:
 
-• Ultra realistic food photography
-• Bright natural lighting
-• Clean modern kitchen aesthetic
-• Soft shadows and realistic textures
-• Elegant Pinterest-style composition
-• Premium food magazine look
-• Soft pastel or white background
-• Slight top-down angle
-• Highly appetizing and realistic
+• One vertical {{facebook_ratio}} canvas at {{facebook_size}}; the reference-standard default is 1024×1536 (2:3)
+• EXACTLY {{facebook_steps}} equal panels in a strict 2-column × 3-row grid, read left-to-right and top-to-bottom
+• Thin, straight, uniform white gutters, approximately 6–10 px at 1024 px width; no decorative outer border
+• No extra frame, inset image, split cell, overlap, irregular mosaic, duplicated panel or missing panel
+• Each panel contains one complete, immediately readable action or state; important food and tools stay inside the cell
 
-LAYOUT:
+CHOOSE ONE STORYBOARD ARCHETYPE:
 
-• Create a vertical {{facebook_ratio}} collage at {{facebook_size}} with {{facebook_steps}} sections, framed for a mobile feed
-• Each image represents one important step of the recipe
-• Keep the same bowl, mold, plate, and visual consistency across all steps
-• Smooth visual progression from ingredients to final plated recipe
+A. LAYERED OR OVEN-BAKED DISH — ingredients → sauce or first preparation → base/layer 1 → assembly → final topping or ready-to-bake state → browned finished dish with a lifted, cut or plated portion.
+B. BRAISE, STEW OR SOUP — ingredients → protein browning or aromatic base → vegetables/components cooking → protein returned and liquid added → visibly reduced tender simmer → plated serving or close hero in the authentic pot.
+C. PASTRY, CAKE OR BATTER — ingredients → batter/filling/base → inclusions or shaping → moulding/filling → whole baked/set result → sliced, opened or spooned hero revealing the interior.
+D. PAN-COOKED OR FOLDED DISH — ingredients → mixture/base preparation → base cooking and setting → filling added → folded/finished in the pan → clean plated hero.
 
-THE SIX STEPS MUST COME FROM THE ARTICLE ITSELF, in order, using the real ingredients and the real gestures described. Never invent a step the recipe does not contain.
+Use exactly one archetype or the closest logical variant. Never mix incompatible stages merely to fill six cells.
 
-IMAGES TO INCLUDE:
+PANEL ROLES:
 
-1. Preparing the base or arranging ingredients
-2. Mixing cream, batter, sauce, or filling
-3. First assembly step
-4. Second assembly step
-5. Final decoration or topping
-6. Final finished recipe beautifully presented and sliced/opened
+1. MISE EN PLACE — a clean editorial arrangement of only the canonical ingredients, in the forms used by the recipe, with the relevant empty cookware or mould nearby. No packaging. Make the principal ingredient visually dominant.
+2. FIRST DECISIVE TRANSFORMATION — the action that establishes the recipe: whisking, mixing, marinating, searing, sweating aromatics, spreading a base or preparing a sauce.
+3. CORE PROCESS — the next clearly visible state change, such as browning, cooking vegetables, adding the first layer, incorporating filling or forming the dough.
+4. COMBINATION OR CONSTRUCTION — combine the main components, add the liquid, build the layers, fill, fold, roll or transfer to the cooking vessel.
+5. PENULTIMATE STATE — choose the most useful state immediately before serving: final uncooked assembly for a gratin/pizza/pastry, reduced simmer for a braise, folded finish for a pan dish, or whole baked result when a slice is still needed.
+6. APPETITE HERO — the fully cooked final recipe at peak texture. Structured food must show a cut, lifted or plated portion and its true layers/crumb/filling. Stews and soups must show a natural plated bowl, ladled serving or close pot hero; never force an irrelevant slice or cheese pull.
 
-FOOD DETAILS:
+Select the six most visually distinct and useful canonical moments; do not sample mechanically by step number or elapsed time. Omit passive or invisible actions such as preheating, waiting, chilling or storage unless they produce a visible transformation. Never invent a step, ingredient, garnish or cooking method.
 
-• Ingredients must look fresh and realistic
-• Creams, sauces, fruits, chocolate, cheese, etc. should have rich texture
-• Add realistic cooking details (powdered sugar, glossy fruits, melted cheese, herbs, crumbs, steam if needed)
-• Keep proportions realistic
+CONTINUITY — ONE REAL KITCHEN SESSION:
 
-TEXT:
+• Preserve ingredient identity, cut size, quantity impression, vessel geometry and construction order across the sequence
+• Panel 1 may use a wider mise-en-place angle; panels 2–5 should retain the same process vessel and a stable 30–45° three-quarter or slightly top-down camera language
+• Panel 6 may move slightly lower and closer for appetite appeal, but must remain in the same kitchen, light and colour grade
+• Maintain the same work surface, restrained props, daylight direction, exposure, white balance and ingredient-led colour palette
+• Props remain secondary: at most a folded neutral/checked linen, a small herb plant, grinder or blurred ingredient bowl where contextually correct
+• Use one credible tool per action—whisk, wooden spoon, tongs, spatula, ladle or pastry brush—with natural scale, grip and contact
+• Every panel must visibly advance the same recipe; no generic filler and no near-duplicate stages
 
-• No text
-• No watermark
-• No logo
-• No labels
+FOOD REALISM AND PHYSICS:
 
-QUALITY:
+• Show only exact canonical ingredients, in believable proportions and the correct physical state for that moment
+• Raw food remains raw early; searing, translucency, reduction, bubbling, melting, setting and browning appear progressively and at the correct time
+• Render truthful textures: distinct meat fibres and seared edges, recognisable vegetables, plausible sauce viscosity, crisp pastry lamination, tender crumb, set egg or cream, restrained steam and gravity-correct pours
+• Melted cheese follows the food’s structure; it may stretch only when hot and physically connected, never as an unsupported curtain
+• The final food must match earlier panels in component count, shape, colour, garnish and vessel scale
+• Avoid plastic smoothness, waxy meat, raw-looking cooked protein, excessive gloss, neon saturation, repeated ingredient clones, fused utensils, floating food, malformed hands and impossible cookware
 
-• Ultra detailed
-• Professional culinary photography
-• Pinterest viral aesthetic
-• 4K realistic rendering
-• Clean composition
-• Consistent colors and lighting
+PHOTOGRAPHIC AND STYLING QUALITY:
 
-The final image must look exactly like a professional Pinterest recipe tutorial collage showing all preparation stages of the recipe.
+• Bright diffused side-window light with soft directional shadows and neutral-to-warm white balance
+• Premium but attainable French home-kitchen styling on light stone or warm wood; choose one surface and keep it coherent
+• Food occupies roughly 70–90% of each process cell; crop closely enough to read texture while preserving vessel edges needed for orientation
+• Crisp focus on the active food, gentle background falloff, realistic lens perspective, controlled highlights and visible fine texture
+• Rich but natural appetite cues: caramelised edges, golden crust, glossy sauce, moist crumb and fresh herbs only when canonical
+• Panel 6 receives the strongest visual hierarchy and most appetising angle; it should be share-worthy even when viewed alone
 
-Consistency: same dish, same colours, same crockery and same lighting in all {{facebook_steps}} sections, ending on the finished recipe exactly as described in the VISUAL REFERENCE supplied with this brief.
+SOURCE FIDELITY:
 
-The VISUAL REFERENCE was observed in real photographs of this dish: its colour, surface, texture, plating, garnish and doneness cues outrank every style instruction above. The final panel must match it, and the earlier panels must lead to it — the colour the mixture really takes, the vessel it is really made in, the state it is really in at that stage. Never make a step look better than the reference says the finished dish looks.
+Use the supplied RESEARCH PACKAGE only for supported appearance, equipment and doneness cues. Reference photographs are evidence, not assets: do not copy a recognisable composition, reproduce a source image, infer hidden ingredients or include branding.
+
+FORBIDDEN:
+
+No text, letters, numbers, captions, labels, logos, watermark, packaging, branded containers, oven display, UI, title strip, arrows, badges or decorative stickers.
+
+SILENT FINAL CHECK BEFORE RETURNING:
+
+Verify: exactly six equal cells; correct archetype; one clear advance per panel; canonical ingredients and order; believable state progression; process-vessel continuity; consistent light and colour; no text or visual artifacts; and a fully cooked, high-impact panel 6 that reveals the most appetising truthful texture. Correct every failed condition before returning the image.
+
+The result must equal or exceed a professionally art-directed social recipe tutorial in layout discipline, continuity, instructional clarity, food physics and final-shot appetite appeal.

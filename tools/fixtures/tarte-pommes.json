@@ -1,42 +1,34 @@
 {
   "title": "Tarte aux pommes normande",
   "text": "Tarte aux pommes normande traditionnelle : pâte brisée maison, pommes fondantes, appareil à la crème et calvados. Préciser le choix des pommes, les substitutions, le matériel, les erreurs fréquentes, la conservation et des variantes plus légères.",
+  "editor_input": {
+    "type": "article",
+    "title": "Tarte aux pommes normande",
+    "text": "Tarte aux pommes normande traditionnelle : pâte brisée maison, pommes fondantes, appareil à la crème et calvados. Préciser le choix des pommes, les substitutions, le matériel, les erreurs fréquentes, la conservation et des variantes plus légères.",
+    "images": []
+  },
   "research": {
-    "recipe_facts": [
-      {
-        "source": "https://example.test/pommes",
-        "text": "Les pommes Reinette et Boskoop tiennent la cuisson et gardent une acidité qui équilibre la crème."
-      },
-      {
-        "source": "https://example.test/pate",
-        "text": "Une pâte brisée repose au moins 30 minutes au froid pour limiter la rétractation à la cuisson."
-      },
-      {
-        "source": "https://example.test/cuisson",
-        "text": "La cuisson se fait à 180 °C chaleur tournante, 35 à 45 minutes selon l'épaisseur de l'appareil."
-      }
+    "dish_identity": { "name": "Tarte aux pommes normande", "confidence": "élevée", "evidence": "Le titre et le texte éditeur concordent." },
+    "ingredient_facts": [
+      { "source_url": "https://example.test/pommes", "text": "Les pommes Reinette et Boskoop tiennent la cuisson et gardent une acidité qui équilibre la crème." }
+    ],
+    "preparation_facts": [
+      { "source_url": "https://example.test/pate", "text": "Une pâte brisée repose au moins 30 minutes au froid pour limiter la rétractation à la cuisson." },
+      { "source_url": "https://example.test/cuisson", "text": "La cuisson se fait à 180 °C chaleur tournante, 35 à 45 minutes selon l'épaisseur de l'appareil." }
     ],
     "references": [
-      {
-        "url": "https://example.test/pommes",
-        "title": "Choisir ses pommes à cuire"
-      },
-      {
-        "url": "https://example.test/cuisson",
-        "title": "Cuisson des tartes aux fruits"
-      }
+      { "url": "https://example.test/pommes", "title": "Choisir ses pommes à cuire" },
+      { "url": "https://example.test/cuisson", "title": "Cuisson des tartes aux fruits" }
     ],
-    "uncertainties": [
-      "Les temps varient selon le four ; vérifier la coloration."
+    "food_safety": [],
+    "visual_references": [
+      { "image_url": "https://example.test/images/tarte-pommes.jpg", "source_url": "https://example.test/tarte", "title": "Tarte aux pommes normande" }
     ],
-    "visual_reference": {
-      "colour": "La pâte apparaît beige doré sur le pourtour ; les pommes visibles vont du jaune crème au brun doré, avec un appareil plus clair, beige ivoire, entre les morceaux ou sous les quartiers.",
-      "surface": "Les photographies montrent une surface mate à légèrement brillante, avec des quartiers ou lamelles de pommes brunis par endroits ; certaines versions portent un voile blanc de sucre glace, d’autres quelques amandes effilées.",
-      "texture": "La coupe ou le dessus révèle des pommes en quartiers ou en lamelles prises dans une couche d’appareil crémeux ; les versions photographiées gardent des morceaux distincts plutôt qu’une compote uniforme.",
-      "plating": "La tarte est photographiée entière dans un moule rond ou présentée en parts sur une assiette ; une version montre une tarte ronde garnie en rosace dans un plat rouge, tandis qu’une autre montre une part sur une assiette.",
-      "garnish": "Selon les photographies et les versions, la tarte est servie avec des amandes effilées ou un saupoudrage de sucre glace ; certaines présentations sont sans garniture supplémentaire.",
-      "doneness_cues": "La cuisson correcte se lit à la pâte dorée, aux pommes colorées mais encore reconnaissables et à l’appareil pris ; une surface très pâle ou un centre encore liquide indique une cuisson insuffisante, tandis que des pommes noircies signalent une coloration excessive."
-    }
+    "visual_observations": [
+      { "image_url": "https://example.test/images/tarte-pommes.jpg", "source_url": "https://example.test/tarte", "observable_details": "Pommes disposées en rosace sur une tarte ronde.", "composition": "Vue de trois quarts, tarte entière centrée.", "colours": "Pommes dorées et pâte brun clair.", "textures": "Bords croustillants et appareil pris.", "uncertainties": "La photographie ne permet pas d'identifier les quantités." }
+    ],
+    "uncertainties": ["Les temps varient selon le four ; vérifier la coloration."],
+    "originality_notes": ["Les faits sont reformulés et les observations visuelles restent descriptives."]
   },
   "canonical": {
     "title": "Tarte aux pommes normande",
@@ -48,81 +40,28 @@
     "difficulty": "Facile",
     "calories_estimate": 320,
     "ingredients": [
-      {
-        "name": "Pâte brisée",
-        "quantity": "1",
-        "unit": "rouleau"
-      },
-      {
-        "name": "Pommes Reinette",
-        "quantity": "6",
-        "unit": "pièces"
-      },
-      {
-        "name": "Crème fraîche épaisse",
-        "quantity": "20",
-        "unit": "cl"
-      },
-      {
-        "name": "Œufs",
-        "quantity": "2",
-        "unit": "pièces"
-      },
-      {
-        "name": "Sucre",
-        "quantity": "80",
-        "unit": "g"
-      },
-      {
-        "name": "Calvados",
-        "quantity": "2",
-        "unit": "cuillères à soupe"
-      },
-      {
-        "name": "Beurre",
-        "quantity": "20",
-        "unit": "g"
-      }
+      { "name": "Pâte brisée", "quantity": "1", "unit": "rouleau" },
+      { "name": "Pommes Reinette", "quantity": "6", "unit": "pièces" },
+      { "name": "Crème fraîche épaisse", "quantity": "20", "unit": "cl" },
+      { "name": "Œufs", "quantity": "2", "unit": "pièces" },
+      { "name": "Sucre", "quantity": "80", "unit": "g" },
+      { "name": "Calvados", "quantity": "2", "unit": "cuillères à soupe" },
+      { "name": "Beurre", "quantity": "20", "unit": "g" }
     ],
     "steps": [
-      {
-        "text": "Foncer le moule avec la pâte et piquer le fond à la fourchette."
-      },
-      {
-        "text": "Éplucher les pommes, les couper en quartiers réguliers."
-      },
-      {
-        "text": "Disposer les pommes en rosace sur le fond de tarte."
-      },
-      {
-        "text": "Battre les œufs avec le sucre, la crème et le calvados."
-      },
-      {
-        "text": "Verser l'appareil sur les pommes et parsemer de beurre."
-      },
-      {
-        "text": "Enfourner 40 minutes à 180 °C jusqu'à coloration dorée."
-      }
+      { "text": "Foncer le moule avec la pâte et piquer le fond à la fourchette." },
+      { "text": "Éplucher les pommes, les couper en quartiers réguliers." },
+      { "text": "Disposer les pommes en rosace sur le fond de tarte." },
+      { "text": "Battre les œufs avec le sucre, la crème et le calvados." },
+      { "text": "Verser l'appareil sur les pommes et parsemer de beurre." },
+      { "text": "Enfourner 40 minutes à 180 °C jusqu'à coloration dorée." }
     ],
-    "equipment": [
-      "Moule à tarte de 28 cm",
-      "Économe",
-      "Fouet"
-    ],
-    "notes": [
-      "Servir tiède pour que l'appareil reste fondant."
-    ],
-    "faq": [
-      {
-        "question": "Peut-on préparer la tarte la veille ?",
-        "answer": "Oui, elle se conserve 48 heures au réfrigérateur et se réchauffe 10 minutes à 150 °C."
-      }
-    ],
-    "keywords": [
-      "tarte aux pommes",
-      "normande",
-      "calvados"
-    ]
+    "equipment": ["Moule à tarte de 28 cm", "Économe", "Fouet"],
+    "notes": ["Servir tiède pour que l'appareil reste fondant."],
+    "faq": [{ "question": "Peut-on préparer la tarte la veille ?", "answer": "Oui, elle se conserve 48 heures au réfrigérateur et se réchauffe 10 minutes à 150 °C." }],
+    "keywords": ["tarte aux pommes", "normande", "calvados"],
+    "food_safety": ["Conserver la tarte au réfrigérateur en raison de l'appareil aux œufs et à la crème."],
+    "uncertainties": ["Le repos de la pâte n'est pas inclus dans total_minutes."]
   },
   "article": {
     "title": "Tarte aux pommes normande",

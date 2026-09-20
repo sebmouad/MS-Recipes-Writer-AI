@@ -1,0 +1,170 @@
+{
+    "title": "Daube de bœuf à la provençale facile, mijotée au vin rouge et aux légumes",
+    "servings": 8,
+    "prep_minutes": 750,
+    "cook_minutes": 245,
+    "total_minutes": 995,
+    "cuisine": "Provençale",
+    "difficulty": "Moyenne",
+    "calories_estimate": 650,
+    "ingredients": [
+        {
+            "name": "bœuf à braiser, en gros morceaux",
+            "quantity": 2,
+            "unit": "kg"
+        },
+        {
+            "name": "vin rouge corsé, de type côtes-du-rhône",
+            "quantity": 750,
+            "unit": "ml"
+        },
+        {
+            "name": "huile d’olive",
+            "quantity": 3,
+            "unit": "cuillères à soupe"
+        },
+        {
+            "name": "oignons",
+            "quantity": 2,
+            "unit": "unités"
+        },
+        {
+            "name": "carottes",
+            "quantity": 4,
+            "unit": "unités"
+        },
+        {
+            "name": "gousses d’ail",
+            "quantity": 4,
+            "unités": "unités"
+        },
+        {
+            "name": "thym",
+            "quantity": 4,
+            "unit": "brins"
+        },
+        {
+            "name": "laurier",
+            "quantity": 2,
+            "unit": "feuilles"
+        },
+        {
+            "name": "écorce d’orange",
+            "quantity": 1,
+            "unit": "bande"
+        },
+        {
+            "name": "olives noires dénoyautées",
+            "quantity": 300,
+            "unit": "g"
+        },
+        {
+            "name": "coulis ou sauce tomate épaisse",
+            "quantity": 2,
+            "unit": "cuillères à soupe"
+        },
+        {
+            "name": "sel",
+            "quantity": 1,
+            "unit": "pincée"
+        }
+    ],
+    "steps": [
+        {
+            "text": "Déposer le bœuf, les oignons, les carottes, l’ail, le thym, le laurier et l’écorce d’orange dans un grand récipient ; la viande est entourée par les aromates."
+        },
+        {
+            "text": "Verser le vin rouge sur la viande et les aromates ; tous les morceaux sont largement imbibés."
+        },
+        {
+            "text": "Couvrir le récipient et le placer au réfrigérateur pendant 12 heures ; la viande est bien froide et parfumée."
+        },
+        {
+            "text": "Séparer la viande et les aromates de la marinade ; les solides sont égouttés et le vin est conservé."
+        },
+        {
+            "text": "Filtrer la marinade à travers une passoire fine ; le liquide ne contient plus de débris."
+        },
+        {
+            "text": "Égoutter soigneusement les morceaux de bœuf ; leur surface n’est plus ruisselante."
+        },
+        {
+            "text": "Chauffer l’huile d’olive dans une cocotte à feu vif ; l’huile est chaude mais ne fume pas."
+        },
+        {
+            "text": "Faire dorer le bœuf par petites quantités ; chaque morceau est brun sur plusieurs faces."
+        },
+        {
+            "text": "Faire suer les oignons, les carottes et l’ail dans la même cocotte ; les légumes commencent à s’attendrir."
+        },
+        {
+            "text": "Ajouter le coulis de tomate ; il enrobe les légumes et le fond de la cocotte."
+        },
+        {
+            "text": "Porter la marinade filtrée à ébullition pendant 5 minutes dans une casserole ; le liquide bout franchement."
+        },
+        {
+            "text": "Verser la marinade bouillie dans la cocotte ; le liquide arrive autour de la viande."
+        },
+        {
+            "text": "Ajouter le thym, le laurier et l’écorce d’orange ; les aromates sont immergés dans la sauce."
+        },
+        {
+            "text": "Couvrir la cocotte et laisser mijoter à feu très doux pendant 4 heures ; la viande se défait facilement à la fourchette."
+        },
+        {
+            "text": "Ajouter les olives noires pendant les 15 dernières minutes de cuisson ; elles restent entières et distinctes dans la sauce."
+        },
+        {
+            "text": "Goûter la sauce et saler très modérément ; l’assaisonnement reste équilibré malgré les olives."
+        }
+    ],
+    "equipment": [
+        "Grand récipient couvert",
+        "Réfrigérateur",
+        "Passoire fine",
+        "Cocotte avec couvercle",
+        "Casserole",
+        "Cuillère en bois",
+        "Fourchette"
+    ],
+    "notes": [
+        "La durée de préparation inclut les 12 heures de marinade au réfrigérateur.",
+        "Servir la daube chaude avec sa sauce ; l’aspect attendu est une sauce brun rougeâtre entourant une viande très tendre, avec des carottes et des olives visibles.",
+        "Le vin doit être assez corsé et rond, par exemple un côtes-du-rhône.",
+        "Saler peu au départ : les olives peuvent augmenter sensiblement la salinité de la sauce."
+    ],
+    "faq": [
+        {
+            "question": "Peut-on faire mariner la viande plus longtemps ?",
+            "answer": "Les sources indiquent de 12 à 24 heures, et certaines vont jusqu’à 1 à 3 jours. Pour cette version, 12 heures au réfrigérateur constitue le choix le plus simple et le plus prudent."
+        },
+        {
+            "question": "Comment savoir si la daube est cuite ?",
+            "answer": "Après environ 4 heures de mijotage doux, la viande doit être tendre et se défaire facilement à la fourchette."
+        },
+        {
+            "question": "Peut-on utiliser une cocotte-minute ?",
+            "answer": "Oui. Les sources indiquent environ 1 h 30 de cuisson après le début de la rotation lente de la soupape, mais cette version est prévue pour une cocotte traditionnelle."
+        },
+        {
+            "question": "Pourquoi ajouter les olives à la fin ?",
+            "answer": "Cela leur permet de rester distinctes et d’éviter qu’elles ne dominent toute la sauce."
+        },
+        {
+            "question": "Peut-on préparer la daube à l’avance ?",
+            "answer": "Oui. Refroidie rapidement, elle se conserve 3 à 4 jours au réfrigérateur et se réchauffe très bien."
+        }
+    ],
+    "keywords": [
+        "daube provençale",
+        "bœuf mijoté",
+        "vin rouge",
+        "cuisine provençale",
+        "olives noires",
+        "carottes",
+        "plat familial"
+    ],
+    "food_safety": "Maintenir la viande et la marinade au réfrigérateur pendant les 12 heures de marinade. Ne jamais utiliser la marinade crue telle quelle : elle doit bouillir pendant 5 minutes avant d’être ajoutée à la cocotte. Réfrigérer la daube dans les 2 heures suivant la cuisson, ou dans l’heure si la température ambiante dépasse 32 °C, dans des contenants peu profonds. Conserver les restes à 4 °C ou moins pendant 3 à 4 jours. Réchauffer les restes jusqu’à 74 °C à cœur ; une sauce ou un ragoût doit atteindre une ébullition franche. Maintenir la daube à au moins 60 °C si elle reste chaude avant le service. Le vin peut contenir des sulfites, allergène à signaler aux personnes sensibles.",
+    "uncertainties": "Les sources divergent sur la durée de marinade, de 12 heures à 1 à 3 jours ; 12 heures est retenu ici comme option prudente. Les durées de cuisson varient d’environ 3 à 4 heures à au moins 5 heures en cocotte traditionnelle ; 4 heures à feu très doux est retenu jusqu’à obtention d’une viande tendre. Les versions régionales ne concordent pas toutes sur la poitrine salée, le fenouil, la cannelle et l’os à moelle ; ces ingrédients ne sont pas utilisés ici. Les quantités des aromates frais ont été fixées pour rendre la recette exécutable, tandis que les proportions documentées de référence portent surtout sur 2 kg de viande, une bouteille de vin et 300 g d’olives."
+}

@@ -9,17 +9,18 @@ Three layers. Each answers a different question, and all three gate a task.
 | **Real** `tests/real/` | does it work on a real site, for real money? | before ticking a task | WordPress + app password |
 
 ```bash
-php tools/prompt-lab.php run article   # prompt lab, see tools/README.md
+php tools/prompt-lab.php run research  # create the shared evidence package first
 php tests/run.php                      # offline: lint + every offline test
 php tests/run.php lists                # filter by filename fragment
 php tests/real/run.php                 # real: preflight, then run what it can
 ```
 
-The prompt lab needs no WordPress and no database: it calls the API directly,
-assembles the input exactly as the pipeline does, and scores the answer with
-the plugin's own quality gate. Prompts proven there are promoted into the
-defaults in `includes/class-msrwa-settings.php`, which seed the `prompts`
-table.
+The prompt lab needs no WordPress and no database. It starts from a title-,
+article- or image-led editor brief, creates one sourced research package, and
+passes that same package to the canonical recipe, single-call article, images,
+review, fact-check and proofreading. See `tools/README.md` for the commands and
+real-image provenance rules. Maintained lab prompts can be compared with the
+plugin defaults before promotion.
 
 The offline runner exits non-zero on any lint or test failure; CI
 (`.github/workflows/ci.yml`) runs it on PHP 7.4, 8.1 and 8.3.
