@@ -333,10 +333,33 @@ final class MSRWA_Pipeline {
 			$review = MSRWA_Images::review( $job, $artifacts[ $key ], isset( $artifacts['canonical'] ) ? $artifacts['canonical'] : array() );
 			if ( is_wp_error( $review ) ) { self::set_status( $job, 'needs_review', $review->get_error_code(), $review->get_error_message() ); return; }
 			$artifacts['image_reviews'][ $key ] = $review;
-			if ( isset( $review['pass'] ) && empty( $review['pass'] ) ) { self::set_status( $job, 'needs_review', 'image_review_failed', 'La relecture image a détecté un défaut à vérifier.' ); return; }
+			if ( isset( $review['pass'] ) && empty( $review['pass'] ) ) {
+				$cycles = isset( $artifacts['image_correction_cycles'][ $key ] ) ? absint( $artifacts['image_correction_cycles'][ $key ] ) : 0;
+				$settings = MSRWA_Settings::get();
+				$max = isset( $settings['max_corrections'] ) ? max( 0, (int) $settings['max_corrections'] ) : 0;
+				if ( $cycles >= $max ) { self::set_status( $job, 'needs_review', 'image_review_failed', 'La relecture image reste négative après la limite de corrections.' ); return; }
+				if ( empty( $artifacts['image_correction_cycles'] ) || ! is_array( $artifacts['image_correction_cycles'] ) ) { $artifacts['image_correction_cycles'] = array(); }
+				if ( empty( $artifacts['image_correction_context'] ) || ! is_array( $artifacts['image_correction_context'] ) ) { $artifacts['image_correction_context'] = array(); }
+				$artifacts['image_correction_cycles'][ $key ] = $cycles + 1;
+				$artifacts['image_correction_context'][ $key ] = isset( $review['findings'] ) && is_array( $review['findings'] ) ? array_slice( $review['findings'], 0, 8 ) : array( array( 'reason' => 'La relecture a échoué sans détail structuré.', 'fix' => 'Reproduire fidèlement la recette et le ratio demandés.' ) );
+				self::discard_image_artifact( $artifacts, $key );
+				if ( 'featured_image' === $key ) {
+					self::discard_image_artifact( $artifacts, 'facebook_image' );
+					unset( $artifacts['image_correction_context']['facebook_image'] );
+				}
+				MSRWA_DB::event( 'image_correction_requested', $job->batch_id, $job->id, array( 'image' => $key, 'cycle' => $cycles + 1 ) );
+				self::advance( $job, $artifacts, $key );
+				return;
+			}
 		}
 		MSRWA_DB::event( 'final_review_passed', $job->batch_id, $job->id, array( 'checks' => array( 'article', 'featured_image', 'facebook_image' ) ) );
 		self::advance( $job, $artifacts, 'draft' );
+	}
+
+	private static function discard_image_artifact( &$artifacts, $key ) {
+		$attachment_id = isset( $artifacts[ $key ]['attachment_id'] ) ? absint( $artifacts[ $key ]['attachment_id'] ) : 0;
+		if ( $attachment_id && function_exists( 'wp_delete_attachment' ) ) { wp_delete_attachment( $attachment_id, true ); }
+		unset( $artifacts[ $key ], $artifacts['image_reviews'][ $key ] );
 	}
 
 	private static function draft( $job, $artifacts ) {

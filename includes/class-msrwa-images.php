@@ -9,7 +9,7 @@ final class MSRWA_Images {
 		$reservation = MSRWA_DB::reserve( $job, (float) $settings['image_reserve_usd'], 'featured_image' );
 		if ( is_wp_error( $reservation ) ) { return $reservation; }
 		$canonical = isset( $artifacts['canonical'] ) ? $artifacts['canonical'] : array();
-		$prompt = $settings['prompt_image'] . '\nRECETTE VALIDÉE : ' . wp_json_encode( $canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . self::visual_context( $artifacts );
+		$prompt = $settings['prompt_image'] . '\nRECETTE VALIDÉE : ' . wp_json_encode( $canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . self::visual_context( $artifacts ) . self::correction_context( $artifacts, 'featured_image', $settings );
 		$size = self::native_size( $settings['featured_ratio'], '1024x1024' );
 		$quality = self::quality( $settings );
 		$format = self::format( $settings );
@@ -33,7 +33,7 @@ final class MSRWA_Images {
 		$featured_file = $featured_id ? get_attached_file( $featured_id ) : '';
 		$settings = MSRWA_Settings::get();
 		$canonical = isset( $artifacts['canonical'] ) ? $artifacts['canonical'] : array();
-		$prompt = $settings['prompt_facebook_image'] . '\nRECETTE VALIDÉE : ' . wp_json_encode( $canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . self::visual_context( $artifacts );
+		$prompt = $settings['prompt_facebook_image'] . '\nRECETTE VALIDÉE : ' . wp_json_encode( $canonical, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . self::visual_context( $artifacts ) . self::correction_context( $artifacts, 'facebook_image', $settings );
 		$size = self::native_size( $settings['facebook_ratio'], '1024x1536' );
 		$quality = self::quality( $settings );
 		$format = self::format( $settings );
@@ -100,6 +100,12 @@ final class MSRWA_Images {
 		);
 		if ( empty( $context['direction'] ) && empty( $context['observations'] ) ) { return ''; }
 		return '\nDIRECTION VISUELLE DE RECHERCHE (observations uniquement, sans réutiliser ni reproduire une image source) : ' . wp_json_encode( $context, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+	}
+
+	private static function correction_context( $artifacts, $key, $settings ) {
+		$context = isset( $artifacts['image_correction_context'][ $key ] ) && is_array( $artifacts['image_correction_context'][ $key ] ) ? $artifacts['image_correction_context'][ $key ] : array();
+		if ( empty( $context ) || empty( $settings['prompt_image_correction'] ) ) { return ''; }
+		return '\nCORRECTION IMAGE : ' . $settings['prompt_image_correction'] . '\nDÉFAUTS À CORRIGER : ' . wp_json_encode( $context, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
 	}
 
 	private static function native_size( $ratio, $fallback ) {
