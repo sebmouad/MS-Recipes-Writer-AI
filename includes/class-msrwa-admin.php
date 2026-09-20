@@ -77,31 +77,171 @@ final class MSRWA_Admin {
 	public static function page() {
 		if ( ! current_user_can( 'edit_posts' ) ) { wp_die( esc_html__( 'Accès refusé.', 'ms-recipes-writer-ai' ) ); }
 		$settings = MSRWA_Settings::get();
-		$view = isset( $_GET['msrwa_view'] ) && 'jobs' === sanitize_key( wp_unslash( $_GET['msrwa_view'] ) ) ? 'jobs' : 'articles';
-		$articles_url = add_query_arg( array( 'page' => 'ms-recipes-writer-ai', 'msrwa_view' => 'articles' ), admin_url( 'admin.php' ) );
-		$jobs_url = add_query_arg( array( 'page' => 'ms-recipes-writer-ai', 'msrwa_view' => 'jobs' ), admin_url( 'admin.php' ) );
+		$args = MSRWA_Lists::sanitize_args( $_GET );
 		?>
-		<div class="wrap msrwa-wrap msrwa-create-page"><div class="msrwa-page-head"><div><h1>MS Recipes Writer</h1><p class="description">Créez des articles et des images à partir d’un seul brief culinaire.</p></div><a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=ms-recipes-writer-ai-stats' ) ); ?>">Voir les statistiques</a></div><section class="msrwa-card msrwa-composer"><h2>Créer des Articles/Images</h2><p class="description">Fournissez une recette, un titre ou des instructions. Les images peuvent être ajoutées par URL ou depuis votre ordinateur.</p><form id="msrwa-create-form" enctype="multipart/form-data" data-max-reference-images="<?php echo esc_attr( $settings['max_reference_images'] ); ?>"><label for="msrwa-recipe">Texte ou recette fournie<textarea id="msrwa-recipe" rows="12" maxlength="20000" placeholder="Exemple : Tarte aux pommes... ingrédients, étapes, temps et consignes éditoriales."></textarea></label><div class="msrwa-reference-grid"><label for="msrwa-image-urls">Images de référence — URLs<textarea id="msrwa-image-urls" rows="5" placeholder="Une URL HTTPS par ligne"></textarea><span class="description">Les URLs sont vérifiées puis stockées temporairement hors du document public.</span></label><label for="msrwa-reference-files">Images de référence — depuis l’ordinateur<input type="file" id="msrwa-reference-files" name="reference_files[]" accept="image/jpeg,image/png,image/webp,image/gif" multiple><span id="msrwa-files-help" class="description">Jusqu’à <?php echo esc_html( $settings['max_reference_images'] ); ?> images, taille maximale 10 Mo par fichier.</span></label></div><div class="msrwa-form-actions"><button type="submit" class="button button-primary button-hero" id="msrwa-create">Créer le lot</button><span id="msrwa-message" role="status" aria-live="polite"></span></div></form></section><nav class="msrwa-range-tabs" aria-label="Listes"><a class="<?php echo 'articles' === $view ? 'is-active' : ''; ?>" href="<?php echo esc_url( $articles_url ); ?>">Articles</a><a class="<?php echo 'jobs' === $view ? 'is-active' : ''; ?>" href="<?php echo esc_url( $jobs_url ); ?>">Jobs</a></nav><?php if ( 'jobs' === $view ) { self::render_jobs_list(); } else { self::render_articles_list(); } ?></div>
+		<div class="wrap msrwa-wrap msrwa-create-page"><div class="msrwa-page-head"><div><h1>MS Recipes Writer</h1><p class="description">Créez des articles et des images à partir d’un seul brief culinaire.</p></div><a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=ms-recipes-writer-ai-stats' ) ); ?>">Voir les statistiques</a></div><section class="msrwa-card msrwa-composer"><h2>Créer des Articles/Images</h2><p class="description">Fournissez une recette, un titre ou des instructions. Les images peuvent être ajoutées par URL ou depuis votre ordinateur.</p><form id="msrwa-create-form" enctype="multipart/form-data" data-max-reference-images="<?php echo esc_attr( $settings['max_reference_images'] ); ?>"><label for="msrwa-recipe">Texte ou recette fournie<textarea id="msrwa-recipe" rows="12" maxlength="20000" placeholder="Exemple : Tarte aux pommes... ingrédients, étapes, temps et consignes éditoriales."></textarea></label><div class="msrwa-reference-grid"><label for="msrwa-image-urls">Images de référence — URLs<textarea id="msrwa-image-urls" rows="5" placeholder="Une URL HTTPS par ligne"></textarea><span class="description">Les URLs sont vérifiées puis stockées temporairement hors du document public.</span></label><label for="msrwa-reference-files">Images de référence — depuis l’ordinateur<input type="file" id="msrwa-reference-files" name="reference_files[]" accept="image/jpeg,image/png,image/webp,image/gif" multiple><span id="msrwa-files-help" class="description">Jusqu’à <?php echo esc_html( $settings['max_reference_images'] ); ?> images, taille maximale 10 Mo par fichier.</span></label></div><div class="msrwa-form-actions"><button type="submit" class="button button-primary button-hero" id="msrwa-create">Créer le lot</button><span id="msrwa-message" role="status" aria-live="polite"></span></div></form></section>
+		<nav class="msrwa-range-tabs" aria-label="Listes"><a class="<?php echo 'articles' === $args['view'] ? 'is-active' : ''; ?>" <?php echo 'articles' === $args['view'] ? 'aria-current="page"' : ''; ?> href="<?php echo esc_url( self::list_url( array( 'msrwa_view' => 'articles' ) ) ); ?>">Articles</a><a class="<?php echo 'jobs' === $args['view'] ? 'is-active' : ''; ?>" <?php echo 'jobs' === $args['view'] ? 'aria-current="page"' : ''; ?> href="<?php echo esc_url( self::list_url( array( 'msrwa_view' => 'jobs' ) ) ); ?>">Jobs</a></nav>
+		<?php if ( 'jobs' === $args['view'] ) { self::render_jobs_list( $args, $settings ); } else { self::render_articles_list( $args ); } ?>
+		</div>
 		<?php
 	}
 
-	/** Recent articles produced by the plugin. Quality belongs to the article, never to the job that ran. */
-	private static function render_articles_list() {
-		global $wpdb;
-		$tables = MSRWA_DB::tables();
-		$articles = $wpdb->get_results( "SELECT id,batch_id,title,status,artifacts_json,draft_post_id,cost_estimate,created_at,updated_at FROM {$tables['jobs']} WHERE draft_post_id > 0" . self::owner_clause() . ' ORDER BY id DESC LIMIT 20', ARRAY_A );
+	/** Builds a list URL from the current request, so filters survive navigation. */
+	private static function list_url( $overrides = array() ) {
+		$keep = array( 'msrwa_view', 'msrwa_search', 'msrwa_status', 'msrwa_quality', 'msrwa_state', 'msrwa_stage', 'msrwa_batch', 'msrwa_days', 'msrwa_order', 'msrwa_per_page', 'msrwa_paged' );
+		if ( MSRWA_Lists::can_view_all() ) { $keep[] = 'msrwa_author'; }
+		$query = array( 'page' => 'ms-recipes-writer-ai' );
+		foreach ( $keep as $key ) {
+			if ( array_key_exists( $key, $overrides ) ) { continue; }
+			if ( isset( $_GET[ $key ] ) && is_scalar( $_GET[ $key ] ) && '' !== $_GET[ $key ] ) { $query[ $key ] = sanitize_text_field( wp_unslash( $_GET[ $key ] ) ); }
+		}
+		foreach ( $overrides as $key => $value ) { if ( '' !== $value && null !== $value ) { $query[ $key ] = $value; } }
+		unset( $query['msrwa_paged'] );
+		if ( isset( $overrides['msrwa_paged'] ) ) { $query['msrwa_paged'] = absint( $overrides['msrwa_paged'] ); }
+		return add_query_arg( $query, admin_url( 'admin.php' ) );
+	}
+
+	private static function render_select( $name, $label, $options, $selected, $any_label ) {
+		echo '<label>' . esc_html( $label ) . '<select name="' . esc_attr( $name ) . '"><option value="">' . esc_html( $any_label ) . '</option>';
+		foreach ( $options as $value => $option_label ) {
+			echo '<option value="' . esc_attr( $value ) . '" ' . selected( (string) $selected, (string) $value, false ) . '>' . esc_html( $option_label ) . '</option>';
+		}
+		echo '</select></label>';
+	}
+
+	/** One filter bar for both lists; only the relevant controls are rendered. */
+	private static function render_filters( $args, $result ) {
+		$can_view_all = MSRWA_Lists::can_view_all();
 		?>
-		<section class="msrwa-card"><div class="msrwa-section-head"><h2>Articles récents</h2><span class="description">Qualité mesurée sur chaque article produit ; un job sans article reste dans l’onglet Jobs.</span></div><div class="msrwa-table-scroll"><table class="widefat striped"><thead><tr><th>Article</th><th>Qualité</th><th>État</th><th>Lot</th><th>Créé</th><th>Mis à jour</th><th>Actions</th></tr></thead><tbody><?php if ( empty( $articles ) ) : ?><tr><td colspan="7">Aucun article.</td></tr><?php else : foreach ( $articles as $article ) : $draft_url = get_edit_post_link( (int) $article['draft_post_id'], 'raw' ); ?><tr><td><?php echo esc_html( $article['title'] ); ?><br><small>Job #<?php echo esc_html( $article['id'] ); ?> — <?php echo esc_html( number_format_i18n( (float) $article['cost_estimate'], 4 ) ); ?> $</small></td><td class="msrwa-quality-cell"><?php MSRWA_Presentation::render_quality( MSRWA_Presentation::quality( $article ) ); ?></td><td class="msrwa-batch-status"><?php echo esc_html( MSRWA_Presentation::state( $article['status'] ) ); ?></td><td><a href="<?php echo esc_url( add_query_arg( array( 'page' => 'ms-recipes-writer-ai-job', 'batch_id' => absint( $article['batch_id'] ) ), admin_url( 'admin.php' ) ) ); ?>">#<?php echo esc_html( $article['batch_id'] ); ?></a></td><td><?php echo esc_html( $article['created_at'] ); ?></td><td><?php echo esc_html( $article['updated_at'] ); ?></td><td class="msrwa-actions"><?php if ( $draft_url ) : ?><a class="button button-primary" href="<?php echo esc_url( $draft_url ); ?>">Ouvrir le brouillon</a> <?php endif; ?><a class="button" href="<?php echo esc_url( add_query_arg( array( 'page' => 'ms-recipes-writer-ai-job-detail', 'job_id' => absint( $article['id'] ) ), admin_url( 'admin.php' ) ) ); ?>">Détails</a></td></tr><?php endforeach; endif; ?></tbody></table></div></section>
+		<form class="msrwa-filters" method="get" action="<?php echo esc_url( admin_url( 'admin.php' ) ); ?>">
+			<input type="hidden" name="page" value="ms-recipes-writer-ai">
+			<input type="hidden" name="msrwa_view" value="<?php echo esc_attr( $args['view'] ); ?>">
+			<label>Recherche<input type="search" name="msrwa_search" value="<?php echo esc_attr( $args['search'] ); ?>" placeholder="Titre ou numéro de job"></label>
+			<?php
+			if ( 'articles' === $args['view'] ) {
+				self::render_select( 'msrwa_status', 'Publication', MSRWA_Lists::post_status_labels(), $args['post_status'], 'Tous les statuts' );
+				self::render_select( 'msrwa_quality', 'Qualité', array_intersect_key( MSRWA_Lists::quality_labels(), array_flip( array( 'good', 'review', 'incomplete', 'uncertain', 'pending' ) ) ), $args['quality'], 'Toutes qualités' );
+			} else {
+				self::render_select( 'msrwa_stage', 'Étape', MSRWA_Lists::stage_labels(), $args['stage'], 'Toutes les étapes' );
+			}
+			self::render_select( 'msrwa_state', 'État', MSRWA_Lists::state_labels(), $args['state'], 'Tous les états' );
+			if ( $can_view_all ) { self::render_select( 'msrwa_author', 'Auteur', MSRWA_Lists::authors(), $args['author'], 'Tous les auteurs' ); }
+			self::render_select( 'msrwa_days', 'Période', array( 1 => 'Aujourd’hui', 7 => '7 jours', 30 => '30 jours', 90 => '90 jours', 365 => '1 an' ), $args['days'], 'Depuis toujours' );
+			self::render_select( 'msrwa_order', 'Tri', MSRWA_Lists::order_labels(), $args['order'], 'Plus récents' );
+			self::render_select( 'msrwa_per_page', 'Par page', array_combine( MSRWA_Lists::PER_PAGE_CHOICES, MSRWA_Lists::PER_PAGE_CHOICES ), $args['per_page'], '20' );
+			?>
+			<div class="msrwa-filter-actions"><button type="submit" class="button button-primary">Filtrer</button> <a class="button" href="<?php echo esc_url( add_query_arg( array( 'page' => 'ms-recipes-writer-ai', 'msrwa_view' => $args['view'] ), admin_url( 'admin.php' ) ) ); ?>">Réinitialiser</a><span class="msrwa-result-count"><?php echo esc_html( number_format_i18n( $result['total'] ) ); ?> résultat<?php echo $result['total'] > 1 ? 's' : ''; ?><?php echo $result['pages'] > 1 ? esc_html( ' · page ' . number_format_i18n( $result['paged'] ) . ' / ' . number_format_i18n( $result['pages'] ) ) : ''; ?></span></div>
+		</form>
 		<?php
 	}
 
-	/** Processing view: jobs and their batches, without any editorial verdict. */
-	private static function render_jobs_list() {
+	private static function render_pagination( $args, $result ) {
+		if ( $result['pages'] < 2 ) { return; }
+		$links = paginate_links( array(
+			'base'      => self::list_url( array( 'msrwa_paged' => '%#%' ) ),
+			'format'    => '',
+			'current'   => $result['paged'],
+			'total'     => $result['pages'],
+			'prev_text' => '‹ Précédent',
+			'next_text' => 'Suivant ›',
+		) );
+		if ( $links ) { echo '<nav class="msrwa-pagination" aria-label="Pagination">' . wp_kses_post( $links ) . '</nav>'; }
+	}
+
+	private static function render_post_status( $row ) {
+		$labels = MSRWA_Lists::post_status_labels();
+		$status = $row['draft_post_id'] && $row['post_status'] ? (string) $row['post_status'] : 'missing';
+		$label = $labels[ $status ] ?? $status;
+		echo '<span class="msrwa-post-status msrwa-post-status-' . esc_attr( $status ) . '">' . esc_html( $label ) . '</span>';
+	}
+
+	/** Every article produced, filtered and paginated. Quality belongs to the article. */
+	private static function render_articles_list( $args ) {
+		$result = MSRWA_Lists::articles( $args );
+		$can_view_all = MSRWA_Lists::can_view_all();
+		$columns = $can_view_all ? 9 : 8;
+		?>
+		<section class="msrwa-card"><div class="msrwa-section-head"><div><h2>Articles</h2><p class="description">Qualité mesurée sur chaque article produit. <?php echo esc_html( $can_view_all ? 'Tous les éditeurs sont visibles ; utilisez le filtre Auteur.' : 'Vous voyez uniquement vos articles.' ); ?></p></div></div>
+		<?php self::render_filters( $args, $result ); ?>
+		<div class="msrwa-table-scroll"><table class="widefat striped"><thead><tr><th>Article</th><th>Publication</th><th>Qualité</th><th>État</th><?php if ( $can_view_all ) : ?><th>Auteur</th><?php endif; ?><th>Lot</th><th>Coût</th><th>Mis à jour</th><th>Actions</th></tr></thead><tbody>
+		<?php if ( empty( $result['rows'] ) ) : ?><tr><td colspan="<?php echo esc_attr( $columns ); ?>">Aucun article pour ces filtres.</td></tr><?php else : foreach ( $result['rows'] as $row ) :
+			$post_id = (int) $row['draft_post_id'];
+			$edit_url = $post_id ? get_edit_post_link( $post_id, 'raw' ) : '';
+			$view_url = $post_id && 'publish' === $row['post_status'] ? get_permalink( $post_id ) : '';
+			$owner = get_userdata( (int) $row['owner_id'] );
+		?>
+			<tr>
+				<td><strong><?php echo esc_html( $row['post_title'] ?: $row['title'] ); ?></strong><br><small>Job #<?php echo esc_html( $row['id'] ); ?> · créé le <?php echo esc_html( $row['created_at'] ); ?></small></td>
+				<td><?php self::render_post_status( $row ); ?></td>
+				<td class="msrwa-quality-cell"><?php MSRWA_Presentation::render_quality( $row['quality'] ); ?></td>
+				<td class="msrwa-batch-status"><?php echo esc_html( MSRWA_Lists::state_labels()[ MSRWA_Presentation::state( $row['status'] ) ] ); ?></td>
+				<?php if ( $can_view_all ) : ?><td><?php echo esc_html( $owner ? $owner->display_name : '#' . (int) $row['owner_id'] ); ?></td><?php endif; ?>
+				<td><a href="<?php echo esc_url( add_query_arg( array( 'page' => 'ms-recipes-writer-ai-job', 'batch_id' => absint( $row['batch_id'] ) ), admin_url( 'admin.php' ) ) ); ?>">#<?php echo esc_html( $row['batch_id'] ); ?></a></td>
+				<td><?php echo esc_html( number_format_i18n( (float) $row['cost_estimate'], 4 ) ); ?> $</td>
+				<td><?php echo esc_html( $row['updated_at'] ); ?></td>
+				<td class="msrwa-actions"><?php if ( $edit_url ) : ?><a class="button button-primary" href="<?php echo esc_url( $edit_url ); ?>">Modifier</a> <?php endif; ?><?php if ( $view_url ) : ?><a class="button" href="<?php echo esc_url( $view_url ); ?>" target="_blank" rel="noopener">Voir</a> <?php endif; ?><a class="button" href="<?php echo esc_url( add_query_arg( array( 'page' => 'ms-recipes-writer-ai-job-detail', 'job_id' => absint( $row['id'] ) ), admin_url( 'admin.php' ) ) ); ?>">Détails</a></td>
+			</tr>
+		<?php endforeach; endif; ?>
+		</tbody></table></div><?php self::render_pagination( $args, $result ); ?></section>
+		<?php
+	}
+
+	/** Jobs with their complete processing record, filtered and paginated. */
+	private static function render_jobs_list( $args, $settings ) {
+		$result = MSRWA_Lists::jobs( $args );
+		$can_view_all = MSRWA_Lists::can_view_all();
+		$columns = $can_view_all ? 11 : 10;
+		?>
+		<section class="msrwa-card"><div class="msrwa-section-head"><div><h2>Jobs</h2><p class="description">Traitement complet de chaque recette : état, étape, modèles, appels, tokens, coûts, corrections et erreurs.</p></div></div>
+		<?php self::render_filters( $args, $result ); ?>
+		<div class="msrwa-table-scroll"><table class="widefat striped"><thead><tr><th>Job</th><?php if ( $can_view_all ) : ?><th>Auteur</th><?php endif; ?><th>Lot</th><th>État</th><th>Étape</th><th>Tentatives</th><th>Corrections</th><th>Appels</th><th>Tokens</th><th>Coût</th><th>Durée</th></tr></thead><tbody>
+		<?php if ( empty( $result['rows'] ) ) : ?><tr><td colspan="<?php echo esc_attr( $columns ); ?>">Aucun job pour ces filtres.</td></tr><?php else : foreach ( $result['rows'] as $row ) :
+			$owner = get_userdata( (int) $row['owner_id'] );
+			$edit_url = $row['draft_post_id'] ? get_edit_post_link( (int) $row['draft_post_id'], 'raw' ) : '';
+			$cycle_parts = array();
+			foreach ( $row['cycles'] as $element => $cycles ) { $cycle_parts[] = sanitize_key( $element ) . ' ' . absint( $cycles ) . '/' . absint( $settings['max_corrections'] ); }
+			$model_parts = array();
+			foreach ( $row['models'] as $stage => $plan ) { if ( is_array( $plan ) && isset( $plan['provider'], $plan['model'] ) ) { $model_parts[] = sanitize_key( $stage ) . ' : ' . $plan['provider'] . ' / ' . $plan['model']; } }
+		?>
+			<tr>
+				<td><strong>#<?php echo esc_html( $row['id'] ); ?></strong> — <?php echo esc_html( $row['title'] ); ?>
+					<details class="msrwa-row-details"><summary>Tout afficher</summary><dl>
+						<dt>Diagnostic technique</dt><dd><?php echo esc_html( $row['status'] ); ?><?php echo $row['error_code'] ? esc_html( ' · ' . $row['error_code'] ) : ''; ?></dd>
+						<?php if ( $row['error_message'] ) : ?><dt>Message</dt><dd><?php echo esc_html( $row['error_message'] ); ?></dd><?php endif; ?>
+						<dt>Article</dt><dd><?php if ( $edit_url ) : ?><a href="<?php echo esc_url( $edit_url ); ?>">Brouillon #<?php echo esc_html( (int) $row['draft_post_id'] ); ?></a> — <?php self::render_post_status( $row ); ?><?php else : ?>Aucun article produit<?php endif; ?></dd>
+						<dt>Qualité de l’article</dt><dd><?php MSRWA_Presentation::render_quality( $row['quality'] ); ?></dd>
+						<dt>Modèles retenus</dt><dd><?php echo esc_html( $model_parts ? implode( ' · ', $model_parts ) : 'Aucun plan enregistré' ); ?></dd>
+						<dt>Corrections par élément</dt><dd><?php echo esc_html( $cycle_parts ? implode( ' · ', $cycle_parts ) : 'Aucune' ); ?></dd>
+						<dt>Appels fournisseurs</dt><dd><?php echo esc_html( number_format_i18n( (int) $row['calls']['calls'] ) ); ?> appel(s) · <?php echo esc_html( number_format_i18n( (int) $row['calls']['failures'] ) ); ?> en échec · <?php echo esc_html( number_format_i18n( (int) $row['calls']['uncertain'] ) ); ?> incertain(s)</dd>
+						<dt>Tokens entrée / sortie</dt><dd><?php echo esc_html( number_format_i18n( (int) $row['calls']['input_tokens'] ) . ' / ' . number_format_i18n( (int) $row['calls']['output_tokens'] ) ); ?></dd>
+						<dt>Coût des appels</dt><dd><?php echo esc_html( number_format_i18n( (float) $row['calls']['cost'], 6 ) ); ?> $ (job : <?php echo esc_html( number_format_i18n( (float) $row['cost_estimate'], 6 ) ); ?> $)</dd>
+						<dt>Premier / dernier appel</dt><dd><?php echo esc_html( ( $row['calls']['first_call'] ?: '—' ) . ' → ' . ( $row['calls']['last_call'] ?: '—' ) ); ?></dd>
+						<dt>Créé / mis à jour</dt><dd><?php echo esc_html( $row['created_at'] . ' → ' . $row['updated_at'] ); ?></dd>
+						<dt>Propriétaire</dt><dd><?php echo esc_html( $owner ? $owner->display_name . ' (#' . (int) $row['owner_id'] . ')' : '#' . (int) $row['owner_id'] ); ?></dd>
+					</dl><p><a class="button" href="<?php echo esc_url( add_query_arg( array( 'page' => 'ms-recipes-writer-ai-job-detail', 'job_id' => absint( $row['id'] ) ), admin_url( 'admin.php' ) ) ); ?>">Diagnostic complet</a> <a class="button" href="<?php echo esc_url( add_query_arg( array( 'page' => 'ms-recipes-writer-ai-job', 'batch_id' => absint( $row['batch_id'] ) ), admin_url( 'admin.php' ) ) ); ?>">Lot #<?php echo esc_html( $row['batch_id'] ); ?></a></p></details>
+				</td>
+				<?php if ( $can_view_all ) : ?><td><?php echo esc_html( $owner ? $owner->display_name : '#' . (int) $row['owner_id'] ); ?></td><?php endif; ?>
+				<td><a href="<?php echo esc_url( add_query_arg( array( 'page' => 'ms-recipes-writer-ai-job', 'batch_id' => absint( $row['batch_id'] ) ), admin_url( 'admin.php' ) ) ); ?>">#<?php echo esc_html( $row['batch_id'] ); ?></a></td>
+				<td class="msrwa-batch-status"><?php echo esc_html( MSRWA_Lists::state_labels()[ MSRWA_Presentation::state( $row['status'] ) ] ); ?></td>
+				<td><?php echo esc_html( MSRWA_Lists::stage_labels()[ $row['stage'] ] ?? $row['stage'] ); ?></td>
+				<td><?php echo esc_html( $row['attempts'] . ' · retry ' . $row['retry_attempts'] . '/3' ); ?></td>
+				<td><?php echo esc_html( $row['correction_cycles'] . ' / ' . absint( $settings['max_corrections'] ) ); ?></td>
+				<td><?php echo esc_html( number_format_i18n( (int) $row['calls']['calls'] ) ); ?></td>
+				<td><?php echo esc_html( number_format_i18n( (int) $row['calls']['input_tokens'] + (int) $row['calls']['output_tokens'] ) ); ?></td>
+				<td><?php echo esc_html( number_format_i18n( (float) $row['cost_estimate'], 4 ) ); ?> $</td>
+				<td><?php echo esc_html( human_time_diff( 0, (int) $row['duration_seconds'] ) ); ?></td>
+			</tr>
+		<?php endforeach; endif; ?>
+		</tbody></table></div><?php self::render_pagination( $args, $result ); ?></section>
+		<?php self::render_batch_panel( $args ); ?>
+		<?php
+	}
+
+	/** Batch controls stay reachable from the jobs view without crowding it. */
+	private static function render_batch_panel( $args ) {
 		global $wpdb;
 		$tables = MSRWA_DB::tables();
-		$owner_clause = self::owner_clause();
-		$settings = MSRWA_Settings::get();
-		$jobs = $wpdb->get_results( "SELECT id,batch_id,title,status,stage,correction_cycles,cost_estimate,draft_post_id,created_at,updated_at FROM {$tables['jobs']} WHERE 1=1{$owner_clause} ORDER BY id DESC LIMIT 20", ARRAY_A );
+		$owner_clause = MSRWA_Lists::can_view_all() ? ( $args['author'] ? $wpdb->prepare( ' AND owner_id = %d', absint( $args['author'] ) ) : '' ) : $wpdb->prepare( ' AND owner_id = %d', get_current_user_id() );
 		$recent_batches = $wpdb->get_results( "SELECT id,status,total,completed,created_at,updated_at FROM {$tables['batches']} WHERE 1=1{$owner_clause} ORDER BY id DESC LIMIT 20", ARRAY_A );
 		$batch_views = array();
 		if ( $recent_batches ) {
@@ -112,15 +252,8 @@ final class MSRWA_Admin {
 			foreach ( $recent_batches as $row ) { $batch_views[ $row['id'] ] = MSRWA_Presentation::batch( $grouped[ $row['id'] ] ?? array() ); }
 		}
 		?>
-		<section class="msrwa-card"><div class="msrwa-section-head"><h2>Jobs récents</h2><span class="description">Avancement du traitement ; la qualité éditoriale est mesurée sur l’article dans l’onglet Articles.</span></div><div class="msrwa-table-scroll"><table class="widefat striped"><thead><tr><th>Job</th><th>Lot</th><th>État</th><th>Étape</th><th>Corrections</th><th>Coût</th><th>Mis à jour</th><th>Actions</th></tr></thead><tbody><?php if ( empty( $jobs ) ) : ?><tr><td colspan="8">Aucun job.</td></tr><?php else : foreach ( $jobs as $job ) : ?><tr><td>#<?php echo esc_html( $job['id'] ); ?> — <?php echo esc_html( $job['title'] ); ?></td><td><a href="<?php echo esc_url( add_query_arg( array( 'page' => 'ms-recipes-writer-ai-job', 'batch_id' => absint( $job['batch_id'] ) ), admin_url( 'admin.php' ) ) ); ?>">#<?php echo esc_html( $job['batch_id'] ); ?></a></td><td class="msrwa-batch-status"><?php echo esc_html( MSRWA_Presentation::state( $job['status'] ) ); ?></td><td><?php echo esc_html( $job['stage'] ); ?></td><td><?php echo esc_html( $job['correction_cycles'] . ' / ' . absint( $settings['max_corrections'] ) ); ?></td><td><?php echo esc_html( number_format_i18n( (float) $job['cost_estimate'], 4 ) ); ?> $</td><td><?php echo esc_html( $job['updated_at'] ); ?></td><td class="msrwa-actions"><a class="button" href="<?php echo esc_url( add_query_arg( array( 'page' => 'ms-recipes-writer-ai-job-detail', 'job_id' => absint( $job['id'] ) ), admin_url( 'admin.php' ) ) ); ?>">Détails</a></td></tr><?php endforeach; endif; ?></tbody></table></div></section><section class="msrwa-card"><div class="msrwa-section-head"><h2>Lots récents</h2><span class="description">Les détails et contrôles restent disponibles après création.</span></div><div class="msrwa-table-scroll"><table class="widefat striped"><thead><tr><th>ID</th><th>État</th><th>Progression</th><th>Créé</th><th>Mis à jour</th><th>Actions</th></tr></thead><tbody><?php if ( empty( $recent_batches ) ) : ?><tr><td colspan="6">Aucun lot.</td></tr><?php else : foreach ( $recent_batches as $batch ) : ?><tr><td><?php echo esc_html( $batch['id'] ); ?></td><td class="msrwa-batch-status"><?php echo esc_html( $batch_views[ $batch['id'] ]['state'] ); ?></td><td><?php echo esc_html( $batch_views[ $batch['id'] ]['finished'] . ' / ' . $batch['total'] ); ?></td><td><?php echo esc_html( $batch['created_at'] ); ?></td><td><?php echo esc_html( $batch['updated_at'] ); ?></td><td class="msrwa-actions"><a class="button msrwa-batch-details" href="<?php echo esc_url( add_query_arg( array( 'page' => 'ms-recipes-writer-ai-job', 'batch_id' => absint( $batch['id'] ) ), admin_url( 'admin.php' ) ) ); ?>">Détails</a> <button type="button" class="button msrwa-batch-action" data-action="pause" data-batch-id="<?php echo esc_attr( $batch['id'] ); ?>">Pause</button> <button type="button" class="button msrwa-batch-action" data-action="resume" data-batch-id="<?php echo esc_attr( $batch['id'] ); ?>">Reprendre</button> <button type="button" class="button msrwa-batch-action" data-action="cancel" data-batch-id="<?php echo esc_attr( $batch['id'] ); ?>">Annuler</button></td></tr><?php endforeach; endif; ?></tbody></table></div></section>
+		<section class="msrwa-card"><details class="msrwa-batch-panel" <?php echo $args['batch'] ? 'open' : ''; ?>><summary>Lots récents — pause, reprise et annulation</summary><div class="msrwa-table-scroll"><table class="widefat striped"><thead><tr><th>Lot</th><th>État</th><th>Progression</th><th>Créé</th><th>Mis à jour</th><th>Actions</th></tr></thead><tbody><?php if ( empty( $recent_batches ) ) : ?><tr><td colspan="6">Aucun lot.</td></tr><?php else : foreach ( $recent_batches as $batch ) : ?><tr><td>#<?php echo esc_html( $batch['id'] ); ?></td><td class="msrwa-batch-status"><?php echo esc_html( MSRWA_Lists::state_labels()[ $batch_views[ $batch['id'] ]['state'] ] ); ?></td><td><?php echo esc_html( $batch_views[ $batch['id'] ]['finished'] . ' / ' . $batch['total'] ); ?></td><td><?php echo esc_html( $batch['created_at'] ); ?></td><td><?php echo esc_html( $batch['updated_at'] ); ?></td><td class="msrwa-actions"><a class="button" href="<?php echo esc_url( self::list_url( array( 'msrwa_view' => 'jobs', 'msrwa_batch' => absint( $batch['id'] ) ) ) ); ?>">Voir les jobs</a> <a class="button msrwa-batch-details" href="<?php echo esc_url( add_query_arg( array( 'page' => 'ms-recipes-writer-ai-job', 'batch_id' => absint( $batch['id'] ) ), admin_url( 'admin.php' ) ) ); ?>">Détails</a> <button type="button" class="button msrwa-batch-action" data-action="pause" data-batch-id="<?php echo esc_attr( $batch['id'] ); ?>">Pause</button> <button type="button" class="button msrwa-batch-action" data-action="resume" data-batch-id="<?php echo esc_attr( $batch['id'] ); ?>">Reprendre</button> <button type="button" class="button msrwa-batch-action" data-action="cancel" data-batch-id="<?php echo esc_attr( $batch['id'] ); ?>">Annuler</button></td></tr><?php endforeach; endif; ?></tbody></table></div></details></section>
 		<?php
-	}
-
-	/** Editors without the cross-editor capability only ever see their own rows. */
-	private static function owner_clause() {
-		global $wpdb;
-		if ( current_user_can( 'msrwa_view_all' ) || current_user_can( 'manage_options' ) ) { return ''; }
-		return $wpdb->prepare( ' AND owner_id = %d', get_current_user_id() );
 	}
 
 	public static function job_page() {
@@ -192,10 +325,14 @@ final class MSRWA_Admin {
 		$can_view_all = current_user_can( 'msrwa_view_all' ) || current_user_can( 'manage_options' );
 		if ( ! $job || ( (int) $job['owner_id'] !== get_current_user_id() && ! $can_view_all ) ) { wp_die( esc_html__( 'Job introuvable.', 'ms-recipes-writer-ai' ) ); }
 		$batch = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$t['batches']} WHERE id = %d", $job['batch_id'] ), ARRAY_A );
-		$events = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$t['events']} WHERE job_id = %d ORDER BY id ASC", $job_id ), ARRAY_A );
-		$calls = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$t['calls']} WHERE job_id = %d ORDER BY id ASC", $job_id ), ARRAY_A );
-		$artifacts = $wpdb->get_results( $wpdb->prepare( "SELECT artifact_key,version,status,content_json,content_hash,created_at FROM {$t['artifacts']} WHERE job_id = %d ORDER BY artifact_key ASC,version DESC", $job_id ), ARRAY_A );
-		$snapshots = $wpdb->get_results( $wpdb->prepare( "SELECT snapshot_type,version,data_json,data_hash,created_at FROM {$t['snapshots']} WHERE job_id = %d OR (batch_id = %d AND job_id = 0) ORDER BY id ASC", $job_id, $job['batch_id'] ), ARRAY_A );
+		$events = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$t['events']} WHERE job_id = %d ORDER BY id DESC LIMIT 300", $job_id ), ARRAY_A );
+		$calls = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$t['calls']} WHERE job_id = %d ORDER BY id DESC LIMIT 200", $job_id ), ARRAY_A );
+		$artifacts = $wpdb->get_results( $wpdb->prepare( "SELECT artifact_key,version,status,content_json,content_hash,created_at FROM {$t['artifacts']} WHERE job_id = %d ORDER BY artifact_key ASC,version DESC LIMIT 200", $job_id ), ARRAY_A );
+		$snapshots = $wpdb->get_results( $wpdb->prepare( "SELECT snapshot_type,version,data_json,data_hash,created_at FROM {$t['snapshots']} WHERE job_id = %d OR (batch_id = %d AND job_id = 0) ORDER BY id DESC LIMIT 200", $job_id, $job['batch_id'] ), ARRAY_A );
+		// The queries above take the most recent rows; the screens read chronologically.
+		$events = array_reverse( $events );
+		$calls = array_reverse( $calls );
+		$snapshots = array_reverse( $snapshots );
 		$input = json_decode( (string) $job['input_json'], true );
 		$models = json_decode( (string) $job['selected_models_json'], true );
 		$legacy_artifacts = json_decode( (string) $job['artifacts_json'], true );

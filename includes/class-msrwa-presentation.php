@@ -13,9 +13,21 @@ final class MSRWA_Presentation {
 	/** True once the job produced an article: a saved draft or a generated article artifact. */
 	public static function has_article( $job, $artifacts = null ) {
 		$job = (array) $job;
-		if ( ! empty( $job['draft_post_id'] ) ) { return true; }
+		if ( ! empty( $job['draft_post_id'] ) || ! empty( $job['quality_checked_at'] ) ) { return true; }
 		if ( null === $artifacts ) { $artifacts = json_decode( (string) ( $job['artifacts_json'] ?? '' ), true ); }
 		return is_array( $artifacts ) && ! empty( $artifacts['article']['content_html'] );
+	}
+
+	/**
+	 * Reads the article measurement from the job row when it was stored there,
+	 * and falls back to the artifacts a detail screen already loaded.
+	 */
+	private static function measurement( $job, $artifacts ) {
+		if ( ! empty( $job['quality_checked_at'] ) ) {
+			return array( 'score' => null === ( $job['quality_score'] ?? null ) || '' === (string) $job['quality_score'] ? null : max( 0, min( 100, (int) $job['quality_score'] ) ), 'passed' => ! empty( $job['quality_passed'] ) );
+		}
+		$report = MSRWA_Publisher::editorial_report( $artifacts );
+		return array( 'score' => isset( $report['score'] ) ? max( 0, min( 100, (int) $report['score'] ) ) : null, 'passed' => 'checks_passed' === $report['status'] );
 	}
 
 	/** Quality of the article produced by a job. A job without an article carries no quality. */
@@ -27,13 +39,13 @@ final class MSRWA_Presentation {
 		$notes = array( 'paused' => 'En pause — reprise manuelle', 'paused_budget' => 'Budget insuffisant — action requise', 'awaiting_input' => 'Confirmation requise', 'awaiting_admin' => 'Décision administrateur requise', 'retry_wait' => 'Nouvelle tentative planifiée', 'uncertain' => 'Résultat fournisseur à vérifier avant relance', 'failed' => 'Traitement arrêté — consulter les erreurs' );
 		$note = $notes[ $status ] ?? '';
 		if ( ! self::has_article( $job, $artifacts ) ) { return array( 'code' => 'none', 'label' => 'Aucun article', 'score' => null, 'note' => $note, 'evaluated' => 0, 'total' => 0 ); }
-		$report = MSRWA_Publisher::editorial_report( $artifacts );
-		$score = isset( $report['score'] ) ? max( 0, min( 100, (int) $report['score'] ) ) : null;
+		$measured = self::measurement( $job, $artifacts );
+		$score = $measured['score'];
 		$code = 'pending'; $label = 'Non évalué';
-		if ( 'uncertain' === $status ) { $code = 'uncertain'; $label = 'uncertain'; }
+		if ( 'uncertain' === $status ) { $code = 'uncertain'; $label = 'Incertain'; }
 		elseif ( 'failed' === $status ) { $code = 'incomplete'; $label = 'Incomplet'; }
 		elseif ( in_array( $status, array( 'completed', 'needs_review' ), true ) ) {
-			$code = 'completed' === $status && 'checks_passed' === $report['status'] ? 'good' : 'review';
+			$code = 'completed' === $status && $measured['passed'] ? 'good' : 'review';
 			$label = 'good' === $code ? 'Bon' : 'À vérifier';
 		} elseif ( null !== $score && 'canceled' !== self::state( $status ) ) { $label = 'Évaluation en cours'; }
 		return array( 'code' => $code, 'label' => $label, 'score' => $score, 'note' => $note, 'evaluated' => null === $score ? 0 : 1, 'total' => 1 );

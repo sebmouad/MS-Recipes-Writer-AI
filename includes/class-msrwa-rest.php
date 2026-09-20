@@ -107,7 +107,15 @@ final class MSRWA_REST {
 			}
 			if ( $upload_errors ) { MSRWA_DB::event( 'reference_upload_rejected', $batch_id, $reference_job_id, array( 'errors' => $upload_errors ) ); }
 		}
-		MSRWA_DB::event( 'batch_created', $batch_id, 0, array( 'total' => count( $items ) ) );
+		// The batch total must match the jobs that exist, or it can never complete.
+		if ( count( $job_ids ) !== count( $items ) ) {
+			$wpdb->update( $t['batches'], array( 'total' => count( $job_ids ), 'updated_at' => current_time( 'mysql', true ) ), array( 'id' => $batch_id ), array( '%d', '%s' ), array( '%d' ) );
+		}
+		if ( empty( $job_ids ) ) {
+			$wpdb->update( $t['batches'], array( 'status' => 'failed', 'updated_at' => current_time( 'mysql', true ) ), array( 'id' => $batch_id ), array( '%s', '%s' ), array( '%d' ) );
+			return new WP_Error( 'batch_not_created', 'Aucune recette n’a pu être enregistrée pour ce lot.', array( 'status' => 500 ) );
+		}
+		MSRWA_DB::event( 'batch_created', $batch_id, 0, array( 'total' => count( $job_ids ) ) );
 		MSRWA_Queue::schedule_batch( $batch_id );
 		$response = array( 'id' => $batch_id, 'status' => 'queued', 'total' => count( $job_ids ) );
 		if ( $upload_errors ) { $response['reference_upload_errors'] = $upload_errors; }

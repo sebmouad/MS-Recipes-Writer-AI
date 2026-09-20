@@ -59,6 +59,7 @@ final class MSRWA_Publisher {
 		self::write_provenance( $post_id, $job, $artifacts );
 		$report = self::editorial_report( $artifacts, $allow_partial );
 		MSRWA_DB::store_artifact( $job->id, $job->batch_id, 'editorial_review', $report );
+		MSRWA_DB::store_article_quality( $job->id, $report );
 		update_post_meta( $post_id, '_msrwa_job_id', absint( $job->id ) );
 		if ( ! empty( $artifacts['featured_image']['attachment_id'] ) ) {
 			set_post_thumbnail( $post_id, absint( $artifacts['featured_image']['attachment_id'] ) );

@@ -15,6 +15,11 @@ $without_article = MSRWA_Presentation::quality( $empty );
 if ( 'none' !== $without_article['code'] || null !== $without_article['score'] || 0 !== $without_article['total'] ) { throw new RuntimeException( 'A job without an article must not carry a quality verdict.' ); }
 $rescue_draft = MSRWA_Presentation::quality( array( 'status' => 'failed', 'draft_post_id' => 12 ) );
 if ( 'incomplete' !== $rescue_draft['code'] || 1 !== $rescue_draft['total'] || null !== $rescue_draft['score'] ) { throw new RuntimeException( 'Saved draft must be measured without a fabricated score.' ); }
+// The verdict stored on the job row is used without decoding artifacts again.
+$stored = MSRWA_Presentation::quality( array( 'status' => 'completed', 'draft_post_id' => 5, 'quality_checked_at' => '2026-09-20 12:00:00', 'quality_score' => 91, 'quality_passed' => 1 ) );
+if ( 'good' !== $stored['code'] || 91 !== $stored['score'] ) { throw new RuntimeException( 'Stored article verdict ignored.' ); }
+$stored_review = MSRWA_Presentation::quality( array( 'status' => 'completed', 'draft_post_id' => 5, 'quality_checked_at' => '2026-09-20 12:00:00', 'quality_score' => 91, 'quality_passed' => 0 ) );
+if ( 'review' !== $stored_review['code'] ) { throw new RuntimeException( 'A failed check must not read as good.' ); }
 $batch = MSRWA_Presentation::batch( array( $review, $empty ) );
 if ( 'encours' !== $batch['state'] || 1 !== $batch['quality']['evaluated'] || 1 !== $batch['quality']['total'] || 100 !== $batch['quality']['score'] ) { throw new RuntimeException( 'Batch quality must count articles, not jobs.' ); }
 $pending = MSRWA_Presentation::batch( array( $empty, $empty ) );

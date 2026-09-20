@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.39` fournit un socle installable DB-first :
+La version `0.2.40` fournit un socle installable DB-first :
 
 - modes administrateur `Automatique` / `Manuel` ;
 - limites initiales de 50 recettes par lot, 4 traitements simultanés et 2 corrections ;
@@ -24,7 +24,9 @@ La version `0.2.39` fournit un socle installable DB-first :
 - vérification des droits actuels du propriétaire avant création du brouillon, puis relecture des métadonnées Recipe Card, SEO, image principale et Facebook écrites en base avant de terminer le job ;
 - adaptateurs texte OpenAI, Gemini et Claude, budget par recette/jour/mois avec réserve image et statistiques des appels sans secret ;
 - formulaire de création réduit à deux entrées : texte/recette et images de référence par URLs HTTPS ou téléversement local privé ;
-- page de création organisée en deux onglets : **Articles** par défaut, avec la qualité mesurée sur chaque article produit, puis **Jobs** pour l’avancement des traitements et des lots ;
+- page de création organisée en deux onglets : **Articles** par défaut, avec la qualité mesurée sur chaque article produit, puis **Jobs** pour le traitement complet ;
+- listes complètes et paginées, filtrables par recherche, publication, qualité, état, étape, période et tri ; chaque éditeur ne voit que ses propres articles et jobs, les administrateurs disposent en plus d’un filtre Auteur ;
+- verdict qualité enregistré sur l’article lui-même, ce qui permet de filtrer et de trier sans recalculer les artefacts ;
 - vue détaillée protégée par lot : jobs, étapes, erreurs, relecture, appels, coûts et ouverture du brouillon ;
 - confirmation explicite et accessible d’une association ambiguë depuis le détail du job, avec reprise contrôlée ;
 - réconciliation automatique des statuts de lots (terminé, annulé, à vérifier, attente de budget) et reprise explicite après validation du budget ;
@@ -60,6 +62,15 @@ La version `0.2.39` fournit un socle installable DB-first :
 - file durable avec budgets opérationnels par recette, jour et mois.
 
 Les appels fournisseurs restent déclenchés uniquement par les jobs créés par un éditeur autorisé et soumis aux limites budgétaires. Aucune clé n’est incluse dans le dépôt.
+
+## Version 0.2.40
+
+- Liste **Articles** complète : pagination, recherche par titre ou numéro de job, filtres publication (brouillon, publié, en attente, planifié, privé, corbeille, brouillon supprimé), qualité, état, période, tri et nombre par page.
+- Liste **Jobs** complète : mêmes filtres plus l’étape du pipeline, et un dépliant par ligne réunissant diagnostic technique, erreur, article lié, modèles retenus, corrections par élément, appels, tokens, coûts, fenêtres d’exécution et propriétaire.
+- Cloisonnement par éditeur appliqué côté requête : un paramètre d’auteur forgé est ignoré pour qui ne possède pas `msrwa_view_all`. Le filtre Auteur n’est proposé qu’aux administrateurs.
+- Verdict qualité persisté sur le job (`quality_score`, `quality_passed`, `quality_checked_at`), écrit à la création du brouillon et rétro-rempli une seule fois à la migration.
+- Corrections : le total d’un lot correspond désormais aux jobs réellement créés, un lot sans job est signalé en erreur au lieu de rester bloqué ; la reprise de données structurées ne se rejoue plus à chaque mise à jour ; les écrans de diagnostic bornent leurs requêtes.
+- Interface : barre de filtres et pagination dédiées, pastilles de statut de publication, libellés d’état en français, onglet actif annoncé aux lecteurs d’écran.
 
 ## Version 0.2.39
 

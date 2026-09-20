@@ -122,8 +122,6 @@
     button.addEventListener('click', function () {
       var batchId = button.getAttribute('data-batch-id');
       var action = button.getAttribute('data-action');
-      var row = button.closest('tr');
-      var status = row ? row.querySelector('.msrwa-batch-status') : null;
       if (!batchId || !action) return;
       if (action === 'cancel' && !window.confirm('Annuler ce lot ? Les appels déjà acceptés par un fournisseur peuvent rester facturés.')) return;
       button.disabled = true;
