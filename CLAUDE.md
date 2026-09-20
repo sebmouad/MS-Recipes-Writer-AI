@@ -3,8 +3,9 @@
 WordPress plugin, PHP, no build step. It generates culinary articles with AI
 providers, measures them, and hands editors a draft.
 
-Read [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) before changing behaviour,
-and [`docs/ROADMAP.md`](docs/ROADMAP.md) before choosing what to work on.
+Read [`docs/SPEC.md`](docs/SPEC.md) for what the plugin must become,
+[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) before changing behaviour, and
+[`docs/ROADMAP.md`](docs/ROADMAP.md) before choosing what to work on.
 
 ## Commands
 

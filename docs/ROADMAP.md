@@ -24,7 +24,22 @@ editors about cost, quality or data.
 - Queue drains a whole batch: free slots are refilled as jobs finish and an
   unclaimed job re-schedules itself instead of being dropped.
 
-## Next — ordered
+## Current programme
+
+[`SPEC.md`](SPEC.md) holds the editorial and cost contract agreed with the
+owner on 2026-09-20. It supersedes the ordering below: build its six phases
+first, in order, each with tests and a version bump.
+
+1. Cost engine — four buckets, derived min/max estimates, live recompute,
+   daily and monthly budgets only, no cost-driven stop mid-job.
+2. Model policy and escalation on failure.
+3. AI-assisted policy setup, starting with the per-bucket requirement interview.
+4. Article contract — enforced editable outline, two-part writing, fact check,
+   always-on proofreading, Recipe JSON-LD.
+5. Role separation — editors without cost or technical detail.
+6. Site language setting.
+
+## Maintenance backlog — ordered
 
 1. **Internationalisation.** Every user-facing string is hardcoded French.
    Wrap them in `__()`/`esc_html__()` with the `ms-recipes-writer-ai` text
