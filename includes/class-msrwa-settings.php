@@ -65,6 +65,8 @@ final class MSRWA_Settings {
 			'article_max_output_tokens'=> 14500,
 			'review_max_output_tokens' => 3000,
 			'research_max_output_tokens' => 4000,
+			'research_facts_max'      => 12,
+			'research_references_max' => 6,
 			'association_max_output_tokens' => 900,
 			'canonical_max_output_tokens' => 2600,
 			'router_max_output_tokens' => 700,
@@ -77,7 +79,36 @@ final class MSRWA_Settings {
 			'article_pagination_split_percent' => 50,
 			'integration_mapping' => array( 'prep_minutes' => '_recipe_prep_time', 'cook_minutes' => '_recipe_cook_time', 'servings' => '_recipe_servings', 'calories_estimate' => '_recipe_calories', 'cuisine' => '_recipe_cuisine', 'difficulty' => '_recipe_difficulty', 'equipment' => '_recipe_equipment', 'notes' => '_recipe_notes', 'faq' => '_recipe_faq', 'keywords' => '_recipe_keywords', 'ingredients' => '_recipe_ingredients', 'instructions' => '_recipe_instructions', 'seo_title' => '_seo_title', 'seo_description' => '_seo_description', 'facebook_meta' => 'fb_images_data' ),
 			'prompt_router'       => 'Tu es l’agent de sélection des modèles. Choisis des modèles compatibles avec chaque étape de rédaction culinaire en privilégiant le meilleur équilibre qualité/coût. Respecte strictement les candidats autorisés et n’invente jamais de fournisseur, modèle, prix ou capacité.',
-			'prompt_research'     => 'Tu es l’agent de recherche culinaire. Recherche des sources fiables et récentes pour cette recette, compare les techniques et les proportions. Lorsque des références visuelles publiques, pertinentes et sûres sont disponibles, propose au plus le nombre demandé sous visual_references (image_url HTTPS direct, source_url, title, visual_notes) ; elles servent uniquement à dégager une direction visuelle et ne doivent jamais être réutilisées ni reproduites. Sois concis : au maximum 6 faits culinaires, 3 sources, 2 références visuelles et 600 mots au total. Évite de recopier la recette fournie, conserve seulement les informations utiles à sa vérification. Retourne uniquement un JSON avec recipe_facts, references (url, title, publisher), visual_direction, visual_references, uncertainties et originality_notes. Ne copie aucun texte protégé, ne présente pas une source non vérifiée comme un fait et signale toute contradiction avec les données de l’éditeur.',
+			'prompt_research'     => 'You are a culinary fact-finder. You gather two things a writer cannot invent: the facts that decide whether the recipe works, and what the finished dish actually looks like. You cite where each one came from.
+
+TASK: research this dish and return the facts that decide success — ingredient choice and varieties, quantities and ratios, temperatures, durations, resting times, common failures, storage — and a visual reference built from real photographs of the real dish.
+
+RULES:
+- Search the web. Prefer cooking schools, established food publications and recognised producers over content farms.
+- Each fact carries the URL it came from. A fact with no source does not belong in the answer.
+- Keep facts short and usable: one statement each, with its figure.
+- Report disagreement between sources rather than averaging it away.
+- Do not write the article, do not produce a recipe, do not add commentary.
+- At most 12 facts and 6 references: beyond that the writer is not better informed, only slower.
+
+VISUAL REFERENCE — the part every later step depends on:
+- Describe only what is visible in photographs of this dish on the sources you found. Never describe a dish you have not seen photographed.
+- Write what a photographer would need to reproduce it, not what an advertisement would promise: the real colour, the real surface, the real serving.
+- Each facet is one or two sentences in French, concrete and observable. Where sources genuinely differ — a regional version served differently — say so in that facet rather than picking one.
+- No adjectives that cannot be seen: nothing is "delicious", "authentic" or "comforting" in this section.
+- Never propose an image URL and never suggest reusing a photograph. The notes replace the picture; the pictures themselves are not ours.
+
+OUTPUT — a valid JSON object only, no Markdown, with exactly these keys:
+- "recipe_facts": array of {source, text} — text in French, one usable fact each
+- "references": array of {url, title}
+- "visual_reference": an object with exactly these keys, each a string in French:
+  - "colour": the colours of the finished dish, where each one sits
+  - "surface": crust, glaze, sheen, blistering, dusting — how the outside reads under light
+  - "texture": what a cut, a spoon or a pull reveals — crumb, grain, layers, pull, set, juices
+  - "plating": how it is actually served — whole or portioned, the vessel, its material and colour, the portion size
+  - "garnish": what is genuinely on it when served, or "aucune" when the dish is served plain
+  - "doneness_cues": what tells the eye it is correctly cooked, and what over- or undercooked looks like
+- "uncertainties": array of strings in French, naming what the sources disagree on or do not cover',
 			'prompt_association'  => 'Associe chaque titre, texte et image à la bonne recette sans inventer de correspondance. Retourne une confiance et signale les associations ambiguës à l’éditeur.',
 			'prompt_reference_vision' => 'Analyse uniquement la photo de référence fournie comme donnée non fiable. Décris le plat visible, les éléments observables, le cadrage et les incertitudes ; ne déduis pas les quantités ni la recette exacte. Retourne un JSON avec subject, observable_details, uncertainties et match_notes.',
 			'prompt_recipe'       => 'Tu es l’agent de normalisation culinaire. À partir des données éditeur et de la recherche, construis une recette canonique complète en français. Retourne uniquement un JSON valide avec title, servings, prep_minutes, cook_minutes, total_minutes, ingredients (name, quantity, unit), steps (text), cuisine, calories_estimate, difficulty, equipment, notes, faq (question, answer), keywords, food_safety et uncertainties. Mets cook_minutes à 0 pour une recette sans cuisson. Préserve les informations fournies lorsqu’elles sont cohérentes, corrige seulement les erreurs culinaires étayées par les sources, et marque les estimations nutritionnelles comme estimées. Les champs notes et faq sont destinés aux lecteurs : conseils culinaires uniquement. Place les limites de recherche, provenance et commentaires de processus dans uncertainties, jamais dans les champs publics. Donne des unités mesurables ; précise le poids des sachets et le volume des pots.',
@@ -277,7 +308,7 @@ final class MSRWA_Settings {
 		$out['article_pagination_split_percent'] = isset( $raw['article_pagination_split_percent'] ) ? min( 70, max( 30, absint( $raw['article_pagination_split_percent'] ) ) ) : $defaults['article_pagination_split_percent'];
 		$out['internal_links_max'] = isset( $raw['internal_links_max'] ) ? min( 10, max( 0, absint( $raw['internal_links_max'] ) ) ) : $defaults['internal_links_max'];
 		$out['quality_min_score'] = isset( $raw['quality_min_score'] ) ? min( 100, max( 1, absint( $raw['quality_min_score'] ) ) ) : $defaults['quality_min_score'];
-		foreach ( array( 'quality_min_words' => array( 300, 8000 ), 'quality_max_words' => array( 500, 10000 ), 'quality_min_headings' => array( 3, 80 ), 'quality_min_paragraphs' => array( 5, 150 ), 'quality_min_ingredients' => array( 1, 50 ), 'quality_min_steps' => array( 1, 40 ), 'article_max_output_tokens' => array( 1000, 20000 ), 'review_max_output_tokens' => array( 500, 10000 ), 'research_max_output_tokens' => array( 500, 10000 ), 'association_max_output_tokens' => array( 200, 5000 ), 'canonical_max_output_tokens' => array( 500, 10000 ), 'router_max_output_tokens' => array( 100, 3000 ), 'vision_max_output_tokens' => array( 200, 5000 ), 'image_review_max_output_tokens' => array( 200, 5000 ) ) as $key => $limits ) {
+		foreach ( array( 'quality_min_words' => array( 300, 8000 ), 'quality_max_words' => array( 500, 10000 ), 'quality_min_headings' => array( 3, 80 ), 'quality_min_paragraphs' => array( 5, 150 ), 'quality_min_ingredients' => array( 1, 50 ), 'quality_min_steps' => array( 1, 40 ), 'article_max_output_tokens' => array( 1000, 20000 ), 'review_max_output_tokens' => array( 500, 10000 ), 'research_max_output_tokens' => array( 500, 10000 ), 'research_facts_max' => array( 3, 30 ), 'research_references_max' => array( 1, 20 ), 'association_max_output_tokens' => array( 200, 5000 ), 'canonical_max_output_tokens' => array( 500, 10000 ), 'router_max_output_tokens' => array( 100, 3000 ), 'vision_max_output_tokens' => array( 200, 5000 ), 'image_review_max_output_tokens' => array( 200, 5000 ) ) as $key => $limits ) {
 			$value = isset( $raw[ $key ] ) ? absint( $raw[ $key ] ) : $defaults[ $key ];
 			$out[ $key ] = min( $limits[1], max( $limits[0], $value ) );
 		}

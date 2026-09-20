@@ -3,11 +3,32 @@
   "text": "Poulet yassa sénégalais : poulet mariné au citron et à la moutarde, oignons fondants longuement compotés, servi avec du riz blanc. Marinade, cuisson des oignons, équilibre acidité, variantes et conservation.",
   "research": {
     "recipe_facts": [
-      { "source": "https://example.test/yassa", "text": "La marinade au citron et à la moutarde agit au minimum 4 heures, idéalement une nuit." },
-      { "source": "https://example.test/oignons", "text": "Les oignons représentent au moins le même poids que le poulet et compotent 30 à 40 minutes à feu doux." }
+      {
+        "source": "https://example.test/yassa",
+        "text": "La marinade au citron et à la moutarde agit au minimum 4 heures, idéalement une nuit."
+      },
+      {
+        "source": "https://example.test/oignons",
+        "text": "Les oignons représentent au moins le même poids que le poulet et compotent 30 à 40 minutes à feu doux."
+      }
     ],
-    "references": [ { "url": "https://example.test/yassa", "title": "Yassa traditionnel" } ],
-    "uncertainties": ["Le piment est facultatif selon les familles."]
+    "references": [
+      {
+        "url": "https://example.test/yassa",
+        "title": "Yassa traditionnel"
+      }
+    ],
+    "uncertainties": [
+      "Le piment est facultatif selon les familles."
+    ],
+    "visual_reference": {
+      "colour": "Le riz est blanc; la sauce et les oignons sont brun doré à brun foncé; les morceaux de poulet sont brunis avec des zones plus foncées; des olives vertes apparaissent par endroits.",
+      "surface": "La peau visible du poulet présente une coloration grillée irrégulière. La sauce aux oignons est humide et brillante, étalée en nappes épaisses sur le riz, sans croûte ni saupoudrage visible.",
+      "texture": "Les photographies montrent des grains de riz séparés sous une sauce composée de nombreux morceaux d’oignon fondus. Les morceaux de poulet restent entiers; aucune coupe montrant l’intérieur ou le jus n’est visible.",
+      "plating": "Une photographie montre le plat sur un grand plat rond métallique, avec le riz réparti sur presque toute la surface et le poulet placé au centre; une autre source décrit un service sur plat commun, avec la sauce déposée sur le riz juste avant de manger.",
+      "garnish": "Les olives vertes sont visibles dans la sauce sur les photographies; aucun persil, quartier de citron ou autre garniture nettement identifiable n’est visible.",
+      "doneness_cues": "À l’œil, les repères photographiés sont le poulet fortement doré et la sauce réduite qui adhère aux oignons et au riz. Les photographies ne montrent pas assez l’intérieur du poulet pour distinguer visuellement une cuisson insuffisante ou excessive."
+    }
   },
   "canonical": {
     "title": "Poulet yassa sénégalais",
@@ -19,25 +40,80 @@
     "difficulty": "Moyenne",
     "calories_estimate": 480,
     "ingredients": [
-      { "name": "Cuisses de poulet", "quantity": "6", "unit": "pièces" },
-      { "name": "Oignons", "quantity": "1,5", "unit": "kg" },
-      { "name": "Citrons jaunes", "quantity": "4", "unit": "pièces" },
-      { "name": "Moutarde de Dijon", "quantity": "3", "unit": "cuillères à soupe" },
-      { "name": "Huile d'arachide", "quantity": "5", "unit": "cuillères à soupe" },
-      { "name": "Feuille de laurier", "quantity": "2", "unit": "feuilles" },
-      { "name": "Piment antillais", "quantity": "1", "unit": "pièce" }
+      {
+        "name": "Cuisses de poulet",
+        "quantity": "6",
+        "unit": "pièces"
+      },
+      {
+        "name": "Oignons",
+        "quantity": "1,5",
+        "unit": "kg"
+      },
+      {
+        "name": "Citrons jaunes",
+        "quantity": "4",
+        "unit": "pièces"
+      },
+      {
+        "name": "Moutarde de Dijon",
+        "quantity": "3",
+        "unit": "cuillères à soupe"
+      },
+      {
+        "name": "Huile d'arachide",
+        "quantity": "5",
+        "unit": "cuillères à soupe"
+      },
+      {
+        "name": "Feuille de laurier",
+        "quantity": "2",
+        "unit": "feuilles"
+      },
+      {
+        "name": "Piment antillais",
+        "quantity": "1",
+        "unit": "pièce"
+      }
     ],
     "steps": [
-      { "text": "Mélanger jus de citron, moutarde, huile et oignons émincés pour la marinade." },
-      { "text": "Faire mariner le poulet au moins 4 heures au réfrigérateur." },
-      { "text": "Égoutter le poulet et le colorer sur toutes ses faces." },
-      { "text": "Faire compoter les oignons de la marinade à feu doux 30 minutes." },
-      { "text": "Remettre le poulet dans les oignons avec le laurier et le piment entier." },
-      { "text": "Laisser mijoter 25 minutes à couvert puis servir avec du riz blanc." }
+      {
+        "text": "Mélanger jus de citron, moutarde, huile et oignons émincés pour la marinade."
+      },
+      {
+        "text": "Faire mariner le poulet au moins 4 heures au réfrigérateur."
+      },
+      {
+        "text": "Égoutter le poulet et le colorer sur toutes ses faces."
+      },
+      {
+        "text": "Faire compoter les oignons de la marinade à feu doux 30 minutes."
+      },
+      {
+        "text": "Remettre le poulet dans les oignons avec le laurier et le piment entier."
+      },
+      {
+        "text": "Laisser mijoter 25 minutes à couvert puis servir avec du riz blanc."
+      }
     ],
-    "equipment": ["Grande cocotte", "Saladier", "Presse-agrumes"],
-    "notes": ["Le piment reste entier pour parfumer sans piquer."],
-    "faq": [{ "question": "Peut-on utiliser du blanc de poulet ?", "answer": "Oui, mais réduisez le mijotage à 12 minutes pour éviter une viande sèche." }],
-    "keywords": ["poulet yassa", "sénégal", "citron"]
+    "equipment": [
+      "Grande cocotte",
+      "Saladier",
+      "Presse-agrumes"
+    ],
+    "notes": [
+      "Le piment reste entier pour parfumer sans piquer."
+    ],
+    "faq": [
+      {
+        "question": "Peut-on utiliser du blanc de poulet ?",
+        "answer": "Oui, mais réduisez le mijotage à 12 minutes pour éviter une viande sèche."
+      }
+    ],
+    "keywords": [
+      "poulet yassa",
+      "sénégal",
+      "citron"
+    ]
   }
 }

@@ -107,16 +107,25 @@ function lab_brief( $name ) {
 	return $brief;
 }
 
+/** What research observed about the finished dish, carried into every later step. */
+function lab_visual_reference( $brief ) {
+	$research = is_array( $brief['research'] ?? null ) ? $brief['research'] : array();
+	$reference = $research['visual_reference'] ?? array();
+	return is_array( $reference ) ? $reference : array();
+}
+
 /** Assembles the same input the pipeline would send for this step. */
 function lab_build_input( $step, $prompt, $brief, $options ) {
 	$settings = lab_settings();
 	$encode = static function ( $value ) { return json_encode( $value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ); };
+	$visual = $encode( lab_visual_reference( $brief ) );
 	if ( 'research' === $step ) {
 		return $prompt . "\nEntrée éditeur : " . $encode( array( 'title' => $brief['title'], 'source_text' => $brief['text'] ) );
 	}
 	if ( 'canonical_recipe' === $step ) {
 		return $prompt . "\nEntrée : " . $encode( array( 'title' => $brief['title'], 'source_text' => $brief['text'] ) )
-			. ' Recherche : ' . $encode( $brief['research'] ?? array() );
+			. ' Recherche : ' . $encode( $brief['research'] ?? array() )
+			. "\nVISUAL REFERENCE: " . $visual;
 	}
 	if ( 'article_full' === $step ) {
 		return $prompt . "\nBRIEF: " . $encode( array( 'title' => $brief['title'], 'source_text' => $brief['text'] ) )
@@ -126,7 +135,8 @@ function lab_build_input( $step, $prompt, $brief, $options ) {
 		lab_boot();
 		return $prompt . MSRWA_Quality::prompt_contract( $settings )
 			. "\nRecette canonique : " . $encode( $brief['canonical'] ?? array() )
-			. "\nRecherche : " . $encode( $brief['research'] ?? array() );
+			. "\nRecherche : " . $encode( $brief['research'] ?? array() )
+			. "\nVISUAL REFERENCE: " . $visual;
 	}
 	if ( 'review' === $step ) {
 		return $prompt . "\nCANONICAL RECIPE: " . $encode( $brief['canonical'] ?? array() )
@@ -177,6 +187,24 @@ function lab_score( $step, $text, $brief ) {
 		$sourced = 0;
 		foreach ( (array) ( $json['references'] ?? array() ) as $reference ) { if ( ! empty( $reference['url'] ) ) { $sourced++; } }
 		$checks['references carry a URL'] = array( 'pass' => $sourced > 0, 'detail' => $sourced . ' with a URL' );
+
+		// Every later prompt reads this object, so a missing facet degrades the
+		// recipe, the article and both images at once.
+		$facets = array( 'colour', 'surface', 'texture', 'plating', 'garnish', 'doneness_cues' );
+		$reference = is_array( $json['visual_reference'] ?? null ) ? $json['visual_reference'] : array();
+		$filled = array();
+		$empty = array();
+		foreach ( $facets as $facet ) {
+			$value = trim( (string) ( $reference[ $facet ] ?? '' ) );
+			if ( '' !== $value ) { $filled[ $facet ] = $value; } else { $empty[] = $facet; }
+		}
+		$checks['visual reference complete'] = array( 'pass' => empty( $empty ), 'detail' => $empty ? 'missing: ' . implode( ', ', $empty ) : count( $filled ) . ' facets' );
+		$words = str_word_count( implode( ' ', $filled ), 0, 'àâäçéèêëîïôöùûüœÀÂÄÇÉÈÊËÎÏÔÖÙÛÜŒ' );
+		$checks['visual reference is usable'] = array( 'pass' => $words >= 40, 'detail' => $words . ' words across the facets, 40 minimum' );
+		$banned = array( 'délicieux', 'delicieux', 'authentique', 'savoureux', 'réconfortant', 'gourmand', 'incontournable' );
+		$found = array();
+		foreach ( $banned as $word ) { if ( false !== mb_stripos( implode( ' ', $filled ), $word ) ) { $found[] = $word; } }
+		$checks['visual reference is observable'] = array( 'pass' => empty( $found ), 'detail' => $found ? 'unseeable: ' . implode( ', ', $found ) : 'no unseeable adjective' );
 	}
 
 	if ( 'canonical_recipe' === $step ) {

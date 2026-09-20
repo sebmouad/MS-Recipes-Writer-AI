@@ -57,4 +57,6 @@ QUALITY:
 
 The final image must look exactly like a professional Pinterest recipe tutorial collage showing all preparation stages of the recipe.
 
-Consistency: same dish, same colours, same crockery and same lighting in all six sections, ending on the finished recipe exactly as described in the final visual notes.
+Consistency: same dish, same colours, same crockery and same lighting in all {{facebook_steps}} sections, ending on the finished recipe exactly as described in the VISUAL REFERENCE supplied with this brief.
+
+The VISUAL REFERENCE was observed in real photographs of this dish: its colour, surface, texture, plating, garnish and doneness cues outrank every style instruction above. The final panel must match it, and the earlier panels must lead to it — the colour the mixture really takes, the vessel it is really made in, the state it is really in at that stage. Never make a step look better than the reference says the finished dish looks.

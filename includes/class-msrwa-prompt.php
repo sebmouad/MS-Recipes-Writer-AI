@@ -53,6 +53,8 @@ final class MSRWA_Prompt {
 			'image_format'         => strtoupper( (string) ( $s['image_format'] ?? 'webp' ) ),
 			'image_quality'        => (string) ( $s['image_quality'] ?? 'medium' ),
 			'facebook_steps'       => (int) ( $s['facebook_collage_steps'] ?? 6 ),
+			'research_facts_max'      => (int) ( $s['research_facts_max'] ?? 12 ),
+			'research_references_max' => (int) ( $s['research_references_max'] ?? 6 ),
 		);
 	}
 

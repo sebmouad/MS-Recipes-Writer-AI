@@ -56,7 +56,19 @@ cost) in the task before changing anything.
   *Gate:* `run article` passes every check on three briefs.
 - [~] **A2 — Canonical recipe.** Written in English, `food_safety` added after the schema rejected the first draft. Passes on OpenAI and Claude; Gemini low drops `calories_estimate` and `keywords`. *Original:* **A2 — Canonical recipe.** Valid against `MSRWA_Recipe::validate` on the
   first attempt, no repair call needed, quantities coherent with the steps.
-- [ ] **A3 — Research.** Same factual quality for a fraction of the input
+- [~] **A3 — Research.** Rewritten as `research.tpl.txt`, and it now carries the
+  owner's visual-reference directive (2026-09-20): research returns what the
+  finished dish really looks like, observed in the photographs on the sources it
+  found — colour, surface, texture, plating, garnish, doneness cues — and that
+  object drives the canonical recipe, the article and both images. No photograph
+  is ever reused or proposed for reuse; the notes replace the picture. Measured
+  8/8 on both briefs with `gpt-5.6-luna`: 44.9s/$0.0152 and 37.2s/$0.0124. The
+  article then scored 10/10 including `visual_final_notes`, the one check still
+  failing across all nine article cells. Promoted into `prompt_research`.
+  Input tokens stay high (45–58k) because the web-search results are billed —
+  that part of the original task is still open, and Claude high costs $0.19 to
+  OpenAI medium's $0.015 for the same scorecard.
+  *Original:* **A3 — Research.** Same factual quality for a fraction of the input
   tokens: the 13,475-token call is the most expensive of the pipeline.
   *Gate:* sources still carry URLs, facts still cover times and temperatures.
 - [~] **A4 — Review.** Written in English; findings must name the section to patch. *Original:* **A4 — Review.** Returns a boolean verdict plus findings that name the

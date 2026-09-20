@@ -2,7 +2,12 @@ Create a highly realistic premium food photograph of the finished, ready-to-serv
 
 The image must look like a real professional photograph made for a recipe website: not an illustration, not a render, not a generated-looking picture.
 
-Priority of information: the final visual notes written from the completed article outrank any earlier description. Use the recipe title, the exact ingredients and those notes to decide what is on the plate.
+Priority of information, highest first:
+1. The VISUAL REFERENCE supplied with this brief — colour, surface, texture, plating, garnish, doneness cues observed in real photographs of this dish. It decides what the dish looks like. Where it contradicts your idea of the dish, it wins.
+2. The final visual notes written from the completed article, for anything the reference does not cover.
+3. The recipe title and its exact ingredients.
+
+Reproduce the reference rather than improving on it: its real colour, not a richer one; its real serving vessel, not a prettier one; its real garnish, or none when it says the dish is served plain. A dish that looks better than the reference is the wrong dish.
 
 Required visual quality:
 - photorealistic food photography;

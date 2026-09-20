@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.51` est un socle installable : file persistante, pipeline de
+La version `0.2.52` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.
@@ -20,6 +20,34 @@ Le plugin est en cours de refonte éditoriale et budgétaire :
 Les coûts affichés sont des estimations calculées avec le catalogue configuré,
 non une facture fournisseur. `completed` signifie que le traitement est terminé,
 jamais qu’un texte est validé éditorialement.
+
+## Version 0.2.52
+
+La recherche produit désormais une **référence visuelle** : ce à quoi le plat
+fini ressemble réellement, observé dans les photographies des sources trouvées,
+et non une image réutilisée. Six facettes — couleur, surface, texture, dressage,
+garniture, repères de cuisson — descendent ensuite dans la recette canonique,
+l'article, l'image mise en avant et le visuel Facebook, où elles priment sur
+l'idée que le modèle se fait du plat.
+
+Mesuré le 20/09/2026 sur deux plats, `gpt-5.6-luna` : 8/8 sur la recherche
+(44,9s / 0,0152 $ et 37,2s / 0,0124 $), puis 10/10 sur l'article, `visual_final_notes`
+compris — la seule vérification qui échouait encore sur les neuf cellules
+d'article. Les notes finales reprennent la référence sans la contredire :
+grand plat rond métallique, riz blanc aux grains séparés, oignons brun doré
+brillants, aucune garniture ajoutée.
+
+- `tools/prompts/research.tpl.txt` et `canonical_recipe.tpl.txt` sont des
+  gabarits compilés depuis les réglages, comme l'article et les deux images.
+- `research_facts_max` et `research_references_max` deviennent réglables.
+- `docs/LAB-RESULTS.md` consigne les 51 appels réels mesurés : modèle, durée,
+  coût, score, cause d'arrêt.
+- `tests/test-visual-reference.php` vérifie que chaque étape reçoit encore la
+  référence — une étape qui cesse de la recevoir invente une apparence sans rien
+  signaler.
+
+**Aucune photographie trouvée n'est republiée.** Les notes remplacent l'image ;
+les images restent celles de leurs auteurs.
 
 ## Version 0.2.51
 

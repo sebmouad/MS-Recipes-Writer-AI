@@ -19,7 +19,9 @@ The second page must begin EXACTLY with <h2>{{page2_opening}}</h2>. It does not 
 {{/unless}}
 FAQ: {{faq_minimum}} to {{faq_maximum}} questions phrased as real search queries, each answer 40 to 60 words and self-contained.
 
-CONSISTENCY: same ingredients, same quantities, same promise throughout.
+VISUAL REFERENCE: the brief carries what the finished dish really looks like, observed in photographs of the real dish — colour, surface, texture, plating, garnish, doneness cues. Use it wherever the reader needs to recognise a state: what "done" looks like, what the cut reveals, how it reaches the table. Write those details into the prose; never describe an appearance the reference contradicts, and never announce that a reference exists.
+
+CONSISTENCY: same ingredients, same quantities, same promise throughout. The dish the article describes, the dish the photograph will show and the dish the reference observed are one dish.
 
 RULES:
 - Paragraphs of 2 to 4 sentences; lists reserved for ingredients, equipment and steps.
@@ -34,4 +36,4 @@ OUTPUT — a valid JSON object only, no Markdown, with exactly these keys:
 - "recipe_meta": an empty object {} — recipe metadata is taken from the canonical recipe by the engine
 - "internal_links": 0 to {{internal_links_max}} objects {url, anchor} pointing only at the allowed internal paths supplied, the anchor existing verbatim in the text; an empty array if none fit
 - "facebook_caption": 200 to 400 characters, warm, ending on a question or an invitation, without excessive hashtags
-- "visual_final_notes": 250 to 350 characters describing how the finished dish really looks — texture, plating, vessel, garnish, colours, light — to guide the photograph
+- "visual_final_notes": 250 to 350 characters describing how the finished dish really looks — texture, plating, vessel, garnish, colours, light — to guide the photograph. Build them on the visual reference supplied, adding only what this recipe's own ingredients and method make certain. Contradicting the reference here sends the photographer after the wrong dish.
