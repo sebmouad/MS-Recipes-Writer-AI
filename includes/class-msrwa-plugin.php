@@ -4,9 +4,8 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
 final class MSRWA_Plugin {
 	public static function activate() {
 		MSRWA_DB::install();
-		if ( ! get_option( MSRWA_Settings::OPTION, false ) ) { add_option( MSRWA_Settings::OPTION, MSRWA_Settings::defaults(), '', false ); }
-		MSRWA_Settings::upgrade_defaults();
-		MSRWA_Settings::upgrade_secrets();
+		MSRWA_Catalog::install();
+		MSRWA_Settings::install();
 		self::caps();
 		if ( ! wp_next_scheduled( 'msrwa_cleanup' ) ) { wp_schedule_event( time() + HOUR_IN_SECONDS, 'daily', 'msrwa_cleanup' ); }
 	}
@@ -30,8 +29,11 @@ final class MSRWA_Plugin {
 		add_action( 'msrwa_cleanup', array( 'MSRWA_DB', 'purge_expired' ) );
 		add_action( 'msrwa_cleanup', array( 'MSRWA_Queue', 'recover_expired' ) );
 		if ( is_admin() ) { MSRWA_Admin::hooks(); }
-		if ( get_option( 'msrwa_db_version' ) !== MSRWA_VERSION ) { MSRWA_DB::install(); MSRWA_Queue::reconcile_batches(); }
-		MSRWA_Settings::upgrade_defaults();
-		MSRWA_Settings::upgrade_secrets();
+		if ( MSRWA_DB::system_value( 'db_version' ) !== MSRWA_VERSION ) {
+			MSRWA_DB::install();
+			MSRWA_Catalog::install();
+			MSRWA_Settings::install();
+			MSRWA_Queue::reconcile_batches();
+		}
 	}
 }

@@ -60,8 +60,6 @@ final class MSRWA_Queue {
 	public static function resume_batch( $batch_id ) {
 		global $wpdb;
 		$t = MSRWA_DB::tables();
-		$settings = MSRWA_Settings::get();
-		if ( empty( $settings['allow_paid_tests'] ) || (float) $settings['test_budget_usd'] <= 0 ) { return false; }
 		$now = current_time( 'mysql', true );
 		$updated = $wpdb->query( $wpdb->prepare( "UPDATE {$t['batches']} SET status = 'queued', updated_at = %s WHERE id = %d AND status IN ('paused','awaiting_admin','paused_budget')", $now, absint( $batch_id ) ) );
 		$wpdb->query( $wpdb->prepare( "UPDATE {$t['jobs']} SET status = 'queued', error_code = NULL, error_message = NULL, updated_at = %s WHERE batch_id = %d AND status IN ('paused','awaiting_admin','paused_budget')", $now, absint( $batch_id ) ) );
@@ -168,12 +166,6 @@ final class MSRWA_Queue {
 		$wpdb->update( $t['batches'], array( 'status' => 'running', 'updated_at' => current_time( 'mysql', true ) ), array( 'id' => $batch_id ), array( '%s', '%s' ), array( '%d' ) );
 		MSRWA_DB::event( 'batch_started', $batch_id, 0, array( 'stage' => 'intake' ) );
 		$settings = MSRWA_Settings::get();
-		if ( empty( $settings['allow_paid_tests'] ) || (float) $settings['test_budget_usd'] <= 0 ) {
-			$wpdb->update( $t['batches'], array( 'status' => 'awaiting_admin', 'updated_at' => current_time( 'mysql', true ) ), array( 'id' => $batch_id ), array( '%s', '%s' ), array( '%d' ) );
-			$wpdb->query( $wpdb->prepare( "UPDATE {$t['jobs']} SET status = 'awaiting_admin', error_code = 'paid_tests_disabled', error_message = 'Activez explicitement les tests payants et un budget supérieur à zéro.', updated_at = %s WHERE batch_id = %d AND status IN ('queued','retry_wait')", current_time( 'mysql', true ), $batch_id ) );
-			MSRWA_DB::event( 'batch_awaiting_admin', $batch_id, 0, array( 'reason' => 'provider_calls_require_explicit_test_budget' ) );
-			return;
-		}
 		$slots = max( 0, (int) $settings['max_concurrency'] - self::active_count() );
 		if ( ! $slots ) { return; }
 		$jobs = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM {$t['jobs']} WHERE batch_id = %d AND status = 'queued' AND (lock_until IS NULL OR lock_until < UTC_TIMESTAMP()) ORDER BY id ASC LIMIT %d", $batch_id, $slots ) );

@@ -2,7 +2,8 @@
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
 final class MSRWA_Settings {
-	const OPTION = 'msrwa_settings';
+	const FORM_FIELD = 'msrwa_settings';
+	const SCOPE = 'global';
 
 	public static function defaults() {
 		return array(
@@ -26,9 +27,8 @@ final class MSRWA_Settings {
 			'max_batch'           => 50,
 			'max_concurrency'     => 4,
 			'max_corrections'     => 2,
-			'allow_paid_tests'    => 0,
-			'test_budget_usd'     => 0,
 			'per_recipe_budget_usd' => 0,
+			'target_cost_usd'      => 0.10,
 			'daily_budget_usd'    => 0,
 			'monthly_budget_usd'  => 0,
 			'vision_reserve_usd'   => 0.005,
@@ -49,9 +49,6 @@ final class MSRWA_Settings {
 			'internal_links_enabled' => 1,
 			'internal_links_max'     => 3,
 			'internal_links_heading' => 'À découvrir aussi',
-			'quality_reference_author' => 'Anass',
-			'quality_sample_size'      => 10,
-			'quality_reference_ratio'  => 0.85,
 			'quality_min_score'        => 90,
 			'quality_min_words'        => 2800,
 			'quality_max_words'        => 4200,
@@ -80,36 +77,139 @@ final class MSRWA_Settings {
 	}
 
 	public static function get() {
-		$value = get_option( self::OPTION, array() );
 		$defaults = self::defaults();
-		$out = array_intersect_key( wp_parse_args( is_array( $value ) ? $value : array(), $defaults ), $defaults );
+		$prompt_keys = array_keys( self::prompt_labels() );
+		$stored = array();
+		if ( class_exists( 'MSRWA_DB' ) ) {
+			global $wpdb;
+			$t = MSRWA_DB::tables();
+			if ( MSRWA_DB::table_exists( $t['settings'] ) ) {
+				$rows = $wpdb->get_results( "SELECT setting_key,value_json FROM {$t['settings']} WHERE scope = 'global' AND owner_id = 0", ARRAY_A );
+				foreach ( $rows as $row ) {
+					$value = json_decode( (string) $row['value_json'], true );
+					if ( null !== $value || 'null' === $row['value_json'] ) { $stored[ $row['setting_key'] ] = $value; }
+				}
+			}
+			if ( MSRWA_DB::table_exists( $t['prompts'] ) ) {
+				$rows = $wpdb->get_results( "SELECT prompt_key,content FROM {$t['prompts']} WHERE is_active = 1 ORDER BY version DESC" );
+				foreach ( $rows as $row ) { if ( ! isset( $stored[ $row->prompt_key ] ) ) { $stored[ $row->prompt_key ] = $row->content; } }
+			}
+		}
+		$out = array_intersect_key( wp_parse_args( $stored, $defaults ), $defaults );
+		foreach ( $prompt_keys as $key ) { if ( empty( $out[ $key ] ) ) { $out[ $key ] = $defaults[ $key ]; } }
 		foreach ( array( 'openai_key', 'gemini_key', 'claude_key', 'research_fallback_key' ) as $key ) { $out[ $key ] = self::decrypt_secret( isset( $out[ $key ] ) ? $out[ $key ] : '' ); }
 		return $out;
 	}
 
-	public static function upgrade_secrets() {
-		$raw = get_option( self::OPTION, array() );
-		if ( ! is_array( $raw ) || ! self::crypto_available() ) { return; }
-		$changed = false;
-		foreach ( array( 'openai_key', 'gemini_key', 'claude_key', 'research_fallback_key' ) as $key ) {
-			if ( ! empty( $raw[ $key ] ) && 0 !== strpos( (string) $raw[ $key ], 'enc:v1:' ) ) { $encrypted = self::encrypt_secret( $raw[ $key ] ); if ( $encrypted ) { $raw[ $key ] = $encrypted; $changed = true; } }
+	public static function install() {
+		global $wpdb;
+		$t = MSRWA_DB::tables();
+		if ( ! MSRWA_DB::table_exists( $t['settings'] ) ) { return false; }
+		$defaults = self::defaults();
+		$seed = $defaults;
+		foreach ( self::prompt_labels() as $key => $label ) {
+			$content = isset( $seed[ $key ] ) ? (string) $seed[ $key ] : (string) $defaults[ $key ];
+			self::seed_prompt( $key, $label, $content );
+			unset( $seed[ $key ] );
 		}
-		if ( $changed ) { update_option( self::OPTION, $raw, false ); }
+		foreach ( $seed as $key => $value ) {
+			if ( self::is_secret( $key ) && $value && 0 !== strpos( (string) $value, 'enc:v1:' ) ) { $value = self::encrypt_secret( $value ); }
+			self::write_setting( $key, $value, 'default', false, true );
+		}
+		return true;
 	}
 
-	public static function upgrade_defaults() {
-		$raw = get_option( self::OPTION, array() );
-		if ( ! is_array( $raw ) ) { $raw = array(); }
-		$defaults = self::defaults();
-		$changed = false;
-		foreach ( $defaults as $key => $value ) {
-			if ( ! array_key_exists( $key, $raw ) ) { $raw[ $key ] = $value; $changed = true; }
+	public static function upgrade_defaults() { return self::install(); }
+	public static function upgrade_secrets() { return true; }
+
+	public static function save( $raw, $source = 'admin' ) {
+		$clean = self::sanitize( $raw );
+		foreach ( self::prompt_labels() as $key => $label ) {
+			self::activate_prompt_version( $key, $label, $clean[ $key ] );
+			unset( $clean[ $key ] );
 		}
-		foreach ( array( 'manual_models', 'integration_mapping' ) as $group ) {
-			if ( ! is_array( $raw[ $group ] ) ) { $raw[ $group ] = array(); $changed = true; }
-			foreach ( $defaults[ $group ] as $key => $value ) { if ( ! array_key_exists( $key, $raw[ $group ] ) ) { $raw[ $group ][ $key ] = $value; $changed = true; } }
+		foreach ( $clean as $key => $value ) { self::write_setting( $key, $value, $source, true, false ); }
+		MSRWA_DB::event( 'settings_saved', 0, 0, array( 'keys' => count( $clean ), 'source' => sanitize_key( $source ) ) );
+		return self::get();
+	}
+
+	private static function write_setting( $key, $value, $source, $history = true, $insert_only = false ) {
+		global $wpdb;
+		$t = MSRWA_DB::tables();
+		$key = sanitize_key( $key );
+		$json = wp_json_encode( $value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+		$old = $wpdb->get_var( $wpdb->prepare( "SELECT value_json FROM {$t['settings']} WHERE scope = 'global' AND owner_id = 0 AND setting_key = %s", $key ) );
+		if ( $insert_only && null !== $old ) { return true; }
+		if ( null !== $old && hash_equals( hash( 'sha256', (string) $old ), hash( 'sha256', (string) $json ) ) ) { return true; }
+		$now = current_time( 'mysql', true );
+		if ( $history && null !== $old ) {
+			$wpdb->insert( $t['settings_history'], array( 'scope' => 'global', 'owner_id' => 0, 'group_name' => self::group_for( $key ), 'setting_key' => $key, 'old_value_json' => $old, 'new_value_json' => $json, 'changed_by' => get_current_user_id(), 'change_source' => sanitize_key( $source ), 'created_at' => $now ), array( '%s', '%d', '%s', '%s', '%s', '%s', '%d', '%s', '%s' ) );
 		}
-		if ( $changed ) { update_option( self::OPTION, $raw, false ); }
+		$sql = "INSERT INTO {$t['settings']} (scope,owner_id,group_name,setting_key,value_json,value_type,is_secret,source,created_at,updated_at,updated_by) VALUES ('global',0,%s,%s,%s,%s,%d,%s,%s,%s,%d) ON DUPLICATE KEY UPDATE group_name=VALUES(group_name),value_json=VALUES(value_json),value_type=VALUES(value_type),is_secret=VALUES(is_secret),source=VALUES(source),updated_at=VALUES(updated_at),updated_by=VALUES(updated_by)";
+		return false !== $wpdb->query( $wpdb->prepare( $sql, self::group_for( $key ), $key, $json, gettype( $value ), self::is_secret( $key ) ? 1 : 0, sanitize_key( $source ), $now, $now, get_current_user_id() ) );
+	}
+
+	private static function seed_prompt( $key, $label, $content ) {
+		global $wpdb;
+		$t = MSRWA_DB::tables();
+		$exists = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$t['prompts']} WHERE prompt_key = %s", $key ) );
+		if ( ! $exists ) { self::activate_prompt_version( $key, $label, $content ); }
+	}
+
+	private static function activate_prompt_version( $key, $label, $content ) {
+		global $wpdb;
+		$t = MSRWA_DB::tables();
+		$key = sanitize_key( $key );
+		$content = sanitize_textarea_field( $content );
+		$hash = hash( 'sha256', $content );
+		$current = $wpdb->get_row( $wpdb->prepare( "SELECT id,content_hash,version FROM {$t['prompts']} WHERE prompt_key = %s AND is_active = 1 ORDER BY version DESC LIMIT 1", $key ) );
+		if ( $current && hash_equals( (string) $current->content_hash, $hash ) ) { return (int) $current->version; }
+		$version = 1 + (int) $wpdb->get_var( $wpdb->prepare( "SELECT COALESCE(MAX(version),0) FROM {$t['prompts']} WHERE prompt_key = %s", $key ) );
+		$wpdb->update( $t['prompts'], array( 'is_active' => 0 ), array( 'prompt_key' => $key ), array( '%d' ), array( '%s' ) );
+		$wpdb->insert( $t['prompts'], array( 'prompt_key' => $key, 'label' => sanitize_text_field( $label ), 'version' => $version, 'content' => $content, 'content_hash' => $hash, 'is_active' => 1, 'created_by' => get_current_user_id(), 'created_at' => current_time( 'mysql', true ) ), array( '%s', '%s', '%d', '%s', '%s', '%d', '%d', '%s' ) );
+		return $version;
+	}
+
+	public static function prompt_labels() {
+		return array( 'prompt_router' => 'Sélection automatique des modèles', 'prompt_research' => 'Recherche web', 'prompt_association' => 'Association', 'prompt_reference_vision' => 'Analyse vision des références', 'prompt_recipe' => 'Recette canonique', 'prompt_nutrition' => 'Nutrition estimée', 'prompt_article' => 'Article et métadonnées', 'prompt_seo' => 'SEO', 'prompt_correction' => 'Correction', 'prompt_review' => 'Relecture et correction', 'prompt_image' => 'Image principale', 'prompt_image_review' => 'Contrôle image', 'prompt_image_correction' => 'Correction image', 'prompt_facebook_image' => 'Image Facebook' );
+	}
+
+	public static function prompt_versions() {
+		global $wpdb;
+		$t = MSRWA_DB::tables();
+		if ( ! MSRWA_DB::table_exists( $t['prompts'] ) ) { return array(); }
+		return $wpdb->get_results( "SELECT prompt_key,label,version,is_active,created_by,created_at FROM {$t['prompts']} ORDER BY prompt_key ASC,version DESC", ARRAY_A );
+	}
+
+	public static function history( $limit = 100 ) {
+		global $wpdb;
+		$t = MSRWA_DB::tables();
+		return $wpdb->get_results( $wpdb->prepare( "SELECT group_name,setting_key,changed_by,change_source,created_at FROM {$t['settings_history']} ORDER BY id DESC LIMIT %d", min( 500, max( 1, absint( $limit ) ) ) ), ARRAY_A );
+	}
+
+	private static function is_secret( $key ) { return in_array( $key, array( 'openai_key', 'gemini_key', 'claude_key', 'research_fallback_key' ), true ); }
+
+	private static function secret_for_save( $key, $raw_value = null ) {
+		global $wpdb;
+		$t = MSRWA_DB::tables();
+		$stored_json = $wpdb->get_var( $wpdb->prepare( "SELECT value_json FROM {$t['settings']} WHERE scope = 'global' AND owner_id = 0 AND setting_key = %s", sanitize_key( $key ) ) );
+		$stored = null !== $stored_json ? json_decode( (string) $stored_json, true ) : '';
+		$stored = is_string( $stored ) ? $stored : '';
+		$new_value = is_scalar( $raw_value ) ? trim( sanitize_text_field( (string) $raw_value ) ) : '';
+		if ( '' === $new_value ) { return $stored; }
+		$current = self::decrypt_secret( $stored );
+		if ( '' !== $stored && hash_equals( (string) $current, $new_value ) ) { return $stored; }
+		return self::encrypt_secret( $new_value );
+	}
+
+	private static function group_for( $key ) {
+		if ( self::is_secret( $key ) || false !== strpos( $key, 'provider' ) || false !== strpos( $key, '_model' ) ) { return 'providers'; }
+		if ( false !== strpos( $key, 'budget' ) || false !== strpos( $key, 'cost' ) || false !== strpos( $key, 'estimate' ) || false !== strpos( $key, 'reserve' ) ) { return 'costs'; }
+		if ( 0 === strpos( $key, 'quality_' ) || false !== strpos( $key, 'output_tokens' ) ) { return 'quality'; }
+		if ( false !== strpos( $key, 'image' ) || false !== strpos( $key, 'ratio' ) || false !== strpos( $key, 'facebook' ) ) { return 'images'; }
+		if ( false !== strpos( $key, 'integration' ) || false !== strpos( $key, 'internal_links' ) ) { return 'integrations'; }
+		if ( false !== strpos( $key, 'days' ) || false !== strpos( $key, 'months' ) ) { return 'retention'; }
+		return 'general';
 	}
 
 	public static function sanitize( $raw ) {
@@ -117,14 +217,9 @@ final class MSRWA_Settings {
 		$defaults = self::defaults();
 		$out = $defaults;
 		$out['mode'] = in_array( isset( $raw['mode'] ) ? $raw['mode'] : '', array( 'automatic', 'manual' ), true ) ? $raw['mode'] : $defaults['mode'];
-		foreach ( array( 'openai_key', 'gemini_key', 'claude_key' ) as $key ) {
-			if ( isset( $raw[ $key ] ) && '' !== trim( $raw[ $key ] ) ) {
-				$out[ $key ] = self::encrypt_secret( sanitize_text_field( $raw[ $key ] ) );
-			} else {
-				$out[ $key ] = self::encrypt_secret( self::get()[ $key ] );
-			}
+		foreach ( array( 'openai_key', 'gemini_key', 'claude_key', 'research_fallback_key' ) as $key ) {
+			$out[ $key ] = self::secret_for_save( $key, $raw[ $key ] ?? null );
 		}
-		if ( isset( $raw['research_fallback_key'] ) && '' !== trim( $raw['research_fallback_key'] ) ) { $out['research_fallback_key'] = self::encrypt_secret( sanitize_text_field( $raw['research_fallback_key'] ) ); } else { $out['research_fallback_key'] = self::encrypt_secret( self::get()['research_fallback_key'] ); }
 		foreach ( array( 'openai_model', 'gemini_model', 'claude_model', 'research_provider' ) as $key ) {
 			if ( isset( $raw[ $key ] ) ) { $out[ $key ] = sanitize_text_field( $raw[ $key ] ); }
 		}
@@ -146,9 +241,7 @@ final class MSRWA_Settings {
 			$value = isset( $raw[ $key ] ) ? absint( $raw[ $key ] ) : $defaults[ $key ];
 			$out[ $key ] = min( $limits[1], max( $limits[0], $value ) );
 		}
-		$out['allow_paid_tests'] = empty( $raw['allow_paid_tests'] ) ? 0 : 1;
-		$out['test_budget_usd'] = isset( $raw['test_budget_usd'] ) ? min( 1000, max( 0, (float) $raw['test_budget_usd'] ) ) : $defaults['test_budget_usd'];
-		foreach ( array( 'per_recipe_budget_usd', 'daily_budget_usd', 'monthly_budget_usd' ) as $key ) { $out[ $key ] = isset( $raw[ $key ] ) ? min( 100000, max( 0, (float) $raw[ $key ] ) ) : $defaults[ $key ]; }
+		foreach ( array( 'per_recipe_budget_usd', 'target_cost_usd', 'daily_budget_usd', 'monthly_budget_usd' ) as $key ) { $out[ $key ] = isset( $raw[ $key ] ) ? min( 100000, max( 0, (float) $raw[ $key ] ) ) : $defaults[ $key ]; }
 		$out['vision_reserve_usd'] = isset( $raw['vision_reserve_usd'] ) ? min( 1000, max( 0.001, (float) $raw['vision_reserve_usd'] ) ) : $defaults['vision_reserve_usd'];
 		$out['web_search_tool_cost_usd'] = isset( $raw['web_search_tool_cost_usd'] ) ? min( 1000, max( 0, (float) $raw['web_search_tool_cost_usd'] ) ) : $defaults['web_search_tool_cost_usd'];
 		$out['featured_image_estimate_usd'] = isset( $raw['featured_image_estimate_usd'] ) ? min( 1000, max( 0.001, (float) $raw['featured_image_estimate_usd'] ) ) : $defaults['featured_image_estimate_usd'];
@@ -160,9 +253,6 @@ final class MSRWA_Settings {
 		$out['internal_links_enabled'] = empty( $raw['internal_links_enabled'] ) ? 0 : 1;
 		$out['internal_links_max'] = isset( $raw['internal_links_max'] ) ? min( 10, max( 0, absint( $raw['internal_links_max'] ) ) ) : $defaults['internal_links_max'];
 		$out['internal_links_heading'] = isset( $raw['internal_links_heading'] ) ? sanitize_text_field( $raw['internal_links_heading'] ) : $defaults['internal_links_heading'];
-		$out['quality_reference_author'] = isset( $raw['quality_reference_author'] ) ? sanitize_user( $raw['quality_reference_author'], true ) : $defaults['quality_reference_author'];
-		$out['quality_sample_size'] = isset( $raw['quality_sample_size'] ) ? min( 30, max( 3, absint( $raw['quality_sample_size'] ) ) ) : $defaults['quality_sample_size'];
-		$out['quality_reference_ratio'] = isset( $raw['quality_reference_ratio'] ) ? min( 1.25, max( 0.5, (float) $raw['quality_reference_ratio'] ) ) : $defaults['quality_reference_ratio'];
 		$out['quality_min_score'] = isset( $raw['quality_min_score'] ) ? min( 100, max( 1, absint( $raw['quality_min_score'] ) ) ) : $defaults['quality_min_score'];
 		foreach ( array( 'quality_min_words' => array( 300, 8000 ), 'quality_max_words' => array( 500, 10000 ), 'quality_min_headings' => array( 3, 80 ), 'quality_min_paragraphs' => array( 5, 150 ), 'quality_min_ingredients' => array( 1, 50 ), 'quality_min_steps' => array( 1, 40 ), 'article_max_output_tokens' => array( 1000, 20000 ), 'review_max_output_tokens' => array( 500, 10000 ) ) as $key => $limits ) {
 			$value = isset( $raw[ $key ] ) ? absint( $raw[ $key ] ) : $defaults[ $key ];

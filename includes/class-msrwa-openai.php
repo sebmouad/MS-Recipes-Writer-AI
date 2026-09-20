@@ -24,8 +24,10 @@ final class MSRWA_OpenAI {
 			if ( $required_tool ) { $payload['tool_choice'] = 'required'; }
 			$payload['include'] = array( 'web_search_call.action.sources' );
 		}
-		$response = wp_remote_post( 'https://api.openai.com/v1/responses', array(
-			'timeout' => 45,
+		$url = MSRWA_Catalog::endpoint( 'openai', 'responses_path' );
+		if ( ! $url ) { return new WP_Error( 'openai_endpoint_missing', 'Endpoint OpenAI Responses non configuré.', array( 'status' => 500 ) ); }
+		$response = wp_remote_post( $url, array(
+			'timeout' => MSRWA_Catalog::timeout( 'openai', 'timeout_text', 60 ),
 			'sslverify' => true,
 			'headers' => array( 'Authorization' => 'Bearer ' . $key, 'Content-Type' => 'application/json' ),
 			'body' => wp_json_encode( $payload ),
@@ -81,7 +83,9 @@ final class MSRWA_OpenAI {
 			'store' => false,
 			'max_output_tokens' => max( 16, absint( $max_output_tokens ) ),
 		);
-		$response = wp_remote_post( 'https://api.openai.com/v1/responses', array( 'timeout' => 60, 'sslverify' => true, 'headers' => array( 'Authorization' => 'Bearer ' . $key, 'Content-Type' => 'application/json' ), 'body' => wp_json_encode( $payload ) ) );
+		$url = MSRWA_Catalog::endpoint( 'openai', 'responses_path' );
+		if ( ! $url ) { return new WP_Error( 'openai_endpoint_missing', 'Endpoint OpenAI Responses non configuré.', array( 'status' => 500 ) ); }
+		$response = wp_remote_post( $url, array( 'timeout' => MSRWA_Catalog::timeout( 'openai', 'timeout_text', 60 ), 'sslverify' => true, 'headers' => array( 'Authorization' => 'Bearer ' . $key, 'Content-Type' => 'application/json' ), 'body' => wp_json_encode( $payload ) ) );
 		if ( is_wp_error( $response ) ) { return new WP_Error( 'openai_vision_network', $response->get_error_message(), array( 'status' => 502 ) ); }
 		$code = wp_remote_retrieve_response_code( $response );
 		$body = json_decode( wp_remote_retrieve_body( $response ), true );
@@ -99,7 +103,9 @@ final class MSRWA_OpenAI {
 		$allowed_quality = array( 'low', 'medium', 'high', 'xhigh', 'max', 'auto' );
 		$allowed_formats = array( 'png', 'jpeg', 'webp' );
 		$payload = array( 'model' => $model, 'prompt' => sanitize_textarea_field( $prompt ), 'size' => in_array( $size, $allowed_sizes, true ) ? $size : '1024x1024', 'quality' => in_array( $quality, $allowed_quality, true ) ? $quality : 'low', 'output_format' => in_array( $format, $allowed_formats, true ) ? $format : 'webp', 'n' => 1 );
-		$response = wp_remote_post( 'https://api.openai.com/v1/images/generations', array( 'timeout' => 120, 'sslverify' => true, 'headers' => array( 'Authorization' => 'Bearer ' . $key, 'Content-Type' => 'application/json' ), 'body' => wp_json_encode( $payload ) ) );
+		$url = MSRWA_Catalog::endpoint( 'openai', 'image_generation_path' );
+		if ( ! $url ) { return new WP_Error( 'openai_endpoint_missing', 'Endpoint OpenAI Images non configuré.', array( 'status' => 500 ) ); }
+		$response = wp_remote_post( $url, array( 'timeout' => MSRWA_Catalog::timeout( 'openai', 'timeout_image', 120 ), 'sslverify' => true, 'headers' => array( 'Authorization' => 'Bearer ' . $key, 'Content-Type' => 'application/json' ), 'body' => wp_json_encode( $payload ) ) );
 		if ( is_wp_error( $response ) ) { return new WP_Error( 'openai_image_network', $response->get_error_message(), array( 'status' => 502 ) ); }
 		$code = wp_remote_retrieve_response_code( $response );
 		$body = json_decode( wp_remote_retrieve_body( $response ), true );
@@ -139,8 +145,10 @@ final class MSRWA_OpenAI {
 		$add_field( 'output_format', $format );
 		$add_file( 'image', $image_path, $mime );
 		$body .= '--' . $boundary . "--\r\n";
-		$response = wp_remote_post( 'https://api.openai.com/v1/images/edits', array(
-			'timeout' => 120,
+		$url = MSRWA_Catalog::endpoint( 'openai', 'image_edit_path' );
+		if ( ! $url ) { return new WP_Error( 'openai_endpoint_missing', 'Endpoint OpenAI Image Edit non configuré.', array( 'status' => 500 ) ); }
+		$response = wp_remote_post( $url, array(
+			'timeout' => MSRWA_Catalog::timeout( 'openai', 'timeout_image', 120 ),
 			'sslverify' => true,
 			'headers' => array( 'Authorization' => 'Bearer ' . $key, 'Content-Type' => 'multipart/form-data; boundary=' . $boundary ),
 			'body' => $body,

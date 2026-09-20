@@ -72,6 +72,7 @@ final class MSRWA_REST {
 		foreach ( array( 'openai_key', 'gemini_key', 'claude_key', 'research_fallback_key' ) as $secret ) { $snapshot[ $secret ] = ''; }
 		$wpdb->insert( $t['batches'], array( 'owner_id' => get_current_user_id(), 'status' => 'queued', 'total' => count( $items ), 'settings_snapshot' => wp_json_encode( $snapshot ), 'created_at' => $now, 'updated_at' => $now ), array( '%d', '%s', '%d', '%s', '%s', '%s' ) );
 		$batch_id = (int) $wpdb->insert_id;
+		MSRWA_DB::snapshot( 'settings', $snapshot, $batch_id, 0 );
 		$job_ids = array();
 		foreach ( $items as $item ) {
 			$title = isset( $item['title'] ) ? sanitize_text_field( $item['title'] ) : '';
@@ -83,7 +84,10 @@ final class MSRWA_REST {
 				if ( ! is_wp_error( $plan ) ) { $models[ $key ] = $plan; }
 			}
 			$wpdb->insert( $t['jobs'], array( 'batch_id' => $batch_id, 'owner_id' => get_current_user_id(), 'title' => $title, 'input_json' => wp_json_encode( $normalized ), 'selected_models_json' => wp_json_encode( $models ), 'status' => 'queued', 'stage' => 'intake', 'created_at' => $now, 'updated_at' => $now ), array( '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s' ) );
-			$job_ids[] = (int) $wpdb->insert_id;
+			$job_id = (int) $wpdb->insert_id;
+			$job_ids[] = $job_id;
+			MSRWA_DB::snapshot( 'input', $normalized, $batch_id, $job_id );
+			MSRWA_DB::snapshot( 'model_plan', $models, $batch_id, $job_id );
 		}
 		$upload_errors = array();
 		$file_params = $request->get_file_params();
@@ -98,6 +102,7 @@ final class MSRWA_REST {
 					$input_data = is_array( $input_data ) ? $input_data : array();
 					$input_data['reference_images'] = array_merge( isset( $input_data['reference_images'] ) && is_array( $input_data['reference_images'] ) ? $input_data['reference_images'] : array(), $uploaded['valid'] );
 					$wpdb->update( $t['jobs'], array( 'input_json' => wp_json_encode( $input_data ), 'updated_at' => current_time( 'mysql', true ) ), array( 'id' => $job_id ), array( '%s', '%s' ), array( '%d' ) );
+					MSRWA_DB::snapshot( 'input', $input_data, $batch_id, $job_id );
 				}
 			}
 			if ( $upload_errors ) { MSRWA_DB::event( 'reference_upload_rejected', $batch_id, $reference_job_id, array( 'errors' => $upload_errors ) ); }
@@ -159,6 +164,8 @@ final class MSRWA_REST {
 		$artifacts['association']['needs_editor'] = false;
 		$updated = $wpdb->update( $t['jobs'], array( 'artifacts_json' => wp_json_encode( $artifacts ), 'status' => 'queued', 'error_code' => null, 'error_message' => null, 'lock_token' => null, 'lock_until' => null, 'updated_at' => current_time( 'mysql', true ) ), array( 'id' => $id, 'status' => 'awaiting_input' ), array( '%s', '%s', '%s', '%s', '%s', '%s', '%s' ), array( '%d', '%s' ) );
 		if ( ! $updated ) { return new WP_Error( 'association_update_failed', 'La confirmation n’a pas pu être enregistrée.', array( 'status' => 409 ) ); }
+		MSRWA_DB::store_artifacts( $id, $job->batch_id, $artifacts );
+		MSRWA_DB::snapshot( 'editor_decision', array( 'type' => 'association_confirmation', 'confirmed' => true ), $job->batch_id, $id );
 		MSRWA_DB::event( 'association_confirmed', $job->batch_id, $id );
 		MSRWA_Queue::schedule_job( $id );
 		return rest_ensure_response( array( 'id' => $id, 'status' => 'queued', 'stage' => 'association' ) );
@@ -182,8 +189,6 @@ final class MSRWA_REST {
 	public static function resume_batch( WP_REST_Request $request ) {
 		$batch = self::owned_batch( $request['id'] );
 		if ( is_wp_error( $batch ) ) { return $batch; }
-		$settings = MSRWA_Settings::get();
-		if ( empty( $settings['allow_paid_tests'] ) || (float) $settings['test_budget_usd'] <= 0 ) { return new WP_Error( 'paid_tests_disabled', 'Activez les tests payants et définissez un budget avant de reprendre ce lot.', array( 'status' => 409 ) ); }
 		if ( ! MSRWA_Queue::resume_batch( $batch->id ) ) { return new WP_Error( 'batch_not_resumed', 'Ce lot n’est pas suspendu ou en attente de validation.', array( 'status' => 409 ) ); }
 		return rest_ensure_response( array( 'id' => (int) $batch->id, 'status' => 'queued' ) );
 	}

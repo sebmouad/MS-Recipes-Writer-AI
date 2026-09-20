@@ -8,8 +8,9 @@ final class MSRWA_Providers {
 		$key = defined( 'MSRWA_GEMINI_KEY' ) && MSRWA_GEMINI_KEY ? MSRWA_GEMINI_KEY : ( getenv( 'MSRWA_GEMINI_KEY' ) ?: $settings['gemini_key'] );
 		if ( ! $key ) { return new WP_Error( 'missing_gemini_key', 'Aucune clé Gemini côté serveur.', array( 'status' => 400 ) ); }
 		$payload = array( 'contents' => array( array( 'role' => 'user', 'parts' => array( array( 'text' => sanitize_textarea_field( $prompt ) ) ) ) ), 'generationConfig' => array( 'responseModalities' => array( 'IMAGE' ) ) );
-		$url = 'https://generativelanguage.googleapis.com/v1beta/models/' . rawurlencode( $model ) . ':generateContent?key=' . rawurlencode( $key );
-		$response = wp_remote_post( $url, array( 'timeout' => 120, 'sslverify' => true, 'headers' => array( 'Content-Type' => 'application/json' ), 'body' => wp_json_encode( $payload ) ) );
+		$url = self::gemini_endpoint( $model, $key );
+		if ( is_wp_error( $url ) ) { return $url; }
+		$response = wp_remote_post( $url, array( 'timeout' => MSRWA_Catalog::timeout( 'gemini', 'timeout_image', 120 ), 'sslverify' => true, 'headers' => array( 'Content-Type' => 'application/json' ), 'body' => wp_json_encode( $payload ) ) );
 		if ( is_wp_error( $response ) ) { return new WP_Error( 'gemini_image_network', $response->get_error_message(), array( 'status' => 502 ) ); }
 		$code = wp_remote_retrieve_response_code( $response );
 		$body = json_decode( wp_remote_retrieve_body( $response ), true );
@@ -34,8 +35,9 @@ final class MSRWA_Providers {
 		$key = defined( 'MSRWA_GEMINI_KEY' ) && MSRWA_GEMINI_KEY ? MSRWA_GEMINI_KEY : ( getenv( 'MSRWA_GEMINI_KEY' ) ?: $settings['gemini_key'] );
 		if ( ! $key ) { return new WP_Error( 'missing_gemini_key', 'Aucune clé Gemini côté serveur.', array( 'status' => 400 ) ); }
 		$payload = array( 'contents' => array( array( 'role' => 'user', 'parts' => array( array( 'inlineData' => array( 'mimeType' => $mime, 'data' => base64_encode( $binary ) ) ), array( 'text' => sanitize_textarea_field( $prompt ) ) ) ) ), 'generationConfig' => array( 'responseModalities' => array( 'IMAGE' ) ) );
-		$url = 'https://generativelanguage.googleapis.com/v1beta/models/' . rawurlencode( $model ) . ':generateContent?key=' . rawurlencode( $key );
-		$response = wp_remote_post( $url, array( 'timeout' => 120, 'sslverify' => true, 'headers' => array( 'Content-Type' => 'application/json' ), 'body' => wp_json_encode( $payload ) ) );
+		$url = self::gemini_endpoint( $model, $key );
+		if ( is_wp_error( $url ) ) { return $url; }
+		$response = wp_remote_post( $url, array( 'timeout' => MSRWA_Catalog::timeout( 'gemini', 'timeout_image', 120 ), 'sslverify' => true, 'headers' => array( 'Content-Type' => 'application/json' ), 'body' => wp_json_encode( $payload ) ) );
 		if ( is_wp_error( $response ) ) { return new WP_Error( 'gemini_image_edit_network', $response->get_error_message(), array( 'status' => 502 ) ); }
 		$code = wp_remote_retrieve_response_code( $response );
 		$body = json_decode( wp_remote_retrieve_body( $response ), true );
@@ -131,8 +133,9 @@ final class MSRWA_Providers {
 			'generationConfig' => array( 'maxOutputTokens' => max( 16, absint( $max_tokens ) ), 'responseMimeType' => 'application/json' ),
 		);
 		if ( $search ) { $payload['tools'] = array( array( 'google_search' => new stdClass() ) ); }
-		$url = 'https://generativelanguage.googleapis.com/v1beta/models/' . rawurlencode( $model ) . ':generateContent?key=' . rawurlencode( $key );
-		$response = wp_remote_post( $url, array( 'timeout' => 60, 'sslverify' => true, 'headers' => array( 'Content-Type' => 'application/json' ), 'body' => wp_json_encode( $payload ) ) );
+		$url = self::gemini_endpoint( $model, $key );
+		if ( is_wp_error( $url ) ) { return $url; }
+		$response = wp_remote_post( $url, array( 'timeout' => MSRWA_Catalog::timeout( 'gemini', 'timeout_text', 60 ), 'sslverify' => true, 'headers' => array( 'Content-Type' => 'application/json' ), 'body' => wp_json_encode( $payload ) ) );
 		if ( is_wp_error( $response ) ) { return new WP_Error( 'gemini_network', $response->get_error_message(), array( 'status' => 502 ) ); }
 		$code = wp_remote_retrieve_response_code( $response );
 		$body = json_decode( wp_remote_retrieve_body( $response ), true );
@@ -148,8 +151,9 @@ final class MSRWA_Providers {
 		$key = defined( 'MSRWA_GEMINI_KEY' ) && MSRWA_GEMINI_KEY ? MSRWA_GEMINI_KEY : ( getenv( 'MSRWA_GEMINI_KEY' ) ?: $settings['gemini_key'] );
 		if ( ! $key ) { return new WP_Error( 'missing_gemini_key', 'Aucune clé Gemini côté serveur.', array( 'status' => 400 ) ); }
 		$payload = array( 'contents' => array( array( 'role' => 'user', 'parts' => array( array( 'text' => sanitize_textarea_field( $prompt ) ), array( 'inlineData' => array( 'mimeType' => $mime, 'data' => $encoded ) ) ) ) ), 'generationConfig' => array( 'maxOutputTokens' => max( 16, absint( $max_tokens ) ), 'responseMimeType' => 'application/json' ) );
-		$url = 'https://generativelanguage.googleapis.com/v1beta/models/' . rawurlencode( $model ) . ':generateContent?key=' . rawurlencode( $key );
-		$response = wp_remote_post( $url, array( 'timeout' => 60, 'sslverify' => true, 'headers' => array( 'Content-Type' => 'application/json' ), 'body' => wp_json_encode( $payload ) ) );
+		$url = self::gemini_endpoint( $model, $key );
+		if ( is_wp_error( $url ) ) { return $url; }
+		$response = wp_remote_post( $url, array( 'timeout' => MSRWA_Catalog::timeout( 'gemini', 'timeout_text', 60 ), 'sslverify' => true, 'headers' => array( 'Content-Type' => 'application/json' ), 'body' => wp_json_encode( $payload ) ) );
 		if ( is_wp_error( $response ) ) { return new WP_Error( 'gemini_vision_network', $response->get_error_message(), array( 'status' => 502 ) ); }
 		$code = wp_remote_retrieve_response_code( $response );
 		$body = json_decode( wp_remote_retrieve_body( $response ), true );
@@ -164,10 +168,13 @@ final class MSRWA_Providers {
 		$settings = MSRWA_Settings::get();
 		$key = defined( 'MSRWA_CLAUDE_KEY' ) && MSRWA_CLAUDE_KEY ? MSRWA_CLAUDE_KEY : ( getenv( 'MSRWA_CLAUDE_KEY' ) ?: $settings['claude_key'] );
 		if ( ! $key ) { return new WP_Error( 'missing_claude_key', 'Aucune clé Claude côté serveur.', array( 'status' => 400 ) ); }
-		$response = wp_remote_post( 'https://api.anthropic.com/v1/messages', array(
-			'timeout' => 60,
+		$url = MSRWA_Catalog::endpoint( 'claude', 'messages_path' );
+		if ( ! $url ) { return new WP_Error( 'claude_endpoint_missing', 'Endpoint Claude Messages non configuré.', array( 'status' => 500 ) ); }
+		$api = MSRWA_Catalog::provider_api( 'claude' );
+		$response = wp_remote_post( $url, array(
+			'timeout' => MSRWA_Catalog::timeout( 'claude', 'timeout_text', 60 ),
 			'sslverify' => true,
-			'headers' => array( 'Content-Type' => 'application/json', 'x-api-key' => $key, 'anthropic-version' => '2023-06-01' ),
+			'headers' => array( 'Content-Type' => 'application/json', 'x-api-key' => $key, 'anthropic-version' => sanitize_text_field( $api['api_version'] ?? '2023-06-01' ) ),
 			'body' => wp_json_encode( array( 'model' => $model, 'max_tokens' => max( 16, absint( $max_tokens ) ), 'messages' => array( array( 'role' => 'user', 'content' => sanitize_textarea_field( $input ) ) ) ) ),
 		) );
 		if ( is_wp_error( $response ) ) { return new WP_Error( 'claude_network', $response->get_error_message(), array( 'status' => 502 ) ); }
@@ -185,7 +192,10 @@ final class MSRWA_Providers {
 		$key = defined( 'MSRWA_CLAUDE_KEY' ) && MSRWA_CLAUDE_KEY ? MSRWA_CLAUDE_KEY : ( getenv( 'MSRWA_CLAUDE_KEY' ) ?: $settings['claude_key'] );
 		if ( ! $key ) { return new WP_Error( 'missing_claude_key', 'Aucune clé Claude côté serveur.', array( 'status' => 400 ) ); }
 		$payload = array( 'model' => $model, 'max_tokens' => max( 16, absint( $max_tokens ) ), 'messages' => array( array( 'role' => 'user', 'content' => array( array( 'type' => 'image', 'source' => array( 'type' => 'base64', 'media_type' => $mime, 'data' => $encoded ) ), array( 'type' => 'text', 'text' => sanitize_textarea_field( $prompt ) ) ) ) ) );
-		$response = wp_remote_post( 'https://api.anthropic.com/v1/messages', array( 'timeout' => 60, 'sslverify' => true, 'headers' => array( 'Content-Type' => 'application/json', 'x-api-key' => $key, 'anthropic-version' => '2023-06-01' ), 'body' => wp_json_encode( $payload ) ) );
+		$url = MSRWA_Catalog::endpoint( 'claude', 'messages_path' );
+		if ( ! $url ) { return new WP_Error( 'claude_endpoint_missing', 'Endpoint Claude Messages non configuré.', array( 'status' => 500 ) ); }
+		$api = MSRWA_Catalog::provider_api( 'claude' );
+		$response = wp_remote_post( $url, array( 'timeout' => MSRWA_Catalog::timeout( 'claude', 'timeout_text', 60 ), 'sslverify' => true, 'headers' => array( 'Content-Type' => 'application/json', 'x-api-key' => $key, 'anthropic-version' => sanitize_text_field( $api['api_version'] ?? '2023-06-01' ) ), 'body' => wp_json_encode( $payload ) ) );
 		if ( is_wp_error( $response ) ) { return new WP_Error( 'claude_vision_network', $response->get_error_message(), array( 'status' => 502 ) ); }
 		$code = wp_remote_retrieve_response_code( $response );
 		$body = json_decode( wp_remote_retrieve_body( $response ), true );
@@ -194,5 +204,11 @@ final class MSRWA_Providers {
 		foreach ( (array) ( $body['content'] ?? array() ) as $part ) { if ( isset( $part['text'] ) ) { $text .= (string) $part['text']; } }
 		if ( '' === trim( $text ) ) { return new WP_Error( 'claude_vision_empty', 'Claude vision n’a retourné aucun texte.', array( 'status' => 502 ) ); }
 		return array( 'id' => isset( $body['id'] ) ? sanitize_text_field( $body['id'] ) : '', 'text' => $text, 'sources' => array(), 'usage' => isset( $body['usage'] ) ? array( 'input_tokens' => absint( $body['usage']['input_tokens'] ?? 0 ), 'output_tokens' => absint( $body['usage']['output_tokens'] ?? 0 ) ) : array(), 'model' => $model );
+	}
+
+	private static function gemini_endpoint( $model, $key ) {
+		$url = MSRWA_Catalog::endpoint( 'gemini', 'generate_path', array( 'model' => $model ) );
+		if ( ! $url ) { return new WP_Error( 'gemini_endpoint_missing', 'Endpoint Gemini Generate non configuré.', array( 'status' => 500 ) ); }
+		return add_query_arg( 'key', $key, $url );
 	}
 }

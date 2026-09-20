@@ -8,11 +8,6 @@ final class MSRWA_Pipeline {
 		if ( ! MSRWA_Queue::acquire_job( $job_id ) ) { return; }
 		$job = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$t['jobs']} WHERE id = %d", $job_id ) );
 		if ( ! $job || in_array( $job->status, array( 'completed', 'cancelled', 'needs_review', 'awaiting_admin' ), true ) ) { MSRWA_Queue::release_job( $job_id ); return; }
-		$settings = MSRWA_Settings::get();
-		if ( empty( $settings['allow_paid_tests'] ) || (float) $settings['test_budget_usd'] <= 0 ) {
-			self::set_status( $job, 'awaiting_admin', 'paid_tests_disabled', 'Activez explicitement les tests payants et un budget supérieur à zéro.' );
-			return;
-		}
 		$input = json_decode( (string) $job->input_json, true );
 		$artifacts = json_decode( (string) $job->artifacts_json, true );
 		$artifacts = is_array( $artifacts ) ? $artifacts : array();
@@ -110,6 +105,7 @@ final class MSRWA_Pipeline {
 			global $wpdb;
 			$t = MSRWA_DB::tables();
 			$wpdb->update( $t['jobs'], array( 'selected_models_json' => wp_json_encode( $routing ), 'updated_at' => current_time( 'mysql', true ) ), array( 'id' => $job->id, 'lock_token' => $job->lock_token, 'status' => 'running' ), array( '%s', '%s' ), array( '%d', '%s', '%s' ) );
+			MSRWA_DB::snapshot( 'model_plan', $routing, $job->batch_id, $job->id );
 			$job->selected_models_json = wp_json_encode( $routing );
 			MSRWA_DB::event( 'router_selected', $job->batch_id, $job->id, array( 'models' => array_map( function ( $value ) { return is_array( $value ) && isset( $value['provider'], $value['model'] ) ? $value['provider'] . ':' . $value['model'] : ''; }, $routing ), 'reason' => isset( $routing['reason'] ) ? $routing['reason'] : '' ) );
 		}
@@ -243,6 +239,8 @@ final class MSRWA_Pipeline {
 		if ( empty( $review['pass'] ) && (int) $job->correction_cycles < (int) $settings['max_corrections'] ) {
 			global $wpdb;
 			$t = MSRWA_DB::tables();
+			MSRWA_DB::store_artifacts( $job->id, $job->batch_id, $artifacts );
+			MSRWA_DB::snapshot( 'correction_decision', array( 'cycle' => (int) $job->correction_cycles + 1, 'review' => $review, 'quality' => $quality ), $job->batch_id, $job->id );
 			$updated = $wpdb->update( $t['jobs'], array( 'artifacts_json' => wp_json_encode( $artifacts ), 'correction_cycles' => (int) $job->correction_cycles + 1, 'stage' => 'article', 'status' => 'queued', 'lock_token' => null, 'lock_until' => null, 'updated_at' => current_time( 'mysql', true ) ), array( 'id' => $job->id, 'lock_token' => $job->lock_token, 'status' => 'running' ), array( '%s', '%d', '%s', '%s', '%s', '%s', '%s' ), array( '%d', '%s', '%s' ) );
 			if ( ! $updated ) { return; }
 			MSRWA_DB::event( 'review_correction_requested', $job->batch_id, $job->id, array( 'cycle' => (int) $job->correction_cycles + 1 ) );
@@ -389,12 +387,14 @@ final class MSRWA_Pipeline {
 	}
 
 	private static function draft( $job, $artifacts ) {
+		MSRWA_DB::store_artifacts( $job->id, $job->batch_id, $artifacts );
 		$post_id = MSRWA_Publisher::create_draft( $job, $artifacts );
 		if ( is_wp_error( $post_id ) ) { self::set_status( $job, 'needs_review', $post_id->get_error_code(), $post_id->get_error_message() ); return; }
 		global $wpdb;
 		$t = MSRWA_DB::tables();
 		$updated = $wpdb->update( $t['jobs'], array( 'status' => 'completed', 'stage' => 'draft', 'error_code' => null, 'error_message' => null, 'draft_post_id' => absint( $post_id ), 'lock_token' => null, 'lock_until' => null, 'updated_at' => current_time( 'mysql', true ) ), array( 'id' => $job->id, 'lock_token' => $job->lock_token, 'status' => 'running' ), array( '%s', '%s', '%s', '%s', '%d', '%s', '%s', '%s' ), array( '%d', '%s', '%s' ) );
 		if ( ! $updated ) { return; }
+		MSRWA_DB::snapshot( 'draft_result', array( 'post_id' => absint( $post_id ), 'status' => 'draft', 'completed_at' => current_time( 'mysql', true ) ), $job->batch_id, $job->id );
 		MSRWA_Queue::refresh_batch( $job->batch_id );
 		MSRWA_DB::event( 'draft_completed', $job->batch_id, $job->id, array( 'post_id' => absint( $post_id ) ) );
 	}
@@ -483,6 +483,8 @@ final class MSRWA_Pipeline {
 	private static function advance( $job, $artifacts, $stage ) {
 		global $wpdb;
 		$t = MSRWA_DB::tables();
+		MSRWA_DB::store_artifacts( $job->id, $job->batch_id, $artifacts );
+		MSRWA_DB::snapshot( 'stage_transition', array( 'from' => $job->stage, 'to' => sanitize_key( $stage ), 'status' => 'queued' ), $job->batch_id, $job->id );
 		$updated = $wpdb->update( $t['jobs'], array( 'artifacts_json' => wp_json_encode( $artifacts ), 'stage' => sanitize_key( $stage ), 'status' => 'queued', 'lock_token' => null, 'lock_until' => null, 'updated_at' => current_time( 'mysql', true ) ), array( 'id' => $job->id, 'lock_token' => $job->lock_token, 'status' => 'running' ), array( '%s', '%s', '%s', '%s', '%s', '%s' ), array( '%d', '%s', '%s' ) );
 		if ( ! $updated ) { return; }
 		MSRWA_DB::event( 'stage_completed', $job->batch_id, $job->id, array( 'stage' => $job->stage, 'next' => $stage ) );

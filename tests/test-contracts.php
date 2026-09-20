@@ -17,7 +17,7 @@ require dirname( __DIR__ ) . '/includes/class-msrwa-quality.php';
 
 class MSRWA_Settings {
 	public static function get() {
-		return array( 'mode' => 'automatic', 'openai_key' => '', 'gemini_key' => '', 'claude_key' => '', 'manual_models' => array( 'text' => 'openai:gpt-5.6-luna', 'review' => 'claude:claude-sonnet-5', 'image' => 'gemini:gemini-3.1-flash-image', 'search' => 'openai:gpt-5.6-luna' ), 'quality_reference_author' => 'Anass', 'quality_sample_size' => 10, 'quality_reference_ratio' => 0.85, 'quality_min_score' => 90, 'quality_min_words' => 2800, 'quality_max_words' => 4200, 'quality_min_headings' => 16, 'quality_min_paragraphs' => 35, 'quality_min_ingredients' => 6, 'quality_min_steps' => 6, 'internal_links_max' => 3 );
+		return array( 'mode' => 'automatic', 'openai_key' => '', 'gemini_key' => '', 'claude_key' => '', 'manual_models' => array( 'text' => 'openai:gpt-5.6-luna', 'review' => 'claude:claude-sonnet-5', 'image' => 'gemini:gemini-3.1-flash-image', 'search' => 'openai:gpt-5.6-luna' ), 'quality_min_score' => 90, 'quality_min_words' => 2800, 'quality_max_words' => 4200, 'quality_min_headings' => 16, 'quality_min_paragraphs' => 35, 'quality_min_ingredients' => 6, 'quality_min_steps' => 6, 'internal_links_max' => 3 );
 	}
 }
 define( 'MSRWA_OPENAI_KEY', 'contract-test-only' );
