@@ -1,0 +1,43 @@
+{
+  "title": "Poulet yassa sénégalais",
+  "text": "Poulet yassa sénégalais : poulet mariné au citron et à la moutarde, oignons fondants longuement compotés, servi avec du riz blanc. Marinade, cuisson des oignons, équilibre acidité, variantes et conservation.",
+  "research": {
+    "recipe_facts": [
+      { "source": "https://example.test/yassa", "text": "La marinade au citron et à la moutarde agit au minimum 4 heures, idéalement une nuit." },
+      { "source": "https://example.test/oignons", "text": "Les oignons représentent au moins le même poids que le poulet et compotent 30 à 40 minutes à feu doux." }
+    ],
+    "references": [ { "url": "https://example.test/yassa", "title": "Yassa traditionnel" } ],
+    "uncertainties": ["Le piment est facultatif selon les familles."]
+  },
+  "canonical": {
+    "title": "Poulet yassa sénégalais",
+    "servings": 6,
+    "prep_minutes": 25,
+    "cook_minutes": 60,
+    "total_minutes": 85,
+    "cuisine": "Sénégalaise",
+    "difficulty": "Moyenne",
+    "calories_estimate": 480,
+    "ingredients": [
+      { "name": "Cuisses de poulet", "quantity": "6", "unit": "pièces" },
+      { "name": "Oignons", "quantity": "1,5", "unit": "kg" },
+      { "name": "Citrons jaunes", "quantity": "4", "unit": "pièces" },
+      { "name": "Moutarde de Dijon", "quantity": "3", "unit": "cuillères à soupe" },
+      { "name": "Huile d'arachide", "quantity": "5", "unit": "cuillères à soupe" },
+      { "name": "Feuille de laurier", "quantity": "2", "unit": "feuilles" },
+      { "name": "Piment antillais", "quantity": "1", "unit": "pièce" }
+    ],
+    "steps": [
+      { "text": "Mélanger jus de citron, moutarde, huile et oignons émincés pour la marinade." },
+      { "text": "Faire mariner le poulet au moins 4 heures au réfrigérateur." },
+      { "text": "Égoutter le poulet et le colorer sur toutes ses faces." },
+      { "text": "Faire compoter les oignons de la marinade à feu doux 30 minutes." },
+      { "text": "Remettre le poulet dans les oignons avec le laurier et le piment entier." },
+      { "text": "Laisser mijoter 25 minutes à couvert puis servir avec du riz blanc." }
+    ],
+    "equipment": ["Grande cocotte", "Saladier", "Presse-agrumes"],
+    "notes": ["Le piment reste entier pour parfumer sans piquer."],
+    "faq": [{ "question": "Peut-on utiliser du blanc de poulet ?", "answer": "Oui, mais réduisez le mijotage à 12 minutes pour éviter une viande sèche." }],
+    "keywords": ["poulet yassa", "sénégal", "citron"]
+  }
+}

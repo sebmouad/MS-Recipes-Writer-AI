@@ -67,3 +67,31 @@ function lab_cost( $model, $usage, $catalog ) {
 	}
 	return null;
 }
+
+/** One image generation. Writes the file and returns its path, size and usage. */
+function lab_image( $prompt, $model, $size, $quality, $output_format, $destination ) {
+	$payload = array(
+		'model' => $model, 'prompt' => (string) $prompt, 'size' => $size,
+		'quality' => $quality, 'output_format' => $output_format, 'n' => 1,
+	);
+	$started = microtime( true );
+	$ch = curl_init( 'https://api.openai.com/v1/images/generations' );
+	curl_setopt_array( $ch, array(
+		CURLOPT_RETURNTRANSFER => true,
+		CURLOPT_POST => true,
+		CURLOPT_HTTPHEADER => array( 'Content-Type: application/json', 'Authorization: Bearer ' . lab_key() ),
+		CURLOPT_POSTFIELDS => json_encode( $payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ),
+		CURLOPT_TIMEOUT => 600,
+	) );
+	$raw = curl_exec( $ch );
+	$status = (int) curl_getinfo( $ch, CURLINFO_RESPONSE_CODE );
+	curl_close( $ch );
+	$seconds = round( microtime( true ) - $started, 1 );
+	if ( 200 !== $status ) { return array( 'error' => 'HTTP ' . $status . ': ' . substr( (string) $raw, 0, 300 ), 'seconds' => $seconds ); }
+	$body = json_decode( (string) $raw, true );
+	$b64 = $body['data'][0]['b64_json'] ?? '';
+	if ( '' === $b64 ) { return array( 'error' => 'no image payload returned', 'seconds' => $seconds ); }
+	$binary = base64_decode( $b64 );
+	file_put_contents( $destination, $binary );
+	return array( 'path' => $destination, 'bytes' => strlen( $binary ), 'seconds' => $seconds, 'usage' => $body['usage'] ?? array(), 'model' => $body['model'] ?? $model );
+}

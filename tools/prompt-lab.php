@@ -57,6 +57,16 @@ if ( 'promote' === $command ) {
 	exit( 0 );
 }
 
+if ( 'rescore' === $command ) {
+	$file = $argv[3] ?? '';
+	if ( ! file_exists( $file ) ) { fwrite( STDERR, "Usage: rescore <step> <tools/runs/file.json>\n" ); exit( 2 ); }
+	$saved = json_decode( file_get_contents( $file ), true );
+	$scores = lab_score( $step, $saved['output'] ?? '', lab_brief( $options['brief'] ?? 'tarte-pommes' ) );
+	foreach ( $scores['checks'] as $label => $check ) { printf( "  %-1s %-30s %s\n", $check['pass'] ? '✓' : '✗', $label, $check['detail'] ); }
+	printf( "\n%s  (%d/%d checks)\n", $scores['pass'] ? 'PASS' : 'FAIL', $scores['passed'], $scores['total'] );
+	exit( $scores['pass'] ? 0 : 1 );
+}
+
 if ( 'run' !== $command ) { fwrite( STDERR, "Unknown command '{$command}'.\n" ); exit( 2 ); }
 
 $brief = lab_brief( $options['brief'] ?? 'tarte-pommes' );

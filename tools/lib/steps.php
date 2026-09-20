@@ -57,6 +57,14 @@ function lab_steps() {
 			'prompts' => array( 'prompt_review' ), 'json' => true, 'max_output' => (int) $s['review_max_output_tokens'],
 			'expects' => 'JSON with pass, findings, corrected_artifact',
 		),
+		'article_part1' => array(
+			'prompts' => array( 'prompt_article' ), 'json' => true, 'max_output' => 6000,
+			'expects' => 'page one: intro, ingredients and their role, choice, substitutions, equipment, plus continuity_context',
+		),
+		'article_part2' => array(
+			'prompts' => array( 'prompt_article' ), 'json' => true, 'max_output' => 6000,
+			'expects' => 'page two: preparation, mistakes, storage, variants, serving, FAQ, conclusion',
+		),
 	);
 }
 
@@ -102,6 +110,24 @@ function lab_build_input( $step, $prompt, $brief, $options ) {
 		return $prompt . "\nRECETTE : " . $encode( $brief['canonical'] ?? array() )
 			. "\nARTICLE : " . $encode( $brief['article'] ?? array() );
 	}
+	if ( 'article_part1' === $step ) {
+		return $prompt . "\nRECETTE CANONIQUE : " . $encode( $brief['canonical'] ?? array() )
+			. "\nRECHERCHE : " . $encode( $brief['research'] ?? array() );
+	}
+	if ( 'article_part2' === $step ) {
+		$handoff = $options['handoff'] ?? '';
+		if ( '' !== $handoff && file_exists( $handoff ) ) {
+			$previous = json_decode( file_get_contents( $handoff ), true );
+			$decoded = json_decode( (string) ( $previous['output'] ?? '' ), true );
+			$handoff = (string) ( $decoded['continuity_context'] ?? '' );
+			$part1_html = (string) ( $decoded['content_html'] ?? '' );
+		} else {
+			$part1_html = '';
+		}
+		return $prompt . "\nRECETTE CANONIQUE : " . $encode( $brief['canonical'] ?? array() )
+			. "\nCONTEXTE DE CONTINUITÉ DE LA PARTIE 1 : " . $handoff
+			. "\nTITRES DÉJÀ TRAITÉS EN PARTIE 1 : " . $encode( lab_headings( $part1_html ) );
+	}
 	return $prompt;
 }
 
@@ -137,12 +163,58 @@ function lab_score( $step, $text, $brief ) {
 		$checks['words'] = array( 'pass' => $words >= (int) $settings['quality_min_words'], 'detail' => $words . ' / ' . (int) $settings['quality_min_words'] );
 		$checks['headings'] = array( 'pass' => (int) ( $quality['metrics']['headings'] ?? 0 ) >= (int) $settings['quality_min_headings'], 'detail' => (int) ( $quality['metrics']['headings'] ?? 0 ) . ' / ' . (int) $settings['quality_min_headings'] );
 		$content = (string) ( $json['content_html'] ?? '' );
+		$headings = lab_headings( $content );
 		$missing = array();
-		foreach ( lab_required_sections() as $section ) {
-			if ( ! preg_match( '/<h[23][^>]*>[^<]*' . preg_quote( $section, '/' ) . '/iu', $content ) ) { $missing[] = $section; }
+		foreach ( lab_required_sections() as $section => $synonyms ) {
+			$found = false;
+			foreach ( $synonyms as $synonym ) {
+				foreach ( $headings as $heading ) { if ( false !== strpos( lab_fold( $heading ), $synonym ) ) { $found = true; break 2; } }
+			}
+			if ( ! $found ) { $missing[] = $section; }
+		}
+		$checks['required sections'] = array( 'pass' => empty( $missing ), 'detail' => $missing ? 'missing: ' . implode( ', ', $missing ) : count( lab_required_sections() ) . '/' . count( lab_required_sections() ) . ' present' );
+		$closing = lab_closing_section( $content );
+		$checks['closing section'] = array( 'pass' => $closing['words'] >= 60 && ! $closing['is_question'], 'detail' => $closing['words'] . ' words under "' . mb_substr( $closing['heading'], 0, 40 ) . '"' );
+		$accents = lab_accent_density( $content );
+		$checks['French typography'] = array( 'pass' => $accents >= 12, 'detail' => sprintf( '%.1f accented characters per 1000 (French prose sits near 30)', $accents ) );
+		$checks['two parts'] = array( 'pass' => false !== strpos( $content, '<!--nextpage-->' ) || ! empty( $json['content_html_part2'] ), 'detail' => false !== strpos( $content, '<!--nextpage-->' ) ? 'page break present' : 'single block' );
+		$checks['no metadata in body'] = array( 'pass' => ! preg_match( '/meta.?description|slug\s*:|mots.?cl(é|e)s\s*:/iu', $content ), 'detail' => 'body carries prose only' );
+		$fields = array( 'title', 'excerpt', 'seo_title', 'seo_description', 'slug', 'tags', 'categories', 'recipe_meta', 'internal_links', 'facebook_caption', 'faq', 'visual_final_notes' );
+		$absent = array();
+		foreach ( $fields as $field ) { if ( ! array_key_exists( $field, $json ) ) { $absent[] = $field; } }
+		$checks['fields the plugin needs'] = array( 'pass' => empty( $absent ), 'detail' => $absent ? 'missing: ' . implode( ', ', $absent ) : count( $fields ) . ' fields present' );
+	}
+
+	if ( 'article_part1' === $step || 'article_part2' === $step ) {
+		$content = (string) ( $json['content_html'] ?? '' );
+		$words = preg_match_all( '/\p{L}+(?:[’\'-]\p{L}+)*/u', strip_tags( $content ) );
+		$target = 'article_part1' === $step ? 1500 : 1300;
+		$checks['words'] = array( 'pass' => $words >= $target * 0.85, 'detail' => $words . ' / ' . $target . ' expected' );
+		$accents = lab_accent_density( $content );
+		$checks['French typography'] = array( 'pass' => $accents >= 12, 'detail' => sprintf( '%.1f accented characters per 1000', $accents ) );
+		$headings = lab_headings( $content );
+		$checks['headings'] = array( 'pass' => count( $headings ) >= 4, 'detail' => count( $headings ) . ' headings' );
+		$sections = 'article_part1' === $step
+			? array( 'ingrédients' => array( 'ingredient' ), 'choix' => array( 'choisir', 'choix', 'selection' ), 'substitutions' => array( 'substitut', 'remplacer' ), 'matériel' => array( 'materiel', 'equipement', 'ustensile' ) )
+			: array( 'préparation' => array( 'preparation', 'etape' ), 'erreurs' => array( 'erreur', 'eviter' ), 'conservation' => array( 'conservation', 'conserver' ), 'variantes' => array( 'variante', 'version' ), 'service' => array( 'service', 'servir', 'accompagn' ), 'faq' => array( 'faq', 'question' ) );
+		$missing = array();
+		foreach ( $sections as $section => $synonyms ) {
+			$found = false;
+			foreach ( $synonyms as $synonym ) { foreach ( $headings as $heading ) { if ( false !== strpos( lab_fold( $heading ), $synonym ) ) { $found = true; break 2; } } }
+			if ( ! $found ) { $missing[] = $section; }
 		}
 		$checks['required sections'] = array( 'pass' => empty( $missing ), 'detail' => $missing ? 'missing: ' . implode( ', ', $missing ) : 'all present' );
-		$checks['no metadata in body'] = array( 'pass' => ! preg_match( '/meta.?description|slug\s*:|mots.?cl(é|e)s\s*:/iu', $content ), 'detail' => 'body carries prose only' );
+		if ( 'article_part1' === $step ) {
+			$handoff = (string) ( $json['continuity_context'] ?? '' );
+			$complete = false !== strpos( $handoff, 'INGREDIENTS:' ) && false !== strpos( $handoff, 'A_NE_PAS_CONTREDIRE:' );
+			$checks['continuity handoff'] = array( 'pass' => $complete, 'detail' => $complete ? strlen( $handoff ) . ' chars' : 'missing or incomplete' );
+			$checks['no preparation steps'] = array( 'pass' => ! preg_match( '/<h[23][^>]*>[^<]*(préparation de la recette|étape par étape)/iu', $content ), 'detail' => 'preparation left to page two' );
+		} else {
+			$opens = preg_match( '/^\s*<h2[^>]*>\s*Préparation de la recette étape par étape/iu', trim( $content ) );
+			$checks['opens on the preparation'] = array( 'pass' => (bool) $opens, 'detail' => $opens ? 'exact opening heading' : 'wrong opening' );
+			$checks['faq field'] = array( 'pass' => isset( $json['faq'] ) && count( (array) $json['faq'] ) >= 3, 'detail' => count( (array) ( $json['faq'] ?? array() ) ) . ' entries' );
+			$checks['visual notes'] = array( 'pass' => mb_strlen( (string) ( $json['visual_final_notes'] ?? '' ) ) >= 200, 'detail' => mb_strlen( (string) ( $json['visual_final_notes'] ?? '' ) ) . ' chars for the image prompt' );
+		}
 	}
 
 	if ( 'review' === $step ) {
@@ -155,7 +227,62 @@ function lab_score( $step, $text, $brief ) {
 	return array( 'checks' => $checks, 'passed' => $passed, 'total' => count( $checks ), 'pass' => $passed === count( $checks ) );
 }
 
-/** The outline the specification requires an article to carry. */
+/**
+ * The outline the specification requires, each with the wordings that satisfy
+ * it. Matching ignores accents and case so typography is measured separately.
+ */
 function lab_required_sections() {
-	return array( 'ingrédient', 'substitution', 'matériel', 'préparation', 'erreur', 'conservation', 'variante', 'FAQ' );
+	return array(
+		'ingrédients'  => array( 'ingredient' ),
+		'choix'        => array( 'choisir', 'choix', 'selection' ),
+		'substitutions'=> array( 'substitut', 'remplacer', 'alternative' ),
+		'matériel'     => array( 'materiel', 'equipement', 'ustensile' ),
+		'préparation'  => array( 'preparation', 'etape', 'pas a pas' ),
+		'erreurs'      => array( 'erreur', 'piege', 'eviter' ),
+		'conservation' => array( 'conservation', 'conserver', 'rechauff' ),
+		'variantes'    => array( 'variante', 'version', 'adaptation' ),
+		'service'      => array( 'service', 'servir', 'accompagn', 'decoupe' ),
+		'faq'          => array( 'faq', 'questions frequentes', 'question' ),
+	);
+}
+
+/** Heading texts of an article body. */
+function lab_headings( $html ) {
+	preg_match_all( '/<h[23][^>]*>(.*?)<\/h[23]>/is', (string) $html, $matches );
+	$out = array();
+	foreach ( (array) $matches[1] as $heading ) { $out[] = trim( strip_tags( $heading ) ); }
+	return $out;
+}
+
+/** Lowercase, accent-free form, for matching content rather than spelling. */
+function lab_fold( $text ) {
+	$text = mb_strtolower( (string) $text, 'UTF-8' );
+	$map = array( 'á'=>'a','à'=>'a','â'=>'a','ä'=>'a','é'=>'e','è'=>'e','ê'=>'e','ë'=>'e','í'=>'i','ì'=>'i','î'=>'i','ï'=>'i','ó'=>'o','ò'=>'o','ô'=>'o','ö'=>'o','ú'=>'u','ù'=>'u','û'=>'u','ü'=>'u','ç'=>'c','œ'=>'oe','æ'=>'ae' );
+	return strtr( $text, $map );
+}
+
+/**
+ * Accented characters per thousand. A French recipe written without accents
+ * is a writing mistake, not a style: real prose sits around thirty.
+ */
+function lab_accent_density( $html ) {
+	$text = trim( preg_replace( '/\s+/u', ' ', strip_tags( (string) $html ) ) );
+	$length = mb_strlen( $text, 'UTF-8' );
+	if ( ! $length ) { return 0.0; }
+	preg_match_all( '/[àâäéèêëîïôöùûüçœæ]/ui', $text, $matches );
+	return round( count( $matches[0] ) * 1000 / $length, 2 );
+}
+
+/**
+ * The article's closing section: whatever sits under the last h2. An editor
+ * titles it "Une recette à refaire", not "Conclusion", so it is measured by
+ * position and substance rather than by its wording.
+ */
+function lab_closing_section( $html ) {
+	$parts = preg_split( '/<h2[^>]*>/i', (string) $html );
+	$last = trim( (string) end( $parts ) );
+	$heading = '';
+	if ( preg_match( '/^(.*?)<\/h2>/is', $last, $match ) ) { $heading = trim( strip_tags( $match[1] ) ); $last = substr( $last, strlen( $match[0] ) ); }
+	$words = preg_match_all( '/\p{L}+/u', strip_tags( $last ) );
+	return array( 'heading' => $heading, 'words' => (int) $words, 'is_question' => false !== strpos( $heading, '?' ) );
 }

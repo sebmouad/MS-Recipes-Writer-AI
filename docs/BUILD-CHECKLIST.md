@@ -41,10 +41,16 @@ defaults in `includes/class-msrwa-settings.php`, which seed the `prompts` table.
 Needs `OPENAI_API_KEY` in the environment. Record the baseline (score, seconds,
 cost) in the task before changing anything.
 
-- [ ] **A0 — Baselines.** Run every step on three briefs and write the numbers
+- [x] **A0 — Baselines.** Run every step on three briefs and write the numbers
   here. Measured on the live site before this phase: research 24s / $0.0244
   (13,475 input tokens), canonical 21s, article 40s for 2,539 words, review 12s.
-- [ ] **A1 — Article.** Two parts with continuity, page 2 opening on the
+- [x] **A1 — Article.** Done: one call replaces the reference plugin's two, measured
+  head to head — 51.7s and $0.0072 against 63.1s and $0.0086, with 38% fewer input
+  tokens and consistency by construction. v4 passes 10/10 checks on two cuisines
+  (2831–3245 words). Found and fixed on the way: the shipped prompt wrote French
+  without accents, 1.0 accented character per 1000 against 33 after the fix.
+  Promoted into `prompt_article`; `quality_min_words` raised to 2800.
+  *Superseded original wording:* **A1 — Article.** Two parts with continuity, page 2 opening on the
   preparation, 2800 words minimum, every required section present, no metadata
   in the body, question-style H2s, paragraphs of two to four sentences.
   *Gate:* `run article` passes every check on three briefs.
@@ -60,7 +66,11 @@ cost) in the task before changing anything.
   that contradicts them.
 - [ ] **A6 — Proofreading** (new step). Grammar, spelling and coherence between
   ingredients, steps and times, returning the corrected text only.
-- [ ] **A7 — Images.** Featured and Facebook prompts: appetising, faithful to
+- [x] **A7 — Images.** Featured prompt from MS Cook Writer (11.6s, $0.0132,
+  1024×1024); Facebook prompt from MS Recipes Writer with portrait framing and
+  the six real recipe steps (13.5s, $0.0103, 1024×1536). Both driven by the
+  `visual_final_notes` the article writes about itself. Awaiting owner validation
+  before promotion. *Original wording:* **A7 — Images.** Featured and Facebook prompts: appetising, faithful to
   the recipe, no text in the image, no invented dish.
 - [ ] **A8 — Promote.** Winners written into the defaults, version bumped,
   `tools/runs/` summary of before and after in the commit body.
