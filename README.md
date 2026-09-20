@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.43` fournit un socle installable DB-first :
+La version `0.2.44` fournit un socle installable DB-first :
 
 - modes administrateur `Automatique` / `Manuel` ;
 - limites initiales de 50 recettes par lot, 4 traitements simultanés et 2 corrections ;
@@ -64,6 +64,12 @@ La version `0.2.43` fournit un socle installable DB-first :
 - file durable avec budgets opérationnels par recette, jour et mois.
 
 Les appels fournisseurs restent déclenchés uniquement par les jobs créés par un éditeur autorisé et soumis aux limites budgétaires. Aucune clé n’est incluse dans le dépôt.
+
+## Version 0.2.44
+
+- Configuration dédiée à la pagination en deux pages et aux choix indépendants des images principale et Facebook.
+- Choix conservés dans les données de chaque nouveau job ; étapes de génération et de contrôle ignorées pour les images désactivées.
+- Facebook sans image principale utilise la recette comme base de génération.
 
 ## Version 0.2.43
 

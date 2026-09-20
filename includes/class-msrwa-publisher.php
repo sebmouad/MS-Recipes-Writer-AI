@@ -25,7 +25,7 @@ final class MSRWA_Publisher {
 		if ( isset( $canonical['calories_estimate'] ) && '' !== (string) $canonical['calories_estimate'] ) {
 			$content .= '<p class="msrwa-nutrition-note">Valeurs nutritionnelles estimées par IA ; elles ne remplacent pas une analyse nutritionnelle professionnelle.</p>';
 		}
-		$paginated = self::apply_pagination( $content, MSRWA_Settings::get() );
+		$paginated = self::apply_pagination( $content, array_merge( MSRWA_Settings::get(), $artifacts['output_options'] ?? array() ) );
 		if ( is_wp_error( $paginated ) ) {
 			if ( ! $allow_partial ) { return $paginated; }
 			$artifacts['delivery_findings'][] = array( 'severity' => 'warning', 'field' => 'pagination', 'reason' => $paginated->get_error_message() );
@@ -77,6 +77,7 @@ final class MSRWA_Publisher {
 		$quality = (array) ( $artifacts['quality_report'] ?? array() );
 		$findings = array_merge( (array) ( $quality['findings'] ?? array() ), (array) ( $artifacts['review']['findings'] ?? array() ), (array) ( $artifacts['delivery_findings'] ?? array() ) );
 		foreach ( array( 'featured_image', 'facebook_image' ) as $key ) {
+			if ( isset( $artifacts['output_options'][ 'generate_' . $key ] ) && ! $artifacts['output_options'][ 'generate_' . $key ] ) { continue; }
 			if ( empty( $artifacts[ $key ]['attachment_id'] ) ) { $requires_review = true; $findings[] = array( 'severity' => 'warning', 'field' => $key, 'reason' => 'Image non disponible.' ); }
 			foreach ( (array) ( $artifacts['image_reviews'][ $key ]['findings'] ?? array() ) as $finding ) { if ( is_array( $finding ) ) { $finding['field'] = $key; $findings[] = $finding; } }
 			if ( true !== ( $artifacts['image_reviews'][ $key ]['pass'] ?? null ) ) { $requires_review = true; }
@@ -103,7 +104,7 @@ final class MSRWA_Publisher {
 	private static function verify_draft( $post_id, $article, $canonical, $artifacts ) {
 		$post = get_post( $post_id );
 		if ( ! $post || 'draft' !== $post->post_status || 'post' !== $post->post_type ) { return new WP_Error( 'draft_write_failed', 'Le brouillon WordPress n’a pas été enregistré dans l’état attendu.' ); }
-		$settings = MSRWA_Settings::get();
+		$settings = array_merge( MSRWA_Settings::get(), $artifacts['output_options'] ?? array() );
 		$page_breaks = substr_count( (string) $post->post_content, '<!--nextpage-->' );
 		if ( ! empty( $settings['article_pagination_enabled'] ) && 1 !== $page_breaks ) { return new WP_Error( 'draft_pagination_missing', 'La division de l’article en deux pages n’a pas été enregistrée correctement.' ); }
 		if ( empty( $settings['article_pagination_enabled'] ) && 0 !== $page_breaks ) { return new WP_Error( 'draft_pagination_unexpected', 'Une division de page est présente alors que ce réglage est désactivé.' ); }

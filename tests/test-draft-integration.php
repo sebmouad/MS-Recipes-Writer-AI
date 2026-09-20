@@ -32,6 +32,18 @@ try {
 	$wpdb->update( $wpdb->posts, array( 'post_status' => 'publish' ), array( 'ID' => $post_id ) ); clean_post_cache( $post_id );
 	$result = MSRWA_Publisher::create_draft( $job, array(), true );
 	if ( ! is_wp_error( $result ) || 'draft_not_editable' !== $result->get_error_code() ) { throw new RuntimeException( 'Published article could be overwritten.' ); }
+	$artifacts = array( 'output_options' => array( 'generate_featured_image' => 0, 'generate_facebook_image' => 0 ) );
+	$before = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$tables['calls']}" );
+	foreach ( array( 'featured_image' => 'facebook_image', 'facebook_image' => 'final_review', 'final_review' => 'draft' ) as $stage => $next ) {
+		$wpdb->update( $tables['jobs'], array( 'status' => 'running', 'stage' => $stage, 'lock_token' => 'draft-contract' ), array( 'id' => $id ) );
+		$job->stage = $stage;
+		$step = new ReflectionMethod( MSRWA_Pipeline::class, $stage );
+		$step->invokeArgs( null, array( $job, &$artifacts ) );
+		$actual = $wpdb->get_var( $wpdb->prepare( "SELECT stage FROM {$tables['jobs']} WHERE id=%d", $id ) );
+		if ( $next !== $actual ) { throw new RuntimeException( 'Disabled image stage not skipped.' ); }
+	}
+	if ( $before !== (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$tables['calls']}" ) ) { throw new RuntimeException( 'Disabled image made an API call.' ); }
+	echo "MSRWA image generation and review skipped without API calls OK\n";
 	echo "MSRWA local integration OK: failed draft, source fallback, private report, idempotence, published protection\n";
 } finally {
 	$wpdb->query( 'ROLLBACK' );

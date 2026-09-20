@@ -85,6 +85,9 @@ final class MSRWA_REST {
 			}
 			$wpdb->insert( $t['jobs'], array( 'batch_id' => $batch_id, 'owner_id' => get_current_user_id(), 'title' => $title, 'input_json' => wp_json_encode( $normalized ), 'selected_models_json' => wp_json_encode( $models ), 'status' => 'queued', 'stage' => 'intake', 'created_at' => $now, 'updated_at' => $now ), array( '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s' ) );
 			$job_id = (int) $wpdb->insert_id;
+			$output_options = array_intersect_key( $settings, array_flip( array( 'generate_featured_image', 'generate_facebook_image', 'article_pagination_enabled', 'article_pagination_min_words', 'article_pagination_split_percent' ) ) );
+			$wpdb->update( $t['jobs'], array( 'artifacts_json' => wp_json_encode( array( 'output_options' => $output_options ) ) ), array( 'id' => $job_id ), array( '%s' ), array( '%d' ) );
+			MSRWA_DB::store_artifact( $job_id, $batch_id, 'output_options', $output_options );
 			$job_ids[] = $job_id;
 			MSRWA_DB::snapshot( 'input', $normalized, $batch_id, $job_id );
 			MSRWA_DB::snapshot( 'model_plan', $models, $batch_id, $job_id );

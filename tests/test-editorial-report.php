@@ -11,3 +11,10 @@ if ( 'needs_review' !== $report['status'] || 100 !== $report['score'] || $report
 $a['review']['pass'] = true;
 if ( 'checks_passed' !== MSRWA_Publisher::editorial_report( $a )['status'] ) { throw new RuntimeException( 'Passing review report incorrect.' ); }
 echo "MSRWA editorial report contracts OK\n";
+foreach ( array( array( 0, 0 ), array( 1, 0 ), array( 0, 1 ), array( 1, 1 ) ) as $choices ) {
+	$b = $a;
+	$b['output_options'] = array( 'generate_featured_image' => $choices[0], 'generate_facebook_image' => $choices[1] );
+	foreach ( array( 'featured_image', 'facebook_image' ) as $i => $key ) { if ( ! $choices[ $i ] ) { unset( $b[ $key ], $b['image_reviews'][ $key ] ); } }
+	if ( 'checks_passed' !== MSRWA_Publisher::editorial_report( $b )['status'] ) { throw new RuntimeException( 'Disabled image flagged as missing.' ); }
+}
+echo "MSRWA four image output combinations OK\n";

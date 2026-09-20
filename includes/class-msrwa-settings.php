@@ -71,6 +71,8 @@ final class MSRWA_Settings {
 			'vision_max_output_tokens' => 1200,
 			'image_review_max_output_tokens' => 1000,
 			'article_pagination_enabled' => 1,
+			'generate_featured_image' => 1,
+			'generate_facebook_image' => 1,
 			'article_pagination_min_words' => 1000,
 			'article_pagination_split_percent' => 50,
 			'integration_mapping' => array( 'prep_minutes' => '_recipe_prep_time', 'cook_minutes' => '_recipe_cook_time', 'servings' => '_recipe_servings', 'calories_estimate' => '_recipe_calories', 'cuisine' => '_recipe_cuisine', 'difficulty' => '_recipe_difficulty', 'equipment' => '_recipe_equipment', 'notes' => '_recipe_notes', 'faq' => '_recipe_faq', 'keywords' => '_recipe_keywords', 'ingredients' => '_recipe_ingredients', 'instructions' => '_recipe_instructions', 'seo_title' => '_seo_title', 'seo_description' => '_seo_description', 'facebook_meta' => 'fb_images_data' ),
@@ -272,6 +274,8 @@ final class MSRWA_Settings {
 		$out['facebook_text'] = empty( $raw['facebook_text'] ) ? 0 : 1;
 		$out['internal_links_enabled'] = empty( $raw['internal_links_enabled'] ) ? 0 : 1;
 		$out['article_pagination_enabled'] = empty( $raw['article_pagination_enabled'] ) ? 0 : 1;
+		$out['generate_featured_image'] = empty( $raw['generate_featured_image'] ) ? 0 : 1;
+		$out['generate_facebook_image'] = empty( $raw['generate_facebook_image'] ) ? 0 : 1;
 		$out['article_pagination_min_words'] = isset( $raw['article_pagination_min_words'] ) ? min( 8000, max( 300, absint( $raw['article_pagination_min_words'] ) ) ) : $defaults['article_pagination_min_words'];
 		$out['article_pagination_split_percent'] = isset( $raw['article_pagination_split_percent'] ) ? min( 70, max( 30, absint( $raw['article_pagination_split_percent'] ) ) ) : $defaults['article_pagination_split_percent'];
 		$out['internal_links_max'] = isset( $raw['internal_links_max'] ) ? min( 10, max( 0, absint( $raw['internal_links_max'] ) ) ) : $defaults['internal_links_max'];

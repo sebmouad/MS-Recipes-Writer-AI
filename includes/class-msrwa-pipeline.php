@@ -11,6 +11,10 @@ final class MSRWA_Pipeline {
 		$input = json_decode( (string) $job->input_json, true );
 		$artifacts = json_decode( (string) $job->artifacts_json, true );
 		$artifacts = is_array( $artifacts ) ? $artifacts : array();
+		if ( ! isset( $artifacts['output_options'] ) ) {
+			$settings = MSRWA_Settings::get();
+			$artifacts['output_options'] = array_intersect_key( $settings, array_flip( array( 'generate_featured_image', 'generate_facebook_image', 'article_pagination_enabled', 'article_pagination_min_words', 'article_pagination_split_percent' ) ) );
+		}
 		try {
 			switch ( $job->stage ) {
 				case 'intake': self::advance( $job, $artifacts, 'association' ); break;
@@ -381,6 +385,7 @@ final class MSRWA_Pipeline {
 	}
 
 	private static function featured_image( $job, &$artifacts ) {
+		if ( isset( $artifacts['output_options']['generate_featured_image'] ) && ! $artifacts['output_options']['generate_featured_image'] ) { self::advance( $job, $artifacts, 'facebook_image' ); return; }
 		if ( ! empty( $artifacts['featured_image']['attachment_id'] ) ) {
 			$valid = MSRWA_Images::validate( $artifacts['featured_image'] );
 			if ( ! is_wp_error( $valid ) ) { self::advance( $job, $artifacts, 'facebook_image' ); return; }
@@ -393,6 +398,7 @@ final class MSRWA_Pipeline {
 	}
 
 	private static function facebook_image( $job, &$artifacts ) {
+		if ( isset( $artifacts['output_options']['generate_facebook_image'] ) && ! $artifacts['output_options']['generate_facebook_image'] ) { self::advance( $job, $artifacts, 'final_review' ); return; }
 		if ( ! empty( $artifacts['facebook_image']['attachment_id'] ) ) {
 			$valid = MSRWA_Images::validate( $artifacts['facebook_image'] );
 			if ( ! is_wp_error( $valid ) ) { self::advance( $job, $artifacts, 'final_review' ); return; }
@@ -405,7 +411,10 @@ final class MSRWA_Pipeline {
 	}
 
 	private static function final_review( $job, &$artifacts ) {
+		$checks = array( 'article' );
 		foreach ( array( 'featured_image', 'facebook_image' ) as $key ) {
+			if ( isset( $artifacts['output_options'][ 'generate_' . $key ] ) && ! $artifacts['output_options'][ 'generate_' . $key ] ) { continue; }
+			$checks[] = $key;
 			if ( empty( $artifacts[ $key ] ) ) { self::set_status( $job, 'needs_review', 'image_missing', 'Une image requise est absente avant la finalisation.', $artifacts ); return; }
 			$valid = MSRWA_Images::validate( $artifacts[ $key ] );
 			if ( is_wp_error( $valid ) ) { self::set_status( $job, 'needs_review', $valid->get_error_code(), $valid->get_error_message(), $artifacts ); return; }
@@ -433,7 +442,7 @@ final class MSRWA_Pipeline {
 				return;
 			}
 		}
-		MSRWA_DB::event( 'final_review_passed', $job->batch_id, $job->id, array( 'checks' => array( 'article', 'featured_image', 'facebook_image' ) ) );
+		MSRWA_DB::event( 'final_review_passed', $job->batch_id, $job->id, array( 'checks' => $checks ) );
 		self::advance( $job, $artifacts, 'draft' );
 	}
 
