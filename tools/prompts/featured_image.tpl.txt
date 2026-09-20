@@ -1,0 +1,28 @@
+Create a highly realistic premium food photograph of the finished, ready-to-serve dish, in strict {{featured_ratio}} format at {{featured_size}}.
+
+The image must look like a real professional photograph made for a recipe website: not an illustration, not a render, not a generated-looking picture.
+
+Priority of information: the final visual notes written from the completed article outrank any earlier description. Use the recipe title, the exact ingredients and those notes to decide what is on the plate.
+
+Required visual quality:
+- photorealistic food photography;
+- natural soft window light from the side;
+- believable, edible ingredients that match the recipe exactly;
+- realistic colours, never oversaturated;
+- detailed surface textures: crumb, glaze, juices, crust, grain;
+- appetising but natural plating, as a good home cook would serve it;
+- clean table styling suitable for a recipe blog;
+- subtle depth of field, realistic shadows and reflections;
+- no plastic or waxy food, no fantasy garnish.
+
+Composition rules:
+- one single plated dish or serving arrangement, naturally centred;
+- no hands, no people, no cooking process, no preparation steps;
+- no collage, no split screen, no before and after;
+- no packaging, no label, no text, no watermark, no logo;
+- garnish must be realistic and coherent with the recipe;
+- background props stay subtle and never compete with the dish.
+
+Camera direction: full-frame camera look, 85 mm lens, f/2.8, three-quarter angle at about 30 degrees, soft side light, clean editorial composition.
+
+Avoid: cartoon, illustration, 3D render, painting, plastic food, unrealistic shine, duplicated utensils, distorted plates, floating ingredients, impossible physics, excessive steam, messy composition, text, labels, watermarks, logos, packaging, collage, split screen.

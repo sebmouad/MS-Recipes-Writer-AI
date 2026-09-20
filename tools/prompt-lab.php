@@ -18,6 +18,8 @@
 define( 'MSRWA_LAB', true );
 require __DIR__ . '/lib/api.php';
 require __DIR__ . '/lib/steps.php';
+require __DIR__ . '/lib/providers.php';
+require __DIR__ . '/lib/pricing.php';
 
 $argv = $_SERVER['argv'];
 $command = $argv[1] ?? 'list';
@@ -70,27 +72,29 @@ if ( 'rescore' === $command ) {
 if ( 'run' !== $command ) { fwrite( STDERR, "Unknown command '{$command}'.\n" ); exit( 2 ); }
 
 $brief = lab_brief( $options['brief'] ?? 'tarte-pommes' );
-$model = $options['model'] ?? 'gpt-5.6-luna';
+$provider = $options['provider'] ?? 'openai';
+$tier = $options['tier'] ?? '';
+$model = $options['model'] ?? ( '' !== $tier ? ( lab_tiers()[ $tier ][ $provider ] ?? '' ) : 'gpt-5.6-luna' );
+if ( '' === $model ) { fwrite( STDERR, "No model for provider {$provider} tier {$tier}.\n" ); exit( 2 ); }
 $prompt = lab_prompt( $step, $options['variant'] ?? '' );
 $input = lab_build_input( $step, $prompt, $brief, $options );
 $tokens = (int) ( $options['max-output'] ?? $steps[ $step ]['max_output'] );
 
-printf( "step=%s variant=%s model=%s max_output=%d\n", $step, $options['variant'] ?? 'shipped', $model, $tokens );
+printf( "step=%s variant=%s provider=%s model=%s tier=%s max_output=%d\n", $step, $options['variant'] ?? 'shipped', $provider, $model, $tier ?: '-', $tokens );
 printf( "prompt=%d chars, input=%d chars\n\n", strlen( $prompt ), strlen( $input ) );
 
-$result = lab_responses( $input, $model, $tokens, $steps[ $step ]['tools'] ?? array(), ! empty( $steps[ $step ]['json'] ) );
+$result = lab_call( $provider, $model, $input, $tokens, ! empty( $steps[ $step ]['json'] ), $steps[ $step ]['tools'] ?? array() );
 if ( isset( $result['error'] ) ) { fwrite( STDERR, 'API error after ' . $result['seconds'] . "s: " . $result['error'] . "\n" ); exit( 1 ); }
 
-$catalog = lab_catalog();
-$cost = lab_cost( $result['model'], $result['usage'], $catalog );
+$cost = lab_price( $provider, $model, $result['usage'] );
 $scores = lab_score( $step, $result['text'], $brief );
 
 $run = array(
-	'step' => $step, 'variant' => $options['variant'] ?? 'shipped', 'model' => $result['model'],
+	'step' => $step, 'variant' => $options['variant'] ?? 'shipped', 'provider' => $provider, 'tier' => $tier, 'model' => $result['model'],
 	'seconds' => $result['seconds'], 'usage' => $result['usage'], 'cost_usd' => $cost,
 	'status' => $result['status'], 'scores' => $scores, 'output' => $result['text'], 'prompt' => $prompt,
 );
-$path = __DIR__ . '/runs/' . $step . '-' . ( $options['variant'] ?? 'shipped' ) . '-' . gmdate( 'Ymd-His' ) . '.json';
+$path = __DIR__ . '/runs/' . $step . '-' . ( $options['variant'] ?? 'shipped' ) . '-' . $provider . '-' . ( $tier ?: 'x' ) . '-' . gmdate( 'Ymd-His' ) . '.json';
 file_put_contents( $path, json_encode( $run, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) );
 
 printf( "%-28s %s\n", 'time', $result['seconds'] . 's' );

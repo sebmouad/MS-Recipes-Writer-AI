@@ -52,6 +52,11 @@ final class MSRWA_Settings {
 			'prompt_internal_links' => 'Intègre les liens naturellement sur plusieurs mots ou expressions pertinents dans les paragraphes de content_html. Chaque ancre doit décrire la recette cible et faire partie de la phrase. Répartis les liens dans le texte, sans répétition de cible, sans liste de liens ni section À découvrir, À lire aussi ou équivalente. Retourne dans internal_links les mêmes ancres exactes et URLs. Si aucun lien ne convient au contexte, omets-le plutôt que forcer une recommandation.',
 			'quality_min_score'        => 90,
 			'quality_min_words'   => 2800,
+			'site_language'       => 'fr',
+			'article_page2_heading' => 'Préparation de la recette étape par étape',
+			'facebook_collage_steps' => 6,
+			'required_sections'   => array(),
+
 			'quality_max_words'        => 2400,
 			'quality_min_headings'     => 10,
 			'quality_min_paragraphs'   => 24,

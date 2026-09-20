@@ -54,17 +54,17 @@ cost) in the task before changing anything.
   preparation, 2800 words minimum, every required section present, no metadata
   in the body, question-style H2s, paragraphs of two to four sentences.
   *Gate:* `run article` passes every check on three briefs.
-- [ ] **A2 — Canonical recipe.** Valid against `MSRWA_Recipe::validate` on the
+- [~] **A2 — Canonical recipe.** Written in English, `food_safety` added after the schema rejected the first draft. Passes on OpenAI and Claude; Gemini low drops `calories_estimate` and `keywords`. *Original:* **A2 — Canonical recipe.** Valid against `MSRWA_Recipe::validate` on the
   first attempt, no repair call needed, quantities coherent with the steps.
 - [ ] **A3 — Research.** Same factual quality for a fraction of the input
   tokens: the 13,475-token call is the most expensive of the pipeline.
   *Gate:* sources still carry URLs, facts still cover times and temperatures.
-- [ ] **A4 — Review.** Returns a boolean verdict plus findings that name the
+- [~] **A4 — Review.** Written in English; findings must name the section to patch. *Original:* **A4 — Review.** Returns a boolean verdict plus findings that name the
   **section to patch**, never a full rewrite instruction.
-- [ ] **A5 — Fact check** (new step). Compares the finished article to the
+- [~] **A5 — Fact check** (new step). Written; scored on whether it quotes the article verbatim rather than inventing a sentence to correct. *Original:* **A5 — Fact check** (new step). Compares the finished article to the
   research sources and returns only the passages to correct, with the source
   that contradicts them.
-- [ ] **A6 — Proofreading** (new step). Grammar, spelling and coherence between
+- [~] **A6 — Proofreading** (new step). Written; scored on structure preserved, page break kept and every figure untouched. *Original:* **A6 — Proofreading** (new step). Grammar, spelling and coherence between
   ingredients, steps and times, returning the corrected text only.
 - [x] **A7 — Images.** Featured prompt from MS Cook Writer (11.6s, $0.0132,
   1024×1024); Facebook prompt from MS Recipes Writer with portrait framing and
@@ -72,6 +72,16 @@ cost) in the task before changing anything.
   `visual_final_notes` the article writes about itself. Awaiting owner validation
   before promotion. *Original wording:* **A7 — Images.** Featured and Facebook prompts: appetising, faithful to
   the recipe, no text in the image, no invented dish.
+- [ ] **A9 — Prompt templates (owner directive, 2026-09-20).** Prompts are
+  templates compiled from the settings by `MSRWA_Prompt`, used by the lab and
+  the engine alike: word count, one or two pages, page-two opening heading,
+  editable outline, image sizes and format, language, FAQ count, internal link
+  limit. Done for the article and both image prompts; the remaining steps are
+  still plain English text and must be converted before phase B.
+- [ ] **A10 — Recipe fields in the article call.** Measured and rejected: one
+  call carrying both shortened the article to 2248 words on OpenAI medium and
+  truncated at 16k output tokens on Claude medium ($0.16 wasted). The canonical
+  recipe stays its own call. Re-test when output budgets grow.
 - [ ] **A8 — Promote.** Winners written into the defaults, version bumped,
   `tools/runs/` summary of before and after in the commit body.
 
