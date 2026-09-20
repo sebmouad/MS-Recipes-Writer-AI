@@ -118,6 +118,24 @@ cost) in the task before changing anything.
   Both were generated and look strong, but nothing has judged them against each
   other — the approval step (A16) can now do exactly that.
 
+- [ ] **A18 — The six-panel collage is unreliable in one generation
+  (measured 2026-09-20).** Eight real generations judged by A16: `medium` 0/3
+  approved, `high` 1/2, `medium` with a corrected prompt 1/3. Failures are the
+  same two kinds at both tiers — panels out of the recipe's order, and a serving
+  vessel appearing nowhere else. Quality tier is not the lever: `high` costs 2.5×
+  and still failed half its runs. The featured image, by contrast, is `good` at
+  every tier including `low`.
+  Part of the cause was ours: the generic panel roles put "whisking, mixing" at
+  panel 2, which for a tart places the custard before the case is lined. Roles
+  are now subordinate to the canonical step order and panel 6 must use the
+  observed serving vessel; that moved `medium` from 0/3 to 1/3.
+  *Decision needed from the owner before phase B:* retry until approved (about
+  $0.077 per accepted collage at a 1-in-3 rate) or generate six panels separately
+  and compose the grid locally ($0.062 at `low`, $0.106 at `medium`, order
+  guaranteed by construction, each panel able to carry the previous as a
+  continuity reference). The second is an architecture change, so it is not made
+  unilaterally.
+
 - [~] **A4 — Review.** Written in English; findings must name the section to patch. *Original:* **A4 — Review.** Returns a boolean verdict plus findings that name the
   **section to patch**, never a full rewrite instruction.
 - [~] **A5 — Fact check** (new step). Written; scored on whether it quotes the article verbatim rather than inventing a sentence to correct. *Original:* **A5 — Fact check** (new step). Compares the finished article to the

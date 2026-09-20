@@ -10,6 +10,65 @@ php tools/prompt-lab.php run <step> --variant=tpl --provider=<openai|gemini|clau
 
 Measured 2026-09-20. Prices from `tools/lib/pricing.php`, verified the same day.
 
+## Image quality and the Facebook collage — measured 2026-09-20
+
+`gpt-image-2.5-flare`, tarte normande, featured image 1024×1024 and collage
+1024×1536. Every row is one real generation; every verdict comes from
+`tools/approval-lab.php` judging that image against the same article and recipe.
+
+### What a tier costs
+
+| Quality | Image tokens | Seconds | Featured cost | Collage cost |
+|---|---:|---:|---:|---:|
+| `low` | 196 / 158 | 8.7 / 14.5 | $0.0104 | $0.0151 |
+| `medium` | 439 / 343 | 10.1 / 13.7 | $0.0177 | $0.0207 |
+| `high` | 1756 / 1372 | 18.0 / 20.4 | $0.0572 | $0.0516 |
+
+### What a tier buys
+
+The featured image was judged `good` for both verdict and realism at **every
+tier**, including `low`. Raising its quality bought no editorial improvement that
+the approval step could detect.
+
+The collage is a different matter, and not in the way a price list suggests:
+
+| Collage | Quality | Approved | Why refused |
+|---|---|---|---|
+| 233143 | medium | no | crockery break between collage and featured |
+| 234434 | medium | no | crockery break, panel 5 to panel 6 |
+| 234448 | medium | no | steps out of order; cooling rack in panel 6 |
+| 234209 | high | **yes** | — |
+| 234502 | high | no | steps out of order; final panel over-browned |
+| 234743 | medium + fixed prompt | no | steps out of order; vessel family differs |
+| 234757 | medium + fixed prompt | **yes** | — |
+| 234811 | medium + fixed prompt | no | steps out of order; vessel and light change |
+
+**Quality tier is not the lever.** `high` costs 2.5× and still failed one run in
+two. Both tiers fail the same two ways: panels out of the recipe's order, and a
+serving vessel that appears nowhere else in the sequence.
+
+The order failures had a cause in our own prompt. The generic panel roles named
+"whisking, mixing" as panel 2, which for a tart pushes the custard ahead of
+lining the case — exactly the error the judge caught twice. The prompt now
+subordinates the roles to the canonical step order. That moved medium from 0/3
+to 1/3 approved, which is an improvement and not a fix.
+
+**Open question for the owner.** One image generation is being asked to compose
+six ordered, mutually consistent scenes, and it does not do so reliably. Two
+routes, priced:
+
+- *Retry until approved.* At 1 in 3, an accepted medium collage costs about
+  three generations plus three judgements: roughly $0.077.
+- *Generate six panels separately and compose the grid ourselves.* Order becomes
+  guaranteed by construction and each panel can carry the previous one as a
+  reference for continuity. Six `low` panels cost $0.062, six `medium` panels
+  $0.106, and the composition itself is free.
+
+The second costs about the same as retrying and is deterministic, but it is an
+architecture change rather than a prompt change, so it is not made here.
+
+## Per-step matrix
+
 | Step | Variant | Provider | Tier | Model | Seconds | Cost USD | Score | Stop reason |
 |---|---|---|---|---|---:|---:|:---:|---|
 | article | en | claude | high | `claude-opus-5` | 147.1 | 0.3257 | 9/10 | end_turn |

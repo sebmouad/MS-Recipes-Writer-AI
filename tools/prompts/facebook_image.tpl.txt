@@ -28,6 +28,10 @@ PANEL ROLES:
 5. PENULTIMATE STATE — choose the most useful state immediately before serving: final uncooked assembly for a gratin/pizza/pastry, reduced simmer for a braise, folded finish for a pan dish, or whole baked result when a slice is still needed.
 6. APPETITE HERO — the fully cooked final recipe at peak texture. Structured food must show a cut, lifted or plated portion and its true layers/crumb/filling. Stews and soups must show a natural plated bowl, ladled serving or close pot hero; never force an irrelevant slice or cheese pull.
 
+ORDER OUTRANKS ROLE. The roles above say which six moments are worth showing. The canonical recipe says in which order they happen, and the recipe always wins. Map each chosen moment back to its step number and lay the panels out in ascending step order. If a role would place a moment before a step that must precede it — whisking a filling before the case that holds it is lined, saucing before the thing being sauced is cooked — move it, or choose a different moment for that panel. A collage whose panels run out of order teaches the reader the wrong recipe, and that is the single most common failure of this format.
+
+Before returning the image, read your six panels in order and confirm each one could only happen after the one before it. Fix any that could not.
+
 Select the six most visually distinct and useful canonical moments; do not sample mechanically by step number or elapsed time. Omit passive or invisible actions such as preheating, waiting, chilling or storage unless they produce a visible transformation. Never invent a step, ingredient, garnish or cooking method.
 
 CONTINUITY — ONE REAL KITCHEN SESSION:
@@ -35,6 +39,7 @@ CONTINUITY — ONE REAL KITCHEN SESSION:
 • Preserve ingredient identity, cut size, quantity impression, vessel geometry and construction order across the sequence
 • Panel 1 may use a wider mise-en-place angle; panels 2–5 should retain the same process vessel and a stable 30–45° three-quarter or slightly top-down camera language
 • Panel 6 may move slightly lower and closer for appetite appeal, but must remain in the same kitchen, light and colour grade
+• Panel 6 serves the dish on the vessel the research observations describe for serving, and panels 5 and 6 keep that vessel or the cooking vessel between them. Never introduce a support that appears nowhere else — a cooling rack, a wooden board, a plate of a different family — and never let the finished dish look more cooked or more darkly coloured in panel 6 than the observations describe
 • Maintain the same work surface, restrained props, daylight direction, exposure, white balance and ingredient-led colour palette
 • Props remain secondary: at most a folded neutral/checked linen, a small herb plant, grinder or blurred ingredient bowl where contextually correct
 • Use one credible tool per action—whisk, wooden spoon, tongs, spatula, ladle or pastry brush—with natural scale, grip and contact

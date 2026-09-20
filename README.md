@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.55` est un socle installable : file persistante, pipeline de
+La version `0.2.56` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.
@@ -20,6 +20,32 @@ Le plugin est en cours de refonte éditoriale et budgétaire :
 Les coûts affichés sont des estimations calculées avec le catalogue configuré,
 non une facture fournisseur. `completed` signifie que le traitement est terminé,
 jamais qu’un texte est validé éditorialement.
+
+## Version 0.2.56
+
+Le collage Facebook est repassé au banc d'essai avec l'étape d'approbation, et
+le résultat contredit l'hypothèse de départ.
+
+**La qualité n'est pas le levier.** L'image mise en avant est jugée `good`,
+verdict et réalisme, à **toutes les qualités, `low` comprise** : monter sa
+qualité n'achète aucune amélioration détectable. Le collage échoue en revanche
+aux deux qualités, et toujours des deux mêmes façons — panneaux dans le
+désordre, et vaisselle de service qui n'apparaît nulle part ailleurs. En `high`,
+à 2,5× le prix, un tirage sur deux est encore refusé.
+
+Une partie de la cause était dans notre propre prompt : les rôles génériques
+plaçaient « whisking, mixing » en panneau 2, ce qui, pour une tarte, fait battre
+l'appareil avant même le fonçage de la pâte — exactement l'erreur relevée deux
+fois par le juge. Les rôles sont désormais subordonnés à l'ordre canonique de la
+recette, et le panneau 6 doit servir le plat dans le contenant décrit par les
+observations. Le `medium` passe de 0/3 à 1/3 approuvé : un progrès, pas une
+solution.
+
+Les huit tirages, leurs coûts et leurs verdicts sont consignés dans
+[`docs/LAB-RESULTS.md`](docs/LAB-RESULTS.md), avec les deux routes chiffrées
+pour la suite — réessayer jusqu'à approbation (~0,077 $ le collage accepté) ou
+générer six panneaux séparés et composer la grille nous-mêmes (0,062 $ en `low`,
+0,106 $ en `medium`, composition gratuite et ordre garanti par construction).
 
 ## Version 0.2.55
 
