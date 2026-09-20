@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.37` fournit un socle installable DB-first :
+La version `0.2.38` fournit un socle installable DB-first :
 
 - modes administrateur `Automatique` / `Manuel` ;
 - limites initiales de 50 recettes par lot, 4 traitements simultanés et 2 corrections ;
@@ -17,7 +17,7 @@ La version `0.2.37` fournit un socle installable DB-first :
 - snapshot des réglages et modèles sélectionnés pour chaque lot et chaque job ;
 - sélection manuelle distincte par étape (rédaction, relecture, images, recherche) ;
 - pipeline persistant association → recherche web → recette canonique → article → relecture, avec deux corrections maximum ;
-- suggestions de liens internes depuis les recettes locales publiées, sous forme de chemins relatifs et avec une limite administrable ; insertion de secours dans une section personnalisable lorsque l’article ne contient pas encore les ancres ;
+- suggestions de liens internes depuis les recettes locales publiées, sous forme de chemins relatifs et avec une limite administrable ; insertion sur les expressions pertinentes déjà présentes dans les paragraphes, sans section dédiée ;
 - adaptateurs OpenAI Responses et Image API testés localement avec sorties JSON et WebP temporaires ;
 - génération de l’image principale puis variante Facebook référencée, validation mécanique des médias et création idempotente d’un brouillon WordPress ;
 - ratios, qualité OpenAI et format de sortie administrables pour l’image principale et Facebook, avec recadrage non étiré et cohérence MIME/extension après transformation ;
@@ -59,6 +59,11 @@ La version `0.2.37` fournit un socle installable DB-first :
 - file durable avec budgets opérationnels par recette, jour et mois.
 
 Les appels fournisseurs restent déclenchés uniquement par les jobs créés par un éditeur autorisé et soumis aux limites budgétaires. Aucune clé n’est incluse dans le dépôt.
+
+## Version 0.2.38
+
+- Liens internes contextuels dans les paragraphes uniquement : suppression de la section automatique de recommandations et de son réglage de titre.
+- Consignes d’ancres configurables ; conservation du texte et des liens existants, sans lien imbriqué ni cible externe.
 
 ## Version 0.2.37
 

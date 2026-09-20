@@ -20,7 +20,7 @@ final class MSRWA_Publisher {
 		}
 		$link_specs = self::internal_link_specs( isset( $article['internal_links'] ) ? $article['internal_links'] : array(), isset( $artifacts['internal_link_candidates'] ) ? $artifacts['internal_link_candidates'] : array() );
 		$content = self::sanitize_content( (string) $article['content_html'], $link_specs );
-		$content = self::append_internal_links( $content, $link_specs );
+		$content = self::insert_internal_links( $content, $link_specs );
 		if ( ! preg_match( '/<\w[\s\S]*>/i', $content ) ) { $content = wpautop( esc_html( $content ) ); }
 		if ( isset( $canonical['calories_estimate'] ) && '' !== (string) $canonical['calories_estimate'] ) {
 			$content .= '<p class="msrwa-nutrition-note">Valeurs nutritionnelles estimées par IA ; elles ne remplacent pas une analyse nutritionnelle professionnelle.</p>';
@@ -175,8 +175,8 @@ final class MSRWA_Publisher {
 			$allowed[] = function_exists( 'wp_make_link_relative' ) ? wp_make_link_relative( $url ) : ( wp_parse_url( $url, PHP_URL_PATH ) ?: '' );
 		}
 		$content = preg_replace_callback( '/<a\b[^>]*href=["\']([^"\']+)["\'][^>]*>(.*?)<\/a>/is', function ( $match ) use ( $allowed ) {
-			$href = function_exists( 'wp_make_link_relative' ) ? wp_make_link_relative( $match[1] ) : ( wp_parse_url( $match[1], PHP_URL_PATH ) ?: '' );
-			return in_array( $href, $allowed, true ) ? $match[0] : $match[2];
+			$href = self::relative_internal_url( html_entity_decode( $match[1], ENT_QUOTES, 'UTF-8' ) );
+			return $href && in_array( $href, $allowed, true ) ? '<a href="' . esc_url( $href ) . '">' . $match[2] . '</a>' : $match[2];
 		}, $content );
 		return $content;
 	}
@@ -206,15 +206,6 @@ final class MSRWA_Publisher {
 			if ( isset( $out[ $key ] ) ) { continue; }
 			$out[ $key ] = array( 'title' => $title, 'anchor' => $anchor ? $anchor : ( $title ? $title : $relative ), 'url' => $relative );
 		}
-		foreach ( $allowed as $link ) {
-			if ( count( $out ) >= $limit || ! is_array( $link ) ) { break; }
-			$relative = self::relative_internal_url( isset( $link['url'] ) ? $link['url'] : '' );
-			if ( ! $relative ) { continue; }
-			$key = md5( $relative );
-			if ( isset( $out[ $key ] ) ) { continue; }
-			$title = sanitize_text_field( isset( $link['title'] ) ? $link['title'] : '' );
-			$out[ $key ] = array( 'title' => $title, 'anchor' => $title ? $title : $relative, 'url' => $relative );
-		}
 		return array_values( $out );
 	}
 
@@ -231,19 +222,34 @@ final class MSRWA_Publisher {
 		return esc_url_raw( $relative );
 	}
 
-	private static function append_internal_links( $content, $links ) {
-		if ( ! is_array( $links ) || empty( $links ) ) { return $content; }
-		$items = array();
-		$heading = sanitize_text_field( MSRWA_Settings::get()['internal_links_heading'] );
-		if ( '' === $heading ) { return $content; }
+	private static function insert_internal_links( $content, $links ) {
+		if ( ! $links || ! class_exists( 'DOMDocument' ) ) { return $content; }
+		$doc = new DOMDocument( '1.0', 'UTF-8' );
+		$errors = libxml_use_internal_errors( true );
+		$doc->loadHTML( '<?xml encoding="UTF-8"><html><body>' . $content . '</body></html>', LIBXML_NONET );
+		libxml_clear_errors(); libxml_use_internal_errors( $errors );
+		$xpath = new DOMXPath( $doc );
+		$used = array();
+		foreach ( $doc->getElementsByTagName( 'a' ) as $a ) { $used[ self::relative_internal_url( $a->getAttribute( 'href' ) ) ] = true; }
+		$changed = false;
 		foreach ( $links as $link ) {
-			$url = esc_url( $link['url'] );
-			$anchor = esc_html( $link['anchor'] );
-			if ( ! $url || ! $anchor || false !== strpos( $content, esc_attr( $link['url'] ) ) ) { continue; }
-			$items[] = '<li><a href="' . $url . '">' . $anchor . '</a></li>';
+			$url = self::relative_internal_url( $link['url'] ?? '' );
+			$anchor = trim( (string) ( $link['anchor'] ?? '' ) );
+			if ( ! $url || ! $anchor || isset( $used[ $url ] ) ) { continue; }
+			$nodes = $xpath->query( '//p//text()[not(ancestor::a) and not(ancestor::script) and not(ancestor::style) and not(ancestor::code)]' );
+			foreach ( $nodes as $node ) {
+				if ( ! preg_match( '/(?<![\p{L}\p{N}])' . preg_quote( $anchor, '/' ) . '(?![\p{L}\p{N}])/iu', $node->nodeValue, $match, PREG_OFFSET_CAPTURE ) ) { continue; }
+				$text = $node->nodeValue; $start = $match[0][1]; $matched = $match[0][0];
+				$fragment = $doc->createDocumentFragment();
+				$fragment->appendChild( $doc->createTextNode( substr( $text, 0, $start ) ) );
+				$a = $doc->createElement( 'a' ); $a->setAttribute( 'href', $url ); $a->appendChild( $doc->createTextNode( $matched ) ); $fragment->appendChild( $a );
+				$fragment->appendChild( $doc->createTextNode( substr( $text, $start + strlen( $matched ) ) ) );
+				$node->parentNode->replaceChild( $fragment, $node ); $used[ $url ] = true; $changed = true; break;
+			}
 		}
-		if ( empty( $items ) ) { return $content; }
-		return $content . '<section class="msrwa-internal-links" aria-labelledby="msrwa-internal-links-title"><h2 id="msrwa-internal-links-title">' . esc_html( $heading ) . '</h2><ul>' . implode( '', $items ) . '</ul></section>';
+		if ( ! $changed ) { return $content; }
+		$html = ''; foreach ( $doc->getElementsByTagName( 'body' )->item( 0 )->childNodes as $node ) { $html .= $doc->saveHTML( $node ); }
+		return $html;
 	}
 
 	private static function write_recipe_meta( $post_id, $recipe ) {
