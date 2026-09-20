@@ -274,6 +274,9 @@ final class MSRWA_Publisher {
 		$map = array(
 			'prep_minutes'    => $mapping['prep_minutes'],
 			'cook_minutes'    => $mapping['cook_minutes'],
+			'total_minutes'   => $mapping['total_minutes'] ?? '',
+			'recipe_category' => $mapping['recipe_category'] ?? '',
+			'description'     => $mapping['description'] ?? '',
 			'servings'        => $mapping['servings'],
 			'calories_estimate' => $mapping['calories_estimate'],
 			'cuisine'         => $mapping['cuisine'],
@@ -281,7 +284,7 @@ final class MSRWA_Publisher {
 		);
 		foreach ( $map as $source => $key ) {
 			if ( $key && isset( $recipe[ $source ] ) ) {
-				$value = in_array( $source, array( 'prep_minutes', 'cook_minutes', 'servings', 'calories_estimate' ), true ) ? absint( $recipe[ $source ] ) : sanitize_text_field( $recipe[ $source ] );
+				$value = in_array( $source, array( 'prep_minutes', 'cook_minutes', 'total_minutes', 'servings', 'calories_estimate' ), true ) ? absint( $recipe[ $source ] ) : sanitize_text_field( $recipe[ $source ] );
 				update_post_meta( $post_id, $key, $value );
 			}
 		}

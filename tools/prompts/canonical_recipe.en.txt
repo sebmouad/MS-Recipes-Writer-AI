@@ -10,12 +10,18 @@ RULES:
 - Temperatures are given in °C with the oven mode when it matters.
 - Steps are ordered, each one a single action with its sign of success. Never merge three gestures into one step.
 - Use only ingredients and method details supported by the editor brief or research package. Invent nothing, and never pad the list to look complete.
+- Completeness beats caution: the list must let someone cook the dish without guessing. A staple the method plainly requires — cooking fat, salt, pepper, water or stock, a marinade's own liquid — belongs in the list with its quantity, even when no source spells it out, because a step that says to brown or to season needs it. What must not be invented is a distinctive ingredient that changes the dish: a spice, a spirit, a garnish, a regional addition.
+- Every ingredient appears in at least one step, and every ingredient a step names appears in the list. A step that seasons, browns or deglazes without a listed ingredient is an incomplete recipe.
 - Research visual observations may confirm visible appearance, texture and plating only. Never derive quantities, ingredients or hidden preparation steps from an image.
+- recipe_category is the course the dish belongs to, one of: entrée, plat principal, accompagnement, dessert, petit-déjeuner, apéritif, boisson, sauce. It is how the dish is eaten, not what it is made of.
+- description is one sentence of 120 to 200 characters naming the dish, its texture and when it is served. It is read on a search results page, so no marketing and no figures that the recipe does not carry.
 - calories_estimate is an integer number of kcal per serving. It is an honest approximation, never a precise claim; put uncertainty in "uncertainties", not in this numeric field.
 - If the research contradicts itself, choose the safest value for the cook and record the doubt in "uncertainties".
 - food_safety states the handling rules this dish actually needs: core temperatures, raw-egg or raw-fish handling, cooling and reheating limits, allergens present. Never leave it generic.
 
 OUTPUT — a valid JSON object only, no Markdown, with exactly these keys:
-"title", "servings" (integer), "prep_minutes", "cook_minutes", "total_minutes", "cuisine", "difficulty",
-"calories_estimate", "ingredients" [{name, quantity, unit}], "steps" [{text}], "equipment" [string],
-"notes" [string], "faq" [{question, answer}], "keywords" [string], "food_safety" [string], "uncertainties" [string]
+"title", "description", "servings" (integer), "prep_minutes", "cook_minutes", "total_minutes", "cuisine", "recipe_category", "difficulty",
+"calories_estimate", "ingredients" (array of {name, quantity, unit}), "steps" (array of {text}),
+"equipment" (array of strings), "notes" (array of strings), "faq" (array of {question, answer}),
+"keywords" (array of strings, one keyword per entry, never one comma-separated string),
+"food_safety" (array of strings), "uncertainties" (array of strings)

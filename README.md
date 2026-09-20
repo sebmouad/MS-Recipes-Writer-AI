@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.52` est un socle installable : file persistante, pipeline de
+La version `0.2.53` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.
@@ -20,6 +20,33 @@ Le plugin est en cours de refonte éditoriale et budgétaire :
 Les coûts affichés sont des estimations calculées avec le catalogue configuré,
 non une facture fournisseur. `completed` signifie que le traitement est terminé,
 jamais qu’un texte est validé éditorialement.
+
+## Version 0.2.53
+
+La recette canonique fournit enfin les données structurées Google attendues, et
+une liste d'ingrédients avec laquelle on peut réellement cuisiner.
+
+- **`recipe_category` et `description`** sont produits et enregistrés : Google
+  lit le premier comme cours du repas, le second comme phrase affichée dans les
+  résultats de recherche. Aucun des deux n'existait.
+- **`total_minutes`** était produit depuis toujours mais absent de
+  `integration_mapping` : il n'atteignait jamais l'article. Il est désormais
+  mappé et vérifié.
+- **`canonical_max_output_tokens` passe de 2 600 à 4 500.** Le plafond était
+  déjà trop bas avant cet ajout : la recette du rapport livré consommait 3 260
+  jetons de sortie, et un premier essai s'est terminé en `incomplete` à 2 600
+  exactement.
+- **Liste d'ingrédients cuisinable.** La règle « n'invente rien » supprimait les
+  ingrédients de base : un poulet yassa revenait avec quatre ingrédients, sans
+  huile ni sel. La recette doit maintenant permettre de cuisiner sans deviner —
+  matière grasse, sel, poivre, eau ou bouillon quand la méthode les exige — tout
+  en continuant d'interdire l'invention d'un ingrédient distinctif. Mesuré sur
+  `gpt-5.6-luna` : 4 ingrédients et 5 étapes avant, 7 et 14 après ; la tarte
+  normande passe de 4 à 9 ingrédients. Les deux fiches passent 4/4.
+- La notation `[string]` du contrat était ambiguë et le modèle renvoyait
+  `keywords` en une seule chaîne séparée par des virgules. Le contrat dit
+  désormais « array of strings », et le contrôle accepte les deux formes, que le
+  publisher sait déjà lire.
 
 ## Version 0.2.52
 

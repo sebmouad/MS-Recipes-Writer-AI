@@ -73,6 +73,20 @@ cost) in the task before changing anything.
   *Still open from the original task:* input tokens stay high (45–58k) because
   the web-search results are billed, and Claude high costs $0.19 against OpenAI
   medium's $0.015 for the same scorecard.
+- [x] **A15 — Google Recipe structured data completed (owner-approved, 2026-09-20).**
+  The audit against the agreed specification found the recipe produced 16 fields
+  but not all of what Google reads. `recipe_category` and `description` are now
+  produced and validated; `total_minutes` was produced but missing from
+  `integration_mapping`, so it never reached the post. Two defects surfaced while
+  proving it: `canonical_max_output_tokens` at 2 600 truncated the answer (the
+  delivered report's own recipe used 3 260 output tokens), and the "invent
+  nothing" rule suppressed staples — a poulet yassa came back with four
+  ingredients and no oil or salt. Both fixed; both briefs now pass 4/4 with 7–9
+  ingredients and 14–16 steps.
+  *Still open:* `recipeInstructions` are plain text rather than `HowToStep`, so
+  the per-step rich result is not available; and no `aggregateRating` or `video`,
+  which cannot be produced honestly.
+
 - [~] **A4 — Review.** Written in English; findings must name the section to patch. *Original:* **A4 — Review.** Returns a boolean verdict plus findings that name the
   **section to patch**, never a full rewrite instruction.
 - [~] **A5 — Fact check** (new step). Written; scored on whether it quotes the article verbatim rather than inventing a sentence to correct. *Original:* **A5 — Fact check** (new step). Compares the finished article to the

@@ -68,7 +68,7 @@ final class MSRWA_Settings {
 			'research_facts_max'      => 12,
 			'research_references_max' => 6,
 			'association_max_output_tokens' => 900,
-			'canonical_max_output_tokens' => 2600,
+			'canonical_max_output_tokens' => 4500,
 			'router_max_output_tokens' => 700,
 			'vision_max_output_tokens' => 1200,
 			'image_review_max_output_tokens' => 1000,
@@ -77,7 +77,7 @@ final class MSRWA_Settings {
 			'generate_facebook_image' => 1,
 			'article_pagination_min_words' => 1000,
 			'article_pagination_split_percent' => 50,
-			'integration_mapping' => array( 'prep_minutes' => '_recipe_prep_time', 'cook_minutes' => '_recipe_cook_time', 'servings' => '_recipe_servings', 'calories_estimate' => '_recipe_calories', 'cuisine' => '_recipe_cuisine', 'difficulty' => '_recipe_difficulty', 'equipment' => '_recipe_equipment', 'notes' => '_recipe_notes', 'faq' => '_recipe_faq', 'keywords' => '_recipe_keywords', 'ingredients' => '_recipe_ingredients', 'instructions' => '_recipe_instructions', 'seo_title' => '_seo_title', 'seo_description' => '_seo_description', 'facebook_meta' => 'fb_images_data' ),
+			'integration_mapping' => array( 'prep_minutes' => '_recipe_prep_time', 'cook_minutes' => '_recipe_cook_time', 'total_minutes' => '_recipe_total_time', 'recipe_category' => '_recipe_category', 'description' => '_recipe_description', 'servings' => '_recipe_servings', 'calories_estimate' => '_recipe_calories', 'cuisine' => '_recipe_cuisine', 'difficulty' => '_recipe_difficulty', 'equipment' => '_recipe_equipment', 'notes' => '_recipe_notes', 'faq' => '_recipe_faq', 'keywords' => '_recipe_keywords', 'ingredients' => '_recipe_ingredients', 'instructions' => '_recipe_instructions', 'seo_title' => '_seo_title', 'seo_description' => '_seo_description', 'facebook_meta' => 'fb_images_data' ),
 			'prompt_router'       => 'Tu es l’agent de sélection des modèles. Choisis des modèles compatibles avec chaque étape de rédaction culinaire en privilégiant le meilleur équilibre qualité/coût. Respecte strictement les candidats autorisés et n’invente jamais de fournisseur, modèle, prix ou capacité.',
 			'prompt_research'     => 'You are a culinary research editor. Turn an editor brief into one reusable evidence package for the recipe, article, images, and quality reviewers.
 
