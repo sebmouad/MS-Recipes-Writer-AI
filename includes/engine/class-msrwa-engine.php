@@ -204,8 +204,6 @@ final class MSRWA_Engine {
 	 */
 	private static function prepare( $name, MSRWA_Engine_Config $config, MSRWA_Result $result, array $options, array $findings = array() ) {
 		$capability = MSRWA_Engine_Steps::capability( $name, (array) $config->get( 'steps', array() ) );
-		$clean = self::nothing_to_do( $name, $config, $result );
-		if ( '' !== $clean ) { return self::skipped( $name, $result, $clean ); }
 		if ( 'none' === $capability ) { return self::apply_corrections( $result ); }
 		if ( 'image_generation' === $capability ) { return self::draw( $name, $config, $result, $options, $findings ); }
 		if ( 'vision' === $capability ) { return self::decide( $name, $config, $result, $options ); }
@@ -257,43 +255,6 @@ final class MSRWA_Engine {
 				: $plan;
 		}
 		return $outcomes;
-	}
-
-	/**
-	 * Why a step has nothing left to do, or '' when it has.
-	 *
-	 * Proofreading is the only step this applies to today, and it is the dearest
-	 * of the verification group: it regenerates the whole article, some 6,600
-	 * output tokens, whether or not anyone objected to a word of it. When the
-	 * review passed with no finding and every correction the fact check asked for
-	 * went in cleanly, the text it would rewrite is a text three checks have
-	 * already agreed on. The article still reaches the approval — as the corrected
-	 * version rather than a rewritten one.
-	 *
-	 * A caller that wants the rewrite regardless turns it off in configuration.
-	 */
-	private static function nothing_to_do( $name, MSRWA_Engine_Config $config, MSRWA_Result $result ) {
-		if ( ! $config->get( 'skip_when_clean.' . $name, false ) || 'proofread' !== $name ) { return ''; }
-
-		$review = (array) ( $result->artifacts['review'] ?? array() );
-		$corrected = (array) ( $result->artifacts['corrected'] ?? array() );
-		// A step that never ran is not a step that found nothing.
-		if ( ! $review || ! $corrected ) { return ''; }
-		if ( true !== ( $review['pass'] ?? null ) || (array) ( $review['findings'] ?? array() ) ) { return ''; }
-		if ( (array) ( $corrected['corrections_for_the_editor'] ?? array() ) ) { return ''; }
-
-		return 'the review passed with no finding and every correction applied, so there is nothing to rewrite';
-	}
-
-	/** A step recorded as not run, with the article it would have rewritten passed on unchanged. */
-	private static function skipped( $name, MSRWA_Result $result, $because ) {
-		$result->event( 'skip', $name, 'Skipped: ' . $because );
-		$checks = array( 'nothing to do' => array( 'pass' => true, 'detail' => $because ) );
-		return array(
-			'provider' => '', 'model' => '', 'seconds' => 0, 'usage' => array(), 'cost_usd' => 0.0, 'status' => 'skipped',
-			'passed' => 1, 'total' => 1, 'checks' => $checks, 'error' => '', 'retry' => '',
-			'artifact' => (array) ( $result->artifacts['corrected'] ?? array() ),
-		);
 	}
 
 	/**

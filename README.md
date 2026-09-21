@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.83` est un socle installable : file persistante, pipeline de
+La version `0.2.84` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.
@@ -23,22 +23,27 @@ Les coûts affichés sont des estimations calculées avec le catalogue configur�
 non une facture fournisseur. `completed` signifie que le traitement est terminé,
 jamais qu’un texte est validé éditorialement.
 
+## Version 0.2.84
+
+**Retrait du saut de relecture introduit en 0.2.83, qui ne se déclenchait
+jamais.** L'idée tenait : la relecture est l'étape la plus chère du groupe de
+vérification — 0,0104 $ et 35 s, environ 7 000 tokens de sortie — et elle
+réécrivait l'article entier même quand la revue n'avait rien à redire.
+
+Rejoué sur les cinq runs complets enregistrés, le saut ne se serait déclenché
+aucune fois : la revue relève entre deux et cinq remarques à chaque article,
+sans exception. Le garde était juste, ses tests aussi, mais c'était une porte
+qui ne s'ouvre jamais. Le moteur ne garde pas de code qui ne fait rien.
+
+L'économie annoncée n'existait pas. Ce qui reste de l'épisode est une mesure qui
+vaut mieux que le code : la revue n'a jamais approuvé un article sans réserve,
+et savoir si c'est un signal honnête ou un prompt qui doit toujours trouver
+quelque chose se vérifie sans rien dépenser.
+
 ## Version 0.2.83
 
-**La relecture ne réécrit plus un texte que personne n'a contesté.** C'est
-l'étape la plus chère du groupe de vérification — 0,0104 $ et 36,7 s sur un run
-mesuré, environ 6 600 tokens de sortie — et elle régénérait l'article entier
-que la revue ait trouvé quelque chose ou non.
-
-Quand la revue passe sans aucune remarque et que chaque correction demandée par
-la vérification des faits s'est appliquée exactement, il n'y a rien à réécrire :
-trois contrôles se sont déjà accordés sur ce texte. L'étape est alors consignée
-comme non exécutée, à coût nul, et c'est la version corrigée qui poursuit
-jusqu'à l'approbation.
-
-Une revue absente n'est jamais lue comme une revue satisfaite, une remarque même
-mineure ramène la réécriture, et l'appelant garde le dernier mot :
-`skip_when_clean.proofread` à `false` la rétablit systématiquement.
+**Saut de relecture sur article propre** — ajouté puis retiré en 0.2.84, faute
+de se déclencher une seule fois sur les runs mesurés.
 
 ## Version 0.2.82
 
