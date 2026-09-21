@@ -11,7 +11,9 @@ Two documents drive the work:
   execute, with the tests each task needs and the rule for marking it done.
 
 [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) describes the code as it exists;
-read it before changing behaviour.
+read it before changing behaviour. [`docs/ENGINE.md`](docs/ENGINE.md) is the
+engine's contract — how it is called, configured and what it returns — and is
+what the plugin is written against.
 
 ## Commands
 

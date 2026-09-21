@@ -15,6 +15,8 @@ Le plugin est en cours de refonte éditoriale et budgétaire :
 - [`docs/BUILD-CHECKLIST.md`](docs/BUILD-CHECKLIST.md) — les tâches à réaliser,
   leurs tests et leur critère d’achèvement.
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — le code tel qu’il existe.
+- [`docs/ENGINE.md`](docs/ENGINE.md) — le contrat du moteur : comment on
+  l’appelle, comment on le configure, ce qu’il rend.
 - [`docs/TESTING.md`](docs/TESTING.md) — suite hors ligne et tests réels.
 
 Les coûts affichés sont des estimations calculées avec le catalogue configuré,

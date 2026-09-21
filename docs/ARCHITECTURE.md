@@ -30,6 +30,8 @@ schedules the next run. A crashed worker leaves an expired lease that
 
 ## The engine
 
+[`ENGINE.md`](ENGINE.md) is its full contract; this is the short version.
+
 `includes/engine/` is the part that makes a recipe. It touches no WordPress
 function, reads nothing from disk beyond its own prompts, and never exits: it
 takes a brief and returns a `MSRWA_Result`. The plugin and the prompt lab both
