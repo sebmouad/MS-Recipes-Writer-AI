@@ -326,6 +326,53 @@ final class MSRWA_Engine_Input {
 	 * distilled in its visual brief instead. Dropping them takes about 6 100 characters
 	 * off every text call that carries the package.
 	 */
+	/**
+	 * What the real photographs showed, written for the editor who judges the
+	 * generated ones.
+	 *
+	 * The judge's own prompt said it received "observations taken from real
+	 * photographs of this dish", and it did not: research_for_text() strips them,
+	 * so the only appearance it ever saw was the handful of colour and texture
+	 * phrases inside the visual brief. It was deciding whether a photograph looks
+	 * like this dish without having seen what this dish looks like.
+	 *
+	 * This is the opposite job from the one the image prompt does, so it carries
+	 * the opposite risk. The generator must not be shown another cook's garnish,
+	 * because it draws what it is shown. The judge must be shown it, because it
+	 * is comparing — but it must know whose plate it is looking at, which is why
+	 * the tier, the source and the uncertainties travel with each observation.
+	 */
+	public static function visual_evidence( $research ) {
+		$research = is_array( $research ) ? $research : array();
+		$observations = array_values( array_filter( (array) ( $research['visual_observations'] ?? array() ), 'is_array' ) );
+		if ( ! $observations ) { return "VISUAL EVIDENCE: none. No real photograph of this dish was read, so judge the images on realism and on the canonical recipe alone, and say in uncertainties that you had no photographic reference.\n"; }
+
+		$tiers = array();
+		foreach ( (array) ( $research['visual_references'] ?? array() ) as $reference ) {
+			if ( is_array( $reference ) && ! empty( $reference['image_url'] ) ) { $tiers[ (string) $reference['image_url'] ] = (int) ( $reference['tier'] ?? 0 ); }
+		}
+
+		$lines = array( 'VISUAL EVIDENCE — what real photographs of this dish actually showed, read from the image files themselves. This is evidence about appearance, and nothing else.' );
+		$index = 0;
+		foreach ( $observations as $observation ) {
+			$index++;
+			$tier = (int) ( $observation['tier'] ?? $tiers[ (string) ( $observation['image_url'] ?? '' ) ] ?? 0 );
+			$label = 2 === $tier ? 'a close variant of this dish, weaker evidence' : ( 1 === $tier ? 'this dish' : 'unrated source' );
+			$parts = array();
+			foreach ( array( 'observable_details' => 'Visible', 'colours' => 'Colours', 'textures' => 'Textures' ) as $key => $name ) {
+				$value = self::about_the_dish( self::observation_text( $observation[ $key ] ?? '' ) );
+				if ( '' !== $value ) { $parts[] = $name . ': ' . $value; }
+			}
+			$doubt = self::observation_text( $observation['uncertainties'] ?? '' );
+			if ( '' !== $doubt ) { $parts[] = 'The pass could not identify: ' . $doubt; }
+			if ( ! $parts ) { continue; }
+			$lines[] = 'Photograph ' . $index . ' (' . $label . '): ' . implode( ' ', $parts );
+		}
+
+		$lines[] = 'HOW TO USE IT. These are other cooks\' plates, not a specification. Use them to decide whether the generated images are believable and whether they show this dish: a colour, a texture, a doneness or a way of serving that matches them is right, and one that is wildly outside them is worth a finding. Never require an element because a photograph had it — a source plate served with rice does not make rice compulsory — and never treat a second-tier variant as proof of anything. What an observation says the pass could not identify proves nothing at all.' . "\n";
+		return implode( "\n", $lines ) . "\n";
+	}
+
 	public static function research_for_text( $research ) {
 		$research = is_array( $research ) ? $research : array();
 		foreach ( array( 'originality_notes', 'visual_references', 'visual_observations' ) as $key ) { unset( $research[ $key ] ); }
@@ -454,10 +501,13 @@ final class MSRWA_Engine_Input {
 		}
 		if ( 'final_approval' === $step ) {
 			// The images travel beside this text, as bytes. Everything the judge
-			// measures them against has to be in here, or it judges pictures alone.
+			// measures them against has to be in here, or it judges pictures alone:
+			// the recipe it must accept as given, the research behind it, and what
+			// the real photographs of this dish actually showed.
 			return $prompt . "\n\nCANONICAL RECIPE: " . $encode( $canonical )
 				. "\nRESEARCH PACKAGE: " . $encode( $text_research )
-				. "\n\n" . self::visual_brief( $canonical, $research )
+				. "\n\n" . self::visual_evidence( $research )
+				. "\n" . self::visual_brief( $canonical, $research )
 				. "\nARTICLE: " . $encode( self::article( $brief ) );
 		}
 		return $prompt;

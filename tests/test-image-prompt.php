@@ -92,4 +92,39 @@ msrwa_test_contains( $collage, "recipe's own order", 'The collage must restate t
 $featured_serving = MSRWA_Engine_Input::serving_presentation( $clean['canonical'], $clean['research'], true );
 msrwa_test_assert( false !== strpos( $kept, $featured_serving ) && false !== strpos( $collage, $featured_serving ), 'The featured photograph and the collage must be given the same serving presentation.' );
 
+// The judge and the generator are given opposite things, on purpose. The
+// generator draws what it is shown, so it must not see another cook's garnish.
+// The judge compares, so it must — with the tier and the doubt attached.
+$evidence_research = array(
+	'visual_references' => array(
+		array( 'image_url' => 'https://example.org/1.jpg', 'tier' => 1 ),
+		array( 'image_url' => 'https://example.org/2.jpg', 'tier' => 2 ),
+	),
+	'visual_observations' => array(
+		array( 'image_url' => 'https://example.org/1.jpg', 'observable_details' => 'Une tarte dorée servie sur une assiette blanche, avec du riz à côté.', 'colours' => 'Doré et brun clair.', 'textures' => 'Croûte ferme.', 'uncertainties' => 'La nature des morceaux orange est indéterminable.' ),
+		array( 'image_url' => 'https://example.org/2.jpg', 'observable_details' => 'Une variante plus foncée.', 'colours' => 'Brun soutenu.' ),
+	),
+);
+$evidence = MSRWA_Engine_Input::visual_evidence( $evidence_research );
+msrwa_test_contains( $evidence, '(this dish)', 'A first-tier photograph must be named as evidence of this dish.' );
+msrwa_test_contains( $evidence, 'weaker evidence', 'A second-tier photograph must be marked as weaker.' );
+msrwa_test_contains( $evidence, 'could not identify', 'What the vision pass could not identify must travel with the evidence.' );
+msrwa_test_contains( $evidence, 'Never require an element because a photograph had it', 'The evidence must never become a specification.' );
+msrwa_test_contains( $evidence, 'assiette blanche', 'The judge, unlike the generator, may see what was in the frame.' );
+msrwa_test_contains( MSRWA_Engine_Input::visual_evidence( array() ), 'VISUAL EVIDENCE: none', 'A run with no photograph must say so rather than stay silent.' );
+
+// The judge's input must actually carry it: its prompt has promised these
+// observations all along while research_for_text() stripped them out.
+$judged = MSRWA_Engine_Input::build( 'final_approval', 'PROMPT', array_merge( $clean, array( 'research' => $evidence_research, 'article' => array( 'content_html' => '<p>x</p>' ) ) ) );
+msrwa_test_contains( $judged, 'VISUAL EVIDENCE', 'The approval step must be sent the visual evidence.' );
+msrwa_test_contains( $judged, 'CANONICAL RECIPE', 'The approval step must be sent the canonical recipe.' );
+msrwa_test_contains( $judged, 'assiette blanche', 'The approval step must be sent what the photographs showed.' );
+
+// And the generation path must still not be: this is the channel that drew a
+// watermark, two hands, peppers and carrots into four separate images.
+$generated = MSRWA_Engine_Input::image_prompt( 'featured', array_merge( $clean, array( 'research' => $evidence_research ) ), array() );
+msrwa_test_missing( $generated, 'assiette blanche', 'The image generator must still not receive the frame inventory.' );
+msrwa_test_missing( $generated, 'riz à côté', 'Another cook\'s accompaniment must never reach the generator.' );
+msrwa_test_contains( $generated, 'Doré et brun clair', 'Colour must still reach the generator.' );
+
 msrwa_test_done( 'image prompts' );

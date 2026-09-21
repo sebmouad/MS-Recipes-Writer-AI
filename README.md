@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.80` est un socle installable : file persistante, pipeline de
+La version `0.2.81` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.
@@ -22,6 +22,39 @@ Le plugin est en cours de refonte éditoriale et budgétaire :
 Les coûts affichés sont des estimations calculées avec le catalogue configuré,
 non une facture fournisseur. `completed` signifie que le traitement est terminé,
 jamais qu’un texte est validé éditorialement.
+
+## Version 0.2.81
+
+**Le juge reçoit enfin les observations visuelles qu'on lui promettait.** Son
+prompt annonçait « le dossier de recherche, avec les observations tirées de
+photographies réelles de ce plat » — et `research_for_text()` retirait
+précisément celles-là. Il décidait si une photographie ressemble à ce plat sans
+avoir jamais vu à quoi ce plat ressemble, sinon par les quelques mots de couleur
+et de texture glissés dans le brief visuel.
+
+Il reçoit maintenant, explicitement : la **recette canonique de l'étape 2**,
+qu'il prend comme référence, et les **observations visuelles de l'étape 1**,
+lues dans les octets des vraies photographies.
+
+**Le générateur et le juge reçoivent l'inverse l'un de l'autre, exprès.** Le
+générateur dessine ce qu'on lui montre : lui montrer la garniture d'un autre
+cuisinier, c'est la voir apparaître — filigrane, mains, poivrons, carottes,
+quatre images perdues. Le juge, lui, compare : il doit la voir. Chaque
+observation lui arrive donc avec son **rang** (ce plat, ou une variante, preuve
+plus faible), sa **source**, et ce que la passe visuelle **n'a pas su
+identifier**.
+
+Et une règle qui compte autant que l'évidence elle-même : **une photographie
+n'ajoute jamais une exigence.** Une assiette source servie avec du riz ne rend
+pas le riz obligatoire. L'évidence sert à reconnaître le plat et à juger si la
+cuisson est crédible, jamais à réclamer un élément que la recette canonique ne
+contient pas.
+
+Vérifié en réel sur le poulet yassa : image à la une `good`, collage `good`,
+cohérence `good` — et **aucun constat ne réclame un élément vu sur une
+photographie source**. Un contrôle hors ligne vérifie les deux sens : que le
+juge reçoit l'inventaire du cadre, et que le générateur ne le reçoit toujours
+pas.
 
 ## Version 0.2.80
 
