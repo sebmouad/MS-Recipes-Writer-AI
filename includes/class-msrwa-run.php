@@ -60,7 +60,7 @@ final class MSRWA_Run {
 	}
 
 	public static function may_see( array $run ) {
-		return (int) $run['owner_id'] === get_current_user_id() || current_user_can( 'msrwa_view_all' ) || current_user_can( 'manage_options' );
+		return (int) $run['owner_id'] === get_current_user_id() || current_user_can( 'manage_options' );
 	}
 
 	public static function cancel( $id ) {

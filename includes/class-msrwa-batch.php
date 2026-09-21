@@ -66,14 +66,14 @@ final class MSRWA_Batch {
 	public static function recent( $limit = 30 ) {
 		global $wpdb;
 		$limit = max( 1, min( 200, (int) $limit ) );
-		if ( current_user_can( 'msrwa_view_all' ) || current_user_can( 'manage_options' ) ) {
+		if ( current_user_can( 'manage_options' ) ) {
 			return (array) $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM ' . self::table() . ' ORDER BY id DESC LIMIT %d', $limit ), ARRAY_A );
 		}
 		return (array) $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM ' . self::table() . ' WHERE owner_id = %d ORDER BY id DESC LIMIT %d', get_current_user_id(), $limit ), ARRAY_A );
 	}
 
 	public static function may_see( array $batch ) {
-		return (int) $batch['owner_id'] === get_current_user_id() || current_user_can( 'msrwa_view_all' ) || current_user_can( 'manage_options' );
+		return (int) $batch['owner_id'] === get_current_user_id() || current_user_can( 'manage_options' );
 	}
 
 	public static function matching( $id ) {

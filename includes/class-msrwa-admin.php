@@ -50,14 +50,61 @@ final class MSRWA_Admin {
 		echo '</nav>';
 	}
 
+	private static function editor_jobs() {
+		global $wpdb;
+		$t = MSRWA_DB::tables();
+		$where = $wpdb->prepare( 'owner_id = %d', get_current_user_id() );
+		$status = sanitize_key( $_GET['status'] ?? '' );
+		if ( in_array( $status, array( 'queued', 'running', 'done', 'failed', 'cancelled' ), true ) ) { $where .= $wpdb->prepare( ' AND status = %s', $status ); }
+		$search = sanitize_text_field( wp_unslash( $_GET['s'] ?? '' ) );
+		if ( $search ) { $where .= $wpdb->prepare( ' AND label LIKE %s', '%' . $wpdb->esc_like( $search ) . '%' ); }
+		$total = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$t['runs']} WHERE $where" );
+		$page = min( max( 1, absint( $_GET['paged'] ?? 1 ) ), max( 1, (int) ceil( $total / 25 ) ) );
+		$rows = (array) $wpdb->get_results( $wpdb->prepare( "SELECT id,label,status,draft_post_id,approved FROM {$t['runs']} WHERE $where ORDER BY id DESC LIMIT %d OFFSET %d", 25, ( $page - 1 ) * 25 ), ARRAY_A );
+		echo '<div class="wrap msrwa-wrap"><h1>Mes recettes</h1>'; self::navigation();
+		echo '<form method="get"><input type="hidden" name="page" value="msrwa-jobs"><label>Rechercher une recette <input name="s" value="' . esc_attr( $search ) . '"></label><button class="button">Rechercher</button></form>';
+		self::editor_cards( $rows );
+		foreach ( array( $page - 1 => 'Précédent', $page + 1 => 'Suivant' ) as $target => $label ) {
+			if ( $target > 0 && $target <= ceil( $total / 25 ) ) { echo '<a class="button" href="' . esc_url( add_query_arg( array( 'page' => 'msrwa-jobs', 'paged' => $target, 's' => $search, 'status' => $status ), admin_url( 'admin.php' ) ) ) . '">' . esc_html( $label ) . '</a>'; }
+		}
+		echo '</div>';
+	}
+
+	private static function editor_cards( array $runs ) {
+		if ( ! $runs ) { echo '<p>Aucune recette pour le moment.</p>'; }
+		foreach ( $runs as $run ) {
+			echo '<section class="msrwa-card"><h2>' . esc_html( $run['label'] ) . '</h2><p>' . esc_html( self::run_label( $run['status'] ) ) . '</p>';
+			if ( null !== $run['approved'] ) { echo '<p>' . ( $run['approved'] ? 'Contrôle qualité réussi. Relecture éditoriale nécessaire.' : 'Cette recette nécessite votre attention.' ) . '</p>'; }
+			echo '<a class="button" href="' . esc_url( admin_url( 'admin.php?page=msrwa-run&run_id=' . (int) $run['id'] ) ) . '">Voir la recette</a>';
+			if ( $run['draft_post_id'] && current_user_can( 'edit_post', (int) $run['draft_post_id'] ) ) { echo '<a class="button button-primary" href="' . esc_url( get_edit_post_link( (int) $run['draft_post_id'] ) ) . '">Ouvrir l’article</a><p>Publication : ' . esc_html( get_post_status( (int) $run['draft_post_id'] ) ) . '</p>'; }
+			echo '</section>';
+		}
+	}
+
+	private static function editor_result( array $run ) {
+		$a = MSRWA_Run::artifacts( (int) $run['id'] );
+		require_once MSRWA_DIR . 'tools/report.php';
+		echo '<div class="wrap msrwa-wrap"><h1>' . esc_html( $run['label'] ) . '</h1>'; self::navigation();
+		self::editor_cards( array( $run ) );
+		echo '<section class="msrwa-card"><h2>Recette</h2>' . report_recipe_card( (array) ( $a['canonical'] ?? array() ) ) . '</section>';
+		$article = (array) ( $a['proofread'] ?? $a['corrected'] ?? $a['article'] ?? array() );
+		echo '<section class="msrwa-card"><h2>Article</h2>' . wp_kses_post( (string) ( $article['content_html'] ?? '' ) ) . '</section>';
+		foreach ( array( 'featured' => 'Image à la une', 'facebook' => 'Collage Facebook' ) as $kind => $label ) {
+			$image = MSRWA_Operations::safe_image( (array) ( $a[ $kind ] ?? array() ), (int) $run['id'] );
+			echo '<section class="msrwa-card">' . report_image( $image, $label, '' ) . '</section>';
+		}
+		echo '</div>';
+	}
+
 	public static function jobs() {
 		self::guard();
+		if ( ! current_user_can( 'manage_options' ) ) { self::editor_jobs(); return; }
 		global $wpdb;
 		$t = MSRWA_DB::tables();
 		$page = max( 1, absint( $_GET['paged'] ?? 1 ) );
 		$status = sanitize_key( $_GET['status'] ?? '' );
 		$search = sanitize_text_field( wp_unslash( $_GET['s'] ?? '' ) );
-		$where = current_user_can( 'msrwa_view_all' ) || current_user_can( 'manage_options' ) ? '1=1' : $wpdb->prepare( 'owner_id = %d', get_current_user_id() );
+		$where = current_user_can( 'manage_options' ) ? '1=1' : $wpdb->prepare( 'owner_id = %d', get_current_user_id() );
 		$statuses = array( 'queued' => 'En attente', 'running' => 'En cours', 'done' => 'Terminé', 'failed' => 'Échoué', 'cancelled' => 'Annulé' );
 		if ( isset( $statuses[ $status ] ) ) { $where .= $wpdb->prepare( ' AND status = %s', $status ); }
 		if ( '' !== $search ) { $where .= $wpdb->prepare( ' AND label LIKE %s', '%' . $wpdb->esc_like( $search ) . '%' ); }
@@ -90,10 +137,10 @@ final class MSRWA_Admin {
 			<?php self::navigation(); ?>
 			<p class="description">Collez vos recettes, séparées par une ligne de tirets. Ajoutez les photographies. Elles seront décrites puis associées aux recettes ; vous confirmez l’appariement avant que quoi que ce soit ne soit généré.</p>
 
-			<?php if ( ! $keys ) : ?>
+			<?php if ( ! $keys && current_user_can( 'manage_options' ) ) : ?>
 				<div class="notice notice-error"><p>Aucune clé d’API enregistrée. Rien ne peut être généré. <a href="<?php echo esc_url( admin_url( 'admin.php?page=msrwa-settings' ) ); ?>">Réglages</a></p></div>
 			<?php endif; ?>
-			<?php if ( defined( 'DISABLE_WP_CRON' ) && DISABLE_WP_CRON ) : ?>
+			<?php if ( current_user_can( 'manage_options' ) && defined( 'DISABLE_WP_CRON' ) && DISABLE_WP_CRON ) : ?>
 				<div class="notice notice-warning"><p><code>DISABLE_WP_CRON</code> est actif : les runs n’avanceront que si un cron serveur appelle <code>wp-cron.php</code>.</p></div>
 			<?php endif; ?>
 
@@ -110,20 +157,20 @@ final class MSRWA_Admin {
 						<span id="msrwa-image-count" class="description">aucune</span>
 						<input type="hidden" id="msrwa-images" name="images" value="">
 					</p>
-					<p>
+					<?php if ( current_user_can( 'manage_options' ) ) : ?><p>
 						<label for="msrwa-budget"><strong>Plafond par recette, en dollars</strong></label><br>
 						<input type="number" id="msrwa-budget" name="budget" value="0.20" step="0.01" min="0.01" class="small-text">
 						<span class="description">Chaque run s’arrête plutôt que de dépasser ce plafond.</span>
-					</p>
+					</p><?php endif; ?>
 					<p><button type="submit" class="button button-primary">Décrire et apparier</button> <span id="msrwa-new-status" class="description"></span></p>
-					<p class="description">L’appariement coûte un appel de vision par photographie, une seule fois.</p>
+					<?php if ( current_user_can( 'manage_options' ) ) : ?><p class="description">L’appariement coûte un appel de vision par photographie, une seule fois.</p><?php endif; ?>
 				</form>
 			</div>
 
 			<div class="msrwa-card">
 				<h2>Lots récents</h2>
 				<table class="widefat striped">
-					<thead><tr><th>#</th><th>Lot</th><th>État</th><th>Recettes</th><th>Photos</th><th>Plafond</th><th></th></tr></thead>
+					<thead><tr><th>#</th><th>Lot</th><th>État</th><th>Recettes</th><th>Photos</th><?php if ( current_user_can( 'manage_options' ) ) : ?><th>Plafond</th><?php endif; ?><th></th></tr></thead>
 					<tbody>
 					<?php if ( ! $batches ) : ?><tr><td colspan="7">Aucun lot.</td></tr><?php endif; ?>
 					<?php foreach ( $batches as $batch ) : ?>
@@ -133,7 +180,7 @@ final class MSRWA_Admin {
 							<td><?php echo esc_html( self::batch_state( $batch['status'] ) ); ?></td>
 							<td><?php echo esc_html( $batch['recipes'] ); ?></td>
 							<td><?php echo esc_html( $batch['images'] ); ?></td>
-							<td><?php echo esc_html( sprintf( '%.2f $', (float) $batch['budget_usd'] ) ); ?></td>
+							<?php if ( current_user_can( 'manage_options' ) ) : ?><td><?php echo esc_html( sprintf( '%.2f $', (float) $batch['budget_usd'] ) ); ?></td><?php endif; ?>
 							<td><a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=msrwa-batch&batch_id=' . (int) $batch['id'] ) ); ?>">Ouvrir</a></td>
 						</tr>
 					<?php endforeach; ?>
@@ -147,6 +194,18 @@ final class MSRWA_Admin {
 	private static function batch_state( $status ) {
 		$labels = array( 'matching' => 'appariement en cours', 'ready' => 'à confirmer', 'running' => 'en cours', 'done' => 'terminé', 'failed' => 'échoué' );
 		return $labels[ $status ] ?? $status;
+	}
+
+	public static function run_label( $status ) {
+		return array( 'queued' => 'En attente', 'running' => 'En cours', 'done' => 'Terminé', 'failed' => 'Échoué', 'cancelled' => 'Annulé' )[ $status ] ?? $status;
+	}
+
+	public static function batch_summary( array $runs ) {
+		$counts = array( 'queued' => 0, 'running' => 0, 'done' => 0, 'failed' => 0, 'cancelled' => 0 );
+		foreach ( $runs as $run ) { if ( isset( $counts[ $run['status'] ] ) ) { $counts[ $run['status'] ]++; } }
+		echo '<div class="msrwa-summary-grid" aria-label="Résumé des recettes du lot">';
+		foreach ( $counts as $status => $count ) { echo '<div><span>' . esc_html( self::run_label( $status ) ) . '</span><strong data-run-count="' . esc_attr( $status ) . '">' . esc_html( $count ) . '</strong></div>'; }
+		echo '</div>';
 	}
 
 	// --- Un lot : l’appariement, puis les runs ---------------------------
@@ -211,7 +270,8 @@ final class MSRWA_Admin {
 
 			<?php if ( $runs ) : ?>
 			<div class="msrwa-card">
-				<h2>Runs</h2>
+				<h2>Suivi des <?php echo esc_html( count( $runs ) ); ?> recettes</h2>
+				<?php self::batch_summary( $runs ); ?>
 				<table class="widefat striped" id="msrwa-runs">
 					<thead><tr><th>#</th><th>Recette</th><th>État</th><th>Étapes</th><th>Coût</th><th>Durée</th><th>Verdict</th><th></th></tr></thead>
 					<tbody>
@@ -219,8 +279,8 @@ final class MSRWA_Admin {
 						<tr data-run="<?php echo esc_attr( $run['id'] ); ?>">
 							<td><?php echo esc_html( $run['id'] ); ?></td>
 							<td><?php echo esc_html( $run['label'] ); ?></td>
-							<td class="msrwa-run-state"><?php echo esc_html( $run['status'] ); ?></td>
-							<td class="msrwa-run-steps"><?php echo esc_html( $run['steps_done'] . ' / ' . $run['steps_total'] ); ?></td>
+							<td class="msrwa-run-state"><span class="msrwa-state" data-state="<?php echo esc_attr( $run['status'] ); ?>"><?php echo esc_html( self::run_label( $run['status'] ) ); ?></span></td>
+							<td><progress class="msrwa-run-progress" max="<?php echo esc_attr( max( 1, (int) $run['steps_total'] ) ); ?>" value="<?php echo esc_attr( min( (int) $run['steps_done'], max( 1, (int) $run['steps_total'] ) ) ); ?>" aria-label="Étapes exécutées"></progress><span class="msrwa-run-steps"><?php echo esc_html( $run['steps_done'] . ' / ' . $run['steps_total'] ); ?></span></td>
 							<td class="msrwa-run-cost"><?php echo esc_html( sprintf( '%.4f $', (float) $run['cost_usd'] ) ); ?></td>
 							<td class="msrwa-run-seconds"><?php echo esc_html( sprintf( '%.1f s', (float) $run['seconds'] ) ); ?></td>
 							<td><?php echo esc_html( null === $run['approved'] ? '—' : ( $run['approved'] ? 'approuvé par le juge' : 'refusé par le juge' ) ); ?></td>
@@ -247,6 +307,7 @@ final class MSRWA_Admin {
 		self::guard();
 		$run = MSRWA_Run::get( isset( $_GET['run_id'] ) ? absint( $_GET['run_id'] ) : 0 );
 		if ( ! $run || ! MSRWA_Run::may_see( $run ) ) { wp_die( esc_html__( 'Run introuvable.', 'ms-recipes-writer-ai' ) ); }
+		if ( ! current_user_can( 'manage_options' ) ) { self::editor_result( $run ); return; }
 		$id = (int) $run['id'];
 		$state = MSRWA_Run::state( $id );
 		$totals = $state['totals'];

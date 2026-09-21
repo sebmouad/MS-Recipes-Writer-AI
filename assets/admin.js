@@ -126,9 +126,17 @@
 	var recipeSummary = document.createElement('p');
 	recipeSummary.setAttribute('role', 'status');
 	recipesField.after(recipeSummary);
+	var recipeList = document.createElement('ol'); recipeList.className = 'msrwa-recipe-preview';
+	recipeSummary.after(recipeList);
 	function summarizeRecipes() {
 	  var recipes = recipesField.value.split(/^\s*-{3,}\s*$/m).filter(function (item) { return item.trim(); });
 	  recipeSummary.textContent = recipes.length + ' recette(s) à préparer. Les associations seront confirmées avant lancement.';
+	  recipeList.replaceChildren();
+	  recipes.forEach(function (recipe) {
+	    var item = document.createElement('li');
+	    item.textContent = recipe.trim().split(/\r?\n/)[0].replace(/^#+\s*/, '');
+	    recipeList.appendChild(item);
+	  });
 	}
 	recipesField.addEventListener('input', summarizeRecipes);
 	summarizeRecipes();
@@ -176,7 +184,7 @@
         body: JSON.stringify({
           recipes: document.getElementById('msrwa-recipes').value,
           images: field.value,
-          budget: parseFloat(document.getElementById('msrwa-budget').value)
+          budget: document.getElementById('msrwa-budget') ? parseFloat(document.getElementById('msrwa-budget').value) : undefined
         })
       }).then(function (data) {
         window.location = 'admin.php?page=msrwa-batch&batch_id=' + data.id;
@@ -244,15 +252,27 @@
     refreshing = true;
     return call('/batches/' + batch + '/runs').then(function (data) {
       var moving = false;
+      var counts = { queued: 0, running: 0, done: 0, failed: 0, cancelled: 0 };
+      var labels = { queued: 'En attente', running: 'En cours', done: 'Terminé', failed: 'Échoué', cancelled: 'Annulé' };
       say(batchStatus, 'Suivi actualisé à ' + new Date().toLocaleTimeString('fr-FR') + '.');
       data.runs.forEach(function (run) {
         var row = table.querySelector('tr[data-run="' + run.id + '"]');
         if (!row) { window.location.reload(); return; }
-        row.querySelector('.msrwa-run-state').textContent = run.status + (run.step && 'running' === run.status ? ' — ' + run.step : '');
+        if (Object.prototype.hasOwnProperty.call(counts, run.status)) counts[run.status]++;
+        var badge = row.querySelector('.msrwa-state');
+        badge.dataset.state = run.status;
+        badge.textContent = (labels[run.status] || run.status) + (run.step && 'running' === run.status ? ' — ' + run.step : '');
+        var progress = row.querySelector('.msrwa-run-progress');
+        progress.max = Math.max(1, run.steps_total);
+        progress.value = Math.min(run.steps_done, progress.max);
         row.querySelector('.msrwa-run-steps').textContent = run.steps_done + ' / ' + run.steps_total;
         row.querySelector('.msrwa-run-cost').textContent = run.cost_usd.toFixed(4) + ' $';
         row.querySelector('.msrwa-run-seconds').textContent = run.seconds.toFixed(1) + ' s';
         if ('queued' === run.status || 'running' === run.status) moving = true;
+      });
+      Object.keys(counts).forEach(function (state) {
+        var count = document.querySelector('[data-run-count="' + state + '"]');
+        if (count) count.textContent = counts[state];
       });
       // A finished batch is a page whose drafts have appeared; reload once so
       // their links are there rather than asking the reader to press refresh.

@@ -172,6 +172,15 @@ Badge codes: `good` (completed and every check passed), `review`, `incomplete`
 
 ## Permissions
 
+Current access rule (0.3.3): only `manage_options` grants global data access.
+Authors, editors and an existing custom `writer` role receive `msrwa_create`
+and own-job access. Legacy `msrwa_view_all` alone does not bypass ownership.
+Editorial screens expose only their own recipes, article content, images,
+quality verdict and publication links. Full reports, costs, technical events,
+global statistics and settings are administrator-only. REST polling removes
+technical/cost fields for non-administrators; editor budgets are resolved server-side.
+The historical capability table below describes the previous architecture.
+
 | Capability | Meaning |
 | --- | --- |
 | `msrwa_create` | May create batches (editors, administrators) |

@@ -42,7 +42,8 @@ final class MSRWA_REST {
 		$ids = is_string( $ids ) ? array_filter( array_map( 'absint', explode( ',', $ids ) ) ) : (array) $ids;
 		$images = MSRWA_Intake::images( $ids );
 
-		$id = MSRWA_Batch::create( $recipes, $images, (float) $request->get_param( 'budget' ) );
+		$budget = current_user_can( 'manage_options' ) ? (float) $request->get_param( 'budget' ) : (float) ( MSRWA_Settings::get()['per_recipe_budget_usd'] ?? 0.20 );
+		$id = MSRWA_Batch::create( $recipes, $images, $budget );
 		if ( is_wp_error( $id ) ) { return $id; }
 		return rest_ensure_response( array( 'id' => (int) $id, 'recipes' => count( $recipes ), 'images' => count( $images ) ) );
 	}
@@ -82,6 +83,10 @@ final class MSRWA_REST {
 				'approved' => null === $run['approved'] ? null : (bool) $run['approved'],
 				'draft_post_id' => (int) $run['draft_post_id'],
 			);
+			if ( ! current_user_can( 'manage_options' ) ) {
+				$last = count( $out ) - 1;
+				unset( $out[ $last ]['step'], $out[ $last ]['steps_done'], $out[ $last ]['steps_total'], $out[ $last ]['cost_usd'], $out[ $last ]['seconds'] );
+			}
 		}
 		return rest_ensure_response( array( 'status' => (string) $batch['status'], 'runs' => $out ) );
 	}

@@ -1,5 +1,13 @@
 # Build checklist — for the model doing the work
 
+## Reference-inspired 0.3.3
+
+- [~] Administrator-only global access; writers/editors scoped to own jobs even with legacy view-all capability. Editorial result cards omit costs and technical reports. Statistics explanatory text moved into collapsed help. Offline scope tests pass; live role/browser validation pending.
+
+- [~] Multi-recipe title preview, live per-status batch counters, accessible per-recipe progress bars and French status badges. Offline summary-count regressions pass; real browser verification pending.
+
+- [~] Interface-only inspiration from MS Cook Writer AI revision 2c00d91: statistics summary cards. Preserve multiple-recipe batches, pairing and per-job tracking. Do not change engine, article or image prompts/generation. Visual validation pending.
+
 ## Hotfix 0.3.2
 
 - [~] Restore credential sanitization, preserve partial settings saves, and handle the removed catalog table. Production settings class tested offline with OpenSSL; live WordPress save still requires deployment verification.

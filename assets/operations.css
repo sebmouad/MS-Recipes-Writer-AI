@@ -55,6 +55,20 @@
 .msrwa-filters label { flex: 1 1 200px; }
 .msrwa-wrap .msrwa-filters input, .msrwa-wrap .msrwa-filters select { width: 100%; max-width: none; min-width: 0; }
 .msrwa-pagination { display: flex; flex-wrap: wrap; gap: 8px; }
+.msrwa-wrap .image-card { margin: 0; }
+.msrwa-wrap .image-card img { max-width: 100%; height: auto; border-radius: 10px; }
+.msrwa-metric-help { margin: 12px 0; color: var(--muted); }
+.msrwa-state { display: inline-block; padding: 4px 10px; border-radius: 20px; background: #edf1f3; color: #344b58; font-weight: 600; font-size: 12px; }
+.msrwa-state[data-state=running] { background: #e4f1fc; color: #185383; }
+.msrwa-state[data-state=done] { background: #e5f4eb; color: #175c35; }
+.msrwa-state[data-state=failed] { background: #fbe9e7; color: #932f26; }
+.msrwa-run-progress { display: block; width: 130px; max-width: 100%; height: 10px; margin: 8px 0; accent-color: var(--brand); }
+.msrwa-recipe-preview { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); gap: 8px; padding-left: 24px; max-height: 240px; overflow: auto; }
+.msrwa-recipe-preview li { padding: 8px 12px; background: var(--soft); border-radius: 8px; overflow-wrap: anywhere; }
+.msrwa-summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr)); gap: 12px; margin: 20px 0; }
+.msrwa-summary-grid > div { padding: 18px; background: #fff; border: 1px solid var(--line); border-radius: 12px; border-top: 3px solid var(--brand); }
+.msrwa-summary-grid span { display: block; font-size: 12px; color: var(--muted); }
+.msrwa-summary-grid strong { display: block; font-size: 25px; margin-top: 8px; font-variant-numeric: tabular-nums; }
 .msrwa-report-frame { display: block; width: 100%; height: 85vh; min-height: 460px; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
 .msrwa-event-list > div { display: flex; flex-wrap: wrap; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); overflow-wrap: anywhere; }
 .msrwa-event-list > div > span:nth-child(2) { flex: 1 1 240px; }

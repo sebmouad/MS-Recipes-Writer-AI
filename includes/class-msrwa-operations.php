@@ -29,6 +29,7 @@ final class MSRWA_Operations {
 		$id = absint( $_GET['run_id'] ?? 0 );
 		check_admin_referer( 'msrwa_job_report_' . $id );
 		$run = MSRWA_Run::get( $id );
+		if ( ! current_user_can( 'manage_options' ) ) { wp_die( 'Accès refusé.' ); }
 		if ( ! $run || ! MSRWA_Run::may_see( $run ) || ( ! current_user_can( 'msrwa_create' ) && ! current_user_can( 'manage_options' ) ) ) { wp_die( 'Accès refusé.' ); }
 		$state = MSRWA_Run::state( $id );
 		$state['artifacts']['brief'] = (array) json_decode( (string) $run['brief_json'], true );
@@ -73,8 +74,15 @@ final class MSRWA_Operations {
 		$days = max( 1, min( 365, absint( $_GET['days'] ?? 30 ) ) );
 		$since = gmdate( 'Y-m-d H:i:s', time() - $days * DAY_IN_SECONDS );
 		$where = $wpdb->prepare( 'r.created_at >= %s', $since );
-		echo '<div class="wrap msrwa-wrap"><h1>Analytics et diagnostics</h1><p>Générations commencées pendant la période (UTC). Coûts estimés, hors appariement initial des photographies. Les appels sans tarif ne sont pas gratuits.</p>';
+		echo '<div class="wrap msrwa-wrap"><h1>Statistiques</h1>';
 		MSRWA_Admin::navigation();
+		$summary = (array) $wpdb->get_row( "SELECT COUNT(*) AS jobs,SUM(r.status='running') AS active,SUM(r.status='failed') AS failed,SUM(r.cost_usd) AS cost,AVG(r.seconds) AS seconds FROM {$t['runs']} r WHERE $where", ARRAY_A );
+		echo '<div class="msrwa-summary-grid">';
+		foreach ( array( 'Jobs' => (int) ( $summary['jobs'] ?? 0 ), 'En cours' => (int) ( $summary['active'] ?? 0 ), 'Échecs' => (int) ( $summary['failed'] ?? 0 ), 'Coût estimé' => sprintf( '%.4f $', $summary['cost'] ?? 0 ), 'Temps moyen cumulé' => sprintf( '%.1f s', $summary['seconds'] ?? 0 ) ) as $label => $value ) {
+			echo '<div><span>' . esc_html( $label ) . '</span><strong>' . esc_html( $value ) . '</strong></div>';
+		}
+		echo '</div>';
+		echo '<details class="msrwa-metric-help"><summary>À propos des indicateurs</summary><p>Période basée sur le début des jobs, en UTC. Coûts estimés hors appariement. Les appels sans tarif restent signalés séparément.</p></details>';
 		echo '<form method="get"><input type="hidden" name="page" value="msrwa-operations"><label>Derniers jours <input type="number" name="days" min="1" max="365" value="' . esc_attr( $days ) . '"></label> <button class="button">Actualiser</button></form>';
 		self::table( 'Générations et verdicts', (array) $wpdb->get_results( "SELECT r.status, COUNT(*) AS generations, SUM(r.approved = 1) AS approuvees, SUM(r.draft_post_id > 0) AS brouillons, SUM(r.cost_usd) AS cout_usd, AVG(r.seconds) AS secondes_moyennes FROM {$t['runs']} r WHERE $where GROUP BY r.status", ARRAY_A ) );
 		self::table( 'Étapes : qualité, tentatives et latence', (array) $wpdb->get_results( "SELECT s.step, s.status, COUNT(*) AS executions, SUM(s.attempts) AS tentatives, SUM(s.passed) AS controles_reussis, SUM(s.total) AS controles_total, SUM(s.cost_usd) AS cout_usd, AVG(s.seconds) AS secondes_moyennes FROM {$t['steps']} s JOIN {$t['runs']} r ON r.id=s.run_id WHERE $where GROUP BY s.step,s.status", ARRAY_A ) );

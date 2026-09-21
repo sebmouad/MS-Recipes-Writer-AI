@@ -17,8 +17,10 @@ final class MSRWA_Plugin {
 	private static function caps() {
 		$admin = get_role( 'administrator' );
 		if ( $admin ) { foreach ( array( 'msrwa_create', 'msrwa_view_all' ) as $cap ) { $admin->add_cap( $cap ); } }
-		$editor = get_role( 'editor' );
-		if ( $editor ) { $editor->add_cap( 'msrwa_create' ); }
+		foreach ( array( 'editor', 'author', 'writer' ) as $name ) {
+			$role = get_role( $name );
+			if ( $role ) { $role->add_cap( 'msrwa_create' ); $role->add_cap( 'msrwa_view_own' ); $role->remove_cap( 'msrwa_view_all' ); }
+		}
 	}
 
 	public static function boot() {
@@ -31,7 +33,7 @@ final class MSRWA_Plugin {
 		add_action( 'msrwa_run_step', array( 'MSRWA_Run', 'tick' ) );
 		add_action( 'msrwa_cleanup', array( 'MSRWA_Run', 'recover_expired' ) );
 		if ( is_admin() ) { MSRWA_Admin::hooks(); }
-		if ( get_option( 'msrwa_db_version' ) !== MSRWA_VERSION ) { MSRWA_DB::install(); }
+		if ( get_option( 'msrwa_db_version' ) !== MSRWA_VERSION ) { MSRWA_DB::install(); self::caps(); }
 	}
 
 	public static function schedules( $schedules ) {

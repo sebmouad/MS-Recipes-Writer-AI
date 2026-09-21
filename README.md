@@ -2,6 +2,21 @@
 
 Plugin WordPress en construction pour la génération éditoriale culinaire orchestrée.
 
+## Version 0.3.3
+
+Accès globaux réservés aux administrateurs. Auteurs/rédacteurs et éditeurs
+voient uniquement leurs propres recettes et résultats, sans coûts ni détails
+techniques. Aides statistiques repliables pour alléger l’interface.
+
+Inspiration : [MS Cook Writer AI](https://github.com/sebmouad/MS-Cook-Writer-AI),
+révision `2c00d91`, uniquement pour l’interface : cartes de synthèse dans les
+statistiques. MS Recipes Writer conserve la rédaction multiple par lots,
+l’appariement des photos par recette et le suivi individuel de chaque job.
+Aucune modification du moteur, des prompts, des articles ou des images.
+La rédaction multiple affiche un aperçu des titres saisis ; le suivi du lot
+affiche des compteurs par état et une progression par recette actualisés
+automatiquement, avec des libellés français et des badges lisibles.
+
 ## Version 0.3.2
 
 Corrige l’erreur fatale `secret_for_save()` lors de l’enregistrement des clés.
@@ -34,7 +49,7 @@ cron réel et validité distante des clés restent à vérifier sur un site de t
 
 ## État actuel
 
-La version `0.3.2` est un socle installable : file persistante, pipeline de
+La version `0.3.3` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.
