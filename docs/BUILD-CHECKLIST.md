@@ -302,11 +302,14 @@ cost) in the task before changing anything.
   one call doing both may resolve a conflict silently instead of recording it;
   and since identical replays cache at 99.96%, a bigger replayed call pays more
   of the uncached remainder. The template stays in the repo, like `article_full`
-  before it.
-- [ ] **A33 — `recipe_outline` is under-specified.** Research alone returned only
-  2 of its 4 figures on the yassa where the merged variant returned 4. The
-  contract should say that a figure no source gives is null and that the model
-  must look for each one, rather than leaving them out.
+  before it. **Removed from the repository on the owner's decision, 2026-09-21;
+  the measurement above is the record.**
+- [x] **A33 — `recipe_outline` left holes (closed 2026-09-21).** Research returned
+  2 of its 4 figures on the yassa. Every key is now always present, the model
+  must look for each figure before giving up on it, and `null` is only for a
+  figure actually searched for and not found. Verified on both dishes: yassa
+  14/14 with `cook_minutes` honestly null, lamb 14/14 with all eight keys and all
+  four figures.
 
 - [~] **A4 — Review.** Written in English; findings must name the section to patch. *Original:* **A4 — Review.** Returns a boolean verdict plus findings that name the
   **section to patch**, never a full rewrite instruction.

@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.67` est un socle installable : file persistante, pipeline de
+La version `0.2.68` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.
@@ -20,6 +20,26 @@ Le plugin est en cours de refonte éditoriale et budgétaire :
 Les coûts affichés sont des estimations calculées avec le catalogue configuré,
 non une facture fournisseur. `completed` signifie que le traitement est terminé,
 jamais qu’un texte est validé éditorialement.
+
+## Version 0.2.68
+
+**`recipe_outline` ne laisse plus de trou.** Le contrat exigeait sept valeurs
+mais tolérait qu'elles disparaissent : sur le poulet yassa, la recherche n'en
+rendait que deux sur quatre. Les clés sont désormais **toujours présentes**, le
+modèle doit chercher chaque figure avant d'y renoncer — une page de recette
+donne presque toujours un nombre de parts et un temps de cuisson, et le total
+est la somme des deux quand les deux existent — et `null` ne s'écrit que pour une
+valeur réellement cherchée qu'aucune source ne donne.
+
+Vérifié sur les deux plats : poulet yassa **14/14**, `cook_minutes` à `null`
+honnêtement plutôt qu'omis ; souris d'agneau **14/14**, les huit clés présentes
+et les quatre figures trouvées.
+
+**L'approche fusionnée est retirée.** Le gabarit, l'étape de laboratoire, son
+score et ses tirages quittent le dépôt. La mesure qui l'a écartée reste dans
+l'historique des versions et dans `docs/BUILD-CHECKLIST.md` (A32) : 1,3 %
+d'économie pour 13 secondes de plus, et un échec de validation cinq fois plus
+cher à rejouer.
 
 ## Version 0.2.67
 

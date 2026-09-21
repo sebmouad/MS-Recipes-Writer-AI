@@ -11,22 +11,30 @@
     "dish_identity": {
       "name": "Poulet yassa sénégalais",
       "confidence": "élevée",
-      "evidence": "Les sources décrivent un plat sénégalais de poulet mariné avec des oignons et des agrumes, puis grillé ou doré et mijoté dans une sauce aux oignons; plusieurs sources le rattachent à la Casamance.",
-      "source_url": "https://www.saveur.com/article/recipes/yassa-poulet-grilled-chicken-caramelized-onion/"
+      "evidence": [
+        {
+          "claim": "Le titre identifie explicitement un plat sénégalais de poulet mariné aux agrumes, puis mijoté avec beaucoup d’oignons.",
+          "source_url": "https://www.saveur.com/article/recipes/yassa-poulet-grilled-chicken-caramelized-onion/"
+        },
+        {
+          "claim": "Le yassa est associé à la Casamance et est généralement servi avec du riz blanc.",
+          "source_url": "https://www.ifad.org/en/w/recipes-for-change/senegal-poulet-yassa"
+        }
+      ]
     },
     "recipe_outline": {
-      "servings": 4,
-      "prep_minutes": null,
+      "servings": 6,
+      "prep_minutes": 240,
       "cook_minutes": null,
       "total_minutes": 290,
       "category": "plat principal",
       "cuisine": "sénégalaise",
-      "difficulty": "intermédiaire",
+      "difficulty": "facile",
       "source_url": "https://www.saveur.com/article/recipes/yassa-poulet-grilled-chicken-caramelized-onion/"
     },
     "ingredients": [
       {
-        "name": "cuisses et pilons de poulet avec os et peau",
+        "name": "poulet en morceaux",
         "quantity": "2",
         "unit": "lb",
         "role": "protéine principale",
@@ -35,17 +43,49 @@
       },
       {
         "name": "oignons jaunes",
-        "quantity": "2",
-        "unit": "gros",
-        "role": "base sucrée de la sauce",
+        "quantity": "2 grands",
+        "unit": null,
+        "role": "base sucrée et sauce",
         "essential": true,
+        "source_url": "https://www.saveur.com/article/recipes/yassa-poulet-grilled-chicken-caramelized-onion/"
+      },
+      {
+        "name": "jus de citron ou de citron vert",
+        "quantity": "1/3",
+        "unit": "tasse",
+        "role": "acidité de la marinade",
+        "essential": true,
+        "source_url": "https://www.saveur.com/article/recipes/yassa-poulet-grilled-chicken-caramelized-onion/"
+      },
+      {
+        "name": "vinaigre de cidre",
+        "quantity": "1/3",
+        "unit": "tasse",
+        "role": "acidité et équilibre",
+        "essential": false,
         "source_url": "https://www.saveur.com/article/recipes/yassa-poulet-grilled-chicken-caramelized-onion/"
       },
       {
         "name": "ail",
         "quantity": "6",
         "unit": "gousses",
-        "role": "aromatique de la marinade",
+        "role": "aromatique",
+        "essential": false,
+        "source_url": "https://www.saveur.com/article/recipes/yassa-poulet-grilled-chicken-caramelized-onion/"
+      },
+      {
+        "name": "gingembre frais",
+        "quantity": "2",
+        "unit": "cuillères à soupe",
+        "role": "aromatique piquant",
+        "essential": false,
+        "source_url": "https://www.saveur.com/article/recipes/yassa-poulet-grilled-chicken-caramelized-onion/"
+      },
+      {
+        "name": "piment fort",
+        "quantity": "1",
+        "unit": "piment Scotch bonnet",
+        "role": "chaleur",
         "essential": false,
         "source_url": "https://www.saveur.com/article/recipes/yassa-poulet-grilled-chicken-caramelized-onion/"
       },
@@ -58,43 +98,11 @@
         "source_url": "https://www.saveur.com/article/recipes/yassa-poulet-grilled-chicken-caramelized-onion/"
       },
       {
-        "name": "vinaigre de cidre",
-        "quantity": "1/3",
-        "unit": "tasse",
-        "role": "acidité de la marinade",
-        "essential": false,
-        "source_url": "https://www.saveur.com/article/recipes/yassa-poulet-grilled-chicken-caramelized-onion/"
-      },
-      {
-        "name": "jus et zeste de citron vert",
-        "quantity": "1/3 tasse de jus et 1 c. à soupe de zeste",
-        "unit": null,
-        "role": "acidité et parfum",
+        "name": "huile d’arachide ou huile végétale",
+        "quantity": "2",
+        "unit": "cuillères à soupe",
+        "role": "brunissage et cuisson",
         "essential": true,
-        "source_url": "https://www.saveur.com/article/recipes/yassa-poulet-grilled-chicken-caramelized-onion/"
-      },
-      {
-        "name": "gingembre frais",
-        "quantity": "2",
-        "unit": "c. à soupe",
-        "role": "chaleur aromatique",
-        "essential": false,
-        "source_url": "https://www.saveur.com/article/recipes/yassa-poulet-grilled-chicken-caramelized-onion/"
-      },
-      {
-        "name": "piment Scotch bonnet, poivre noir et piment de Cayenne",
-        "quantity": "1 piment, 2 c. à café de poivre et 1 c. à café de Cayenne",
-        "unit": null,
-        "role": "piquant et assaisonnement",
-        "essential": false,
-        "source_url": "https://www.saveur.com/article/recipes/yassa-poulet-grilled-chicken-caramelized-onion/"
-      },
-      {
-        "name": "huile d'arachide ou huile végétale",
-        "quantity": "2",
-        "unit": "c. à soupe, plus un peu pour badigeonner",
-        "role": "dorage du poulet",
-        "essential": false,
         "source_url": "https://www.saveur.com/article/recipes/yassa-poulet-grilled-chicken-caramelized-onion/"
       },
       {
@@ -109,80 +117,72 @@
     "preparation": [
       {
         "step": 1,
-        "action": "Mélanger les oignons, l'ail, la carotte, le vinaigre, le jus et le zeste de citron vert, le gingembre, le piment, les poivres, le laurier et le sel avec le poulet.",
-        "cue": "Le poulet est entièrement enrobé de marinade.",
-        "minutes": null,
-        "temperature_c": null,
-        "source_url": "https://www.saveur.com/article/recipes/yassa-poulet-grilled-chicken-caramelized-onion/"
-      },
-      {
-        "step": 2,
-        "action": "Couvrir et réfrigérer en retournant occasionnellement le poulet.",
-        "cue": "La marinade a reposé au froid pendant au moins 4 heures.",
-        "minutes": 240,
-        "temperature_c": null,
-        "source_url": "https://www.saveur.com/article/recipes/yassa-poulet-grilled-chicken-caramelized-onion/"
-      },
-      {
-        "step": 3,
-        "action": "Retirer le poulet et filtrer la marinade en séparant les solides du liquide.",
-        "cue": "Les oignons et autres aromates sont séparés du liquide réservé.",
-        "minutes": null,
-        "temperature_c": null,
-        "source_url": "https://www.saveur.com/article/recipes/yassa-poulet-grilled-chicken-caramelized-onion/"
-      },
-      {
-        "step": 4,
-        "action": "Chauffer l'huile à feu moyen-vif et dorer le poulet en plusieurs fois.",
-        "cue": "Les deux faces sont dorées.",
-        "minutes": null,
-        "temperature_c": null,
-        "source_url": "https://www.saveur.com/article/recipes/yassa-poulet-grilled-chicken-caramelized-onion/"
-      },
-      {
-        "step": 5,
-        "action": "Retirer le poulet, ajouter le piment de la Jamaïque et le cuire jusqu'à ce qu'il soit parfumé.",
-        "cue": "Le piment de la Jamaïque devient odorant.",
-        "minutes": 2,
-        "temperature_c": null,
-        "source_url": "https://www.saveur.com/article/recipes/yassa-poulet-grilled-chicken-caramelized-onion/"
-      },
-      {
-        "step": 6,
-        "action": "Ajouter les solides filtrés de la marinade et les cuire en remuant.",
-        "cue": "Les oignons sont ramollis.",
+        "action": "Mélanger les oignons, l’ail, la carotte, l’acide choisi, le gingembre, le piment, le poivre, le piment de Cayenne, le laurier et le sel avec le poulet.",
+        "cue": "Tous les morceaux de poulet sont enrobés de marinade.",
         "minutes": 5,
         "temperature_c": null,
         "source_url": "https://www.saveur.com/article/recipes/yassa-poulet-grilled-chicken-caramelized-onion/"
       },
       {
-        "step": 7,
-        "action": "Remettre le poulet dans la marmite et verser le liquide de marinade filtré.",
-        "cue": "Le poulet est entouré de liquide et d'aromates.",
-        "minutes": null,
+        "step": 2,
+        "action": "Couvrir et réfrigérer la marinade.",
+        "cue": "Le poulet a mariné au moins 4 heures; une marinade durant la nuit est également documentée.",
+        "minutes": 240,
+        "temperature_c": 4,
+        "source_url": "https://www.saveur.com/article/recipes/yassa-poulet-grilled-chicken-caramelized-onion/"
+      },
+      {
+        "step": 3,
+        "action": "Retirer le poulet et filtrer la marinade en séparant les solides du liquide.",
+        "cue": "Les morceaux de poulet, les solides et le liquide sont réservés séparément.",
+        "minutes": 5,
         "temperature_c": null,
+        "source_url": "https://www.saveur.com/article/recipes/yassa-poulet-grilled-chicken-caramelized-onion/"
+      },
+      {
+        "step": 4,
+        "action": "Chauffer l’huile et faire dorer le poulet en plusieurs fois.",
+        "cue": "Les deux faces sont dorées.",
+        "minutes": 16,
+        "temperature_c": null,
+        "source_url": "https://www.saveur.com/article/recipes/yassa-poulet-grilled-chicken-caramelized-onion/"
+      },
+      {
+        "step": 5,
+        "action": "Faire revenir brièvement le piment de la Jamaïque, puis cuire les solides de la marinade.",
+        "cue": "Le piment est parfumé et les oignons sont ramollis.",
+        "minutes": 7,
+        "temperature_c": null,
+        "source_url": "https://www.saveur.com/article/recipes/yassa-poulet-grilled-chicken-caramelized-onion/"
+      },
+      {
+        "step": 6,
+        "action": "Remettre le poulet dans la cocotte, ajouter le liquide de marinade, porter à ébullition puis réduire à frémissement.",
+        "cue": "Le liquide bout puis mijote doucement.",
+        "minutes": 2,
+        "temperature_c": null,
+        "source_url": "https://www.saveur.com/article/recipes/yassa-poulet-grilled-chicken-caramelized-onion/"
+      },
+      {
+        "step": 7,
+        "action": "Couvrir et mijoter jusqu’à ce que le poulet soit tendre et cuit.",
+        "cue": "Le poulet est tendre et atteint 74 °C à cœur.",
+        "minutes": 30,
+        "temperature_c": 74,
         "source_url": "https://www.saveur.com/article/recipes/yassa-poulet-grilled-chicken-caramelized-onion/"
       },
       {
         "step": 8,
-        "action": "Porter à ébullition, réduire à frémissement, couvrir et cuire en remuant occasionnellement.",
-        "cue": "Le poulet est tendre et complètement cuit.",
-        "minutes": 30,
-        "temperature_c": null,
-        "source_url": "https://www.saveur.com/article/recipes/yassa-poulet-grilled-chicken-caramelized-onion/"
-      },
-      {
-        "step": 9,
-        "action": "Retirer le poulet puis réduire la sauce à découvert à feu moyen-vif.",
-        "cue": "Le liquide est presque entièrement évaporé et les oignons sont légèrement caramélisés.",
+        "action": "Retirer le poulet, réduire la sauce à découvert, puis la verser sur le poulet.",
+        "cue": "Le liquide est presque évaporé et les oignons sont légèrement caramélisés.",
         "minutes": 20,
         "temperature_c": null,
         "source_url": "https://www.saveur.com/article/recipes/yassa-poulet-grilled-chicken-caramelized-onion/"
       },
       {
-        "step": 10,
-        "action": "Rectifier le sel et le poivre, verser la sauce sur le poulet et servir chaud.",
-        "cue": "La sauce nappe le poulet et les oignons sont fondants.",
+        "step": 9,
+        "action": "Servir chaud avec du riz blanc.",
+        "cue": "La sauce aux oignons nappe le poulet et le riz.",
         "minutes": null,
         "temperature_c": null,
         "source_url": "https://www.saveur.com/article/recipes/yassa-poulet-grilled-chicken-caramelized-onion/"
@@ -190,149 +190,133 @@
     ],
     "substitutions": [
       {
-        "ingredient": "huile d'arachide",
+        "ingredient": "huile d’arachide",
         "replacement": "huile végétale",
-        "note": "Saveur documente l'utilisation de l'une ou l'autre huile.",
+        "note": "La source autorise l’huile d’arachide ou l’huile végétale.",
         "source_url": "https://www.saveur.com/article/recipes/yassa-poulet-grilled-chicken-caramelized-onion/"
       },
       {
-        "ingredient": "berbéré",
-        "replacement": "épices à steak",
-        "note": "Ricardo propose cette substitution dans une autre version du yassa.",
-        "source_url": "https://www.ricardocuisine.com/recettes/6771-poulet-yassa-de-boucar-diouf"
+        "ingredient": "piment Scotch bonnet",
+        "replacement": "autre piment fort",
+        "note": "Une recette Food Network indique qu’un autre piment fort peut remplacer le habanero.",
+        "source_url": "https://www.foodnetwork.com/recipes/senegalese-chicken-yassa-recipe-1964241"
       }
     ],
     "accompaniments": [
       {
         "name": "riz blanc cuit",
-        "note": "Saveur sert le poulet yassa chaud avec du riz blanc.",
-        "source_url": "https://www.saveur.com/article/recipes/yassa-poulet-grilled-chicken-caramelized-onion/"
-      },
-      {
-        "name": "riz basmati",
-        "note": "Ricardo sert sa version avec du riz basmati.",
-        "source_url": "https://www.ricardocuisine.com/recettes/6771-poulet-yassa-de-boucar-diouf"
-      },
-      {
-        "name": "banane ou igname bouilli",
-        "note": "Meilleur du Chef documente ces accompagnements en plus du riz blanc.",
-        "source_url": "https://www.meilleurduchef.com/fr/recette/poulet-yassa.html"
+        "note": "Le poulet yassa est servi chaud sur ou avec du riz blanc.",
+        "source_url": "https://www.foodnetwork.com/recipes/senegalese-chicken-yassa-recipe-1964241"
       }
     ],
     "common_failures": [
       {
-        "problem": "Poulet insuffisamment cuit",
-        "cause": "La cuisson visuelle seule ne garantit pas la sécurité.",
-        "remedy": "Vérifier 74 °C au cœur avec un thermomètre.",
-        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/leftovers-and-food-safety"
-      },
-      {
-        "problem": "Poulet qui ne dore pas",
-        "cause": "La marmite est trop chargée.",
-        "remedy": "Dorer les morceaux en plusieurs fois.",
+        "problem": "Poulet pâle ou peu savoureux",
+        "cause": "Les morceaux n’ont pas été suffisamment dorés avant le mijotage.",
+        "remedy": "Les faire dorer en plusieurs fois jusqu’à obtenir une coloration brune sur les deux faces.",
         "source_url": "https://www.saveur.com/article/recipes/yassa-poulet-grilled-chicken-caramelized-onion/"
       },
       {
         "problem": "Oignons encore fermes",
-        "cause": "La réduction est arrêtée avant qu'ils soient ramollis et légèrement caramélisés.",
-        "remedy": "Poursuivre la cuisson jusqu'à évaporation presque complète du liquide.",
+        "cause": "La cuisson des oignons a été interrompue trop tôt.",
+        "remedy": "Les cuire jusqu’à ce qu’ils soient ramollis, puis poursuivre la réduction à découvert jusqu’à légère caramélisation.",
         "source_url": "https://www.saveur.com/article/recipes/yassa-poulet-grilled-chicken-caramelized-onion/"
       },
       {
-        "problem": "Contamination croisée",
-        "cause": "La marinade ayant touché le poulet cru est réutilisée sans cuisson.",
-        "remedy": "Faire bouillir et cuire la marinade avant de la servir comme sauce.",
-        "source_url": "https://www.fda.gov/consumers/consumer-updates/barbecue-basics-tips-prevent-foodborne-illness"
+        "problem": "Poulet insuffisamment cuit",
+        "cause": "La durée seule ne garantit pas la cuisson selon la taille des morceaux.",
+        "remedy": "Vérifier une température interne minimale de 74 °C avec un thermomètre.",
+        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/poultry/poultry-basting-brining-and-marinating"
+      },
+      {
+        "problem": "Sauce trop liquide",
+        "cause": "La réduction finale n’a pas été menée assez longtemps.",
+        "remedy": "Retirer le poulet et cuire la sauce à découvert jusqu’à évaporation presque complète.",
+        "source_url": "https://www.saveur.com/article/recipes/yassa-poulet-grilled-chicken-caramelized-onion/"
       }
     ],
     "storage": [
       {
-        "method": "Réfrigération",
+        "method": "réfrigération",
         "duration": "3 à 4 jours",
-        "note": "Réfrigérer rapidement dans des contenants peu profonds et couverts.",
-        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/leftovers-and-food-safety"
+        "note": "Réfrigérer rapidement les restes dans des contenants peu profonds.",
+        "source_url": "https://www.fsis.usda.gov/food-safety/food-safety-basics/leftovers-and-food-safety"
       },
       {
-        "method": "Congélation",
+        "method": "congélation",
         "duration": "3 à 4 mois",
-        "note": "La congélation est documentée pour les restes; la qualité diminue avec le temps.",
-        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/leftovers-and-food-safety"
+        "note": "Les restes peuvent être congelés; les réchauffer à 74 °C.",
+        "source_url": "https://www.fsis.usda.gov/food-safety/food-safety-basics/leftovers-and-food-safety"
       }
     ],
     "food_safety": [
       {
-        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/leftovers-and-food-safety",
-        "text": "Cuire toute volaille à une température interne minimale de 74 °C."
+        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/poultry/poultry-basting-brining-and-marinating",
+        "text": "Mariner le poulet couvert au réfrigérateur, jamais à température ambiante."
       },
       {
-        "source_url": "https://www.fda.gov/consumers/consumer-updates/barbecue-basics-tips-prevent-foodborne-illness",
-        "text": "Mariner le poulet au réfrigérateur et ne pas réutiliser sans cuisson une marinade ayant touché le poulet cru."
+        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/poultry/poultry-basting-brining-and-marinating",
+        "text": "Une marinade ayant touché du poulet cru doit être portée à ébullition avant d’être utilisée comme sauce."
       },
       {
-        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/leftovers-and-food-safety",
-        "text": "Réfrigérer les restes dans les 2 heures, ou dans l'heure si la température ambiante dépasse 32 °C."
+        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/poultry/poultry-basting-brining-and-marinating",
+        "text": "Le poulet doit atteindre une température interne minimale de 74 °C."
       },
       {
-        "source_url": "https://www.fda.gov/consumers/consumer-updates/barbecue-basics-tips-prevent-foodborne-illness",
-        "text": "Réchauffer les restes jusqu'à 74 °C."
+        "source_url": "https://www.fsis.usda.gov/food-safety/food-safety-basics/leftovers-and-food-safety",
+        "text": "Réfrigérer les restes dans les 2 heures suivant la cuisson, ou dans l’heure si la température ambiante dépasse 32 °C."
       }
     ],
     "references": [
       {
         "url": "https://www.saveur.com/article/recipes/yassa-poulet-grilled-chicken-caramelized-onion/",
-        "title": "Chicken Yassa Recipe",
+        "title": "Chicken Yassa",
         "publisher": "Saveur"
       },
       {
-        "url": "https://www.ricardocuisine.com/recettes/6771-poulet-yassa-de-boucar-diouf",
-        "title": "Poulet yassa de Boucar Diouf",
-        "publisher": "Ricardo"
+        "url": "https://www.ifad.org/en/w/recipes-for-change/senegal-poulet-yassa",
+        "title": "Senegal: Poulet yassa",
+        "publisher": "Fonds international de développement agricole"
       },
       {
-        "url": "https://www.cuisineculinaire.com/yassa-au-poulet-recette-senegalaise/",
-        "title": "Yassa au poulet",
-        "publisher": "Cuisine Culinaire"
+        "url": "https://www.foodnetwork.com/recipes/senegalese-chicken-yassa-recipe-1964241",
+        "title": "Senegalese Chicken Yassa",
+        "publisher": "Food Network"
       },
       {
-        "url": "https://www.meilleurduchef.com/fr/recette/poulet-yassa.html",
-        "title": "Poulet Yassa",
-        "publisher": "Meilleur du Chef"
+        "url": "https://www.foodnetwork.com/recipes/senegalese-yassa-17648867",
+        "title": "Senegalese Yassa Poulet",
+        "publisher": "Food Network"
       },
       {
-        "url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/leftovers-and-food-safety",
+        "url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/poultry/poultry-basting-brining-and-marinating",
+        "title": "Poultry: Basting, Brining, and Marinating",
+        "publisher": "USDA Food Safety and Inspection Service"
+      },
+      {
+        "url": "https://www.fsis.usda.gov/food-safety/food-safety-basics/leftovers-and-food-safety",
         "title": "Leftovers and Food Safety",
-        "publisher": "USDA FSIS"
-      },
-      {
-        "url": "https://www.fda.gov/consumers/consumer-updates/barbecue-basics-tips-prevent-foodborne-illness",
-        "title": "Barbecue Basics: Tips to Prevent Foodborne Illness",
-        "publisher": "U.S. Food and Drug Administration"
+        "publisher": "USDA Food Safety and Inspection Service"
       }
     ],
     "visual_references": [
       {
         "image_url": "https://www.saveur.com/uploads/2012/08/HR-2022-Summer-SIP-Senegalese-Style-Grilled-Chicken-with-Caramelized-Onions-recipe-saveur-8-scaled.jpg?format=auto&optimize=high&width=1440",
         "source_url": "https://www.saveur.com/article/recipes/yassa-poulet-grilled-chicken-caramelized-onion/",
-        "title": "Senegalese Style Grilled Chicken with Caramelized Onions",
+        "title": "Chicken Yassa",
         "tier": 1
       },
       {
-        "image_url": "https://images.ricardocuisine.com/services/recipes/1325218637551998aec7b10.jpg",
-        "source_url": "https://www.ricardocuisine.com/recettes/6771-poulet-yassa-de-boucar-diouf",
-        "title": "Poulet yassa de Boucar Diouf",
+        "image_url": "https://food.fnr.sndimg.com/content/dam/images/food/fullset/2023/11/QK910-kardea-brown-senegalese-yassa_s4x3.jpg.rend.hgtvcom.826.620.suffix/1698846172102.webp",
+        "source_url": "https://www.foodnetwork.com/recipes/senegalese-yassa-17648867",
+        "title": "Senegalese Yassa Poulet",
         "tier": 1
       },
       {
-        "image_url": "https://www.cuisineculinaire.com/wp-content/uploads/2017/05/Yassa-au-poulet.jpg",
-        "source_url": "https://www.cuisineculinaire.com/yassa-au-poulet-recette-senegalaise/",
-        "title": "Yassa au poulet",
+        "image_url": "https://upload.wikimedia.org/wikipedia/commons/c/cb/Poulet_Yassa.JPG",
+        "source_url": "https://commons.wikimedia.org/wiki/File:Poulet_Yassa.JPG",
+        "title": "Poulet Yassa",
         "tier": 1
-      },
-      {
-        "image_url": "https://files.meilleurduchef.com/mdc/photo/recette/poulet-yassa/poulet-yassa-etape-1-160.jpg",
-        "source_url": "https://www.meilleurduchef.com/fr/recette/poulet-yassa.html",
-        "title": "Poulet Yassa - étape photographiée",
-        "tier": 2
       }
     ],
     "visual_observations": [
@@ -340,123 +324,58 @@
         "image_url": "https://www.saveur.com/uploads/2012/08/HR-2022-Summer-SIP-Senegalese-Style-Grilled-Chicken-with-Caramelized-Onions-recipe-saveur-8-scaled.jpg?format=auto&optimize=high&width=1440",
         "source_url": "https://www.saveur.com/article/recipes/yassa-poulet-grilled-chicken-caramelized-onion/",
         "observable_details": [
-          "Une grande assiette ovale claire contient plusieurs morceaux de viande brunis, avec des zones foncées et luisantes.",
-          "De nombreuses lamelles translucides brun doré sont réparties sur et autour des morceaux.",
-          "Des morceaux orange sont visibles entre les morceaux de viande et les lamelles.",
-          "Une fourchette métallique décorée repose en diagonale sur l’assiette, de la zone centrale vers l’angle supérieur droit.",
-          "Le bord d’un autre récipient contenant des grains blancs est visible dans l’angle inférieur gauche.",
-          "L’assiette est posée sur une surface composée de carreaux clairs aux joints visibles."
+          "Une grande assiette claire contient plusieurs morceaux brunis, avec des surfaces dorées à très foncées.",
+          "Des lamelles pâles à brunâtres sont réparties sur et autour des morceaux.",
+          "Des morceaux orange sont visibles entre les éléments principaux.",
+          "Une fourchette métallique décorée repose en diagonale sur l’assiette, de la zone centrale vers le coin supérieur droit.",
+          "Un petit bord de récipient contenant des grains blancs apparaît dans l’angle inférieur gauche.",
+          "L’assiette est posée sur une surface composée de carreaux clairs avec des joints visibles."
         ],
-        "composition": [
-          "La photographie est cadrée en vue principalement plongeante.",
-          "L’assiette occupe la majeure partie de l’image.",
-          "Les aliments sont concentrés au centre et dans la moitié inférieure de l’assiette.",
-          "La fourchette traverse la partie supérieure de la composition en diagonale.",
-          "Le bord de l’assiette et le carrelage restent visibles autour des aliments."
-        ],
-        "couleurs": [
-          "Brun foncé à presque noir sur certaines surfaces des morceaux.",
-          "Brun doré et beige sur les lamelles et les zones non foncées.",
-          "Orange vif à orange-brun sur les morceaux dispersés.",
-          "Blanc cassé et gris clair pour l’assiette et le carrelage.",
-          "Argenté et cuivré sur la fourchette, avec des reflets lumineux.",
-          "Blanc cassé pour les grains visibles dans le récipient partiel."
-        ],
-        "textures": [
-          "Les surfaces des morceaux paraissent rôties, irrégulières et brillantes.",
-          "Certaines zones présentent des marques ou plaques très foncées.",
-          "Les lamelles sont souples, translucides et légèrement brillantes.",
-          "Les morceaux orange ont des contours irréguliers et des surfaces lisses à légèrement granuleuses.",
-          "L’assiette présente une surface mate avec de petites marques et des traces brunâtres.",
-          "Le carrelage montre des joints, des taches et des bords usés."
-        ],
-        "incertainties": [
-          "La nature exacte des morceaux brunis et des éléments orange ne peut pas être confirmée uniquement par la photographie.",
-          "La préparation, les ingrédients non visibles et les quantités ne sont pas déterminables.",
-          "La couleur très foncée de certaines zones peut correspondre à une coloration de surface, à des marques de cuisson ou à des ombres."
-        ]
-      },
-      {
-        "image_url": "https://images.ricardocuisine.com/services/recipes/1325218637551998aec7b10.jpg",
-        "source_url": "https://www.ricardocuisine.com/recettes/6771-poulet-yassa-de-boucar-diouf",
-        "observable_details": [
-          "Une grande assiette creuse verte occupe la majeure partie de l’image.",
-          "Elle contient une portion de grains blancs allongés, avec des morceaux dorés à brunâtres et des bandes rouges et vertes.",
-          "Des lamelles translucides jaune pâle sont visibles parmi les morceaux dorés et colorés.",
-          "Une seconde assiette partiellement visible apparaît dans l’angle supérieur gauche.",
-          "Plusieurs quartiers verts à chair jaune pâle sont disposés sur la table, près du bord supérieur.",
-          "La scène est photographiée sur une surface en bois brun."
-        ],
-        "composition": "Vue rapprochée en plongée oblique. L’assiette principale est centrée vers le bas et la droite, tandis que l’assiette secondaire et les quartiers verts sont partiellement coupés par les bords de l’image. Les grains blancs forment un amas au centre de l’assiette principale, avec les autres éléments disposés autour et par-dessus.",
-        "couleurs": [
-          "Vert olive et vert clair pour l’assiette",
-          "Blanc et crème pour les grains",
-          "Brun doré et orange pour les morceaux",
-          "Rouge vif et vert foncé pour les bandes",
-          "Jaune pâle et vert pour les quartiers",
-          "Brun moyen à foncé pour la surface en bois"
-        ],
-        "textures": [
-          "Les grains paraissent séparés, irréguliers et légèrement brillants.",
-          "Les morceaux dorés présentent des surfaces striées et ponctuées de petites marques sombres.",
-          "Les bandes rouges et vertes ont des bords lisses et une surface brillante.",
-          "Les lamelles pâles paraissent souples et translucides.",
-          "L’assiette présente une texture fine, granuleuse et légèrement brillante.",
-          "La surface en bois montre des veines longitudinales visibles."
-        ],
-        "incertitudes": [
-          "Les éléments exacts visibles dans l’assiette ne peuvent pas être identifiés avec certitude à partir de la photographie seule.",
-          "La quantité totale et le contenu des parties masquées ou hors champ ne sont pas observables.",
-          "La nature précise des quartiers verts et des différents morceaux n’est pas certaine."
-        ]
-      },
-      {
-        "image_url": "https://www.cuisineculinaire.com/wp-content/uploads/2017/05/Yassa-au-poulet.jpg",
-        "source_url": "https://www.cuisineculinaire.com/yassa-au-poulet-recette-senegalaise/",
-        "observable_details": [
-          "Une assiette blanche à liseré bleu contient une grande portion de grains blancs.",
-          "Au centre se trouvent plusieurs morceaux dorés et brunis, dont un morceau avec une partie sombre et croustillée.",
-          "Des lamelles translucides brun clair entourent et recouvrent partiellement les morceaux centraux.",
-          "Des quartiers d’agrume vert sont visibles près du centre et au premier plan.",
-          "Des feuilles vertes sont dispersées sur les aliments.",
-          "Une cuillère blanche est posée en diagonale au-dessus de l’assiette.",
-          "Une table brune et des éléments de vaisselle blanche apparaissent en arrière-plan."
-        ],
-        "composition": "Photographie rapprochée en plongée partielle, centrée sur l’assiette. Les aliments occupent la majeure partie de l’image, avec la cuillère en diagonale dans la partie supérieure.",
+        "composition": {
+          "cadrage": "Vue rapprochée légèrement plongeante, centrée sur l’assiette.",
+          "disposition": "Les aliments occupent principalement la moitié supérieure et la zone centrale de l’assiette, tandis que la fourchette traverse la partie supérieure.",
+          "arrière_plan": "Carrelage clair visible autour de l’assiette.",
+          "éléments_partiellement_coupés": "Plusieurs morceaux et le récipient de grains blancs sont coupés par les bords de l’image."
+        },
         "colours": [
-          "Blanc et crème pour l’assiette et les grains.",
-          "Brun doré et ambre pour les lamelles et les morceaux centraux.",
-          "Brun très foncé à noir sur les surfaces fortement brunies.",
-          "Vert vif pour les quartiers d’agrume et les feuilles.",
-          "Brun moyen à foncé pour la table."
+          "Brun doré",
+          "Brun foncé à presque noir",
+          "Orange",
+          "Beige et crème",
+          "Argent métallique",
+          "Blanc cassé et gris clair"
         ],
         "textures": [
-          "Les grains paraissent séparés et légèrement brillants.",
-          "Les lamelles semblent souples, luisantes et translucides.",
-          "Les morceaux centraux présentent des surfaces irrégulières, brunies et partiellement sombres.",
-          "Les feuilles ont des bords dentelés et une texture visuellement fraîche.",
-          "La vaisselle paraît lisse et mate à légèrement brillante.",
-          "La table présente un aspect granuleux avec des variations de veinage."
+          "Surfaces brillantes et huileuses visibles sur plusieurs morceaux.",
+          "Zones rissolées ou fortement brunies.",
+          "Lamelles souples d’apparence humide.",
+          "Assiette mate avec de légères marques et taches.",
+          "Carreaux présentant des joints irréguliers, des fissures et des traces d’usure.",
+          "Fourchette métallique réfléchissante avec un manche ornementé."
         ],
         "uncertainties": [
-          "La nature exacte des morceaux centraux, des lamelles, des feuilles et des quartiers verts ne peut pas être déterminée uniquement à partir de l’image.",
-          "La photographie est légèrement floue par endroits, notamment vers les bords et l’arrière-plan.",
-          "La quantité réelle de chaque élément et leur mode de préparation ne sont pas observables."
+          "La nature exacte des morceaux et des éléments visibles ne peut pas être déterminée avec certitude à partir de la photographie seule.",
+          "La quantité réelle d’aliments n’est pas déterminable précisément, car une partie est masquée ou hors cadre.",
+          "Les couleurs et l’aspect de surface peuvent être influencés par l’éclairage et les reflets."
         ]
       }
     ],
     "uncertainties": [
-      "Les sources divergent fortement sur la marinade: Saveur utilise vinaigre de cidre et citron vert avec une marinade de 4 heures, tandis que d'autres recettes utilisent citron, moutarde et une macération de 10 minutes à une nuit.",
-      "Les sources divergent sur la viande: Saveur emploie des cuisses et pilons avec os, alors que Ricardo utilise des poitrines désossées.",
-      "La température de cuisson de la marmite n'est pas chiffrée dans la recette principale.",
-      "La recette Saveur ne donne pas de temps de préparation actif distinct du temps total.",
-      "La durée de congélation spécifique au plat n'est pas donnée par Ricardo; la durée indiquée provient des recommandations USDA pour les restes de volaille."
+      "Les sources divergent sur l’agrume: Saveur utilise le citron vert, tandis que Food Network et IFAD utilisent le citron.",
+      "La durée de marinade varie de 2 heures à 4 heures, 6 heures ou une nuit selon la source.",
+      "Les versions divergent sur les ingrédients secondaires: carotte, olives, vinaigre, ail, gingembre et moutarde ne figurent pas tous dans chaque recette.",
+      "Les méthodes divergent entre grillade ou cuisson au gril, brunissage à la poêle et braisage direct.",
+      "La source Saveur annonce 4 heures 50 minutes au total mais ne fournit pas de durée globale de cuisson séparée; cook_minutes est donc null.",
+      "Le rendement varie selon les sources entre 4, 4 à 6 et 6 portions.",
+      "Image non analysée : image HTTP 403",
+      "Image non analysée : image HTTP 429"
     ],
     "originality_notes": [
-      "Les quantités et étapes ont été reformulées en français sans recopier la prose des sources.",
-      "Aucune quantité ou substitution non documentée n'a été ajoutée.",
-      "Les observations visuelles ont volontairement été laissées vides conformément au protocole de vérification des fichiers image.",
-      "Les images citées sont des photographies publiées sur les pages sources; aucune image générée, composée ou créée pour cette tâche n'a été utilisée."
+      "Les quantités et étapes ont été conservées comme variantes documentées plutôt que moyennées.",
+      "Aucune quantité absente des sources n’a été inventée.",
+      "Les photographies citées sont des images publiques existantes provenant de trois domaines distincts.",
+      "visual_observations est volontairement vide conformément à la consigne; aucune caractéristique visuelle n’a été déduite des images ou des vignettes.",
+      "Les substitutions et accompagnements ne reprennent que les possibilités explicitement documentées par les sources."
     ]
   },
   "canonical": {

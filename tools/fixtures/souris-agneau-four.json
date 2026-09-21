@@ -9,99 +9,82 @@
   },
   "research": {
     "dish_identity": {
-      "name": "Souris d’agneau braisées au four, oignons grelots et ail confit",
+      "name": "Souris d’agneau braisées et confites au four, oignons grelots et ail confit",
       "confidence": "élevée",
-      "evidence": "Le brief décrit des souris d’agneau cuites longuement au four avec oignons grelots, ail en chemise et liquide de cuisson, une préparation documentée par 750g et rapprochée des versions de souris d’agneau confites de Marmiton.",
-      "source_url": "https://www.750g.com/souris-dagneau-confites-r93428.htm"
+      "evidence": "Le brief correspond à une cuisson longue de souris d’agneau avec ail en chemise, oignons grelots, liquide de braisage et finition au four. 750g documente quatre souris, vingt oignons grelots, sept à huit gousses d’ail, du vin blanc et une cuisson à 160 °C ; La Petite Cuisine de Nat documente l’ail confit, le vin ou l’eau, la cuisson couverte puis découverte et la viande qui se détache de l’os. Sources : https://www.750g.com/souris-dagneau-confites-r93428.htm ; https://www.lapetitecuisinedenat.com/2017/11/souris-dagneau-confites.html"
     },
     "recipe_outline": {
       "servings": 4,
       "prep_minutes": 10,
       "cook_minutes": 125,
       "total_minutes": 135,
-      "category": "plat principal mijoté",
-      "cuisine": "française",
-      "difficulty": "facile",
+      "category": "Plat principal",
+      "cuisine": "Française",
+      "difficulty": "Facile",
       "source_url": "https://www.marmiton.org/recettes/recette_souris-d-agneau-au-miel-et-thym_93493.aspx"
     },
     "ingredients": [
       {
         "name": "souris d’agneau",
-        "quantity": 4,
+        "quantity": "4",
         "unit": "pièces",
-        "role": "élément principal braisé",
+        "role": "pièce principale à confire",
         "essential": true,
-        "source_url": "https://www.750g.com/souris-dagneau-confites-r93428.htm"
+        "source_url": "https://www.marmiton.org/recettes/recette_souris-d-agneau-au-miel-et-thym_93493.aspx"
       },
       {
         "name": "oignons grelots",
-        "quantity": 20,
+        "quantity": "20",
         "unit": "pièces",
-        "role": "garniture fondante et sucrée",
+        "role": "garniture douce et fondante",
         "essential": true,
         "source_url": "https://www.750g.com/souris-dagneau-confites-r93428.htm"
       },
       {
         "name": "ail en chemise",
-        "quantity": 7,
+        "quantity": "7 à 8",
         "unit": "gousses",
-        "role": "parfum et pulpe confite",
+        "role": "parfum et ail confit",
         "essential": true,
         "source_url": "https://www.750g.com/souris-dagneau-confites-r93428.htm"
       },
       {
-        "name": "huile d’olive",
-        "quantity": null,
-        "unit": null,
-        "role": "enrobage ou saisie",
-        "essential": false,
-        "source_url": "https://www.750g.com/souris-dagneau-confites-r93428.htm"
-      },
-      {
-        "name": "vin blanc moelleux",
-        "quantity": 1,
-        "unit": "bouteille",
+        "name": "vin blanc",
+        "quantity": "15",
+        "unit": "cl",
         "role": "liquide de braisage",
         "essential": false,
-        "source_url": "https://www.750g.com/souris-dagneau-confites-r93428.htm"
+        "source_url": "https://www.lapetitecuisinedenat.com/2017/11/souris-dagneau-confites.html"
+      },
+      {
+        "name": "huile d’olive",
+        "quantity": "10",
+        "unit": "cuillères à soupe",
+        "role": "enrobage et saisie",
+        "essential": false,
+        "source_url": "https://www.marmiton.org/recettes/recette_souris-d-agneau-au-miel-et-thym_93493.aspx"
+      },
+      {
+        "name": "miel",
+        "quantity": "4",
+        "unit": "cuillères à soupe",
+        "role": "enrobage sucré et coloration",
+        "essential": false,
+        "source_url": "https://www.marmiton.org/recettes/recette_souris-d-agneau-au-miel-et-thym_93493.aspx"
       },
       {
         "name": "thym",
-        "quantity": null,
-        "unit": null,
-        "role": "aromate",
+        "quantity": "6",
+        "unit": "branches",
+        "role": "aromatique",
         "essential": false,
-        "source_url": "https://www.750g.com/souris-dagneau-confites-r93428.htm"
+        "source_url": "https://www.marmiton.org/recettes/recette_souris-d-agneau-au-miel-et-thym_93493.aspx"
       },
       {
-        "name": "romarin",
-        "quantity": null,
-        "unit": null,
-        "role": "aromate",
-        "essential": false,
-        "source_url": "https://www.750g.com/souris-dagneau-confites-r93428.htm"
-      },
-      {
-        "name": "laurier",
-        "quantity": null,
-        "unit": null,
-        "role": "aromate",
-        "essential": false,
-        "source_url": "https://www.750g.com/souris-dagneau-confites-r93428.htm"
-      },
-      {
-        "name": "sel",
-        "quantity": null,
-        "unit": null,
-        "role": "assaisonnement",
-        "essential": false,
-        "source_url": "https://www.750g.com/souris-dagneau-confites-r93428.htm"
-      },
-      {
-        "name": "poivre",
-        "quantity": null,
-        "unit": null,
-        "role": "assaisonnement",
+        "name": "romarin et laurier",
+        "quantity": "au goût",
+        "unit": "",
+        "role": "aromatiques de cuisson",
         "essential": false,
         "source_url": "https://www.750g.com/souris-dagneau-confites-r93428.htm"
       }
@@ -109,368 +92,349 @@
     "preparation": [
       {
         "step": 1,
-        "action": "Saler et poivrer les souris, puis les enduire d’huile d’olive.",
-        "cue": "La viande est uniformément assaisonnée et légèrement brillante.",
-        "minutes": 5,
-        "temperature_c": null,
-        "source_url": "https://www.750g.com/souris-dagneau-confites-r93428.htm"
+        "action": "Préchauffer le four à 150 °C en chaleur tournante et assaisonner les souris.",
+        "cue": "La viande est uniformément salée et poivrée.",
+        "minutes": 10,
+        "temperature_c": 150,
+        "source_url": "https://www.marmiton.org/recettes/recette_souris-d-agneau-au-miel-et-thym_93493.aspx"
       },
       {
         "step": 2,
-        "action": "Saisir les souris sur toutes leurs faces dans une cocotte avec de l’huile chaude, si une coloration plus marquée est recherchée.",
-        "cue": "Toutes les faces sont dorées.",
+        "action": "Faire dorer les souris sur toutes leurs faces dans l’huile d’olive, ou les enrober d’huile et de miel sans saisie préalable selon la méthode choisie.",
+        "cue": "La surface est dorée si la viande est saisie ; sinon elle est entièrement enrobée.",
         "minutes": 10,
         "temperature_c": null,
-        "source_url": "https://www.recette-painperdu.fr/recette/souris-d-agneau-recette"
+        "source_url": "https://www.lapetitecuisinedenat.com/2017/11/souris-dagneau-confites.html"
       },
       {
         "step": 3,
-        "action": "Ajouter les oignons grelots, l’ail en chemise, le thym, le romarin et le laurier.",
-        "cue": "Les aromates sont répartis autour de la viande.",
+        "action": "Ajouter l’ail en chemise, le thym, le romarin et le laurier.",
+        "cue": "Les aromates sont répartis autour de la viande et l’ail reste dans sa peau.",
         "minutes": 2,
         "temperature_c": null,
         "source_url": "https://www.750g.com/souris-dagneau-confites-r93428.htm"
       },
       {
         "step": 4,
-        "action": "Verser le vin blanc ou un autre liquide de cuisson jusqu’à couvrir largement le fond du plat.",
-        "cue": "Le liquide entoure la viande sans nécessairement la recouvrir entièrement.",
-        "minutes": 3,
+        "action": "Verser le vin blanc ou l’eau ; les sources indiquent soit 15 cl, soit un liquide couvrant les souris.",
+        "cue": "Le fond du plat est bien mouillé et le liquide atteint au minimum une partie de la hauteur de la viande.",
+        "minutes": 2,
+        "temperature_c": null,
+        "source_url": "https://www.lapetitecuisinedenat.com/2017/11/souris-dagneau-confites.html"
+      },
+      {
+        "step": 5,
+        "action": "Ajouter les oignons grelots et couvrir hermétiquement la cocotte ou le plat.",
+        "cue": "Le couvercle limite visiblement l’évaporation et les oignons sont immergés en partie.",
+        "minutes": 1,
         "temperature_c": null,
         "source_url": "https://www.750g.com/souris-dagneau-confites-r93428.htm"
       },
       {
-        "step": 5,
-        "action": "Couvrir la cocotte et l’enfourner en chaleur tournante.",
-        "cue": "Le couvercle est bien fermé et la vapeur reste retenue.",
-        "minutes": null,
+        "step": 6,
+        "action": "Cuire couvert au four jusqu’à ce que la viande soit très tendre.",
+        "cue": "La chair se détache facilement de l’os ; une source indique environ 2 heures à 150 °C en chaleur tournante, une autre 7 heures à 160 °C.",
+        "minutes": 120,
         "temperature_c": 150,
         "source_url": "https://www.marmiton.org/recettes/recette_souris-d-agneau-au-miel-et-thym_93493.aspx"
-      },
-      {
-        "step": 6,
-        "action": "Cuire doucement jusqu’à ce que la viande soit très tendre.",
-        "cue": "La pointe d’un couteau s’enfonce comme dans du beurre et la chair commence à se rétracter de l’os.",
-        "minutes": 125,
-        "temperature_c": 150,
-        "source_url": "https://www.recette-painperdu.fr/recette/souris-d-agneau-recette"
       },
       {
         "step": 7,
-        "action": "Contrôler le niveau de liquide pendant la cuisson et ajouter de l’eau, du vin ou du bouillon si nécessaire.",
-        "cue": "Le fond du plat reste humide et les aromates ne brûlent pas.",
-        "minutes": null,
+        "action": "Découvrir, arroser avec le jus et poursuivre la cuisson.",
+        "cue": "La surface devient plus colorée et le jus nappe davantage la viande.",
+        "minutes": 30,
         "temperature_c": 150,
-        "source_url": "https://www.marmiton.org/recettes/recette_souris-d-agneau-au-miel-et-thym_93493.aspx"
+        "source_url": "https://www.lapetitecuisinedenat.com/2017/11/souris-dagneau-confites.html"
       },
       {
         "step": 8,
-        "action": "Découvrir en fin de cuisson pour concentrer le jus et colorer légèrement la surface.",
-        "cue": "Le jus devient plus concentré et la viande prend une coloration brillante.",
-        "minutes": 15,
-        "temperature_c": 150,
-        "source_url": "https://www.recette-painperdu.fr/recette/souris-d-agneau-recette"
-      },
-      {
-        "step": 9,
-        "action": "Retirer les souris avec précaution et laisser reposer avant de servir.",
-        "cue": "La chair se détache facilement et l’os commence à apparaître.",
+        "action": "Laisser reposer brièvement puis servir avec le jus et l’ail écrasé si désiré.",
+        "cue": "L’ail est assez tendre pour être pressé hors de sa peau et la viande reste chaude.",
         "minutes": 10,
-        "temperature_c": 0,
-        "source_url": "https://www.recette-painperdu.fr/recette/souris-d-agneau-recette"
-      },
-      {
-        "step": 10,
-        "action": "Filtrer ou réduire le jus séparément si une sauce plus nappante est souhaitée.",
-        "cue": "La sauce nappe le dos d’une cuillère.",
-        "minutes": 15,
         "temperature_c": null,
-        "source_url": "https://www.bbcgoodfood.com/recipes/braised-lamb-shanks"
+        "source_url": "https://www.lapetitecuisinedenat.com/2017/11/souris-dagneau-confites.html"
       }
     ],
     "substitutions": [
       {
-        "ingredient": "liquide de cuisson",
-        "replacement": "eau, vin ou bouillon",
-        "note": "Marmiton documente ces trois possibilités selon le plat utilisé.",
-        "source_url": "https://www.marmiton.org/recettes/recette_souris-d-agneau-au-miel-et-thym_93493.aspx"
-      },
-      {
-        "ingredient": "fond de veau",
-        "replacement": "vin blanc sec et bouillon de bœuf",
-        "note": "Le remplacement est présenté comme moins onctueux.",
-        "source_url": "https://www.recette-painperdu.fr/recette/souris-d-agneau-recette"
+        "ingredient": "vin blanc",
+        "replacement": "eau",
+        "note": "La source propose du vin blanc ou de l’eau pour les 15 cl de liquide.",
+        "source_url": "https://www.lapetitecuisinedenat.com/2017/11/souris-dagneau-confites.html"
       },
       {
         "ingredient": "souris d’agneau",
         "replacement": "jarret de veau ou paleron de bœuf",
-        "note": "Le temps de cuisson peut varier selon la viande.",
+        "note": "La source autorise ces remplacements mais précise que le temps de cuisson peut changer.",
         "source_url": "https://www.marmiton.org/recettes/recette_souris-d-agneau-au-miel-et-thym_93493.aspx"
       }
     ],
     "accompaniments": [
       {
         "name": "purée maison",
-        "note": "750g recommande de servir la souris avec une purée maison.",
+        "note": "Proposée avec les souris confites et adaptée à l’absorption du jus.",
         "source_url": "https://www.750g.com/souris-dagneau-confites-r93428.htm"
       },
       {
-        "name": "pommes de terre fondantes",
-        "note": "Marmiton les cite parmi les accompagnements adaptés.",
+        "name": "pommes de terre rôties",
+        "note": "Citée comme accompagnement possible.",
         "source_url": "https://www.marmiton.org/recettes/recette_souris-d-agneau-au-miel-et-thym_93493.aspx"
       },
       {
         "name": "semoule",
-        "note": "Marmiton la propose comme accompagnement possible.",
-        "source_url": "https://www.marmiton.org/recettes/recette_souris-d-agneau-au-miel-et-thym_93493.aspx"
+        "note": "Servie avec une version de souris d’agneau confite aux oignons grelots.",
+        "source_url": "https://www.chefnini.com/souris-dagneau-confites-au-four-figues-miel-porto/"
       }
     ],
     "common_failures": [
       {
-        "problem": "Viande sèche ou fibreuse",
-        "cause": "Température trop élevée ou cuisson sans liquide suffisant.",
-        "remedy": "Cuire lentement, couvrir la cocotte et maintenir un fond de liquide.",
-        "source_url": "https://www.recette-painperdu.fr/recette/souris-d-agneau-recette"
-      },
-      {
-        "problem": "Surface supérieure desséchée",
-        "cause": "Absence d’arrosage régulier.",
-        "remedy": "Arroser avec le jus pendant la cuisson.",
-        "source_url": "https://www.recette-painperdu.fr/recette/souris-d-agneau-recette"
+        "problem": "Viande sèche ou jus insuffisant",
+        "cause": "Cuisson en chaleur tournante sans liquide ou évaporation excessive.",
+        "remedy": "Couvrir et ajouter de l’eau, du vin ou du bouillon si le niveau baisse.",
+        "source_url": "https://www.marmiton.org/recettes/recette_souris-d-agneau-au-miel-et-thym_93493.aspx"
       },
       {
         "problem": "Viande encore ferme",
-        "cause": "Cuisson interrompue avant la transformation complète du collagène.",
-        "remedy": "Prolonger la cuisson jusqu’à ce que la pointe du couteau entre sans résistance.",
-        "source_url": "https://www.recette-painperdu.fr/recette/souris-d-agneau-recette"
+        "cause": "Cuisson trop courte ou température trop élevée.",
+        "remedy": "Prolonger la cuisson douce jusqu’à ce que la chair se détache facilement de l’os.",
+        "source_url": "https://www.lapetitecuisinedenat.com/2017/11/souris-dagneau-confites.html"
       },
       {
-        "problem": "Jus trop liquide",
-        "cause": "Réduction insuffisante après la cuisson.",
-        "remedy": "Réduire le jus à feu vif jusqu’à ce qu’il nappe la cuillère.",
-        "source_url": "https://www.bbcgoodfood.com/recipes/braised-lamb-shanks"
+        "problem": "Surface pâle",
+        "cause": "Plat resté couvert pendant toute la cuisson.",
+        "remedy": "Découvrir en fin de cuisson, arroser et poursuivre environ 30 minutes.",
+        "source_url": "https://www.lapetitecuisinedenat.com/2017/11/souris-dagneau-confites.html"
       },
       {
-        "problem": "Ail amer ou brûlé",
-        "cause": "Gousses exposées directement à une chaleur sèche trop forte.",
-        "remedy": "Conserver l’ail en chemise et le maintenir dans le liquide ou sous la viande.",
-        "source_url": "https://www.recette-painperdu.fr/recette/souris-d-agneau-recette"
+        "problem": "Oignons trop mous ou brûlés",
+        "cause": "Ajout trop précoce dans un plat très sec ou cuisson non surveillée.",
+        "remedy": "Maintenir un fond humide et vérifier la réduction du jus pendant la cuisson.",
+        "source_url": "https://www.750g.com/souris-dagneau-confites-r93428.htm"
       }
     ],
     "storage": [
       {
-        "method": "réfrigérateur",
-        "duration": 3,
-        "note": "Conserver dans un contenant hermétique, de préférence dans le jus.",
-        "source_url": "https://www.recette-painperdu.fr/recette/souris-d-agneau-recette"
+        "method": "Réfrigération",
+        "duration": "3 à 4 jours",
+        "note": "Conserver l’agneau cuit dans un récipient couvert au réfrigérateur.",
+        "source_url": "https://ask.fsis.usda.gov/article/What-are-suggested-storage-times-for-lamb"
       },
       {
-        "method": "réfrigérateur",
-        "duration": 2,
-        "note": "BBC Good Food indique une préparation possible jusqu’à deux jours à l’avance.",
-        "source_url": "https://www.bbcgoodfood.com/recipes/braised-lamb-shanks"
+        "method": "Congélation",
+        "duration": "jusqu’à 3 mois",
+        "note": "Refroidir complètement puis congeler dans un contenant hermétique avec un peu de jus.",
+        "source_url": "https://www.lapetitecuisinedenat.com/2017/11/souris-dagneau-confites.html"
       },
       {
-        "method": "congélation",
-        "duration": 3,
-        "note": "La recette indique une congélation possible jusqu’à trois mois, idéalement avec la sauce.",
-        "source_url": "https://www.recette-painperdu.fr/recette/souris-d-agneau-recette"
-      },
-      {
-        "method": "réchauffage en cocotte",
-        "duration": 30,
-        "note": "Réchauffer doucement et à couvert avec un peu d’eau ou de bouillon pour limiter le dessèchement.",
-        "source_url": "https://www.recette-painperdu.fr/recette/souris-d-agneau-recette"
+        "method": "Réchauffage au four",
+        "duration": "20 à 30 minutes",
+        "note": "Réchauffer à 150 °C en arrosant régulièrement avec le jus.",
+        "source_url": "https://www.lapetitecuisinedenat.com/2017/11/souris-dagneau-confites.html"
       }
     ],
     "food_safety": [
       {
-        "source_url": "https://www.foodsafety.gov/blog/game-day-food-safety-tips",
-        "text": "Réfrigérer les restes dans les deux heures, ou dans l’heure si la température ambiante dépasse 32 °C."
+        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/meat-catfish/lamb-farm-table",
+        "text": "Pour une pièce entière d’agneau, atteindre au moins 63 °C à cœur puis laisser reposer au moins 3 minutes."
       },
       {
-        "source_url": "https://www.foodsafety.gov/people-at-risk",
-        "text": "Conserver les restes cuits au réfrigérateur pendant quatre jours au maximum."
-      },
-      {
-        "source_url": "https://www.foodsafety.gov/food-safety-charts/safe-minimum-internal-temperatures",
+        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/safe-temperature-chart",
         "text": "Réchauffer les restes à 74 °C à cœur."
       },
       {
-        "source_url": "https://www.foodsafety.gov/blog/game-day-food-safety-tips",
-        "text": "Répartir les grandes quantités dans des contenants peu profonds pour accélérer le refroidissement."
+        "source_url": "https://ask.fsis.usda.gov/article/How-long-can-you-keep-leftovers-in-the-refrigerator",
+        "text": "Réfrigérer les restes pendant 3 à 4 jours maximum ou les congeler pendant 3 à 4 mois."
       }
     ],
     "references": [
-      {
-        "url": "https://www.750g.com/souris-dagneau-confites-r93428.htm",
-        "title": "Souris d’agneau confites",
-        "publisher": "750g"
-      },
       {
         "url": "https://www.marmiton.org/recettes/recette_souris-d-agneau-au-miel-et-thym_93493.aspx",
         "title": "Souris d’agneau confite et fondante",
         "publisher": "Marmiton"
       },
       {
-        "url": "https://www.recette-painperdu.fr/recette/souris-d-agneau-recette",
-        "title": "Recette de souris d’agneau confite au four ultra fondante",
-        "publisher": "RecettePainPerdu"
+        "url": "https://www.lapetitecuisinedenat.com/2017/11/souris-dagneau-confites.html",
+        "title": "Souris d’agneau confite au four",
+        "publisher": "La Petite Cuisine de Nat"
       },
       {
-        "url": "https://www.bbcgoodfood.com/recipes/braised-lamb-shanks",
-        "title": "Braised lamb shanks",
-        "publisher": "BBC Good Food"
+        "url": "https://www.750g.com/souris-dagneau-confites-r93428.htm",
+        "title": "Souris d’agneau confites",
+        "publisher": "750g"
       },
       {
-        "url": "https://www.foodsafety.gov/people-at-risk",
-        "title": "People at Risk of Food Poisoning",
-        "publisher": "FoodSafety.gov"
+        "url": "https://www.chefnini.com/souris-dagneau-confites-au-four-figues-miel-porto/",
+        "title": "Souris d’agneau confites au four, figues au miel et porto",
+        "publisher": "ChefNini"
       },
       {
-        "url": "https://www.foodsafety.gov/food-safety-charts/safe-minimum-internal-temperatures",
-        "title": "Cook to a Safe Minimum Internal Temperature",
-        "publisher": "FoodSafety.gov"
+        "url": "https://www.elle-et-vire.com/fr/fr/recettes/souris-d-agneau-confites-legumes-glaces-et-creme-poivrons-tomates-1/",
+        "title": "Souris d’agneau confites, légumes glacés et crème poivrons tomates",
+        "publisher": "Elle & Vire"
+      },
+      {
+        "url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/safe-temperature-chart",
+        "title": "Safe Minimum Internal Temperature Chart",
+        "publisher": "USDA FSIS"
       }
     ],
     "visual_references": [
       {
-        "image_url": "https://assets.afcdn.com/recipe/20250408/159509_w150h150c1cx3680cy2456cxt0cyt0cxb7360cyb4912.webp",
-        "source_url": "https://www.marmiton.org/recettes/recette_souris-d-agneau-au-miel-et-thym_93493.aspx",
-        "title": "Souris d’agneau confite et fondante",
+        "image_url": "https://static.chefnini.com/wp-content/uploads/2014/06/souris-agneau-figues4.jpg",
+        "source_url": "https://www.chefnini.com/souris-dagneau-confites-au-four-figues-miel-porto/",
+        "title": "Souris d’agneau confites aux figues et oignons grelots",
         "tier": 1
       },
       {
-        "image_url": "https://static.750g.com/images/220-165/fb26db40ef0ade0ecab10a031f794d24/souris-d-agneau.jpg",
-        "source_url": "https://www.750g.com/souris-dagneau-confite-r58237.htm",
-        "title": "Souris d’agneau confite au miel, à l’ail et au romarin",
+        "image_url": "https://www.elle-et-vire.com/uploads/cache/1920x1200/uploads/recip/recipe/802/souris-d-agneau-confite-et-creme-poivron-tomate-9a.jpg",
+        "source_url": "https://www.elle-et-vire.com/fr/fr/recettes/souris-d-agneau-confites-legumes-glaces-et-creme-poivrons-tomates-1/",
+        "title": "Souris d’agneau confites, légumes glacés et crème de poivrons-tomates",
         "tier": 1
       },
       {
-        "image_url": "https://images.immediate.co.uk/production/volatile/sites/30/2020/08/recipe-image-legacy-id-373546_10-2051fea.jpg?quality=90&resize=440%2C400",
-        "source_url": "https://www.bbcgoodfood.com/recipes/braised-lamb-shanks",
-        "title": "Braised lamb shanks",
+        "image_url": "https://www.lapetitecuisinedenat.com/wp-content/uploads/2023/11/souris-agneau-four.jpg-500x500.webp",
+        "source_url": "https://www.lapetitecuisinedenat.com/2017/11/souris-dagneau-confites.html",
+        "title": "Souris d’agneau confites au four à l’ail",
+        "tier": 1
+      },
+      {
+        "image_url": "https://www.saveur.com/uploads/2019/03/18/V7LCVA6GN3QKVYUQQT7WN56X6I.jpg?format=auto&optimize=high&width=1440",
+        "source_url": "https://www.saveur.com/article/Recipes/Aunt-Pollys-Lamb-Shanks-50314/",
+        "title": "Aunt Polly’s Lamb Shanks",
+        "tier": 2
+      },
+      {
+        "image_url": "https://cdn.apartmenttherapy.info/image/upload/f_auto%2Cq_auto%3Aeco%2Cc_fill%2Cg_center%2Cw_730%2Ch_913/k%2Farchive%2F3f5dbba9c7cf720cfdca7794b58ec9f1299b2834",
+        "source_url": "https://www.thekitchn.com/lamb-shank-267498",
+        "title": "Rosemary Braised Lamb Shanks with Creamy Polenta",
         "tier": 2
       }
     ],
     "visual_observations": [
       {
-        "image_url": "https://assets.afcdn.com/recipe/20250408/159509_w150h150c1cx3680cy2456cxt0cyt0cxb7360cyb4912.webp",
-        "source_url": "https://www.marmiton.org/recettes/recette_souris-d-agneau-au-miel-et-thym_93493.aspx",
+        "image_url": "https://static.chefnini.com/wp-content/uploads/2014/06/souris-agneau-figues4.jpg",
+        "source_url": "https://www.chefnini.com/souris-dagneau-confites-au-four-figues-miel-porto/",
         "observable_details": [
-          "Un bol ou une assiette creuse de couleur noire est placé au centre de l’image.",
-          "Il contient une pièce volumineuse brun-rouge, avec une extrémité allongée ressemblant visuellement à un os.",
-          "Des éléments verts sont visibles sur le dessus et autour de la pièce principale.",
-          "Une matière sombre et brillante entoure partiellement la pièce centrale.",
-          "Quelques éléments orange-brun sont visibles sur les côtés."
+          "Une assiette blanche contient un morceau de viande brun foncé avec un os long et clair visible.",
+          "Plusieurs quartiers de fruits à peau violette et à chair claire avec de petites graines sont disposés autour de la viande.",
+          "De petits éléments ronds et pâles sont visibles au fond de l’assiette.",
+          "Un morceau de pain clair se trouve sur le côté droit de l’assiette.",
+          "Quelques feuilles vertes sont placées sur la viande.",
+          "L’assiette repose sur un linge à rayures claires et foncées, posé sur une surface sombre."
         ],
-        "composition": [
-          "La composition est centrée, avec le contenu regroupé dans le bol.",
-          "La prise de vue est réalisée en légère plongée, montrant l’intérieur du récipient.",
-          "Le fond est sombre et peu détaillé.",
-          "La pièce principale forme une diagonale approximative entre le bas-centre et le haut-gauche."
-        ],
-        "couleurs": [
-          "Noir et gris foncé pour le récipient et l’arrière-plan.",
-          "Brun foncé, brun-rouge et rouge sombre pour l’élément principal.",
-          "Vert vif pour les éléments disposés sur le dessus.",
-          "Orange-brun et quelques petites touches claires autour du contenu."
+        "composition": "La viande et son os occupent le centre de l’image. Les quartiers de fruits et les petits éléments ronds entourent la viande dans l’assiette. Le pain est placé vers l’arrière droit. L’arrière-plan est flou et montre un récipient métallique ainsi qu’un autre contenant partiellement visible.",
+        "colours": [
+          "Brun foncé et brun doré sur la viande",
+          "Violet, rouge rosé et crème dans les quartiers de fruits",
+          "Beige clair sur le pain et les éléments ronds",
+          "Vert sur les feuilles",
+          "Blanc sur l’assiette",
+          "Bleu-gris sur la surface et l’arrière-plan",
+          "Noir et blanc cassé sur le linge"
         ],
         "textures": [
-          "La surface de l’élément principal paraît irrégulière, fibreuse et légèrement brillante.",
-          "La matière sombre dans le bol présente des reflets luisants.",
-          "Les éléments verts semblent feuillus et fragmentés.",
-          "Le récipient a une surface mate ou peu réfléchissante."
+          "La surface de la viande paraît irrégulière et légèrement brillante.",
+          "L’os présente une surface claire et lisse par endroits, avec des zones brunies.",
+          "Les quartiers de fruits montrent une chair humide et granuleuse, avec des graines visibles.",
+          "Le pain présente une croûte dorée et une mie claire alvéolée.",
+          "Les petits éléments ronds ont une surface lisse et brillante.",
+          "Le linge sous l’assiette paraît souple et plissé."
         ],
-        "incertainties": [
-          "La résolution et la taille réduite de l’image ne permettent pas d’identifier précisément tous les éléments visibles.",
-          "La nature exacte de la pièce centrale, des éléments verts et de la matière sombre ne peut pas être déterminée avec certitude à partir de l’image seule.",
-          "Les détails fins de la surface et du contenu périphérique sont partiellement indistincts."
+        "uncertainties": [
+          "L’identité exacte des petits éléments ronds et pâles n’est pas certaine.",
+          "L’identité exacte de la viande ne peut pas être confirmée uniquement à partir de l’image.",
+          "Certains détails de l’arrière-plan sont flous et indéterminables."
         ]
       },
       {
-        "image_url": "https://static.750g.com/images/220-165/fb26db40ef0ade0ecab10a031f794d24/souris-d-agneau.jpg",
-        "source_url": "https://www.750g.com/souris-dagneau-confite-r58237.htm",
+        "image_url": "https://www.elle-et-vire.com/uploads/cache/1920x1200/uploads/recip/recipe/802/souris-d-agneau-confite-et-creme-poivron-tomate-9a.jpg",
+        "source_url": "https://www.elle-et-vire.com/fr/fr/recettes/souris-d-agneau-confites-legumes-glaces-et-creme-poivrons-tomates-1/",
         "observable_details": [
-          "Une portion de viande brun très foncé à rougeâtre occupe la partie gauche et le premier plan.",
-          "La viande est recouverte d’une surface brillante et sombre, avec des zones plus rouges et des reliefs irréguliers.",
-          "Un jus ou une sauce sombre est visible sous et autour de la viande.",
-          "À l’arrière-plan, sur la droite, se trouve un accompagnement de forme irrégulière, avec des zones beige clair, vertes et brunies.",
-          "L’ensemble est présenté sur une assiette de couleur rose pâle."
+          "Une assiette blanche contient une composition dressée au centre.",
+          "Un morceau brun de forme irrégulière occupe la partie centrale.",
+          "La composition comprend une base rectangulaire dorée, feuilletée ou friable en apparence.",
+          "Des éléments orange allongés, des bâtonnets verts, des formes rouges arrondies et des morceaux de légumes de teintes pâles et violettes sont visibles.",
+          "Des feuilles vertes plates et dentelées sont disposées sur les côtés et au sommet.",
+          "Une sauce ou purée orange est étalée en plusieurs zones sur l’assiette, notamment au premier plan.",
+          "Un pédoncule vert ramifié est visible au-dessus des éléments rouges."
         ],
         "composition": [
-          "La pièce principale est placée au premier plan, légèrement à gauche du centre.",
-          "L’accompagnement est situé dans la moitié supérieure droite de l’assiette.",
-          "Le cadrage est rapproché et coupe partiellement les éléments visibles.",
-          "Un arrière-plan sombre et flou apparaît au-dessus de l’assiette."
+          "Le dressage est vertical et empilé, avec les éléments colorés placés autour et au-dessus de la pièce centrale.",
+          "La base rectangulaire est située dans la moitié inférieure de l’assiette.",
+          "La pièce centrale brune est entourée de petits éléments colorés et de feuilles vertes.",
+          "Un élément vert allongé traverse diagonalement la partie inférieure du dressage.",
+          "La sauce orange forme une nappe irrégulière au premier plan et une autre zone sur la droite.",
+          "L’assiette occupe presque toute l’image, tandis que l’arrière-plan est flou."
         ],
         "couleurs": [
-          "Brun très foncé, rouge-brun et noirâtre sur la pièce principale et le jus.",
-          "Rose pâle et blanc rosé sur l’assiette.",
-          "Beige clair, vert pâle et brun doré sur l’accompagnement.",
-          "Tons gris foncé et noirs dans l’arrière-plan."
+          "Blanc dominant de l’assiette.",
+          "Brun, beige et doré sur la pièce centrale et la base rectangulaire.",
+          "Orange vif sur les éléments allongés et la sauce.",
+          "Vert clair à vert foncé sur les bâtonnets, les feuilles et le pédoncule.",
+          "Rouge sur les formes arrondies centrales.",
+          "Touches de violet ou de brun très foncé sur certains morceaux.",
+          "Fond composé de gris pâle, beige et blanc, avec une faible saturation due au flou."
         ],
         "textures": [
-          "Surface luisante et nappée sur la pièce principale.",
-          "Reliefs et bords irréguliers sur la viande.",
-          "Jus sombre d’aspect fluide ou épais autour de la pièce.",
-          "Accompagnement à l’aspect compact, irrégulier et partiellement granuleux.",
-          "Image légèrement floue et peu détaillée."
+          "La surface de la pièce centrale paraît humide et brillante, avec des zones brunies.",
+          "La base rectangulaire présente des couches visibles et des bords irréguliers, d’aspect friable.",
+          "Les éléments orange et verts ont des surfaces lisses et brillantes.",
+          "Les formes rouges semblent lisses et légèrement brillantes.",
+          "La sauce paraît lisse, épaisse et brillante, avec de petites bulles visibles.",
+          "Les feuilles vertes ont des contours découpés et une surface mate à légèrement brillante.",
+          "Certains morceaux présentent des marques sombres ou roussies."
         ],
         "incertainties": [
-          "La nature exacte de la pièce principale et de l’accompagnement n’est pas déterminable avec certitude à partir de l’image seule.",
-          "La couleur sombre peut être due à un glaçage, une sauce ou une coloration de cuisson, sans qu’il soit possible de les distinguer visuellement.",
-          "Les éléments partiellement coupés par le cadrage ne sont pas observables dans leur totalité."
+          "La nature exacte de la pièce centrale, de la base et des différents éléments ne peut pas être déterminée avec certitude à partir de l’image seule.",
+          "La composition exacte de la sauce orange n’est pas identifiable visuellement.",
+          "La température, le goût, les quantités et le mode de préparation ne sont pas observables.",
+          "Une partie des éléments situés derrière la pièce centrale est masquée ou partiellement floue."
         ]
       },
       {
-        "image_url": "https://images.immediate.co.uk/production/volatile/sites/30/2020/08/recipe-image-legacy-id-373546_10-2051fea.jpg?quality=90&resize=440%2C400",
-        "source_url": "https://www.bbcgoodfood.com/recipes/braised-lamb-shanks",
+        "image_url": "https://www.lapetitecuisinedenat.com/wp-content/uploads/2023/11/souris-agneau-four.jpg-500x500.webp",
+        "source_url": "https://www.lapetitecuisinedenat.com/2017/11/souris-dagneau-confites.html",
         "observable_details": [
-          "Une assiette blanche contient un gros morceau de viande brun accompagné d'un os allongé.",
-          "Un autre morceau brun est visible sur le côté gauche de l'assiette.",
-          "Des éléments verts ressemblant à des bouquets de légume sont placés derrière la viande.",
-          "Une sauce brun foncé s'étend sous la viande.",
-          "L'assiette repose sur une surface textile à motifs gris."
+          "Un récipient de cuisson rond, clair à l’intérieur, occupe presque toute l’image.",
+          "Deux gros morceaux de viande brunis sont visibles, chacun associé à un os allongé clair.",
+          "Plusieurs petits éléments pâles, certains entiers et d’autres séparés en quartiers, entourent la viande.",
+          "Un liquide brun et brillant est présent au fond du récipient.",
+          "La photographie est prise en plongée rapprochée."
         ],
-        "composition": "Le morceau principal occupe le centre droit de l'assiette. L'os s'étend vers la gauche, tandis que les éléments verts sont placés en arrière-plan. La sauce forme une flaque autour de la base de la viande.",
-        "couleurs": [
-          "Brun foncé et brun doré pour la viande et la sauce",
-          "Beige clair pour l'os",
-          "Vert foncé pour les éléments à l'arrière",
-          "Blanc pour l'assiette",
-          "Gris et blanc pour le textile sous l'assiette",
-          "Rose et violet dans l'arrière-plan"
+        "composition": "Les deux morceaux principaux se trouvent au centre et dans la partie supérieure de l’image. Les éléments plus petits sont répartis autour, dans le liquide. Le bord sombre du récipient est visible sur les côtés et dans les angles.",
+        "colours": [
+          "Brun foncé et brun doré sur la surface des morceaux principaux.",
+          "Beige clair à ivoire pour les os et plusieurs éléments périphériques.",
+          "Brun ambré et doré pour le liquide.",
+          "Gris clair et crème pour l’intérieur du récipient.",
+          "Noir ou brun très foncé sur certaines zones rissolées."
         ],
         "textures": [
-          "La surface de la viande paraît luisante et irrégulière.",
-          "La sauce paraît fluide et brillante.",
-          "L'os paraît mat et lisse.",
-          "Les éléments verts ont une apparence granuleuse et ramifiée.",
-          "Le textile sous l'assiette présente un motif doux et flou."
+          "Surface des morceaux principaux irrégulière, plissée et fortement dorée.",
+          "Certaines zones paraissent luisantes et humides.",
+          "Le liquide présente des reflets brillants.",
+          "Les petits éléments ont des surfaces variables, certaines lisses, d’autres fripées ou légèrement dorées.",
+          "Des zones plus foncées et possiblement croustillantes sont visibles sur la viande et autour du fond."
         ],
-        "incertainties": [
-          "La nature exacte des éléments verts et des autres accompagnements n'est pas certaine.",
-          "La photographie ne permet pas de déterminer les ingrédients, les quantités, le goût ou le mode de préparation invisible.",
-          "Certains détails de la viande et de la sauce sont partiellement masqués par les reflets et la faible résolution."
+        "uncertainties": [
+          "La nature exacte des petits éléments entourant la viande n’est pas déterminable avec certitude à partir de l’image seule.",
+          "La composition exacte du liquide et les ingrédients utilisés ne sont pas visibles avec certitude.",
+          "La méthode et la durée de cuisson ne peuvent pas être déduites uniquement de la photographie."
         ]
       }
     ],
     "uncertainties": [
-      "Les sources divergent fortement sur la durée : environ 2 heures à 150 °C en chaleur tournante chez Marmiton, 2 h 15 à 2 h 45 à 150 °C dans une recette récente, et 7 heures à 160 °C chez 750g.",
-      "750g indique une bouteille entière de vin blanc sans préciser le volume utile ni le niveau de liquide dans le plat.",
-      "Les sources ne s’accordent pas sur la saisie préalable : 750g l’omet, tandis que d’autres versions la recommandent pour colorer la viande.",
-      "La découverte en fin de cuisson est documentée par une source récente, mais pas par la recette Marmiton.",
-      "Le repos de 10 minutes est documenté par une recette récente, tandis que plusieurs autres sources ne donnent aucun temps de repos.",
-      "La conservation domestique varie selon les sources culinaires entre deux et trois jours ; la recommandation de sécurité FoodSafety.gov est de quatre jours maximum au réfrigérateur.",
-      "La photographie Marmiton est de faible résolution ; la photographie BBC Good Food montre un jarret d’agneau braisé proche, mais pas exactement la garniture du brief."
+      "Les temps et températures divergent fortement : Marmiton indique 2 heures à 150 °C en chaleur tournante, La Petite Cuisine de Nat indique 2 heures couvertes puis 30 minutes découvertes à 150-160 °C, tandis que 750g indique 7 heures à 160 °C.",
+      "La quantité de liquide n’est pas harmonisée : La Petite Cuisine de Nat indique 15 cl de vin blanc ou d’eau, alors que 750g indique de couvrir les souris avec du vin blanc.",
+      "La saisie n’est pas universelle : La Petite Cuisine de Nat la recommande, tandis que Marmiton décrit une méthode sans saisie préalable.",
+      "Les images de référence de niveau 1 montrent des variantes proches, mais pas toutes simultanément avec oignons grelots et ail confit ; elles servent à documenter l’apparence d’une souris d’agneau cuite et dressée, pas à prouver les ingrédients invisibles."
     ],
     "originality_notes": [
-      "Les quantités et techniques ont été attribuées à leurs sources respectives sans moyenne ni harmonisation non documentée.",
-      "La saisie, la couverture, la découverte et le niveau de liquide sont présentés comme des pratiques documentées ou comme des divergences, sans les transformer en certitudes universelles.",
-      "Aucune quantité d’huile, d’herbes, de sel ou de poivre n’a été inventée lorsque la source ne la donnait pas.",
-      "Les observations visuelles sont volontairement absentes conformément au protocole demandé ; aucune caractéristique visuelle n’a été déduite des vignettes ou des descriptions textuelles.",
-      "La troisième image est explicitement classée en tier 2 car elle montre une variante proche de jarret d’agneau braisé, et non la préparation exacte aux oignons grelots et à l’ail confit."
+      "Les quantités, températures, durées, signes de cuisson, substitutions et accompagnements sont attribués à des sources précises.",
+      "Aucun ingrédient ou dosage n’a été déduit d’une photographie.",
+      "Les désaccords de cuisson et de quantité de liquide sont conservés au lieu d’être moyennés.",
+      "Les références visuelles sont des photographies publiques liées à leurs pages sources ; aucune image générée, retouchée ou créée pour cette tâche n’est utilisée.",
+      "Le champ visual_observations est volontairement vide afin de laisser le laboratoire analyser les fichiers image réels."
     ]
   },
   "canonical": {

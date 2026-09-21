@@ -19,7 +19,7 @@ RULES:
 
 OUTPUT — a valid JSON object only, no Markdown, with exactly these keys:
 - "dish_identity": {name, confidence, evidence} — values in {{language}}
-- "recipe_outline": {servings, prep_minutes, cook_minutes, total_minutes, category, cuisine, difficulty, source_url} — integers for the minutes and the yield, {{language}} for the rest, and null for anything no source gives
+- "recipe_outline": {servings, prep_minutes, cook_minutes, total_minutes, category, cuisine, difficulty, source_url} — every one of these keys is present in the answer, always. Integers for the yield and the three durations, {{language}} for the rest. Look for each figure in the sources before giving up on it: a recipe page almost always states a yield and a cooking time, and a total is the sum of the others when both are given. Write null only for a figure you actually searched for and no source provides — never omit a key, and never leave one out because it was easier
 - "ingredients": array of {name, quantity, unit, role, essential, source_url} — name and role in {{language}}, role being what it does in the dish in a few words, essential a boolean
 - "preparation": array of {step, action, cue, minutes, temperature_c, source_url} — step an integer from 1 upward in the order the recipe is performed, action and cue in {{language}}, cue being the visible sign that the step is done, minutes and temperature_c integers or null
 - "substitutions": array of {ingredient, replacement, note, source_url} — only replacements a source states

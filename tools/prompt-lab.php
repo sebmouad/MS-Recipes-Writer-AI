@@ -78,7 +78,7 @@ $tier = $options['tier'] ?? '';
 $model = $options['model'] ?? ( '' !== $tier ? ( lab_tiers()[ $tier ][ $provider ] ?? '' ) : 'gpt-5.6-luna' );
 if ( '' === $model ) { fwrite( STDERR, "No model for provider {$provider} tier {$tier}.\n" ); exit( 2 ); }
 $brief_vision_usage = array( 'input_tokens' => 0, 'output_tokens' => 0 );
-if ( 'research' === $step || 'research_recipe' === $step ) {
+if ( 'research' === $step ) {
 	$editor = lab_editor_brief( $brief );
 	$editor['image_observations'] = array();
 	foreach ( array_slice( (array) ( $editor['images'] ?? array() ), 0, 3 ) as $candidate ) {
@@ -106,7 +106,7 @@ if ( isset( $result['error'] ) ) { fwrite( STDERR, 'API error after ' . $result[
 $result['usage']['input_tokens'] = (int) ( $result['usage']['input_tokens'] ?? 0 ) + $brief_vision_usage['input_tokens'];
 $result['usage']['output_tokens'] = (int) ( $result['usage']['output_tokens'] ?? 0 ) + $brief_vision_usage['output_tokens'];
 
-if ( 'research' === $step || 'research_recipe' === $step ) {
+if ( 'research' === $step ) {
 	$package = MSRWA_Json::decode( $result['text'] );
 	if ( is_array( $package ) ) {
 		$vision = lab_enrich_research_images( $provider, $model, $package );
