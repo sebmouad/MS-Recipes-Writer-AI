@@ -106,6 +106,15 @@ final class MSRWA_Engine_Config {
 			'language' => 'fr',
 
 			/*
+			 * Steps that are skipped when the checks before them found nothing to
+			 * act on. Proofreading rewrites the whole article and is the dearest
+			 * step of the verification group; when the review passed with no
+			 * finding and every correction applied cleanly, it rewrites a text
+			 * nobody objected to. A caller that wants it every time sets false.
+			 */
+			'skip_when_clean' => array( 'proofread' => true ),
+
+			/*
 			 * Which observation fields reach an image prompt. Colour and texture
 			 * describe the food; observable_details and composition inventory the
 			 * frame, which is how another site's watermark, a pair of hands and two

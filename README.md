@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.82` est un socle installable : file persistante, pipeline de
+La version `0.2.83` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.
@@ -22,6 +22,23 @@ Le plugin est en cours de refonte éditoriale et budgétaire :
 Les coûts affichés sont des estimations calculées avec le catalogue configuré,
 non une facture fournisseur. `completed` signifie que le traitement est terminé,
 jamais qu’un texte est validé éditorialement.
+
+## Version 0.2.83
+
+**La relecture ne réécrit plus un texte que personne n'a contesté.** C'est
+l'étape la plus chère du groupe de vérification — 0,0104 $ et 36,7 s sur un run
+mesuré, environ 6 600 tokens de sortie — et elle régénérait l'article entier
+que la revue ait trouvé quelque chose ou non.
+
+Quand la revue passe sans aucune remarque et que chaque correction demandée par
+la vérification des faits s'est appliquée exactement, il n'y a rien à réécrire :
+trois contrôles se sont déjà accordés sur ce texte. L'étape est alors consignée
+comme non exécutée, à coût nul, et c'est la version corrigée qui poursuit
+jusqu'à l'approbation.
+
+Une revue absente n'est jamais lue comme une revue satisfaite, une remarque même
+mineure ramène la réécriture, et l'appelant garde le dernier mot :
+`skip_when_clean.proofread` à `false` la rétablit systématiquement.
 
 ## Version 0.2.82
 
