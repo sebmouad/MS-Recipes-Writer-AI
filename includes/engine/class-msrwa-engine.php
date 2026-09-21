@@ -331,6 +331,8 @@ final class MSRWA_Engine {
 		$settings = MSRWA_Engine_Input::settings();
 		$brief = self::working_set( $name, $result );
 
+		MSRWA_Engine_Input::use_observation_phrases( (int) $config->get( 'limits.observation_phrases', 8 ) );
+		MSRWA_Engine_Input::use_observation_fields( (array) $config->get( 'observation_fields', array( 'colours', 'textures' ) ) );
 		$choices = array_merge( $options, array( 'collage_panels' => (int) $config->get( 'images.collage_panels', 6 ) ) );
 		$prompt = MSRWA_Engine_Input::image_prompt( $kind, $brief, $choices, $findings );
 		$ceiling = (int) $config->get( 'limits.image_prompt_chars', 30000 );

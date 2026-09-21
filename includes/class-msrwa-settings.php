@@ -423,11 +423,14 @@ FORBIDDEN:
 
 No text, letters, numbers, captions, labels, logos, watermark, packaging, branded containers, oven display, UI, title strip, arrows, badges or decorative stickers.
 
-SILENT FINAL CHECK BEFORE RETURNING:
+SILENT FINAL CHECK BEFORE RETURNING — fix anything that fails:
 
-Verify: exactly six equal cells; correct archetype; one clear advance per panel; canonical ingredients and order; believable state progression; process-vessel continuity; consistent light and colour; no text or visual artifacts; and a fully cooked, high-impact panel 6 that reveals the most appetising truthful texture without exceeding the observed colour. Then compare panel 6 against the serving presentation in the visual brief — same vessel, same angle, same colour — and against panel 1\'s ingredient count. Correct every failed condition before returning the image.
-
-The result must equal or exceed a professionally art-directed social recipe tutorial in layout discipline, continuity, instructional clarity, food physics and final-shot appetite appeal.',
+• 6 equal cells, one grid, no extra frame
+• each panel could only happen after the one before it
+• only canonical ingredients, in panel 1\'s counts
+• same vessel, surface, light and colour grade throughout
+• no text, letters, logo, watermark or border anywhere
+• panel 6 matches the visual brief\'s serving presentation — same vessel, same angle, no darker than the observations record',
 		);
 		$facebook_prompt = __DIR__ . '/engine/prompts/facebook_image.tpl.txt';
 		if ( is_readable( $facebook_prompt ) ) { $defaults['prompt_facebook_image'] = trim( file_get_contents( $facebook_prompt ) ); }

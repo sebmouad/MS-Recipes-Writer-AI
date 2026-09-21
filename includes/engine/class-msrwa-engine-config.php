@@ -100,6 +100,14 @@ final class MSRWA_Engine_Config {
 			'language' => 'fr',
 
 			/*
+			 * Which observation fields reach an image prompt. Colour and texture
+			 * describe the food; observable_details and composition inventory the
+			 * frame, which is how another site's watermark, a pair of hands and two
+			 * different cooks' garnish were drawn into generated photographs.
+			 */
+			'observation_fields' => array( 'colours', 'textures' ),
+
+			/*
 			 * How each provider is reached. A new provider is a row here, not a
 			 * branch in the transport: endpoint, how the key is presented, which
 			 * environment variables carry it, and how it spells "search the web".

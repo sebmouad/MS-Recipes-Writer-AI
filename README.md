@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.76` est un socle installable : file persistante, pipeline de
+La version `0.2.77` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.
@@ -22,6 +22,59 @@ Le plugin est en cours de refonte éditoriale et budgétaire :
 Les coûts affichés sont des estimations calculées avec le catalogue configuré,
 non une facture fournisseur. `completed` signifie que le traitement est terminé,
 jamais qu’un texte est validé éditorialement.
+
+## Version 0.2.77
+
+**Les images refusaient toujours pour la même raison, et ce n'était pas le
+prompt.** Chaque défaut mesuré venait de la même source : la passe visuelle
+inventoriait ce qu'il y avait *dans la photographie* au lieu de décrire *le
+plat*, et ces phrases voyageaient jusqu'au prompt image comme des faits sur le
+plat. Le modèle les dessinait.
+
+| Ce qui a été dessiné | D'où cela venait |
+|---|---|
+| « La Cuisine de Biscottine » et une bordure jaune | le filigrane et le cadre d'une photo source |
+| le plat tenu à deux mains | la mise en scène de la photo source |
+| des poivrons, une tranche de citron | « lanières rouges et vertes », « un demi-fruit jaune » |
+| des carottes | « morceaux orange visibles » |
+
+Cinq défauts, cinq refus, **un seul canal** : `observable_details` et
+`composition`. Ce sont des inventaires du cadre. `colours` et `textures`
+décrivent la nourriture. Le prompt image ne reçoit plus que ces deux-là.
+
+Trois corrections, à trois niveaux :
+
+1. **À la source.** La passe visuelle décrit le plat et rien d'autre : ni
+   accompagnement, ni garniture, ni seconde assiette, ni couverts, ni mains, ni
+   personne, ni vêtement, ni fond — et jamais le texte, le filigrane, le logo ou
+   la bordure posés sur l'image. Ce qu'elle ne peut pas identifier part dans
+   `uncertainties`, au lieu d'être décrit par sa forme et sa couleur.
+2. **En défense.** Un filtre phrase par phrase retire ce qui parle de la
+   photographie plutôt que du plat. Une mauvaise proposition ne coûte plus toute
+   l'observation.
+3. **En dernier recours.** Six règles courtes closent chaque prompt image — là
+   où un modèle pèse le plus — et chacune est une règle déjà énoncée plus haut
+   qu'une génération réelle a quand même enfreinte.
+
+**Mesuré, même recette, même dossier de recherche** (le poulet yassa, refusé
+trois fois de suite sur ses images) :
+
+| | avant | après |
+|---|---|---|
+| image à la une | `bad` | **`good`** |
+| collage | `bad` | `reservations` |
+| cohérence | `bad` | **`good`** |
+| constats bloquants | 3 | **0** |
+
+**Et le prompt maigrit de 31 %** — 34 104 → 23 678 caractères pour la paire.
+Un appel image est facturé surtout sur ce qu'on lui envoie : l'entrée
+représentait 51 % du coût de l'image à la une et 69 % de celui du collage. La
+paire passe de $0,0598 à $0,0535. Le vrai gain reste le cycle de refus évité :
+$0,0615 et 75 secondes.
+
+Le dossier brut ne suit plus le brief visuel qui le distillait déjà : c'était
+38 % du prompt de l'image à la une, en doublons — et cela doublait aussi le
+poids des mauvaises phrases.
 
 ## Version 0.2.76
 

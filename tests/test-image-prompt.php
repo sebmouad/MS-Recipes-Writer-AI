@@ -1,0 +1,95 @@
+<?php
+// Every assertion here is a refused image that was paid for. An image call is
+// billed mostly on what it is sent, so a prompt that is both wrong and long
+// costs twice: once for the generation, once for the regeneration it forces.
+require __DIR__ . '/bootstrap.php';
+require_once dirname( __DIR__ ) . '/tools/lib/steps.php';
+lab_settings();
+
+// The vision pass once reported another site's watermark and its yellow border
+// as facts about the dish. Both travelled into the image prompt and were drawn.
+$dirty = array(
+	'title' => 'Tarte aux pommes',
+	'canonical' => array(
+		'title' => 'Tarte aux pommes', 'servings' => 8, 'cook_minutes' => 45,
+		'ingredients' => array(
+			array( 'quantity' => '1', 'unit' => 'pâte', 'name' => 'pâte sablée' ),
+			array( 'quantity' => '6', 'unit' => '', 'name' => 'pommes à cuire' ),
+		),
+		'steps' => array( array( 'text' => 'Préchauffer le four.' ), array( 'text' => 'Garnir et cuire.' ) ),
+		'equipment' => array( 'moule à tarte' ),
+	),
+	'research' => array( 'visual_observations' => array( array(
+		'observable_details' => 'Une part de tarte dorée est posée au centre d’une assiette. Un texte noir lisible apparaît en bas à droite : « La Cuisine de Biscottine ». L’ensemble est photographié sur une surface en bois.',
+		'composition' => 'Vue légèrement plongeante. L’image est encadrée par une fine bordure jaune.',
+		'colours' => 'Doré et brun clair.',
+		'textures' => 'Surface irrégulière, bords plus fermes.',
+	) ) ),
+);
+
+$prompt = MSRWA_Engine_Input::image_prompt( 'featured', $dirty, array() );
+msrwa_test_missing( $prompt, 'Biscottine', 'A watermark read off a source photograph must never reach an image prompt.' );
+msrwa_test_missing( $prompt, 'bordure jaune', 'A border drawn on a source photograph is a fact about the file, not the dish.' );
+
+// Colour and texture describe the food. observable_details and composition
+// inventory the frame, and every measured image defect came through them: the
+// watermark, the border, two hands holding the plate, red and green strips
+// drawn as peppers, orange pieces drawn as carrots. Five defects, one channel.
+msrwa_test_contains( $prompt, 'Doré et brun clair', 'Colour must reach the image prompt: it is what the dish actually looks like.' );
+msrwa_test_contains( $prompt, 'Surface irrégulière', 'Texture must reach the image prompt.' );
+msrwa_test_missing( $prompt, 'surface en bois', 'observable_details inventories the frame and must not reach an image prompt.' );
+msrwa_test_missing( $prompt, 'plongeante', 'composition describes the framing and must not reach an image prompt.' );
+
+// The sentence-level filter still protects whatever does reach a prompt.
+msrwa_test_assert( '' === MSRWA_Engine_Input::about_the_dish( 'Un texte noir apparaît en bas à droite.' ), 'A sentence about the picture must be dropped whole.' );
+msrwa_test_assert( 'La tarte est dorée.' === MSRWA_Engine_Input::about_the_dish( 'La tarte est dorée. Le plat est tenu à deux mains.' ), 'Only the offending sentence goes; got ' . MSRWA_Engine_Input::about_the_dish( 'La tarte est dorée. Le plat est tenu à deux mains.' ) );
+
+// The observations come from other cooks. Where they disagree with the recipe,
+// the recipe wins — that is what stopped peppers and a lemon slice appearing.
+msrwa_test_contains( $prompt, 'ingredient list wins', 'The prompt must say which side wins when an observation and the recipe disagree.' );
+
+// The six rules a real generation broke, restated last, where a model weighs most.
+foreach ( array( 'BEFORE YOU DRAW', 'No hands', 'watermark', 'Serve it exactly as the brief above says' ) as $rule ) {
+	msrwa_test_contains( $prompt, $rule, 'The closing rules must carry: ' . $rule );
+}
+msrwa_test_assert( strlen( $prompt ) - mb_strpos( $prompt, 'BEFORE YOU DRAW' ) < 1400, 'The closing rules must stay near the end to be weighed as closing rules.' );
+
+// A unit that repeats the ingredient reads as two ingredients, which is exactly
+// what the exact-ingredient list exists to prevent.
+msrwa_test_contains( $prompt, '1 pâte sablée', 'A unit that repeats the name must be dropped, not printed twice.' );
+msrwa_test_missing( $prompt, 'pâte pâte', 'The ingredient list must not stutter.' );
+
+// The visual brief already distils the observations. Sending the raw package as
+// well repeated the same sentences and was 38% of the featured prompt.
+msrwa_test_missing( $prompt, 'What the real photographs showed', 'The raw observation package must not follow the brief that already distils it.' );
+msrwa_test_missing( $prompt, 'dish_identity', 'An image model has no use for source URLs and evidence prose.' );
+
+// A clean observation must survive untouched: the filter is for picture
+// furniture, not for anything that mentions a word in passing.
+$clean = $dirty;
+$clean['research']['visual_observations'][0]['observable_details'] = 'Une tarte dorée aux pommes, bords fermes, sur une assiette blanche.';
+$clean['research']['visual_observations'][0]['composition'] = 'Vue de trois quarts à hauteur de table.';
+$clean['research']['visual_observations'][0]['colours'] = 'Doré soutenu, crème et brun clair.';
+$kept = MSRWA_Engine_Input::image_prompt( 'featured', $clean, array() );
+msrwa_test_contains( $kept, 'Doré soutenu', 'A clean colour note must reach the prompt intact.' );
+// The vessel is still read from every field — it lifts one word out rather than
+// quoting text back at the image model, so it carries no garnish with it.
+msrwa_test_contains( $kept, 'plain ceramic plate', 'The serving vessel must still be read from the observations.' );
+msrwa_test_missing( $kept, 'assiette blanche', 'But the sentence it was read from must not be quoted into the prompt.' );
+
+// A caller may change which fields are trusted, like everything else.
+MSRWA_Engine_Input::use_observation_fields( array( 'observable_details' ) );
+msrwa_test_contains( MSRWA_Engine_Input::image_prompt( 'featured', $clean, array() ), 'assiette blanche', 'A caller may widen the fields an image prompt is built from.' );
+MSRWA_Engine_Input::use_observation_fields( array( 'colours', 'textures' ) );
+
+// The collage carries the panel count and the recipe's own order in its closing rules.
+$collage = MSRWA_Engine_Input::image_prompt( 'facebook', $clean, array( 'collage_panels' => 6 ) );
+msrwa_test_contains( $collage, 'Exactly 6 panels', 'The collage must restate its panel count last.' );
+msrwa_test_contains( $collage, "recipe's own order", 'The collage must restate that the recipe fixes the order.' );
+
+// Both images of one dish must be told the same serving presentation, or they
+// disagree — which was three refusals in four before it was written into both.
+$featured_serving = MSRWA_Engine_Input::serving_presentation( $clean['canonical'], $clean['research'], true );
+msrwa_test_assert( false !== strpos( $kept, $featured_serving ) && false !== strpos( $collage, $featured_serving ), 'The featured photograph and the collage must be given the same serving presentation.' );
+
+msrwa_test_done( 'image prompts' );

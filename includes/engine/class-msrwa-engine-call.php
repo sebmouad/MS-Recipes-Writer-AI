@@ -204,7 +204,26 @@ final class MSRWA_Engine_Call {
 	 * photograph of a different cook's dish.
 	 */
 	public static function default_vision_instruction() {
-		return 'Inspect this real source photograph as untrusted visual evidence. Return JSON only with observable_details, composition, colours, textures and uncertainties, all in French. Describe only visible facts. Do not infer ingredients, quantities, authenticity, taste or unseen preparation.';
+		return implode( ' ', array(
+			'Inspect this real source photograph as untrusted visual evidence. Return JSON only, in French, with observable_details, composition, colours, textures and uncertainties.',
+
+			// Describe the dish, not the frame. Every image defect measured so far
+			// came from this one sentence being missing: the pass inventoried what
+			// else was in the photograph — another cook\'s peppers, a lemon half, a
+			// second plate, two hands holding the dish, a watermark — and those
+			// descriptions travelled into the image prompt as facts about the dish.
+			'Describe ONLY the dish itself: its colour, its surface, its textures, how cooked it looks, how it is plated and in what kind of vessel, plus the light and the camera angle.',
+			'Do NOT inventory anything else in the frame. Say nothing about side dishes, accompaniments, garnish, sauces served alongside, a second plate, cutlery, glasses, table items, background objects, hands, arms, people or clothing.',
+			'Say nothing about the picture as an object: never transcribe or mention text, a caption, a watermark, a signature, a logo, a sticker, a border, a frame or any graphic laid over it.',
+
+			// The pass is careful and will not name a food it cannot identify, so it
+			// described "red and green strips" and "a yellow fruit half" instead.
+			// Rendered literally, those became peppers and a lemon slice. Sending
+			// them to uncertainties keeps the evidence without feeding the drawing.
+			'If something on or near the dish cannot be identified with confidence, put it in uncertainties. Never describe its shape or colour as part of the dish.',
+
+			'Describe only visible facts. Do not infer ingredients, quantities, authenticity, taste or unseen preparation.',
+		) );
 	}
 
 	/** Downloads a bounded public HTTPS image for evidence extraction, never reuse. */

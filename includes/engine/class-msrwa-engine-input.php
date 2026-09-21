@@ -15,6 +15,30 @@ final class MSRWA_Engine_Input {
 	public static function prompt_path( $file ) { return __DIR__ . '/prompts/' . $file; }
 
 	/**
+	 * One ingredient, written the way an image prompt should read it.
+	 *
+	 * Models name the unit after the thing itself — "1 pâte, pâte sablée",
+	 * "2 œufs, œufs". Written out as given it reads as two ingredients, which is
+	 * what an exact ingredient list exists to prevent.
+	 */
+	public static function ingredient_line( $ingredient ) {
+		$unit = trim( (string) ( $ingredient['unit'] ?? '' ) );
+		$name = trim( (string) ( $ingredient['name'] ?? '' ) );
+		if ( '' !== $unit && 0 === mb_stripos( $name, $unit ) ) { $unit = ''; }
+		return trim( trim( (string) ( $ingredient['quantity'] ?? '' ) . ' ' . $unit ) . ' ' . $name );
+	}
+
+	/** How many observed phrases reach a prompt. The caller sets it; zero means the default. */
+	private static $observation_phrases = 0;
+
+	/** Which observation fields describe the food rather than the frame. */
+	private static $observation_fields = array();
+
+	public static function use_observation_phrases( $count ) { self::$observation_phrases = max( 0, (int) $count ); }
+
+	public static function use_observation_fields( $fields ) { self::$observation_fields = array_values( array_filter( (array) $fields ) ); }
+
+	/**
 	 * The settings the engine runs against.
 	 *
 	 * The plugin hands its own in; standalone, the engine reads the shipped
@@ -81,6 +105,46 @@ final class MSRWA_Engine_Input {
 	}
 
 	/**
+	 * Drops what an observation says about the photograph rather than the food.
+	 *
+	 * The vision pass is told not to, and mostly does not. When it does, the
+	 * sentence is a fact about someone else's image file — a watermark, a
+	 * signature, a coloured border — and it travels into the image prompt as a
+	 * description of how the dish looks. A generation then drew "La Cuisine de
+	 * Biscottine" across the corner and a yellow frame around the picture, which
+	 * the approval step refused, at the price of two regenerations and a second
+	 * verdict. The prompt already forbade text three times over; a description
+	 * beats a prohibition, so the description has to go.
+	 */
+	public static function about_the_dish( $text, $pattern = '' ) {
+		$text = trim( (string) $text );
+		if ( '' === $text ) { return ''; }
+		$pattern = '' !== trim( (string) $pattern ) ? $pattern : self::staging_pattern();
+		$kept = array();
+		// Sentence by sentence: one bad clause must not cost the whole observation.
+		foreach ( preg_split( '/(?<=[.!?])\s+/u', $text ) as $sentence ) {
+			if ( '' === trim( $sentence ) || preg_match( $pattern, $sentence ) ) { continue; }
+			$kept[] = trim( $sentence );
+		}
+		return implode( ' ', $kept );
+	}
+
+	/**
+	 * What counts as a description of the photograph rather than of the dish.
+	 *
+	 * Two families, both measured: the picture as an object — text, watermark,
+	 * signature, border — and the picture's staging — the hands holding the
+	 * plate, the cook's clothing, the second plate at the edge of the frame. A
+	 * generation drew the watermark, and another served the dish held in two
+	 * hands because that is how the source photograph was staged.
+	 */
+	public static function staging_pattern() {
+		return '/\b(texte|textes|mention|inscription|lettrage|l[ée]gende|filigrane|signature|logo|marque|watermark|autocollant|sticker|bordure|cadre|liser[ée]|bandeau|vignette|mosa[ïi]que|collage|capture|montage'
+			. '|main|mains|bras|doigt|doigts|personne|homme|femme|torse|v[êe]tement|tablier|manche|poignet'
+			. '|seconde assiette|deuxi[èe]me assiette|arri[èe]re-plan|背景)\b/iu';
+	}
+
+	/**
 	 * Turns the recipe and the research into constraints an image model can obey,
 	 * instead of the JSON dump it used to receive.
 	 *
@@ -102,7 +166,7 @@ final class MSRWA_Engine_Input {
 			if ( '' !== $quantity && is_numeric( str_replace( ',', '.', $quantity ) ) && in_array( mb_strtolower( $unit ), $countable, true ) ) {
 				$counts[] = $name . ' — exactly ' . $quantity . ( '' === $unit ? '' : ' ' . $unit );
 			} else {
-				$measured[] = trim( $quantity . ' ' . $unit . ' ' . $name );
+				$measured[] = self::ingredient_line( $ingredient );
 			}
 		}
 
@@ -124,16 +188,32 @@ final class MSRWA_Engine_Input {
 			$lines[] = '• Scale and doneness: ' . ( $servings > 0 ? 'serves ' . $servings . '. ' : '' ) . ( $cook > 0 ? 'Cooked ' . $cook . ' minutes, so the colour is what that produces — not darker for drama.' : '' );
 		}
 
+		/*
+		 * Colour and texture describe the food. observable_details and composition
+		 * describe the frame — they are an inventory of what is in the photograph,
+		 * and every leak measured so far came through them: another site's
+		 * watermark and its yellow border, two hands holding the plate, red and
+		 * green strips that were drawn as peppers, orange pieces that were drawn as
+		 * carrots. Five defects, five refusals, one channel. The camera angle is
+		 * not lost with them: the serving presentation below fixes it.
+		 */
 		$observed = array();
+		$fields = self::$observation_fields ? self::$observation_fields : array( 'colours', 'textures' );
 		foreach ( (array) ( $research['visual_observations'] ?? array() ) as $observation ) {
 			if ( ! is_array( $observation ) ) { continue; }
-			foreach ( array( 'colours', 'textures', 'observable_details', 'composition' ) as $key ) {
-				$value = self::observation_text( $observation[ $key ] ?? '' );
+			foreach ( $fields as $key ) {
+				$value = self::about_the_dish( self::observation_text( $observation[ $key ] ?? '' ) );
 				if ( '' !== $value ) { $observed[] = $value; }
 			}
 		}
 		if ( $observed ) {
-			$lines[] = '• How the real dish looks, observed in photographs of it: ' . implode( ' ', array_slice( array_unique( $observed ), 0, 8 ) ) . ' The finished dish must match this. It may not look more cooked, more darkly coloured or more elaborately garnished than these observations describe.';
+			$phrases = (int) ( self::$observation_phrases > 0 ? self::$observation_phrases : 8 );
+			// These describe other cooks' photographs of the same dish, so they are
+			// evidence about appearance and nothing else. Saying which one wins, here
+			// where the observations actually are, is what stopped the image model
+			// adding the peppers and the lemon slice it had just been shown.
+			$lines[] = '• How the real dish looks, observed in photographs of it: ' . implode( ' ', array_slice( array_unique( $observed ), 0, $phrases ) )
+				. ' These are other cooks\' photographs of this dish: read them for colour, texture, doneness and plating only. Where one shows a food the ingredient list above does not contain, the ingredient list wins and that food does not appear. The finished dish may not look more cooked, more darkly coloured or more elaborately garnished than these observations describe.';
 		}
 
 		// Every image is generated in its own call, so nothing makes them agree unless
@@ -150,13 +230,21 @@ final class MSRWA_Engine_Input {
 	 * "whole, seen at three quarters" still chose a plate and a tin, and the
 	 * approval step blocked the pair every time. The vessel has to be named.
 	 */
-	public static function serving_presentation( $canonical, $research ) {
-		$text = '';
+	public static function serving_presentation( $canonical, $research, $short = false ) {
+		// Two different reads of the same observations. Choosing the vessel may scan
+		// everything, because it only lifts a single word out — "assiette", "plat",
+		// "cocotte". Quoting the colour back to the image model may not: that text is
+		// drawn, and the inventory fields are what put another cook's garnish in it.
+		$vessel_text = '';
+		$appearance_text = '';
+		$fields = self::$observation_fields ? self::$observation_fields : array( 'colours', 'textures' );
 		foreach ( (array) ( $research['visual_observations'] ?? array() ) as $observation ) {
 			if ( ! is_array( $observation ) ) { continue; }
-			foreach ( array( 'observable_details', 'composition', 'colours' ) as $key ) { $text .= ' ' . self::observation_text( $observation[ $key ] ?? '' ); }
+			foreach ( array( 'observable_details', 'composition', 'colours' ) as $key ) { $vessel_text .= ' ' . self::observation_text( $observation[ $key ] ?? '' ); }
+			foreach ( $fields as $key ) { $appearance_text .= ' ' . self::observation_text( $observation[ $key ] ?? '' ); }
 		}
-		$text .= ' ' . (string) ( $research['visual_reference']['plating'] ?? '' );
+		$vessel_text .= ' ' . (string) ( $research['visual_reference']['plating'] ?? '' );
+		$text = $vessel_text;
 
 		// A vessel the observations actually name wins; otherwise one is chosen here,
 		// because leaving it open is what let the two images disagree.
@@ -176,8 +264,10 @@ final class MSRWA_Engine_Input {
 		}
 		if ( '' === $decision ) { $decision = 'removed from whatever it was cooked in and served whole on a plain ceramic plate'; }
 
-		$appearance = trim( preg_replace( '/\s+/', ' ', $text ) );
-		return $decision . ', whole and centred, photographed from a three-quarter angle at table height, never from directly above'
+		$appearance = trim( preg_replace( '/\s+/', ' ', self::about_the_dish( $appearance_text ) ) );
+		$framing = ', whole and centred, photographed from a three-quarter angle at table height, never from directly above';
+		if ( $short ) { return $decision . $framing . '.'; }
+		return $decision . $framing
 			. ( '' === $appearance ? '' : ', and at exactly the colour the observations record: ' . mb_substr( $appearance, 0, 240 ) );
 	}
 
@@ -252,19 +342,22 @@ final class MSRWA_Engine_Input {
 	 */
 	public static function image_prompt( $kind, $brief, $options = array(), $findings = array() ) {
 		$settings = self::settings();
-		$encode = static function ( $value ) { return json_encode( $value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ); };
 		$research = self::research_package( $brief );
 		$canonical = self::canonical_recipe( $brief );
 		$ingredients = array();
 		foreach ( (array) ( $canonical['ingredients'] ?? array() ) as $ingredient ) {
-			$ingredients[] = trim( ( $ingredient['quantity'] ?? '' ) . ' ' . ( $ingredient['unit'] ?? '' ) . ' ' . ( $ingredient['name'] ?? '' ) );
+			if ( is_array( $ingredient ) ) { $ingredients[] = self::ingredient_line( $ingredient ); }
 		}
 		$file = self::prompt_path( ( 'featured' === $kind ? 'featured_image' : 'facebook_image' ) . '.tpl.txt' );
+		// The visual brief already distils the observations into constraints. The raw
+		// package used to follow it as well, which repeated the same sentences a
+		// second time — 38% of the featured prompt, and roughly half the cost of the
+		// image, since an image call is billed mostly on what it is sent. Repeating
+		// them also doubled the weight of the bad ones.
 		$prompt = MSRWA_Prompt::compile( trim( file_get_contents( $file ) ), $settings ) . "\n\n"
 			. 'Recipe title: ' . (string) ( $canonical['title'] ?? $brief['title'] ) . "\n"
 			. 'Exact ingredients: ' . implode( ', ', $ingredients ) . "\n\n"
-			. self::visual_brief( $canonical, $research ) . "\n"
-			. 'What the real photographs showed, for anything the brief above does not cover: ' . $encode( self::research_for_image( $research ) ) . "\n";
+			. self::visual_brief( $canonical, $research ) . "\n";
 
 		if ( 'facebook' === $kind ) {
 			$all_steps = array_values( (array) ( $canonical['steps'] ?? array() ) );
@@ -291,6 +384,24 @@ final class MSRWA_Engine_Input {
 				}
 			}
 		}
+
+		// Last, because last is what a model weighs most. Every line here is a rule
+		// stated earlier that a real generation broke anyway: hands holding the dish,
+		// a bowl where the brief named a plate, another site's watermark, a garnish
+		// nobody bought. Restating them in six lines at the end costs about 400
+		// characters and is cheaper than one refused image.
+		$prompt .= "\nBEFORE YOU DRAW — the six rules a previous attempt at this brief broke:\n"
+			. "1. No text anywhere in the image: no caption, signature, watermark, logo, sticker, border or coloured frame. Nothing written, in any corner.\n"
+			. "2. No hands, no arms, no people. Nobody holds, carries or presents the dish.\n"
+			. '3. Nothing on the plate that is not in this list: ' . implode( ', ', $ingredients ) . ". No herb sprig, no citrus wedge, no dusting, no drizzle, no scattered seeds, however usual that looks."
+			// The observations name only what the vision pass could identify, so an
+			// unrecognised garnish arrives as "red and green strips" or "a yellow
+			// fruit half". Drawn literally those became peppers and a lemon slice,
+			// twice, on the same recipe. A colour and a shape is not permission.
+			. " If an observation describes something only by its colour or its shape — coloured strips, an unidentified fruit, green tufts, pale pieces — that is another cook's garnish and it does not belong to this recipe: leave it out.\n"
+			. '4. Serve it exactly as the brief above says: ' . self::serving_presentation( $canonical, $research, true ) . "\n"
+			. "5. Anything the recipe says to lift out or discard before serving is not visible in the finished dish.\n"
+			. ( 'facebook' === $kind ? "6. Exactly " . (int) ( $options['collage_panels'] ?? $settings['facebook_collage_steps'] ?? 6 ) . " panels, in the recipe's own order, with the last one presented as rule 4 says.\n" : "6. One plate, one dish, photographed once. No collage, no before and after.\n" );
 
 		$findings = array_values( array_filter( (array) $findings, 'is_array' ) );
 		if ( $findings ) {
