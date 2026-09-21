@@ -11,6 +11,7 @@ function lab_boot() {
 	if ( $booted ) { return; }
 	$booted = true;
 	require_once dirname( __DIR__, 2 ) . '/tests/bootstrap.php';
+	require_once dirname( __DIR__, 2 ) . '/includes/engine/load.php';
 	foreach ( array( 'recipe', 'quality', 'catalog', 'images', 'prompt', 'json', 'cost' ) as $class ) {
 		require_once dirname( __DIR__, 2 ) . '/includes/class-msrwa-' . $class . '.php';
 	}

@@ -311,6 +311,24 @@ cost) in the task before changing anything.
   14/14 with `cook_minutes` honestly null, lamb 14/14 with all eight keys and all
   four figures.
 
+- [~] **A34 — The lab becomes the engine (owner directive, 2026-09-21).** Stage
+  one: orchestration moves from `tools/` to `includes/engine/`, loaded by the
+  plugin and the lab alike, touching no WordPress function. The plugin passes
+  settings in and takes a `MSRWA_Result` back.
+  `MSRWA_Result` is the envelope — ok, artifacts, steps, totals, errors, events —
+  and doubles as the live progress report, with an observer called per event.
+  Failure is a value: a missing key, an unknown model or a provider error all
+  come back as data, and the nine `exit()` calls the lab could afford are gone.
+  `MSRWA_Engine_Steps` declares what each step needs, which gives the run order
+  and the parallelism: research, then the recipe, then **article with both
+  images**, then **the three reviews**, then approval. Estimated critical path
+  ~186s against ~250s serial.
+  Found while drawing the graph: approval depended on the raw article, so it
+  judged text a reader never sees. It now depends on the proofread article.
+  *Remaining:* migrate step inputs and scoring out of `tools/lib/steps.php`,
+  collapse the eight CLI tools into one, and add the run-a-whole-recipe entry
+  point with its wave scheduler.
+
 - [~] **A4 — Review.** Written in English; findings must name the section to patch. *Original:* **A4 — Review.** Returns a boolean verdict plus findings that name the
   **section to patch**, never a full rewrite instruction.
 - [~] **A5 — Fact check** (new step). Written; scored on whether it quotes the article verbatim rather than inventing a sentence to correct. *Original:* **A5 — Fact check** (new step). Compares the finished article to the

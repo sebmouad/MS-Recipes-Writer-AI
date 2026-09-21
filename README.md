@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.68` est un socle installable : file persistante, pipeline de
+La version `0.2.69` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.
@@ -20,6 +20,48 @@ Le plugin est en cours de refonte éditoriale et budgétaire :
 Les coûts affichés sont des estimations calculées avec le catalogue configuré,
 non une facture fournisseur. `completed` signifie que le traitement est terminé,
 jamais qu’un texte est validé éditorialement.
+
+## Version 0.2.69
+
+**Le laboratoire devient le moteur du plugin** — première étape. Le code
+d'orchestration quitte `tools/` pour `includes/engine/`, chargé par le plugin
+comme par le laboratoire. C'est le même code des deux côtés, par construction :
+un prompt prouvé au banc d'essai ne peut plus diverger de celui qui tourne en
+production.
+
+Le moteur ne touche aucune fonction WordPress. Le plugin lui passe ses réglages
+et récupère un résultat.
+
+- **`MSRWA_Result`** — l'enveloppe que rend chaque exécution : `ok`, artefacts,
+  étapes, totaux, erreurs, événements. Elle sert de rapport d'avancement pendant
+  l'exécution *et* de trace après, si bien que l'écran d'administration et le
+  rapport HTML lisent la même chose. Un observateur reçoit chaque événement au
+  moment où il se produit, pour une barre de progression réelle.
+- **Une panne est une valeur, jamais une mort.** Clé absente, modèle inconnu,
+  fournisseur en erreur : tout revient en donnée. Le laboratoire pouvait se
+  permettre `exit(2)` ; un plugin ne le peut pas. Les neuf points de sortie
+  brutale ont disparu.
+- **`MSRWA_Engine_Steps`** décrit ce que chaque étape exige avant de tourner. Le
+  graphe qui en découle montre où se gagne le temps :
+
+| Vague | Étapes simultanées |
+|---|---|
+| 1 | recherche |
+| 2 | recette canonique |
+| 3 | **article, image à la une, collage** |
+| 4 | **revue, fact-check, correction** |
+| 5 | approbation finale |
+
+  Les images ne dépendent que de la recette et de la recherche, pas de
+  l'article : elles peuvent tourner pendant sa rédaction. Chemin critique estimé
+  à ~186 s contre ~250 s en série.
+
+- **Correction éditoriale trouvée en dessinant le graphe** : l'approbation
+  dépend désormais de la correction, pas de l'article brut. On jugeait le texte
+  avant sa relecture, donc pas celui que le lecteur reçoit.
+
+`tools/lib/` ne contient plus que des adaptateurs vers le moteur, le temps de
+migrer les appelants ; ils disparaîtront à l'étape suivante.
 
 ## Version 0.2.68
 
