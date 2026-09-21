@@ -11,23 +11,8 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
  */
 final class MSRWA_Engine_Input {
 
-	/**
-	 * Where the engine reads prompts and where the lab keeps its briefs and runs.
-	 *
-	 * Prompts are the engine's own data and sit beside it. Briefs and saved runs
-	 * belong to whoever is driving it — the lab sets this; the plugin never does,
-	 * because it passes its data in directly.
-	 */
-	private static $lab_root = '';
-
-	public static function use_lab_root( $path ) { self::$lab_root = rtrim( (string) $path, '/' ); }
-
+	/** Prompts are the engine's own data and sit beside it. */
 	public static function prompt_path( $file ) { return __DIR__ . '/prompts/' . $file; }
-
-	private static function lab_path( $file ) {
-		$root = self::$lab_root ? self::$lab_root : dirname( __DIR__, 2 ) . '/tools';
-		return $root . '/' . $file;
-	}
 
 	/**
 	 * The settings the engine runs against.
@@ -51,15 +36,11 @@ final class MSRWA_Engine_Input {
 
 	/** Normalizes title-, article- and image-led editor briefs into one contract. */
 	public static function editor_brief( $brief ) {
-		// A malformed editor_input used to be forwarded as-is. The research model then
-		// answered, truthfully, that it had been given no dish to research, and the run
-		// still cost money and scored seven of ten.
-		if ( isset( $brief['editor_input'] ) && is_array( $brief['editor_input'] ) ) {
-			$editor = $brief['editor_input'];
-			if ( '' === trim( (string) ( $editor['title'] ?? '' ) ) && '' === trim( (string) ( $editor['text'] ?? '' ) ) ) {
-				fwrite( STDERR, "The brief's editor_input carries neither a title nor a text; there is nothing to research.\n" );
-				exit( 2 );
-			}
+		// An editor_input carrying neither title nor text is not a brief; the run
+		// refuses it before anything is billed. Reaching here with one means the
+		// caller bypassed MSRWA_Engine::run(), so the outer shape is used instead.
+		$editor = isset( $brief['editor_input'] ) && is_array( $brief['editor_input'] ) ? $brief['editor_input'] : array();
+		if ( '' !== trim( (string) ( $editor['title'] ?? '' ) ) || '' !== trim( (string) ( $editor['text'] ?? '' ) ) ) {
 			return $editor;
 		}
 		return array(
@@ -70,35 +51,16 @@ final class MSRWA_Engine_Input {
 		);
 	}
 
-	/** Loads a saved research run or the fixture package. Downstream stages share it unchanged. */
-	public static function research_package( $brief, $options = array() ) {
-		$file = (string) ( $options['research'] ?? '' );
-		if ( '' === $file ) { return is_array( $brief['research'] ?? null ) ? $brief['research'] : array(); }
-		if ( ! file_exists( $file ) ) { fwrite( STDERR, "No such research package: {$file}\n" ); exit( 2 ); }
-		$data = json_decode( file_get_contents( $file ), true );
-		if ( isset( $data['output'] ) && is_string( $data['output'] ) ) { $data = MSRWA_Json::decode( $data['output'] ); }
-		if ( ! is_array( $data ) ) { fwrite( STDERR, "Research package is not valid JSON: {$file}\n" ); exit( 2 ); }
-		return $data;
-	}
+	/*
+	 * The three artifacts every later step reads. They arrive in memory, from the
+	 * run that produced them; reading them off disk is the lab's business, not the
+	 * engine's, and keeping it that way is what lets the plugin call the same code.
+	 */
+	public static function research_package( $brief ) { return is_array( $brief['research'] ?? null ) ? $brief['research'] : array(); }
 
-	/** Loads the saved canonical step when supplied, otherwise the fixture recipe. */
-	public static function canonical_recipe( $brief, $options = array() ) {
-		$file = (string) ( $options['canonical'] ?? '' );
-		if ( '' === $file ) { return is_array( $brief['canonical'] ?? null ) ? $brief['canonical'] : array(); }
-		if ( ! file_exists( $file ) ) { fwrite( STDERR, "No such canonical recipe: {$file}\n" ); exit( 2 ); }
-		$data = json_decode( file_get_contents( $file ), true );
-		if ( isset( $data['output'] ) && is_string( $data['output'] ) ) { $data = MSRWA_Json::decode( $data['output'] ); }
-		if ( ! is_array( $data ) ) { fwrite( STDERR, "Canonical recipe is not valid JSON: {$file}\n" ); exit( 2 ); }
-		return $data;
-	}
+	public static function canonical_recipe( $brief ) { return is_array( $brief['canonical'] ?? null ) ? $brief['canonical'] : array(); }
 
-	public static function brief( $name ) {
-		$file = self::lab_path( 'fixtures/' . basename( $name ) . '.json' );
-		if ( ! file_exists( $file ) ) { fwrite( STDERR, "No such brief: {$file}\n" ); exit( 2 ); }
-		$brief = json_decode( file_get_contents( $file ), true );
-		if ( ! is_array( $brief ) ) { fwrite( STDERR, "Brief is not valid JSON: {$file}\n" ); exit( 2 ); }
-		return $brief;
-	}
+	public static function article( $brief ) { return is_array( $brief['article'] ?? null ) ? $brief['article'] : array(); }
 
 	/**
 	 * One observation field as prose. The vision model returns some of these as a
@@ -288,8 +250,8 @@ final class MSRWA_Engine_Input {
 	public static function image_prompt( $kind, $brief, $options = array(), $findings = array() ) {
 		$settings = self::settings();
 		$encode = static function ( $value ) { return json_encode( $value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ); };
-		$research = self::research_package( $brief, $options );
-		$canonical = self::canonical_recipe( $brief, $options );
+		$research = self::research_package( $brief );
+		$canonical = self::canonical_recipe( $brief );
 		$ingredients = array();
 		foreach ( (array) ( $canonical['ingredients'] ?? array() ) as $ingredient ) {
 			$ingredients[] = trim( ( $ingredient['quantity'] ?? '' ) . ' ' . ( $ingredient['unit'] ?? '' ) . ' ' . ( $ingredient['name'] ?? '' ) );
@@ -304,17 +266,18 @@ final class MSRWA_Engine_Input {
 		if ( 'facebook' === $kind ) {
 			$all_steps = array_values( (array) ( $canonical['steps'] ?? array() ) );
 			$steps = array();
+			$panels = (int) ( $options['collage_panels'] ?? $settings['facebook_collage_steps'] ?? 6 );
 			$selected = array_values( array_filter( array_map( 'intval', explode( ',', (string) ( $options['steps'] ?? '' ) ) ) ) );
-			if ( $selected ) {
-				if ( 6 !== count( $selected ) ) { fwrite( STDERR, "Facebook --steps must contain exactly six comma-separated canonical step numbers.\n" ); exit( 2 ); }
-				foreach ( $selected as $number ) {
-					if ( isset( $all_steps[ $number - 1 ] ) ) { $steps[] = count( $steps ) + 1 . '. ' . ( $all_steps[ $number - 1 ]['text'] ?? '' ); }
-				}
-				if ( 6 !== count( $steps ) ) { fwrite( STDERR, "One or more Facebook --steps numbers do not exist in the canonical recipe.\n" ); exit( 2 ); }
-				$prompt .= 'Use these six editor-selected canonical moments, in this order: ' . implode( ' ', $steps ) . "\n";
+			foreach ( $selected as $number ) {
+				if ( isset( $all_steps[ $number - 1 ] ) ) { $steps[] = count( $steps ) + 1 . '. ' . ( $all_steps[ $number - 1 ]['text'] ?? '' ); }
+			}
+			if ( count( $steps ) === $panels && $panels > 0 ) {
+				$prompt .= 'Use these ' . $panels . ' editor-selected canonical moments, in this order: ' . implode( ' ', $steps ) . "\n";
 			} else {
+				// A partial or impossible selection is not a silent half-selection: the
+				// model gets the whole pool back and chooses, as it would with none.
+				$steps = array();
 				foreach ( $all_steps as $index => $step ) { $steps[] = ( $index + 1 ) . '. ' . ( $step['text'] ?? '' ); }
-				$panels = (int) ( $settings['facebook_collage_steps'] ?? 6 );
 				if ( count( $all_steps ) === $panels ) {
 					// Nothing to choose: every step is a panel. Leaving the model to select
 					// anyway is what produced the ordering failures — it hoisted the batter
@@ -324,13 +287,6 @@ final class MSRWA_Engine_Input {
 					$prompt .= 'Canonical step pool, numbered in the order the recipe performs them: ' . implode( ' ', $steps ) . "\nSelect exactly " . $panels . " visually distinct moments using the storyboard contract, then lay them out in ascending step number; do not sample mechanically or show passive filler.\n";
 				}
 			}
-		}
-
-		// The provider rejects a prompt over 32000 characters, and did so once the
-		// research package grew. Fail here, where the cause is visible, not there.
-		if ( strlen( $prompt ) > 30000 ) {
-			fwrite( STDERR, 'The ' . $kind . " image prompt is " . strlen( $prompt ) . " characters; the provider refuses anything over 32000. Trim what self::research_for_image() forwards.\n" );
-			exit( 1 );
 		}
 
 		$findings = array_values( array_filter( (array) $findings, 'is_array' ) );
@@ -343,14 +299,14 @@ final class MSRWA_Engine_Input {
 		return $prompt;
 	}
 
-	/** Assembles the same input the pipeline would send for this step. */
-	public static function build( $step, $prompt, $brief, $options ) {
+	/** Assembles the input one step is sent, from the artifacts already produced. */
+	public static function build( $step, $prompt, $brief, $options = array() ) {
 		$settings = self::settings();
 		$encode = static function ( $value ) { return json_encode( $value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ); };
 		$editor = self::editor_brief( $brief );
-		$research = self::research_package( $brief, $options );
+		$research = self::research_package( $brief );
 		$text_research = self::research_for_text( $research );
-		$canonical = self::canonical_recipe( $brief, $options );
+		$canonical = self::canonical_recipe( $brief );
 		if ( 'research' === $step ) {
 			return $prompt . "\nEDITOR BRIEF: " . $encode( $editor );
 		}
@@ -359,13 +315,8 @@ final class MSRWA_Engine_Input {
 				. "\n" . self::observed_appearance( $research );
 		}
 		if ( 'article' === $step ) {
-			$feedback = array();
-			$feedback_file = (string) ( $options['feedback'] ?? '' );
-			if ( '' !== $feedback_file && file_exists( $feedback_file ) ) {
-				$saved = json_decode( file_get_contents( $feedback_file ), true );
-				$feedback = MSRWA_Json::decode( (string) ( $saved['output'] ?? '' ) );
-				$feedback = is_array( $feedback ) ? $feedback : array();
-			}
+			// A rewrite carries the findings the reviews raised; a first draft carries none.
+			$feedback = is_array( $brief['feedback'] ?? null ) ? $brief['feedback'] : array();
 			return $prompt . MSRWA_Quality::prompt_contract( $settings )
 				. "\nRecette canonique : " . $encode( $canonical )
 				. "\nRESEARCH PACKAGE: " . $encode( $text_research )
@@ -375,39 +326,19 @@ final class MSRWA_Engine_Input {
 		if ( 'review' === $step ) {
 			return $prompt . "\nCANONICAL RECIPE: " . $encode( $canonical )
 				. "\nRESEARCH PACKAGE: " . $encode( $text_research )
-				. "\nARTICLE: " . $encode( self::article_under_test( $options ) );
+				. "\nARTICLE: " . $encode( self::article( $brief ) );
 		}
 		if ( 'fact_check' === $step ) {
 			return $prompt . "\nRESEARCH PACKAGE: " . $encode( $text_research )
 				. "\nCANONICAL RECIPE: " . $encode( $canonical )
-				. "\nARTICLE: " . $encode( self::article_under_test( $options )['content_html'] ?? '' );
+				. "\nARTICLE: " . $encode( self::article( $brief )['content_html'] ?? '' );
 		}
 		if ( 'proofread' === $step ) {
 			return $prompt . "\nRESEARCH PACKAGE: " . $encode( $research )
 				. "\nCANONICAL RECIPE: " . $encode( $canonical )
-				. "\nARTICLE TO CORRECT: " . $encode( self::article_under_test( $options )['content_html'] ?? '' );
+				. "\nARTICLE TO CORRECT: " . $encode( self::article( $brief )['content_html'] ?? '' );
 		}
 		return $prompt;
-	}
-
-	/**
-	 * The article the review, fact check and proofreading steps are measured on.
-	 * One fixed article for every provider and tier, so the comparison is fair.
-	 */
-	public static function article_under_test( $options ) {
-		static $article = null;
-		if ( null !== $article ) { return $article; }
-		$file = $options['article'] ?? '';
-		if ( '' === $file ) {
-			$candidates = glob( self::lab_path( 'runs/article-*.json' ) );
-			sort( $candidates );
-			$file = $candidates ? $candidates[0] : '';
-		}
-		if ( '' === $file || ! file_exists( $file ) ) { fwrite( STDERR, "No article to measure against. Run the article step first, or pass --article=<run.json>.\n" ); exit( 2 ); }
-		$run = json_decode( file_get_contents( $file ), true );
-		$article = json_decode( (string) ( $run['output'] ?? '' ), true );
-		$article = is_array( $article ) ? $article : array();
-		return $article;
 	}
 
 	/** Heading texts of an article body. */

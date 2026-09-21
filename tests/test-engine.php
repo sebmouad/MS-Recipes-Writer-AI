@@ -60,4 +60,49 @@ msrwa_test_assert( array( 'final_approval' ) === $waves[4], 'Approval is last: i
 $missing = MSRWA_Engine_Steps::missing( 'article', array( 'research' => true ) );
 msrwa_test_assert( array( 'canonical' ) === $missing, 'A step must say what it is still waiting for.' );
 
+// Every step names a prompt that exists, or the run fails at the provider.
+foreach ( MSRWA_Engine_Steps::all() as $name => $step ) {
+	msrwa_test_assert( ! empty( $step['prompt'] ), $name . ' must name its prompt template.' );
+	msrwa_test_assert( is_readable( MSRWA_Engine_Input::prompt_path( $step['prompt'] ) ), $step['prompt'] . ' must exist beside the engine.' );
+}
+
+// Configuration speaks the engine's vocabulary, and the caller overrides it in that
+// vocabulary — never the other way round.
+$config = MSRWA_Engine_Config::create(
+	array( 'max_output' => array( 'article' => 9000 ), 'images' => array( 'featured_quality' => 'high' ) ),
+	array( 'routing' => array( 'article' => 'claude:high' ), 'max_output' => array( 'article' => 99999 ) )
+);
+msrwa_test_assert( 'high' === $config->get( 'images.featured_quality' ), 'A caller value must survive where the run says nothing.' );
+msrwa_test_assert( 32000 === $config->max_output( 'article' ), 'A ceiling above what providers accept is clamped, not forwarded.' );
+msrwa_test_assert( 4500 === $config->max_output( 'canonical_recipe' ), 'An untouched default must stay the measured one.' );
+msrwa_test_assert( 'claude' === $config->model_for( 'article' )['provider'], 'The run layer overrides the caller layer.' );
+msrwa_test_assert( ! isset( $config->to_array()['settings'] ), 'The recorded configuration must never carry the settings, which hold keys.' );
+
+// A brief with nothing in it costs nothing and kills nobody.
+$empty = MSRWA_Engine::run( array( 'title' => '  ', 'text' => '' ) );
+msrwa_test_assert( false === $empty->ok && 0 === count( $empty->steps ), 'An empty brief must be refused before anything is billed.' );
+
+// A whole run without a key: every step reports, none exits, and the pipeline
+// still terminates instead of waiting forever on an artifact that never came.
+putenv( 'OPENAI_API_KEY' );
+putenv( 'MSRWA_OPENAI_KEY' );
+$run = MSRWA_Engine::run( array( 'title' => 'Tarte aux pommes' ) );
+msrwa_test_assert( false === $run->ok, 'A run with no key cannot succeed.' );
+msrwa_test_assert( count( MSRWA_Engine_Steps::names() ) === count( $run->errors ), 'Every step must account for itself, whether it ran or waited.' );
+msrwa_test_assert( 0.0 === $run->totals()['cost_usd'], 'A call that never happened costs nothing.' );
+if ( false !== $before ) { putenv( 'OPENAI_API_KEY=' . $before ); }
+
+// Each capability reaches its own path: text, image generation and the judge that
+// reads image bytes. None of the three may take the run down with it.
+$artifacts = array(
+	'research' => array( 'ingredients' => array( array( 'name' => 'pommes' ) ) ),
+	'canonical' => array( 'title' => 'Tarte aux pommes', 'ingredients' => array( array( 'quantity' => '6', 'name' => 'pommes' ) ), 'steps' => array( array( 'text' => 'Éplucher' ) ) ),
+	'article' => array( 'content_html' => '<h2>Test</h2><p>Bonjour</p>' ),
+	'proofread' => array( 'content_html' => '<h2>Test</h2><p>Bonjour corrigé</p>' ),
+	'featured' => array( 'kind' => 'featured', 'path' => '/no/such/image.webp', 'size' => '1024x1024', 'mime' => 'image/webp' ),
+	'facebook' => array( 'kind' => 'facebook', 'path' => '/no/such/image.webp', 'size' => '1024x1536', 'mime' => 'image/webp' ),
+);
+$judged = MSRWA_Engine::run_step( 'final_approval', array( 'title' => 'Tarte aux pommes', 'artifacts' => $artifacts ) );
+msrwa_test_assert( false !== strpos( $judged->errors[0]['message'], 'no longer readable' ), 'An image the judge cannot read is named, not skipped: ' . $judged->errors[0]['message'] );
+
 msrwa_test_done( 'engine' );

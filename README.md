@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.70` est un socle installable : file persistante, pipeline de
+La version `0.2.71` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.
@@ -20,6 +20,30 @@ Le plugin est en cours de refonte éditoriale et budgétaire :
 Les coûts affichés sont des estimations calculées avec le catalogue configuré,
 non une facture fournisseur. `completed` signifie que le traitement est terminé,
 jamais qu’un texte est validé éditorialement.
+
+## Version 0.2.71
+
+Le moteur a une porte d'entrée : `MSRWA_Engine::run()`.
+
+Un appel, un brief, un `MSRWA_Result` : les artefacts produits, le détail par
+étape, les totaux dans les quatre postes de budget, les erreurs et les
+événements tels qu'ils se sont produits. Rien ne lève d'exception et rien ne
+sort du processus — un plugin ne peut se le permettre en pleine requête — donc
+un échec est une valeur, enregistrée à côté de ce qui a réussi.
+
+- Les étapes tournent par vagues de dépendances : l'article s'écrit pendant que
+  les deux images se dessinent, puis les trois relectures tournent ensemble.
+- Trois chemins d'appel selon ce que l'étape demande au modèle : texte, génération
+  d'image, et le juge qui lit les octets des deux images à la fois.
+- « Relancer jusqu'à approbation » converge : un refus régénère **les images que
+  le juge a bloquées**, avec ses constats comme corrections, avant de redemander
+  un verdict — au lieu de relancer le même dé.
+- Le budget arrête le passage avant l'étape qui le dépasserait.
+- Le moteur ne lit plus rien sur le disque : les artefacts arrivent en mémoire.
+  Charger un passage sauvegardé est le travail du laboratoire, pas du moteur.
+- La configuration parle **le vocabulaire du moteur** : c'est l'appelant qui
+  traduit le sien, jamais l'inverse. Le moteur est la pièce réutilisée ; il ne
+  peut pas porter une table de correspondance par appelant.
 
 ## Version 0.2.70
 

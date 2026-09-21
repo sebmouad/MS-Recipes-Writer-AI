@@ -17,7 +17,7 @@ final class MSRWA_Engine_Score {
 	}
 
 	/** Scores an answer against the contract of its step. */
-	public static function step( $step, $text, $brief, $options = array() ) {
+	public static function step( $step, $text, $brief ) {
 		$settings = MSRWA_Engine_Input::settings();
 		$checks = array();
 		$json = MSRWA_Json::decode( $text );
@@ -73,7 +73,7 @@ final class MSRWA_Engine_Score {
 		}
 
 		if ( 'article' === $step ) {
-			$canonical = MSRWA_Engine_Input::canonical_recipe( $brief, $options );
+			$canonical = MSRWA_Engine_Input::canonical_recipe( $brief );
 			$quality = MSRWA_Quality::evaluate( $json, $canonical, $settings );
 			$checks['quality gate'] = array( 'pass' => ! empty( $quality['pass'] ), 'detail' => 'score ' . (int) $quality['score'] . '/100' . ( empty( $quality['blockers'] ) ? '' : ', blocked on ' . implode( ', ', $quality['blockers'] ) ) );
 			$words = (int) ( $quality['metrics']['words'] ?? 0 );
@@ -103,7 +103,7 @@ final class MSRWA_Engine_Score {
 		}
 
 		if ( 'fact_check' === $step ) {
-			$article = (string) ( MSRWA_Engine_Input::article_under_test( $options )['content_html'] ?? '' );
+			$article = (string) ( MSRWA_Engine_Input::article( $brief )['content_html'] ?? '' );
 			$plain = html_entity_decode( strip_tags( $article ), ENT_QUOTES, 'UTF-8' );
 			$checks['verdict is boolean'] = array( 'pass' => array_key_exists( 'pass', $json ) && is_bool( $json['pass'] ), 'detail' => isset( $json['pass'] ) ? var_export( $json['pass'], true ) : 'missing' );
 			$corrections = (array) ( $json['corrections'] ?? array() );
@@ -121,7 +121,7 @@ final class MSRWA_Engine_Score {
 		}
 
 		if ( 'proofread' === $step ) {
-			$original = (string) ( MSRWA_Engine_Input::article_under_test( $options )['content_html'] ?? '' );
+			$original = (string) ( MSRWA_Engine_Input::article( $brief )['content_html'] ?? '' );
 			$corrected = (string) ( $json['content_html'] ?? '' );
 			$checks['returns the article'] = array( 'pass' => mb_strlen( $corrected ) > 0.7 * mb_strlen( $original ), 'detail' => mb_strlen( $corrected ) . ' vs ' . mb_strlen( $original ) . ' characters' );
 			$before_headings = count( MSRWA_Engine_Input::headings( $original ) );

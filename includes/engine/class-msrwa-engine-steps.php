@@ -5,57 +5,57 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
  * What the engine can do, and in what order.
  *
  * One entry per step: what it needs before it can run, what it produces, which
- * budget bucket its cost belongs to, and which capability it asks a model for.
- * The order here is the order a recipe is made, and `needs` is what lets a
- * caller run part of a pipeline — or run two steps at once when neither waits
- * on the other.
+ * budget bucket its cost belongs to, which capability it asks a model for, and
+ * the prompt template it is built from. The order here is the order a recipe is
+ * made, and `needs` is what lets a caller run part of a pipeline — or run two
+ * steps at once when neither waits on the other.
  */
 final class MSRWA_Engine_Steps {
 
 	public static function all() {
 		return array(
 			'research' => array(
-				'label' => 'Recherche', 'bucket' => 'other', 'capability' => 'web_search',
+				'label' => 'Recherche', 'bucket' => 'other', 'capability' => 'web_search', 'prompt' => 'research.tpl.txt',
 				'needs' => array(), 'produces' => 'research',
 				'expects' => 'the recipe the sources describe, with photographs of it read from their bytes',
 			),
 			'canonical_recipe' => array(
-				'label' => 'Recette canonique', 'bucket' => 'article', 'capability' => 'text',
+				'label' => 'Recette canonique', 'bucket' => 'article', 'capability' => 'text', 'prompt' => 'canonical_recipe.tpl.txt',
 				'needs' => array( 'research' ), 'produces' => 'canonical',
 				'expects' => 'a recipe passing MSRWA_Recipe::validate',
 			),
 			'article' => array(
-				'label' => 'Article', 'bucket' => 'article', 'capability' => 'text',
+				'label' => 'Article', 'bucket' => 'article', 'capability' => 'text', 'prompt' => 'article.tpl.txt',
 				'needs' => array( 'research', 'canonical' ), 'produces' => 'article',
 				'expects' => 'an article passing MSRWA_Quality plus the required outline',
 			),
 			'featured_image' => array(
-				'label' => 'Image à la une', 'bucket' => 'featured', 'capability' => 'image_generation',
+				'label' => 'Image à la une', 'bucket' => 'featured', 'capability' => 'image_generation', 'prompt' => 'featured_image.tpl.txt',
 				'needs' => array( 'research', 'canonical' ), 'produces' => 'featured',
 				'expects' => 'a photograph of this dish at the configured size',
 			),
 			'facebook_image' => array(
-				'label' => 'Collage Facebook', 'bucket' => 'facebook', 'capability' => 'image_generation',
+				'label' => 'Collage Facebook', 'bucket' => 'facebook', 'capability' => 'image_generation', 'prompt' => 'facebook_image.tpl.txt',
 				'needs' => array( 'research', 'canonical' ), 'produces' => 'facebook',
 				'expects' => 'a panel collage following the recipe order',
 			),
 			'review' => array(
-				'label' => 'Revue éditoriale', 'bucket' => 'article', 'capability' => 'text',
+				'label' => 'Revue éditoriale', 'bucket' => 'article', 'capability' => 'text', 'prompt' => 'review.tpl.txt',
 				'needs' => array( 'research', 'canonical', 'article' ), 'produces' => 'review',
 				'expects' => 'a research-grounded verdict and findings naming the section',
 			),
 			'fact_check' => array(
-				'label' => 'Vérification des faits', 'bucket' => 'article', 'capability' => 'text',
+				'label' => 'Vérification des faits', 'bucket' => 'article', 'capability' => 'text', 'prompt' => 'fact_check.tpl.txt',
 				'needs' => array( 'research', 'canonical', 'article' ), 'produces' => 'fact_check',
 				'expects' => 'only the passages the sources contradict, quoted verbatim',
 			),
 			'proofread' => array(
-				'label' => 'Correction', 'bucket' => 'article', 'capability' => 'text',
+				'label' => 'Correction', 'bucket' => 'article', 'capability' => 'text', 'prompt' => 'proofread.tpl.txt',
 				'needs' => array( 'article' ), 'produces' => 'proofread',
 				'expects' => 'the same article with its language corrected and every figure untouched',
 			),
 			'final_approval' => array(
-				'label' => 'Approbation finale', 'bucket' => 'other', 'capability' => 'vision',
+				'label' => 'Approbation finale', 'bucket' => 'other', 'capability' => 'vision', 'prompt' => 'final_approval.tpl.txt',
 				// The proofread article is what a reader gets, so it is what gets judged.
 				'needs' => array( 'research', 'canonical', 'proofread', 'featured', 'facebook' ), 'produces' => 'approval',
 				'expects' => 'one decision over the article and both images together',
@@ -68,6 +68,12 @@ final class MSRWA_Engine_Steps {
 	public static function get( $name ) {
 		$all = self::all();
 		return isset( $all[ $name ] ) ? $all[ $name ] : array();
+	}
+
+	/** The capability a step asks a model for: text, web_search, image_generation or vision. */
+	public static function capability( $name ) {
+		$step = self::get( $name );
+		return isset( $step['capability'] ) ? $step['capability'] : 'text';
 	}
 
 	/** Which of the four budget buckets a step's cost belongs to. */

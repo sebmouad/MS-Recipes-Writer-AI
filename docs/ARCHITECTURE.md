@@ -28,6 +28,50 @@ A job advances one stage per worker run. Each run acquires a lease
 schedules the next run. A crashed worker leaves an expired lease that
 `MSRWA_Queue::recover_expired()` returns to `retry_wait`.
 
+## The engine
+
+`includes/engine/` is the part that makes a recipe. It touches no WordPress
+function, reads nothing from disk beyond its own prompts, and never exits: it
+takes a brief and returns a `MSRWA_Result`. The plugin and the prompt lab both
+call it, which is what stops a prompt proven at the bench from drifting away
+from the one that runs in production.
+
+```php
+$result = MSRWA_Engine::run(
+    array( 'title' => 'Souris d’agneau au four' ),          // the editor’s brief
+    array( 'config' => $engine_config, 'workspace' => $dir ),
+    function ( $event ) { /* progress, as it happens */ }
+);
+```
+
+| Class | Responsibility |
+| --- | --- |
+| `MSRWA_Engine` | The entry point: `run()`, `run_step()`, the wave loop and the retries |
+| `MSRWA_Engine_Config` | Three layers of settings — defaults, caller, this run |
+| `MSRWA_Engine_Steps` | What each step needs, produces, costs and asks a model for |
+| `MSRWA_Engine_Input` | What a step is given before it runs |
+| `MSRWA_Engine_Score` | Whether an answer satisfied its step's contract |
+| `MSRWA_Engine_Call` | Every provider call, normalized across three providers |
+| `MSRWA_Engine_Rates` | Published prices and tiers |
+| `MSRWA_Result` | What comes back: artifacts, steps, totals, errors, events |
+
+**Steps run in dependency waves.** `needs` declares what a step waits on, and
+everything whose inputs exist may run together:
+
+| Wave | Steps that may run at once |
+| --- | --- |
+| 1 | research |
+| 2 | canonical recipe |
+| 3 | **article, featured image, Facebook collage** |
+| 4 | **review, fact check, proofread** |
+| 5 | final approval |
+
+**Three call paths**, chosen by the capability a step declares: text (including
+the web-searching research step), image generation, and the judge that reads
+both images' bytes alongside the article. A refused approval regenerates the
+images the judge blocked, carrying its findings as corrections, then asks
+again — that is what makes "retry until approved" converge rather than reroll.
+
 ## Files
 
 | File | Responsibility |

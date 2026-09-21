@@ -27,3 +27,4 @@ require_once __DIR__ . '/class-msrwa-engine-steps.php';
 require_once __DIR__ . '/class-msrwa-engine-input.php';
 require_once __DIR__ . '/class-msrwa-engine-score.php';
 require_once __DIR__ . '/class-msrwa-result.php';
+require_once __DIR__ . '/class-msrwa-engine.php';
