@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.79` est un socle installable : file persistante, pipeline de
+La version `0.2.80` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.
@@ -22,6 +22,40 @@ Le plugin est en cours de refonte éditoriale et budgétaire :
 Les coûts affichés sont des estimations calculées avec le catalogue configuré,
 non une facture fournisseur. `completed` signifie que le traitement est terminé,
 jamais qu’un texte est validé éditorialement.
+
+## Version 0.2.80
+
+**Le juge prend la recette canonique comme donnée** (décision du propriétaire,
+2026-09-21). C'est la contradiction F14 de l'audit, tranchée.
+
+L'étape recette reçoit l'ordre d'être cuisinable : « la complétude prime sur la
+prudence », un ingrédient de base que la méthode exige manifestement — matière
+grasse, sel, poivre, eau ou bouillon, le liquide d'une marinade — figure dans la
+liste même si aucune source n'en donne la quantité, parce qu'une étape qui dit
+de saisir ou d'assaisonner en a besoin. Le juge, lui, bloquait « un ingrédient
+que nul fait de recherche n'appuie ». Un rédacteur obéissant était donc refusé
+par un juge obéissant.
+
+Désormais : **le silence de la recherche n'est pas un constat contre la
+recette ; une contradiction l'est.** Restent bloquants — un ingrédient, une
+étape, une température ou une durée que la recherche contredit directement ; un
+ingrédient que la recherche tient pour essentiel et que la recette omet ; et une
+affirmation de l'**article** qui ne se trouve ni dans la recette ni dans la
+recherche.
+
+Vérifié en réel sur le poulet yassa, dont la recette canonique porte six
+ingrédients qu'aucune source ne chiffre :
+
+| | avant | après |
+|---|---|---|
+| huile, sel, poivre, eau, bouillon non sourcés | bloquants | **aucun constat** |
+| autorité du juge | la recherche | **la recette canonique** |
+| image à la une | — | `good` |
+
+Les refus restants sont justes : l'article ajoutait du persil absent de la
+recette, et un panneau du collage montrait les hauts de cuisse crus déjà dans le
+liquide. Le juge cite maintenant la recette canonique comme référence, et non le
+silence des sources.
 
 ## Version 0.2.79
 

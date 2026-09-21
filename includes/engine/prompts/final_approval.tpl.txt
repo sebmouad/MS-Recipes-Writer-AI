@@ -33,18 +33,23 @@ Two things are not added ingredients. An accompaniment the recipe or the researc
 
 4. THE COLLAGE AS A SEQUENCE. It must read as one recipe being made, in the order the recipe makes it. Blocking: a step shown before a step that must precede it, a panel that repeats another, or a panel showing something the recipe never does. The number of panels and their styling are minor.
 
-THE TEXT IS JUDGED STRICTLY. Everything above about ignoring detail applies to the IMAGES ONLY. A photograph is an impression and may be forgiven a sprig of herb; the article and the recipe are what the reader cooks from, and they are held to the research.
+THE TEXT IS JUDGED STRICTLY. Everything above about ignoring detail applies to the IMAGES ONLY. A photograph is an impression and may be forgiven a sprig of herb; the article and the recipe are what the reader cooks from. Strictly means held to what the research CONTRADICTS and to what the canonical recipe says — not to what the research happens not to mention. Judge the recipe as given and the article against the recipe.
 
-5. THE RECIPE AND THE ARTICLE AGAINST THE RESEARCH. The ingredients and the method must be the ones the research supports. Blocking, each time:
-- an ingredient in the recipe or named in the article that no research fact supports;
-- an ingredient the research treats as essential to this dish and that is missing;
-- a preparation step, a technique or an order of operations the research does not support, or that it contradicts;
-- a temperature, a duration, a resting time or a ratio that contradicts the research, or that no source gives.
-Name the fact you relied on. Where the sources disagree, the recipe may follow any one of them, and that is not a finding — but it may not follow none of them.
+5. THE RECIPE AND THE ARTICLE AGAINST THE RESEARCH. The canonical recipe is the reference, and you take it as given. It was written from this same research by an editor who was told to make it cookable: a staple the method plainly requires — cooking fat, salt, pepper, water or stock, a marinade's own liquid — belongs in it whether or not a source spells the quantity out, because a step that says to brown or to season needs it. So silence in the research is not a finding against the recipe. What the research CONTRADICTS is.
 
-6. THE ARTICLE AGAINST THE RECIPE. Every quantity, temperature and duration in the prose must match the canonical recipe. A figure that contradicts it is blocking. Prose rounding is not a contradiction: "about three and a half hours" for 213 minutes, "a good kilo" for 1.1 kg are how a cook writes and reads, and they change nothing anyone would do. A figure the recipe does not mention at all, and that no source supports, is blocking under check 5.
+Blocking, each time:
+- an ingredient, a step, a technique, an order of operations, a temperature, a duration, a resting time or a ratio in the recipe that the research directly contradicts;
+- an ingredient the research treats as essential to this dish and that the recipe omits;
+- a claim in the ARTICLE about ingredients or method that is in neither the canonical recipe nor the research — the article may explain and expand what the recipe does, but it may not add to it.
 
-7. WHAT ELSE THE ARTICLE CLAIMS. A claim the research contradicts is blocking. A claim the research is silent on is blocking when it is specific, checkable and consequential — a food-safety instruction, a storage limit, a temperature that changes the result, a claim about a variety or a season. It is not a finding only when it is ordinary cooking knowledge no source would bother to state, such as why acid balances fat.
+Not a finding, ever:
+- a staple, a quantity or an ordinary operation that appears in the canonical recipe and that no source happens to state. The recipe is allowed to be more complete than its sources.
+
+Name the fact you relied on, and quote the research that does the contradicting. Where the sources disagree, the recipe may follow any one of them, and that is not a finding.
+
+6. THE ARTICLE AGAINST THE RECIPE. Every quantity, temperature and duration in the prose must match the canonical recipe. A figure that contradicts it is blocking. Prose rounding is not a contradiction: "about three and a half hours" for 213 minutes, "a good kilo" for 1.1 kg are how a cook writes and reads, and they change nothing anyone would do. A figure the article introduces that is in neither the recipe nor the research is blocking under check 5.
+
+7. WHAT ELSE THE ARTICLE CLAIMS. This is about the prose, not the recipe: check 5 has already settled the recipe, and nothing in it is re-litigated here. A claim the research contradicts is blocking. A claim the research is silent on is blocking when it is specific, checkable and consequential and does not come from the canonical recipe — a food-safety instruction, a storage limit, a temperature that changes the result, a claim about a variety or a season. It is not a finding when it restates the canonical recipe, nor when it is ordinary cooking knowledge no source would bother to state, such as why acid balances fat.
 
 SEVERITY:
 - For the IMAGES: blocking means it is not believable as a photograph, or it shows a different dish, or the collage teaches the wrong order. Everything else — secondary ingredients, counts, garnish, crockery, framing — is minor, and doubt resolves to minor.

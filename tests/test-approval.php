@@ -80,8 +80,19 @@ msrwa_test_contains( $prompt, 'SEVERITY:', 'Severity must be defined, or everyth
 msrwa_test_contains( $prompt, 'applies to the IMAGES ONLY', 'The relaxed judgement must be scoped to images.' );
 msrwa_test_contains( $prompt, 'doubt resolves to minor', 'For images, doubt resolves towards shipping.' );
 msrwa_test_contains( $prompt, 'Doubt resolves to blocking', 'For the text, doubt resolves towards refusing.' );
-msrwa_test_contains( $prompt, 'that no research fact supports', 'An unsupported ingredient must block.' );
-msrwa_test_contains( $prompt, 'the research does not support', 'An unsupported preparation step must block.' );
+
+// The judge takes the canonical recipe as given (owner, 2026-09-21). The recipe
+// step is told to add the staple a method plainly needs even when no source
+// states its quantity; the judge used to block exactly that, so an obedient
+// writer was refused by an obedient judge. Silence in the research is no longer
+// a finding against the recipe — contradiction still is.
+msrwa_test_contains( $prompt, 'you take it as given', 'The judge must take the canonical recipe as the reference.' );
+msrwa_test_contains( $prompt, 'silence in the research is not a finding against the recipe', 'An unstated staple in the recipe must not block.' );
+msrwa_test_contains( $prompt, 'The recipe is allowed to be more complete than its sources', 'The recipe may exceed its sources.' );
+msrwa_test_contains( $prompt, 'that the research directly contradicts', 'A contradicted ingredient or figure must still block.' );
+msrwa_test_contains( $prompt, 'that the recipe omits', 'An essential ingredient the recipe drops must still block.' );
+msrwa_test_contains( $prompt, 'in neither the canonical recipe nor the research', 'The article may not add what neither carries.' );
+msrwa_test_missing( $prompt, 'that no research fact supports', 'The old rule that blocked an unsourced staple must be gone.' );
 msrwa_test_contains( $prompt, 'Never trade one against the other', 'Good images must not excuse an unsupported ingredient.' );
 
 // A refusal decides what gets regenerated. Getting this wrong wastes an image
