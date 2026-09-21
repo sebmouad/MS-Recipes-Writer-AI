@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.63` est un socle installable : file persistante, pipeline de
+La version `0.2.64` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.
@@ -20,6 +20,50 @@ Le plugin est en cours de refonte éditoriale et budgétaire :
 Les coûts affichés sont des estimations calculées avec le catalogue configuré,
 non une facture fournisseur. `completed` signifie que le traitement est terminé,
 jamais qu’un texte est validé éditorialement.
+
+## Version 0.2.64
+
+Le juge a été mesuré au lieu d'être supposé : mêmes artefacts, même prompt,
+plusieurs passages par fournisseur (`tools/judge-stability.php`).
+
+| Fournisseur | Verdicts exploitables | Accord entre eux | Coût / appel |
+|---|---:|---:|---:|
+| `gpt-5.6-luna` | 4/5 | 4/4 | **0,0061 $** |
+| `claude-sonnet-5` | 3/3 | 3/3 | 0,153 $ |
+| `gemini-3.5-flash` | 3/5 | 2/3 | 0,017 $ |
+
+**Deux faux positifs systématiques trouvés et corrigés.** Sur des artefacts
+identiques, le juge n'approuvait que 2 fois sur 5. Les refus portaient sur des
+brins verts « ressemblant à du persil » — alors que le thym, le romarin et le
+laurier figurent dans cette recette — et sur **un verre de vin posé à côté de
+l'assiette**, lu comme un ingrédient inventé. Le contrôle ne juge désormais que
+ce qui est *dans* le plat : une boisson, une bouteille, un bol à côté, des
+couverts ne sont jamais un ingrédient ; et avant de déclarer un ajout, le juge
+doit chercher dans la liste ce que l'élément pourrait être, les herbes hachées
+étant indiscernables à cette résolution. Résultat immédiat : de 2/5 à **4/4**
+d'accord.
+
+**`approval_max_output_tokens` passe de 6 000 à 14 000** — le cinquième plafond
+trop bas de ce projet. Claude rédige des verdicts nettement plus longs que
+OpenAI et se faisait couper systématiquement.
+
+**Deux corrections à ce que j'avais annoncé :**
+
+- J'avais écrit « environ un appel sur trois mal formé ». Le chiffre datait
+  d'avant la clarification du contrat de sortie ; la mesure donne **1 sur 5**, et
+  la boucle redemande le jugement dans ce cas.
+- J'avais conclu « Claude ne sait pas juger » sur un 0/5. C'était le plafond, pas
+  le modèle : à 14 000 jetons il rend **3/3** verdicts exploitables et cohérents.
+  Il reste 25 fois plus cher qu'OpenAI pour ce travail.
+
+Gemini ignore par ailleurs la consigne de ne pas compter les objets : son seul
+constat bloquant reprochait « 5 souris d'agneau » dans un panneau.
+
+**A14 est close, autrement que prévu.** Sonnet 5 ne tronque plus l'article
+(11 698 jetons sous le plafond, `end_turn`) : le plafond corrigé et l'élagage des
+prompts ont suffi. Mais il écrit désormais trop **court** — 2 420 mots pour
+2 800 exigés — à 0,1396 $ contre 0,0092 $ pour OpenAI. Le diagnostic initial,
+« il écrit beaucoup trop long », était faux.
 
 ## Version 0.2.63
 

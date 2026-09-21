@@ -237,7 +237,7 @@ cost) in the task before changing anything.
   carrot-like pieces on the yassa against a recipe holding one habanero
   (blocked, corrected to a single whole habanero, approved in one retry,
   $0.0734).
-- [ ] **A28 — The judge sometimes returns a malformed verdict.** `gpt-5.6-luna`
+- [x] **A28 — Judge stability, measured (closed 2026-09-21).** `gpt-5.6-luna`
   closes the root object early and leaves the image verdicts outside it, which
   read as "refused with no findings" and triggered an image regeneration against
   a decision nobody made. The lab now re-asks for the judgement without touching
@@ -245,6 +245,24 @@ cost) in the task before changing anything.
   roughly one call in three; a merge-the-objects parser was tried and reverted
   because the answer is not recoverable — the root closes before the rest exists.
   Worth re-measuring on another model before phase B.
+
+- [x] **A29 — The judge had two systematic false positives (found 2026-09-21).**
+  Measuring the same artifacts five times showed it approving only 2 of 5. Both
+  refusal reasons were wrong: fine green specks called parsley when thyme,
+  rosemary and bay are in that recipe's list, and a glass of wine beside the
+  plate read as an invented ingredient. The review now judges only what is on or
+  in the dish — a drink, a bottle, a bowl alongside, cutlery are never
+  ingredients — and must look for a plausible match in the list before calling
+  anything added, since chopped herbs are indistinguishable at this resolution.
+  Agreement went from 2/5 to 4/4.
+  *Measured judges, same prompt and artifacts:* `gpt-5.6-luna` 4/5 usable and
+  4/4 consistent at $0.0061; `claude-sonnet-5` 3/3 and 3/3 at $0.153;
+  `gemini-3.5-flash` 3/5 and 2/3 at $0.017, and it counts objects despite the
+  rule against it. OpenAI medium is the judge; Claude is worth a second opinion
+  on a contested decision, at 25 times the price.
+  *Also raised:* `approval_max_output_tokens` 6 000 → 14 000, the fifth ceiling
+  in this project set below what the step needs. `tools/judge-stability.php`
+  exists so this is re-measurable rather than re-argued.
 
 - [~] **A4 — Review.** Written in English; findings must name the section to patch. *Original:* **A4 — Review.** Returns a boolean verdict plus findings that name the
   **section to patch**, never a full rewrite instruction.
@@ -279,7 +297,7 @@ cost) in the task before changing anything.
   14 500 output tokens on the article step and the saved answer was zero bytes,
   which reads as "the model returned nothing" when it returned an article.
   `MSRWA_Json::valid_utf8` scrubs the tail before reading and before storing.
-- [ ] **A14 — Sonnet 5 exceeds any article ceiling we have tried.** 8 000 then
+- [x] **A14 — Closed 2026-09-21, and the original diagnosis was wrong.** 8 000 then
   14 500 output tokens, both `max_tokens`, 148s and $0.15 on the second. Extended
   thinking is ruled out — a control call returns `thinking_tokens: 0`, so the
   default is off. The model is simply writing far longer than the 2 800-word

@@ -73,7 +73,7 @@ final class MSRWA_Settings {
 			'router_max_output_tokens' => 700,
 			'vision_max_output_tokens' => 1200,
 			'image_review_max_output_tokens' => 1000,
-			'approval_max_output_tokens' => 6000,
+			'approval_max_output_tokens' => 14000,
 			'article_pagination_enabled' => 1,
 			'generate_featured_image' => 1,
 			'generate_facebook_image' => 1,
@@ -296,6 +296,10 @@ WHAT IS MISSING — forgiving. Only the PRINCIPAL ingredients must be visible: t
 WHAT HAS BEEN ADDED — strict. Anything edible that is visible and is NOT in the canonical ingredient list is BLOCKING, however small and however natural it looks in a food photograph. A sprig of rosemary or thyme laid on the meat, scattered parsley or coriander, a bay leaf, a chilli, a citrus wedge, a spoonful of cream, a dusting, a drizzle, a scattering of seeds, a slice of something the recipe never mentions. A reader who cooks the recipe will not produce that plate, and an invented ingredient is a promise the recipe cannot keep. Name the item and say it is absent from the list.
 
 When you cannot tell what a visible item is, name what it looks like to a reader and decide on that. A plate of yassa showing orange pieces cut like carrot rounds reads as carrot, even if the list contains an orange chilli: one habanero cannot become a dozen orange batons. For additions, doubt resolves to BLOCKING — the opposite of everywhere else in this review — because an invented ingredient misleads the person who cooks it, and record the ambiguity in uncertainties so an editor can overrule you.
+
+Judge only what is ON or IN the dish — on the plate, in the pot, in the sauce. The rest of the frame is a table, not the recipe: a glass of wine or water, a bottle, a bowl of something beside the plate, a second serving in the background, cutlery, a cloth. None of those is an added ingredient, and none is ever a finding. A drink is never an ingredient.
+
+And before calling something added, check the list again for what it could be. Herbs are the usual trap: fine green specks on meat or sauce are thyme, rosemary or bay when the list holds any of them, and you cannot tell chopped herbs apart at this resolution. If the list contains a plausible match, it is that ingredient, and you say nothing.
 
 Two things are not added ingredients. An accompaniment the recipe or the research says the dish is served with — rice, bread, a salad, mashed potato — is correct even though it is not an ingredient. And nothing inedible is an ingredient: a linen, a board, a pot, a plant in the background, a bowl. Judge the food on the plate, not the styling around it.
 
@@ -609,7 +613,7 @@ The result must equal or exceed a professionally art-directed social recipe tuto
 		$out['article_pagination_split_percent'] = isset( $raw['article_pagination_split_percent'] ) ? min( 70, max( 30, absint( $raw['article_pagination_split_percent'] ) ) ) : $defaults['article_pagination_split_percent'];
 		$out['internal_links_max'] = isset( $raw['internal_links_max'] ) ? min( 10, max( 0, absint( $raw['internal_links_max'] ) ) ) : $defaults['internal_links_max'];
 		$out['quality_min_score'] = isset( $raw['quality_min_score'] ) ? min( 100, max( 1, absint( $raw['quality_min_score'] ) ) ) : $defaults['quality_min_score'];
-		foreach ( array( 'quality_min_words' => array( 300, 8000 ), 'quality_max_words' => array( 500, 10000 ), 'quality_min_headings' => array( 3, 80 ), 'quality_min_paragraphs' => array( 5, 150 ), 'quality_min_ingredients' => array( 1, 50 ), 'quality_min_steps' => array( 1, 40 ), 'article_max_output_tokens' => array( 1000, 20000 ), 'review_max_output_tokens' => array( 500, 10000 ), 'research_max_output_tokens' => array( 500, 10000 ), 'research_facts_max' => array( 3, 30 ), 'research_references_max' => array( 1, 20 ), 'association_max_output_tokens' => array( 200, 5000 ), 'canonical_max_output_tokens' => array( 500, 10000 ), 'router_max_output_tokens' => array( 100, 3000 ), 'vision_max_output_tokens' => array( 200, 5000 ), 'image_review_max_output_tokens' => array( 200, 5000 ), 'approval_max_output_tokens' => array( 1000, 16000 ) ) as $key => $limits ) {
+		foreach ( array( 'quality_min_words' => array( 300, 8000 ), 'quality_max_words' => array( 500, 10000 ), 'quality_min_headings' => array( 3, 80 ), 'quality_min_paragraphs' => array( 5, 150 ), 'quality_min_ingredients' => array( 1, 50 ), 'quality_min_steps' => array( 1, 40 ), 'article_max_output_tokens' => array( 1000, 20000 ), 'review_max_output_tokens' => array( 500, 10000 ), 'research_max_output_tokens' => array( 500, 10000 ), 'research_facts_max' => array( 3, 30 ), 'research_references_max' => array( 1, 20 ), 'association_max_output_tokens' => array( 200, 5000 ), 'canonical_max_output_tokens' => array( 500, 10000 ), 'router_max_output_tokens' => array( 100, 3000 ), 'vision_max_output_tokens' => array( 200, 5000 ), 'image_review_max_output_tokens' => array( 200, 5000 ), 'approval_max_output_tokens' => array( 1000, 24000 ) ) as $key => $limits ) {
 			$value = isset( $raw[ $key ] ) ? absint( $raw[ $key ] ) : $defaults[ $key ];
 			$out[ $key ] = min( $limits[1], max( $limits[0], $value ) );
 		}
