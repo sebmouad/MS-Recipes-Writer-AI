@@ -26,7 +26,7 @@ PANEL ROLES:
 3. CORE PROCESS — the next clearly visible state change, such as browning, cooking vegetables, adding the first layer, incorporating filling or forming the dough.
 4. COMBINATION OR CONSTRUCTION — combine the main components, add the liquid, build the layers, fill, fold, roll or transfer to the cooking vessel.
 5. PENULTIMATE STATE — choose the most useful state immediately before serving: final uncooked assembly for a gratin/pizza/pastry, reduced simmer for a braise, folded finish for a pan dish, or whole baked result when a slice is still needed.
-6. APPETITE HERO — the fully cooked final recipe at peak texture. Structured food must show a cut, lifted or plated portion and its true layers/crumb/filling. Stews and soups must show a natural plated bowl, ladled serving or close pot hero; never force an irrelevant slice or cheese pull.
+6. APPETITE HERO — the fully cooked final recipe at peak texture, in the single serving presentation the visual brief names, at the colour the observations record. Appetite comes from light, framing and texture, never from cooking it further: a browner crust, a darker glaze or a deeper caramel than the observations describe is a defect, not an improvement, and it makes this panel disagree with the featured photograph of the same dish. Structured food must show a cut, lifted or plated portion and its true layers/crumb/filling. Stews and soups must show a natural plated bowl, ladled serving or close pot hero; never force an irrelevant slice or cheese pull.
 
 ORDER OUTRANKS ROLE. The roles above say which six moments are worth showing. The canonical recipe says in which order they happen, and the recipe always wins. Map each chosen moment back to its step number and lay the panels out in ascending step order. If a role would place a moment before a step that must precede it — whisking a filling before the case that holds it is lined, saucing before the thing being sauced is cooked — move it, or choose a different moment for that panel. A collage whose panels run out of order teaches the reader the wrong recipe, and that is the single most common failure of this format.
 
@@ -61,7 +61,7 @@ PHOTOGRAPHIC AND STYLING QUALITY:
 • Food occupies roughly 70–90% of each process cell; crop closely enough to read texture while preserving vessel edges needed for orientation
 • Crisp focus on the active food, gentle background falloff, realistic lens perspective, controlled highlights and visible fine texture
 • Rich but natural appetite cues: caramelised edges, golden crust, glossy sauce, moist crumb and fresh herbs only when canonical
-• Panel 6 receives the strongest visual hierarchy and most appetising angle; it should be share-worthy even when viewed alone
+• Panel 6 receives the strongest visual hierarchy and the most appetising light; it should be share-worthy even when viewed alone, while keeping the angle and the degree of colour the visual brief fixes
 
 SOURCE FIDELITY:
 
@@ -73,6 +73,6 @@ No text, letters, numbers, captions, labels, logos, watermark, packaging, brande
 
 SILENT FINAL CHECK BEFORE RETURNING:
 
-Verify: exactly six equal cells; correct archetype; one clear advance per panel; canonical ingredients and order; believable state progression; process-vessel continuity; consistent light and colour; no text or visual artifacts; and a fully cooked, high-impact panel 6 that reveals the most appetising truthful texture. Correct every failed condition before returning the image.
+Verify: exactly six equal cells; correct archetype; one clear advance per panel; canonical ingredients and order; believable state progression; process-vessel continuity; consistent light and colour; no text or visual artifacts; and a fully cooked, high-impact panel 6 that reveals the most appetising truthful texture without exceeding the observed colour. Then compare panel 6 against the serving presentation in the visual brief — same vessel, same angle, same colour — and against panel 1's ingredient count. Correct every failed condition before returning the image.
 
 The result must equal or exceed a professionally art-directed social recipe tutorial in layout discipline, continuity, instructional clarity, food physics and final-shot appetite appeal.

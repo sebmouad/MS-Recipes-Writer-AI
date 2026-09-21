@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.56` est un socle installable : file persistante, pipeline de
+La version `0.2.57` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.
@@ -20,6 +20,49 @@ Le plugin est en cours de refonte éditoriale et budgétaire :
 Les coûts affichés sont des estimations calculées avec le catalogue configuré,
 non une facture fournisseur. `completed` signifie que le traitement est terminé,
 jamais qu’un texte est validé éditorialement.
+
+## Version 0.2.57
+
+**Ce que la recherche a lu et ce qu'elle a vu alimentent désormais toutes les
+étapes**, et sous une forme exploitable : un *brief visuel* dérivé de la recette
+et des observations, à la place du JSON brut qu'on jetait au modèle.
+
+Chaque ligne du brief existe parce qu'une image réelle a échoué dessus :
+
+- **Comptes exacts** tirés des quantités (`1 rouleau`, `6 pommes`, `2 œufs`),
+  bornés à la mise en place seule.
+- **Ustensiles** tirés de `equipment` : le moule doit être le même partout ; une
+  planche ou un saladier nécessaires à une étape restent permis, un support qui
+  change la présentation finale ne l'est pas.
+- **Échelle et cuisson** : portions et durée réelles, « pas plus foncé pour
+  l'effet ».
+- **Apparence observée** dans de vraies photographies.
+- **Une seule présentation de service, nommée**, partagée par les deux images.
+
+Mesuré sur la tarte normande, huit collages puis quatre paires :
+
+| Défaut | Avant | Après |
+|---|---|---|
+| Panneaux dans le désordre | 3 refus sur 5 | **aucun** |
+| Contenant différent entre les deux images | quasi systématique | **aucun** une fois la présentation nommée |
+| Ustensiles étrangers | plusieurs | **aucun** |
+
+Décrire le plat ne suffisait pas : deux appels lisant « entière, vue de trois
+quarts » choisissaient encore l'un une assiette, l'autre un moule. Le contenant
+devait être **nommé**, pas décrit.
+
+Le compte d'ingrédients passe de bloquant à mineur : un lecteur prend les
+quantités dans la liste, pas en comptant les pommes sur une photo — et les
+modèles d'image ne comptent pas de façon fiable.
+
+`lab_observed_appearance()` alimente la recette canonique, `lab_visual_brief()`
+l'article, les deux images et le contrôle final.
+
+**Limite connue.** Les observations des fiches d'essai sont des amorces
+pointant vers `example.test` : aucune vraie photographie n'a jamais été
+analysée pour elles. Les refus de couleur restants s'appuient donc sur une
+référence d'une ligne, inventée. Prochaine étape : rejouer la recherche avec le
+scraping d'images réel sur les deux fiches.
 
 ## Version 0.2.56
 

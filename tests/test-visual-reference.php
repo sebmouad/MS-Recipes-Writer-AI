@@ -40,4 +40,30 @@ foreach ( glob( dirname( __DIR__ ) . '/tools/fixtures/*.json' ) as $file ) {
 	msrwa_test_assert( is_array( $brief['research'] ?? null ), $name . ' must carry a research package.' );
 }
 
+// The owner's directive, 2026-09-21: what research read and what it saw in real
+// photographs must reach every later step, not only the images. Raw JSON is not
+// enough — the distilled brief is what an image model and a judge can obey.
+require_once dirname( __DIR__ ) . '/tools/lib/steps.php';
+$brief = lab_brief( 'tarte-pommes' );
+$recipe_input = lab_build_input( 'canonical_recipe', 'PROMPT', $brief, array() );
+msrwa_test_contains( $recipe_input, 'OBSERVED APPEARANCE', 'The recipe must receive what the photographs showed.' );
+msrwa_test_contains( $recipe_input, 'never an ingredient, a quantity or a step', 'An observation may establish appearance only.' );
+
+$article_input = lab_build_input( 'article', 'PROMPT', $brief, array() );
+msrwa_test_contains( $article_input, 'VISUAL BRIEF', 'The article must receive the derived visual brief.' );
+
+foreach ( array( 'featured', 'facebook' ) as $kind ) {
+	$image_prompt = lab_image_prompt( $kind, $brief, array() );
+	msrwa_test_contains( $image_prompt, 'VISUAL BRIEF', 'The ' . $kind . ' prompt must receive the derived visual brief.' );
+	msrwa_test_contains( $image_prompt, 'ONE SERVING PRESENTATION', 'Both images must share one serving decision.' );
+	msrwa_test_contains( $image_prompt, 'Moule à tarte de 28 cm', 'The canonical equipment must bound what may appear.' );
+	msrwa_test_contains( $image_prompt, 'exactly 6 pièces', 'A countable ingredient must reach the prompt as a number.' );
+	msrwa_test_contains( $image_prompt, 'exactly 1 rouleau', 'One pastry roll must be stated as one.' );
+}
+
+// A measured ingredient carries no count to respect, so it must not be stated as one.
+$featured = lab_image_prompt( 'featured', $brief, array() );
+msrwa_test_contains( $featured, '80 g Sucre', 'A measured ingredient is listed with its amount.' );
+msrwa_test_missing( $featured, 'Sucre — exactly', 'Grams are not a count and must not be given as one.' );
+
 msrwa_test_done( 'visual reference' );

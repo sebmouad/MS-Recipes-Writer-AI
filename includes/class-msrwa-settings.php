@@ -147,8 +147,9 @@ Then check the appearance against the research observations. A dish that looks b
 - The research is SILENT and the claim is specific, checkable and consequential — a named variety\'s sugar content, a temperature that changes the result, a health or safety statement → minor.
 
 SEVERITY — apply it strictly, because a verdict where everything is blocking is worth nothing to the person who has to act on it:
-- BLOCKING means a reader is misled or the dish fails: a figure contradicting the recipe, an ingredient visible that is not in it, a claim the sources contradict, an image that is not this dish, a collage that breaks its own sequence.
+- BLOCKING means a reader is misled or the dish fails: a figure contradicting the recipe, an ingredient visible that is not in it, a claim the sources contradict, an image that is not this dish, a collage that breaks its own sequence, the two images disagreeing about the finished dish.
 - MINOR means a reader is fine but an editor would improve it.
+- Counting is its own case. How many apples or eggs sit in a laid-out shot is decoration: the reader takes the quantities from the ingredient list, not by counting a photograph, so a count that differs from the recipe is MINOR. It becomes blocking only when the number changes the dish — one chicken breast in a recipe for four, a single egg where the dish is built on a dozen.
 - If you would not hold the publication back for it, it is minor.
 
 RULES:

@@ -150,7 +150,8 @@ function lab_build_input( $step, $prompt, $brief, $options ) {
 		return $prompt . "\nEDITOR BRIEF: " . $encode( $editor );
 	}
 	if ( 'canonical_recipe' === $step ) {
-		return $prompt . "\nEDITOR BRIEF: " . $encode( $editor ) . "\nRESEARCH PACKAGE: " . $encode( $research );
+		return $prompt . "\nEDITOR BRIEF: " . $encode( $editor ) . "\nRESEARCH PACKAGE: " . $encode( $research )
+			. "\n" . lab_observed_appearance( $research );
 	}
 	if ( 'article' === $step ) {
 		lab_boot();
@@ -164,6 +165,7 @@ function lab_build_input( $step, $prompt, $brief, $options ) {
 		return $prompt . MSRWA_Quality::prompt_contract( $settings )
 			. "\nRecette canonique : " . $encode( $canonical )
 			. "\nRESEARCH PACKAGE: " . $encode( $research )
+			. "\n" . lab_visual_brief( $canonical, $research )
 			. ( $feedback ? "\nREVIEW FINDINGS TO CORRECT IN THE COMPLETE RETURNED ARTICLE: " . $encode( $feedback ) : '' );
 	}
 	if ( 'review' === $step ) {
@@ -238,6 +240,226 @@ function lab_score_approval( $verdict, $image_count, $expected_panels ) {
 	$checks['uncertainties reported'] = array( 'pass' => isset( $verdict['uncertainties'] ) && is_array( $verdict['uncertainties'] ), 'detail' => isset( $verdict['uncertainties'] ) ? count( (array) $verdict['uncertainties'] ) . ' entries' : 'missing' );
 
 	return $checks;
+}
+
+/**
+ * Turns the recipe and the research into constraints an image model can obey,
+ * instead of the JSON dump it used to receive.
+ *
+ * Every line here answers a failure the approval step actually raised: two
+ * pastry rolls where the recipe says one, seven apples where it says six, a
+ * cooling rack and a serving board that appear in no step, and a final panel
+ * browner than the photographs of the real dish.
+ */
+function lab_visual_brief( $canonical, $research ) {
+	$countable = array( 'pièce', 'pièces', 'piece', 'pieces', 'rouleau', 'rouleaux', 'gousse', 'gousses', 'tranche', 'tranches', 'feuille', 'feuilles', 'branche', 'branches', 'oeuf', 'œuf', 'unité', 'unités', '' );
+	$counts = array();
+	$measured = array();
+	foreach ( (array) ( $canonical['ingredients'] ?? array() ) as $ingredient ) {
+		if ( ! is_array( $ingredient ) ) { continue; }
+		$name = trim( (string) ( $ingredient['name'] ?? '' ) );
+		$quantity = trim( (string) ( $ingredient['quantity'] ?? '' ) );
+		$unit = trim( (string) ( $ingredient['unit'] ?? '' ) );
+		if ( '' === $name ) { continue; }
+		if ( '' !== $quantity && is_numeric( str_replace( ',', '.', $quantity ) ) && in_array( mb_strtolower( $unit ), $countable, true ) ) {
+			$counts[] = $name . ' — exactly ' . $quantity . ( '' === $unit ? '' : ' ' . $unit );
+		} else {
+			$measured[] = trim( $quantity . ' ' . $unit . ' ' . $name );
+		}
+	}
+
+	$lines = array( 'VISUAL BRIEF — derived from this recipe and binding. Each line below exists because a real image failed on it.' );
+	if ( $counts ) {
+		$lines[] = '• Countable ingredients, exact numbers: ' . implode( '; ', $counts ) . '. Where a panel lays the ingredients out — the mise en place — show exactly these numbers, not one more pack, roll, fruit or egg "for composition". This binds the ingredient display only. A later panel showing the dish being made or served need not have them all in shot, and a few of the same fruit resting in the background of a finished shot is styling, not a miscount.';
+	}
+	if ( $measured ) {
+		$lines[] = '• Measured ingredients, no count to respect, show a believable amount: ' . implode( '; ', $measured ) . '.';
+	}
+	$equipment = array_values( array_filter( array_map( 'trim', array_map( 'strval', (array) ( $canonical['equipment'] ?? array() ) ) ) ) );
+	if ( $equipment ) {
+		$lines[] = '• The cookware this recipe names: ' . implode( ', ', $equipment ) . '. These must be the ones actually used for the steps that need them, and in one colour and material throughout — the same tin in every panel it appears in. Ordinary kitchen things a cook obviously needs to perform a step are fine and expected: a board to peel on, a bowl to mix in, a spoon, a knife, a cloth. What is a defect is a support that changes how the finished dish is presented — a cooling rack, a board or a plate standing in for the serving vessel in the last panel alone, or a second tin of a different colour.';
+	}
+	$servings = (int) ( $canonical['servings'] ?? 0 );
+	$cook = (int) ( $canonical['cook_minutes'] ?? 0 );
+	if ( $servings > 0 || $cook > 0 ) {
+		$lines[] = '• Scale and doneness: ' . ( $servings > 0 ? 'serves ' . $servings . '. ' : '' ) . ( $cook > 0 ? 'Cooked ' . $cook . ' minutes, so the colour is what that produces — not darker for drama.' : '' );
+	}
+
+	$observed = array();
+	foreach ( (array) ( $research['visual_observations'] ?? array() ) as $observation ) {
+		if ( ! is_array( $observation ) ) { continue; }
+		foreach ( array( 'colours', 'textures', 'observable_details', 'composition' ) as $key ) {
+			$value = trim( (string) ( $observation[ $key ] ?? '' ) );
+			if ( '' !== $value ) { $observed[] = $value; }
+		}
+	}
+	if ( $observed ) {
+		$lines[] = '• How the real dish looks, observed in photographs of it: ' . implode( ' ', array_slice( array_unique( $observed ), 0, 8 ) ) . ' The finished dish must match this. It may not look more cooked, more darkly coloured or more elaborately garnished than these observations describe.';
+	}
+
+	// Every image is generated in its own call, so nothing makes them agree unless
+	// the same decision is written into both. Three refusals in four came from the
+	// featured photograph and the collage's last panel serving the dish differently.
+	$lines[] = '• ONE SERVING PRESENTATION, shared by every image of this recipe: ' . lab_serving_presentation( $canonical, $research ) . ' The featured photograph and the last panel of the collage must show the finished dish presented that same way, in the same vessel and at the same degree of colour. They are two photographs of one dish, taken minutes apart.';
+
+	return implode( "\n", $lines ) . "\n";
+}
+
+/**
+ * What was observed in real photographs, as prose. The canonical recipe is
+ * written before a visual brief can be derived from it, so this is the part of
+ * the brief that does not depend on the recipe.
+ */
+function lab_observed_appearance( $research ) {
+	$observed = array();
+	foreach ( (array) ( $research['visual_observations'] ?? array() ) as $observation ) {
+		if ( ! is_array( $observation ) ) { continue; }
+		foreach ( array( 'observable_details', 'colours', 'textures', 'composition' ) as $key ) {
+			$value = trim( (string) ( $observation[ $key ] ?? '' ) );
+			if ( '' !== $value ) { $observed[] = $value; }
+		}
+	}
+	if ( ! $observed ) { return ''; }
+	return "OBSERVED APPEARANCE — taken from real photographs of this dish, not from a description of it: "
+		. implode( ' ', array_slice( array_unique( $observed ), 0, 8 ) )
+		. " Use it for the signs a cook reads by eye: what the surface does, what a cut reveals, what correctly cooked looks like. It establishes appearance only — never an ingredient, a quantity or a step it cannot show.\n";
+}
+
+/**
+ * The single way the finished dish is presented, as a decision rather than a
+ * description. Describing the dish was not enough: two calls that each read
+ * "whole, seen at three quarters" still chose a plate and a tin, and the
+ * approval step blocked the pair every time. The vessel has to be named.
+ */
+function lab_serving_presentation( $canonical, $research ) {
+	$text = '';
+	foreach ( (array) ( $research['visual_observations'] ?? array() ) as $observation ) {
+		if ( ! is_array( $observation ) ) { continue; }
+		foreach ( array( 'observable_details', 'composition', 'colours' ) as $key ) { $text .= ' ' . (string) ( $observation[ $key ] ?? '' ); }
+	}
+	$text .= ' ' . (string) ( $research['visual_reference']['plating'] ?? '' );
+
+	// A vessel the observations actually name wins; otherwise one is chosen here,
+	// because leaving it open is what let the two images disagree.
+	$vessels = array(
+		'assiette' => 'served on a plain ceramic plate, out of any cooking vessel',
+		'plat de service' => 'served on a plain serving dish, out of any cooking vessel',
+		'plat rond' => 'served on a round serving dish, out of any cooking vessel',
+		'moule' => 'presented in its own baking tin, the same tin as the earlier panels',
+		'bol' => 'served in a bowl',
+		'planche' => 'served on a wooden board',
+		'cocotte' => 'served in the cooking pot it was made in',
+		'poêle' => 'served in the pan it was made in',
+	);
+	$decision = '';
+	foreach ( $vessels as $needle => $sentence ) {
+		if ( false !== mb_stripos( $text, $needle ) ) { $decision = $sentence; break; }
+	}
+	if ( '' === $decision ) { $decision = 'removed from whatever it was cooked in and served whole on a plain ceramic plate'; }
+
+	$appearance = trim( preg_replace( '/\s+/', ' ', $text ) );
+	return $decision . ', whole and centred, photographed from a three-quarter angle at table height, never from directly above'
+		. ( '' === $appearance ? '' : ', and at exactly the colour the observations record: ' . mb_substr( $appearance, 0, 240 ) );
+}
+
+/**
+ * The prompt one image generation receives. Shared by the image lab and the
+ * approval retry loop so a regenerated image is built exactly like a first one,
+ * plus the defects the approval step asked to correct.
+ *
+ * $findings is the list the judge returned for this image; passing it is what
+ * makes a retry a correction rather than another roll of the dice.
+ */
+function lab_image_prompt( $kind, $brief, $options = array(), $findings = array() ) {
+	lab_boot();
+	$settings = lab_settings();
+	$encode = static function ( $value ) { return json_encode( $value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ); };
+	$research = lab_research_package( $brief, $options );
+	$canonical = lab_canonical_recipe( $brief, $options );
+	$ingredients = array();
+	foreach ( (array) ( $canonical['ingredients'] ?? array() ) as $ingredient ) {
+		$ingredients[] = trim( ( $ingredient['quantity'] ?? '' ) . ' ' . ( $ingredient['unit'] ?? '' ) . ' ' . ( $ingredient['name'] ?? '' ) );
+	}
+	$file = dirname( __DIR__ ) . '/prompts/' . ( 'featured' === $kind ? 'featured_image' : 'facebook_image' ) . '.tpl.txt';
+	$prompt = MSRWA_Prompt::compile( trim( file_get_contents( $file ) ), $settings ) . "\n\n"
+		. 'Recipe title: ' . (string) ( $canonical['title'] ?? $brief['title'] ) . "\n"
+		. 'Exact ingredients: ' . implode( ', ', $ingredients ) . "\n\n"
+		. lab_visual_brief( $canonical, $research ) . "\n"
+		. 'Research package, for anything the brief above does not cover: ' . $encode( $research ) . "\n";
+
+	if ( 'facebook' === $kind ) {
+		$all_steps = array_values( (array) ( $canonical['steps'] ?? array() ) );
+		$steps = array();
+		$selected = array_values( array_filter( array_map( 'intval', explode( ',', (string) ( $options['steps'] ?? '' ) ) ) ) );
+		if ( $selected ) {
+			if ( 6 !== count( $selected ) ) { fwrite( STDERR, "Facebook --steps must contain exactly six comma-separated canonical step numbers.\n" ); exit( 2 ); }
+			foreach ( $selected as $number ) {
+				if ( isset( $all_steps[ $number - 1 ] ) ) { $steps[] = count( $steps ) + 1 . '. ' . ( $all_steps[ $number - 1 ]['text'] ?? '' ); }
+			}
+			if ( 6 !== count( $steps ) ) { fwrite( STDERR, "One or more Facebook --steps numbers do not exist in the canonical recipe.\n" ); exit( 2 ); }
+			$prompt .= 'Use these six editor-selected canonical moments, in this order: ' . implode( ' ', $steps ) . "\n";
+		} else {
+			foreach ( $all_steps as $index => $step ) { $steps[] = ( $index + 1 ) . '. ' . ( $step['text'] ?? '' ); }
+			$panels = (int) ( $settings['facebook_collage_steps'] ?? 6 );
+			if ( count( $all_steps ) === $panels ) {
+				// Nothing to choose: every step is a panel. Leaving the model to select
+				// anyway is what produced the ordering failures — it hoisted the batter
+				// to panel two, ahead of lining the case, in three runs out of five.
+				$prompt .= 'The recipe has exactly ' . $panels . ' steps, so there is nothing to select. Use these, one per panel, in this order: ' . implode( ' ', $steps ) . "\n";
+			} else {
+				$prompt .= 'Canonical step pool, numbered in the order the recipe performs them: ' . implode( ' ', $steps ) . "\nSelect exactly " . $panels . " visually distinct moments using the storyboard contract, then lay them out in ascending step number; do not sample mechanically or show passive filler.\n";
+			}
+		}
+	}
+
+	$findings = array_values( array_filter( (array) $findings, 'is_array' ) );
+	if ( $findings ) {
+		$prompt .= "\nTHIS IMAGE WAS REFUSED. An independent editor inspected the previous attempt and listed what is wrong with it. Produce the same image with each of these corrected, and change nothing else:\n";
+		foreach ( $findings as $index => $finding ) {
+			$prompt .= ( $index + 1 ) . '. ' . trim( (string) ( $finding['reason'] ?? '' ) ) . ' — ' . trim( (string) ( $finding['fix'] ?? '' ) ) . "\n";
+		}
+	}
+	return $prompt;
+}
+
+/** Regenerates one image with the judge's findings as corrections. */
+function lab_regenerate_image( $kind, $brief, $options, $findings, $settings ) {
+	$prompt = lab_image_prompt( $kind, $brief, $options, $findings );
+	$size = MSRWA_Images::native_size( 'featured' === $kind ? $settings['featured_ratio'] : $settings['facebook_ratio'], 'featured' === $kind ? '1024x1024' : '1024x1536' );
+	$quality = $options['quality'] ?? MSRWA_Images::quality( $settings, $kind );
+	$model = $options['image-model'] ?? 'gpt-image-2.5-flare';
+	$format = $options['format'] ?? 'webp';
+	$name = preg_replace( '/[^a-z0-9-]+/i', '-', (string) ( $options['brief'] ?? 'tarte-pommes' ) );
+	$destination = dirname( __DIR__ ) . '/runs/' . $name . '-' . $kind . '-retry-' . gmdate( 'Ymd-His' ) . '.' . $format;
+	$result = lab_image( $prompt, $model, $size, $quality, $format, $destination );
+	if ( isset( $result['error'] ) ) { fwrite( STDERR, 'Image error after ' . $result['seconds'] . "s: " . $result['error'] . "\n" ); exit( 1 ); }
+	return array( 'path' => $result['path'], 'seconds' => $result['seconds'], 'cost' => lab_price( 'openai', $model, $result['usage'] ), 'usage' => $result['usage'] );
+}
+
+/** The blocking findings the judge raised against one image. */
+function lab_findings_for( $verdict, $target ) {
+	$out = array();
+	foreach ( (array) ( ( is_array( $verdict ) ? $verdict : array() )['findings'] ?? array() ) as $finding ) {
+		if ( ! is_array( $finding ) || 'blocking' !== ( $finding['severity'] ?? '' ) ) { continue; }
+		if ( $target === ( $finding['target'] ?? '' ) ) { $out[] = $finding; }
+	}
+	return $out;
+}
+
+/**
+ * Which images a refusal asks us to regenerate. A consistency finding names no
+ * single image, so it is charged to the collage: the featured image is one
+ * photograph of the finished dish and the collage is the piece that has to agree
+ * with it, and measurement put every consistency break on the collage's side.
+ */
+function lab_images_to_retry( $verdict ) {
+	if ( ! is_array( $verdict ) || ! empty( $verdict['approved'] ) ) { return array(); }
+	$retry = array();
+	foreach ( array( 'featured' => 'featured_image', 'facebook' => 'facebook_image' ) as $kind => $target ) {
+		if ( lab_findings_for( $verdict, $target ) ) { $retry[] = $kind; }
+	}
+	if ( lab_findings_for( $verdict, 'consistency' ) && ! in_array( 'facebook', $retry, true ) ) { $retry[] = 'facebook'; }
+	return $retry;
 }
 
 /** Scores an answer against the contract of its step. */

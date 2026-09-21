@@ -136,6 +136,34 @@ cost) in the task before changing anything.
   continuity reference). The second is an architecture change, so it is not made
   unilaterally.
 
+- [~] **A19 — Research feeds every step, distilled (owner directive, 2026-09-21).**
+  What research read and what it observed in real photographs now reaches the
+  canonical recipe, the article, both images and the final approval — as a
+  derived brief rather than raw JSON. `lab_visual_brief()` turns the recipe and
+  the observations into constraints a model can obey: exact counts from the
+  quantities (bounded to the mise en place), the cookware the recipe names, the
+  scale and doneness, the observed appearance, and one named serving
+  presentation shared by both images.
+  Measured on the tarte over eight collages and four pairs: panels out of order
+  went from 3 refusals in 5 to none; the vessel mismatch between the featured
+  photograph and the collage's last panel went from near-systematic to none.
+  Two lessons worth keeping: describing the presentation was not enough — two
+  calls both reading "whole, seen at three quarters" still chose a plate and a
+  tin, so the vessel has to be *named*; and our own prompt was fighting the
+  brief, since "APPETITE HERO at peak texture" pushed panel 6 browner than the
+  observations allowed.
+  Ingredient counting is now minor rather than blocking: a reader takes
+  quantities from the list, and image models do not count reliably.
+  *Blocked on a fixture, not on the prompts.* Both fixtures' `visual_observations`
+  are placeholders citing `example.test`; no real photograph was ever analysed
+  for them. The colour refusals that remain are enforcing a one-line invented
+  reference. Re-run research with real image scraping on both fixtures before
+  reading any further colour result.
+- [ ] **A20 — The fixtures carry invented observations.** `tarte-pommes` and
+  `poulet-yassa` cite `https://example.test/...`. Every measurement that depends
+  on observed appearance is therefore measuring a stub. Re-run `research` with
+  `lab_enrich_research_images` against real sources and store the result.
+
 - [~] **A4 — Review.** Written in English; findings must name the section to patch. *Original:* **A4 — Review.** Returns a boolean verdict plus findings that name the
   **section to patch**, never a full rewrite instruction.
 - [~] **A5 — Fact check** (new step). Written; scored on whether it quotes the article verbatim rather than inventing a sentence to correct. *Original:* **A5 — Fact check** (new step). Compares the finished article to the

@@ -9,7 +9,13 @@
  *
  *   php tools/approval-lab.php --article=tools/runs/<article run>.json \
  *       --featured=tools/runs/<file>.webp --facebook=tools/runs/<file>.webp \
- *       [--brief=tarte-pommes] [--provider=openai] [--tier=medium]
+ *       [--brief=tarte-pommes] [--provider=openai] [--tier=medium] [--attempts=3]
+ *
+ * With --attempts above 1 a refusal is not the end: the images the judge blocked
+ * are regenerated with its findings as corrections and submitted again, until it
+ * approves or the attempts run out. Measurement put a single collage generation
+ * at roughly one approval in three, so the accepted artifact is what costs money,
+ * not the attempt.
  */
 define( 'MSRWA_LAB', true );
 require __DIR__ . '/lib/steps.php';
@@ -43,31 +49,62 @@ function approval_image( $path, $label ) {
 }
 
 $settings = lab_settings();
-$images = array_values( array_filter( array(
-	approval_image( $options['featured'] ?? '', 'featured, ' . MSRWA_Images::native_size( $settings['featured_ratio'], '1024x1024' ) ),
-	approval_image( $options['facebook'] ?? '', 'facebook collage, ' . MSRWA_Images::native_size( $settings['facebook_ratio'], '1024x1536' ) ),
-) ) );
-if ( ! $images ) { fwrite( STDERR, "Pass --featured= and --facebook= with the generated image files.\n" ); exit( 2 ); }
+$paths = array( 'featured' => (string) ( $options['featured'] ?? '' ), 'facebook' => (string) ( $options['facebook'] ?? '' ) );
+if ( '' === $paths['featured'] && '' === $paths['facebook'] ) { fwrite( STDERR, "Pass --featured= and --facebook= with the generated image files.\n" ); exit( 2 ); }
+$labels = array(
+	'featured' => 'featured, ' . MSRWA_Images::native_size( $settings['featured_ratio'], '1024x1024' ),
+	'facebook' => 'facebook collage, ' . MSRWA_Images::native_size( $settings['facebook_ratio'], '1024x1536' ),
+);
+$attempts = max( 1, min( 6, (int) ( $options['attempts'] ?? 1 ) ) );
+$spent = 0.0;
+$history = array();
 
 $encode = static function ( $value ) { return json_encode( $value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ); };
 $prompt = MSRWA_Prompt::compile( trim( file_get_contents( __DIR__ . '/prompts/final_approval.tpl.txt' ) ), $settings )
 	. "\n\nCANONICAL RECIPE: " . $encode( $canonical )
 	. "\nRESEARCH PACKAGE: " . $encode( $research )
+	. "\n\n" . lab_visual_brief( $canonical, $research )
 	. "\nARTICLE: " . $encode( $article );
 
-printf( "provider=%s model=%s images=%d prompt=%d chars\n", $provider, $model, count( $images ), strlen( $prompt ) );
-foreach ( $images as $image ) { printf( "  %-28s %s KB\n", $image['label'], number_format( $image['bytes'] / 1024, 1 ) ); }
+for ( $attempt = 1; ; $attempt++ ) {
+	$images = array();
+	foreach ( $paths as $kind => $path ) {
+		$image = approval_image( $path, $labels[ $kind ] );
+		if ( $image ) { $images[ $kind ] = $image; }
+	}
+	if ( ! $images ) { fwrite( STDERR, "No images to judge.\n" ); exit( 2 ); }
 
-$result = lab_call_judge( $provider, $model, $prompt, $images, (int) ( $settings['approval_max_output_tokens'] ?? 6000 ) );
-if ( isset( $result['error'] ) ) { fwrite( STDERR, 'Approval error after ' . $result['seconds'] . "s: " . $result['error'] . "\n" ); exit( 1 ); }
+	printf( "\n--- attempt %d of %d ---\nprovider=%s model=%s images=%d prompt=%d chars\n", $attempt, $attempts, $provider, $model, count( $images ), strlen( $prompt ) );
+	foreach ( $images as $image ) { printf( "  %-28s %-52s %s KB\n", $image['label'], basename( $image['path'] ), number_format( $image['bytes'] / 1024, 1 ) ); }
 
-$verdict = MSRWA_Json::decode( $result['text'] );
-$cost = lab_price( $provider, $model, $result['usage'] );
-$checks = lab_score_approval( $verdict, count( $images ), (int) ( $settings['facebook_collage_steps'] ?? 6 ) );
+	$result = lab_call_judge( $provider, $model, $prompt, array_values( $images ), (int) ( $settings['approval_max_output_tokens'] ?? 6000 ) );
+	if ( isset( $result['error'] ) ) { fwrite( STDERR, 'Approval error after ' . $result['seconds'] . "s: " . $result['error'] . "\n" ); exit( 1 ); }
 
-printf( "\n%-20s %s\n", 'time', $result['seconds'] . 's' );
+	$verdict = MSRWA_Json::decode( $result['text'] );
+	$cost = lab_price( $provider, $model, $result['usage'] );
+	$spent += (float) $cost;
+	$checks = lab_score_approval( $verdict, count( $images ), (int) ( $settings['facebook_collage_steps'] ?? 6 ) );
+	$history[] = array( 'attempt' => $attempt, 'approved' => ! empty( $verdict['approved'] ), 'judge_cost_usd' => $cost, 'seconds' => $result['seconds'], 'images' => array_map( static function ( $image ) { return basename( $image['path'] ); }, $images ) );
+
+	$retry = lab_images_to_retry( $verdict );
+	if ( ! $retry || $attempt >= $attempts ) { break; }
+
+	printf( "\nrefused; regenerating: %s\n", implode( ', ', $retry ) );
+	foreach ( $retry as $kind ) {
+		$findings = lab_findings_for( $verdict, $kind . '_image' );
+		if ( 'facebook' === $kind ) { $findings = array_merge( $findings, lab_findings_for( $verdict, 'consistency' ) ); }
+		$regenerated = lab_regenerate_image( $kind, $brief, $options, $findings, $settings );
+		printf( "  %-10s %s  %ss  %s\n", $kind, basename( $regenerated['path'] ), $regenerated['seconds'], null === $regenerated['cost'] ? 'unknown rate' : sprintf( '$%.4f', $regenerated['cost'] ) );
+		$paths[ $kind ] = $regenerated['path'];
+		$spent += (float) $regenerated['cost'];
+	}
+}
+
+printf( "\n%-20s %d of %d\n", 'attempts used', count( $history ), $attempts );
+printf( "%-20s %s\n", 'time (last call)', $result['seconds'] . 's' );
 printf( "%-20s in %d / out %d\n", 'tokens', $result['usage']['input_tokens'] ?? 0, $result['usage']['output_tokens'] ?? 0 );
-printf( "%-20s %s\n", 'cost', null === $cost ? 'unknown rate' : sprintf( '$%.4f', $cost ) );
+printf( "%-20s %s\n", 'cost (last judge)', null === $cost ? 'unknown rate' : sprintf( '$%.4f', $cost ) );
+printf( "%-20s %s\n", 'cost until accepted', sprintf( '$%.4f', $spent ) );
 printf( "%-20s %s\n\n", 'response status', (string) ( $result['status'] ?? '' ) );
 
 echo "scorecard\n";
@@ -88,8 +125,8 @@ if ( is_array( $verdict ) ) {
 $path = __DIR__ . '/runs/' . preg_replace( '/[^a-z0-9-]+/i', '-', (string) ( $options['brief'] ?? 'tarte-pommes' ) ) . '-final_approval-' . $provider . '-' . $tier . '-' . gmdate( 'Ymd-His' ) . '.json';
 file_put_contents( $path, json_encode( array(
 	'step' => 'final_approval', 'provider' => $provider, 'tier' => $tier, 'model' => $model,
-	'seconds' => $result['seconds'], 'usage' => $result['usage'], 'cost_usd' => $cost, 'status' => $result['status'] ?? '',
-	'images' => array_map( static function ( $image ) { return array( 'label' => $image['label'], 'path' => $image['path'], 'bytes' => $image['bytes'] ); }, $images ),
+	'seconds' => $result['seconds'], 'usage' => $result['usage'], 'cost_usd' => $cost, 'total_cost_usd' => round( $spent, 6 ), 'attempts' => $history, 'status' => $result['status'] ?? '',
+	'images' => array_map( static function ( $image ) { return array( 'label' => $image['label'], 'path' => $image['path'], 'bytes' => $image['bytes'] ); }, array_values( $images ) ),
 	'scores' => array( 'checks' => $checks, 'passed' => $passed, 'total' => count( $checks ), 'pass' => $passed === count( $checks ) ),
 	'output' => $result['text'],
 ), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) );

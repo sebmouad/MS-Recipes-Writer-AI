@@ -22,34 +22,7 @@ $brief = lab_brief( $options['brief'] ?? 'tarte-pommes' );
 $research = lab_research_package( $brief, $options );
 if ( empty( $research ) ) { fwrite( STDERR, "Pass --research=<a saved research run> or use a fixture containing research.\n" ); exit( 2 ); }
 
-$prompt_file = __DIR__ . '/prompts/' . ( 'featured' === $kind ? 'featured_image' : 'facebook_image' ) . '.tpl.txt';
-if ( ! file_exists( $prompt_file ) ) { fwrite( STDERR, "No such prompt: {$prompt_file}\n" ); exit( 2 ); }
-
-$canonical = lab_canonical_recipe( $brief, $options );
-$ingredients = array();
-foreach ( (array) ( $canonical['ingredients'] ?? array() ) as $ingredient ) {
-	$ingredients[] = trim( ( $ingredient['quantity'] ?? '' ) . ' ' . ( $ingredient['unit'] ?? '' ) . ' ' . ( $ingredient['name'] ?? '' ) );
-}
-$prompt = MSRWA_Prompt::compile( trim( file_get_contents( $prompt_file ) ), lab_settings() ) . "\n\n"
-	. 'Recipe title: ' . (string) ( $canonical['title'] ?? $brief['title'] ) . "\n"
-	. 'Exact ingredients: ' . implode( ', ', $ingredients ) . "\n"
-	. 'Research package, including observations from real source images: ' . json_encode( $research, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . "\n";
-if ( 'facebook' === $kind ) {
-	$all_steps = array_values( (array) ( $canonical['steps'] ?? array() ) );
-	$steps = array();
-	$selected = array_values( array_filter( array_map( 'intval', explode( ',', (string) ( $options['steps'] ?? '' ) ) ) ) );
-	if ( $selected ) {
-		if ( 6 !== count( $selected ) ) { fwrite( STDERR, "Facebook --steps must contain exactly six comma-separated canonical step numbers.\n" ); exit( 2 ); }
-		foreach ( $selected as $number ) {
-			if ( isset( $all_steps[ $number - 1 ] ) ) { $steps[] = count( $steps ) + 1 . '. ' . ( $all_steps[ $number - 1 ]['text'] ?? '' ); }
-		}
-		if ( 6 !== count( $steps ) ) { fwrite( STDERR, "One or more Facebook --steps numbers do not exist in the canonical recipe.\n" ); exit( 2 ); }
-		$prompt .= 'Use these six editor-selected canonical moments, in this order: ' . implode( ' ', $steps ) . "\n";
-	} else {
-		foreach ( $all_steps as $index => $step ) { $steps[] = ( $index + 1 ) . '. ' . ( $step['text'] ?? '' ); }
-		$prompt .= 'Canonical step pool: ' . implode( ' ', $steps ) . "\nSelect exactly six visually distinct moments using the storyboard contract; do not sample mechanically or show passive filler.\n";
-	}
-}
+$prompt = lab_image_prompt( $kind, $brief, $options );
 
 $settings = lab_settings();
 $size = MSRWA_Images::native_size( 'featured' === $kind ? $settings['featured_ratio'] : $settings['facebook_ratio'], 'featured' === $kind ? '1024x1024' : '1024x1536' );

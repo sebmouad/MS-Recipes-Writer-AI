@@ -66,4 +66,67 @@ msrwa_test_contains( $prompt, 'is never a finding', 'A supported accompaniment m
 msrwa_test_contains( $prompt, 'not a finding at all', 'Ordinary cooking knowledge must not be a finding.' );
 msrwa_test_contains( $prompt, 'If you would not hold the publication back for it, it is minor', 'Severity must be defined, or everything becomes blocking.' );
 
+// A refusal decides what gets regenerated. Getting this wrong wastes an image
+// generation per attempt, which is the expensive half of the retry loop.
+$blocked_collage = array( 'approved' => false, 'findings' => array(
+	array( 'target' => 'facebook_image', 'severity' => 'blocking', 'reason' => 'Ordre des panneaux.', 'fix' => 'Suivre la recette.' ),
+	array( 'target' => 'article', 'severity' => 'blocking', 'reason' => 'Durée contradictoire.', 'fix' => 'Corriger la durée.' ),
+	array( 'target' => 'featured_image', 'severity' => 'minor', 'reason' => 'Cadrage.', 'fix' => 'Resserrer.' ),
+) );
+msrwa_test_assert( array( 'facebook' ) === lab_images_to_retry( $blocked_collage ), 'Only the image with a blocking finding is regenerated.' );
+
+// An article finding is not an image problem: regenerating a photograph cannot fix a sentence.
+$article_only = array( 'approved' => false, 'findings' => array(
+	array( 'target' => 'article', 'severity' => 'blocking', 'reason' => 'Quantité fausse.', 'fix' => 'Corriger.' ),
+) );
+msrwa_test_assert( array() === lab_images_to_retry( $article_only ), 'An article-only refusal must not regenerate an image.' );
+
+// A consistency break names no single image; measurement put every one on the collage.
+$inconsistent = array( 'approved' => false, 'findings' => array(
+	array( 'target' => 'consistency', 'severity' => 'blocking', 'reason' => 'Vaisselle différente.', 'fix' => 'Même assiette.' ),
+) );
+msrwa_test_assert( array( 'facebook' ) === lab_images_to_retry( $inconsistent ), 'A consistency break is charged to the collage.' );
+
+// It must not be charged twice when the collage is already being regenerated.
+$both = array( 'approved' => false, 'findings' => array(
+	array( 'target' => 'facebook_image', 'severity' => 'blocking', 'reason' => 'Ordre.', 'fix' => 'Réordonner.' ),
+	array( 'target' => 'consistency', 'severity' => 'blocking', 'reason' => 'Vaisselle.', 'fix' => 'Même assiette.' ),
+) );
+msrwa_test_assert( array( 'facebook' ) === lab_images_to_retry( $both ), 'The collage must be regenerated once, not twice.' );
+
+$featured_too = array( 'approved' => false, 'findings' => array(
+	array( 'target' => 'featured_image', 'severity' => 'blocking', 'reason' => 'Ingrédient absent.', 'fix' => 'Retirer.' ),
+	array( 'target' => 'consistency', 'severity' => 'blocking', 'reason' => 'Vaisselle.', 'fix' => 'Même assiette.' ),
+) );
+msrwa_test_assert( array( 'featured', 'facebook' ) === lab_images_to_retry( $featured_too ), 'Both images may be regenerated in one attempt.' );
+
+// An approval ends the loop even when minor findings remain.
+$approved = array( 'approved' => true, 'findings' => array(
+	array( 'target' => 'facebook_image', 'severity' => 'minor', 'reason' => 'Lumière.', 'fix' => 'Adoucir.' ),
+) );
+msrwa_test_assert( array() === lab_images_to_retry( $approved ), 'An approval must stop the loop.' );
+msrwa_test_assert( array() === lab_images_to_retry( null ), 'An unreadable verdict must not trigger a blind regeneration.' );
+
+// A retry is a correction, not another roll of the dice: the findings must reach
+// the prompt, or the model repeats the same mistake at the same price.
+$brief = lab_brief( 'tarte-pommes' );
+$plain = lab_image_prompt( 'facebook', $brief, array() );
+msrwa_test_missing( $plain, 'THIS IMAGE WAS REFUSED', 'A first attempt carries no correction block.' );
+$corrected = lab_image_prompt( 'facebook', $brief, array(), array( array( 'reason' => 'Les panneaux sont dans le désordre.', 'fix' => 'Suivre l’ordre canonique.' ) ) );
+msrwa_test_contains( $corrected, 'THIS IMAGE WAS REFUSED', 'A retry must say the previous attempt was refused.' );
+msrwa_test_contains( $corrected, 'Les panneaux sont dans le désordre.', 'The reason must reach the prompt.' );
+msrwa_test_contains( $corrected, 'Suivre l’ordre canonique.', 'The fix must reach the prompt.' );
+
+// A recipe with exactly as many steps as panels has nothing to select, and
+// leaving the model to select anyway is what reordered the panels: it hoisted
+// the batter to panel two, ahead of lining the case, in three runs of five.
+msrwa_test_contains( $plain, 'nothing to select', 'A six-step recipe must pin its panels rather than invite a selection.' );
+msrwa_test_contains( $plain, 'Foncer le moule', 'The canonical steps must reach the prompt in order.' );
+$position = array();
+foreach ( array( 'Foncer le moule', 'Éplucher les pommes', 'Disposer les pommes', 'Battre les œufs' ) as $step ) {
+	$position[ $step ] = strpos( $plain, $step );
+	msrwa_test_assert( false !== $position[ $step ], 'Step "' . $step . '" must appear in the prompt.' );
+}
+msrwa_test_assert( $position['Foncer le moule'] < $position['Battre les œufs'], 'Lining the case must be asked for before beating the custard.' );
+
 msrwa_test_done( 'approval' );
