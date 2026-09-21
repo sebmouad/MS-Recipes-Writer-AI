@@ -289,6 +289,25 @@ cost) in the task before changing anything.
   cross-recipe caching did not fire at 1 622 tokens, so there is nothing yet to
   optimise towards; re-measure if prompts grow.
 
+- [x] **A32 — Merging research and the canonical recipe: measured and rejected
+  (2026-09-21).** `research_recipe.tpl.txt` does both jobs in one call and works
+  — 17/17 on the yassa, valid recipe, 10 ingredients, 12 steps. It just buys
+  nothing. Split: 49.5s + 21.8s = 71.3s for $0.0183 + $0.0047 = $0.0230. Merged:
+  84.5s for $0.0227. A 1.3% saving, inside the noise, for 13 seconds more,
+  because one call's 8 635 output tokens generate sequentially where two calls
+  generate 6 943 then 3 162.
+  Three reasons beyond the numbers: a recipe the validator rejects costs $0.0047
+  to retry today and would cost $0.0227 merged, five times more; research records
+  what sources say including their disagreements while the recipe decides, and
+  one call doing both may resolve a conflict silently instead of recording it;
+  and since identical replays cache at 99.96%, a bigger replayed call pays more
+  of the uncached remainder. The template stays in the repo, like `article_full`
+  before it.
+- [ ] **A33 — `recipe_outline` is under-specified.** Research alone returned only
+  2 of its 4 figures on the yassa where the merged variant returned 4. The
+  contract should say that a figure no source gives is null and that the model
+  must look for each one, rather than leaving them out.
+
 - [~] **A4 — Review.** Written in English; findings must name the section to patch. *Original:* **A4 — Review.** Returns a boolean verdict plus findings that name the
   **section to patch**, never a full rewrite instruction.
 - [~] **A5 — Fact check** (new step). Written; scored on whether it quotes the article verbatim rather than inventing a sentence to correct. *Original:* **A5 — Fact check** (new step). Compares the finished article to the

@@ -45,6 +45,12 @@ function lab_steps() {
 			'tools' => array( array( 'type' => 'web_search' ) ),
 			'expects' => 'a sourced research package: ingredients, method and real-image observations',
 		),
+		'research_recipe' => array(
+			'prompts' => array( 'prompt_research' ), 'file' => 'research_recipe.tpl.txt', 'json' => true,
+			'max_output' => (int) $s['research_max_output_tokens'] + (int) $s['canonical_max_output_tokens'],
+			'tools' => array( array( 'type' => 'web_search' ) ),
+			'expects' => 'the research package and the canonical recipe from one call',
+		),
 		'canonical_recipe' => array(
 			'prompts' => array( 'prompt_recipe', 'prompt_nutrition' ), 'file' => 'canonical_recipe.tpl.txt', 'json' => true, 'max_output' => (int) $s['canonical_max_output_tokens'],
 			'expects' => 'a recipe passing MSRWA_Recipe::validate',
@@ -157,7 +163,7 @@ function lab_build_input( $step, $prompt, $brief, $options ) {
 	$research = lab_research_package( $brief, $options );
 	$text_research = lab_research_for_text( $research );
 	$canonical = lab_canonical_recipe( $brief, $options );
-	if ( 'research' === $step ) {
+	if ( 'research' === $step || 'research_recipe' === $step ) {
 		return $prompt . "\nEDITOR BRIEF: " . $encode( $editor );
 	}
 	if ( 'canonical_recipe' === $step ) {
@@ -560,7 +566,17 @@ function lab_score( $step, $text, $brief, $options = array() ) {
 	$checks['valid JSON'] = array( 'pass' => is_array( $json ), 'detail' => is_array( $json ) ? count( $json ) . ' keys' : 'not parseable' );
 	$json = is_array( $json ) ? $json : array();
 
-	if ( 'research' === $step ) {
+	if ( 'research_recipe' === $step ) {
+		// Both jobs are scored, on the same answer: a merge is only worth it if
+		// neither half is quietly worse than the step it replaced.
+		$recipe = is_array( $json['recipe'] ?? null ) ? $json['recipe'] : array();
+		$errors = MSRWA_Recipe::validate( $recipe );
+		$checks['recipe schema'] = array( 'pass' => empty( $errors ), 'detail' => $errors ? implode( ', ', array_keys( $errors ) ) : 'valid' );
+		$checks['recipe ingredients'] = array( 'pass' => count( (array) ( $recipe['ingredients'] ?? array() ) ) >= (int) $settings['quality_min_ingredients'], 'detail' => count( (array) ( $recipe['ingredients'] ?? array() ) ) . ' items' );
+		$checks['recipe steps'] = array( 'pass' => count( (array) ( $recipe['steps'] ?? array() ) ) >= (int) $settings['quality_min_steps'], 'detail' => count( (array) ( $recipe['steps'] ?? array() ) ) . ' steps' );
+	}
+
+	if ( 'research' === $step || 'research_recipe' === $step ) {
 		// An empty array is not evidence. Every one of these keys passing on zero
 		// entries is how a package with no facts and no sources scored 7/10.
 		$required = array( 'ingredients' => 4, 'preparation' => 4, 'references' => 2, 'visual_references' => 1, 'visual_observations' => 1, 'uncertainties' => 0 );

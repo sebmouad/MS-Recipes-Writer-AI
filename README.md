@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.65` est un socle installable : file persistante, pipeline de
+La version `0.2.66` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.
@@ -20,6 +20,45 @@ Le plugin est en cours de refonte éditoriale et budgétaire :
 Les coûts affichés sont des estimations calculées avec le catalogue configuré,
 non une facture fournisseur. `completed` signifie que le traitement est terminé,
 jamais qu’un texte est validé éditorialement.
+
+## Version 0.2.66
+
+**Fusionner recherche et recette canonique : mesuré, puis écarté.**
+
+La question était légitime — la recherche rend déjà les ingrédients avec leurs
+quantités et les étapes dans l'ordre, soit presque la recette. Le gabarit fusionné
+`research_recipe.tpl.txt` fait les deux travaux en un appel et il **fonctionne** :
+17/17 sur le poulet yassa, recette valide, 10 ingrédients, 12 étapes.
+
+Il ne rapporte simplement rien. Sur le même plat :
+
+| | Temps | Coût | Score |
+|---|---:|---:|---|
+| Recherche + recette, séparées | 49,5 s + 21,8 s = **71,3 s** | 0,0183 $ + 0,0047 $ = **0,0230 $** | 13/14 puis 4/4 |
+| Fusionnées | **84,5 s** | **0,0227 $** | 17/17 |
+
+Soit 1,3 % d'économie — dans le bruit — pour **13 secondes de plus**. La sortie
+d'un seul appel se génère séquentiellement : 8 635 jetons d'affilée coûtent plus
+de temps que 6 943 puis 3 162 dans deux appels.
+
+Trois raisons de garder la séparation, au-delà des chiffres :
+
+1. **Le coût d'un échec.** Une recette rejetée par le validateur se rejoue
+   aujourd'hui pour 0,0047 $. Fusionnée, il faudrait relancer l'appel avec
+   recherche web : 0,0227 $, soit **cinq fois plus**.
+2. **Deux métiers différents.** La recherche consigne ce que disent les sources,
+   désaccords compris ; la recette tranche. Un seul appel doit faire les deux, et
+   le risque est qu'il tranche en silence au lieu de consigner le désaccord.
+3. **Le cache ne joue pas en sa faveur.** Les reprises d'un appel identique sont
+   mises en cache à 99,96 % ; plus l'appel rejoué est gros, plus on paie la part
+   non mise en cache.
+
+Le gabarit reste dans le dépôt, comme `article_full` avant lui : une expérience
+mesurée et rejetée vaut mieux qu'une question rouverte tous les trois mois.
+
+Trouvé au passage : la recherche seule n'a donné que 2 des 4 figures de
+`recipe_outline` sur ce plat, là où la version fusionnée en donne 4 — le contrat
+d'`outline` mérite d'être resserré.
 
 ## Version 0.2.65
 
