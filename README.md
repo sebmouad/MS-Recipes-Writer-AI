@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.86` est un socle installable : file persistante, pipeline de
+La version `0.2.87` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.
@@ -22,6 +22,25 @@ Le plugin est en cours de refonte éditoriale et budgétaire :
 Les coûts affichés sont des estimations calculées avec le catalogue configuré,
 non une facture fournisseur. `completed` signifie que le traitement est terminé,
 jamais qu’un texte est validé éditorialement.
+
+## Version 0.2.87
+
+**Un écran « Moteur » : tout ce que le moteur utilise, modifiable.** Routage par
+étape, plafonds de sortie, tentatives, budget, images, seuils d'un côté ;
+fournisseurs, tarifs, niveaux, registre des étapes et gabarits de prompt de
+l'autre. Chaque groupe s'affiche avec sa valeur effective et, dépliable à côté,
+la valeur par défaut du moteur.
+
+Ce qui est enregistré n'est que la différence. Un champ renvoyé tel quel n'est
+pas stocké, donc le jour où le moteur change d'avis sur un plafond, le site
+suit — sauf là où quelqu'un a explicitement écrit autre chose. L'écran montre en
+bas la couche « appelant » réellement transmise au moteur.
+
+Un test refuse désormais qu'un groupe de configuration du moteur n'ait aucun
+champ pour l'atteindre : le jour où le moteur en gagne un, la suite le dit.
+
+Les clés d'API ne s'éditent pas ici. Elles restent chiffrées dans la
+configuration et rejoignent le moteur par l'autre chemin.
 
 ## Version 0.2.86
 

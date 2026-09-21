@@ -239,8 +239,8 @@ final class MSRWA_Lab {
 	}
 
 	/**
-	 * The engine configuration a run starts from: the plugin's settings first,
-	 * then whatever the run itself asked for.
+	 * The engine configuration a run starts from: whatever the Moteur screen has
+	 * overridden, then the keys, then whatever the run itself asked for.
 	 *
 	 * The API keys are handed to the engine directly under `settings`, the one
 	 * branch of the configuration that never reaches a stored record. WordPress
@@ -254,7 +254,8 @@ final class MSRWA_Lab {
 			$value = (string) ( $settings[ $field ] ?? '' );
 			if ( '' !== trim( $value ) ) { $keys[ $provider ] = trim( $value ); }
 		}
-		$base = $keys ? array( 'settings' => array( 'keys' => $keys ) ) : array();
+		$base = class_exists( 'MSRWA_Lab_Config' ) ? MSRWA_Lab_Config::stored() : array();
+		if ( $keys ) { $base['settings'] = array_merge( (array) ( $base['settings'] ?? array() ), array( 'keys' => $keys ) ); }
 		return self::merge( $base, $overrides );
 	}
 

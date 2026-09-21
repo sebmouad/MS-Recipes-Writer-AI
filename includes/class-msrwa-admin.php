@@ -5,6 +5,7 @@ final class MSRWA_Admin {
 	public static function hooks() {
 		add_action( 'admin_menu', array( __CLASS__, 'menu' ), 30 );
 		add_action( 'admin_post_msrwa_save_settings', array( __CLASS__, 'save_settings' ) );
+		MSRWA_Lab_Config::hooks();
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'assets' ) );
 		add_action( 'add_meta_boxes_post', array( __CLASS__, 'editorial_meta_box' ) );
 	}
@@ -51,6 +52,7 @@ final class MSRWA_Admin {
 		add_submenu_page( 'ms-recipes-writer-ai', 'Statistiques', 'Statistiques', 'edit_posts', 'ms-recipes-writer-ai-stats', array( __CLASS__, 'stats_page' ) );
 		add_submenu_page( 'ms-recipes-writer-ai', 'Configuration', 'Configuration', 'manage_options', 'ms-recipes-writer-ai-settings', array( __CLASS__, 'settings_page' ) );
 		MSRWA_Lab_Screen::menu();
+		MSRWA_Lab_Config::menu();
 		add_submenu_page( null, 'Détail du lot', 'Détail du lot', 'edit_posts', 'ms-recipes-writer-ai-job', array( __CLASS__, 'job_page' ) );
 		add_submenu_page( null, 'Détail du job', 'Détail du job', 'edit_posts', 'ms-recipes-writer-ai-job-detail', array( __CLASS__, 'job_detail_page' ) );
 	}
