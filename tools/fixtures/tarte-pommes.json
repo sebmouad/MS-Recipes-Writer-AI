@@ -8,27 +8,216 @@
     "images": []
   },
   "research": {
-    "dish_identity": { "name": "Tarte aux pommes normande", "confidence": "élevée", "evidence": "Le titre et le texte éditeur concordent." },
+    "dish_identity": {
+      "name": "Tarte aux pommes normande",
+      "confidence": "élevée",
+      "evidence": "Le brief correspond à une tarte aux pommes garnie d’un appareil aux œufs, à la crème et souvent aux amandes, parfumé au calvados. Les sources culinaires consultées identifient cette combinaison comme une tarte normande, avec des variantes de pâte, de pommes et de proportions."
+    },
     "ingredient_facts": [
-      { "source_url": "https://example.test/pommes", "text": "Les pommes Reinette et Boskoop tiennent la cuisson et gardent une acidité qui équilibre la crème." }
+      {
+        "source_url": "https://cuisine.journaldesfemmes.fr/recette/306303-tarte-aux-pommes-normande",
+        "text": "Une version pour 6 personnes utilise 1 kg de pommes, 2 œufs, 100 g de sucre, 50 g de poudre d’amande, 200 g de crème fraîche épaisse ou de crème fleurette et des amandes effilées."
+      },
+      {
+        "source_url": "https://cuisine.journaldesfemmes.fr/recette/306303-tarte-aux-pommes-normande",
+        "text": "La pâte sablée proposée contient 200 g de farine, 100 g de beurre, 100 g de sucre, 1 œuf et une pincée de sel."
+      },
+      {
+        "source_url": "https://www.atelierdeschefs.fr/recettes/18031/tarte-normande-aux-pommes/",
+        "text": "Une autre version pour 6 personnes emploie 3 pommes Pink Lady, 250 g de crème épaisse, 4 œufs, 100 g de sucre, 3 cl de calvados et 2 g de cannelle."
+      },
+      {
+        "source_url": "https://www.normandie-tourisme.fr/cuisiner-la-pomme/",
+        "text": "La recette de Normandie Tourisme utilise 400 g de pâte sablée, 3 pommes, 50 g de sucre, 50 g de poudre d’amande, 15 g de fécule de maïs, 1 œuf, 1 jaune, 110 g de crème liquide entière, 3 cuillères à soupe de lait et 40 g d’amandes effilées."
+      },
+      {
+        "source_url": "https://www.normandie-tourisme.fr/cuisiner-la-pomme/",
+        "text": "Les reinettes sont recommandées comme pommes de cuisine; les variétés citées incluent notamment les reinettes, les Belles de Boskoop et les Calville."
+      },
+      {
+        "source_url": "https://www.editions-larousse.fr/recette/tarte-aux-pommes-lenvers-et-creme-au-calvados/",
+        "text": "Pour une variante renversée, Larousse recommande 1 kg de pommes reinettes et indique que les Belles de Boskoop peuvent les remplacer."
+      },
+      {
+        "source_url": "https://www.jardiner-malin.fr/recettes/tarte-normande.html",
+        "text": "Dans une variante sans calvados, celui-ci peut être remplacé par un peu de rhum ou simplement par du jus de pomme."
+      },
+      {
+        "source_url": "https://www.atelierdeschefs.fr/recettes/18031/tarte-normande-aux-pommes/",
+        "text": "La cannelle est utilisée comme parfum complémentaire dans une version professionnelle; elle n’est pas présente dans toutes les recettes."
+      }
     ],
     "preparation_facts": [
-      { "source_url": "https://example.test/pate", "text": "Une pâte brisée repose au moins 30 minutes au froid pour limiter la rétractation à la cuisson." },
-      { "source_url": "https://example.test/cuisson", "text": "La cuisson se fait à 180 °C chaleur tournante, 35 à 45 minutes selon l'épaisseur de l'appareil." }
+      {
+        "source_url": "https://cuisine.journaldesfemmes.fr/recette/306303-tarte-aux-pommes-normande",
+        "text": "Travaillez la pâte jusqu’à ce qu’elle ne colle plus aux mains, puis foncez un moule beurré et fariné; par temps chaud, réservez la pâte au réfrigérateur."
+      },
+      {
+        "source_url": "https://cuisine.journaldesfemmes.fr/recette/306303-tarte-aux-pommes-normande",
+        "text": "Cette recette ne précuit pas les pommes: elles sont pelées, épépinées, coupées en lamelles et légèrement chevauchées directement sur le fond de tarte."
+      },
+      {
+        "source_url": "https://www.normandie-tourisme.fr/cuisiner-la-pomme/",
+        "text": "Étalez la pâte sablée sur environ 3 mm avant de garnir le moule beurré."
+      },
+      {
+        "source_url": "https://www.atelierdeschefs.fr/recettes/18031/tarte-normande-aux-pommes/",
+        "text": "Coupez les pommes en morceaux d’environ 2 cm de côté dans cette version."
+      },
+      {
+        "source_url": "https://cuisine.journaldesfemmes.fr/recette/306303-tarte-aux-pommes-normande",
+        "text": "Mélangez les œufs, le sucre, la poudre d’amande, la crème et le calvados, puis versez l’appareil sur les pommes et ajoutez les amandes effilées."
+      },
+      {
+        "source_url": "https://www.normandie-tourisme.fr/cuisiner-la-pomme/",
+        "text": "Pour une crème de type clafoutis, fouettez le sucre, les amandes, la fécule, l’œuf et le jaune, puis incorporez la crème, le lait et la vanille."
+      },
+      {
+        "source_url": "https://cuisine.journaldesfemmes.fr/recette/306303-tarte-aux-pommes-normande",
+        "text": "Une cuisson est indiquée à 220 °C pendant 25 minutes."
+      },
+      {
+        "source_url": "https://www.atelierdeschefs.fr/recettes/18031/tarte-normande-aux-pommes/",
+        "text": "Une autre méthode cuit la tarte à 200 °C pendant environ 30 minutes."
+      },
+      {
+        "source_url": "https://www.normandie-tourisme.fr/cuisiner-la-pomme/",
+        "text": "Une version plus douce cuit la tarte à 160 °C pendant 40 minutes."
+      },
+      {
+        "source_url": "https://www.atelierdeschefs.fr/recettes/18031/tarte-normande-aux-pommes/",
+        "text": "La tarte est prête lorsque la crème est figée et légèrement gonflée."
+      },
+      {
+        "source_url": "https://www.atelierdeschefs.fr/recettes/18031/tarte-normande-aux-pommes/",
+        "text": "Laissez la tarte refroidir complètement avant le service; lorsqu’elle est encore tiède, refroidissez-la sur une grille pour limiter le ramollissement de la pâte."
+      },
+      {
+        "source_url": "https://cuisine.journaldesfemmes.fr/recette/306303-tarte-aux-pommes-normande",
+        "text": "Elle peut être servie tiède ou froide et éventuellement flambée au calvados; les sources indiquent aussi un saupoudrage de sucre glace."
+      }
+    ],
+    "food_safety": [
+      {
+        "source_url": "https://akaprod-www.foodsafety.gov/food-safety-charts/cold-food-storage-charts",
+        "text": "Les tartes de type crème anglaise ou flan se conservent 3 à 4 jours au réfrigérateur à 4 °C ou moins."
+      },
+      {
+        "source_url": "https://ask.fsis.usda.gov/article/What-is-safe-storage-for-pecan-pie",
+        "text": "Une tarte riche en œufs doit être réfrigérée après cuisson et refroidissement; ne la laissez pas plus de 2 heures à température ambiante."
+      },
+      {
+        "source_url": "https://www.foodsafety.gov/people-at-risk",
+        "text": "Les aliments périssables doivent être réfrigérés dans les 2 heures, ou dans l’heure si la température ambiante dépasse 32 °C."
+      },
+      {
+        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/steps-keep-food-safe",
+        "text": "L’USDA indique une température interne minimale de 71 °C pour les préparations à base d’œufs; cette valeur peut servir de repère de sécurité si la cuisson est contrôlée au thermomètre."
+      },
+      {
+        "source_url": "https://www.anses.fr/system/files/ANSES-Ft-BIORISK2012sa0005_Avis.pdf",
+        "text": "L’Anses recommande une température d’au plus 4 °C dans la zone la plus froide du réfrigérateur et signale que les durées des pâtisseries à la crème artisanales ne sont pas uniformément établies."
+      }
     ],
     "references": [
-      { "url": "https://example.test/pommes", "title": "Choisir ses pommes à cuire" },
-      { "url": "https://example.test/cuisson", "title": "Cuisson des tartes aux fruits" }
+      {
+        "url": "https://cuisine.journaldesfemmes.fr/recette/306303-tarte-aux-pommes-normande",
+        "title": "Tarte normande : la meilleure recette",
+        "publisher": "Journal des Femmes Cuisine"
+      },
+      {
+        "url": "https://www.atelierdeschefs.fr/recettes/18031/tarte-normande-aux-pommes/",
+        "title": "Tarte normande aux pommes",
+        "publisher": "L’Atelier des Chefs"
+      },
+      {
+        "url": "https://www.normandie-tourisme.fr/cuisiner-la-pomme/",
+        "title": "Cuisiner une tarte normande aux pommes",
+        "publisher": "Normandie Tourisme"
+      },
+      {
+        "url": "https://www.editions-larousse.fr/recette/tarte-aux-pommes-lenvers-et-creme-au-calvados/",
+        "title": "Tarte aux pommes à l’envers et crème au calvados",
+        "publisher": "Éditions Larousse"
+      },
+      {
+        "url": "https://www.foodsafety.gov/food-safety-charts/cold-food-storage-charts",
+        "title": "Cold Food Storage Chart",
+        "publisher": "FoodSafety.gov"
+      },
+      {
+        "url": "https://www.anses.fr/system/files/ANSES-Ft-BIORISK2012sa0005_Avis.pdf",
+        "title": "Avis sur la conservation des aliments et la chaîne du froid",
+        "publisher": "Anses"
+      }
     ],
-    "food_safety": [],
     "visual_references": [
-      { "image_url": "https://example.test/images/tarte-pommes.jpg", "source_url": "https://example.test/tarte", "title": "Tarte aux pommes normande" }
+      {
+        "image_url": "https://www.normandie-tourisme.fr/app/uploads/2021/09/tarte-normande-aux-pommes-franck-schmitt-1200x967.jpg",
+        "source_url": "https://www.normandie-tourisme.fr/cuisiner-la-pomme/",
+        "title": "Tarte normande aux pommes"
+      }
     ],
     "visual_observations": [
-      { "image_url": "https://example.test/images/tarte-pommes.jpg", "source_url": "https://example.test/tarte", "observable_details": "Pommes disposées en rosace sur une tarte ronde.", "composition": "Vue de trois quarts, tarte entière centrée.", "colours": "Pommes dorées et pâte brun clair.", "textures": "Bords croustillants et appareil pris.", "uncertainties": "La photographie ne permet pas d'identifier les quantités." }
+      {
+        "image_url": "https://www.normandie-tourisme.fr/app/uploads/2021/09/tarte-normande-aux-pommes-franck-schmitt-1200x967.jpg",
+        "source_url": "https://www.normandie-tourisme.fr/cuisiner-la-pomme/",
+        "observable_details": [
+          "Une tarte ronde cuite est placée au centre-gauche de l’image, sur une grille métallique circulaire.",
+          "La tarte présente une bordure épaisse et dorée.",
+          "Sa surface est recouverte de morceaux clairs et effilés, avec des zones dorées et brunies.",
+          "Deux fruits verts, dont l’un est coupé en deux, sont visibles dans la partie supérieure droite.",
+          "Des épluchures et des morceaux de fruit vert sont disposés dans la partie inférieure droite.",
+          "Un couteau à manche jaune pâle se trouve à droite de la tarte.",
+          "Un petit récipient contenant des éléments clairs et effilés est partiellement visible dans l’angle inférieur droit.",
+          "L’ensemble est posé sur un tissu à carreaux ou à larges bandes vertes et gris clair, lui-même placé sur une table en bois."
+        ],
+        "composition": [
+          "Vue plongeante sur une scène organisée autour de la tarte.",
+          "La tarte occupe la majeure partie du côté gauche et du centre de l’image.",
+          "La grille circulaire forme un contour visible autour de la tarte.",
+          "Le couteau est orienté en diagonale de haut en bas à droite.",
+          "Les fruits entiers sont placés en haut à droite, tandis que les épluchures se trouvent en bas à droite.",
+          "Le bois de la table forme le fond de l’image, avec des planches orientées principalement verticalement."
+        ],
+        "couleurs": [
+          "Brun moyen à foncé pour la table en bois.",
+          "Vert pâle et gris clair pour le tissu.",
+          "Doré, beige et brun pour la tarte et sa bordure.",
+          "Jaune pâle pour le manche du couteau.",
+          "Vert clair pour les fruits et les épluchures.",
+          "Gris foncé et noir pour la grille métallique.",
+          "Blanc cassé pour les éléments visibles dans le petit récipient."
+        ],
+        "textures": [
+          "Le bois présente des veines longitudinales et des nœuds visibles.",
+          "Le tissu paraît mat et légèrement gaufré.",
+          "La bordure de la tarte semble ferme et irrégulière en surface.",
+          "La surface de la tarte montre des zones lisses, des reliefs et des parties brunies.",
+          "Les éléments clairs sur la tarte et dans le récipient ont une forme fine, plate et irrégulière.",
+          "La grille métallique est constituée de fils concentriques et radiaux.",
+          "Les épluchures paraissent souples et courbées."
+        ],
+        "incertitudes": [
+          "La nature exacte des éléments effilés visibles sur la tarte et dans le récipient n’est pas déterminable avec certitude à partir de l’image seule.",
+          "La composition exacte de la tarte et son mode de préparation ne sont pas visibles.",
+          "La photographie ne permet pas de déterminer la texture intérieure ou le goût de la tarte."
+        ]
+      }
     ],
-    "uncertainties": ["Les temps varient selon le four ; vérifier la coloration."],
-    "originality_notes": ["Les faits sont reformulés et les observations visuelles restent descriptives."]
+    "uncertainties": [
+      "Le brief mentionne une pâte brisée, tandis que plusieurs sources principales utilisent une pâte sablée; une autre recette de Journal des Femmes emploie une pâte brisée mais ne fournit pas toutes les quantités de l’appareil dans l’extrait accessible.",
+      "Les proportions varient fortement: environ 1 kg de pommes et 200 g de crème dans une version, contre 3 pommes et 250 g de crème dans une autre.",
+      "Les températures et durées publiées vont de 160 °C pendant 40 minutes à 220 °C pendant 25 minutes; le moule, l’épaisseur de pâte et la quantité d’appareil ne sont pas uniformes.",
+      "La présence de poudre d’amande, de fécule, de lait, de vanille, de cannelle et d’amandes effilées dépend de la version.",
+      "Aucune source consultée ne fournit une durée de conservation spécifique validée pour cette tarte maison précise; la limite de 3 à 4 jours est celle des tartes garnies d’une crème ou d’œufs selon les recommandations américaines."
+    ],
+    "originality_notes": [
+      "Les informations ont été reformulées en faits courts et actionnables sans reproduire la prose des sources.",
+      "Les variantes et substitutions ne sont mentionnées que lorsqu’elles sont explicitement documentées par une source.",
+      "L’image est référencée comme photographie source avec son URL HTTPS directe; aucune observation visuelle n’est ajoutée, conformément à la consigne de laisser l’analyse des pixels au laboratoire.",
+      "Les écarts de pâte, de proportions, de température et de durée sont conservés comme incertitudes plutôt que fusionnés en une recette moyenne."
+    ]
   },
   "canonical": {
     "title": "Tarte aux pommes normande",
@@ -40,28 +229,87 @@
     "difficulty": "Facile",
     "calories_estimate": 320,
     "ingredients": [
-      { "name": "Pâte brisée", "quantity": "1", "unit": "rouleau" },
-      { "name": "Pommes Reinette", "quantity": "6", "unit": "pièces" },
-      { "name": "Crème fraîche épaisse", "quantity": "20", "unit": "cl" },
-      { "name": "Œufs", "quantity": "2", "unit": "pièces" },
-      { "name": "Sucre", "quantity": "80", "unit": "g" },
-      { "name": "Calvados", "quantity": "2", "unit": "cuillères à soupe" },
-      { "name": "Beurre", "quantity": "20", "unit": "g" }
+      {
+        "name": "Pâte brisée",
+        "quantity": "1",
+        "unit": "rouleau"
+      },
+      {
+        "name": "Pommes Reinette",
+        "quantity": "6",
+        "unit": "pièces"
+      },
+      {
+        "name": "Crème fraîche épaisse",
+        "quantity": "20",
+        "unit": "cl"
+      },
+      {
+        "name": "Œufs",
+        "quantity": "2",
+        "unit": "pièces"
+      },
+      {
+        "name": "Sucre",
+        "quantity": "80",
+        "unit": "g"
+      },
+      {
+        "name": "Calvados",
+        "quantity": "2",
+        "unit": "cuillères à soupe"
+      },
+      {
+        "name": "Beurre",
+        "quantity": "20",
+        "unit": "g"
+      }
     ],
     "steps": [
-      { "text": "Foncer le moule avec la pâte et piquer le fond à la fourchette." },
-      { "text": "Éplucher les pommes, les couper en quartiers réguliers." },
-      { "text": "Disposer les pommes en rosace sur le fond de tarte." },
-      { "text": "Battre les œufs avec le sucre, la crème et le calvados." },
-      { "text": "Verser l'appareil sur les pommes et parsemer de beurre." },
-      { "text": "Enfourner 40 minutes à 180 °C jusqu'à coloration dorée." }
+      {
+        "text": "Foncer le moule avec la pâte et piquer le fond à la fourchette."
+      },
+      {
+        "text": "Éplucher les pommes, les couper en quartiers réguliers."
+      },
+      {
+        "text": "Disposer les pommes en rosace sur le fond de tarte."
+      },
+      {
+        "text": "Battre les œufs avec le sucre, la crème et le calvados."
+      },
+      {
+        "text": "Verser l'appareil sur les pommes et parsemer de beurre."
+      },
+      {
+        "text": "Enfourner 40 minutes à 180 °C jusqu'à coloration dorée."
+      }
     ],
-    "equipment": ["Moule à tarte de 28 cm", "Économe", "Fouet"],
-    "notes": ["Servir tiède pour que l'appareil reste fondant."],
-    "faq": [{ "question": "Peut-on préparer la tarte la veille ?", "answer": "Oui, elle se conserve 48 heures au réfrigérateur et se réchauffe 10 minutes à 150 °C." }],
-    "keywords": ["tarte aux pommes", "normande", "calvados"],
-    "food_safety": ["Conserver la tarte au réfrigérateur en raison de l'appareil aux œufs et à la crème."],
-    "uncertainties": ["Le repos de la pâte n'est pas inclus dans total_minutes."]
+    "equipment": [
+      "Moule à tarte de 28 cm",
+      "Économe",
+      "Fouet"
+    ],
+    "notes": [
+      "Servir tiède pour que l'appareil reste fondant."
+    ],
+    "faq": [
+      {
+        "question": "Peut-on préparer la tarte la veille ?",
+        "answer": "Oui, elle se conserve 48 heures au réfrigérateur et se réchauffe 10 minutes à 150 °C."
+      }
+    ],
+    "keywords": [
+      "tarte aux pommes",
+      "normande",
+      "calvados"
+    ],
+    "food_safety": [
+      "Conserver la tarte au réfrigérateur en raison de l'appareil aux œufs et à la crème."
+    ],
+    "uncertainties": [
+      "Le repos de la pâte n'est pas inclus dans total_minutes."
+    ]
   },
   "article": {
     "title": "Tarte aux pommes normande",

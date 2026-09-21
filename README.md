@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.61` est un socle installable : file persistante, pipeline de
+La version `0.2.62` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.
@@ -20,6 +20,35 @@ Le plugin est en cours de refonte éditoriale et budgétaire :
 Les coûts affichés sont des estimations calculées avec le catalogue configuré,
 non une facture fournisseur. `completed` signifie que le traitement est terminé,
 jamais qu’un texte est validé éditorialement.
+
+## Version 0.2.62
+
+**Les neuf prompts sont désormais des gabarits compilés depuis les réglages**,
+et plus aucun ne code en dur ce qu'un réglage contrôle. La langue de sortie,
+jusque-là écrite « French » dans cinq prompts, vient de `site_language` :
+basculer le site en espagnol bascule la recherche, la recette, l'article, la
+relecture, la correction, les deux images et le contrôle final.
+
+- `tools/promote-prompts.php` compile chaque gabarit et l'écrit dans les
+  réglages qui alimentent la table `prompts`.
+- `tests/test-prompt-templates.php` vérifie qu'aucun placeholder ne survit,
+  qu'aucune langue n'est codée en dur, et surtout **que ce qui est livré est
+  exactement ce que le gabarit compile**. La dérive entre le laboratoire et la
+  production devient impossible : le plugin ne peut plus exécuter un prompt que
+  personne n'a mesuré.
+
+**Les fiches d'essai portent enfin de vraies observations.** Quatre des cinq
+citaient `example.test` : aucune photographie n'avait jamais été analysée pour
+elles, et toute mesure d'apparence portait sur une amorce inventée. Les cinq
+sont rejouées sur de vraies sources — `provenceweb.fr`, `ptitchef.com`,
+`commons.wikimedia.org`, `thekitchn.com`, `normandie-tourisme.fr` — avec 1 à 3
+photographies téléchargées et analysées octet par octet.
+
+Trouvé en chemin : le CDN de Food Network refuse nos requêtes (HTTP 403), et une
+seule référence citée suffisait alors à nous laisser sans aucune observation. La
+recherche doit maintenant citer **trois** photographies sur **trois domaines
+différents** ; un refus ne rend plus aveugle. Nous ne contournons pas ce refus :
+un serveur qui dit non a dit non.
 
 ## Version 0.2.61
 

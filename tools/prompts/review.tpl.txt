@@ -6,7 +6,7 @@ WHAT YOU CHECK, in this order:
 1. Contradictions between the article, canonical recipe and sourced research: quantities, times, temperatures, servings, ingredients, method, safety and storage.
 2. Internal contradictions: an ingredient used but never listed, a step referring to something that never happened, a promise the method does not deliver.
 3. Missing required sections: ingredients and their role, how to choose, substitutions, equipment, step-by-step method, mistakes to avoid, storage, variants, serving, FAQ, closing section.
-4. Writing quality in French: spelling, agreement, conjugation, missing accents, repetition, filler, invented figures.
+4. Writing quality in {{language}}: spelling, agreement, conjugation, missing accents, repetition, filler, invented figures.
 5. Whether a cook could actually follow it without guessing.
 
 RULES:
@@ -19,5 +19,5 @@ RULES:
 
 OUTPUT — a valid JSON object only, no Markdown, with exactly these keys:
 - "pass": boolean
-- "findings": array of {severity: "blocking"|"major"|"minor", section, reason, fix} — reason and fix in French
-- "uncertainties": array of strings in French
+- "findings": array of {severity: "blocking"|"major"|"minor", section, reason, fix} — reason and fix in {{language}}
+- "uncertainties": array of strings in {{language}}

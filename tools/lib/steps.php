@@ -41,12 +41,12 @@ function lab_steps() {
 	$s = lab_settings();
 	return array(
 		'research' => array(
-			'prompts' => array( 'prompt_research' ), 'file' => 'research.en.txt', 'json' => true, 'max_output' => (int) $s['research_max_output_tokens'],
+			'prompts' => array( 'prompt_research' ), 'file' => 'research.tpl.txt', 'json' => true, 'max_output' => (int) $s['research_max_output_tokens'],
 			'tools' => array( array( 'type' => 'web_search' ) ),
 			'expects' => 'a sourced research package: ingredients, method and real-image observations',
 		),
 		'canonical_recipe' => array(
-			'prompts' => array( 'prompt_recipe', 'prompt_nutrition' ), 'file' => 'canonical_recipe.en.txt', 'json' => true, 'max_output' => (int) $s['canonical_max_output_tokens'],
+			'prompts' => array( 'prompt_recipe', 'prompt_nutrition' ), 'file' => 'canonical_recipe.tpl.txt', 'json' => true, 'max_output' => (int) $s['canonical_max_output_tokens'],
 			'expects' => 'a recipe passing MSRWA_Recipe::validate',
 		),
 		'article' => array(
@@ -54,15 +54,15 @@ function lab_steps() {
 			'expects' => 'an article passing MSRWA_Quality plus the required outline',
 		),
 		'review' => array(
-			'prompts' => array( 'prompt_review' ), 'file' => 'review.en.txt', 'json' => true, 'max_output' => (int) $s['review_max_output_tokens'],
+			'prompts' => array( 'prompt_review' ), 'file' => 'review.tpl.txt', 'json' => true, 'max_output' => (int) $s['review_max_output_tokens'],
 			'expects' => 'a research-grounded verdict and precise findings',
 		),
 		'fact_check' => array(
-			'prompts' => array( 'prompt_review' ), 'file' => 'fact_check.en.txt', 'json' => true, 'max_output' => 4000,
+			'prompts' => array( 'prompt_review' ), 'file' => 'fact_check.tpl.txt', 'json' => true, 'max_output' => 4000,
 			'expects' => 'only the passages the sources contradict, quoted verbatim',
 		),
 		'proofread' => array(
-			'prompts' => array( 'prompt_correction' ), 'file' => 'proofread.en.txt', 'json' => true, 'max_output' => max( (int) $s['article_max_output_tokens'], MSRWA_Cost::output_budget( $s['quality_max_words'] ) ),
+			'prompts' => array( 'prompt_correction' ), 'file' => 'proofread.tpl.txt', 'json' => true, 'max_output' => max( (int) $s['article_max_output_tokens'], MSRWA_Cost::output_budget( $s['quality_max_words'] ) ),
 			'expects' => 'the same article with its French corrected and every figure untouched',
 		),
 	);

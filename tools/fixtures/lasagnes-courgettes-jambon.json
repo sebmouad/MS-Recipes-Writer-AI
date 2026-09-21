@@ -8,29 +8,295 @@
     "images": []
   },
   "research": {
-    "dish_identity": { "name": "Lasagnes de courgettes au jambon et béchamel", "confidence": "élevée", "evidence": "Le titre et l'article éditeur décrivent les couches principales." },
+    "dish_identity": {
+      "name": "Lasagnes de courgettes au jambon et à la béchamel, gratinées au fromage",
+      "confidence": "élevée",
+      "evidence": "Le brief décrit des couches de courgettes, jambon, feuilles de lasagnes et béchamel, combinaison documentée par Fleury Michon, Guy Demarle et Plat et Recette."
+    },
     "ingredient_facts": [
-      { "source_url": "https://example.test/courgettes", "text": "Les courgettes contiennent beaucoup d'eau et gagnent à être précuites avant le montage." },
-      { "source_url": "https://example.test/bechamel", "text": "Une béchamel nappante aide à lier les couches sans détremper les pâtes." }
+      {
+        "source_url": "https://www.fleurymichon.fr/recettes/lasagnes-jambon-courgettes",
+        "text": "Pour 4 personnes, une source indique 8 tranches de jambon, 2 courgettes, 500 ml de béchamel, 200 g de fromage râpé et 1 cuillère à soupe d’huile d’olive."
+      },
+      {
+        "source_url": "https://www.fleurymichon.fr/recettes/lasagnes-jambon-courgettes",
+        "text": "La béchamel peut être achetée ou préparée avec 50 g de beurre, 50 g de farine et 500 ml de lait."
+      },
+      {
+        "source_url": "https://www.platetrecette.fr/lasagnes-aux-courgettes-et-au-jambon-avec-Thermomix/",
+        "text": "Pour 6 personnes, une autre version utilise 250 g de feuilles de lasagne précuites, 600 g de courgettes, 150 g de jambon blanc, 500 g de lait, 40 g de beurre et 50 g de farine."
+      },
+      {
+        "source_url": "https://www.platetrecette.fr/lasagnes-aux-courgettes-et-au-jambon-avec-Thermomix/",
+        "text": "Cette version ajoute 125 g de mozzarella, 50 g de gruyère râpé, 100 g de parmesan et une pincée de muscade."
+      },
+      {
+        "source_url": "https://www.guydemarle.com/recettes/lasagnes-courgettes-jambon-42347",
+        "text": "Pour 6 personnes, Guy Demarle indique 4 courgettes, 4 tranches de jambon, 60 g de beurre, 60 g de farine et 900 ml de lait."
+      },
+      {
+        "source_url": "https://www.fleurymichon.fr/recettes/lasagnes-jambon-courgettes",
+        "text": "Le jambon peut être remplacé par du blanc de poulet dans la recette de Fleury Michon."
+      },
+      {
+        "source_url": "https://www.moulinex.fr/recette/detail/PRO/Lasagnes%20au%20ch%C3%A8vre,%20courgettes%20et%20jambon/470368",
+        "text": "Une variante remplace une partie du fromage gratiné par une bûche de chèvre et ajoute 10 cl de crème fraîche."
+      },
+      {
+        "source_url": "https://www.topmarmite.com/lasagnes-de-courgettes-au-jambon/",
+        "text": "Pour une béchamel sans gluten, TopMarmite propose de remplacer la farine de blé par de la farine de riz."
+      },
+      {
+        "source_url": "https://www.topmarmite.com/lasagnes-de-courgettes-au-jambon/",
+        "text": "La même source propose, en version sans pâte, de remplacer les feuilles de lasagne par des tranches de courgette."
+      },
+      {
+        "source_url": "https://www.platetrecette.fr/lasagnes-aux-courgettes-et-au-jambon-avec-Thermomix/",
+        "text": "La mozzarella fraîche doit être égouttée avant emploi ; la mozzarella pour pizza est présentée comme moins humide."
+      }
     ],
     "preparation_facts": [
-      { "source_url": "https://example.test/lasagnes-montage", "text": "La sauce doit toucher les feuilles de lasagnes pour qu'elles s'hydratent régulièrement." },
-      { "source_url": "https://example.test/lasagnes-repos", "text": "Un repos de 10 minutes après cuisson facilite une découpe nette." }
+      {
+        "source_url": "https://www.fleurymichon.fr/recettes/lasagnes-jambon-courgettes",
+        "text": "Préchauffer le four à 180 °C."
+      },
+      {
+        "source_url": "https://www.fleurymichon.fr/recettes/lasagnes-jambon-courgettes",
+        "text": "Couper les courgettes en fines rondelles et les faire revenir environ 5 minutes à feu moyen jusqu’à légère coloration."
+      },
+      {
+        "source_url": "https://www.platetrecette.fr/lasagnes-aux-courgettes-et-au-jambon-avec-Thermomix/",
+        "text": "Une autre méthode précuit les rondelles de courgette à la vapeur pendant 15 minutes, puis les égoutte avant le montage."
+      },
+      {
+        "source_url": "https://www.topmarmite.com/lasagnes-de-courgettes-au-jambon/",
+        "text": "Pour limiter l’eau, saler les tranches de courgette, les laisser dégorger 10 minutes puis les éponger."
+      },
+      {
+        "source_url": "https://www.platetrecette.fr/lasagnes-aux-courgettes-et-au-jambon-avec-Thermomix/",
+        "text": "Après la précuisson, presser légèrement les courgettes dans du papier absorbant avant de les incorporer."
+      },
+      {
+        "source_url": "https://www.fleurymichon.fr/recettes/lasagnes-jambon-courgettes",
+        "text": "Pour la béchamel, former un roux avec le beurre et la farine pendant 1 à 2 minutes, puis ajouter progressivement le lait en fouettant jusqu’à épaississement."
+      },
+      {
+        "source_url": "https://www.cuisine.journaldesfemmes.fr/recette/3115915-lasagnes-de-courgettes-champignons-et-jambon",
+        "text": "Une béchamel peut être portée à ébullition puis fouettée encore 1 à 2 minutes pour obtenir une sauce épaissie."
+      },
+      {
+        "source_url": "https://www.fleurymichon.fr/recettes/lasagnes-jambon-courgettes",
+        "text": "Monter dans l’ordre une fine couche de béchamel, les feuilles de lasagne, les courgettes, le jambon et une nouvelle couche de béchamel ; terminer par la béchamel."
+      },
+      {
+        "source_url": "https://www.platetrecette.fr/lasagnes-aux-courgettes-et-au-jambon-avec-Thermomix/",
+        "text": "Une variante intercale aussi de la mozzarella entre les couches et termine par béchamel, gruyère et parmesan."
+      },
+      {
+        "source_url": "https://www.fleurymichon.fr/recettes/lasagnes-jambon-courgettes",
+        "text": "Parsemer généreusement la surface de fromage râpé."
+      },
+      {
+        "source_url": "https://www.fleurymichon.fr/recettes/lasagnes-jambon-courgettes",
+        "text": "Cuire environ 30 à 40 minutes à 180 °C, jusqu’à ce que le dessus soit doré et que les feuilles soient cuites."
+      },
+      {
+        "source_url": "https://www.platetrecette.fr/lasagnes-aux-courgettes-et-au-jambon-avec-Thermomix/",
+        "text": "Laisser reposer quelques minutes avant de découper ; une autre source recommande 5 minutes de repos."
+      }
     ],
     "food_safety": [
-      { "source_url": "https://example.test/restes", "text": "Les restes cuits se conservent au froid dans un récipient fermé et doivent être réchauffés à cœur." }
+      {
+        "source_url": "https://www.foodsafety.gov/print/pdf/node/15?id=foo-",
+        "text": "Conserver les restes cuits au réfrigérateur à 4 °C ou moins pendant 3 à 4 jours."
+      },
+      {
+        "source_url": "https://www.foodsafety.gov/print/pdf/node/15?id=foo-",
+        "text": "Les plats en casserole cuits se conservent 3 à 4 jours au réfrigérateur et 2 à 3 mois au congélateur."
+      },
+      {
+        "source_url": "https://www.foodsafety.gov/print/pdf/node/15?id=foo-",
+        "text": "Le jambon cuit tranché et emballé se conserve généralement 3 à 5 jours au réfrigérateur après ouverture."
+      },
+      {
+        "source_url": "https://www.topmarmite.com/lasagnes-de-courgettes-au-jambon/",
+        "text": "Une source propose de congeler les lasagnes en portions individuelles jusqu’à 1 mois, mais cette durée est plus prudente que la recommandation générale de FoodSafety.gov."
+      }
     ],
     "references": [
-      { "url": "https://example.test/lasagnes-montage", "title": "Monter et cuire des lasagnes", "publisher": "École culinaire de test" }
+      {
+        "url": "https://www.fleurymichon.fr/recettes/lasagnes-jambon-courgettes",
+        "title": "Lasagnes Jambon & Courgettes",
+        "publisher": "Fleury Michon"
+      },
+      {
+        "url": "https://www.platetrecette.fr/lasagnes-aux-courgettes-et-au-jambon-avec-Thermomix/",
+        "title": "Lasagnes aux courgettes et au jambon avec Thermomix",
+        "publisher": "Plat et Recette"
+      },
+      {
+        "url": "https://www.guydemarle.com/recettes/lasagnes-courgettes-jambon-42347",
+        "title": "Lasagnes Courgettes / Jambon",
+        "publisher": "Guy Demarle"
+      },
+      {
+        "url": "https://www.cuisine.journaldesfemmes.fr/recette/3115915-lasagnes-de-courgettes-champignons-et-jambon",
+        "title": "Lasagnes de courgettes, champignons et jambon",
+        "publisher": "Journal des Femmes Cuisine"
+      },
+      {
+        "url": "https://www.ptitchef.com/recettes/plat/lasagnes-courgettes-jambon-cru-fid-517516",
+        "title": "Lasagnes courgettes-jambon cru",
+        "publisher": "Ptitchef"
+      },
+      {
+        "url": "https://www.foodsafety.gov/print/pdf/node/15?id=foo-",
+        "title": "Cold Food Storage Chart",
+        "publisher": "FoodSafety.gov"
+      }
     ],
     "visual_references": [
-      { "image_url": "https://example.test/images/lasagnes-courgettes.jpg", "source_url": "https://example.test/lasagnes-courgettes", "title": "Lasagnes de courgettes gratinées" }
+      {
+        "image_url": "https://www.platetrecette.fr/wp-content/uploads/2018/05/lasagnes-aux-courgettes-et-au-jambon-avec-Thermomix.jpg",
+        "source_url": "https://www.platetrecette.fr/lasagnes-aux-courgettes-et-au-jambon-avec-Thermomix/",
+        "title": "Lasagnes aux courgettes et au jambon avec Thermomix"
+      },
+      {
+        "image_url": "https://www.ptitchef.com/imgupl/recipe/lasagnes-courgettes-jambon-cru--lg-340570p552032.jpg",
+        "source_url": "https://www.ptitchef.com/recettes/plat/lasagnes-courgettes-jambon-cru-fid-517516",
+        "title": "Lasagnes courgettes-jambon cru"
+      },
+      {
+        "image_url": "https://www.mesrecettes.info/wp-content/uploads/2021/07/lasagnes-cremeuses-aux-courgettes-et-au-jambon.jpg",
+        "source_url": "https://www.mesrecettes.info/lasagnes-cremeuses-aux-courgettes-et-au-jambon/",
+        "title": "Lasagnes crémeuses aux courgettes et au jambon"
+      }
     ],
     "visual_observations": [
-      { "image_url": "https://example.test/images/lasagnes-courgettes.jpg", "source_url": "https://example.test/lasagnes-courgettes", "observable_details": "Part rectangulaire montrant des couches de pâte, courgette et sauce claire.", "composition": "Part servie devant le plat à gratin.", "colours": "Dessus doré, intérieur crème et vert pâle.", "textures": "Croûte gratinée et couches moelleuses qui se tiennent.", "uncertainties": "La photographie ne permet pas d'identifier le fromage ou l'assaisonnement." }
+      {
+        "image_url": "https://www.platetrecette.fr/wp-content/uploads/2018/05/lasagnes-aux-courgettes-et-au-jambon-avec-Thermomix.jpg",
+        "source_url": "https://www.platetrecette.fr/lasagnes-aux-courgettes-et-au-jambon-avec-Thermomix/",
+        "observable_details": [
+          "L’image montre deux vues d’un plat en couches.",
+          "À gauche, le plat est présenté dans un récipient rectangulaire blanc avec des bords épais et légèrement évasés.",
+          "À droite, une portion est visible sur une assiette blanche.",
+          "Des couches claires et des éléments verts en lamelles ou en petits morceaux sont visibles.",
+          "Des zones rosées et des taches brunies apparaissent entre ou sur les couches.",
+          "Aucun ustensile ni appareil de cuisine n’est clairement visible."
+        ],
+        "composition": {
+          "vue_gauche": "Vue rapprochée du plat entier, placé sur une surface textile ou mate.",
+          "vue_droite": "Vue rapprochée d’une portion découpée, montrant plusieurs couches superposées.",
+          "cadrage": "Les deux vues sont juxtaposées verticalement dans une même image."
+        },
+        "couleurs": [
+          "blanc",
+          "crème",
+          "jaune pâle",
+          "vert",
+          "rose pâle",
+          "brun doré",
+          "gris clair"
+        ],
+        "textures": [
+          "Surface supérieure irrégulière avec des zones légèrement gratinées.",
+          "Aspect crémeux ou humide visible entre les couches.",
+          "Éléments verts aux contours irréguliers.",
+          "Couches souples et compactes visibles sur la tranche de la portion.",
+          "Récipient extérieur lisse et mat."
+        ],
+        "incertainties": [
+          "La nature exacte des éléments verts, rosés et des couches claires n’est pas déterminable uniquement à partir de l’image.",
+          "La profondeur et le nombre exact de couches ne sont pas entièrement visibles.",
+          "La photo ne permet pas de déterminer les ingrédients, les quantités, le mode de préparation ou l’authenticité du plat."
+        ]
+      },
+      {
+        "image_url": "https://www.ptitchef.com/imgupl/recipe/lasagnes-courgettes-jambon-cru--lg-340570p552032.jpg",
+        "source_url": "https://www.ptitchef.com/recettes/plat/lasagnes-courgettes-jambon-cru-fid-517516",
+        "observable_details": [
+          "Un plat rectangulaire en couches est présenté sur une grande assiette claire.",
+          "La préparation est découpée en plusieurs portions superposées, dont une portion est placée au sommet.",
+          "On distingue des couches claires et des éléments rosés et verts entre les couches.",
+          "La surface supérieure est largement dorée et présente des zones brun-orange.",
+          "Les bords des portions sont irréguliers, avec quelques morceaux qui dépassent."
+        ],
+        "composition": {
+          "cadrage": "Vue rapprochée et légèrement plongeante, centrée sur la préparation.",
+          "disposition": "La préparation occupe la majeure partie de l'image, tandis que l'assiette est visible surtout au premier plan et sur les côtés.",
+          "arriere_plan": "L'arrière-plan est sombre et peu détaillé."
+        },
+        "couleurs": [
+          "Jaune pâle à crème pour les couches intérieures.",
+          "Doré et brun-orange sur la surface gratinée.",
+          "Rose-rouge dans plusieurs bandes ou morceaux visibles entre les couches.",
+          "Vert dans de petits éléments répartis dans la garniture.",
+          "Blanc cassé pour l'assiette."
+        ],
+        "textures": [
+          "Surface supérieure lisse par endroits et ridée ou boursouflée par endroits.",
+          "Zones croustillantes ou sèches visuellement sur la surface dorée.",
+          "Couches intérieures souples d'apparence, avec des bords ondulés.",
+          "Petits éléments verts et rosés visibles dans une matière claire et crémeuse en apparence.",
+          "Quelques fils ou traces de matière claire s'étirent entre certaines couches."
+        ],
+        "incertainties": [
+          "La photographie ne permet pas d'identifier avec certitude la nature exacte des éléments rosés, verts ou clairs.",
+          "La photographie ne permet pas de déterminer les quantités, la recette ou le mode de préparation.",
+          "La portion supérieure est partiellement coupée par le bord supérieur de l'image.",
+          "La lumière chaude modifie probablement la perception précise des couleurs."
+        ]
+      },
+      {
+        "image_url": "https://www.mesrecettes.info/wp-content/uploads/2021/07/lasagnes-cremeuses-aux-courgettes-et-au-jambon.jpg",
+        "source_url": "https://www.mesrecettes.info/lasagnes-cremeuses-aux-courgettes-et-au-jambon/",
+        "observable_details": [
+          "Un plat rectangulaire en verre transparent contient une préparation cuite en couches.",
+          "Une portion est soulevée au centre par une spatule perforée.",
+          "Des feuilles plates et ondulées sont visibles, séparées par une sauce claire et épaisse.",
+          "Des éléments verts et des morceaux rosés apparaissent entre les couches.",
+          "Des courgettes coupées sont visibles en arrière-plan à droite."
+        ],
+        "composition": "Le plat occupe la majeure partie de l'image, au premier plan. La portion soulevée se trouve au centre et la spatule s'étend vers l'angle supérieur droit. Le plat est posé sur un tissu à carreaux rouges et blancs. Des morceaux verts sont disposés en arrière-plan à droite.",
+        "colours": [
+          "Blanc cassé et crème pour la sauce et les surfaces internes",
+          "Jaune doré et brun clair sur les zones gratinées",
+          "Vert pâle pour les éléments végétaux visibles",
+          "Rose pâle pour certains morceaux dans les couches",
+          "Rouge et blanc pour le tissu",
+          "Gris métallique pour la spatule",
+          "Transparent et légèrement ambré pour le plat en verre"
+        ],
+        "textures": [
+          "Surface supérieure irrégulière avec des zones dorées",
+          "Sauce visiblement lisse et épaisse par endroits",
+          "Feuilles souples, plissées et superposées",
+          "Bords légèrement croustillants ou brunis visibles sur certaines zones",
+          "Plat en verre lisse et réfléchissant",
+          "Tissu d'arrière-plan présentant un motif quadrillé"
+        ],
+        "uncertainties": [
+          "La nature exacte des éléments verts et rosés n'est pas déterminable avec certitude à partir de l'image seule.",
+          "Le nombre exact de couches et la composition précise de la sauce ne sont pas visibles.",
+          "La photo ne permet pas d'établir les ingrédients, les quantités, le goût, l'authenticité ou le mode de préparation."
+        ]
+      }
     ],
-    "uncertainties": ["L'épaisseur des courgettes influence leur temps de précuisson."],
-    "originality_notes": ["La description visuelle ne déduit aucun ingrédient non visible."]
+    "uncertainties": [
+      "Les quantités varient fortement selon le nombre de portions : 2 à 4 courgettes, 4 à 8 tranches de jambon et 500 à 900 ml de lait sont documentés.",
+      "Les températures et durées divergent : 180 °C pendant 30 à 40 minutes, 200 °C pendant 20 à 25 minutes ou 210 °C pendant 15 minutes selon le type de pâtes et la garniture.",
+      "Certaines recettes utilisent des feuilles précuites, tandis que d’autres ne précisent pas le type de feuilles ; le besoin de précuisson dépend donc de l’emballage.",
+      "Les sources ne donnent pas de température interne cible pour ce plat.",
+      "Les conseils anti-eau sont documentés par plusieurs recettes, mais aucune source consultée ne fournit une quantité standard d’eau résiduelle acceptable.",
+      "Les accompagnements documentés incluent la salade verte et, pour une variante au jambon cru, des vins rouges comme l’Irancy, le pinot noir d’Alsace ou le Fleurie."
+    ],
+    "originality_notes": [
+      "Les formulations ont été condensées et réécrites en français sans reproduire les paragraphes des sources.",
+      "Les quantités n’ont pas été moyennées : les écarts entre recettes sont conservés comme variantes ou incertitudes.",
+      "Aucune quantité ni aucun ingrédient caché n’a été déduit des photographies.",
+      "Les références visuelles sont des fichiers image publics associés à des pages de recettes réelles ; aucune observation visuelle n’est fournie avant l’analyse des fichiers par le laboratoire.",
+      "Les substitutions et accompagnements ne sont mentionnés que lorsqu’une source les documente explicitement."
+    ]
   },
   "canonical": {
     "title": "Lasagnes de courgettes au jambon et béchamel",
@@ -42,27 +308,86 @@
     "difficulty": "Facile",
     "calories_estimate": 490,
     "ingredients": [
-      { "name": "Feuilles de lasagnes", "quantity": "12", "unit": "pièces" },
-      { "name": "Courgettes", "quantity": "3", "unit": "pièces" },
-      { "name": "Jambon blanc", "quantity": "6", "unit": "tranches" },
-      { "name": "Lait", "quantity": "75", "unit": "cl" },
-      { "name": "Beurre", "quantity": "60", "unit": "g" },
-      { "name": "Farine", "quantity": "60", "unit": "g" },
-      { "name": "Fromage râpé", "quantity": "120", "unit": "g" }
+      {
+        "name": "Feuilles de lasagnes",
+        "quantity": "12",
+        "unit": "pièces"
+      },
+      {
+        "name": "Courgettes",
+        "quantity": "3",
+        "unit": "pièces"
+      },
+      {
+        "name": "Jambon blanc",
+        "quantity": "6",
+        "unit": "tranches"
+      },
+      {
+        "name": "Lait",
+        "quantity": "75",
+        "unit": "cl"
+      },
+      {
+        "name": "Beurre",
+        "quantity": "60",
+        "unit": "g"
+      },
+      {
+        "name": "Farine",
+        "quantity": "60",
+        "unit": "g"
+      },
+      {
+        "name": "Fromage râpé",
+        "quantity": "120",
+        "unit": "g"
+      }
     ],
     "steps": [
-      { "text": "Couper les courgettes en tranches de 5 mm et les poêler 10 minutes jusqu'à évaporation de leur eau." },
-      { "text": "Faire fondre le beurre puis incorporer la farine pendant 1 minute." },
-      { "text": "Verser progressivement le lait en fouettant jusqu'à obtenir une béchamel nappante." },
-      { "text": "Alterner béchamel, feuilles de lasagnes, courgettes et jambon dans le plat." },
-      { "text": "Terminer par la béchamel et le fromage râpé." },
-      { "text": "Cuire 35 minutes à 180 °C puis laisser reposer 10 minutes avant de découper." }
+      {
+        "text": "Couper les courgettes en tranches de 5 mm et les poêler 10 minutes jusqu'à évaporation de leur eau."
+      },
+      {
+        "text": "Faire fondre le beurre puis incorporer la farine pendant 1 minute."
+      },
+      {
+        "text": "Verser progressivement le lait en fouettant jusqu'à obtenir une béchamel nappante."
+      },
+      {
+        "text": "Alterner béchamel, feuilles de lasagnes, courgettes et jambon dans le plat."
+      },
+      {
+        "text": "Terminer par la béchamel et le fromage râpé."
+      },
+      {
+        "text": "Cuire 35 minutes à 180 °C puis laisser reposer 10 minutes avant de découper."
+      }
     ],
-    "equipment": ["Plat à gratin de 30 × 20 cm", "Grande poêle", "Casserole", "Fouet"],
-    "notes": ["Bien évaporer l'eau des courgettes évite des lasagnes liquides."],
-    "faq": [{ "question": "Comment éviter que les lasagnes de courgettes rendent de l'eau ?", "answer": "Précuisez les courgettes jusqu'à évaporation de leur eau avant de monter les couches dans le plat." }],
-    "keywords": ["lasagnes de courgettes", "jambon", "béchamel", "gratin"],
-    "food_safety": ["Conserver les restes au réfrigérateur dans un récipient fermé et les réchauffer à cœur."],
+    "equipment": [
+      "Plat à gratin de 30 × 20 cm",
+      "Grande poêle",
+      "Casserole",
+      "Fouet"
+    ],
+    "notes": [
+      "Bien évaporer l'eau des courgettes évite des lasagnes liquides."
+    ],
+    "faq": [
+      {
+        "question": "Comment éviter que les lasagnes de courgettes rendent de l'eau ?",
+        "answer": "Précuisez les courgettes jusqu'à évaporation de leur eau avant de monter les couches dans le plat."
+      }
+    ],
+    "keywords": [
+      "lasagnes de courgettes",
+      "jambon",
+      "béchamel",
+      "gratin"
+    ],
+    "food_safety": [
+      "Conserver les restes au réfrigérateur dans un récipient fermé et les réchauffer à cœur."
+    ],
     "uncertainties": []
   }
 }

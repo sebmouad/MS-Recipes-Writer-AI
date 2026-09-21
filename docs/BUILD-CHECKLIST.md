@@ -159,7 +159,20 @@ cost) in the task before changing anything.
   for them. The colour refusals that remain are enforcing a one-line invented
   reference. Re-run research with real image scraping on both fixtures before
   reading any further colour result.
-- [ ] **A20 — The fixtures carry invented observations.** `tarte-pommes` and
+- [x] **A20 — The fixtures carried invented observations (closed 2026-09-21).**
+  Four of five cited `example.test`, so every appearance measurement taken from
+  them was measuring a stub. All five re-run against real sources with 1 to 3
+  photographs downloaded and analysed. Found on the way: Food Network's CDN
+  returns 403 to our fetch, and a single cited reference left us with no
+  observation at all, so research now cites three photographs across three
+  different domains. The refusal itself is respected, not worked around.
+- [x] **A9 — Prompt templates (closed 2026-09-21).** All nine prompts are
+  templates compiled from the settings; none hardcodes what a setting controls.
+  The output language came from five prompts saying "French" and now comes from
+  `site_language`. `tools/promote-prompts.php` compiles them into the shipped
+  defaults and `tests/test-prompt-templates.php` asserts the defaults equal the
+  compiled templates, so the plugin cannot run a prompt the lab never measured.
+- [ ] *(superseded)* **A20 — The fixtures carry invented observations.** `tarte-pommes` and
   `poulet-yassa` cite `https://example.test/...`. Every measurement that depends
   on observed appearance is therefore measuring a stub. Re-run `research` with
   `lab_enrich_research_images` against real sources and store the result.
@@ -255,7 +268,7 @@ cost) in the task before changing anything.
   which passed 8/10 at $0.043, or add an explicit upper word bound to the prompt
   and re-measure. Not a blocker for OpenAI or Gemini, which both complete.
 
-- [ ] **A9 — Prompt templates (owner directive, 2026-09-20).** Prompts are
+- [x] **A9 — Prompt templates (owner directive, 2026-09-20; closed 2026-09-21).** Prompts are
   templates compiled from the settings by `MSRWA_Prompt`, used by the lab and
   the engine alike: word count, one or two pages, page-two opening heading,
   editable outline, image sizes and format, language, FAQ count, internal link

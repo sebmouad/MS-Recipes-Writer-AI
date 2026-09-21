@@ -8,29 +8,297 @@
     "images": []
   },
   "research": {
-    "dish_identity": { "name": "Daube de bœuf à la provençale", "confidence": "élevée", "evidence": "Le titre éditeur identifie le plat et sa méthode de cuisson." },
+    "dish_identity": {
+      "name": "Daube de bœuf à la provençale, mijotée au vin rouge et aux légumes",
+      "confidence": "élevée",
+      "evidence": "Le titre correspond à un ragoût provençal de bœuf mariné ou braisé au vin rouge, avec aromates, légumes et cuisson longue, décrit par l’Office de Tourisme d’Aix-en-Provence et le Département des Bouches-du-Rhône : https://www.aixenprovencetourism.com/gastronomie/recettes-de-cuisine-provencale/recette-de-la-daube-provencale/ ; https://departement13.fr/vivre-en-provence/votre-kiosque/la-regalade/la-daube-provencale"
+    },
     "ingredient_facts": [
-      { "source_url": "https://example.test/daube-morceaux", "text": "Le paleron et le gîte conviennent au mijotage grâce à leur tissu conjonctif." },
-      { "source_url": "https://example.test/daube-vin", "text": "Un vin rouge sec et fruité convient à la marinade et à la cuisson." }
+      {
+        "source_url": "https://www.aixenprovencetourism.com/gastronomie/recettes-de-cuisine-provencale/recette-de-la-daube-provencale/",
+        "text": "Pour 7 à 8 personnes, l’Office de Tourisme d’Aix-en-Provence indique 1 kg de bœuf, 1 l de vin rouge, 3 cuillères à soupe d’huile d’olive et 100 g de poitrine salée."
+      },
+      {
+        "source_url": "https://departement13.fr/vivre-en-provence/votre-kiosque/la-regalade/la-daube-provencale",
+        "text": "Une autre version pour 6 à 8 personnes utilise 2 kg de bœuf à braiser, 1 l de vin rouge de Provence, 200 g de lard fumé, 3 carottes et 2 oignons."
+      },
+      {
+        "source_url": "https://www.saveurs-magazine.fr/recettes/daube-provencale/",
+        "text": "Saveurs propose 1,6 kg de bœuf pour 6 à 8 personnes, réparti en un tiers de galinette, un tiers de queue de bœuf et un tiers de joue de bœuf."
+      },
+      {
+        "source_url": "https://www.fournil-des-rois.fr/recette-de-daube-au-boeuf/",
+        "text": "Pour 6 personnes, une version emploie 1,2 kg de bœuf à braiser, au choix paleron, macreuse ou joue, avec 75 cl de vin rouge corsé."
+      },
+      {
+        "source_url": "https://www.aixenprovencetourism.com/gastronomie/recettes-de-cuisine-provencale/recette-de-la-daube-provencale/",
+        "text": "Les aromates documentés comprennent persil, thym, laurier, ail, clous de girofle, poivre, muscade et écorce d’orange amère."
+      },
+      {
+        "source_url": "https://departement13.fr/vivre-en-provence/votre-kiosque/la-regalade/la-daube-provencale",
+        "text": "Le Département des Bouches-du-Rhône ajoute 4 baies de genièvre écrasées, une pincée de muscade, une cuillère à soupe de vinaigre et une écorce d’orange séchée."
+      },
+      {
+        "source_url": "https://www.jardiner-malin.fr/recettes/daube-provencale.html",
+        "text": "Une autre liste prévoit 1,5 kg de bœuf, 1,5 kg de carottes, 1 l de vin rouge, 4 ou 5 échalotes, 1 oignon, 2 gousses d’ail et 10 cl d’huile d’olive."
+      },
+      {
+        "source_url": "https://www.journaldesfemmes.fr/recette/3128010-daube-provencale-de-boeuf-carotte-olives-noires-et-vin-rouge-la-recette-facile",
+        "text": "La version aux olives utilise 2 kg de paleron, une bouteille de vin, une carotte, deux gousses d’ail, deux feuilles de laurier, 300 g d’olives noires et 2 cuillères à soupe de coulis de tomate."
+      },
+      {
+        "source_url": "https://www.fournil-des-rois.fr/recette-de-daube-au-boeuf/",
+        "text": "Cette version ajoute 20 cl de bouillon de bœuf, 2 cuillères à soupe de farine, 1 cuillère à soupe de concentré de tomate et 150 g d’olives noires dénoyautées, ces dernières étant indiquées comme facultatives."
+      },
+      {
+        "source_url": "https://www.provenceweb.fr/f/gastronomie/recettes-provencales/daube-provencale.htm",
+        "text": "Provence Web indique que le vin rouge peut être remplacé par un vin blanc sec de Provence pour une version plus légère."
+      }
     ],
     "preparation_facts": [
-      { "source_url": "https://example.test/daube-cuisson", "text": "Une cuisson douce et couverte de 3 heures permet d'attendrir les morceaux." },
-      { "source_url": "https://example.test/daube-marinade", "text": "La viande peut mariner une nuit au réfrigérateur avec le vin et les aromates." }
+      {
+        "source_url": "https://www.saveurs-magazine.fr/recettes/daube-provencale/",
+        "text": "Saveurs recommande de faire mariner la viande avec le vin et les aromates pendant 12 heures."
+      },
+      {
+        "source_url": "https://www.journaldesfemmes.fr/recette/3128010-daube-provencale-de-boeuf-carotte-olives-noires-et-vin-rouge-la-recette-facile",
+        "text": "La recette du Journal des Femmes fait mariner le bœuf, les légumes et les aromates dans le vin pendant 24 heures au réfrigérateur."
+      },
+      {
+        "source_url": "https://departement13.fr/vivre-en-provence/votre-kiosque/la-regalade/la-daube-provencale",
+        "text": "Le Département des Bouches-du-Rhône indique une marinade de 5 à 6 heures avec le vin, les aromates et une cuillère à soupe de vinaigre."
+      },
+      {
+        "source_url": "https://www.fournil-des-rois.fr/recette-de-daube-au-boeuf/",
+        "text": "Après la marinade, égoutter séparément la viande, les légumes et le vin, puis sécher la viande avant de la faire dorer."
+      },
+      {
+        "source_url": "https://www.fournil-des-rois.fr/recette-de-daube-au-boeuf/",
+        "text": "Faire dorer les morceaux par petites quantités dans l’huile, environ 3 à 4 minutes par face, afin d’obtenir une croûte colorée."
+      },
+      {
+        "source_url": "https://www.aixenprovencetourism.com/gastronomie/recettes-de-cuisine-provencale/recette-de-la-daube-provencale/",
+        "text": "L’Office de Tourisme d’Aix-en-Provence fait revenir le petit salé et l’oignon avant d’ajouter les morceaux de bœuf égouttés."
+      },
+      {
+        "source_url": "https://www.fournil-des-rois.fr/recette-de-daube-au-boeuf/",
+        "text": "Après le déglaçage au vin de marinade, ajouter le bouillon jusqu’à presque couvrir la viande."
+      },
+      {
+        "source_url": "https://www.fournil-des-rois.fr/recette-de-daube-au-boeuf/",
+        "text": "La cuisson doit rester à peine frémissante, sans bouillonnement actif, dans une cocotte couverte."
+      },
+      {
+        "source_url": "https://www.fournil-des-rois.fr/recette-de-daube-au-boeuf/",
+        "text": "Une cuisson au four à 150 °C en cocotte couverte est donnée pour 3 à 4 heures."
+      },
+      {
+        "source_url": "https://www.aixenprovencetourism.com/gastronomie/recettes-de-cuisine-provencale/recette-de-la-daube-provencale/",
+        "text": "La recette de l’Office de Tourisme d’Aix-en-Provence prévoit au moins 5 heures de cuisson couverte, avec ajout éventuel de liquide si nécessaire."
+      },
+      {
+        "source_url": "https://www.journaldesfemmes.fr/recette/3128010-daube-provencale-de-boeuf-carotte-olives-noires-et-vin-rouge-la-recette-facile",
+        "text": "La recette du Journal des Femmes annonce une cuisson plus courte de 1 h 30, après avoir porté la marinade à ébullition pendant 5 minutes."
+      },
+      {
+        "source_url": "https://www.fournil-des-rois.fr/recette-de-daube-au-boeuf/",
+        "text": "La viande est prête lorsque la cuillère y pénètre sans résistance; si elle reste ferme, prolonger la cuisson par tranches de 30 minutes."
+      }
     ],
     "food_safety": [
-      { "source_url": "https://example.test/securite-refroidissement", "text": "Le plat doit être refroidi rapidement puis conservé au réfrigérateur dans un récipient fermé." }
+      {
+        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/leftovers-and-food-safety",
+        "text": "Réfrigérer les restes dans les 2 heures après la cuisson, ou dans l’heure si la température ambiante dépasse 32 °C."
+      },
+      {
+        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/meat-catfish/beef-farm-table",
+        "text": "Conserver le bœuf cuit au réfrigérateur à 4 °C ou moins, dans des récipients peu profonds et couverts."
+      },
+      {
+        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/meat-catfish/beef-farm-table",
+        "text": "Consommer le bœuf cuit réfrigéré dans les 3 à 4 jours."
+      },
+      {
+        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/leftovers-and-food-safety",
+        "text": "Réchauffer les restes jusqu’à 74 °C à cœur; pour une sauce ou un ragoût, porter à ébullition en remuant."
+      },
+      {
+        "source_url": "https://www.fda.gov/media/90663/download",
+        "text": "Pour refroidir rapidement une grande quantité de ragoût, la répartir dans plusieurs récipients peu profonds avant réfrigération."
+      },
+      {
+        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/leftovers-and-food-safety",
+        "text": "Les restes peuvent être congelés; l’USDA indique une durée de qualité de 3 à 4 mois."
+      }
     ],
     "references": [
-      { "url": "https://example.test/daube-cuisson", "title": "Réussir une viande braisée", "publisher": "École culinaire de test" }
+      {
+        "url": "https://www.aixenprovencetourism.com/gastronomie/recettes-de-cuisine-provencale/recette-de-la-daube-provencale/",
+        "title": "La daube provençale",
+        "publisher": "Office de Tourisme d’Aix-en-Provence"
+      },
+      {
+        "url": "https://departement13.fr/vivre-en-provence/votre-kiosque/la-regalade/la-daube-provencale",
+        "title": "La régalade : La Daube provençale",
+        "publisher": "Département des Bouches-du-Rhône"
+      },
+      {
+        "url": "https://www.saveurs-magazine.fr/recettes/daube-provencale/",
+        "title": "Recette Daube provençale",
+        "publisher": "Saveurs Magazine"
+      },
+      {
+        "url": "https://www.journaldesfemmes.fr/recette/3128010-daube-provencale-de-boeuf-carotte-olives-noires-et-vin-rouge-la-recette-facile",
+        "title": "Daube provençale de bœuf, carotte, olives noires et vin rouge",
+        "publisher": "Journal des Femmes"
+      },
+      {
+        "url": "https://www.provenceweb.fr/f/gastronomie/recettes-provencales/daube-provencale.htm",
+        "title": "Recette de la Daube Provençale Traditionnelle",
+        "publisher": "Provence Web"
+      },
+      {
+        "url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/leftovers-and-food-safety",
+        "title": "Leftovers and Food Safety",
+        "publisher": "USDA Food Safety and Inspection Service"
+      }
     ],
     "visual_references": [
-      { "image_url": "https://example.test/images/daube-provencale.jpg", "source_url": "https://example.test/daube", "title": "Daube de bœuf provençale" }
+      {
+        "image_url": "https://www.provenceweb.fr/img/containers/images/magazine/daube-a-la-provencale.jpg/bf754f968511f9fa672fcaf983ca663b/daube-a-la-provencale.jpg",
+        "source_url": "https://www.provenceweb.fr/f/gastronomie/recettes-provencales/daube-provencale.htm",
+        "title": "Recette de la daube provençale traditionnelle"
+      },
+      {
+        "image_url": "https://departement13.fr/sites/default/files/styles/img__1200x420__crop_main/public/media/images/2026-08-regalade-daube-1200pxcompress.jpg?itok=W4T18pTG",
+        "source_url": "https://departement13.fr/vivre-en-provence/votre-kiosque/la-regalade/la-daube-provencale",
+        "title": "La régalade : La Daube provençale"
+      },
+      {
+        "image_url": "https://www.jardiner-malin.fr/wp-content/uploads/2018/04/daube-provencale-boeuf.jpg",
+        "source_url": "https://www.jardiner-malin.fr/recettes/daube-provencale.html",
+        "title": "Daube de bœuf traditionnelle mijotée au vin rouge"
+      }
     ],
     "visual_observations": [
-      { "image_url": "https://example.test/images/daube-provencale.jpg", "source_url": "https://example.test/daube", "observable_details": "Morceaux de bœuf nappés d'une sauce sombre avec carottes visibles.", "composition": "Cocotte sombre vue de trois quarts.", "colours": "Brun profond, orange et vert discret.", "textures": "Sauce brillante et épaisse, viande aux fibres souples.", "uncertainties": "La photographie ne prouve ni le vin employé ni le temps de cuisson." }
+      {
+        "image_url": "https://www.provenceweb.fr/img/containers/images/magazine/daube-a-la-provencale.jpg/bf754f968511f9fa672fcaf983ca663b/daube-a-la-provencale.jpg",
+        "source_url": "https://www.provenceweb.fr/f/gastronomie/recettes-provencales/daube-provencale.htm",
+        "observable_details": [
+          "Un plat brun-rouge rempli d'une préparation en sauce occupe la majeure partie de l'image.",
+          "La préparation contient des morceaux brunâtres, des cubes orange et des feuilles vertes visibles en surface.",
+          "Deux cuillères en bois sont posées à droite du plat.",
+          "L'ensemble est présenté sur une surface en bois."
+        ],
+        "composition": "Le plat est cadré en gros plan et partiellement coupé sur les bords gauche et inférieur. Il est placé principalement à gauche et au centre, tandis que les deux cuillères se trouvent à droite. Un objet rouge arrondi est partiellement visible en arrière-plan, au-dessus du plat.",
+        "couleurs": [
+          "brun-rouge",
+          "orange",
+          "brun foncé",
+          "vert",
+          "rouge",
+          "beige et brun bois"
+        ],
+        "textures": [
+          "La surface de la préparation paraît brillante et liquide.",
+          "Les morceaux visibles ont des surfaces irrégulières.",
+          "Les feuilles vertes ont des contours découpés.",
+          "Le plat présente une surface lisse et brillante.",
+          "Les cuillères ont un aspect mat et fibreux.",
+          "La surface en bois montre des veines et des stries horizontales."
+        ],
+        "incertainties": [
+          "La nature exacte des morceaux, des cubes et des feuilles n'est pas déterminable avec certitude à partir de l'image seule.",
+          "La nature exacte de la préparation liquide n'est pas identifiable visuellement avec certitude.",
+          "L'objet rouge partiellement visible en arrière-plan ne peut pas être identifié avec certitude."
+        ]
+      },
+      {
+        "image_url": "https://departement13.fr/sites/default/files/styles/img__1200x420__crop_main/public/media/images/2026-08-regalade-daube-1200pxcompress.jpg?itok=W4T18pTG",
+        "source_url": "https://departement13.fr/vivre-en-provence/votre-kiosque/la-regalade/la-daube-provencale",
+        "observable_details": [
+          "Une assiette blanche à bord sombre contient une préparation en sauce rouge-brune avec plusieurs morceaux cubiques ou irréguliers brun foncé, des morceaux orange et des éléments rouges.",
+          "Des pâtes longues et plates, de couleur jaune pâle, occupent principalement la partie droite de l’assiette.",
+          "Des brins d’herbes vertes et plusieurs feuilles vertes allongées sont disposés à gauche de l’assiette.",
+          "Une petite ampoule beige-brun est visible dans l’angle inférieur droit.",
+          "Une fourchette métallique se trouve à droite de l’assiette.",
+          "Des parties d’un linge gris clair apparaissent sous et derrière l’assiette."
+        ],
+        "composition": "Vue rapprochée en plongée, avec l’assiette centrée et légèrement décalée vers la droite. La préparation en sauce occupe la moitié gauche et supérieure de l’assiette, tandis que les pâtes sont regroupées dans la moitié droite. Les herbes sont placées à gauche, la fourchette à droite et l’ampoule dans le coin inférieur droit.",
+        "couleurs": [
+          "blanc et noir autour de l’assiette",
+          "rouge, orange et brun dans la préparation",
+          "jaune pâle pour les pâtes",
+          "vert pour les végétaux disposés à gauche",
+          "gris et gris bleuté pour le linge et le fond",
+          "beige et brun clair pour l’ampoule"
+        ],
+        "textures": [
+          "La sauce paraît brillante et épaisse à la surface.",
+          "Les morceaux dans la sauce ont des surfaces irrégulières et légèrement brillantes.",
+          "Les pâtes présentent des rubans lisses, souples et superposés.",
+          "Les herbes ont des tiges fines et des feuilles étroites.",
+          "Le fond présente un aspect mat et moucheté.",
+          "Le linge montre des plis visibles."
+        ],
+        "incertainties": [
+          "La nature exacte des morceaux, des éléments rouges et orange et des herbes n’est pas déterminable avec certitude à partir de l’image seule.",
+          "La préparation et les pâtes sont partiellement coupées par les bords du cadrage.",
+          "La petite forme beige-brun dans l’angle inférieur droit est partiellement hors cadre."
+        ]
+      },
+      {
+        "image_url": "https://www.jardiner-malin.fr/wp-content/uploads/2018/04/daube-provencale-boeuf.jpg",
+        "source_url": "https://www.jardiner-malin.fr/recettes/daube-provencale.html",
+        "observable_details": [
+          "Un plat rectangulaire rouge, à bords épais et légèrement décorés, occupe la majeure partie de l’image.",
+          "Le plat contient plusieurs morceaux irréguliers brun foncé, partiellement immergés dans un liquide sombre.",
+          "Des morceaux orange sont visibles entre les morceaux bruns.",
+          "Une portion d’un autre récipient apparaît dans l’angle supérieur gauche, avec des éléments pâles et arrondis.",
+          "Le plat est posé sur une surface recouverte en partie d’un tissu à motifs végétaux."
+        ],
+        "composition": {
+          "cadrage": "Vue rapprochée prise légèrement en plongée.",
+          "disposition": "Le contenu du plat est centré, tandis que le récipient supérieur gauche et le tissu restent partiellement visibles sur les bords.",
+          "profondeur": "Les éléments au premier plan sont plus grands et plus détaillés que ceux situés vers le haut de l’image."
+        },
+        "couleurs": [
+          "Rouge vif et bordeaux sur le plat",
+          "Brun très foncé et presque noir sur les morceaux et le liquide",
+          "Orange sur plusieurs éléments visibles dans le plat",
+          "Jaune pâle et beige dans le récipient en arrière-plan",
+          "Blanc cassé, vert et rose sur le tissu décoratif"
+        ],
+        "textures": [
+          "Surface brillante et émaillée sur le plat rouge",
+          "Morceaux brun foncé à surface irrégulière et humide",
+          "Liquide sombre avec des reflets luisants",
+          "Éléments orange aux contours souples et aux surfaces brillantes",
+          "Tissu à motif imprimé, visiblement mat"
+        ],
+        "incertainties": [
+          "La nature exacte des aliments visibles n’est pas identifiable avec certitude à partir de l’image seule.",
+          "La composition précise du liquide sombre n’est pas déterminable visuellement.",
+          "Le contenu partiellement visible du récipient supérieur gauche ne peut pas être identifié avec certitude.",
+          "L’image ne permet pas de déterminer les quantités, le mode de préparation ou l’authenticité du plat."
+        ]
+      }
     ],
-    "uncertainties": ["La durée de marinade varie selon les sources."],
-    "originality_notes": ["Les faits sont reformulés et les observations restent limitées aux éléments visibles."]
+    "uncertainties": [
+      "Les sources divergent sur la durée de marinade : 5 à 6 heures, 12 heures ou 24 heures.",
+      "Les durées de cuisson varient fortement : 1 h 30, 3 à 4 heures, 4 heures ou au moins 5 heures.",
+      "La cuisson est couverte chez plusieurs sources, tandis que Saveurs indique une cuisson de 5 heures sans couvrir.",
+      "Les olives, le coulis ou concentré de tomate, la cannelle, le vinaigre, le céleri et les champignons ne sont pas présents dans toutes les versions.",
+      "Les proportions de viande et de vin ne sont pas uniformes : les sources vont de 1,2 à 2 kg de bœuf et de 75 cl à 1 l de vin.",
+      "La température interne minimale USDA de 63 °C avec repos de 3 minutes concerne les pièces de bœuf entières; elle ne remplace pas le critère culinaire de tendreté d’un ragoût longuement braisé."
+    ],
+    "originality_notes": [
+      "Les informations sont reformulées en français et chaque fait textuel est rattaché à une source publique.",
+      "Aucune quantité ou méthode n’a été déduite d’une photographie.",
+      "Les désaccords entre sources sont conservés au lieu d’être moyennés.",
+      "Les références visuelles sont des photographies publiées sur trois domaines distincts; aucune observation visuelle n’est fournie ici, conformément au protocole de vision du laboratoire.",
+      "Aucun texte source n’est reproduit intégralement et aucune recette finale rédigée n’est produite."
+    ]
   },
   "canonical": {
     "title": "Daube de bœuf à la provençale",
@@ -42,27 +310,88 @@
     "difficulty": "Facile",
     "calories_estimate": 520,
     "ingredients": [
-      { "name": "Paleron de bœuf", "quantity": "1,2", "unit": "kg" },
-      { "name": "Vin rouge sec", "quantity": "75", "unit": "cl" },
-      { "name": "Carottes", "quantity": "4", "unit": "pièces" },
-      { "name": "Oignons", "quantity": "2", "unit": "pièces" },
-      { "name": "Ail", "quantity": "3", "unit": "gousses" },
-      { "name": "Huile d'olive", "quantity": "2", "unit": "cuillères à soupe" },
-      { "name": "Bouquet garni", "quantity": "1", "unit": "pièce" }
+      {
+        "name": "Paleron de bœuf",
+        "quantity": "1,2",
+        "unit": "kg"
+      },
+      {
+        "name": "Vin rouge sec",
+        "quantity": "75",
+        "unit": "cl"
+      },
+      {
+        "name": "Carottes",
+        "quantity": "4",
+        "unit": "pièces"
+      },
+      {
+        "name": "Oignons",
+        "quantity": "2",
+        "unit": "pièces"
+      },
+      {
+        "name": "Ail",
+        "quantity": "3",
+        "unit": "gousses"
+      },
+      {
+        "name": "Huile d'olive",
+        "quantity": "2",
+        "unit": "cuillères à soupe"
+      },
+      {
+        "name": "Bouquet garni",
+        "quantity": "1",
+        "unit": "pièce"
+      }
     ],
     "steps": [
-      { "text": "Faire mariner le bœuf avec le vin, les carottes, les oignons, l'ail et le bouquet garni une nuit au réfrigérateur." },
-      { "text": "Égoutter et sécher les morceaux de bœuf en conservant la marinade." },
-      { "text": "Colorer le bœuf dans l'huile d'olive jusqu'à obtenir une croûte brune." },
-      { "text": "Ajouter les légumes égouttés et les faire revenir 5 minutes." },
-      { "text": "Verser la marinade, couvrir et porter à très léger frémissement." },
-      { "text": "Mijoter 3 heures à couvert jusqu'à ce que la viande se défasse à la fourchette." }
+      {
+        "text": "Faire mariner le bœuf avec le vin, les carottes, les oignons, l'ail et le bouquet garni une nuit au réfrigérateur."
+      },
+      {
+        "text": "Égoutter et sécher les morceaux de bœuf en conservant la marinade."
+      },
+      {
+        "text": "Colorer le bœuf dans l'huile d'olive jusqu'à obtenir une croûte brune."
+      },
+      {
+        "text": "Ajouter les légumes égouttés et les faire revenir 5 minutes."
+      },
+      {
+        "text": "Verser la marinade, couvrir et porter à très léger frémissement."
+      },
+      {
+        "text": "Mijoter 3 heures à couvert jusqu'à ce que la viande se défasse à la fourchette."
+      }
     ],
-    "equipment": ["Grande cocotte avec couvercle", "Saladier", "Écumoire"],
-    "notes": ["La daube est encore meilleure réchauffée le lendemain."],
-    "faq": [{ "question": "Quel morceau de bœuf choisir pour une daube ?", "answer": "Le paleron ou le gîte supportent une cuisson longue et deviennent fondants sans se dessécher." }],
-    "keywords": ["daube de bœuf", "provence", "vin rouge", "plat mijoté"],
-    "food_safety": ["Faire mariner la viande au réfrigérateur.", "Refroidir rapidement les restes avant réfrigération."],
-    "uncertainties": ["Le temps de marinade n'est pas inclus dans total_minutes."]
+    "equipment": [
+      "Grande cocotte avec couvercle",
+      "Saladier",
+      "Écumoire"
+    ],
+    "notes": [
+      "La daube est encore meilleure réchauffée le lendemain."
+    ],
+    "faq": [
+      {
+        "question": "Quel morceau de bœuf choisir pour une daube ?",
+        "answer": "Le paleron ou le gîte supportent une cuisson longue et deviennent fondants sans se dessécher."
+      }
+    ],
+    "keywords": [
+      "daube de bœuf",
+      "provence",
+      "vin rouge",
+      "plat mijoté"
+    ],
+    "food_safety": [
+      "Faire mariner la viande au réfrigérateur.",
+      "Refroidir rapidement les restes avant réfrigération."
+    ],
+    "uncertainties": [
+      "Le temps de marinade n'est pas inclus dans total_minutes."
+    ]
   }
 }

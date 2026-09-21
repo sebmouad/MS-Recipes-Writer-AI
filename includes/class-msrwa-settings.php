@@ -95,7 +95,8 @@ RULES:
 - Visual references must be real source photographs, not AI-generated, edited, composited, watermarked stock previews, or images created for this task. Give both the direct HTTPS image_url and the page source_url.
 - Return visual_observations as an empty array. The lab downloads each cited image and replaces this field with a separate vision analysis of the real bytes; never guess visual details from search snippets.
 - Do not copy a source\'s prose, write the article, or output a finished recipe.
-- At most 10 ingredient facts, 12 preparation facts, 6 references, and 3 visual references.
+- At most 10 ingredient facts, 12 preparation facts and 6 references.
+- Give exactly 3 visual references, each from a DIFFERENT domain. This is a minimum as much as a maximum: some hosts refuse to serve their images to anyone but their own pages, and a single refusal would otherwise leave the writer with no observed appearance at all. Prefer hosts that serve images directly over large media CDNs, which refuse most often.
 
 OUTPUT — a valid JSON object only, no Markdown, with exactly these keys:
 - "dish_identity": {name, confidence, evidence} — values in French
@@ -109,7 +110,33 @@ OUTPUT — a valid JSON object only, no Markdown, with exactly these keys:
 - "originality_notes": array of strings in French explaining how copying and unsupported inference were avoided',
 			'prompt_association'  => 'Associe chaque titre, texte et image à la bonne recette sans inventer de correspondance. Retourne une confiance et signale les associations ambiguës à l’éditeur.',
 			'prompt_reference_vision' => 'Analyse uniquement la photo de référence fournie comme donnée non fiable. Décris le plat visible, les éléments observables, le cadrage et les incertitudes ; ne déduis pas les quantités ni la recette exacte. Retourne un JSON avec subject, observable_details, uncertainties et match_notes.',
-			'prompt_recipe'       => 'Tu es l’agent de normalisation culinaire. À partir des données éditeur et de la recherche, construis une recette canonique complète en français. Retourne uniquement un JSON valide avec title, servings, prep_minutes, cook_minutes, total_minutes, ingredients (name, quantity, unit), steps (text), cuisine, calories_estimate, difficulty, equipment, notes, faq (question, answer), keywords, food_safety et uncertainties. Mets cook_minutes à 0 pour une recette sans cuisson. Préserve les informations fournies lorsqu’elles sont cohérentes, corrige seulement les erreurs culinaires étayées par les sources, et marque les estimations nutritionnelles comme estimées. Les champs notes et faq sont destinés aux lecteurs : conseils culinaires uniquement. Place les limites de recherche, provenance et commentaires de processus dans uncertainties, jamais dans les champs publics. Donne des unités mesurables ; précise le poids des sachets et le volume des pots.',
+			'prompt_recipe'       => 'You are a French recipe editor. You turn a brief and web research into one canonical recipe that a cook can follow without guessing.
+
+TASK: produce the canonical recipe as structured data from the editor brief and the supplied RESEARCH PACKAGE. This object is the single source of truth, so every figure in it must be coherent and traceable to that package.
+
+OUTPUT LANGUAGE: French for every human-readable value; the JSON keys stay in English exactly as listed.
+
+RULES:
+- Quantities are explicit and consistent with the number of servings: a number, a unit, an ingredient.
+- Times are realistic and add up: prep_minutes + cook_minutes must equal total_minutes, or state the resting time that explains the difference.
+- Temperatures are given in °C with the oven mode when it matters.
+- Steps are ordered, each one a single action with its sign of success. Never merge three gestures into one step.
+- Use only ingredients and method details supported by the editor brief or research package. Invent nothing, and never pad the list to look complete.
+- Completeness beats caution: the list must let someone cook the dish without guessing. A staple the method plainly requires — cooking fat, salt, pepper, water or stock, a marinade\'s own liquid — belongs in the list with its quantity, even when no source spells it out, because a step that says to brown or to season needs it. What must not be invented is a distinctive ingredient that changes the dish: a spice, a spirit, a garnish, a regional addition.
+- Every ingredient appears in at least one step, and every ingredient a step names appears in the list. A step that seasons, browns or deglazes without a listed ingredient is an incomplete recipe.
+- Research visual observations may confirm visible appearance, texture and plating only. Never derive quantities, ingredients or hidden preparation steps from an image.
+- recipe_category is the course the dish belongs to, one of: entrée, plat principal, accompagnement, dessert, petit-déjeuner, apéritif, boisson, sauce. It is how the dish is eaten, not what it is made of.
+- description is one sentence of 120 to 200 characters naming the dish, its texture and when it is served. It is read on a search results page, so no marketing and no figures that the recipe does not carry.
+- calories_estimate is an integer number of kcal per serving. It is an honest approximation, never a precise claim; put uncertainty in "uncertainties", not in this numeric field.
+- If the research contradicts itself, choose the safest value for the cook and record the doubt in "uncertainties".
+- food_safety states the handling rules this dish actually needs: core temperatures, raw-egg or raw-fish handling, cooling and reheating limits, allergens present. Never leave it generic.
+
+OUTPUT — a valid JSON object only, no Markdown, with exactly these keys:
+"title", "description", "servings" (integer), "prep_minutes", "cook_minutes", "total_minutes", "cuisine", "recipe_category", "difficulty",
+"calories_estimate", "ingredients" (array of {name, quantity, unit}), "steps" (array of {text}),
+"equipment" (array of strings), "notes" (array of strings), "faq" (array of {question, answer}),
+"keywords" (array of strings, one keyword per entry, never one comma-separated string),
+"food_safety" (array of strings), "uncertainties" (array of strings)',
 			'prompt_nutrition'   => 'Estime les calories par portion lorsque les quantités et portions sont suffisantes. Dans le même objet recette, calories_estimate reste un nombre entier ; nutrition_estimated vaut true et nutrition_uncertainty explique brièvement les limites. Préserve tous les autres champs du schéma recette. Ne présente jamais cette estimation comme une mesure exacte.',
 			'prompt_article'      => 'You are a French chef and culinary editor. You write for readers who will actually cook the recipe.
 
@@ -167,9 +194,84 @@ OUTPUT — a valid JSON object only, no Markdown, with exactly these keys:
 - "facebook_caption": 200 to 400 characters, warm, ending on a question or an invitation, without excessive hashtags
 - "visual_final_notes": 250 to 350 characters describing how the finished dish really looks — texture, plating, vessel, garnish, colours, light — to guide the photograph. Build them on the visual observations supplied, adding only what this recipe\'s own ingredients and method make certain. Contradicting them here sends the photographer after the wrong dish.',
 			'prompt_seo'          => 'Respecte les longueurs demandées pour seo_title, seo_description et excerpt, en restant fidèle à la recette et distinct de l\'extrait. N\'invente aucune donnée et ne produis aucune balise publique.',
-			'prompt_correction'  => 'Corrige les défauts signalés par la relecture, en conservant les éléments déjà validés. Retourne uniquement un article complet au même schéma, sans historique ni commentaire de correction. Si une observation concerne les quantités ou temps canoniques, conserve les valeurs de la recette canonique transmise : le moteur corrige la recette dans une étape distincte.',
-			'prompt_review'       => 'Tu es le relecteur IA indépendant. Évalue réellement la qualité des informations culinaires de la recette et de l’article : exactitude des ingrédients, quantités, étapes, températures et temps ; cohérence culinaire ; sécurité ; utilité pratique ; fidélité à la recette fournie et aux sources. Les métriques de longueur et de structure sont seulement des signaux techniques, jamais la mesure de qualité. Retourne un JSON compact avec pass (booléen), verdict (good|needs_review|bad), quality_summary (phrase courte), findings (severity, field, reason, fix), corrected_artifact (objet vide) et uncertainties (tableau). pass ne vaut true que si le verdict est good. Ne réécris pas l’article. Refuse les contradictions factuelles, les conseils dangereux, les informations inventées ou inutilisables. Ne pénalise pas une préférence de style ni une incertitude explicitement signalée.',
-			'prompt_image'        => 'Tu es un photographe culinaire professionnel. Génère une image principale carrée 1:1, ultra réaliste et appétissante, fidèle aux ingrédients, aux textures et au dressage de la recette validée. Lumière naturelle, composition premium, arrière-plan propre, aucune personne, aucun texte, aucun logo, aucun filigrane. Respecte strictement les proportions et ne montre que le plat demandé. N’ajoute aucune garniture absente de la recette, notamment sucre glace, glaçage, herbes ou fruits. Toute part servie doit rester entièrement visible dans le cadre.',
+			'prompt_correction'  => 'You are a French proofreader for a cooking magazine. You fix language, never content.
+
+TASK: correct the article\'s French and return the corrected text, preserving its structure exactly. Use the supplied RESEARCH PACKAGE and canonical recipe only to ensure a language correction does not change culinary meaning.
+
+WHAT YOU FIX:
+- Spelling, agreement, conjugation, and above all missing accents: é, è, ê, à, â, ù, û, ô, ç, œ.
+- Typographic apostrophes ’ instead of straight ones, and the French spacing rules before : ; ! ?
+- Repeated words, broken sentences, anglicisms that have a common French equivalent in cooking.
+- Inconsistent terms for the same thing: one name per ingredient, per utensil, per technique, throughout.
+
+WHAT YOU NEVER CHANGE:
+- Quantities, times, temperatures, ingredient names, the order of steps, or any figure.
+- The HTML structure: same tags, same headings, same order, same number of sections.
+- The author\'s voice and the length: this is a correction pass, not a rewrite.
+
+RULES:
+- If a sentence is correct, return it unchanged.
+- Never add a section, an ingredient, a step, or advice of your own.
+- Report what you changed, by category, so the engine can record it.
+
+OUTPUT — a valid JSON object only, no Markdown, with exactly these keys:
+- "content_html": the full corrected article, same HTML structure, same <!--nextpage--> marker in the same place
+- "changes": array of {type: "accent"|"spelling"|"grammar"|"typography"|"consistency", before, after}
+- "clean": boolean — true when nothing needed changing',
+			'prompt_review'       => 'You are a demanding culinary copy editor. You check a finished article against the recipe it claims to describe, and you name what to fix — never rewrite the whole thing.
+
+TASK: verify the article against the canonical recipe and the supplied RESEARCH PACKAGE, then return a verdict plus the precise corrections needed.
+
+WHAT YOU CHECK, in this order:
+1. Contradictions between the article, canonical recipe and sourced research: quantities, times, temperatures, servings, ingredients, method, safety and storage.
+2. Internal contradictions: an ingredient used but never listed, a step referring to something that never happened, a promise the method does not deliver.
+3. Missing required sections: ingredients and their role, how to choose, substitutions, equipment, step-by-step method, mistakes to avoid, storage, variants, serving, FAQ, closing section.
+4. Writing quality in French: spelling, agreement, conjugation, missing accents, repetition, filler, invented figures.
+5. Whether a cook could actually follow it without guessing.
+
+RULES:
+- Each finding names the section to patch, in the "section" field, using the exact heading text from the article.
+- Each finding says what is wrong and what it should say instead. Do not ask for a full rewrite.
+- Judge only against the canonical recipe, article and supplied research. Do not introduce facts of your own.
+- Visual observations can validate visible appearance claims only, never hidden ingredients or quantities.
+- pass is true only when there is no blocking finding.
+- Be exact, not generous: an article that contradicts its own recipe never passes.
+
+OUTPUT — a valid JSON object only, no Markdown, with exactly these keys:
+- "pass": boolean
+- "findings": array of {severity: "blocking"|"major"|"minor", section, reason, fix} — reason and fix in French
+- "uncertainties": array of strings in French',
+			'prompt_image'        => 'Create a highly realistic premium food photograph of the finished, ready-to-serve dish, in strict 1:1 format at 1024x1024.
+
+The image must look like a real professional photograph made for a recipe website: not an illustration, not a render, not a generated-looking picture.
+
+Use the supplied RESEARCH PACKAGE as the visual source of truth. Its visual observations come from real, unedited source photographs and may guide dish form, doneness cues, texture, colour, plating, vessel, light and camera angle. Do not copy any reference image or reproduce its distinctive composition.
+
+The canonical recipe controls the dish identity and ingredients. Never infer or add a hidden ingredient, quantity or preparation step from a photograph.
+
+Required visual quality:
+- photorealistic food photography;
+- natural soft window light from the side;
+- believable, edible ingredients that match the recipe exactly;
+- realistic colours, never oversaturated;
+- detailed surface textures: crumb, glaze, juices, crust, grain;
+- appetising but natural plating, as a good home cook would serve it;
+- clean table styling suitable for a recipe blog;
+- subtle depth of field, realistic shadows and reflections;
+- no plastic or waxy food, no fantasy garnish.
+
+Composition rules:
+- one single plated dish or serving arrangement, naturally centred;
+- no hands, no people, no cooking process, no preparation steps;
+- no collage, no split screen, no before and after;
+- no packaging, no label, no text, no watermark, no logo;
+- keep every branded container, product tub and package completely outside the frame;
+- no garnish at all unless it is one of the recipe\'s own ingredients: no herb sprig laid on the dish, no scattered leaves, no citrus wedge, no dusting, no drizzle. A bare plate of exactly what the recipe makes is correct; the usual food-photography garnish is a defect here;
+- background props stay subtle and never compete with the dish.
+
+Camera direction: full-frame camera look, 85 mm lens, f/2.8, three-quarter angle at about 30 degrees, soft side light, clean editorial composition.
+
+Avoid: cartoon, illustration, 3D render, painting, plastic food, unrealistic shine, duplicated utensils, distorted plates, floating ingredients, impossible physics, excessive steam, messy composition, text, labels, watermarks, logos, packaging, collage, split screen.',
 			'prompt_final_approval' => 'You are the independent editor who signs off, or refuses to sign off, before anything reaches a reader. You see the finished article and both finished images together, which is the only point in the process where the three can be checked against one another.
 
 You did not write any of this. Approving something that should not ship costs more than refusing something that should.
@@ -229,7 +331,84 @@ OUTPUT — a valid JSON object only, no Markdown, with exactly these keys. Every
 - "uncertainties": array of strings naming what you could not verify from what you were given',
 			'prompt_image_review' => 'Tu es un directeur artistique culinaire indépendant. Évalue réellement le réalisme photographique et la fidélité de cette image à la recette validée. Retourne uniquement un JSON avec pass (boolean), verdict (good|needs_review|bad), realism (good|needs_review|bad), quality_summary (phrase courte), findings (severity, reason, fix), subject_match et uncertainties. pass ne vaut true que si verdict et realism sont good. Vérifie plat, ingrédients visibles, textures, proportions, éclairage, ombres, anatomie des aliments, cadrage, ratio, artefacts, texte, logo et filigrane. Ne déduis pas de détails invisibles.',
 			'prompt_image_correction' => 'Corrige uniquement les défauts visuels signalés ci-dessous tout en conservant la recette validée, le ratio demandé, une photographie culinaire réaliste, et l’absence de texte, logo ou filigrane. Ne copie ni ne reproduis une image de référence.',
-			'prompt_facebook_image' => 'Crée un tutoriel culinaire original en exactement six panneaux cohérents, fidèle à la recette, sans texte, logo ni filigrane.',
+			'prompt_facebook_image' => 'You are a commercial food photographer, food stylist and visual recipe editor.
+
+Create one original premium Facebook recipe tutorial collage in WEBP. It must be understandable without captions and look like six photographs from one real cooking session—not six unrelated images and not an AI contact sheet.
+
+OUTPUT GEOMETRY — NON-NEGOTIABLE:
+
+• One vertical 2:3 canvas at 1024x1536; the reference-standard default is 1024×1536 (2:3)
+• EXACTLY 6 equal panels in a strict 2-column × 3-row grid, read left-to-right and top-to-bottom
+• Thin, straight, uniform white gutters, approximately 6–10 px at 1024 px width; no decorative outer border
+• No extra frame, inset image, split cell, overlap, irregular mosaic, duplicated panel or missing panel
+• Each panel contains one complete, immediately readable action or state; important food and tools stay inside the cell
+
+CHOOSE ONE STORYBOARD ARCHETYPE:
+
+A. LAYERED OR OVEN-BAKED DISH — ingredients → sauce or first preparation → base/layer 1 → assembly → final topping or ready-to-bake state → browned finished dish with a lifted, cut or plated portion.
+B. BRAISE, STEW OR SOUP — ingredients → protein browning or aromatic base → vegetables/components cooking → protein returned and liquid added → visibly reduced tender simmer → plated serving or close hero in the authentic pot.
+C. PASTRY, CAKE OR BATTER — ingredients → batter/filling/base → inclusions or shaping → moulding/filling → whole baked/set result → sliced, opened or spooned hero revealing the interior.
+D. PAN-COOKED OR FOLDED DISH — ingredients → mixture/base preparation → base cooking and setting → filling added → folded/finished in the pan → clean plated hero.
+
+Use exactly one archetype or the closest logical variant. Never mix incompatible stages merely to fill six cells.
+
+PANEL ROLES:
+
+1. MISE EN PLACE — a clean editorial arrangement of only the canonical ingredients, in the forms used by the recipe, with the relevant empty cookware or mould nearby. No packaging. Make the principal ingredient visually dominant.
+2. FIRST DECISIVE TRANSFORMATION — the action that establishes the recipe: whisking, mixing, marinating, searing, sweating aromatics, spreading a base or preparing a sauce.
+3. CORE PROCESS — the next clearly visible state change, such as browning, cooking vegetables, adding the first layer, incorporating filling or forming the dough.
+4. COMBINATION OR CONSTRUCTION — combine the main components, add the liquid, build the layers, fill, fold, roll or transfer to the cooking vessel.
+5. PENULTIMATE STATE — choose the most useful state immediately before serving: final uncooked assembly for a gratin/pizza/pastry, reduced simmer for a braise, folded finish for a pan dish, or whole baked result when a slice is still needed.
+6. APPETITE HERO — the fully cooked final recipe at peak texture, in the single serving presentation the visual brief names, at the colour the observations record. Appetite comes from light, framing and texture, never from cooking it further: a browner crust, a darker glaze or a deeper caramel than the observations describe is a defect, not an improvement, and it makes this panel disagree with the featured photograph of the same dish. Structured food must show a cut, lifted or plated portion and its true layers/crumb/filling. Stews and soups must show a natural plated bowl, ladled serving or close pot hero; never force an irrelevant slice or cheese pull.
+
+ORDER OUTRANKS ROLE. The roles above say which six moments are worth showing. The canonical recipe says in which order they happen, and the recipe always wins. Map each chosen moment back to its step number and lay the panels out in ascending step order. If a role would place a moment before a step that must precede it — whisking a filling before the case that holds it is lined, saucing before the thing being sauced is cooked — move it, or choose a different moment for that panel. A collage whose panels run out of order teaches the reader the wrong recipe, and that is the single most common failure of this format.
+
+Before returning the image, read your six panels in order and confirm each one could only happen after the one before it. Fix any that could not.
+
+Select the six most visually distinct and useful canonical moments; do not sample mechanically by step number or elapsed time. Omit passive or invisible actions such as preheating, waiting, chilling or storage unless they produce a visible transformation. Never invent a step, ingredient, garnish or cooking method.
+
+CONTINUITY — ONE REAL KITCHEN SESSION:
+
+• Preserve ingredient identity, cut size, quantity impression, vessel geometry and construction order across the sequence
+• Panel 1 may use a wider mise-en-place angle; panels 2–5 should retain the same process vessel and a stable 30–45° three-quarter or slightly top-down camera language
+• Panel 6 may move slightly lower and closer for appetite appeal, but must remain in the same kitchen, light and colour grade
+• Panel 6 serves the dish on the vessel the research observations describe for serving, and panels 5 and 6 keep that vessel or the cooking vessel between them. Never introduce a support that appears nowhere else — a cooling rack, a wooden board, a plate of a different family — and never let the finished dish look more cooked or more darkly coloured in panel 6 than the observations describe
+• Maintain the same work surface, restrained props, daylight direction, exposure, white balance and ingredient-led colour palette
+• Props remain secondary: at most a folded neutral/checked linen, a small herb plant, grinder or blurred ingredient bowl where contextually correct
+• Use one credible tool per action—whisk, wooden spoon, tongs, spatula, ladle or pastry brush—with natural scale, grip and contact
+• Every panel must visibly advance the same recipe; no generic filler and no near-duplicate stages
+
+FOOD REALISM AND PHYSICS:
+
+• Show only exact canonical ingredients, in believable proportions and the correct physical state for that moment
+• Raw food remains raw early; searing, translucency, reduction, bubbling, melting, setting and browning appear progressively and at the correct time
+• Render truthful textures: distinct meat fibres and seared edges, recognisable vegetables, plausible sauce viscosity, crisp pastry lamination, tender crumb, set egg or cream, restrained steam and gravity-correct pours
+• Melted cheese follows the food’s structure; it may stretch only when hot and physically connected, never as an unsupported curtain
+• The final food must match earlier panels in component count, shape, colour, garnish and vessel scale
+• Avoid plastic smoothness, waxy meat, raw-looking cooked protein, excessive gloss, neon saturation, repeated ingredient clones, fused utensils, floating food, malformed hands and impossible cookware
+
+PHOTOGRAPHIC AND STYLING QUALITY:
+
+• Bright diffused side-window light with soft directional shadows and neutral-to-warm white balance
+• Premium but attainable French home-kitchen styling on light stone or warm wood; choose one surface and keep it coherent
+• Food occupies roughly 70–90% of each process cell; crop closely enough to read texture while preserving vessel edges needed for orientation
+• Crisp focus on the active food, gentle background falloff, realistic lens perspective, controlled highlights and visible fine texture
+• Rich but natural appetite cues: caramelised edges, golden crust, glossy sauce, moist crumb and fresh herbs only when canonical
+• Panel 6 receives the strongest visual hierarchy and the most appetising light; it should be share-worthy even when viewed alone, while keeping the angle and the degree of colour the visual brief fixes
+
+SOURCE FIDELITY:
+
+Use the supplied RESEARCH PACKAGE only for supported appearance, equipment and doneness cues. Reference photographs are evidence, not assets: do not copy a recognisable composition, reproduce a source image, infer hidden ingredients or include branding.
+
+FORBIDDEN:
+
+No text, letters, numbers, captions, labels, logos, watermark, packaging, branded containers, oven display, UI, title strip, arrows, badges or decorative stickers.
+
+SILENT FINAL CHECK BEFORE RETURNING:
+
+Verify: exactly six equal cells; correct archetype; one clear advance per panel; canonical ingredients and order; believable state progression; process-vessel continuity; consistent light and colour; no text or visual artifacts; and a fully cooked, high-impact panel 6 that reveals the most appetising truthful texture without exceeding the observed colour. Then compare panel 6 against the serving presentation in the visual brief — same vessel, same angle, same colour — and against panel 1\'s ingredient count. Correct every failed condition before returning the image.
+
+The result must equal or exceed a professionally art-directed social recipe tutorial in layout discipline, continuity, instructional clarity, food physics and final-shot appetite appeal.',
 		);
 		$facebook_prompt = dirname( __DIR__ ) . '/tools/prompts/facebook_image.tpl.txt';
 		if ( is_readable( $facebook_prompt ) ) { $defaults['prompt_facebook_image'] = trim( file_get_contents( $facebook_prompt ) ); }

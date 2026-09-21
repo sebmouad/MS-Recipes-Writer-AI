@@ -8,24 +8,264 @@
     "images": []
   },
   "research": {
-    "dish_identity": { "name": "Poulet yassa sénégalais", "confidence": "élevée", "evidence": "Le titre éditeur identifie le plat." },
+    "dish_identity": {
+      "name": "Poulet yassa sénégalais",
+      "confidence": "élevée",
+      "evidence": "Le titre fourni correspond à un plat sénégalais de poulet mariné aux agrumes, aux oignons et au piment, puis grillé ou doré et mijoté dans sa sauce aux oignons; plusieurs sources le rattachent à la Casamance."
+    },
     "ingredient_facts": [
-      { "source_url": "https://example.test/oignons", "text": "Les oignons représentent au moins le même poids que le poulet." }
+      {
+        "source_url": "https://www.foodnetwork.com/recipes/senegalese-yassa-17648867",
+        "text": "Pour 4 portions, Food Network indique 8 hauts de cuisse avec os et peau, soit environ 1,36 kg."
+      },
+      {
+        "source_url": "https://www.foodnetwork.com/recipes/senegalese-yassa-17648867",
+        "text": "La marinade comprend 120 ml de jus de citron, 60 ml de vinaigre blanc, 30 ml de moutarde de Dijon, 5 g de gingembre, 5 g de sel, 2,5 g de poivre, 5 gousses d’ail et 1 piment habanero."
+      },
+      {
+        "source_url": "https://www.foodnetwork.com/recipes/senegalese-yassa-17648867",
+        "text": "La recette Food Network ajoute 60 ml d’huile de colza, 2 feuilles de laurier, 2 gros oignons jaunes et 180 ml de bouillon réservé."
+      },
+      {
+        "source_url": "https://www.foodnetwork.com/recipes/senegalese-yassa-17648867",
+        "text": "Cette version ajoute 180 ml d’olives vertes dénoyautées et propose du persil frais facultatif au service."
+      },
+      {
+        "source_url": "https://www.ifad.org/en/w/recipes-for-change/senegal-poulet-yassa",
+        "text": "L’IFAD donne, pour 6 portions, 1 poulet entier de 1,6 kg en morceaux, 4 gros oignons, 3 à 4 citrons, 75 ml d’huile d’arachide, 4 carottes, 15 ml de moutarde et 120 ml d’eau."
+      },
+      {
+        "source_url": "https://www.saveur.com/article/recipes/yassa-poulet-grilled-chicken-caramelized-onion/",
+        "text": "Saveur emploie 2 lb de cuisses et pilons avec os et peau, 2 gros oignons, ⅓ tasse de vinaigre de cidre et ⅓ tasse de jus de citron vert."
+      },
+      {
+        "source_url": "https://www.saveur.com/article/recipes/yassa-poulet-grilled-chicken-caramelized-onion/",
+        "text": "Saveur remplace l’huile d’arachide par de l’huile végétale si nécessaire; la recette utilise aussi gingembre, ail, carotte, piment Scotch bonnet, cayenne, poivre et piment de la Jamaïque."
+      },
+      {
+        "source_url": "https://www.saveur.com/article/recipes/yassa-poulet-grilled-chicken-caramelized-onion/",
+        "text": "Saveur sert le poulet avec du riz blanc cuit."
+      },
+      {
+        "source_url": "https://www.foodnetwork.com/recipes/senegalese-yassa-17648867",
+        "text": "Food Network sert le poulet yassa sur du riz chaud cuit."
+      },
+      {
+        "source_url": "https://commons.wikimedia.org/wiki/File:Poulet_Yassa.JPG",
+        "text": "La notice de la photographie Wikimedia décrit une sauce composée principalement d’oignons, citron, moutarde et olives, servie avec du riz blanc; cette description concerne cette variante photographiée, pas toutes les recettes."
+      }
     ],
     "preparation_facts": [
-      { "source_url": "https://example.test/yassa", "text": "La marinade au citron et à la moutarde agit au minimum 4 heures, idéalement une nuit." },
-      { "source_url": "https://example.test/oignons", "text": "Les oignons compotent 30 à 40 minutes à feu doux." }
+      {
+        "source_url": "https://www.foodnetwork.com/recipes/senegalese-yassa-17648867",
+        "text": "Food Network fait mariner le poulet, les oignons et le laurier au réfrigérateur au moins 6 heures et jusqu’à une nuit."
+      },
+      {
+        "source_url": "https://www.ifad.org/en/w/recipes-for-change/senegal-poulet-yassa",
+        "text": "L’IFAD indique un minimum de 4 heures de marinade et recommande une nuit pour un meilleur résultat."
+      },
+      {
+        "source_url": "https://www.saveur.com/article/recipes/yassa-poulet-grilled-chicken-caramelized-onion/",
+        "text": "Saveur recommande au moins 4 heures de marinade au réfrigérateur, en retournant occasionnellement le poulet."
+      },
+      {
+        "source_url": "https://www.foodnetwork.com/recipes/senegalese-yassa-17648867",
+        "text": "Après la marinade, Food Network égoutte le poulet et réserve séparément les oignons et le liquide."
+      },
+      {
+        "source_url": "https://www.saveur.com/article/recipes/yassa-poulet-grilled-chicken-caramelized-onion/",
+        "text": "Saveur filtre la marinade et conserve séparément les matières solides et le liquide."
+      },
+      {
+        "source_url": "https://www.foodnetwork.com/recipes/senegalese-yassa-17648867",
+        "text": "Food Network dore le poulet par lots dans l’huile à feu moyen, environ 7 à 10 minutes au total pour chaque côté doré."
+      },
+      {
+        "source_url": "https://www.saveur.com/article/recipes/yassa-poulet-grilled-chicken-caramelized-onion/",
+        "text": "Saveur fait dorer les morceaux environ 8 minutes par côté dans une grande marmite à feu moyen-vif."
+      },
+      {
+        "source_url": "https://www.ifad.org/en/w/recipes-for-change/senegal-poulet-yassa",
+        "text": "L’IFAD fait griller ou sauter le poulet jusqu’à ce qu’il soit bien doré avant de le remettre dans la marmite."
+      },
+      {
+        "source_url": "https://www.foodnetwork.com/recipes/senegalese-yassa-17648867",
+        "text": "Food Network cuit les oignons 10 à 12 minutes, jusqu’à ce qu’ils soient tendres et légèrement dorés."
+      },
+      {
+        "source_url": "https://www.saveur.com/article/recipes/yassa-poulet-grilled-chicken-caramelized-onion/",
+        "text": "Saveur fait mijoter le poulet couvert environ 30 minutes, puis réduit la sauce à découvert environ 20 minutes jusqu’à évaporation presque complète et légère caramélisation des oignons."
+      },
+      {
+        "source_url": "https://www.foodnetwork.com/recipes/senegalese-yassa-17648867",
+        "text": "Food Network couvre, baisse à feu doux et mijote environ 15 minutes, jusqu’à 165 °F au cœur; les olives sont ensuite mijotées 5 minutes."
+      },
+      {
+        "source_url": "https://www.ifad.org/en/w/recipes-for-change/senegal-poulet-yassa",
+        "text": "L’IFAD remet le poulet et la marinade dans les oignons, puis cuit à feu doux jusqu’à ce que les oignons soient fondants."
+      }
     ],
-    "references": [ { "url": "https://example.test/yassa", "title": "Yassa traditionnel" } ],
-    "food_safety": [],
+    "food_safety": [
+      {
+        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/poultry/chicken-farm-table",
+        "text": "Le poulet doit atteindre 165 °F, soit environ 74 °C, mesurés au thermomètre dans la partie la plus épaisse."
+      },
+      {
+        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/leftovers-and-food-safety",
+        "text": "Réfrigérer les restes dans les 2 heures; si la température ambiante dépasse 90 °F, la limite est d’1 heure."
+      },
+      {
+        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/poultry/chicken-farm-table",
+        "text": "Le poulet cuit se conserve 3 à 4 jours au réfrigérateur à 40 °F ou moins, soit environ 4 °C."
+      },
+      {
+        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/leftovers-and-food-safety",
+        "text": "Réchauffer les restes de volaille jusqu’à 165 °F, soit environ 74 °C."
+      }
+    ],
+    "references": [
+      {
+        "url": "https://www.foodnetwork.com/recipes/senegalese-yassa-17648867",
+        "title": "Senegalese Yassa Poulet",
+        "publisher": "Food Network"
+      },
+      {
+        "url": "https://www.saveur.com/article/recipes/yassa-poulet-grilled-chicken-caramelized-onion/",
+        "title": "Chicken Yassa",
+        "publisher": "Saveur"
+      },
+      {
+        "url": "https://www.ifad.org/en/w/recipes-for-change/senegal-poulet-yassa",
+        "title": "Senegal: Poulet yassa",
+        "publisher": "Fonds international de développement agricole"
+      },
+      {
+        "url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/poultry/chicken-farm-table",
+        "title": "Chicken from Farm to Table",
+        "publisher": "USDA FSIS"
+      },
+      {
+        "url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/leftovers-and-food-safety",
+        "title": "Leftovers and Food Safety",
+        "publisher": "USDA FSIS"
+      },
+      {
+        "url": "https://commons.wikimedia.org/wiki/File:Poulet_Yassa.JPG",
+        "title": "File:Poulet Yassa.JPG",
+        "publisher": "Wikimedia Commons"
+      }
+    ],
     "visual_references": [
-      { "image_url": "https://example.test/images/yassa.jpg", "source_url": "https://example.test/yassa", "title": "Poulet yassa" }
+      {
+        "image_url": "https://food.fnr.sndimg.com/content/dam/images/food/fullset/2023/11/QK910-kardea-brown-senegalese-yassa_s4x3.jpg.rend.hgtvcom.826.620.suffix/1698846172102.webp",
+        "source_url": "https://www.foodnetwork.com/recipes/senegalese-yassa-17648867",
+        "title": "Kardea Brown’s Senegalese Yassa"
+      },
+      {
+        "image_url": "https://www.saveur.com/uploads/2012/08/HR-2022-Summer-SIP-Senegalese-Style-Grilled-Chicken-with-Caramelized-Onions-recipe-saveur-8-scaled.jpg?format=auto&optimize=high&width=1440",
+        "source_url": "https://www.saveur.com/article/recipes/yassa-poulet-grilled-chicken-caramelized-onion/",
+        "title": "Senegalese-Style Grilled Chicken with Caramelized Onions"
+      },
+      {
+        "image_url": "https://upload.wikimedia.org/wikipedia/commons/c/cb/Poulet_Yassa.JPG",
+        "source_url": "https://commons.wikimedia.org/wiki/File:Poulet_Yassa.JPG",
+        "title": "Poulet Yassa"
+      }
     ],
     "visual_observations": [
-      { "image_url": "https://example.test/images/yassa.jpg", "source_url": "https://example.test/yassa", "observable_details": "Morceaux de poulet dorés couverts d'oignons fondants.", "composition": "Plat de service avec riz blanc à côté.", "colours": "Brun doré, ivoire et blanc.", "textures": "Poulet coloré et oignons souples.", "uncertainties": "Les ingrédients non visibles ne peuvent pas être confirmés." }
+      {
+        "image_url": "https://www.saveur.com/uploads/2012/08/HR-2022-Summer-SIP-Senegalese-Style-Grilled-Chicken-with-Caramelized-Onions-recipe-saveur-8-scaled.jpg?format=auto&optimize=high&width=1440",
+        "source_url": "https://www.saveur.com/article/recipes/yassa-poulet-grilled-chicken-caramelized-onion/",
+        "observable_details": [
+          "Une grande assiette ovale claire occupe la majeure partie de l’image.",
+          "L’assiette contient plusieurs morceaux brunis de forme irrégulière, avec des surfaces dorées à très foncées.",
+          "De nombreuses lamelles translucides brun doré sont réparties sur et autour des morceaux.",
+          "Des morceaux orange, de tailles variées, sont visibles entre les autres éléments.",
+          "Une fourchette métallique décorée est posée en diagonale sur la partie supérieure de l’assiette.",
+          "Une petite portion d’un autre récipient contenant des grains blancs est visible dans l’angle inférieur gauche.",
+          "L’assiette est posée sur une surface constituée de carreaux clairs aux joints foncés."
+        ],
+        "composition": "Vue rapprochée prise depuis le dessus, avec l’assiette centrée et recadrée par les bords de l’image. Les aliments occupent surtout la moitié inférieure et le centre. La fourchette traverse la partie supérieure en diagonale, de la gauche vers la droite.",
+        "colours": [
+          "brun foncé",
+          "brun doré",
+          "orange",
+          "beige",
+          "blanc cassé",
+          "gris métallique",
+          "noir dans certaines zones très grillées"
+        ],
+        "textures": [
+          "Surfaces brillantes et légèrement huileuses sur plusieurs morceaux.",
+          "Zones extérieures ridées, dorées et très foncées sur les morceaux principaux.",
+          "Lamelles souples et luisantes, certaines translucides.",
+          "Morceaux orange lisses à légèrement rugueux.",
+          "Assiette mate et légèrement tachetée.",
+          "Carreaux du fond présentant des fissures, des taches et des joints irréguliers.",
+          "Fourchette présentant des reflets métalliques et des motifs en relief sur le manche."
+        ],
+        "uncertainties": [
+          "La nature exacte des morceaux brunis n’est pas déterminable avec certitude à partir de l’image seule.",
+          "La nature exacte des lamelles et des morceaux orange n’est pas déterminable avec certitude à partir de l’image seule.",
+          "La portion blanche dans l’angle inférieur gauche est partiellement hors cadre.",
+          "La profondeur et la quantité totale des éléments dans l’assiette ne peuvent pas être évaluées précisément depuis cette vue."
+        ]
+      },
+      {
+        "image_url": "https://upload.wikimedia.org/wikipedia/commons/c/cb/Poulet_Yassa.JPG",
+        "source_url": "https://commons.wikimedia.org/wiki/File:Poulet_Yassa.JPG",
+        "observable_details": [
+          "Une assiette rectangulaire claire occupe la majeure partie de l’image.",
+          "Elle contient plusieurs morceaux brun-doré, de forme irrégulière, avec des zones plus claires et des parties sombres.",
+          "Des éléments allongés rouge vif sont visibles entre et autour des morceaux.",
+          "Des éléments pâles, translucides ou jaunâtres apparaissent également dans l’assiette.",
+          "Aucun couvert, verre ou autre objet distinct n’est clairement visible."
+        ],
+        "composition": [
+          "La prise de vue est un gros plan très rapproché, principalement orienté vers le contenu de l’assiette.",
+          "Les aliments sont concentrés au centre et dans la moitié supérieure de l’image.",
+          "Le bord de l’assiette est visible surtout dans la partie inférieure et sur les côtés.",
+          "L’arrière-plan est largement sombre, avec des zones rouges et orangées.",
+          "La profondeur de champ est faible et plusieurs zones sont floues."
+        ],
+        "couleurs": [
+          "Dominante générale de rouge, orange et jaune, avec une forte dominante chaude.",
+          "Les morceaux centraux présentent des tons brun, doré et beige.",
+          "Les éléments allongés sont rouge vif à orange.",
+          "L’assiette paraît blanche ou crème, mais sa couleur est fortement influencée par l’éclairage rougeâtre.",
+          "Des zones noires ou brun très foncé apparaissent en arrière-plan et dans les ombres."
+        ],
+        "textures": [
+          "Les morceaux centraux ont un aspect irrégulier et légèrement brillant.",
+          "Certaines surfaces montrent des marques ou reliefs granuleux.",
+          "Des zones pâles paraissent lisses et humides.",
+          "L’image présente un grain visible et une netteté limitée.",
+          "Les hautes lumières sont fortement diffuses, avec plusieurs zones surexposées."
+        ],
+        "incertainties": [
+          "La dominante rouge et le flou rendent l’identification précise des éléments difficile.",
+          "La texture et la couleur visibles ne permettent pas de déterminer avec certitude la nature de chaque morceau.",
+          "Les éléments rouges et pâles peuvent être partiellement confondus avec des reflets ou des effets de lumière.",
+          "La quantité exacte et la disposition complète du contenu de l’assiette ne sont pas entièrement visibles."
+        ]
+      }
     ],
-    "uncertainties": ["Le piment est facultatif selon les familles."],
-    "originality_notes": ["Les observations décrivent seulement les éléments visibles."]
+    "uncertainties": [
+      "Les sources divergent sur la durée minimale de marinade: 4 heures chez Saveur et l’IFAD, 6 heures chez Food Network; la nuit est recommandée par l’IFAD.",
+      "Les variantes ne sont pas uniformes: Saveur n’emploie pas de moutarde dans la liste principale, tandis que Food Network et l’IFAD en utilisent.",
+      "Les sources divergent sur la cuisson finale: environ 15 minutes couvertes chez Food Network contre environ 30 minutes couvertes puis 20 minutes à découvert chez Saveur.",
+      "Les carottes, les olives, le vinaigre, le gingembre et le bouillon appartiennent à certaines variantes seulement; ils ne doivent pas être présentés comme universels.",
+      "Aucune source culinaire retenue ne documente un temps de repos obligatoire après cuisson; seul le riz est explicitement laissé couvert 5 minutes dans une source secondaire non retenue.",
+      "Les photographies montrent des variantes visuelles différentes et ne prouvent pas la présence ou la quantité d’un ingrédient caché.",
+      "Image non analysée : image HTTP 403"
+    ],
+    "originality_notes": [
+      "Les informations ont été reformulées en faits courts et actionnables, sans reproduire la prose des sources.",
+      "Les quantités et les méthodes n’ont pas été moyennées; les divergences entre recettes sont conservées.",
+      "Les substitutions ne sont mentionnées que lorsqu’une source les documente explicitement, notamment l’huile végétale à la place de l’huile d’arachide.",
+      "Les accompagnements sont limités à ceux documentés par les sources, principalement le riz blanc ou chaud.",
+      "Aucun ingrédient, ratio ou signe visuel n’a été déduit d’une photographie; le champ visual_observations est volontairement vide pour l’analyse ultérieure des fichiers originaux."
+    ]
   },
   "canonical": {
     "title": "Poulet yassa sénégalais",
@@ -37,27 +277,87 @@
     "difficulty": "Moyenne",
     "calories_estimate": 480,
     "ingredients": [
-      { "name": "Cuisses de poulet", "quantity": "6", "unit": "pièces" },
-      { "name": "Oignons", "quantity": "1,5", "unit": "kg" },
-      { "name": "Citrons jaunes", "quantity": "4", "unit": "pièces" },
-      { "name": "Moutarde de Dijon", "quantity": "3", "unit": "cuillères à soupe" },
-      { "name": "Huile d'arachide", "quantity": "5", "unit": "cuillères à soupe" },
-      { "name": "Feuille de laurier", "quantity": "2", "unit": "feuilles" },
-      { "name": "Piment antillais", "quantity": "1", "unit": "pièce" }
+      {
+        "name": "Cuisses de poulet",
+        "quantity": "6",
+        "unit": "pièces"
+      },
+      {
+        "name": "Oignons",
+        "quantity": "1,5",
+        "unit": "kg"
+      },
+      {
+        "name": "Citrons jaunes",
+        "quantity": "4",
+        "unit": "pièces"
+      },
+      {
+        "name": "Moutarde de Dijon",
+        "quantity": "3",
+        "unit": "cuillères à soupe"
+      },
+      {
+        "name": "Huile d'arachide",
+        "quantity": "5",
+        "unit": "cuillères à soupe"
+      },
+      {
+        "name": "Feuille de laurier",
+        "quantity": "2",
+        "unit": "feuilles"
+      },
+      {
+        "name": "Piment antillais",
+        "quantity": "1",
+        "unit": "pièce"
+      }
     ],
     "steps": [
-      { "text": "Mélanger jus de citron, moutarde, huile et oignons émincés pour la marinade." },
-      { "text": "Faire mariner le poulet au moins 4 heures au réfrigérateur." },
-      { "text": "Égoutter le poulet et le colorer sur toutes ses faces." },
-      { "text": "Faire compoter les oignons de la marinade à feu doux 30 minutes." },
-      { "text": "Remettre le poulet dans les oignons avec le laurier et le piment entier." },
-      { "text": "Laisser mijoter 25 minutes à couvert puis servir avec du riz blanc." }
+      {
+        "text": "Mélanger jus de citron, moutarde, huile et oignons émincés pour la marinade."
+      },
+      {
+        "text": "Faire mariner le poulet au moins 4 heures au réfrigérateur."
+      },
+      {
+        "text": "Égoutter le poulet et le colorer sur toutes ses faces."
+      },
+      {
+        "text": "Faire compoter les oignons de la marinade à feu doux 30 minutes."
+      },
+      {
+        "text": "Remettre le poulet dans les oignons avec le laurier et le piment entier."
+      },
+      {
+        "text": "Laisser mijoter 25 minutes à couvert puis servir avec du riz blanc."
+      }
     ],
-    "equipment": ["Grande cocotte", "Saladier", "Presse-agrumes"],
-    "notes": ["Le piment reste entier pour parfumer sans piquer."],
-    "faq": [{ "question": "Peut-on utiliser du blanc de poulet ?", "answer": "Oui, mais réduisez le mijotage à 12 minutes pour éviter une viande sèche." }],
-    "keywords": ["poulet yassa", "sénégal", "citron"],
-    "food_safety": ["Faire mariner le poulet au réfrigérateur.", "Cuire le poulet à cœur avant de servir."],
-    "uncertainties": ["Le temps de marinade n'est pas inclus dans total_minutes."]
+    "equipment": [
+      "Grande cocotte",
+      "Saladier",
+      "Presse-agrumes"
+    ],
+    "notes": [
+      "Le piment reste entier pour parfumer sans piquer."
+    ],
+    "faq": [
+      {
+        "question": "Peut-on utiliser du blanc de poulet ?",
+        "answer": "Oui, mais réduisez le mijotage à 12 minutes pour éviter une viande sèche."
+      }
+    ],
+    "keywords": [
+      "poulet yassa",
+      "sénégal",
+      "citron"
+    ],
+    "food_safety": [
+      "Faire mariner le poulet au réfrigérateur.",
+      "Cuire le poulet à cœur avant de servir."
+    ],
+    "uncertainties": [
+      "Le temps de marinade n'est pas inclus dans total_minutes."
+    ]
   }
 }

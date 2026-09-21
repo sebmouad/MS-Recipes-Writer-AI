@@ -43,7 +43,7 @@ foreach ( array( 'total_minutes', 'recipe_category', 'description' ) as $field )
 }
 
 // And the prompt must actually ask for them.
-$prompt = file_get_contents( dirname( __DIR__ ) . '/tools/prompts/canonical_recipe.en.txt' );
+$prompt = file_get_contents( dirname( __DIR__ ) . '/tools/prompts/canonical_recipe.tpl.txt' );
 foreach ( array( 'recipe_category', 'description', 'total_minutes' ) as $field ) {
 	msrwa_test_contains( $prompt, $field, 'The recipe prompt must ask for ' . $field . '.' );
 }
