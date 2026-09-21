@@ -23,8 +23,8 @@ Read [`ARCHITECTURE.md`](ARCHITECTURE.md) for the existing code and
 
 Three layers, described in [`TESTING.md`](TESTING.md).
 
-1. **Prompt lab** (`tools/prompt-lab.php`) — real API, no WordPress. Proves a
-   prompt produces the required result before any engine depends on it.
+1. **Lab** (`tools/lab.php`) — the engine against a real API, no WordPress.
+   Proves a prompt produces the required result before anything depends on it.
 2. **Offline** (`tests/`) — pure PHP, no network. The fast gate, runs in CI.
 3. **Real** (`tests/real/`) — live WordPress over REST with an application
    password. A task is only *done* after its real test ran green.

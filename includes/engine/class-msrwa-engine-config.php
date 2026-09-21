@@ -77,6 +77,8 @@ final class MSRWA_Engine_Config {
 				'budget_usd'      => 0.0,
 				'seconds'         => 0,
 				'image_prompt_chars' => 30000,
+				// How many of the photographs research cites are downloaded and read.
+				'images_inspected'   => 3,
 			),
 
 			'language' => 'fr',

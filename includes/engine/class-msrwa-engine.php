@@ -222,6 +222,7 @@ final class MSRWA_Engine {
 		if ( '' === $prompt ) { return self::failed( 'No prompt template for ' . $name . '.' ); }
 
 		$brief = self::working_set( $name, $result );
+		if ( 'research' === $name && $brief['images'] ) { $brief['image_observations'] = self::observe_editor_images( $brief['images'], $config, $result ); }
 		$input = MSRWA_Engine_Input::build( $name, $prompt, $brief, $options );
 		$tools = 'web_search' === MSRWA_Engine_Steps::capability( $name ) ? array( array( 'type' => 'web_search' ) ) : array();
 		$ceiling = $config->max_output( $name );
@@ -234,14 +235,67 @@ final class MSRWA_Engine {
 		}
 
 		$answer = MSRWA_Json::decode( $call['text'] );
+		$answer = is_array( $answer ) ? $answer : array();
+
+		if ( 'research' === $name && $answer ) {
+			$answer = self::observe( $answer, $config, $result, $call['usage'] );
+			$call['text'] = (string) json_encode( $answer, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+		}
+
 		$scores = MSRWA_Engine_Score::step( $name, $call['text'], $brief );
 		return array(
 			'provider' => $route['provider'], 'model' => $route['model'], 'seconds' => $call['seconds'],
 			'usage' => $call['usage'], 'cost_usd' => (float) MSRWA_Engine_Rates::price( $route['provider'], $route['model'], $call['usage'] ),
 			'status' => (string) ( $call['status'] ?? '' ), 'passed' => $scores['passed'], 'total' => $scores['total'],
-			'checks' => $scores['checks'], 'error' => '', 'artifact' => is_array( $answer ) ? $answer : array(),
+			'checks' => $scores['checks'], 'error' => '', 'artifact' => $answer,
 			'retry' => $scores['pass'] ? '' : sprintf( 'Scored %d/%d; asking again.', $scores['passed'], $scores['total'] ),
 		);
+	}
+
+	/**
+	 * Replaces the search model's guesses about how the dish looks with what was
+	 * read from the bytes of the photographs it cited.
+	 *
+	 * A search model describes a photograph it has not looked at. Every later
+	 * prompt leans on these observations — the recipe, the article, both images
+	 * and the final judgement — so they have to come from the real file. The
+	 * vision calls are billed to the research step, because that is where they
+	 * belong: without them the package is not finished.
+	 */
+	private static function observe( array $package, MSRWA_Engine_Config $config, MSRWA_Result $result, array &$usage ) {
+		$route = $config->model_for( 'vision' );
+		if ( '' === $route['model'] ) { return $package; }
+		$limit = (int) $config->get( 'limits.images_inspected', 3 );
+		$observed = MSRWA_Engine_Call::observe_images( $route['provider'], $route['model'], $package, $limit );
+		$usage['input_tokens'] = (int) ( $usage['input_tokens'] ?? 0 ) + (int) ( $observed['usage']['input_tokens'] ?? 0 );
+		$usage['output_tokens'] = (int) ( $usage['output_tokens'] ?? 0 ) + (int) ( $observed['usage']['output_tokens'] ?? 0 );
+		$count = count( (array) ( $observed['package']['visual_observations'] ?? array() ) );
+		$result->event( 'observe', 'research', sprintf( '%d of %d cited photographs read from their bytes.', $count, min( $limit, count( (array) ( $package['visual_references'] ?? array() ) ) ) ) );
+		return $observed['package'];
+	}
+
+	/**
+	 * What the editor's own images show, read from their bytes.
+	 *
+	 * An editor who attaches photographs is saying something about the dish that
+	 * the title does not. Research is told what is in them rather than that they
+	 * exist. Recorded on the run so a retry does not pay for the same look twice.
+	 */
+	private static function observe_editor_images( array $images, MSRWA_Engine_Config $config, MSRWA_Result $result ) {
+		if ( isset( $result->artifacts['editor_observations'] ) ) { return (array) $result->artifacts['editor_observations']; }
+		$route = $config->model_for( 'vision' );
+		$observed = array();
+		foreach ( array_slice( $images, 0, (int) $config->get( 'limits.images_inspected', 3 ) ) as $candidate ) {
+			$url = is_array( $candidate ) ? (string) ( $candidate['image_url'] ?? '' ) : (string) $candidate;
+			$image = MSRWA_Engine_Call::fetch_image( $url );
+			if ( isset( $image['error'] ) ) { $observed[] = array( 'image_url' => $url, 'uncertainties' => $image['error'] ); continue; }
+			$vision = MSRWA_Engine_Call::vision( $route['provider'], $route['model'], $image, 'Image fournie par l’éditeur' );
+			$decoded = MSRWA_Json::decode( (string) ( $vision['text'] ?? '' ) );
+			$observed[] = is_array( $decoded ) ? array_merge( array( 'image_url' => $url ), $decoded ) : array( 'image_url' => $url, 'uncertainties' => 'Analyse visuelle non structurée.' );
+		}
+		$result->event( 'observe', 'research', count( $observed ) . ' editor-supplied image(s) read before searching.' );
+		$result->artifact( 'editor_observations', $observed );
+		return $observed;
 	}
 
 	/**

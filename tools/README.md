@@ -1,79 +1,88 @@
-# Prompt and image lab
+# The lab
 
-The lab tests the maintained research-centred pipeline against real providers,
-without WordPress or a database:
+The lab runs the engine against real providers, without WordPress and without a
+database. It is the same engine the plugin runs, so a prompt proven here cannot
+drift from the one that ships.
 
 ```text
 editor brief (title, article or images)
-  -> sourced research package (text facts + observations from real images)
+  -> sourced research package (text facts + observations read from real images)
   -> canonical recipe
-  -> article in one call
-  -> featured image / Facebook process collage
-  -> review / fact-check / proofreading
+  -> article, featured image and Facebook collage, together
+  -> review and fact check, together
+  -> factual corrections applied in code
+  -> language correction
+  -> final approval over the article and both images at once
 ```
 
-Every downstream stage receives the same research package. Visual references
-must identify both the direct real-image URL and its source page; observations
-may describe only visible appearance and must not infer hidden ingredients,
-quantities or method.
+Every later step receives the same research package. Visual references must
+give both the direct real-image URL and its source page; observations may
+describe only visible appearance, never hidden ingredients, quantities or
+method.
 
-During a live research run, the lab downloads up to three cited public HTTPS
-images into memory, sends their bytes through a bounded vision pass, saves only
-the resulting observations and provenance, and discards the bytes. Search-text
-guesses are replaced rather than trusted.
+During a live research run the engine downloads up to three cited public HTTPS
+images into memory, sends their bytes through a bounded vision pass, keeps only
+the observations and the provenance, and discards the bytes. Search-text guesses
+about how a dish looks are replaced rather than trusted.
 
 ## Files
 
-- `prompt-lab.php`: all text stages and scorecards.
-- `image-lab.php`: featured and Facebook image generation.
-- `lib/steps.php`: input contracts and deterministic scoring.
-- `lib/providers.php`: provider transports, including image generation.
-- `lib/pricing.php`: comparison tiers and estimated API cost.
-- `prompts/`: exactly one maintained prompt per stage.
-- `fixtures/`: two different cuisines for offline and API comparisons.
+- `lab.php`: the only command. Everything else is the engine.
+- `report.php` and `report.css`: the human HTML report, rendered from one run.
+- `lib/steps.php`: reading fixtures and saved runs off disk — the lab's own job.
+- `lib/providers.php`, `lib/pricing.php`: what the format experiment still calls.
+- `fixtures/`: briefs across different cuisines, for offline and live comparison.
+- `experiments/`: measurements whose question is answered, kept so the answer
+  can be re-measured rather than re-argued.
+- `runs/`: generated runs and images. Ignored by Git.
 
-Generated runs belong in `tools/runs/`, which is ignored by Git.
+The prompts live with the engine, in `includes/engine/prompts/`. They are its
+data: it executes them, it carries them.
 
 ## Workflow
 
-Never put an API key in a command, fixture, run file or chat.
+Never put an API key in a command, a fixture, a run file or a chat.
 
 ```bash
 export OPENAI_API_KEY=sk-...
 
-php tools/prompt-lab.php list
-php tools/prompt-lab.php run research --brief=tarte-pommes
-php tools/prompt-lab.php run canonical_recipe \
-  --brief=tarte-pommes --research=tools/runs/research-maintained-openai-x-....json
-php tools/prompt-lab.php run article \
-  --brief=tarte-pommes --research=tools/runs/research-maintained-openai-x-....json \
-  --canonical=tools/runs/canonical_recipe-maintained-openai-x-....json
-php tools/prompt-lab.php run review \
-  --brief=tarte-pommes --research=tools/runs/research-maintained-openai-x-....json \
-  --canonical=tools/runs/canonical_recipe-maintained-openai-x-....json \
-  --article=tools/runs/article-maintained-openai-x-....json
+# One recipe, every step, with the report at the end.
+php tools/lab.php run --brief=tarte-pommes --report=/tmp/tarte.html
+
+# Part of a recipe, when only one wave is in question.
+php tools/lab.php run --brief=tarte-pommes --only=research,canonical_recipe
+
+# One step, against artifacts an earlier run produced.
+php tools/lab.php step research --brief=tarte-pommes
+php tools/lab.php step article --brief=tarte-pommes \
+  --research=tools/runs/tarte-pommes-research-....json \
+  --canonical=tools/runs/tarte-pommes-canonical_recipe-....json
+
+# Is the judge judging, or guessing? Five verdicts over identical artifacts.
+php tools/lab.php judge --brief=tarte-pommes --draws=5 \
+  --article=tools/runs/....json --featured=tools/runs/....webp --facebook=tools/runs/....webp
+
+# The report on its own, from any saved run.
+php tools/lab.php report --run=tools/runs/tarte-pommes-....json --output=/tmp/tarte.html
+
+# Housekeeping.
+php tools/lab.php prompts          # compile the templates into the shipped defaults
+php tools/lab.php prune --dry-run  # apply the retention policy to tools/runs
 ```
 
-The same `--research` package is required for canonical recipe, article,
-review, fact-check, proofreading and both image commands. If omitted, the lab
-uses the package embedded in the selected fixture, which is suitable for
-contract testing but not evidence of live web quality.
+Flags common to every command: `--provider`, `--tier`, `--model` (one route for
+the whole pipeline, so the comparison is provider against provider),
+`--image-model`, `--budget`, `--attempts`, `--quality`, `--max-output`.
 
-```bash
-php tools/image-lab.php featured --brief=tarte-pommes --research=tools/runs/research-maintained-openai-x-....json
-php tools/image-lab.php facebook --brief=tarte-pommes --research=tools/runs/research-maintained-openai-x-....json \
-  --canonical=tools/runs/canonical_recipe-maintained-openai-x-....json
-```
-
-Maintained prompts are used by default. Add `--shipped=1` to `show` or `run`
-to compare the plugin's current configured default. A temporary experiment may
-use `--variant=name` and `includes/engine/prompts/<step>.name.txt`; delete it after the
-comparison so the directory remains an inventory of active contracts.
+`--research` and the other artifact flags name a saved run; omit them and the
+package embedded in the fixture is used, which is fine for contract testing but
+is not evidence of live web quality.
 
 ## Acceptance rule
 
-A prompt is ready only after it passes on genuinely different briefs,
-including title-led, article-led and image-led input. The maintained fixture
-set also includes pastry, poultry, long-braised beef and a vegetable gratin. Check
-the saved output manually as well as the scorecard, especially source quality,
-real-image provenance, culinary safety, unsupported claims and visual copying.
+A prompt is ready only after it passes on genuinely different briefs, including
+title-led, article-led and image-led input. The fixture set covers pastry,
+poultry, long-braised beef and a vegetable gratin. Read the saved output
+yourself as well as the scorecard — source quality, real-image provenance,
+culinary safety, unsupported claims and visual copying are not things a
+scorecard settles.

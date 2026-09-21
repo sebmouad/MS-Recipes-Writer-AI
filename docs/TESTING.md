@@ -9,10 +9,11 @@ Three layers. Each answers a different question, and all three gate a task.
 | **Real** `tests/real/` | does it work on a real site, for real money? | before ticking a task | WordPress + app password |
 
 ```bash
-php tools/prompt-lab.php run research  # create the shared evidence package first
-php tests/run.php                      # offline: lint + every offline test
-php tests/run.php lists                # filter by filename fragment
-php tests/real/run.php                 # real: preflight, then run what it can
+php tools/lab.php step research  # create the shared evidence package first
+php tools/lab.php run --brief=…  # or the whole pipeline, with its report
+php tests/run.php                # offline: lint + every offline test
+php tests/run.php lists          # filter by filename fragment
+php tests/real/run.php           # real: preflight, then run what it can
 ```
 
 The prompt lab needs no WordPress and no database. It starts from a title-,
@@ -40,7 +41,7 @@ in the shell profile or the site's `wp-config.php`.
 | `MSRWA_GEMINI_KEY` | Google Gemini key | only if Gemini is in the routing |
 | `MSRWA_CLAUDE_KEY` | Anthropic key | only if Claude is in the routing |
 | `MSRWA_TEST_BUDGET_USD` | Maximum a single real run may spend, for example `2.00` | every real test that calls a provider |
-| `OPENAI_API_KEY` | OpenAI key used by the prompt lab only | `tools/prompt-lab.php` |
+| `OPENAI_API_KEY` | OpenAI key used by the lab only | `tools/lab.php` |
 
 A real test that would exceed `MSRWA_TEST_BUDGET_USD` refuses to start. Each
 run prints what it spent.

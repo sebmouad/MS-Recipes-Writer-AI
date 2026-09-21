@@ -1,11 +1,5 @@
 <?php
-/**
- * Delegates to the engine. The rates moved into includes/engine so the plugin
- * and the lab price a call the same way; these wrappers keep the lab's older
- * entry points working while their callers are migrated.
- */
-function lab_rates() { return MSRWA_Engine_Rates::all(); }
-function lab_tiers() { return MSRWA_Engine_Rates::tiers(); }
+/** The rates live in includes/engine so the plugin and the lab price a call the same way. */
 function lab_price( $provider, $model, $usage ) { return MSRWA_Engine_Rates::price( $provider, $model, $usage ); }
 function lab_model( $provider, $tier ) {
 	$model = MSRWA_Engine_Rates::model( $provider, $tier );

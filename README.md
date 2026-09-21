@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.72` est un socle installable : file persistante, pipeline de
+La version `0.2.73` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.
@@ -20,6 +20,45 @@ Le plugin est en cours de refonte éditoriale et budgétaire :
 Les coûts affichés sont des estimations calculées avec le catalogue configuré,
 non une facture fournisseur. `completed` signifie que le traitement est terminé,
 jamais qu’un texte est validé éditorialement.
+
+## Version 0.2.73
+
+**Huit outils deviennent un.** `tools/lab.php` est la seule commande ; le reste
+est le moteur.
+
+| Avant | Maintenant |
+|---|---|
+| `prompt-lab.php` | `lab.php step <étape>` |
+| `image-lab.php` | `lab.php step featured_image\|facebook_image` |
+| `approval-lab.php` | `lab.php step final_approval` |
+| `judge-stability.php` | `lab.php judge --draws=5` |
+| `build-standalone-report.php` | `lab.php report` |
+| `promote-prompts.php` | `lab.php prompts` |
+| `prune-runs.php` | `lab.php prune` |
+| `format-cost.php` | `tools/experiments/` — sa question est tranchée |
+| — | `lab.php run` : la recette entière, en un appel |
+
+**Le rapport HTML lit une exécution, plus treize fichiers.** Il fallait nommer
+treize chemins sur la ligne de commande, ce qui permettait d'assembler un
+rapport à partir de passages n'ayant jamais appartenu à la même recette. Il part
+désormais d'un `MSRWA_Result` et de rien d'autre.
+
+Ce qu'il montre en plus : le coût par poste de budget, le nombre d'essais par
+étape, chaque vérification avec ce qu'elle a mesuré, les corrections réellement
+appliquées au texte, et le déroulé de l'exécution — vagues, reprises,
+avertissements, échecs. La décision d'approbation passe en bandeau au-dessus des
+quatre verdicts : elle est leur somme, pas leur égale.
+
+**Deux trous du moteur, trouvés en retirant les outils.** L'analyse des
+photographies citées et celle des images fournies par l'éditeur ne vivaient que
+dans `prompt-lab.php`. Une exécution déclenchée par le plugin aurait rendu une
+recherche sans aucune observation visuelle — et tous les prompts suivants
+s'appuient dessus. Les deux passes sont dans le moteur, facturées à l'étape de
+recherche, à laquelle elles appartiennent.
+
+`tools/lib/` passe de 157 à 133 lignes et ne fait plus qu'une chose : lire une
+fiche d'essai ou un passage sauvegardé sur le disque. Le registre d'étapes que
+le laboratoire tenait en double a disparu ; il n'y en a qu'un, celui du moteur.
 
 ## Version 0.2.72
 

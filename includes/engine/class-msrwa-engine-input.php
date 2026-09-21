@@ -44,10 +44,13 @@ final class MSRWA_Engine_Input {
 			return $editor;
 		}
 		return array(
-			'type' => 'article',
+			'type' => (string) ( $brief['type'] ?? 'article' ),
 			'title' => (string) ( $brief['title'] ?? '' ),
 			'text' => (string) ( $brief['text'] ?? '' ),
 			'images' => array_values( (array) ( $brief['images'] ?? array() ) ),
+			// What those images show, when they have been read. An editor who
+			// attaches photographs says something the title does not.
+			'image_observations' => array_values( (array) ( $brief['image_observations'] ?? array() ) ),
 		);
 	}
 

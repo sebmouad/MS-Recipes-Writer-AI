@@ -1,11 +1,11 @@
 # Lab results
 
-Every row is one real API call made by `tools/prompt-lab.php`, scored by the
+Every row is one real API call made by the lab, scored by the
 plugin's own quality gate. Raw answers stay out of git (`tools/runs/` is
 ignored, 4 MB and regenerable); this table is the record. Regenerate a row with:
 
 ```bash
-php tools/prompt-lab.php run <step> --variant=tpl --provider=<openai|gemini|claude> --tier=<low|medium|high>
+php tools/lab.php step <step> --brief=<fixture> --provider=<openai|gemini|claude> --tier=<low|medium|high>
 ```
 
 Measured 2026-09-20. Prices from `tools/lib/pricing.php`, verified the same day.
@@ -14,7 +14,7 @@ Measured 2026-09-20. Prices from `tools/lib/pricing.php`, verified the same day.
 
 `gpt-image-2.5-flare`, tarte normande, featured image 1024×1024 and collage
 1024×1536. Every row is one real generation; every verdict comes from
-`tools/approval-lab.php` judging that image against the same article and recipe.
+the approval step judging that image against the same article and recipe.
 
 ### What a tier costs
 

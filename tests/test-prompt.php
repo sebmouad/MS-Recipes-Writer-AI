@@ -35,14 +35,16 @@ $unknown = MSRWA_Prompt::compile( 'Keep {{words_total}} and drop {{not_a_variabl
 msrwa_test_missing( $unknown, '{{', 'No placeholder may survive compilation.' );
 msrwa_test_missing( $unknown, 'not_a_variable', 'An unknown variable must not leak into the prompt.' );
 
-// The standalone lab keeps one research-centred contract per active stage.
+// There is one registry of steps, and it is the engine's. The lab used to keep
+// its own beside it, which is two places for the pipeline to be described.
 require_once dirname( __DIR__ ) . '/tools/lib/steps.php';
-$lab_steps = lab_steps();
-msrwa_test_assert( array( 'research', 'canonical_recipe', 'article', 'review', 'fact_check', 'proofread' ) === array_keys( $lab_steps ), 'The lab must expose only the active text pipeline.' );
+$engine_steps = array_keys( MSRWA_Engine_Steps::all() );
+msrwa_test_assert( array( 'research', 'canonical_recipe', 'article', 'featured_image', 'facebook_image', 'review', 'fact_check', 'corrections', 'proofread', 'final_approval' ) === $engine_steps, 'The engine must expose the whole pipeline, in order; got ' . implode( ', ', $engine_steps ) );
 $lab_prompts = glob( dirname( __DIR__ ) . '/includes/engine/prompts/*.txt' );
-msrwa_test_assert( 9 === count( $lab_prompts ), 'The lab must keep one maintained prompt for six text stages, two image stages and the final approval.' );
+msrwa_test_assert( 9 === count( $lab_prompts ), 'One maintained prompt per step that calls a model: six text stages, two image stages and the final approval.' );
 $brief = lab_brief( 'tarte-pommes' );
-$article_input = lab_build_input( 'article', lab_prompt( 'article' ), $brief, array() );
+$article_template = MSRWA_Prompt::compile( trim( file_get_contents( MSRWA_Engine_Input::prompt_path( 'article.tpl.txt' ) ) ), lab_settings() );
+$article_input = lab_build_input( 'article', $article_template, $brief, array() );
 msrwa_test_contains( $article_input, 'RESEARCH PACKAGE:', 'The article lab input must carry the shared research package.' );
 msrwa_test_contains( $article_input, 'observed in photographs of it', 'Real-image observations must reach the article, distilled rather than raw.' );
 $facebook_template = file_get_contents( dirname( __DIR__ ) . '/includes/engine/prompts/facebook_image.tpl.txt' );
