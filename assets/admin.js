@@ -238,12 +238,23 @@
   });
 
   table.addEventListener('click', function (event) {
-    var button = event.target.closest('.msrwa-lab-cancel');
-    if (!button) return;
-    button.disabled = true;
-    call('/lab/runs/' + button.dataset.run + '/cancel', { method: 'POST' })
-      .then(refresh)
-      .catch(function (error) { button.textContent = error.message; });
+    var cancel = event.target.closest('.msrwa-lab-cancel');
+    if (cancel) {
+      cancel.disabled = true;
+      call('/lab/runs/' + cancel.dataset.run + '/cancel', { method: 'POST' })
+        .then(refresh)
+        .catch(function (error) { cancel.textContent = error.message; });
+      return;
+    }
+
+    var remove = event.target.closest('.msrwa-lab-delete');
+    if (!remove) return;
+    // A run cost real money to produce and cannot be regenerated for free.
+    if (!window.confirm('Supprimer le run #' + remove.dataset.run + ' et tout ce que le moteur en a rapporté ?')) return;
+    remove.disabled = true;
+    call('/lab/runs/' + remove.dataset.run, { method: 'DELETE' })
+      .then(function () { window.location.reload(); })
+      .catch(function (error) { remove.textContent = error.message; remove.disabled = false; });
   });
 
   function refresh() {

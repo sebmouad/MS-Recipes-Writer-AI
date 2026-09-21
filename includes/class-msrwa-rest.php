@@ -20,6 +20,7 @@ final class MSRWA_REST {
 			array( 'methods' => 'GET', 'permission_callback' => array( __CLASS__, 'can_manage' ), 'callback' => array( __CLASS__, 'lab_runs' ) ),
 			array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_manage' ), 'callback' => array( __CLASS__, 'lab_start' ) ),
 		) );
+		register_rest_route( 'msrwa/v1', '/lab/runs/(?P<id>\d+)', array( 'methods' => 'DELETE', 'permission_callback' => array( __CLASS__, 'can_manage' ), 'callback' => array( __CLASS__, 'lab_delete' ) ) );
 		register_rest_route( 'msrwa/v1', '/lab/runs/(?P<id>\d+)/cancel', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_manage' ), 'callback' => array( __CLASS__, 'lab_cancel' ) ) );
 		register_rest_route( 'msrwa/v1', '/stats', array( 'methods' => 'GET', 'permission_callback' => array( __CLASS__, 'can_read' ), 'callback' => array( __CLASS__, 'stats' ) ) );
 		register_rest_route( 'msrwa/v1', '/events', array( 'methods' => 'GET', 'permission_callback' => array( __CLASS__, 'can_read' ), 'callback' => array( __CLASS__, 'events' ) ) );
@@ -324,6 +325,14 @@ final class MSRWA_REST {
 		$id = MSRWA_Lab::create( $brief, array( 'limits' => array( 'budget_usd' => $budget ) ) );
 		if ( ! $id ) { return new WP_Error( 'msrwa_lab_not_created', 'Le run n’a pas pu être enregistré.', array( 'status' => 500 ) ); }
 		return rest_ensure_response( array( 'id' => $id ) );
+	}
+
+	/** Removes a run and everything the engine reported about it. */
+	public static function lab_delete( $request ) {
+		$run = MSRWA_Lab::get( absint( $request['id'] ) );
+		if ( ! $run || ! MSRWA_Lab::may_see( $run ) ) { return new WP_Error( 'msrwa_lab_not_found', 'Run introuvable.', array( 'status' => 404 ) ); }
+		if ( in_array( $run['status'], array( 'queued', 'running' ), true ) ) { return new WP_Error( 'msrwa_lab_running', 'Arrêtez le run avant de le supprimer.', array( 'status' => 409 ) ); }
+		return rest_ensure_response( array( 'deleted' => MSRWA_Lab::delete( (int) $run['id'] ) ) );
 	}
 
 	public static function lab_cancel( $request ) {

@@ -195,13 +195,45 @@ a result set. REST callbacks re-check ownership row by row.
 - **Statistiques** (`stats_page()`) — cost, activity, article quality, exports.
 - **Configuration** (`settings_page()`) — modes, budgets, prompts, catalogue,
   queue health, history.
+- **Laboratoire** (`MSRWA_Lab_Screen::page()`) — start a whole engine run on one
+  brief and watch it. Administrators only: a run spends real money.
+- **Détail du run** (`detail()`) — every figure the engine reported about one
+  run: steps with their unmet checks, calls with model, endpoint, cache share
+  and price, the verdict and its findings, artifacts, timeline.
+- **Mesures** (`measures()`) — the same data across runs: cost per step, spend
+  per model, which named check fails and how often, how often the judge approves.
+- **Moteur** (`MSRWA_Lab_Config::page()`) — every engine parameter. Only the
+  difference from the engine's defaults is stored.
 
 ## REST
 
 Namespace `msrwa/v1`, all authenticated through WordPress cookies and nonce:
 `POST /batches`, `GET /batches/{id}`, `POST /batches/{id}/{pause|resume|cancel}`,
 `POST /jobs/{id}/{retry|cancel|association}`, `GET /stats`, `GET /events`,
-`GET /export`, `GET /catalog`, `POST /catalog/sync`, `POST /test/{provider}`.
+`GET /export`, `GET /catalog`, `POST /catalog/sync`, `POST /test/{provider}`,
+`GET|POST /lab/runs`, `DELETE /lab/runs/{id}`, `POST /lab/runs/{id}/cancel`.
+
+## The laboratory
+
+A whole engine run takes some four and a half minutes, which no PHP request
+survives. So the run is cut where the engine already cuts it — at the dependency
+wave. One `msrwa_lab_step` cron tick claims the run with a lease, runs the waves
+that are ready, writes down everything they produced and schedules the next
+tick. Nothing is held between ticks: a request the host kills costs at most the
+wave it was in, `MSRWA_Lab::recover_expired()` puts the run back in the queue,
+and it resumes from the last step that finished.
+
+What the engine reports is stored as rows, not as one blob: `lab_steps` (figures
+and scorecard per step), `lab_calls` (model, endpoint, tokens, cache share,
+price), `lab_events` (the timeline) and `lab_artifacts` (what was produced, one
+row per name, replaced when a step produces it again). `MSRWA_Lab::state()`
+assembles them back into the shape the engine returns, which is what the next
+tick reads and what the HTML report renders — so the rows are the record and
+nothing is kept twice.
+
+Keys reach the engine under `settings.keys.<provider>`, the one branch of the
+engine's configuration that never enters a stored record. WordPress keeps them
+encrypted in its settings table and has no environment to export them into.
 
 ## Invariants
 
@@ -212,7 +244,12 @@ Break these and the plugin misreports itself:
 3. `MSRWA_Presentation::state()` is the only public state vocabulary.
 4. Stage lists come from `MSRWA_Recipe::stages()`.
 5. List queries are scoped by capability before they run.
-6. Nothing writes a provider key, a private path or binary data into
+6. A lab run's cost is `NULL` when the model carries no published rate, never
+   zero, and the totals count those steps separately. A run whose spend cannot
+   be verified is not a run that was free.
+7. Every top-level engine configuration group is reachable from the Moteur
+   screen. `tests/test-lab-config.php` fails when one is not.
+8. Nothing writes a provider key, a private path or binary data into
    artifacts, snapshots, events or calls.
-7. A worker never resumes a paused, cancelled or awaiting-decision job.
-8. Costs displayed are estimates from the captured catalogue, never an invoice.
+9. A worker never resumes a paused, cancelled or awaiting-decision job.
+10. Costs displayed are estimates from the captured catalogue, never an invoice.

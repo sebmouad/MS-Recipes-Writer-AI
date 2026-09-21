@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.88` est un socle installable : file persistante, pipeline de
+La version `0.2.89` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.
@@ -22,6 +22,19 @@ Le plugin est en cours de refonte éditoriale et budgétaire :
 Les coûts affichés sont des estimations calculées avec le catalogue configuré,
 non une facture fournisseur. `completed` signifie que le traitement est terminé,
 jamais qu’un texte est validé éditorialement.
+
+## Version 0.2.89
+
+**Supprimer un run, et la documentation du laboratoire.** `MSRWA_Lab::delete()`
+existait sans que rien ne puisse l'appeler ; il a maintenant sa route, son
+bouton et sa confirmation — un run a coûté de l'argent réel et ne se régénère
+pas gratuitement. Un run en cours doit être arrêté avant d'être supprimé.
+
+`docs/ARCHITECTURE.md` décrit le laboratoire : le découpage en vagues qui
+contourne le délai d'exécution PHP, les quatre tables, la reprise après un bail
+expiré, et le chemin des clés. Deux invariants s'ajoutent : un coût inconnu
+reste `NULL` et jamais zéro, et tout groupe de configuration du moteur doit
+rester atteignable depuis l'écran Moteur — la suite le vérifie.
 
 ## Version 0.2.88
 

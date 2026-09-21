@@ -98,6 +98,8 @@ final class MSRWA_Lab_Screen {
 								<a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=ms-recipes-writer-ai-lab-report&run_id=' . (int) $run['id'] ) ); ?>" target="_blank">Rapport</a>
 								<?php if ( in_array( $run['status'], array( 'queued', 'running' ), true ) ) : ?>
 									<button class="button msrwa-lab-cancel" data-run="<?php echo esc_attr( $run['id'] ); ?>">Arrêter</button>
+								<?php else : ?>
+									<button class="button msrwa-lab-delete" data-run="<?php echo esc_attr( $run['id'] ); ?>">Supprimer</button>
 								<?php endif; ?>
 							</td>
 						</tr>
