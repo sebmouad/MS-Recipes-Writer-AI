@@ -26,7 +26,7 @@ final class MSRWA_Batch {
 	 * once, here, and its result is stored. Correcting a pairing afterwards is
 	 * free because nothing is described twice.
 	 */
-	public static function create( array $recipes, array $images, $budget_per_recipe, array $config_overrides = array() ) {
+	public static function create( array $recipes, array $images, $budget_per_recipe, $profile = MSRWA_Profile::FULL, $language = 'fr', array $config_overrides = array() ) {
 		global $wpdb;
 		if ( ! $recipes ) { return new WP_Error( 'msrwa_no_recipes', 'Aucune recette dans ce qui a été fourni.' ); }
 		$budget = round( (float) $budget_per_recipe, 4 );
@@ -37,7 +37,10 @@ final class MSRWA_Batch {
 			'owner_id' => get_current_user_id(),
 			'label' => mb_substr( (string) $recipes[0]['title'], 0, 190 ) . ( count( $recipes ) > 1 ? sprintf( ' et %d autres', count( $recipes ) - 1 ) : '' ),
 			'status' => 'matching', 'recipes' => count( $recipes ), 'images' => count( $images ),
-			'budget_usd' => $budget, 'config_json' => wp_json_encode( $config_overrides ),
+			'budget_usd' => $budget,
+			'profile' => MSRWA_Profile::exists( $profile ) ? $profile : MSRWA_Profile::FULL,
+			'language' => MSRWA_Profile::language_exists( $language ) ? $language : 'fr',
+			'config_json' => wp_json_encode( $config_overrides ),
 			'matching_json' => wp_json_encode( array( 'recipes' => $recipes, 'images' => $images, 'pairs' => array() ) ),
 			'created_at' => $now, 'updated_at' => $now,
 		) );
@@ -125,7 +128,7 @@ final class MSRWA_Batch {
 					$images[] = $matching['images'][ $pair['image'] ];
 				}
 			}
-			if ( MSRWA_Run::create( (int) $id, (int) $batch['owner_id'], MSRWA_Match::brief( $recipe, $images ), $config ) ) { $started++; }
+			if ( MSRWA_Run::create( (int) $id, (int) $batch['owner_id'], MSRWA_Match::brief( $recipe, $images ), $config, MSRWA_Profile::steps( $batch['profile'], (array) ( $config['steps'] ?? array() ) ) ) ) { $started++; }
 		}
 
 		$wpdb->update( self::table(), array( 'status' => $started ? 'running' : 'failed', 'updated_at' => current_time( 'mysql', true ) ), array( 'id' => absint( $id ) ) );
@@ -150,7 +153,12 @@ final class MSRWA_Batch {
 		$batch = self::get( $id );
 		$overrides = $batch ? (array) json_decode( (string) $batch['config_json'], true ) : array();
 		$config = self::merge( MSRWA_Engine_Settings::stored(), $overrides );
-		if ( $batch ) { $config['limits']['budget_usd'] = (float) $batch['budget_usd']; }
+		if ( $batch ) {
+			// What this batch asked to produce, and in which language, expressed
+			// as the engine's own configuration rather than as a special case.
+			$config = self::merge( $config, MSRWA_Profile::config( $batch['profile'], $batch['language'], (array) ( $config['steps'] ?? array() ) ) );
+			$config['limits']['budget_usd'] = (float) $batch['budget_usd'];
+		}
 		$keys = MSRWA_Settings::engine_keys();
 		if ( $keys ) { $config['settings'] = array_merge( (array) ( $config['settings'] ?? array() ), array( 'keys' => $keys ) ); }
 		return $config;

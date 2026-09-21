@@ -5,7 +5,7 @@ final class MSRWA_Plugin {
 
 	public static function activate() {
 		MSRWA_DB::install();
-		self::caps();
+		MSRWA_Rights::grant();
 		if ( ! wp_next_scheduled( 'msrwa_cleanup' ) ) { wp_schedule_event( time() + HOUR_IN_SECONDS, 'hourly', 'msrwa_cleanup' ); }
 	}
 

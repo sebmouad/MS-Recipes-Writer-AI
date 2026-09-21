@@ -25,7 +25,7 @@ final class MSRWA_Run {
 		return $t['runs'];
 	}
 
-	public static function create( $batch_id, $owner_id, array $brief, array $config ) {
+	public static function create( $batch_id, $owner_id, array $brief, array $config, array $steps = array() ) {
 		global $wpdb;
 		$now = current_time( 'mysql', true );
 		$wpdb->insert( self::table(), array(
@@ -34,7 +34,7 @@ final class MSRWA_Run {
 			'brief_json' => wp_json_encode( $brief ),
 			'result_json' => wp_json_encode( array( 'ok' => true, 'errors' => array() ) ),
 			'status' => 'queued', 'step' => '', 'steps_done' => 0,
-			'steps_total' => count( MSRWA_Engine_Steps::names( (array) ( $config['steps'] ?? array() ) ) ),
+			'steps_total' => count( $steps ? $steps : MSRWA_Engine_Steps::names( (array) ( $config['steps'] ?? array() ) ) ),
 			'cost_usd' => 0, 'seconds' => 0, 'workspace' => '',
 			'created_at' => $now, 'updated_at' => $now,
 		) );
@@ -120,7 +120,12 @@ final class MSRWA_Run {
 
 		$done = array();
 		foreach ( (array) $state['steps'] as $step ) { $done[] = (string) $step['step']; }
-		$remaining = array_values( array_diff( MSRWA_Engine_Steps::names( $registry ), $done ) );
+
+		// The batch's profile decides which steps this run has: an article-only
+		// batch must not sit waiting for an image it never asked anyone to draw.
+		$batch = MSRWA_Batch::get( (int) $run['batch_id'] );
+		$wanted = MSRWA_Profile::steps( $batch ? $batch['profile'] : MSRWA_Profile::FULL, $registry );
+		$remaining = array_values( array_diff( $wanted, $done ) );
 		if ( ! $remaining ) { self::complete( $id, $state ); return; }
 
 		$wave = MSRWA_Engine_Steps::ready( $artifacts, $remaining, $registry );

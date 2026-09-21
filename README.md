@@ -2,6 +2,44 @@
 
 Plugin WordPress en construction pour la génération éditoriale culinaire orchestrée.
 
+## Version 0.4.0
+
+**Les fondations de la montée en gamme : droits, profils de sortie, langues.**
+Trois pièces, chacune décidée à un seul endroit, avant la refonte de l'interface
+qui s'appuiera dessus.
+
+**Les droits.** Trois capacités — `msrwa_create` pour soumettre et voir son
+propre travail, `msrwa_view_all` pour voir celui de tout le monde,
+`msrwa_manage` pour les réglages, le moteur, la suppression et le registre
+complet. Chaque écran, chaque route et chaque requête interroge `MSRWA_Rights`
+au lieu de tester une capacité sur place : c'est ainsi qu'une liste finit filtrée
+sur un écran et pas sur le suivant. `scope_sql()` rend la clause de propriété
+plutôt que de laisser l'appelant l'appliquer — une requête qui l'oublie n'a plus
+de `WHERE` du tout et se voit.
+
+**Les profils de sortie.** Article seul, article et image à la une, ou la chaîne
+complète avec le collage. Tout passe par la couche de configuration appelante du
+moteur : la liste des étapes à exécuter, et le retrait des dépendances devenues
+sans objet. Rien dans `includes/engine/` ne sait que ces choix existent.
+
+Le jugement final ne s'exécute que dans le profil complet, et ce n'est pas une
+économie : le moteur lui réclame les deux images par leur nom, et confronter le
+texte à une seule image — ou à aucune — n'a pas de sens. Les contrôles de texte,
+eux, tournent dans les trois profils. Un test rejoue l'ordonnanceur du moteur sur
+chaque profil et vérifie qu'aucun ne se bloque en attendant un artefact que
+personne n'a demandé.
+
+**Les langues.** Deux choses distinctes, et il ne faut pas les confondre : la
+langue de l'interface, que WordPress connaît déjà, et la langue de l'article,
+choisie par lot et transmise au moteur — un rédacteur francophone peut très bien
+commander un article en arabe. Trois de chaque : français, anglais, arabe.
+
+Il n'y a ni chaîne gettext sur cette machine ni étape de compilation dans ce
+dépôt, donc `tools/i18n.php` fait les deux : il extrait les chaînes vers un
+`.pot` et écrit les `.mo` au format GNU. Un test relit un catalogue octet par
+octet plutôt que de faire confiance à l'écrivain — une table mal triée et
+gettext ne trouve plus rien.
+
 ## Version 0.3.4
 
 **Un test refuse désormais qu'un appel statique ne mène nulle part.** Il existe à
@@ -77,7 +115,7 @@ cron réel et validité distante des clés restent à vérifier sur un site de t
 
 ## État actuel
 
-La version `0.3.4` est un socle installable : file persistante, pipeline de
+La version `0.4.0` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.

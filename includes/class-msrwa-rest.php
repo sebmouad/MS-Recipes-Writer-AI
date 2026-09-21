@@ -43,7 +43,11 @@ final class MSRWA_REST {
 		$images = MSRWA_Intake::images( $ids );
 
 		$budget = current_user_can( 'manage_options' ) ? (float) $request->get_param( 'budget' ) : (float) ( MSRWA_Settings::get()['per_recipe_budget_usd'] ?? 0.20 );
-		$id = MSRWA_Batch::create( $recipes, $images, $budget );
+		$id = MSRWA_Batch::create(
+			$recipes, $images, (float) $request->get_param( 'budget' ),
+			sanitize_key( (string) $request->get_param( 'profile' ) ),
+			sanitize_key( (string) $request->get_param( 'language' ) )
+		);
 		if ( is_wp_error( $id ) ) { return $id; }
 		return rest_ensure_response( array( 'id' => (int) $id, 'recipes' => count( $recipes ), 'images' => count( $images ) ) );
 	}
