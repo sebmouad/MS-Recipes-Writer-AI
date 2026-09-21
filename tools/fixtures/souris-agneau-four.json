@@ -1,0 +1,402 @@
+{
+  "title": "Souris d’agneau au four à chaleur tournante, oignons grelots et ail confit",
+  "text": "Rédiger une recette de souris d’agneau cuites au four à chaleur tournante, accompagnées d’oignons grelots et d’ail confit. Insister sur le temps et la température de cuisson au four, la façon de savoir quand la viande se détache de l’os, le choix de saisir ou non avant l’enfournement, la quantité de liquide dans le plat, l’intérêt de couvrir puis découvrir, et la conservation ou le réchauffage.",
+  "editor_input": {
+    "type": "title",
+    "title": "Souris d’agneau au four à chaleur tournante, oignons grelots et ail confit",
+    "text": "Rédiger une recette de souris d’agneau cuites au four à chaleur tournante, accompagnées d’oignons grelots et d’ail confit. Insister sur le temps et la température de cuisson au four, la façon de savoir quand la viande se détache de l’os, le choix de saisir ou non avant l’enfournement, la quantité de liquide dans le plat, l’intérêt de couvrir puis découvrir, et la conservation ou le réchauffage.",
+    "images": []
+  },
+  "research": {
+    "dish_identity": {
+      "name": "Souris d’agneau braisées au four, avec oignons grelots et ail confit",
+      "confidence": "élevée",
+      "evidence": "Le titre du brief identifie directement des souris d’agneau cuites au four avec oignons grelots et ail confit ; les sources culinaires consultées confirment une préparation de souris ou de jarrets d’agneau braisés longuement, généralement avec saisie, liquide de cuisson et cuisson couverte."
+    },
+    "ingredient_facts": [
+      {
+        "source_url": "https://www.greatbritishchefs.com/how-to-cook/how-to-cook-lamb-shanks",
+        "text": "Pour 4 souris d’agneau, une base documentée comprend 250 ml de vin rouge et 750 ml de bouillon de volaille ou d’agneau."
+      },
+      {
+        "source_url": "https://www.greatbritishchefs.com/recipes/french-onion-lamb-shanks-recipe",
+        "text": "Pour 6 souris d’agneau, une autre formule utilise 1,5 l de bouillon et 250 ml de vin blanc."
+      },
+      {
+        "source_url": "https://www.greatbritishchefs.com/recipes/lamb-shanks-recipe-tomato-rosemary",
+        "text": "Une version plus abondante en sauce emploie 2 l de bouillon, une boîte de 400 g de tomates et 250 ml de vin rouge pour 4 souris."
+      },
+      {
+        "source_url": "https://www.750g.com/souris-dagneau-confites-r93428.htm",
+        "text": "Une recette française indique environ 20 oignons grelots et 7 à 8 gousses d’ail en chemise pour des souris d’agneau confites."
+      },
+      {
+        "source_url": "https://www.greatbritishchefs.com/how-to-cook/how-to-cook-lamb-shanks",
+        "text": "Une garniture aromatique courante pour 4 souris comprend 1 oignon, 1 carotte, 1 branche de céleri, 1 brin de romarin et 2 gousses d’ail."
+      },
+      {
+        "source_url": "https://www.greatbritishchefs/recipes/french-onion-lamb-shanks-recipe",
+        "text": "Pour 6 souris, la garniture aromatique comprend 1 kg d’oignons, 3 gousses d’ail, 1 cuillère à soupe de thym et 2 feuilles de laurier."
+      },
+      {
+        "source_url": "https://www.greatbritishchefs.com/recipes/lamb-shanks-recipe-tomato-rosemary",
+        "text": "La saisie peut être réalisée avec 30 ml d’huile végétale pour 4 souris."
+      }
+    ],
+    "preparation_facts": [
+      {
+        "source_url": "https://www.greatbritishchefs.com/how-to-cook/how-to-cook-lamb-shanks",
+        "text": "La souris d’agneau est un morceau ferme et riche en tissu conjonctif qui demande une cuisson longue pour devenir tendre."
+      },
+      {
+        "source_url": "https://www.greatbritishchefs.com/how-to-cook/how-to-cook-lamb-shanks",
+        "text": "La saisie préalable des souris dans l’huile jusqu’à coloration uniforme est la méthode recommandée par cette source."
+      },
+      {
+        "source_url": "https://www.greatbritishchefs.com/recipes/french-onion-lamb-shanks-recipe",
+        "text": "Une autre méthode saisit les souris sur toutes leurs faces avant d’ajouter les aromates et le liquide."
+      },
+      {
+        "source_url": "https://www.greatbritishchefs.com/recipes/lamb-shanks-recipe-tomato-rosemary",
+        "text": "Après la saisie, le vin est réduit avant l’ajout du bouillon, des tomates et des herbes."
+      },
+      {
+        "source_url": "https://www.greatbritishchefs.com/how-to-cook/how-to-cook-lamb-shanks",
+        "text": "Le liquide doit être porté à ébullition puis la cuisson poursuivie à frémissement doux."
+      },
+      {
+        "source_url": "https://www.greatbritishchefs.com/recipes/french-onion-lamb-shanks-recipe",
+        "text": "À 150 °C en chaleur tournante, la cuisson couverte est indiquée pendant 3 à 3 h 30, jusqu’à ce que la viande se détache de l’os."
+      },
+      {
+        "source_url": "https://www.greatbritishchefs.com/recipes/lamb-shanks-recipe-tomato-rosemary",
+        "text": "À 200 °C, une autre recette cuit les souris environ 2 heures sous une couverture de papier cuisson ajustée."
+      },
+      {
+        "source_url": "https://www.750g.com/souris-dagneau-confites-r93428.htm",
+        "text": "Une méthode beaucoup plus lente indique 160 °C pendant environ 7 heures avec le plat couvert."
+      },
+      {
+        "source_url": "https://www.greatbritishchefs.com/recipes/lamb-shanks-recipe-tomato-rosemary",
+        "text": "Le critère de réussite est une viande tendre qui se détache facilement de l’os ; si le liquide baisse trop, il faut en ajouter un peu."
+      },
+      {
+        "source_url": "https://www.greatbritishchefs.com/how-to-cook/how-to-cook-lamb-shanks",
+        "text": "Après cuisson, les souris peuvent refroidir dans leur liquide avant d’être retirées, puis le liquide peut être filtré et réduit."
+      },
+      {
+        "source_url": "https://www.greatbritishchefs.com/recipes/lamb-shanks-recipe-tomato-rosemary",
+        "text": "La réduction finale du liquide après retrait de la viande permet d’obtenir une sauce plus épaisse."
+      },
+      {
+        "source_url": "https://www.rizzoliusa.com/wp-content/uploads/2019/10/Braised-Lamb-Shanks_The-Art-of-the-Host.pdf",
+        "text": "Éviter de tasser les souris dans le plat : une cocotte surchargée favorise une cuisson à la vapeur plutôt qu’une coloration régulière."
+      }
+    ],
+    "food_safety": [
+      {
+        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/leftovers-and-food-safety",
+        "text": "L’agneau doit atteindre au minimum 63 °C à cœur, mesurés dans la partie la plus épaisse et sans toucher l’os, puis reposer au moins 3 minutes pour la sécurité alimentaire."
+      },
+      {
+        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/leftovers-and-food-safety",
+        "text": "Réfrigérer les restes dans les 2 heures suivant la cuisson, plus rapidement encore par forte chaleur ambiante."
+      },
+      {
+        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/leftovers-and-food-safety",
+        "text": "Conserver les restes au réfrigérateur à 4 °C ou moins et les utiliser dans les 3 à 4 jours."
+      },
+      {
+        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/leftovers-and-food-safety",
+        "text": "Réchauffer les restes jusqu’à 74 °C à cœur ; couvrir le plat et ajouter un peu de liquide aide à limiter le dessèchement."
+      }
+    ],
+    "references": [
+      {
+        "url": "https://www.greatbritishchefs.com/how-to-cook/how-to-cook-lamb-shanks",
+        "title": "How to Cook Lamb Shanks",
+        "publisher": "Great British Chefs"
+      },
+      {
+        "url": "https://www.greatbritishchefs.com/recipes/french-onion-lamb-shanks-recipe",
+        "title": "'French onion' lamb shanks",
+        "publisher": "Great British Chefs"
+      },
+      {
+        "url": "https://www.greatbritishchefs.com/recipes/lamb-shanks-recipe-tomato-rosemary",
+        "title": "Lamb shanks with tomato and rosemary",
+        "publisher": "Great British Chefs"
+      },
+      {
+        "url": "https://www.750g.com/souris-dagneau-confites-r93428.htm",
+        "title": "Souris d’agneau confites",
+        "publisher": "750g"
+      },
+      {
+        "url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/leftovers-and-food-safety",
+        "title": "Leftovers and Food Safety",
+        "publisher": "USDA Food Safety and Inspection Service"
+      },
+      {
+        "url": "https://www.rizzoliusa.com/wp-content/uploads/2019/10/Braised-Lamb-Shanks_The-Art-of-the-Host.pdf",
+        "title": "Braised Lamb Shanks",
+        "publisher": "Rizzoli USA"
+      }
+    ],
+    "visual_references": [
+      {
+        "image_url": "https://media-cdn2.greatbritishchefs.com/media/pkhpcqyh/img25446.whqc_768x512q90.jpg",
+        "source_url": "https://www.greatbritishchefs.com/recipes/lamb-shanks-recipe-tomato-rosemary",
+        "title": "Lamb shanks with tomato and rosemary"
+      },
+      {
+        "image_url": "https://media-cdn2.greatbritishchefs.com/media/qs0fwr11/gbc_braising-29.whqc_768x512q90.jpg",
+        "source_url": "https://www.greatbritishchefs.com/recipes/french-onion-lamb-shanks-recipe",
+        "title": "'French onion' lamb shanks"
+      }
+    ],
+    "visual_observations": [
+      {
+        "image_url": "https://media-cdn2.greatbritishchefs.com/media/pkhpcqyh/img25446.whqc_768x512q90.jpg",
+        "source_url": "https://www.greatbritishchefs.com/recipes/lamb-shanks-recipe-tomato-rosemary",
+        "observable_details": [
+          "Un bol blanc contient plusieurs morceaux de viande brunis, avec plusieurs os longs et clairs dépassant vers le haut.",
+          "Les morceaux sont recouverts d'une sauce brun foncé et brillante.",
+          "De petites tiges ou feuilles vertes allongées sont visibles sur et autour de la viande.",
+          "Le bol repose sur une surface claire.",
+          "L'arrière-plan est flou et montre des objets et tissus indistincts."
+        ],
+        "composition": [
+          "Le bol occupe la partie centrale et inférieure de l'image.",
+          "Les os forment des lignes verticales et diagonales dans la partie centrale supérieure.",
+          "La mise au point est principalement sur le contenu du bol.",
+          "L'arrière-plan et les bords de la surface sont flous."
+        ],
+        "couleurs": [
+          "Blanc cassé pour le bol et la surface.",
+          "Brun foncé, brun rougeâtre et cuivré pour la viande et la sauce.",
+          "Vert foncé pour les éléments végétaux visibles.",
+          "Gris, blanc et turquoise atténué dans l'arrière-plan."
+        ],
+        "textures": [
+          "La sauce paraît épaisse et luisante à la surface.",
+          "La viande présente des zones irrégulières et brillantes.",
+          "Les os semblent lisses et légèrement brillants.",
+          "Le bol a une surface mate à légèrement satinée.",
+          "La surface sous le bol paraît granuleuse et irrégulière."
+        ],
+        "incertainties": [
+          "La nature exacte de la viande et des éléments verts n'est pas déterminable avec certitude à partir de l'image seule.",
+          "Les objets présents à l'arrière-plan sont trop flous pour être identifiés précisément.",
+          "La composition exacte de la sauce n'est pas visible avec certitude."
+        ]
+      },
+      {
+        "image_url": "https://media-cdn2.greatbritishchefs.com/media/qs0fwr11/gbc_braising-29.whqc_768x512q90.jpg",
+        "source_url": "https://www.greatbritishchefs.com/recipes/french-onion-lamb-shanks-recipe",
+        "observable_details": [
+          "Un bol rond brun est placé au centre de l’image.",
+          "Le bol contient plusieurs morceaux brunis, dont une pièce avec un os long et apparent.",
+          "Les morceaux reposent dans un liquide sombre et luisant.",
+          "Des zones claires et granuleuses sont visibles sur la surface de plusieurs morceaux.",
+          "L’image est photographiée en vue légèrement plongeante."
+        ],
+        "composition": "Le bol occupe la zone centrale, avec les morceaux disposés de manière serrée à l’intérieur. Le fond gris sombre forme un espace visible autour du bol.",
+        "couleurs": [
+          "Brun foncé et brun doré sur le contenu et le bol",
+          "Noir et brun très sombre dans le liquide",
+          "Gris anthracite et gris bleuté sur la surface autour du bol",
+          "Quelques reflets clairs sur le liquide et les surfaces du bol"
+        ],
+        "textures": [
+          "Surface extérieure mate et irrégulière autour du bol, avec des marques et des veinures visibles",
+          "Morceaux à surface brunie, irrégulière et légèrement croustillante en apparence",
+          "Liquide d’aspect fluide et brillant",
+          "Bol présentant une finition mouchetée et des variations de texture visibles"
+        ],
+        "incertainties": [
+          "La nature exacte des morceaux et du liquide n’est pas déterminable uniquement à partir de l’image.",
+          "Les éléments clairs et granuleux visibles sur les morceaux ne peuvent pas être identifiés avec certitude.",
+          "La photographie ne permet pas d’observer la préparation, les quantités ni le contenu sous la surface du liquide."
+        ]
+      }
+    ],
+    "uncertainties": [
+      "Les sources divergent fortement sur la combinaison température-durée : 150 °C en chaleur tournante pendant 3 à 3 h 30, 200 °C pendant environ 2 heures ou 160 °C pendant environ 7 heures.",
+      "Aucune source suffisamment homogène ne fixe une quantité unique d’oignons grelots et d’ail confit pour quatre souris d’agneau.",
+      "La saisie est recommandée par plusieurs sources, mais elle reste une étape facultative sur le plan technique si l’objectif prioritaire est une cuisson braisée et non une coloration préalable.",
+      "Les quantités de liquide vont de 750 ml de bouillon plus 250 ml de vin pour 4 souris à 2 l de bouillon plus tomates et vin ; le volume dépend de la taille du plat, du couvercle et de la quantité de sauce souhaitée.",
+      "Les sources consultées ne donnent pas toutes un temps de repos distinct après la sortie du four ; le refroidissement dans le liquide est mieux documenté que le repos à sec.",
+      "Les photographies citées montrent des souris ou jarrets d’agneau braisés, mais ne prouvent pas la présence d’oignons grelots ni d’ail confit dans les plats photographiés."
+    ],
+    "originality_notes": [
+      "Le brief a été traité comme l’identification du plat, non comme une recette déjà établie ; les quantités et paramètres ont été conservés uniquement lorsqu’ils étaient documentés.",
+      "Les désaccords de température, de durée et de volume de liquide sont signalés au lieu d’être moyennés.",
+      "Aucun ingrédient, dosage ou critère visuel n’a été déduit d’une photographie.",
+      "Les références visuelles sont des photographies publiques hébergées par leurs éditeurs ; aucune image générée, recomposée ou créée pour cette tâche n’a été utilisée.",
+      "Le champ visual_observations est volontairement laissé vide afin que l’analyse ultérieure porte sur les fichiers image réellement téléchargés."
+    ]
+  },
+  "canonical": {
+    "title": "Souris d’agneau au four à chaleur tournante, oignons grelots et ail confit",
+    "description": "Des souris d’agneau longuement braisées, à la chair fondante qui se détache de l’os, servies en plat principal avec oignons grelots et ail confit.",
+    "servings": 4,
+    "prep_minutes": 25,
+    "cook_minutes": 213,
+    "total_minutes": 238,
+    "cuisine": "française",
+    "recipe_category": "plat principal",
+    "difficulty": "moyenne",
+    "calories_estimate": 720,
+    "ingredients": [
+      {
+        "name": "souris d’agneau",
+        "quantity": 4,
+        "unit": "pièces"
+      },
+      {
+        "name": "oignons grelots",
+        "quantity": 20,
+        "unit": "pièces"
+      },
+      {
+        "name": "gousses d’ail en chemise",
+        "quantity": 8,
+        "unit": "pièces"
+      },
+      {
+        "name": "vin rouge",
+        "quantity": 250,
+        "unit": "ml"
+      },
+      {
+        "name": "bouillon de volaille ou d’agneau",
+        "quantity": 750,
+        "unit": "ml"
+      },
+      {
+        "name": "huile végétale",
+        "quantity": 30,
+        "unit": "ml"
+      },
+      {
+        "name": "sel",
+        "quantity": 8,
+        "unit": "g"
+      },
+      {
+        "name": "poivre noir moulu",
+        "quantity": 2,
+        "unit": "g"
+      }
+    ],
+    "steps": [
+      {
+        "text": "Préchauffer le four à 150 °C en chaleur tournante ; le four doit être chaud avant l’enfournement."
+      },
+      {
+        "text": "Saler et poivrer les souris d’agneau sur toutes leurs faces ; la surface doit être régulièrement assaisonnée."
+      },
+      {
+        "text": "Chauffer l’huile végétale dans une cocotte allant au four ; elle doit être chaude sans fumer."
+      },
+      {
+        "text": "Saisir les souris d’agneau dans l’huile sur toutes leurs faces ; elles doivent être uniformément dorées."
+      },
+      {
+        "text": "Retirer les souris d’agneau de la cocotte ; le fond doit conserver les sucs de cuisson."
+      },
+      {
+        "text": "Verser le vin rouge dans la cocotte ; le liquide doit décoller les sucs du fond."
+      },
+      {
+        "text": "Faire réduire le vin rouge jusqu’à ce qu’il ne reste qu’une petite quantité de liquide parfumé."
+      },
+      {
+        "text": "Verser le bouillon dans la cocotte ; le liquide doit atteindre un frémissement."
+      },
+      {
+        "text": "Répartir les oignons grelots dans la cocotte ; ils doivent être entourés de liquide."
+      },
+      {
+        "text": "Ajouter les gousses d’ail en chemise dans la cocotte."
+      },
+      {
+        "text": "Remettre les souris d’agneau dans la cocotte ; le liquide doit monter autour de la viande sans la recouvrir complètement."
+      },
+      {
+        "text": "Couvrir hermétiquement la cocotte et la placer au four pendant 190 minutes à 150 °C en chaleur tournante."
+      },
+      {
+        "text": "Découvrir la cocotte et poursuivre la cuisson pendant 20 minutes ; la viande doit être brunie et la sauce brillante."
+      },
+      {
+        "text": "Vérifier la cuisson en piquant la viande près de l’os ; elle doit se détacher facilement de l’os et révéler une chair très tendre."
+      },
+      {
+        "text": "Laisser reposer les souris d’agneau 3 minutes dans la cocotte hors du four avant de servir."
+      }
+    ],
+    "equipment": [
+      "cocotte allant au four avec couvercle",
+      "plaque de cuisson",
+      "cuillère en bois",
+      "thermomètre de cuisson",
+      "four à chaleur tournante"
+    ],
+    "notes": [
+      "La saisie est retenue ici pour obtenir une surface plus colorée et une sauce plus profonde ; elle peut être omise, mais la coloration sera moins marquée.",
+      "Le volume de liquide doit entourer la viande sans la submerger. Si le niveau baisse fortement pendant la cuisson, ajouter un peu de bouillon chaud.",
+      "Couvrir conserve l’humidité et attendrit le collagène ; découvrir en fin de cuisson permet de concentrer la sauce et de colorer la viande.",
+      "Ne tassez pas les souris dans la cocotte : elles doivent être disposées sans être serrées.",
+      "Pour conserver le plat, le laisser refroidir dans son liquide, puis le réfrigérer. La sauce peut être filtrée et réduite séparément si elle doit être plus épaisse.",
+      "Pour le réchauffage, couvrir la cocotte et ajouter un peu de liquide afin de limiter le dessèchement."
+    ],
+    "faq": [
+      {
+        "question": "Comment savoir si les souris d’agneau sont cuites ?",
+        "answer": "La viande doit être très tendre et se détacher facilement de l’os lorsqu’on la pique près de celui-ci. La surface doit être brunie et la sauce brillante."
+      },
+      {
+        "question": "Faut-il saisir les souris avant de les enfourner ?",
+        "answer": "La saisie est recommandée pour colorer la viande et renforcer le goût de la sauce, mais elle reste techniquement facultative pour une cuisson braisée."
+      },
+      {
+        "question": "Quelle quantité de liquide faut-il mettre dans la cocotte ?",
+        "answer": "Utilisez 250 ml de vin rouge et 750 ml de bouillon. Le liquide doit entourer les souris sans les recouvrir complètement."
+      },
+      {
+        "question": "Pourquoi couvrir puis découvrir la cocotte ?",
+        "answer": "Le couvercle maintient l’humidité pendant la cuisson longue ; les dernières minutes à découvert concentrent la sauce et colorent la viande."
+      },
+      {
+        "question": "Peut-on préparer les souris d’agneau à l’avance ?",
+        "answer": "Oui. Refroidissez-les dans leur liquide, réfrigérez-les, puis réchauffez-les couvertes avec un peu de liquide."
+      }
+    ],
+    "keywords": [
+      "souris d’agneau",
+      "agneau braisé",
+      "cuisson au four",
+      "chaleur tournante",
+      "oignons grelots",
+      "ail confit",
+      "vin rouge",
+      "plat principal",
+      "cuisine française"
+    ],
+    "food_safety": [
+      "Mesurer la température à cœur dans la partie la plus épaisse de la viande, sans toucher l’os : l’agneau doit atteindre au minimum 63 °C, puis reposer au moins 3 minutes.",
+      "Réfrigérer les restes dans les 2 heures suivant la cuisson, plus rapidement si la température ambiante est élevée.",
+      "Conserver les restes à 4 °C ou moins et les consommer dans les 3 à 4 jours.",
+      "Réchauffer les restes jusqu’à 74 °C à cœur ; couvrir la cocotte et ajouter un peu de liquide pour limiter le dessèchement.",
+      "Le bouillon peut contenir du céleri, du gluten ou d’autres allergènes selon sa composition : vérifier l’étiquette du produit utilisé."
+    ],
+    "uncertainties": [
+      "Les sources divergent sur le couple température-durée, avec des indications allant de 150 °C pendant 3 à 3 h 30 à 160 °C pendant environ 7 heures ou 200 °C pendant environ 2 heures. La version retenue privilégie 150 °C en chaleur tournante pendant 3 h 30, valeur documentée pour une viande qui se détache de l’os.",
+      "Les quantités d’oignons grelots et d’ail varient selon les sources ; 20 oignons grelots et 8 gousses d’ail en chemise sont retenus d’après la formule française documentée.",
+      "Le volume de liquide varie selon la taille de la cocotte, son couvercle et la quantité de sauce souhaitée ; la proportion retenue est de 250 ml de vin rouge et 750 ml de bouillon pour 4 souris.",
+      "La tendreté peut nécessiter une prolongation de cuisson si les souris sont particulièrement grosses ou si la cocotte ferme mal."
+    ]
+  }
+}

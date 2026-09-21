@@ -20,7 +20,6 @@ final class MSRWA_Settings {
 				'image'  => 'gemini:gemini-3.1-flash-image',
 				'search' => 'openai:gpt-5.6-luna',
 			),
-			'research_provider'   => 'native',
 			'max_batch'           => 50,
 			'max_concurrency'     => 4,
 			'max_corrections'     => 2,
@@ -86,7 +85,7 @@ final class MSRWA_Settings {
 
 The editor brief may be led by a recipe title, an existing article, or one or more real recipe images. Identify the intended dish without treating an image as proof of hidden ingredients or quantities.
 
-TASK: combine the editor brief with current web research. Return the best concise information about ingredients, quantities and ratios, preparation method, temperatures, durations, resting times, signs of success, common failures, food safety, and storage. Also find real, publicly accessible photographs of the same dish and record only visual details actually observable in them.
+TASK: combine the editor brief with current web research. Return the best concise information about ingredients, quantities and ratios, preparation method, temperatures, durations, resting times, signs of success, common failures, food safety, and storage. Cover substitutions and accompaniments too — which ingredient a source says may replace another, and what the dish is served with — because the article is allowed to offer only what a source documents. Also find real, publicly accessible photographs of the same dish and record only visual details actually observable in them.
 
 RULES:
 - Search the web. Prefer culinary schools, established publications, recognised producers, and authoritative food-safety sources over content farms.
@@ -130,27 +129,33 @@ WHAT YOU RECEIVE:
 
 WHAT YOU CHECK, and nothing else:
 
-1. AGREEMENT BETWEEN THE THREE. The dish in the featured image, the dish in the last Facebook panel, and the dish the article describes must be the same dish: same ingredients visible, same colour, same vessel family, same degree of doneness. A difference here is blocking — it is the failure a reader notices first.
+WHAT MATTERS MOST, in this order. Realism is the gate; everything else is secondary.
 
-2. IMAGE REALISM — is it a believable photograph? Blocking: food that looks moulded, waxy or plastic; anatomy that cannot exist, such as a fused hand, a spoon passing through a plate, a mismatched cut of meat; duplicated or melted utensils; impossible shadows or reflections; a light source that contradicts the shadows; visible generation artifacts; text, logo, watermark or packaging anywhere. Not blocking on its own: a stylised background, an unusually clean surface, an ambitious plating. Realism is about whether the photograph could exist, never about whether it shows the right dish — that is the next check.
+1. IMAGE REALISM — the primary check. Judge each image as a photograph a reader could believe was taken in a kitchen. Blocking, and only these: food that looks moulded, waxy, plastic or rendered; anatomy that cannot exist, such as a fused hand, a spoon passing through a plate, a bone attached where no bone goes; duplicated, melted or floating objects; shadows or reflections that contradict the light; visible generation artifacts and smeared detail; text, logo, watermark or packaging anywhere in the frame. If an image fails here, say so plainly — this is the finding that matters.
 
-3. IMAGE FIDELITY — is it this recipe? Apply this to EVERY image, the featured one and every panel of the collage alike. Name each food item that is part of the dish — on the plate, in the pan, or among the ingredients laid out for it — then find it in the canonical ingredient list. Styling that is plainly not part of the dish is not an ingredient and is never a finding: a potted plant, a herb pot, a bottle, a tea towel, a board or a bowl in the background. Anything visible that is not on that list is blocking, and it is blocking wherever it appears: a herb, a leaf, a spice, a chilli, a citrus wedge, a sauce, a side dish. An accompaniment is judged differently from an ingredient: a side the recipe or the research says the dish is served with — rice, bread, a salad — is correct and is never a finding, even though it is not in the ingredient list. It becomes a finding only when nothing in the recipe, the article or the research mentions it. Being appetising does not excuse it, and a realistic photograph of the wrong dish is still the wrong dish — an image can be "good" for realism and "bad" here in the same breath.
-Then check the appearance against the research observations. A dish that looks better than the observations describe is the wrong dish, and that is a finding.
+2. IS IT THE RIGHT DISH? Check the PRINCIPAL ingredients only — the two or three that make the dish what it is, the ones in its name. Lamb shanks in a lamb shank recipe, apples in an apple tart, chicken and onions in a yassa. If a principal ingredient is absent, or a different one has replaced it, that is blocking: the photograph shows another dish. Everything else about the contents is secondary and at most minor — a herb sprig, a spice, a garnish, a clove of garlic peeled instead of unpeeled, an accompaniment. Do not inventory the frame against the ingredient list, and do not count: how many shanks, apples or eggs are visible is not a defect a reader would ever notice, and the quantities are in the article.
 
-4. THE FACEBOOK COLLAGE SPECIFICALLY. Exactly 6 panels; each panel one real moment of this recipe in order; the same crockery and lighting throughout; a final panel showing the finished dish. A panel that invents a step, or repeats one, is blocking.
+3. THE THREE TOGETHER. The featured photograph and the collage\'s last panel should read as the same dish: same principal ingredients, broadly the same colour and the same kind of serving. Judge this the way a reader glancing at both would, not by comparing details. Only a difference that makes them look like two different dishes is blocking; a different bowl, a slightly deeper colour or another angle is minor.
 
-5. THE ARTICLE AGAINST THE RECIPE. Every quantity, temperature and duration in the prose must match the canonical recipe. A figure that contradicts it is blocking. A figure the recipe simply does not mention — a preheating time, a resting minute, a tin size given as a variant, a thickness — is ordinary cooking detail, and at most minor. Quote the exact sentence at fault — never paraphrase it, or the correction cannot be applied.
+4. THE COLLAGE AS A SEQUENCE. It must read as one recipe being made, in the order the recipe makes it. Blocking: a step shown before a step that must precede it, a panel that repeats another, or a panel showing something the recipe never does. The number of panels and their styling are minor.
 
-6. WHAT THE ARTICLE CLAIMS. Separate three cases, and do not collapse them:
-- The research CONTRADICTS the claim → blocking.
-- The research is SILENT on the claim, and it is a normal piece of cooking knowledge a competent cook would state — why acid balances cream, why fruit is dried before baking, what to serve alongside → not a finding at all. An article may not only repeat its sources.
-- The research is SILENT and the claim is specific, checkable and consequential — a named variety\'s sugar content, a temperature that changes the result, a health or safety statement → minor.
+THE TEXT IS JUDGED STRICTLY. Everything above about ignoring detail applies to the IMAGES ONLY. A photograph is an impression and may be forgiven a sprig of herb; the article and the recipe are what the reader cooks from, and they are held to the research.
 
-SEVERITY — apply it strictly, because a verdict where everything is blocking is worth nothing to the person who has to act on it:
-- BLOCKING means a reader is misled or the dish fails: a figure contradicting the recipe, an ingredient visible that is not in it, a claim the sources contradict, an image that is not this dish, a collage that breaks its own sequence, the two images disagreeing about the finished dish.
-- MINOR means a reader is fine but an editor would improve it.
-- Counting is its own case. How many apples or eggs sit in a laid-out shot is decoration: the reader takes the quantities from the ingredient list, not by counting a photograph, so a count that differs from the recipe is MINOR. It becomes blocking only when the number changes the dish — one chicken breast in a recipe for four, a single egg where the dish is built on a dozen.
-- If you would not hold the publication back for it, it is minor.
+5. THE RECIPE AND THE ARTICLE AGAINST THE RESEARCH. The ingredients and the method must be the ones the research supports. Blocking, each time:
+- an ingredient in the recipe or named in the article that no research fact supports;
+- an ingredient the research treats as essential to this dish and that is missing;
+- a preparation step, a technique or an order of operations the research does not support, or that it contradicts;
+- a temperature, a duration, a resting time or a ratio that contradicts the research, or that no source gives.
+Name the fact you relied on. Where the sources disagree, the recipe may follow any one of them, and that is not a finding — but it may not follow none of them.
+
+6. THE ARTICLE AGAINST THE RECIPE. Every quantity, temperature and duration in the prose must match the canonical recipe. A figure that contradicts it is blocking. Prose rounding is not a contradiction: "about three and a half hours" for 213 minutes, "a good kilo" for 1.1 kg are how a cook writes and reads, and they change nothing anyone would do. A figure the recipe does not mention at all, and that no source supports, is blocking under check 5.
+
+7. WHAT ELSE THE ARTICLE CLAIMS. A claim the research contradicts is blocking. A claim the research is silent on is blocking when it is specific, checkable and consequential — a food-safety instruction, a storage limit, a temperature that changes the result, a claim about a variety or a season. It is not a finding only when it is ordinary cooking knowledge no source would bother to state, such as why acid balances fat.
+
+SEVERITY:
+- For the IMAGES: blocking means it is not believable as a photograph, or it shows a different dish, or the collage teaches the wrong order. Everything else — secondary ingredients, counts, garnish, crockery, framing — is minor, and doubt resolves to minor.
+- For the RECIPE and the ARTICLE: blocking means it is unsupported by the research, contradicts the research, or contradicts the canonical recipe. Doubt resolves to blocking, because the reader cooks from this.
+- Never trade one against the other: strong images do not excuse an unsupported ingredient, and a well-sourced article does not excuse an image that is not this dish.
 
 RULES:
 - Judge only what is present. Never infer an ingredient you cannot see, and never mark an image down for something outside the frame.
@@ -159,7 +164,8 @@ RULES:
 - `approved` is true only when nothing is blocking. Reservations without blockers still approve, and say why.
 - Write every human-readable value in French.
 
-OUTPUT — a valid JSON object only, no Markdown, with exactly these keys:
+OUTPUT — a valid JSON object only, no Markdown, with exactly these keys. Every key is filled, every time. A verdict of "bad" on one artifact does not excuse leaving another null: the images were sent to you and must be judged even when the article fails, and a refusal must always carry the findings that justify it. An object with nulls, or a refusal with an empty findings list, is useless to the person who has to act on it and counts as no answer at all.
+
 - "approved": boolean, true only when no finding has severity "blocking"
 - "article": {"verdict": "good|reservations|bad", "summary": one sentence}
 - "featured_image": {"verdict": "good|reservations|bad", "realism": "good|reservations|bad", "summary": one sentence}
@@ -320,7 +326,7 @@ OUTPUT — a valid JSON object only, no Markdown, with exactly these keys:
 		foreach ( array( 'openai_key', 'gemini_key', 'claude_key' ) as $key ) {
 			$out[ $key ] = self::secret_for_save( $key, $raw[ $key ] ?? null );
 		}
-		foreach ( array( 'openai_model', 'gemini_model', 'claude_model', 'research_provider' ) as $key ) {
+		foreach ( array( 'openai_model', 'gemini_model', 'claude_model' ) as $key ) {
 			if ( isset( $raw[ $key ] ) ) { $out[ $key ] = sanitize_text_field( $raw[ $key ] ); }
 		}
 		$out['featured_ratio'] = isset( $raw['featured_ratio'] ) && in_array( $raw['featured_ratio'], array( '1:1', '4:5', '3:2', '2:3' ), true ) ? $raw['featured_ratio'] : $defaults['featured_ratio'];

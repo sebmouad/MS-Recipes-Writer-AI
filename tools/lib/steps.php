@@ -98,7 +98,17 @@ function lab_prompt( $step, $variant = '', $shipped = false ) {
 
 /** Normalizes title-, article- and image-led editor briefs into one contract. */
 function lab_editor_brief( $brief ) {
-	if ( isset( $brief['editor_input'] ) && is_array( $brief['editor_input'] ) ) { return $brief['editor_input']; }
+	// A malformed editor_input used to be forwarded as-is. The research model then
+	// answered, truthfully, that it had been given no dish to research, and the run
+	// still cost money and scored seven of ten.
+	if ( isset( $brief['editor_input'] ) && is_array( $brief['editor_input'] ) ) {
+		$editor = $brief['editor_input'];
+		if ( '' === trim( (string) ( $editor['title'] ?? '' ) ) && '' === trim( (string) ( $editor['text'] ?? '' ) ) ) {
+			fwrite( STDERR, "The brief's editor_input carries neither a title nor a text; there is nothing to research.\n" );
+			exit( 2 );
+		}
+		return $editor;
+	}
 	return array(
 		'type' => 'article',
 		'title' => (string) ( $brief['title'] ?? '' ),
@@ -233,6 +243,10 @@ function lab_score_approval( $verdict, $image_count, $expected_panels ) {
 	$checks['findings are addressed'] = array( 'pass' => $readable && 0 === $bad_target, 'detail' => $bad_target ? $bad_target . ' with no valid target' : count( $findings ) . ' findings' );
 	$checks['findings are actionable'] = array( 'pass' => $readable && 0 === $unquoted, 'detail' => $unquoted ? $unquoted . ' without a quote or a fix' : 'every finding carries a fix' );
 
+	// A refusal nobody can act on is not a verdict.
+	$justified = $readable && ( ! empty( $verdict['approved'] ) || count( $findings ) > 0 );
+	$checks['a refusal is justified'] = array( 'pass' => $justified, 'detail' => $justified ? 'ok' : 'refused with no findings' );
+
 	// A blocking finding and an approval cannot both stand.
 	$coherent = $readable && ! ( $blocking > 0 && ! empty( $verdict['approved'] ) );
 	$checks['approval matches findings'] = array( 'pass' => $coherent, 'detail' => $coherent ? ( $blocking . ' blocking, approved ' . var_export( ! empty( $verdict['approved'] ), true ) ) : 'approved despite ' . $blocking . ' blocking findings' );
@@ -240,6 +254,21 @@ function lab_score_approval( $verdict, $image_count, $expected_panels ) {
 	$checks['uncertainties reported'] = array( 'pass' => isset( $verdict['uncertainties'] ) && is_array( $verdict['uncertainties'] ), 'detail' => isset( $verdict['uncertainties'] ) ? count( (array) $verdict['uncertainties'] ) . ' entries' : 'missing' );
 
 	return $checks;
+}
+
+/**
+ * One observation field as prose. The vision model returns some of these as a
+ * list of sentences and some as a sentence; casting a list to string yields the
+ * word "Array", which then travels into an image prompt as the description of
+ * the dish.
+ */
+function lab_observation_text( $value ) {
+	if ( is_array( $value ) ) {
+		$parts = array();
+		foreach ( $value as $item ) { if ( is_scalar( $item ) ) { $parts[] = trim( (string) $item ); } }
+		return trim( implode( ' ', array_filter( $parts ) ) );
+	}
+	return is_scalar( $value ) ? trim( (string) $value ) : '';
 }
 
 /**
@@ -269,6 +298,7 @@ function lab_visual_brief( $canonical, $research ) {
 	}
 
 	$lines = array( 'VISUAL BRIEF — derived from this recipe and binding. Each line below exists because a real image failed on it.' );
+	$lines[] = '• NO GARNISH THAT IS NOT AN INGREDIENT. The most common defect in these images, across every dish tried, is a sprig of herb laid on the finished plate — rosemary, thyme, parsley, coriander, a bay leaf — because that is how this kind of dish is usually photographed. If the ingredient list below does not contain it, it does not go in the picture, in any panel, however conventional it looks. The same applies to a citrus wedge, a grind of visible spice, a drizzle, a dusting or a scattering of seeds. Serve the dish bare rather than garnish it with something the cook was never told to buy.';
 	if ( $counts ) {
 		$lines[] = '• Countable ingredients, exact numbers: ' . implode( '; ', $counts ) . '. Where a panel lays the ingredients out — the mise en place — show exactly these numbers, not one more pack, roll, fruit or egg "for composition". This binds the ingredient display only. A later panel showing the dish being made or served need not have them all in shot, and a few of the same fruit resting in the background of a finished shot is styling, not a miscount.';
 	}
@@ -289,7 +319,7 @@ function lab_visual_brief( $canonical, $research ) {
 	foreach ( (array) ( $research['visual_observations'] ?? array() ) as $observation ) {
 		if ( ! is_array( $observation ) ) { continue; }
 		foreach ( array( 'colours', 'textures', 'observable_details', 'composition' ) as $key ) {
-			$value = trim( (string) ( $observation[ $key ] ?? '' ) );
+			$value = lab_observation_text( $observation[ $key ] ?? '' );
 			if ( '' !== $value ) { $observed[] = $value; }
 		}
 	}
@@ -315,7 +345,7 @@ function lab_observed_appearance( $research ) {
 	foreach ( (array) ( $research['visual_observations'] ?? array() ) as $observation ) {
 		if ( ! is_array( $observation ) ) { continue; }
 		foreach ( array( 'observable_details', 'colours', 'textures', 'composition' ) as $key ) {
-			$value = trim( (string) ( $observation[ $key ] ?? '' ) );
+			$value = lab_observation_text( $observation[ $key ] ?? '' );
 			if ( '' !== $value ) { $observed[] = $value; }
 		}
 	}
@@ -335,7 +365,7 @@ function lab_serving_presentation( $canonical, $research ) {
 	$text = '';
 	foreach ( (array) ( $research['visual_observations'] ?? array() ) as $observation ) {
 		if ( ! is_array( $observation ) ) { continue; }
-		foreach ( array( 'observable_details', 'composition', 'colours' ) as $key ) { $text .= ' ' . (string) ( $observation[ $key ] ?? '' ); }
+		foreach ( array( 'observable_details', 'composition', 'colours' ) as $key ) { $text .= ' ' . lab_observation_text( $observation[ $key ] ?? '' ); }
 	}
 	$text .= ' ' . (string) ( $research['visual_reference']['plating'] ?? '' );
 
@@ -433,7 +463,17 @@ function lab_regenerate_image( $kind, $brief, $options, $findings, $settings ) {
 	$destination = dirname( __DIR__ ) . '/runs/' . $name . '-' . $kind . '-retry-' . gmdate( 'Ymd-His' ) . '.' . $format;
 	$result = lab_image( $prompt, $model, $size, $quality, $format, $destination );
 	if ( isset( $result['error'] ) ) { fwrite( STDERR, 'Image error after ' . $result['seconds'] . "s: " . $result['error'] . "\n" ); exit( 1 ); }
-	return array( 'path' => $result['path'], 'seconds' => $result['seconds'], 'cost' => lab_price( 'openai', $model, $result['usage'] ), 'usage' => $result['usage'] );
+	$cost = lab_price( 'openai', $model, $result['usage'] );
+	// The image lab records what each generation cost; a retried image is a
+	// generation too, and without this its cost and tokens existed only on screen.
+	$meta = array(
+		'step' => $kind . '_image', 'provider' => 'openai', 'model' => $model, 'size' => $size,
+		'quality' => $quality, 'format' => $format, 'retry' => true, 'seconds' => $result['seconds'],
+		'usage' => $result['usage'], 'cost_usd' => $cost, 'bytes' => $result['bytes'],
+		'image_path' => $result['path'], 'corrections' => $findings, 'prompt' => $prompt,
+	);
+	file_put_contents( preg_replace( '/\.[a-z0-9]+$/i', '.json', $destination ), json_encode( $meta, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) );
+	return array( 'path' => $result['path'], 'seconds' => $result['seconds'], 'cost' => $cost, 'usage' => $result['usage'] );
 }
 
 /** The blocking findings the judge raised against one image. */
@@ -472,8 +512,12 @@ function lab_score( $step, $text, $brief, $options = array() ) {
 	$json = is_array( $json ) ? $json : array();
 
 	if ( 'research' === $step ) {
-		foreach ( array( 'ingredient_facts', 'preparation_facts', 'references', 'visual_references', 'visual_observations', 'uncertainties' ) as $key ) {
-			$checks[ $key ] = array( 'pass' => isset( $json[ $key ] ) && is_array( $json[ $key ] ), 'detail' => isset( $json[ $key ] ) ? count( (array) $json[ $key ] ) . ' entries' : 'missing' );
+		// An empty array is not evidence. Every one of these keys passing on zero
+		// entries is how a package with no facts and no sources scored 7/10.
+		$required = array( 'ingredient_facts' => 3, 'preparation_facts' => 3, 'references' => 2, 'visual_references' => 1, 'visual_observations' => 1, 'uncertainties' => 0 );
+		foreach ( $required as $key => $minimum ) {
+			$count = isset( $json[ $key ] ) && is_array( $json[ $key ] ) ? count( $json[ $key ] ) : -1;
+			$checks[ $key ] = array( 'pass' => $count >= $minimum, 'detail' => $count < 0 ? 'missing' : $count . ' entries, ' . $minimum . ' minimum' );
 		}
 		$sourced = 0;
 		foreach ( (array) ( $json['references'] ?? array() ) as $reference ) { if ( ! empty( $reference['url'] ) ) { $sourced++; } }

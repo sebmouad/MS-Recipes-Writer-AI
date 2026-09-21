@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.57` est un socle installable : file persistante, pipeline de
+La version `0.2.58` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.
@@ -20,6 +20,57 @@ Le plugin est en cours de refonte éditoriale et budgétaire :
 Les coûts affichés sont des estimations calculées avec le catalogue configuré,
 non une facture fournisseur. `completed` signifie que le traitement est terminé,
 jamais qu’un texte est validé éditorialement.
+
+## Version 0.2.58
+
+Premier passage complet sur une recette inédite — **souris d'agneau au four à
+chaleur tournante, oignons grelots et ail confit** — et premier passage avec de
+vraies photographies analysées, pas des amorces.
+
+| Étape | Temps | Coût | Résultat |
+|---|---:|---:|---|
+| Recherche (2 photos réelles analysées) | 39,8 s | 0,0144 $ | 10/10 |
+| Recette canonique | 22 s | 0,0038 $ | 4/4 |
+| Article 3 413 mots | 47 s | 0,0095 $ | 10/10, qualité 98/100 |
+| Image mise en avant | 10 s | 0,0373 $ | — |
+| Collage Facebook | 13 s | 0,0428 $ | — |
+| Relecture, fact-check, correction | 62 s | 0,0171 $ | 3/3, 5/5, 6/6 |
+| Approbation finale | 22 s | 0,0055 $ | **10/10 — APPROUVÉ** |
+
+Sources réelles : `greatbritishchefs.com`, deux photographies téléchargées et
+analysées octet par octet. La mise en avant reprend ce qu'elles montrent — bol,
+os saillants, sauce brune et luisante.
+
+**Le juge applique désormais deux barèmes** (directive du 21/09), et c'est
+délibéré : une photographie est une impression, l'article est ce que le lecteur
+cuisine.
+
+- **Images** : le réalisme photographique est la porte ; seuls les ingrédients
+  *principaux* décident si c'est le bon plat ; herbe, gousse épluchée, comptage,
+  vaisselle et cadrage deviennent mineurs ; le doute se résout vers la
+  publication. Quatre calibrages antérieurs avaient chacun dépassé la cible.
+- **Recette et article** : tout ingrédient, toute étape, toute durée que la
+  recherche ne documente pas est bloquant, de même que tout ce qui la contredit.
+  Le doute se résout vers le refus. Aucun échange entre les deux : de belles
+  images n'excusent pas un ingrédient non sourcé.
+
+Mesuré immédiatement : sur le même passage, les images tombent à deux constats
+mineurs tandis que l'article récolte sept constats bloquants — substitutions,
+accompagnements et critères d'achat qu'aucune source ne documente. La section
+« substitutions » étant exigée par le plan de l'article, la recherche doit
+maintenant collecter les substitutions et les accompagnements attestés.
+
+- `tools/prune-runs.php` applique la rétention convenue : dernier article,
+  dernière recette, dernière image mise en avant, **tous** les collages.
+- `tools/cost-history.jsonl` conserve **tout** l'historique de coût — 152 appels,
+  5,18 $ mesurés — avant toute suppression. Les tirages se régénèrent, les
+  mesures non.
+- Les rapports générés quittent le dépôt (8,8 Mo d'images encodées) ;
+  `tools/reports/` est ignoré.
+- Trois défauts trouvés en chemin : un `editor_input` mal formé était transmis
+  tel quel et la recherche répondait, à juste titre, qu'on ne lui donnait aucun
+  plat ; le score de recherche validait un paquet à zéro fait ; une image
+  régénérée n'enregistrait jamais son coût.
 
 ## Version 0.2.57
 

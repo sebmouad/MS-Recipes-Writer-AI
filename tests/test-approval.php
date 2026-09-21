@@ -61,10 +61,23 @@ foreach ( array( null, array(), 'refus' ) as $broken ) {
 
 // The prompt must keep the three distinctions that were wrong when first measured.
 $prompt = file_get_contents( dirname( __DIR__ ) . '/tools/prompts/final_approval.tpl.txt' );
-msrwa_test_contains( $prompt, 'never about whether it shows the right dish', 'Realism and fidelity must stay separate checks.' );
-msrwa_test_contains( $prompt, 'is never a finding', 'A supported accompaniment must not be treated as a stray ingredient.' );
-msrwa_test_contains( $prompt, 'not a finding at all', 'Ordinary cooking knowledge must not be a finding.' );
-msrwa_test_contains( $prompt, 'If you would not hold the publication back for it, it is minor', 'Severity must be defined, or everything becomes blocking.' );
+// The owner's direction, 2026-09-21: realism is the gate, principal ingredients
+// only, and small details are not worth refusing over. Four earlier calibrations
+// each over-reached — a potted plant read as an ingredient, rice with a yassa
+// blocked, seventeen blocking findings on one tarte — so these are asserted.
+msrwa_test_contains( $prompt, 'the primary check', 'Realism must be named the primary check.' );
+msrwa_test_contains( $prompt, 'PRINCIPAL ingredients only', 'Fidelity must be limited to the ingredients that define the dish.' );
+msrwa_test_contains( $prompt, 'do not count', 'Counting objects in a photograph must not be a defect.' );
+msrwa_test_contains( $prompt, 'Do not inventory the frame', 'The judge must not audit the frame against the whole ingredient list.' );
+msrwa_test_contains( $prompt, 'SEVERITY:', 'Severity must be defined, or everything becomes blocking.' );
+// The leniency is for images only. The article and the recipe are what the
+// reader cooks from, so they are held to the research (owner, 2026-09-21).
+msrwa_test_contains( $prompt, 'applies to the IMAGES ONLY', 'The relaxed judgement must be scoped to images.' );
+msrwa_test_contains( $prompt, 'doubt resolves to minor', 'For images, doubt resolves towards shipping.' );
+msrwa_test_contains( $prompt, 'Doubt resolves to blocking', 'For the text, doubt resolves towards refusing.' );
+msrwa_test_contains( $prompt, 'that no research fact supports', 'An unsupported ingredient must block.' );
+msrwa_test_contains( $prompt, 'the research does not support', 'An unsupported preparation step must block.' );
+msrwa_test_contains( $prompt, 'Never trade one against the other', 'Good images must not excuse an unsupported ingredient.' );
 
 // A refusal decides what gets regenerated. Getting this wrong wastes an image
 // generation per attempt, which is the expensive half of the retry loop.

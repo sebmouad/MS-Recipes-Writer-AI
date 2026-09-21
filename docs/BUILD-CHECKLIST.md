@@ -164,6 +164,39 @@ cost) in the task before changing anything.
   on observed appearance is therefore measuring a stub. Re-run `research` with
   `lab_enrich_research_images` against real sources and store the result.
 
+- [x] **A21 — First complete run on a new recipe, with real photographs
+  (2026-09-21).** Souris d'agneau au four. Research fetched and analysed two real
+  photographs from greatbritishchefs.com, which drove the recipe, the article and
+  both images. Article 3 413 words at 98/100; final approval **approved** at
+  10/10. Total about 0,13 $ and roughly three and a half minutes of provider time.
+  Three defects found on the way: a malformed `editor_input` was forwarded as-is
+  and research truthfully answered that it had been given no dish; the research
+  scorecard passed a package with zero facts and zero sources; a regenerated
+  image never wrote its cost.
+- [x] **A22 — The judge applies two standards (owner directive, 2026-09-21).**
+  *Images:* realism is the primary check, only the principal ingredients decide
+  whether it is the right dish, and secondary detail, counts, garnish and
+  crockery are minor — doubt resolves to minor. Four earlier calibrations had
+  each over-reached. *Recipe and article:* any ingredient, step, technique or
+  figure the research does not support is blocking, as is anything contradicting
+  it — doubt resolves to blocking, because the reader cooks from the text.
+  Neither trades against the other.
+  Measured on the same run: the images fell to two minor findings while the
+  article drew seven blocking ones — substitutions, accompaniments and buying
+  criteria no source documents.
+- [ ] **A24 — The outline asks for content the strict rule forbids.** The article
+  plan requires a *substitutions* section, and every substitution the research
+  does not document is now blocking. Research has been asked to gather
+  substitutions and accompaniments; re-measure whether that clears the seven
+  findings, and if it does not, the outline must say that an undocumented
+  section is omitted rather than invented.
+- [x] **A23 — Retention and cost history (owner directive, 2026-09-21).**
+  `tools/prune-runs.php` keeps the last article, the last recipe and the last
+  featured image per brief, and every Facebook collage, since the collage is the
+  piece still being tuned. Every cost is appended to `tools/cost-history.jsonl`
+  before anything is removed: 152 calls, $5.18 measured. Generated reports left
+  the repository — 8.8 MB of encoded images — and `tools/reports/` is ignored.
+
 - [~] **A4 — Review.** Written in English; findings must name the section to patch. *Original:* **A4 — Review.** Returns a boolean verdict plus findings that name the
   **section to patch**, never a full rewrite instruction.
 - [~] **A5 — Fact check** (new step). Written; scored on whether it quotes the article verbatim rather than inventing a sentence to correct. *Original:* **A5 — Fact check** (new step). Compares the finished article to the

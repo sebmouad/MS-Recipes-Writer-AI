@@ -1,2 +1,3 @@
 tools/runs/
+tools/reports/
 .env.local

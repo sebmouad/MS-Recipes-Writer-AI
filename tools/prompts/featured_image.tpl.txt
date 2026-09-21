@@ -23,7 +23,7 @@ Composition rules:
 - no collage, no split screen, no before and after;
 - no packaging, no label, no text, no watermark, no logo;
 - keep every branded container, product tub and package completely outside the frame;
-- garnish must be realistic and coherent with the recipe;
+- no garnish at all unless it is one of the recipe's own ingredients: no herb sprig laid on the dish, no scattered leaves, no citrus wedge, no dusting, no drizzle. A bare plate of exactly what the recipe makes is correct; the usual food-photography garnish is a defect here;
 - background props stay subtle and never compete with the dish.
 
 Camera direction: full-frame camera look, 85 mm lens, f/2.8, three-quarter angle at about 30 degrees, soft side light, clean editorial composition.
