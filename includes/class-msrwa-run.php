@@ -357,6 +357,41 @@ final class MSRWA_Run {
 		if ( in_array( $status, array( 'failed', 'cancelled' ), true ) ) { MSRWA_Batch::settle( (int) ( self::get( $id )['batch_id'] ?? 0 ) ); }
 	}
 
+	/** Whether this run can be picked up again, and by this person. */
+	public static function may_retry( array $run ) {
+		return in_array( (string) $run['status'], array( 'failed', 'cancelled' ), true ) && self::may_see( $run );
+	}
+
+	/**
+	 * Picks a stopped run back up from where it stopped.
+	 *
+	 * Only the steps that errored are removed; everything that succeeded stays,
+	 * artifacts included. So a run that died at the collage redraws the collage
+	 * and does not pay again for research, the article or the images that came
+	 * out fine — which is the whole reason the steps are rows rather than a
+	 * blob in the first place.
+	 *
+	 * The events of the failed attempt are kept. What went wrong the first time
+	 * is usually why it went wrong the second.
+	 */
+	public static function retry( $id ) {
+		global $wpdb;
+		$run = self::get( $id );
+		if ( ! $run || ! self::may_retry( $run ) ) { return false; }
+
+		$t = MSRWA_DB::tables();
+		$wpdb->query( $wpdb->prepare( 'DELETE FROM ' . $t['steps'] . " WHERE run_id = %d AND error_message <> ''", absint( $id ) ) );
+
+		$wpdb->update( self::table(), array(
+			'status' => 'queued', 'step' => '', 'error_message' => '',
+			'lock_token' => null, 'lock_until' => null, 'updated_at' => current_time( 'mysql', true ),
+		), array( 'id' => absint( $id ) ) );
+
+		self::queue( (int) $id, 2 );
+		MSRWA_Batch::reopen( (int) $run['batch_id'] );
+		return true;
+	}
+
 	/**
 	 * Puts a run that lost its worker back in the queue.
 	 *

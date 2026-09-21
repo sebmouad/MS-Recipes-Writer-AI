@@ -14,6 +14,7 @@ final class MSRWA_REST {
 		register_rest_route( 'msrwa/v1', '/batches/(?P<id>\d+)/dispatch', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'dispatch' ) ) );
 		register_rest_route( 'msrwa/v1', '/batches/(?P<id>\d+)/runs', array( 'methods' => 'GET', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'runs' ) ) );
 		register_rest_route( 'msrwa/v1', '/batches/(?P<id>\d+)', array( 'methods' => 'DELETE', 'permission_callback' => array( __CLASS__, 'can_manage' ), 'callback' => array( __CLASS__, 'remove' ) ) );
+		register_rest_route( 'msrwa/v1', '/runs/(?P<id>\d+)/retry', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'retry' ) ) );
 		register_rest_route( 'msrwa/v1', '/runs/(?P<id>\d+)/cancel', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'cancel' ) ) );
 	}
 
@@ -93,6 +94,14 @@ final class MSRWA_REST {
 			}
 		}
 		return rest_ensure_response( array( 'status' => (string) $batch['status'], 'runs' => $out ) );
+	}
+
+	/** Picks a stopped run back up, without paying again for what succeeded. */
+	public static function retry( WP_REST_Request $request ) {
+		$run = MSRWA_Run::get( absint( $request['id'] ) );
+		if ( ! $run || ! MSRWA_Run::may_see( $run ) ) { return new WP_Error( 'msrwa_not_found', __( 'Recette introuvable.', 'ms-recipes-writer-ai' ), array( 'status' => 404 ) ); }
+		if ( ! MSRWA_Run::may_retry( $run ) ) { return new WP_Error( 'msrwa_not_stopped', __( 'Cette recette n’est pas arrêtée.', 'ms-recipes-writer-ai' ), array( 'status' => 409 ) ); }
+		return rest_ensure_response( array( 'retried' => MSRWA_Run::retry( (int) $run['id'] ) ) );
 	}
 
 	public static function cancel( WP_REST_Request $request ) {

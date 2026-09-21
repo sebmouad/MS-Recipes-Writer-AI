@@ -2,6 +2,39 @@
 
 Plugin WordPress en construction pour la génération éditoriale culinaire orchestrée.
 
+## Version 0.4.2
+
+**Tous les écrans sont refondus, et deux manques réels sont comblés.**
+
+**Reprendre une recette arrêtée.** Il n'y avait aucun moyen de rattraper un run
+échoué : il fallait tout relancer et tout repayer. Reprendre ne supprime que les
+étapes qui ont erré — ce qui a réussi reste, artefacts compris. Un run mort au
+collage redessine le collage et ne repaie ni la recherche, ni l'article, ni les
+images qui étaient bonnes. C'est exactement pour cela que les étapes sont des
+lignes et non un bloc.
+
+**Le verdict là où le relecteur travaille.** Un rédacteur ouvre l'article, pas
+les écrans du plugin. La boîte sur l'écran d'édition dit ce que la machine a
+relevé, et dit surtout ce qu'elle n'est pas : l'avis du moteur sur sa propre
+production, jamais une validation. Un avertissement sur un tableau de bord que
+personne n'a ouvert n'a averti personne.
+
+**Ce qui a été gardé de l'ancien écran d'exploitation.** Le rapport complet, avec
+sa politique de sécurité de contenu et son confinement des images au dossier du
+run — une image enregistrée ne doit jamais transformer un rapport en lecteur de
+fichiers arbitraires. Le diagnostic local des routes aussi : quelle étape irait
+où, avec ou sans clé, avec ou sans tarif connu, sans le moindre appel facturé.
+Il vit désormais sur l'écran Moteur, où l'on se pose la question.
+
+**La désinstallation.** Les tables, les options, le cron et les capacités
+partent. Les brouillons produits et les images de la médiathèque restent :
+supprimer une extension ne doit pas supprimer le travail d'un rédacteur.
+
+**236 chaînes traduites** en anglais et en arabe, vérifiées par un test. Et un
+test de rendu passe sur chaque écran, avec une base vide, pour les deux profils
+de droits : un écran qui plante sur une installation neuve est la première chose
+que verrait un nouvel arrivant.
+
 ## Version 0.4.1
 
 **Une interface refondue, traduite, et une couche de données qui tient la
@@ -157,7 +190,7 @@ cron réel et validité distante des clés restent à vérifier sur un site de t
 
 ## État actuel
 
-La version `0.4.1` est un socle installable : file persistante, pipeline de
+La version `0.4.2` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.

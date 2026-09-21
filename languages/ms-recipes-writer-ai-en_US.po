@@ -413,3 +413,306 @@ msgstr "Article language"
 
 msgid "Tarte aux pommes normande\nPâte brisée, pommes, crème, calvados…\n\n---\n\nPoulet yassa\nPoulet, oignons, citron…"
 msgstr "Normandy apple tart\nShortcrust, apples, cream, calvados…\n\n---\n\nChicken yassa\nChicken, onions, lemon…"
+
+msgid "%d étape(s) ont tourné sur un modèle sans tarif publié. Le coût de cette recette est incomplet, pas exact."
+msgstr "%d step(s) ran on a model with no published rate. This recipe's cost is incomplete, not exact."
+
+msgid "Appariement"
+msgstr "Pairing"
+
+msgid "Association probable — vérifiez"
+msgstr "Probable match — check it"
+
+msgid "Association sûre"
+msgstr "Confident match"
+
+msgid "Aucun jugement final n’a été rendu pour cet article — le profil choisi ne l’exécutait pas, ou la recette s’est arrêtée avant."
+msgstr "No final judgement was made for this article — the chosen profile did not run it, or the recipe stopped first."
+
+msgid "Aucune donnée."
+msgstr "No data."
+
+msgid "Aucune photographie"
+msgstr "No photographs"
+
+msgid "Aucune remarque."
+msgstr "No findings."
+
+msgid "Bloquant"
+msgstr "Blocking"
+
+msgid "Ce que le juge a relevé"
+msgstr "What the judge found"
+
+msgid "Ce qui a réellement été facturé, par quel point d’entrée, et quelle part de l’entrée a été servie depuis le cache du fournisseur."
+msgstr "What was actually billed, through which endpoint, and how much of the input the provider served from its cache."
+
+msgid "Ce qui est réellement transmis au moteur"
+msgstr "What is actually handed to the engine"
+
+msgid "Ce qui ne va pas"
+msgstr "What is wrong"
+
+msgid "Celle d’un lot qui n’en choisit pas."
+msgstr "For a lot that does not choose one."
+
+msgid "Cet article a été généré. Les contrôles ci-dessous portent sur ce que la machine a produit ; ils ne remplacent pas votre relecture, et rien ici ne vaut approbation."
+msgstr "This article was generated. The checks below are about what the machine produced; they do not replace your reading, and nothing here counts as approval."
+
+msgid "Cette recette n’est pas arrêtée."
+msgstr "This recipe is not stopped."
+
+msgid "Chaque photographie a été décrite depuis ses propres pixels, puis rapprochée d’une recette. Dans le doute, le modèle n’associe pas : une photographie laissée de côté coûte moins cher qu’une photographie attribuée au mauvais plat."
+msgstr "Each photograph was described from its own pixels, then matched to a recipe. In doubt the model does not pair: a photograph left aside costs less than one attached to the wrong dish."
+
+msgid "Chiffrées à l’enregistrement et jamais réaffichées. Un champ laissé vide conserve la clé enregistrée ; il ne l’efface pas."
+msgstr "Encrypted when saved and never shown again. An empty field keeps the stored key; it does not clear it."
+
+msgid "Clés d’API"
+msgstr "API keys"
+
+msgid "Contrôle local uniquement, sans aucun appel facturé : la présence d’une clé ne prouve pas qu’elle est valide, seulement qu’un appel serait tenté."
+msgstr "Local check only, with nothing billed: a key being present does not prove it works, only that a call would be attempted."
+
+msgid "Contrôles non satisfaits"
+msgstr "Unmet checks"
+
+msgid "Correction :"
+msgstr "Fix:"
+
+msgid "Correction proposée :"
+msgstr "Suggested fix:"
+
+msgid "Coût"
+msgstr "Cost"
+
+msgid "DISABLE_WP_CRON est actif. C’est la configuration recommandée, mais elle suppose qu’un cron serveur appelle wp-cron.php : sans lui, les recettes resteront en attente indéfiniment."
+msgstr "DISABLE_WP_CRON is set. That is the recommended setup, but it assumes a server cron calls wp-cron.php: without one, recipes wait indefinitely."
+
+msgid "Des remarques mineures, sans rien de bloquant."
+msgstr "Minor findings, nothing blocking."
+
+msgid "Durée"
+msgstr "Time"
+
+msgid "Déroulé"
+msgstr "Timeline"
+
+msgid "Enregistrer"
+msgstr "Save"
+
+msgid "Enregistrer l’appariement"
+msgstr "Save the pairing"
+
+msgid "Enregistré."
+msgstr "Saved."
+
+msgid "Gravité"
+msgstr "Severity"
+
+msgid "JSON invalide, donc ignoré pour : %s. Le reste a bien été enregistré, et ces groupes gardent leur valeur précédente."
+msgstr "Invalid JSON, so ignored for: %s. The rest was saved, and those groups keep their previous value."
+
+msgid "La couche appelante, telle quelle. Vide signifie que tout suit le moteur."
+msgstr "The caller layer, as it stands. Empty means everything follows the engine."
+
+msgid "Langue par défaut"
+msgstr "Default language"
+
+msgid "Le dossier des téléversements n’est pas accessible en écriture : aucune image générée ne pourra être enregistrée."
+msgstr "The uploads directory is not writable: no generated image can be saved."
+
+msgid "Le juge n’a rien relevé. Votre relecture reste la seule validation."
+msgstr "The judge found nothing. Your reading is still the only approval."
+
+msgid "Les clés, et l’état de ce qui fait avancer le travail."
+msgstr "The keys, and the state of what moves the work along."
+
+msgid "Les photographies sont en cours de description. Rechargez dans un instant."
+msgstr "The photographs are being described. Reload in a moment."
+
+msgid "Les recettes avancent ensemble, une vague par tick de cron. Vous pouvez fermer cet onglet."
+msgstr "The recipes advance together, one wave per cron tick. You can close this tab."
+
+msgid "Les recettes seront générées sans photographie fournie : le moteur cherchera ses propres références."
+msgstr "The recipes will be generated with no supplied photograph: the engine will find its own references."
+
+msgid "Lot %d"
+msgstr "Lot %d"
+
+msgid "L’avis du moteur sur sa propre production. Ce n’est pas une validation éditoriale : c’est à vous de décider si l’article part."
+msgstr "The engine's opinion of its own output. It is not an editorial approval: whether the article goes out is your call."
+
+msgid "MS Recipes Writer — à vérifier avant publication"
+msgstr "MS Recipes Writer — check before publishing"
+
+msgid "Mineur"
+msgstr "Minor"
+
+msgid "Nom"
+msgstr "Name"
+
+msgid "Non décrite."
+msgstr "Not described."
+
+msgid "Non vérifiable :"
+msgstr "Could not verify:"
+
+msgid "Ouvrir le brouillon"
+msgstr "Open the draft"
+
+msgid "Où irait chaque étape"
+msgstr "Where each step would go"
+
+msgid "Peu sûr — à confirmer"
+msgstr "Unsure — confirm it"
+
+msgid "Porte sur"
+msgstr "About"
+
+msgid "Productions"
+msgstr "Output"
+
+msgid "Rapport complet"
+msgstr "Full report"
+
+msgid "Recette introuvable."
+msgstr "Recipe not found."
+
+msgid "Recette pour la photographie %s"
+msgstr "Recipe for photograph %s"
+
+msgid "Recettes"
+msgstr "Recipes"
+
+msgid "Reprendre"
+msgstr "Resume"
+
+msgid "Reprise…"
+msgstr "Resuming…"
+
+msgid "Retour au lot"
+msgstr "Back to the lot"
+
+msgid "Rien n’est figé dans le moteur : routage, plafonds, tentatives, tarifs, gabarits, registre des étapes. Seule la différence avec ses valeurs par défaut est conservée."
+msgstr "Nothing in the engine is fixed: routing, ceilings, attempts, prices, templates, the step registry. Only the difference from its defaults is stored."
+
+msgid "Structures"
+msgstr "Structures"
+
+msgid "Taille"
+msgstr "Size"
+
+msgid "Valeur par défaut du moteur"
+msgstr "The engine's default"
+
+msgid "Voir le détail de la recette %d"
+msgstr "See recipe %d in detail"
+
+msgid "WordPress"
+msgstr "WordPress"
+
+msgid "accessibles"
+msgstr "writable"
+
+msgid "article"
+msgstr "article"
+
+msgid "aucun entretien planifié"
+msgstr "no maintenance scheduled"
+
+msgid "aucune clé"
+msgstr "no key"
+
+msgid "bloquante"
+msgstr "blocking"
+
+msgid "bloqués"
+msgstr "blocked"
+
+msgid "bon"
+msgstr "good"
+
+msgid "clé enregistrée"
+msgstr "key stored"
+
+msgid "cohérence"
+msgstr "consistency"
+
+msgid "collage"
+msgstr "collage"
+
+msgid "coût"
+msgstr "cost"
+
+msgid "cron"
+msgstr "cron"
+
+msgid "durée"
+msgstr "time"
+
+msgid "défaut du moteur : %s"
+msgstr "engine default: %s"
+
+msgid "groupes modifiés"
+msgstr "groups changed"
+
+msgid "généré"
+msgstr "generated"
+
+msgid "image à la une"
+msgstr "featured image"
+
+msgid "inchangée"
+msgstr "unchanged"
+
+msgid "jours de déroulé conservés ; les chiffres restent"
+msgstr "days of timeline kept; the figures stay"
+
+msgid "langue"
+msgstr "language"
+
+msgid "mauvais"
+msgstr "bad"
+
+msgid "mineure"
+msgstr "minor"
+
+msgid "modifié"
+msgstr "changed"
+
+msgid "photographies"
+msgstr "photographs"
+
+msgid "plafond"
+msgstr "ceiling"
+
+msgid "réserves"
+msgstr "reservations"
+
+msgid "rétention"
+msgstr "retention"
+
+msgid "serveur"
+msgstr "server"
+
+msgid "tarif inconnu"
+msgstr "unpriced"
+
+msgid "téléversements"
+msgstr "uploads"
+
+msgid "Étapes"
+msgstr "Steps"
+
+msgid "État de la machinerie"
+msgstr "State of the machinery"
+
+msgid "à corriger avant publication."
+msgstr "to fix before publishing."
+
+msgid "étapes"
+msgstr "steps"
+
+msgid "— aucune —"
+msgstr "— none —"

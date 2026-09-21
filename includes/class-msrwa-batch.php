@@ -135,6 +135,13 @@ final class MSRWA_Batch {
 		return $started;
 	}
 
+	/** A batch with work in it again is not a finished batch. */
+	public static function reopen( $id ) {
+		global $wpdb;
+		if ( ! $id ) { return; }
+		$wpdb->query( $wpdb->prepare( 'UPDATE ' . self::table() . " SET status = 'running', updated_at = %s WHERE id = %d AND status IN ('done','failed')", current_time( 'mysql', true ), absint( $id ) ) );
+	}
+
 	/** Closes a batch once none of its runs is still moving. */
 	public static function settle( $id ) {
 		global $wpdb;

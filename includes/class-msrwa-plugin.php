@@ -44,7 +44,7 @@ final class MSRWA_Plugin {
 		add_action( 'msrwa_run_step', array( 'MSRWA_Run', 'tick' ) );
 		add_action( 'msrwa_cleanup', array( 'MSRWA_Run', 'recover_expired' ) );
 		add_action( 'msrwa_cleanup', array( __CLASS__, 'prune' ) );
-		if ( is_admin() ) { MSRWA_Admin::hooks(); }
+		if ( is_admin() ) { MSRWA_Admin::hooks(); MSRWA_Editor::hooks(); }
 		if ( get_option( 'msrwa_db_version' ) !== MSRWA_VERSION ) { MSRWA_DB::install(); self::caps(); }
 	}
 

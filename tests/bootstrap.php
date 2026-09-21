@@ -138,6 +138,55 @@ if ( ! class_exists( 'MSRWA_Settings' ) ) {
 // The real class, not a stand-in: its table list and its secret-stripping are
 // what the plugin actually relies on, and a stub that drifts from them would
 // let a test pass over code that does not exist.
+// Options live in memory for the duration of a test, so classes that store
+// their settings there run as they really do rather than through a double.
+$GLOBALS['msrwa_test_options'] = array();
+
+if ( ! function_exists( 'get_option' ) ) {
+	function get_option( $key, $default = false ) {
+		return array_key_exists( $key, $GLOBALS['msrwa_test_options'] ) ? $GLOBALS['msrwa_test_options'][ $key ] : $default;
+	}
+}
+if ( ! function_exists( 'update_option' ) ) {
+	function update_option( $key, $value, $autoload = null ) { $GLOBALS['msrwa_test_options'][ $key ] = $value; return true; }
+}
+if ( ! function_exists( 'delete_option' ) ) {
+	function delete_option( $key ) { unset( $GLOBALS['msrwa_test_options'][ $key ] ); return true; }
+}
+if ( ! function_exists( 'wp_next_scheduled' ) ) {
+	function wp_next_scheduled( $hook, $args = array() ) { return false; }
+}
+if ( ! function_exists( 'wp_is_writable' ) ) {
+	function wp_is_writable( $path ) { return true; }
+}
+if ( ! function_exists( 'wp_upload_dir' ) ) {
+	function wp_upload_dir() { return array( 'basedir' => sys_get_temp_dir() . '/msrwa-test', 'baseurl' => 'https://example.test/uploads' ); }
+}
+if ( ! function_exists( 'submit_button' ) ) {
+	function submit_button( $text = '', $type = 'primary', $name = 'submit', $wrap = true ) {
+		echo '<p><button type="submit" class="button button-primary">' . esc_html( $text ) . '</button></p>';
+	}
+}
+if ( ! function_exists( 'wp_nonce_field' ) ) {
+	function wp_nonce_field( $action = -1, $name = '_wpnonce', $referer = true, $display = true ) {
+		$field = '<input type="hidden" name="' . esc_attr( $name ) . '" value="test">';
+		if ( $display ) { echo $field; }
+		return $field;
+	}
+}
+if ( ! function_exists( 'apply_filters' ) ) {
+	function apply_filters( $hook, $value ) { return $value; }
+}
+if ( ! function_exists( 'wp_date' ) ) {
+	function wp_date( $format, $timestamp = null ) { return gmdate( $format, $timestamp ?: time() ); }
+}
+if ( ! function_exists( 'human_time_diff' ) ) {
+	function human_time_diff( $from, $to = 0 ) { return '1 min'; }
+}
+if ( ! function_exists( 'size_format' ) ) {
+	function size_format( $bytes, $decimals = 0 ) { return number_format( (float) $bytes / 1024, $decimals ) . ' KB'; }
+}
+
 if ( ! function_exists( 'wp_dropdown_users' ) ) {
 	function wp_dropdown_users( $args = array() ) {
 		$name = isset( $args['name'] ) ? $args['name'] : 'user';

@@ -159,6 +159,22 @@
     });
   }
 
+  // --- Picking a stopped recipe back up ----------------------------------
+
+  var retry = document.querySelector('.ms-retry');
+  if (retry) {
+    retry.addEventListener('click', function () {
+      retry.disabled = true;
+      say(document.getElementById('ms-run-status'), t.retrying || '');
+      call('/runs/' + retry.dataset.run + '/retry', { method: 'POST' })
+        .then(function () { window.location.reload(); })
+        .catch(function (error) {
+          say(document.getElementById('ms-run-status'), error.message);
+          retry.disabled = false;
+        });
+    });
+  }
+
   // --- Keeping a rail honest ---------------------------------------------
 
   var rail = document.querySelector('[data-batch] .ms-rail') || document.querySelector('#ms-live-rail .ms-rail');

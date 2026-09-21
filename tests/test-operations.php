@@ -5,9 +5,18 @@ require_once MSRWA_DIR . 'includes/class-msrwa-run.php';
 function wp_upload_dir() { return array( 'basedir' => MSRWA_DIR . 'tests' ); }
 function update_option( $key, $value, $autoload = false ) { $GLOBALS['ops_options'][ $key ] = $value; }
 
-try { MSRWA_Operations::screen(); msrwa_test_assert( false, 'Editor must not access global analytics.' ); }
-catch ( RuntimeException $error ) { msrwa_test_assert( 'Accès refusé.' === $error->getMessage(), 'Analytics checks authorization before querying.' ); }
-msrwa_test_assert( ! $GLOBALS['wpdb']->queries, 'Unauthorized analytics does not query the database.' );
+// Analytics moved to its own screen; authorisation is still checked before a
+// single row is read, which is the property that matters.
+require_once MSRWA_DIR . 'includes/class-msrwa-rights.php';
+require_once MSRWA_DIR . 'includes/class-msrwa-i18n.php';
+require_once MSRWA_DIR . 'includes/class-msrwa-profile.php';
+require_once MSRWA_DIR . 'includes/class-msrwa-ui.php';
+require_once MSRWA_DIR . 'includes/class-msrwa-ledger.php';
+require_once MSRWA_DIR . 'includes/class-msrwa-screen-analysis.php';
+
+try { MSRWA_Screen_Analysis::render(); msrwa_test_assert( false, 'A writer must not reach the whole ledger.' ); }
+catch ( RuntimeException $error ) { msrwa_test_assert( '' !== $error->getMessage(), 'Analysis checks authorisation before querying.' ); }
+msrwa_test_assert( ! $GLOBALS['wpdb']->queries, 'A refused reader never reaches the database.' );
 $image = MSRWA_Operations::safe_image( array( 'path' => __FILE__, 'mime' => 'image/png' ), 1 );
 msrwa_test_assert( '' === $image['path'], 'Report refuses paths outside the job image directory.' );
 $image = MSRWA_Operations::safe_image( array( 'path' => '/missing/image.webp' ), 1 );

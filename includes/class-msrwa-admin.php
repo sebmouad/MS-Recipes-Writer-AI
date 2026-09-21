@@ -2,18 +2,22 @@
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
 /**
- * The screens. One submission, its pairing, its runs, and what they cost.
+ * The menu, the assets, and the two forms that post back.
+ *
+ * Every screen lives in its own class; this only decides who may reach which
+ * one and hands WordPress the pieces it needs.
  */
 final class MSRWA_Admin {
 
 	public static function hooks() {
-		add_action( 'admin_post_msrwa_job_report', array( 'MSRWA_Operations', 'report' ) );
 		add_action( 'admin_menu', array( __CLASS__, 'menu' ), 30 );
 		add_action( 'admin_post_msrwa_save_settings', array( __CLASS__, 'save_settings' ) );
 		add_action( 'admin_post_msrwa_save_engine', array( __CLASS__, 'save_engine' ) );
+		add_action( 'admin_post_msrwa_report', array( 'MSRWA_Operations', 'report' ) );
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'assets' ) );
 	}
 
+	/** In the order the work happens: the pass, submitting, the record, the levers. */
 	public static function menu() {
 		$write = MSRWA_Rights::CREATE;
 		$manage = MSRWA_Rights::MANAGE;
@@ -23,23 +27,30 @@ final class MSRWA_Admin {
 		add_submenu_page( 'msrwa', __( 'Nouveau lot', 'ms-recipes-writer-ai' ), __( 'Nouveau lot', 'ms-recipes-writer-ai' ), $write, 'msrwa-compose', array( 'MSRWA_Screen_Compose', 'render' ) );
 		add_submenu_page( 'msrwa', __( 'Articles', 'ms-recipes-writer-ai' ), __( 'Articles', 'ms-recipes-writer-ai' ), $write, 'msrwa-articles', array( 'MSRWA_Screen_Articles', 'render' ) );
 		add_submenu_page( 'msrwa', __( 'Analyse', 'ms-recipes-writer-ai' ), __( 'Analyse', 'ms-recipes-writer-ai' ), $manage, 'msrwa-analysis', array( 'MSRWA_Screen_Analysis', 'render' ) );
-		add_submenu_page( 'msrwa', __( 'Moteur', 'ms-recipes-writer-ai' ), __( 'Moteur', 'ms-recipes-writer-ai' ), $manage, 'msrwa-engine', array( __CLASS__, 'engine' ) );
-		add_submenu_page( 'msrwa', __( 'Réglages', 'ms-recipes-writer-ai' ), __( 'Réglages', 'ms-recipes-writer-ai' ), $manage, 'msrwa-settings', array( __CLASS__, 'settings' ) );
+		add_submenu_page( 'msrwa', __( 'Moteur', 'ms-recipes-writer-ai' ), __( 'Moteur', 'ms-recipes-writer-ai' ), $manage, 'msrwa-engine', array( 'MSRWA_Screen_Engine', 'render' ) );
+		add_submenu_page( 'msrwa', __( 'Réglages', 'ms-recipes-writer-ai' ), __( 'Réglages', 'ms-recipes-writer-ai' ), $manage, 'msrwa-settings', array( 'MSRWA_Screen_Settings', 'render' ) );
 
 		// Reached from a ticket, never from the menu.
-		add_submenu_page( null, __( 'Lot', 'ms-recipes-writer-ai' ), __( 'Lot', 'ms-recipes-writer-ai' ), $write, 'msrwa-batch', array( __CLASS__, 'batch' ) );
-		add_submenu_page( null, __( 'Recette', 'ms-recipes-writer-ai' ), __( 'Recette', 'ms-recipes-writer-ai' ), $write, 'msrwa-run', array( __CLASS__, 'run' ) );
+		add_submenu_page( null, __( 'Lot', 'ms-recipes-writer-ai' ), __( 'Lot', 'ms-recipes-writer-ai' ), $write, 'msrwa-batch', array( 'MSRWA_Screen_Batch', 'render' ) );
+		add_submenu_page( null, __( 'Recette', 'ms-recipes-writer-ai' ), __( 'Recette', 'ms-recipes-writer-ai' ), $write, 'msrwa-run', array( 'MSRWA_Screen_Run', 'render' ) );
 	}
 
 	public static function assets( $hook ) {
-		if ( false === strpos( (string) $hook, 'msrwa' ) ) { return; }
-		wp_enqueue_media();
+		$ours = false !== strpos( (string) $hook, 'msrwa' );
+		// The verdict box lives on the post editor, so the stylesheet has to
+		// reach there too — otherwise an editor sees unstyled findings.
+		$editing = in_array( (string) $hook, array( 'post.php', 'post-new.php' ), true );
+		if ( ! $ours && ! $editing ) { return; }
+
 		wp_enqueue_style( 'msrwa-admin', MSRWA_URL . 'assets/admin.css', array(), MSRWA_VERSION . '.' . filemtime( MSRWA_DIR . 'assets/admin.css' ) );
+		if ( ! $ours ) { return; }
+
+		wp_enqueue_media();
 		wp_enqueue_script( 'msrwa-admin', MSRWA_URL . 'assets/admin.js', array(), MSRWA_VERSION . '.' . filemtime( MSRWA_DIR . 'assets/admin.js' ), true );
 
 		// Every word the script can print comes from here, so the interface is
 		// translated in one place rather than half in PHP and half in English
-		// strings buried in a bundle.
+		// buried in a bundle.
 		wp_localize_script( 'msrwa-admin', 'MSRWA', array(
 			'api' => esc_url_raw( rest_url( 'msrwa/v1' ) ),
 			'nonce' => wp_create_nonce( 'wp_rest' ),
@@ -59,373 +70,13 @@ final class MSRWA_Admin {
 				'saving' => __( 'Enregistrement…', 'ms-recipes-writer-ai' ),
 				'saved' => __( 'Appariement enregistré.', 'ms-recipes-writer-ai' ),
 				'sending' => __( 'Envoi au moteur…', 'ms-recipes-writer-ai' ),
+				'retrying' => __( 'Reprise…', 'ms-recipes-writer-ai' ),
 			),
 		) );
 	}
 
-	private static function guard( $capability = MSRWA_Rights::CREATE ) {
-		if ( ! MSRWA_Rights::can( $capability ) ) { wp_die( esc_html__( 'Vous n’avez pas accès à cet écran.', 'ms-recipes-writer-ai' ) ); }
-	}
-
-	public static function navigation() {
-		$current = sanitize_key( $_GET['page'] ?? 'msrwa' );
-		$pages = array( 'msrwa' => 'Rédaction', 'msrwa-jobs' => 'Jobs' );
-		if ( current_user_can( 'manage_options' ) ) { $pages += array( 'msrwa-operations' => 'Statistiques', 'msrwa-cron' => 'Planificateur', 'msrwa-engine' => 'Moteur', 'msrwa-settings' => 'Réglages' ); }
-		echo '<nav class="msrwa-nav" aria-label="Navigation du plugin">';
-		foreach ( $pages as $page => $label ) { echo '<a href="' . esc_url( admin_url( 'admin.php?page=' . $page ) ) . '"' . ( $current === $page ? ' aria-current="page"' : '' ) . '>' . esc_html( $label ) . '</a>'; }
-		echo '</nav>';
-	}
-
-	private static function editor_jobs() {
-		global $wpdb;
-		$t = MSRWA_DB::tables();
-		$where = $wpdb->prepare( 'owner_id = %d', get_current_user_id() );
-		$status = sanitize_key( $_GET['status'] ?? '' );
-		if ( in_array( $status, array( 'queued', 'running', 'done', 'failed', 'cancelled' ), true ) ) { $where .= $wpdb->prepare( ' AND status = %s', $status ); }
-		$search = sanitize_text_field( wp_unslash( $_GET['s'] ?? '' ) );
-		if ( $search ) { $where .= $wpdb->prepare( ' AND label LIKE %s', '%' . $wpdb->esc_like( $search ) . '%' ); }
-		$total = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$t['runs']} WHERE $where" );
-		$page = min( max( 1, absint( $_GET['paged'] ?? 1 ) ), max( 1, (int) ceil( $total / 25 ) ) );
-		$rows = (array) $wpdb->get_results( $wpdb->prepare( "SELECT id,label,status,draft_post_id,approved FROM {$t['runs']} WHERE $where ORDER BY id DESC LIMIT %d OFFSET %d", 25, ( $page - 1 ) * 25 ), ARRAY_A );
-		echo '<div class="wrap msrwa"><h1>Mes recettes</h1>'; self::navigation();
-		echo '<form method="get"><input type="hidden" name="page" value="msrwa-jobs"><label>Rechercher une recette <input name="s" value="' . esc_attr( $search ) . '"></label><button class="button">Rechercher</button></form>';
-		self::editor_cards( $rows );
-		foreach ( array( $page - 1 => 'Précédent', $page + 1 => 'Suivant' ) as $target => $label ) {
-			if ( $target > 0 && $target <= ceil( $total / 25 ) ) { echo '<a class="button" href="' . esc_url( add_query_arg( array( 'page' => 'msrwa-jobs', 'paged' => $target, 's' => $search, 'status' => $status ), admin_url( 'admin.php' ) ) ) . '">' . esc_html( $label ) . '</a>'; }
-		}
-		echo '</div>';
-	}
-
-	private static function editor_cards( array $runs ) {
-		if ( ! $runs ) { echo '<p>Aucune recette pour le moment.</p>'; }
-		foreach ( $runs as $run ) {
-			echo '<section class="ms-card"><h2>' . esc_html( $run['label'] ) . '</h2><p>' . esc_html( self::run_label( $run['status'] ) ) . '</p>';
-			if ( null !== $run['approved'] ) { echo '<p>' . ( $run['approved'] ? 'Contrôle qualité réussi. Relecture éditoriale nécessaire.' : 'Cette recette nécessite votre attention.' ) . '</p>'; }
-			echo '<a class="button" href="' . esc_url( admin_url( 'admin.php?page=msrwa-run&run_id=' . (int) $run['id'] ) ) . '">Voir la recette</a>';
-			if ( $run['draft_post_id'] && current_user_can( 'edit_post', (int) $run['draft_post_id'] ) ) { echo '<a class="button button-primary" href="' . esc_url( get_edit_post_link( (int) $run['draft_post_id'] ) ) . '">Ouvrir l’article</a><p>Publication : ' . esc_html( get_post_status( (int) $run['draft_post_id'] ) ) . '</p>'; }
-			echo '</section>';
-		}
-	}
-
-	private static function editor_result( array $run ) {
-		$a = MSRWA_Run::artifacts( (int) $run['id'] );
-		require_once MSRWA_DIR . 'tools/report.php';
-		echo '<div class="wrap msrwa"><h1>' . esc_html( $run['label'] ) . '</h1>'; self::navigation();
-		self::editor_cards( array( $run ) );
-		echo '<section class="ms-card"><h2>Recette</h2>' . report_recipe_card( (array) ( $a['canonical'] ?? array() ) ) . '</section>';
-		$article = (array) ( $a['proofread'] ?? $a['corrected'] ?? $a['article'] ?? array() );
-		echo '<section class="ms-card"><h2>Article</h2>' . wp_kses_post( (string) ( $article['content_html'] ?? '' ) ) . '</section>';
-		foreach ( array( 'featured' => 'Image à la une', 'facebook' => 'Collage Facebook' ) as $kind => $label ) {
-			$image = MSRWA_Operations::safe_image( (array) ( $a[ $kind ] ?? array() ), (int) $run['id'] );
-			echo '<section class="ms-card">' . report_image( $image, $label, '' ) . '</section>';
-		}
-		echo '</div>';
-	}
-
-	private static function batch_state( $status ) {
-		$labels = array( 'matching' => 'appariement en cours', 'ready' => 'à confirmer', 'running' => 'en cours', 'done' => 'terminé', 'failed' => 'échoué' );
-		return $labels[ $status ] ?? $status;
-	}
-
-	public static function run_label( $status ) {
-		return array( 'queued' => 'En attente', 'running' => 'En cours', 'done' => 'Terminé', 'failed' => 'Échoué', 'cancelled' => 'Annulé' )[ $status ] ?? $status;
-	}
-
-	public static function batch_summary( array $runs ) {
-		$counts = array( 'queued' => 0, 'running' => 0, 'done' => 0, 'failed' => 0, 'cancelled' => 0 );
-		foreach ( $runs as $run ) { if ( isset( $counts[ $run['status'] ] ) ) { $counts[ $run['status'] ]++; } }
-		echo '<div class="msrwa-summary-grid" aria-label="Résumé des recettes du lot">';
-		foreach ( $counts as $status => $count ) { echo '<div><span>' . esc_html( self::run_label( $status ) ) . '</span><strong data-run-count="' . esc_attr( $status ) . '">' . esc_html( $count ) . '</strong></div>'; }
-		echo '</div>';
-	}
-
-	// --- Un lot : l’appariement, puis les runs ---------------------------
-
-	public static function batch() {
-		self::guard();
-		$batch = MSRWA_Batch::get( isset( $_GET['batch_id'] ) ? absint( $_GET['batch_id'] ) : 0 );
-		if ( ! $batch || ! MSRWA_Batch::may_see( $batch ) ) { wp_die( esc_html__( 'Lot introuvable.', 'ms-recipes-writer-ai' ) ); }
-		$matching = MSRWA_Batch::matching( (int) $batch['id'] );
-		$runs = MSRWA_Run::for_batch( (int) $batch['id'] );
-		$editable = 'ready' === $batch['status'];
-		?>
-		<div class="wrap msrwa" data-batch="<?php echo esc_attr( $batch['id'] ); ?>">
-			<h1>Lot #<?php echo esc_html( $batch['id'] ); ?> — <?php echo esc_html( $batch['label'] ); ?></h1>
-			<?php self::navigation(); ?>
-			<p><a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=msrwa' ) ); ?>">Retour</a></p>
-
-			<?php if ( '' !== (string) $batch['error_message'] ) : ?>
-				<div class="notice notice-warning"><p><?php echo esc_html( $batch['error_message'] ); ?></p></div>
-			<?php endif; ?>
-
-			<div class="ms-card">
-				<h2>Appariement</h2>
-				<?php if ( ! empty( $matching['reasoning'] ) ) : ?><p class="ms-muted"><?php echo esc_html( $matching['reasoning'] ); ?></p><?php endif; ?>
-				<p class="ms-muted">Coût de l’appariement : <?php echo esc_html( sprintf( '%.4f $', (float) ( $matching['cost_usd'] ?? 0 ) ) ); ?>. Corriger une association ne coûte rien : aucune photographie n’est décrite deux fois.</p>
-				<table class="ms-table" id="msrwa-pairs">
-					<thead><tr><th>Photographie</th><th>Ce qu’elle montre</th><th>Confiance</th><th>Recette</th></tr></thead>
-					<tbody>
-					<?php foreach ( (array) $matching['images'] as $index => $image ) : ?>
-						<?php
-						$pair = array( 'recipe' => null, 'confidence' => 'basse', 'why' => '' );
-						foreach ( (array) $matching['pairs'] as $candidate ) { if ( (int) $candidate['image'] === (int) $index ) { $pair = $candidate; } }
-						?>
-						<tr>
-							<td>
-								<?php if ( ! empty( $image['url'] ) ) : ?><img src="<?php echo esc_url( $image['url'] ); ?>" alt="" style="max-width:120px;height:auto;border-radius:6px"><br><?php endif; ?>
-								<code><?php echo esc_html( $image['file'] ); ?></code>
-							</td>
-							<td><?php echo esc_html( '' !== (string) ( $image['dish'] ?? '' ) ? $image['dish'] . ' — ' : '' ); ?><?php echo esc_html( (string) ( $image['describes'] ?? '' ) ); ?></td>
-							<td><?php echo esc_html( (string) $pair['confidence'] ); ?><br><small><?php echo esc_html( (string) $pair['why'] ); ?></small></td>
-							<td>
-								<select class="msrwa-pair" data-image="<?php echo esc_attr( $index ); ?>" <?php disabled( ! $editable ); ?>>
-									<option value="" <?php selected( null === $pair['recipe'] ); ?>>— aucune —</option>
-									<?php foreach ( (array) $matching['recipes'] as $recipe_index => $recipe ) : ?>
-										<option value="<?php echo esc_attr( $recipe_index ); ?>" <?php selected( null !== $pair['recipe'] && (int) $recipe_index === (int) $pair['recipe'] ); ?>><?php echo esc_html( $recipe['title'] ); ?></option>
-									<?php endforeach; ?>
-								</select>
-							</td>
-						</tr>
-					<?php endforeach; ?>
-					</tbody>
-				</table>
-				<?php if ( $editable ) : ?>
-					<p>
-						<button class="button" id="msrwa-save-pairs">Enregistrer l’appariement</button>
-						<button class="button button-primary" id="msrwa-dispatch">Lancer les <?php echo esc_html( $batch['recipes'] ); ?> recettes</button>
-						<span id="msrwa-batch-status" class="ms-muted"></span>
-					</p>
-					<p class="ms-muted">Une recette sans photographie est générée quand même : le moteur cherchera ses propres références.</p>
-				<?php endif; ?>
-			</div>
-
-			<?php if ( $runs ) : ?>
-			<div class="ms-card">
-				<h2>Suivi des <?php echo esc_html( count( $runs ) ); ?> recettes</h2>
-				<?php self::batch_summary( $runs ); ?>
-				<table class="ms-table" id="msrwa-runs">
-					<thead><tr><th>#</th><th>Recette</th><th>État</th><th>Étapes</th><th>Coût</th><th>Durée</th><th>Verdict</th><th></th></tr></thead>
-					<tbody>
-					<?php foreach ( $runs as $run ) : ?>
-						<tr data-run="<?php echo esc_attr( $run['id'] ); ?>">
-							<td><?php echo esc_html( $run['id'] ); ?></td>
-							<td><?php echo esc_html( $run['label'] ); ?></td>
-							<td class="msrwa-run-state"><span class="msrwa-state" data-state="<?php echo esc_attr( $run['status'] ); ?>"><?php echo esc_html( self::run_label( $run['status'] ) ); ?></span></td>
-							<td><progress class="msrwa-run-progress" max="<?php echo esc_attr( max( 1, (int) $run['steps_total'] ) ); ?>" value="<?php echo esc_attr( min( (int) $run['steps_done'], max( 1, (int) $run['steps_total'] ) ) ); ?>" aria-label="Étapes exécutées"></progress><span class="msrwa-run-steps"><?php echo esc_html( $run['steps_done'] . ' / ' . $run['steps_total'] ); ?></span></td>
-							<td class="msrwa-run-cost"><?php echo esc_html( sprintf( '%.4f $', (float) $run['cost_usd'] ) ); ?></td>
-							<td class="msrwa-run-seconds"><?php echo esc_html( sprintf( '%.1f s', (float) $run['seconds'] ) ); ?></td>
-							<td><?php echo esc_html( null === $run['approved'] ? '—' : ( $run['approved'] ? 'approuvé par le juge' : 'refusé par le juge' ) ); ?></td>
-							<td>
-								<a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=msrwa-run&run_id=' . (int) $run['id'] ) ); ?>">Détail</a>
-								<?php if ( (int) $run['draft_post_id'] ) : ?>
-									<a class="button" href="<?php echo esc_url( get_edit_post_link( (int) $run['draft_post_id'] ) ); ?>">Brouillon</a>
-								<?php endif; ?>
-							</td>
-						</tr>
-					<?php endforeach; ?>
-					</tbody>
-				</table>
-				<p class="ms-muted">Les runs avancent ensemble, une vague par tick de cron. Vous pouvez fermer cet onglet.</p>
-			</div>
-			<?php endif; ?>
-		</div>
-		<?php
-	}
-
-	// --- Un run : tout ce que le moteur a rapporté -----------------------
-
-	public static function run() {
-		self::guard();
-		$run = MSRWA_Run::get( isset( $_GET['run_id'] ) ? absint( $_GET['run_id'] ) : 0 );
-		if ( ! $run || ! MSRWA_Run::may_see( $run ) ) { wp_die( esc_html__( 'Run introuvable.', 'ms-recipes-writer-ai' ) ); }
-		if ( ! current_user_can( 'manage_options' ) ) { self::editor_result( $run ); return; }
-		$id = (int) $run['id'];
-		$state = MSRWA_Run::state( $id );
-		$totals = $state['totals'];
-		$approval = (array) ( $state['artifacts']['approval'] ?? array() );
-		?>
-		<div class="wrap msrwa">
-			<h1>Run #<?php echo esc_html( $id ); ?> — <?php echo esc_html( $run['label'] ); ?></h1>
-			<?php self::navigation(); ?>
-			<?php $report_url = wp_nonce_url( admin_url( 'admin-post.php?action=msrwa_job_report&run_id=' . $id ), 'msrwa_job_report_' . $id ); ?>
-			<div class="ms-card">
-				<h2>Rapport éditorial complet</h2>
-				<p>État actuel : <strong><?php echo esc_html( $run['status'] ); ?></strong>. Le verdict du moteur ne remplace pas la validation éditoriale. Les temps sont cumulés par étape, hors attente cron.</p>
-				<p><a class="button button-primary" target="_blank" rel="noopener" href="<?php echo esc_url( $report_url ); ?>">Ouvrir le rapport en pleine page</a> <a class="button" href="<?php echo esc_url( $report_url . '&download=1' ); ?>">Télécharger le rapport HTML avec images</a></p>
-				<iframe class="msrwa-report-frame" title="Rapport complet du job : recette, article, SEO, images et contrôles" sandbox="allow-same-origin" referrerpolicy="no-referrer" src="<?php echo esc_url( $report_url ); ?>"></iframe>
-			</div>
-			<p>
-				<a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=msrwa-batch&batch_id=' . (int) $run['batch_id'] ) ); ?>">Retour au lot</a>
-				<?php if ( (int) $run['draft_post_id'] ) : ?><a class="button button-primary" href="<?php echo esc_url( get_edit_post_link( (int) $run['draft_post_id'] ) ); ?>">Ouvrir le brouillon</a><?php endif; ?>
-			</p>
-
-			<div class="ms-card">
-				<h2>Total</h2>
-				<div class="ms-figures">
-					<dl><dt>État</dt><dd><?php echo esc_html( $run['status'] ); ?></dd></dl>
-					<dl><dt>Coût</dt><dd><?php echo esc_html( sprintf( '%.4f $', (float) $totals['cost_usd'] ) ); ?></dd></dl>
-					<dl><dt>Durée</dt><dd><?php echo esc_html( sprintf( '%.1f s', (float) $totals['seconds'] ) ); ?></dd></dl>
-					<dl><dt>Tokens</dt><dd><?php echo esc_html( number_format_i18n( $totals['input_tokens'] ) . ' / ' . number_format_i18n( $totals['output_tokens'] ) ); ?></dd></dl>
-				</div>
-				<?php if ( ! empty( $totals['unpriced_steps'] ) ) : ?>
-					<p class="ms-muted"><strong><?php echo esc_html( $totals['unpriced_steps'] ); ?> étape(s) sur un modèle sans tarif publié : la dépense de ce run n’est pas vérifiable.</strong></p>
-				<?php endif; ?>
-				<?php if ( '' !== (string) $run['error_message'] ) : ?><p class="ms-muted"><strong><?php echo esc_html( $run['error_message'] ); ?></strong></p><?php endif; ?>
-			</div>
-
-			<div class="ms-card">
-				<h2>Étapes</h2>
-				<table class="ms-table">
-					<thead><tr><th>Étape</th><th>Modèle</th><th>Durée</th><th>Coût</th><th>Score</th><th>Contrôles non satisfaits</th></tr></thead>
-					<tbody>
-					<?php foreach ( $state['steps'] as $step ) : ?>
-						<tr>
-							<td><strong><?php echo esc_html( $step['step'] ); ?></strong><?php if ( '' !== $step['error'] ) : ?><br><em><?php echo esc_html( $step['error'] ); ?></em><?php endif; ?></td>
-							<td><?php echo esc_html( $step['model'] ); ?></td>
-							<td><?php echo esc_html( sprintf( '%.1f s', $step['seconds'] ) ); ?></td>
-							<td><?php echo esc_html( null === $step['cost_usd'] ? 'tarif inconnu' : sprintf( '%.4f $', $step['cost_usd'] ) ); ?></td>
-							<td><?php echo esc_html( null === $step['passed'] ? '—' : $step['passed'] . ' / ' . $step['total'] ); ?></td>
-							<td>
-								<?php $failed = array_filter( (array) $step['checks'], static function ( $check ) { return is_array( $check ) && empty( $check['pass'] ); } ); ?>
-								<?php if ( ! $failed ) : ?>—<?php endif; ?>
-								<?php foreach ( $failed as $label => $check ) : ?>
-									<div><code><?php echo esc_html( $label ); ?></code> <?php echo esc_html( is_scalar( $check['detail'] ?? '' ) ? (string) $check['detail'] : '' ); ?></div>
-								<?php endforeach; ?>
-							</td>
-						</tr>
-					<?php endforeach; ?>
-					</tbody>
-				</table>
-			</div>
-
-			<div class="ms-card">
-				<h2>Appels</h2>
-				<table class="ms-table">
-					<thead><tr><th>Étape</th><th>Fournisseur / modèle</th><th>Entrée</th><th>Cache</th><th>Sortie</th><th>Durée</th><th>Coût</th></tr></thead>
-					<tbody>
-					<?php foreach ( MSRWA_Run::calls( $id ) as $call ) : ?>
-						<tr>
-							<td><?php echo esc_html( $call['step'] ); ?></td>
-							<td><?php echo esc_html( $call['provider'] . ' / ' . $call['model'] ); ?><br><small><?php echo esc_html( $call['endpoint'] ); ?></small></td>
-							<td><?php echo esc_html( number_format_i18n( (int) $call['input_tokens'] ) ); ?></td>
-							<td><?php echo esc_html( (int) $call['cached_tokens'] ? round( 100 * (int) $call['cached_tokens'] / max( 1, (int) $call['input_tokens'] ) ) . ' %' : '—' ); ?></td>
-							<td><?php echo esc_html( number_format_i18n( (int) $call['output_tokens'] ) ); ?></td>
-							<td><?php echo esc_html( sprintf( '%.1f s', (float) $call['seconds'] ) ); ?></td>
-							<td><?php echo esc_html( empty( $call['priced'] ) ? 'tarif inconnu' : sprintf( '%.4f $', (float) $call['cost_usd'] ) ); ?></td>
-						</tr>
-					<?php endforeach; ?>
-					</tbody>
-				</table>
-			</div>
-
-			<?php if ( $approval ) : ?>
-			<div class="ms-card">
-				<h2>Verdict du juge</h2>
-				<p class="ms-muted">C’est l’avis du moteur sur sa propre production, jamais une validation éditoriale.</p>
-				<p><strong><?php echo esc_html( empty( $approval['approved'] ) ? 'Refusé' : 'Approuvé' ); ?></strong></p>
-				<?php if ( ! empty( $approval['findings'] ) ) : ?>
-					<ul>
-					<?php foreach ( (array) $approval['findings'] as $finding ) : ?>
-						<li><strong><?php echo esc_html( (string) ( $finding['severity'] ?? '' ) ); ?></strong> — <?php echo esc_html( (string) ( $finding['target'] ?? '' ) ); ?> : <?php echo esc_html( (string) ( $finding['reason'] ?? '' ) ); ?></li>
-					<?php endforeach; ?>
-					</ul>
-				<?php endif; ?>
-			</div>
-			<?php endif; ?>
-
-			<div class="ms-card">
-				<h2>Déroulé</h2>
-				<div class="ms-timeline">
-					<?php foreach ( $state['events'] as $event ) : ?>
-						<div><span><?php echo esc_html( sprintf( '%.1f s (vague)', (float) $event['at'] ) ); ?> <code><?php echo esc_html( $event['step'] ); ?></code></span><span><?php echo esc_html( $event['message'] ); ?></span><small><?php echo esc_html( $event['kind'] ); ?></small></div>
-						<details><summary>Données de l’événement</summary><pre><?php echo esc_html( wp_json_encode( MSRWA_DB::sanitize( $event['data'] ?? array() ), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE ) ); ?></pre></details>
-					<?php endforeach; ?>
-				</div>
-			</div>
-			<section class="ms-card"><h2>Livrables et données du moteur</h2>
-			<?php foreach ( (array) $state['artifacts'] as $key => $artifact ) : ?>
-				<details><summary><?php echo esc_html( $key ); ?></summary><pre><?php echo esc_html( wp_json_encode( MSRWA_DB::sanitize( $artifact ), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) ); ?></pre></details>
-			<?php endforeach; ?>
-			</section>
-		</div>
-		<?php
-	}
-
-	// --- Moteur et réglages ----------------------------------------------
-
-	public static function engine() {
-		self::guard( MSRWA_Rights::MANAGE );
-		$defaults = MSRWA_Engine_Settings::defaults();
-		$stored = MSRWA_Engine_Settings::stored();
-		$invalid = isset( $_GET['invalid'] ) ? array_filter( explode( ',', sanitize_text_field( wp_unslash( $_GET['invalid'] ) ) ) ) : array();
-		$encode = static function ( $value ) { return (string) wp_json_encode( $value, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ); };
-		?>
-		<div class="wrap msrwa">
-			<h1>Moteur</h1>
-			<?php self::navigation(); ?>
-			<p class="ms-muted">Tout ce que le moteur utilise est modifiable ici, et rien n’est modifié à l’intérieur du moteur : ce qui est enregistré lui est remis comme couche appelante. Seule la différence avec ses valeurs par défaut est conservée.</p>
-			<?php if ( isset( $_GET['saved'] ) && ! $invalid ) : ?><div class="notice notice-success"><p>Enregistré.</p></div><?php endif; ?>
-			<?php if ( $invalid ) : ?><div class="notice notice-error"><p>Aucun changement enregistré. JSON invalide pour : <?php echo esc_html( implode( ', ', $invalid ) ); ?>.</p></div><?php endif; ?>
-
-			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
-				<input type="hidden" name="action" value="msrwa_save_engine">
-				<?php wp_nonce_field( 'msrwa_save_engine' ); ?>
-				<div class="ms-card">
-					<h2>Langue</h2>
-					<p><label for="msrwa-language">Langue de génération</label><input id="msrwa-language" type="text" name="msrwa_engine[language]" value="<?php echo esc_attr( $stored['language'] ?? $defaults['language'] ); ?>" class="small-text"> <span class="ms-muted">Défaut : <code><?php echo esc_html( $defaults['language'] ); ?></code></span></p>
-				</div>
-				<?php foreach ( array( 'Réglages' => MSRWA_Engine_Settings::simple(), 'Structures' => MSRWA_Engine_Settings::structural() ) as $section => $groups ) : ?>
-					<h2><?php echo esc_html( $section ); ?></h2>
-					<?php foreach ( $groups as $group => $help ) : ?>
-						<?php $effective = MSRWA_Engine_Settings::effective( $group ); ?>
-						<div class="ms-card">
-							<h3><?php echo esc_html( $group ); ?><?php if ( isset( $stored[ $group ] ) ) : ?> <span class="ms-muted">— modifié</span><?php endif; ?></h3>
-							<p class="ms-muted"><?php echo esc_html( $help ); ?></p>
-							<p><textarea name="msrwa_engine[<?php echo esc_attr( $group ); ?>]" rows="<?php echo esc_attr( min( 24, max( 6, substr_count( $encode( $effective ), "\n" ) + 1 ) ) ); ?>" class="large-text code" spellcheck="false"><?php echo esc_textarea( $encode( $effective ) ); ?></textarea></p>
-							<details><summary>Valeur par défaut du moteur</summary><pre class="code"><?php echo esc_html( $encode( $defaults[ $group ] ?? array() ) ); ?></pre></details>
-						</div>
-					<?php endforeach; ?>
-				<?php endforeach; ?>
-				<?php submit_button( 'Enregistrer' ); ?>
-			</form>
-
-			<div class="ms-card">
-				<h2>Ce qui est réellement transmis</h2>
-				<pre class="code"><?php echo esc_html( $encode( $stored ) ); ?></pre>
-			</div>
-		</div>
-		<?php
-	}
-
-	public static function settings() {
-		self::guard( MSRWA_Rights::MANAGE );
-		$configured = MSRWA_Settings::configured_providers();
-		?>
-		<div class="wrap msrwa">
-			<h1>Réglages</h1>
-			<?php self::navigation(); ?>
-			<?php if ( isset( $_GET['saved'] ) ) : ?><div class="notice notice-success"><p>Enregistré.</p></div><?php endif; ?>
-			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
-				<input type="hidden" name="action" value="msrwa_save_settings">
-				<?php wp_nonce_field( 'msrwa_save_settings' ); ?>
-				<div class="ms-card">
-					<h2>Clés d’API</h2>
-					<p class="ms-muted">Stockées chiffrées et jamais réaffichées. Laissez un champ vide pour conserver la clé enregistrée.</p>
-					<?php foreach ( array( 'openai_key' => array( 'OpenAI', 'openai' ), 'gemini_key' => array( 'Gemini', 'gemini' ), 'claude_key' => array( 'Claude', 'anthropic' ) ) as $field => $provider ) : ?>
-						<p>
-							<label for="msrwa-<?php echo esc_attr( $field ); ?>"><strong><?php echo esc_html( $provider[0] ); ?></strong></label><br>
-							<input type="password" id="msrwa-<?php echo esc_attr( $field ); ?>" name="msrwa_settings[<?php echo esc_attr( $field ); ?>]" value="" class="regular-text" autocomplete="off" placeholder="<?php echo in_array( $provider[1], $configured, true ) ? 'clé enregistrée' : 'aucune clé'; ?>">
-						</p>
-					<?php endforeach; ?>
-				</div>
-				<?php submit_button( 'Enregistrer' ); ?>
-			</form>
-		</div>
-		<?php
-	}
-
 	public static function save_settings() {
-		if ( ! current_user_can( 'manage_options' ) ) { wp_die( esc_html__( 'Accès refusé.', 'ms-recipes-writer-ai' ) ); }
+		if ( ! MSRWA_Rights::may_manage() ) { wp_die( esc_html__( 'Vous n’avez pas accès à cet écran.', 'ms-recipes-writer-ai' ) ); }
 		check_admin_referer( 'msrwa_save_settings' );
 		MSRWA_Settings::save( isset( $_POST['msrwa_settings'] ) ? wp_unslash( $_POST['msrwa_settings'] ) : array() );
 		wp_safe_redirect( admin_url( 'admin.php?page=msrwa-settings&saved=1' ) );
@@ -433,7 +84,7 @@ final class MSRWA_Admin {
 	}
 
 	public static function save_engine() {
-		if ( ! current_user_can( 'manage_options' ) ) { wp_die( esc_html__( 'Accès refusé.', 'ms-recipes-writer-ai' ) ); }
+		if ( ! MSRWA_Rights::may_manage() ) { wp_die( esc_html__( 'Vous n’avez pas accès à cet écran.', 'ms-recipes-writer-ai' ) ); }
 		check_admin_referer( 'msrwa_save_engine' );
 		$invalid = MSRWA_Engine_Settings::save( isset( $_POST['msrwa_engine'] ) ? (array) wp_unslash( $_POST['msrwa_engine'] ) : array() );
 		wp_safe_redirect( add_query_arg( array( 'page' => 'msrwa-engine', 'saved' => 1, 'invalid' => implode( ',', $invalid ) ), admin_url( 'admin.php' ) ) );

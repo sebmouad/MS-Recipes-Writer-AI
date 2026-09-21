@@ -413,3 +413,306 @@ msgstr "لغة المقال"
 
 msgid "Tarte aux pommes normande\nPâte brisée, pommes, crème, calvados…\n\n---\n\nPoulet yassa\nPoulet, oignons, citron…"
 msgstr "تارت التفاح النورماندية\nعجينة مفتّتة، تفاح، قشدة، كالفادوس…\n\n---\n\nدجاج ياسا\nدجاج، بصل، ليمون…"
+
+msgid "%d étape(s) ont tourné sur un modèle sans tarif publié. Le coût de cette recette est incomplet, pas exact."
+msgstr "‏%d خطوة جرت على نموذج بلا تسعيرة منشورة. كلفة هذه الوصفة ناقصة لا دقيقة."
+
+msgid "Appariement"
+msgstr "الاقتران"
+
+msgid "Association probable — vérifiez"
+msgstr "اقتران مرجّح — تحقّق"
+
+msgid "Association sûre"
+msgstr "اقتران مؤكّد"
+
+msgid "Aucun jugement final n’a été rendu pour cet article — le profil choisi ne l’exécutait pas, ou la recette s’est arrêtée avant."
+msgstr "لم يصدر حكم نهائي لهذا المقال — إما أن النمط المختار لا ينفّذه، أو أن الوصفة توقفت قبله."
+
+msgid "Aucune donnée."
+msgstr "لا بيانات."
+
+msgid "Aucune photographie"
+msgstr "لا صور"
+
+msgid "Aucune remarque."
+msgstr "لا ملاحظات."
+
+msgid "Bloquant"
+msgstr "حاجب"
+
+msgid "Ce que le juge a relevé"
+msgstr "ما رصده الحَكَم"
+
+msgid "Ce qui a réellement été facturé, par quel point d’entrée, et quelle part de l’entrée a été servie depuis le cache du fournisseur."
+msgstr "ما جرت فوترته فعلاً، وعبر أي نقطة وصول، وكم من المُدخل قدّمه المزوّد من ذاكرته."
+
+msgid "Ce qui est réellement transmis au moteur"
+msgstr "ما يُسلَّم فعلاً إلى المحرك"
+
+msgid "Ce qui ne va pas"
+msgstr "ما الخلل"
+
+msgid "Celle d’un lot qui n’en choisit pas."
+msgstr "لدفعة لا تختار لغة."
+
+msgid "Cet article a été généré. Les contrôles ci-dessous portent sur ce que la machine a produit ; ils ne remplacent pas votre relecture, et rien ici ne vaut approbation."
+msgstr "هذا المقال مولَّد. والفحوص أدناه تخصّ ما أنتجته الآلة؛ وهي لا تغني عن مراجعتك، ولا شيء هنا يعدّ إجازة."
+
+msgid "Cette recette n’est pas arrêtée."
+msgstr "هذه الوصفة ليست موقوفة."
+
+msgid "Chaque photographie a été décrite depuis ses propres pixels, puis rapprochée d’une recette. Dans le doute, le modèle n’associe pas : une photographie laissée de côté coûte moins cher qu’une photographie attribuée au mauvais plat."
+msgstr "وُصفت كل صورة من وحدات بكسلها ثم قُرنت بوصفة. وعند الشك لا يقرن النموذج: فصورة تُترك جانباً أقل كلفة من صورة تُنسب إلى الطبق الخطأ."
+
+msgid "Chiffrées à l’enregistrement et jamais réaffichées. Un champ laissé vide conserve la clé enregistrée ; il ne l’efface pas."
+msgstr "تُشفَّر عند الحفظ ولا تُعرض ثانية. والحقل الفارغ يبقي المفتاح المحفوظ ولا يمحوه."
+
+msgid "Clés d’API"
+msgstr "مفاتيح الواجهة البرمجية"
+
+msgid "Contrôle local uniquement, sans aucun appel facturé : la présence d’une clé ne prouve pas qu’elle est valide, seulement qu’un appel serait tenté."
+msgstr "فحص محلي فقط دون أي استدعاء مفوتر: وجود المفتاح لا يثبت صلاحيته، بل يثبت أن الاستدعاء سيُحاوَل."
+
+msgid "Contrôles non satisfaits"
+msgstr "فحوص غير مستوفاة"
+
+msgid "Correction :"
+msgstr "التصحيح:"
+
+msgid "Correction proposée :"
+msgstr "التصحيح المقترح:"
+
+msgid "Coût"
+msgstr "الكلفة"
+
+msgid "DISABLE_WP_CRON est actif. C’est la configuration recommandée, mais elle suppose qu’un cron serveur appelle wp-cron.php : sans lui, les recettes resteront en attente indéfiniment."
+msgstr "‏DISABLE_WP_CRON مفعّل. وهو الإعداد المستحسن، لكنه يفترض أن كرون الخادم يستدعي wp-cron.php: وبدونه تبقى الوصفات منتظرة بلا نهاية."
+
+msgid "Des remarques mineures, sans rien de bloquant."
+msgstr "ملاحظات طفيفة، لا شيء حاجب."
+
+msgid "Durée"
+msgstr "المدة"
+
+msgid "Déroulé"
+msgstr "المسار"
+
+msgid "Enregistrer"
+msgstr "حفظ"
+
+msgid "Enregistrer l’appariement"
+msgstr "حفظ الاقتران"
+
+msgid "Enregistré."
+msgstr "حُفظ."
+
+msgid "Gravité"
+msgstr "الخطورة"
+
+msgid "JSON invalide, donc ignoré pour : %s. Le reste a bien été enregistré, et ces groupes gardent leur valeur précédente."
+msgstr "‏JSON غير صالح، فتُجوهل لـ: %s. أما الباقي فحُفظ، وتحتفظ هذه المجموعات بقيمها السابقة."
+
+msgid "La couche appelante, telle quelle. Vide signifie que tout suit le moteur."
+msgstr "طبقة المُستدعي كما هي. والفراغ يعني أن كل شيء يتبع المحرك."
+
+msgid "Langue par défaut"
+msgstr "اللغة الافتراضية"
+
+msgid "Le dossier des téléversements n’est pas accessible en écriture : aucune image générée ne pourra être enregistrée."
+msgstr "مجلد الرفع غير قابل للكتابة: لن تُحفظ أي صورة مولَّدة."
+
+msgid "Le juge n’a rien relevé. Votre relecture reste la seule validation."
+msgstr "لم يرصد الحَكَم شيئاً. وتبقى مراجعتك هي الإجازة الوحيدة."
+
+msgid "Les clés, et l’état de ce qui fait avancer le travail."
+msgstr "المفاتيح، وحال ما يدفع العمل إلى الأمام."
+
+msgid "Les photographies sont en cours de description. Rechargez dans un instant."
+msgstr "يجري وصف الصور. أعد التحميل بعد لحظات."
+
+msgid "Les recettes avancent ensemble, une vague par tick de cron. Vous pouvez fermer cet onglet."
+msgstr "تتقدّم الوصفات معاً، موجة في كل نبضة كرون. يمكنك إغلاق هذا اللسان."
+
+msgid "Les recettes seront générées sans photographie fournie : le moteur cherchera ses propres références."
+msgstr "ستُولَّد الوصفات دون صورة مُقدَّمة: وسيبحث المحرك عن مراجعه الخاصة."
+
+msgid "Lot %d"
+msgstr "دفعة %d"
+
+msgid "L’avis du moteur sur sa propre production. Ce n’est pas une validation éditoriale : c’est à vous de décider si l’article part."
+msgstr "رأي المحرك في إنتاجه هو. وليس إجازة تحريرية: القرار بنشر المقال لك."
+
+msgid "MS Recipes Writer — à vérifier avant publication"
+msgstr "MS Recipes Writer — للتحقق قبل النشر"
+
+msgid "Mineur"
+msgstr "طفيف"
+
+msgid "Nom"
+msgstr "الاسم"
+
+msgid "Non décrite."
+msgstr "غير موصوفة."
+
+msgid "Non vérifiable :"
+msgstr "تعذّر التحقق:"
+
+msgid "Ouvrir le brouillon"
+msgstr "افتح المسودة"
+
+msgid "Où irait chaque étape"
+msgstr "إلى أين تذهب كل خطوة"
+
+msgid "Peu sûr — à confirmer"
+msgstr "غير مؤكّد — للتأكيد"
+
+msgid "Porte sur"
+msgstr "يخصّ"
+
+msgid "Productions"
+msgstr "المُخرَجات"
+
+msgid "Rapport complet"
+msgstr "التقرير الكامل"
+
+msgid "Recette introuvable."
+msgstr "الوصفة غير موجودة."
+
+msgid "Recette pour la photographie %s"
+msgstr "وصفة الصورة %s"
+
+msgid "Recettes"
+msgstr "الوصفات"
+
+msgid "Reprendre"
+msgstr "استئناف"
+
+msgid "Reprise…"
+msgstr "جارٍ الاستئناف…"
+
+msgid "Retour au lot"
+msgstr "العودة إلى الدفعة"
+
+msgid "Rien n’est figé dans le moteur : routage, plafonds, tentatives, tarifs, gabarits, registre des étapes. Seule la différence avec ses valeurs par défaut est conservée."
+msgstr "لا شيء ثابت في المحرك: التوجيه والسقوف والمحاولات والتسعيرات والقوالب وسجلّ الخطوات. ولا يُحفظ إلا الفرق عن قيمه الافتراضية."
+
+msgid "Structures"
+msgstr "البُنى"
+
+msgid "Taille"
+msgstr "الحجم"
+
+msgid "Valeur par défaut du moteur"
+msgstr "القيمة الافتراضية للمحرك"
+
+msgid "Voir le détail de la recette %d"
+msgstr "عرض تفاصيل الوصفة %d"
+
+msgid "WordPress"
+msgstr "ووردبريس"
+
+msgid "accessibles"
+msgstr "قابل للكتابة"
+
+msgid "article"
+msgstr "مقال"
+
+msgid "aucun entretien planifié"
+msgstr "لا صيانة مجدولة"
+
+msgid "aucune clé"
+msgstr "لا مفتاح"
+
+msgid "bloquante"
+msgstr "حاجبة"
+
+msgid "bloqués"
+msgstr "محجوب"
+
+msgid "bon"
+msgstr "جيد"
+
+msgid "clé enregistrée"
+msgstr "مفتاح محفوظ"
+
+msgid "cohérence"
+msgstr "الاتساق"
+
+msgid "collage"
+msgstr "ملصق"
+
+msgid "coût"
+msgstr "الكلفة"
+
+msgid "cron"
+msgstr "كرون"
+
+msgid "durée"
+msgstr "المدة"
+
+msgid "défaut du moteur : %s"
+msgstr "افتراضي المحرك: %s"
+
+msgid "groupes modifiés"
+msgstr "مجموعات معدّلة"
+
+msgid "généré"
+msgstr "مولَّد"
+
+msgid "image à la une"
+msgstr "الصورة الرئيسية"
+
+msgid "inchangée"
+msgstr "دون تغيير"
+
+msgid "jours de déroulé conservés ; les chiffres restent"
+msgstr "أيام من المسار محفوظة؛ والأرقام تبقى"
+
+msgid "langue"
+msgstr "اللغة"
+
+msgid "mauvais"
+msgstr "رديء"
+
+msgid "mineure"
+msgstr "طفيفة"
+
+msgid "modifié"
+msgstr "معدّل"
+
+msgid "photographies"
+msgstr "صور"
+
+msgid "plafond"
+msgstr "السقف"
+
+msgid "réserves"
+msgstr "تحفّظات"
+
+msgid "rétention"
+msgstr "الاحتفاظ"
+
+msgid "serveur"
+msgstr "خادم"
+
+msgid "tarif inconnu"
+msgstr "بلا تسعيرة"
+
+msgid "téléversements"
+msgstr "الرفع"
+
+msgid "Étapes"
+msgstr "الخطوات"
+
+msgid "État de la machinerie"
+msgstr "حال الآلية"
+
+msgid "à corriger avant publication."
+msgstr "للتصحيح قبل النشر."
+
+msgid "étapes"
+msgstr "خطوات"
+
+msgid "— aucune —"
+msgstr "— لا شيء —"
