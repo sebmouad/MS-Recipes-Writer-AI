@@ -225,7 +225,7 @@ final class MSRWA_Engine_Call {
 		$provider = $plan['provider'];
 		$model = $plan['model'];
 		if ( 200 !== $result['status'] ) {
-			$label = 'image' === $plan['kind'] ? '' : ( 'judge' === $plan['kind'] ? 'judge ' : '' );
+			$label = in_array( $plan['kind'], array( 'judge', 'vision' ), true ) ? $plan['kind'] . ' ' : '';
 			return array( 'error' => $label . 'HTTP ' . $result['status'] . ': ' . substr( $result['raw'], 0, 240 ), 'seconds' => $result['seconds'], 'usage' => array() );
 		}
 		$body = json_decode( $result['raw'], true );
@@ -331,63 +331,108 @@ final class MSRWA_Engine_Call {
 
 	/** Downloads a bounded public HTTPS image for evidence extraction, never reuse. */
 	public static function fetch_image( $url, $max_bytes = 10000000 ) {
-		if ( ! preg_match( '#^https://#i', (string) $url ) ) { return array( 'error' => 'image URL is not HTTPS' ); }
+		$fetched = self::fetch_images( array( $url ), $max_bytes, 1 );
+		return $fetched[0];
+	}
+
+	/**
+	 * Several evidence images at once, returned under the keys they were given.
+	 *
+	 * Each download is independent and each waits on a different host, so making
+	 * them in turn spent the sum of three strangers' latency: 19.4 seconds for
+	 * three photographs in one measured run. The checks are unchanged and applied
+	 * per image — HTTPS only, a public address, a bounded body, a real image type
+	 * — and one refused download never disturbs the others.
+	 */
+	public static function fetch_images( array $urls, $max_bytes = 10000000, $limit = 4 ) {
+		$results = array();
+		$bytes = array();
+		$multi = curl_multi_init();
+		$handles = array();
+
+		foreach ( $urls as $key => $url ) {
+			$refused = self::unfetchable( $url );
+			if ( '' !== $refused ) { $results[ $key ] = array( 'error' => $refused ); continue; }
+			if ( count( $handles ) >= max( 1, (int) $limit ) ) { $results[ $key ] = array( 'error' => 'too many images requested at once' ); continue; }
+			$bytes[ $key ] = '';
+			$handle = curl_init( $url );
+			curl_setopt_array( $handle, array(
+				CURLOPT_FOLLOWLOCATION => false, CURLOPT_TIMEOUT => 30,
+				CURLOPT_PROTOCOLS => CURLPROTO_HTTPS,
+				CURLOPT_USERAGENT => 'MSRWA-Prompt-Lab/1.0',
+				CURLOPT_WRITEFUNCTION => static function ( $ignored, $chunk ) use ( &$bytes, $key, $max_bytes ) {
+					if ( strlen( $bytes[ $key ] ) + strlen( $chunk ) > $max_bytes ) { return 0; }
+					$bytes[ $key ] .= $chunk;
+					return strlen( $chunk );
+				},
+			) );
+			curl_multi_add_handle( $multi, $handle );
+			$handles[ $key ] = $handle;
+		}
+
+		if ( $handles ) {
+			do {
+				$status = curl_multi_exec( $multi, $running );
+				if ( $running ) { curl_multi_select( $multi, 1.0 ); }
+			} while ( $running && CURLM_OK === $status );
+		}
+
+		foreach ( $handles as $key => $handle ) {
+			$results[ $key ] = self::downloaded( $handle, $bytes[ $key ] );
+			curl_multi_remove_handle( $multi, $handle );
+			curl_close( $handle );
+		}
+		curl_multi_close( $multi );
+		return $results;
+	}
+
+	/** Why an image URL is not worth opening a connection for, or '' when it is. */
+	private static function unfetchable( $url ) {
+		if ( ! preg_match( '#^https://#i', (string) $url ) ) { return 'image URL is not HTTPS'; }
 		$host = (string) parse_url( $url, PHP_URL_HOST );
 		$ip = gethostbyname( $host );
-		if ( '' === $host || $ip === $host || false === filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE ) ) { return array( 'error' => 'image host is not public' ); }
-		$bytes = '';
-		$ch = curl_init( $url );
-		curl_setopt_array( $ch, array(
-			CURLOPT_FOLLOWLOCATION => false, CURLOPT_TIMEOUT => 30,
-			CURLOPT_PROTOCOLS => CURLPROTO_HTTPS,
-			CURLOPT_USERAGENT => 'MSRWA-Prompt-Lab/1.0',
-			CURLOPT_WRITEFUNCTION => static function ( $handle, $chunk ) use ( &$bytes, $max_bytes ) {
-				if ( strlen( $bytes ) + strlen( $chunk ) > $max_bytes ) { return 0; }
-				$bytes .= $chunk;
-				return strlen( $chunk );
-			},
-		) );
-		$ok = curl_exec( $ch );
-		$status = (int) curl_getinfo( $ch, CURLINFO_RESPONSE_CODE );
-		$mime = strtolower( trim( (string) curl_getinfo( $ch, CURLINFO_CONTENT_TYPE ) ) );
-		$error = curl_error( $ch );
-		if ( false === $ok || 200 !== $status || '' !== $error ) { return array( 'error' => $error ?: 'image HTTP ' . $status ); }
-		$mime = trim( strtok( $mime, ';' ) );
+		if ( '' === $host || $ip === $host || false === filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE ) ) { return 'image host is not public'; }
+		return '';
+	}
+
+	/** What one finished download turned out to be: usable bytes, or the reason not. */
+	private static function downloaded( $handle, $bytes ) {
+		$status = (int) curl_getinfo( $handle, CURLINFO_RESPONSE_CODE );
+		$error = (string) curl_error( $handle );
+		if ( 200 !== $status || '' !== $error ) { return array( 'error' => $error ? $error : 'image HTTP ' . $status ); }
+		$mime = trim( strtok( strtolower( trim( (string) curl_getinfo( $handle, CURLINFO_CONTENT_TYPE ) ) ), ';' ) );
 		if ( ! in_array( $mime, array( 'image/jpeg', 'image/png', 'image/webp', 'image/gif' ), true ) ) { return array( 'error' => 'unsupported image type ' . $mime ); }
+		if ( '' === $bytes ) { return array( 'error' => 'image body was empty or over the size limit' ); }
 		return array( 'mime' => $mime, 'data' => base64_encode( $bytes ) );
 	}
 
 	/** Inspects fetched image bytes; the same evidence prompt is used across providers. */
 	public static function vision( $provider, $model, $image, $context, $max_tokens = 900, $wire = array(), $instruction = '' ) {
+		$plan = self::plan_vision( $provider, $model, $image, $context, $max_tokens, $wire, $instruction );
+		if ( isset( $plan['error'] ) ) { return array( 'error' => $plan['error'], 'seconds' => 0, 'usage' => array() ); }
+		$request = $plan['request'];
+		return self::read( $plan, self::http( $request['url'], $request['headers'], $request['payload'], (int) $request['timeout'] ) );
+	}
+
+	/** Everything one image observation needs, without asking yet, so a set of them can go out together. */
+	public static function plan_vision( $provider, $model, $image, $context, $max_tokens = 900, $wire = array(), $instruction = '' ) {
 		$wire = $wire ? $wire : self::shipped_wire( $provider, $model );
 		$unusable = self::unusable( $provider, $wire );
-		if ( '' !== $unusable ) { return array( 'error' => $unusable, 'seconds' => 0, 'usage' => array() ); }
+		if ( '' !== $unusable ) { return array( 'error' => $unusable ); }
 		$instruction = ( '' !== trim( (string) $instruction ) ? $instruction : self::default_vision_instruction() ) . ' Context: ' . $context;
+
 		if ( 'openai' === $provider ) {
 			$payload = array( 'model' => $model, 'store' => false, 'max_output_tokens' => $max_tokens, 'input' => array( array( 'role' => 'user', 'content' => array( array( 'type' => 'input_text', 'text' => $instruction ), array( 'type' => 'input_image', 'image_url' => 'data:' . $image['mime'] . ';base64,' . $image['data'] ) ) ) ), 'text' => array( 'format' => array( 'type' => 'json_object' ) ) );
-			$result = self::http( $wire['text_endpoint'], $wire['headers'], $payload, (int) ( $wire['timeout'] ?? 600 ) );
-			if ( 200 !== $result['status'] ) { return array( 'error' => 'vision HTTP ' . $result['status'], 'usage' => array() ); }
-			$body = json_decode( $result['raw'], true );
-			$text = '';
-			foreach ( (array) ( $body['output'] ?? array() ) as $item ) { foreach ( (array) ( $item['content'] ?? array() ) as $content ) { if ( isset( $content['text'] ) ) { $text .= $content['text']; } } }
-			return array( 'text' => $text, 'usage' => array( 'input_tokens' => (int) ( $body['usage']['input_tokens'] ?? 0 ), 'output_tokens' => (int) ( $body['usage']['output_tokens'] ?? 0 ) ) );
-		}
-		if ( 'gemini' === $provider ) {
+		} elseif ( 'gemini' === $provider ) {
 			$payload = array( 'contents' => array( array( 'role' => 'user', 'parts' => array( array( 'text' => $instruction ), array( 'inline_data' => array( 'mime_type' => $image['mime'], 'data' => $image['data'] ) ) ) ) ), 'generationConfig' => array( 'maxOutputTokens' => $max_tokens, 'responseMimeType' => 'application/json' ) );
-			$result = self::http( $wire['text_endpoint'], $wire['headers'], $payload, (int) ( $wire['timeout'] ?? 600 ) );
-			if ( 200 !== $result['status'] ) { return array( 'error' => 'vision HTTP ' . $result['status'], 'usage' => array() ); }
-			$body = json_decode( $result['raw'], true );
-			$text = (string) ( $body['candidates'][0]['content']['parts'][0]['text'] ?? '' );
-			$usage = $body['usageMetadata'] ?? array();
-			return array( 'text' => $text, 'usage' => array( 'input_tokens' => (int) ( $usage['promptTokenCount'] ?? 0 ), 'output_tokens' => (int) ( $usage['candidatesTokenCount'] ?? 0 ) ) );
+		} else {
+			$payload = array( 'model' => $model, 'max_tokens' => $max_tokens, 'messages' => array( array( 'role' => 'user', 'content' => array( array( 'type' => 'image', 'source' => array( 'type' => 'base64', 'media_type' => $image['mime'], 'data' => $image['data'] ) ), array( 'type' => 'text', 'text' => $instruction ) ) ) ) );
 		}
-		$payload = array( 'model' => $model, 'max_tokens' => $max_tokens, 'messages' => array( array( 'role' => 'user', 'content' => array( array( 'type' => 'image', 'source' => array( 'type' => 'base64', 'media_type' => $image['mime'], 'data' => $image['data'] ) ), array( 'type' => 'text', 'text' => $instruction ) ) ) ) );
-		$result = self::http( $wire['text_endpoint'], $wire['headers'], $payload, (int) ( $wire['timeout'] ?? 600 ) );
-		if ( 200 !== $result['status'] ) { return array( 'error' => 'vision HTTP ' . $result['status'], 'usage' => array() ); }
-		$body = json_decode( $result['raw'], true );
-		$text = '';
-		foreach ( (array) ( $body['content'] ?? array() ) as $block ) { if ( 'text' === ( $block['type'] ?? '' ) ) { $text .= $block['text']; } }
-		return array( 'text' => $text, 'usage' => array( 'input_tokens' => (int) ( $body['usage']['input_tokens'] ?? 0 ), 'output_tokens' => (int) ( $body['usage']['output_tokens'] ?? 0 ) ) );
+
+		return array(
+			'kind' => 'vision', 'provider' => $provider, 'model' => $model,
+			'request' => array( 'url' => $wire['text_endpoint'], 'headers' => $wire['headers'], 'payload' => $payload, 'timeout' => (int) ( $wire['timeout'] ?? 600 ) ),
+		);
 	}
 
 	/**
@@ -442,14 +487,37 @@ final class MSRWA_Engine_Call {
 		);
 	}
 
-	/** Replaces search-model guesses with observations made from the cited bytes. */
+	/**
+	 * Replaces search-model guesses with observations made from the cited bytes.
+	 *
+	 * The photographs have nothing to do with one another, so they are downloaded
+	 * together and then described together: two waves of concurrent calls instead
+	 * of six in a row. The evidence and its cost are identical; only the waiting
+	 * is gone.
+	 */
 	public static function observe_images( $provider, $model, $package, $limit = 3, $wire = array(), $max_bytes = 10000000, $instruction = '' ) {
 		$package['visual_observations'] = array();
 		$usage = array( 'input_tokens' => 0, 'output_tokens' => 0 );
-		foreach ( array_slice( (array) ( $package['visual_references'] ?? array() ), 0, $limit ) as $reference ) {
-			$image = self::fetch_image( $reference['image_url'] ?? '', $max_bytes );
+		$references = array_slice( (array) ( $package['visual_references'] ?? array() ), 0, $limit );
+		if ( ! $references ) { return array( 'package' => $package, 'usage' => $usage ); }
+
+		$images = self::fetch_images( array_map( static function ( $reference ) { return (string) ( $reference['image_url'] ?? '' ); }, $references ), $max_bytes, max( 1, (int) $limit ) );
+
+		$plans = array();
+		$requests = array();
+		foreach ( $references as $key => $reference ) {
+			$image = (array) ( $images[ $key ] ?? array( 'error' => 'image was not fetched' ) );
 			if ( isset( $image['error'] ) ) { $package['uncertainties'][] = 'Image non analysée : ' . $image['error']; continue; }
-			$vision = self::vision( $provider, $model, $image, (string) ( $reference['title'] ?? '' ), 900, $wire, $instruction );
+			$plan = self::plan_vision( $provider, $model, $image, (string) ( $reference['title'] ?? '' ), 900, $wire, $instruction );
+			if ( isset( $plan['error'] ) ) { $package['uncertainties'][] = 'Image non analysée : ' . $plan['error']; continue; }
+			$plans[ $key ] = $plan;
+			$requests[ $key ] = $plan['request'];
+		}
+
+		$answers = self::http_many( $requests, max( 1, (int) $limit ) );
+		foreach ( $plans as $key => $plan ) {
+			$reference = $references[ $key ];
+			$vision = self::read( $plan, $answers[ $key ] );
 			$usage['input_tokens'] += (int) ( $vision['usage']['input_tokens'] ?? 0 );
 			$usage['output_tokens'] += (int) ( $vision['usage']['output_tokens'] ?? 0 );
 			$observed = MSRWA_Json::decode( (string) ( $vision['text'] ?? '' ) );

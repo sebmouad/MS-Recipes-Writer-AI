@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.81` est un socle installable : file persistante, pipeline de
+La version `0.2.82` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.
@@ -22,6 +22,22 @@ Le plugin est en cours de refonte éditoriale et budgétaire :
 Les coûts affichés sont des estimations calculées avec le catalogue configuré,
 non une facture fournisseur. `completed` signifie que le traitement est terminé,
 jamais qu’un texte est validé éditorialement.
+
+## Version 0.2.82
+
+**Les photographies citées sont lues ensemble, plus l'une après l'autre.** La
+phase d'observation téléchargeait une image, la décrivait, puis passait à la
+suivante : trois inconnus dont on attendait la latence bout à bout, 19,4
+secondes sur un run mesuré. Les photographies n'ont aucun rapport entre elles,
+et le moteur savait déjà lancer plusieurs appels de front — `http_many()`
+existait pour les vagues et n'était pas utilisé ici.
+
+Deux vagues concurrentes remplacent six appels en file. Mesuré sur les mêmes
+références, avec le même instruction et les mêmes observations en sortie : 16,8
+s en série contre 8,9 s ensemble, pour 0,0021 $ contre 0,0020 $. Les
+vérifications restent inchangées et appliquées image par image — HTTPS, adresse
+publique, corps borné, type réel — et un téléchargement refusé n'empêche plus
+les autres.
 
 ## Version 0.2.81
 
