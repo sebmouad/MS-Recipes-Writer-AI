@@ -6,11 +6,26 @@ foreach ( array_slice( $_SERVER['argv'], 1 ) as $argument ) {
 	if ( preg_match( '/^--([a-z-]+)=(.*)$/', $argument, $match ) ) { $options[ $match[1] ] = $match[2]; }
 }
 
-$required = array( 'brief', 'research', 'canonical', 'article', 'proofread', 'review', 'fact-check', 'featured', 'featured-meta', 'facebook', 'facebook-meta', 'output' );
+$required = array( 'brief', 'research', 'canonical', 'article', 'proofread', 'review', 'fact-check', 'featured', 'featured-meta', 'facebook', 'facebook-meta', 'approval', 'output' );
 foreach ( $required as $key ) {
 	if ( empty( $options[ $key ] ) || ! file_exists( $options[ $key ] ) && ! in_array( $key, array( 'brief', 'output' ), true ) ) {
 		fwrite( STDERR, "Missing --{$key}=<path>\n" ); exit( 2 );
 	}
+}
+
+/** The approval verdict as four cards: the decision, then one per artifact. */
+function report_approval_cards( $verdict ) {
+	$verdict = is_array( $verdict ) ? $verdict : array();
+	$approved = ! empty( $verdict['approved'] );
+	$cards = '<div class="card"><h3>Décision</h3><p class="kpi"><span class="pill ' . ( $approved ? 'ok' : 'warn' ) . '">' . ( $approved ? 'Approuvé' : 'Refusé' ) . '</span></p></div>';
+	$labels = array( 'article' => 'Article', 'featured_image' => 'Image à la une', 'facebook_image' => 'Collage Facebook', 'consistency' => 'Cohérence des trois' );
+	foreach ( $labels as $key => $label ) {
+		$part = isset( $verdict[ $key ] ) && is_array( $verdict[ $key ] ) ? $verdict[ $key ] : array();
+		$mark = (string) ( $part['verdict'] ?? '—' );
+		$realism = isset( $part['realism'] ) ? '<p class="muted">Réalisme : ' . report_h( $part['realism'] ) . '</p>' : '';
+		$cards .= '<div class="card"><h3>' . report_h( $label ) . '</h3><p><span class="pill ' . ( 'good' === $mark ? 'ok' : 'warn' ) . '">' . report_h( $mark ) . '</span></p>' . $realism . '<p class="muted">' . report_h( $part['summary'] ?? '' ) . '</p></div>';
+	}
+	return $cards;
 }
 
 function report_run( $path ) {
@@ -91,6 +106,7 @@ $review = report_run( $options['review'] );
 $fact_check = report_run( $options['fact-check'] );
 $featured_meta = report_run( $options['featured-meta'] );
 $facebook_meta = report_run( $options['facebook-meta'] );
+$approval = report_run( $options['approval'] );
 
 $research_data = (array) $research['decoded_output'];
 $canonical_data = (array) $canonical['decoded_output'];
@@ -105,14 +121,15 @@ $content_html = str_replace( '<!--nextpage-->', '<div class="page-break"><span>D
 
 $title = (string) ( $canonical_data['title'] ?? $article_data['title'] ?? $options['brief'] );
 $runs = array(
-	'Recherche' => $research,
-	'Recette canonique' => $canonical,
-	'Article final' => $article,
-	'Relecture' => $proofread,
-	'Revue qualité' => $review,
-	'Fact-check' => $fact_check,
-	'Image à la une' => $featured_meta,
-	'Collage Facebook' => $facebook_meta,
+	'Recherche (research)' => $research,
+	'Recette canonique (canonical_recipe)' => $canonical,
+	'Article final (article)' => $article,
+	'Correction du français (proofread)' => $proofread,
+	'Revue éditoriale (review)' => $review,
+	'Vérification des faits (fact_check)' => $fact_check,
+	'Image à la une (featured_image)' => $featured_meta,
+	'Collage Facebook (facebook_image)' => $facebook_meta,
+	'Approbation finale (final_approval)' => $approval,
 );
 $total_seconds = 0.0; $total_cost = 0.0; $total_in = 0; $total_out = 0;
 foreach ( $runs as $run ) {
@@ -132,7 +149,10 @@ $facebook_data = report_image_data( $options['facebook'] );
 $metric_rows = '';
 foreach ( $runs as $label => $run ) {
 	$verdict = $run['scores']['pass'] ?? true;
-	if ( in_array( $label, array( 'Revue qualité', 'Fact-check' ), true ) && isset( $run['decoded_output']['pass'] ) ) { $verdict = (bool) $run['decoded_output']['pass']; }
+	if ( false !== strpos( $label, '(review)' ) || false !== strpos( $label, '(fact_check)' ) ) {
+		if ( isset( $run['decoded_output']['pass'] ) ) { $verdict = (bool) $run['decoded_output']['pass']; }
+	}
+	if ( false !== strpos( $label, '(final_approval)' ) && isset( $run['decoded_output']['approved'] ) ) { $verdict = (bool) $run['decoded_output']['approved']; }
 	$metric_rows .= '<tr><td>' . report_h( $label ) . '</td><td>' . report_h( $run['model'] ?? 'gpt-5.6-luna' ) . '</td><td>' . report_h( $run['seconds'] ?? 0 ) . ' s</td><td>' . number_format( (int) ( $run['usage']['input_tokens'] ?? 0 ) ) . '</td><td>' . number_format( (int) ( $run['usage']['output_tokens'] ?? 0 ) ) . '</td><td>$' . number_format( (float) ( $run['cost_usd'] ?? 0 ), 4 ) . '</td><td><span class="pill ' . ( $verdict ? 'ok' : 'warn' ) . '">' . ( $verdict ? 'Validé' : 'Réserves' ) . '</span></td></tr>';
 }
 
@@ -143,7 +163,7 @@ foreach ( $runs as $label => $run ) {
 }
 
 $raw_details = '';
-foreach ( array( 'Recherche' => $research_data, 'Recette canonique' => $canonical_data, 'Métadonnées article' => $article_meta, 'Relecture' => $proofread_changes, 'Revue qualité' => $review_data, 'Fact-check' => $fact_data ) as $label => $data ) {
+foreach ( array( 'Recherche' => $research_data, 'Recette canonique' => $canonical_data, 'Métadonnées article' => $article_meta, 'Correction du français' => $proofread_changes, 'Revue éditoriale' => $review_data, 'Vérification des faits' => $fact_data, 'Approbation finale' => $approval['decoded_output'] ) as $label => $data ) {
 	$raw_details .= '<details><summary>' . report_h( $label ) . ' — JSON complet</summary><pre>' . report_h( json_encode( $data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) ) . '</pre></details>';
 }
 
@@ -157,6 +177,11 @@ $html = '<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="
 <section class="section"><h2>Corrections finales après contrôle</h2><ul class="notes"><li>' . implode( '</li><li>', array_map( 'report_h', $correction_notes ) ) . '</li></ul><p class="muted">Ces corrections chirurgicales ont été appliquées au rendu ci-dessous après la dernière revue automatisée; elles ne modifient ni les quantités ni les étapes canoniques.</p></section>
 <section class="section"><h2>Article final prêt à publier</h2><article class="article">' . $content_html . '</article></section>
 <section class="section"><h2>Recherche complète</h2>' . report_value( $research_data ) . '</section>
+<section class="section"><h2>Approbation finale</h2>
+<p class="muted">Un seul appel voit l\'article et les deux images ensemble, le seul moment où les trois peuvent être confrontés. Le réalisme photographique et les ingrédients principaux décident pour les images ; la recette et l\'article sont tenus à ce que la recherche documente.</p>
+<div class="summary-grid">' . report_approval_cards( $approval['decoded_output'] ) . '</div>
+<div style="margin-top:22px">' . report_value( $approval['decoded_output']['findings'] ?? array() ) . '</div></section>
+
 <section class="section"><h2>Relecture, revue et fact-check</h2><div class="cards"><div class="card"><h3>Relecture</h3>' . report_value( $proofread_changes ) . '</div><div class="card"><h3>Revue qualité</h3>' . report_value( $review_data ) . '</div><div class="card"><h3>Fact-check</h3>' . report_value( $fact_data ) . '</div></div></section>
 <section class="section"><h2>Prompts et provenance</h2><p>Les clés API ne figurent jamais dans ce rapport. Les prompts exacts des appels retenus sont conservés ci-dessous pour audit.</p>' . $prompt_details . '</section>
 <section class="section"><h2>Données brutes A à Z</h2><p class="muted">Les blocs JSON ci-dessous conservent l’intégralité des sorties structurées sélectionnées.</p>' . $raw_details . '</section>

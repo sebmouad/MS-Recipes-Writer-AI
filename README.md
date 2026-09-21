@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.58` est un socle installable : file persistante, pipeline de
+La version `0.2.59` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.
@@ -20,6 +20,20 @@ Le plugin est en cours de refonte éditoriale et budgétaire :
 Les coûts affichés sont des estimations calculées avec le catalogue configuré,
 non une facture fournisseur. `completed` signifie que le traitement est terminé,
 jamais qu’un texte est validé éditorialement.
+
+## Version 0.2.59
+
+Le rapport omettait l'étape d'approbation finale — celle qui décide — et ses
+libellés ne se rattachaient à aucune commande : « Relecture » et « Revue
+qualité » pouvaient désigner l'une ou l'autre étape.
+
+- Chaque ligne du tableau porte désormais le nom de l'étape qui l'a produite :
+  `Correction du français (proofread)`, `Revue éditoriale (review)`,
+  `Vérification des faits (fact_check)`. Le tableau se vérifie ligne à ligne
+  contre les commandes exécutées.
+- L'approbation finale apparaît en neuvième ligne et dans sa propre section :
+  décision, verdict par artefact, réalisme jugé à part pour les images, et les
+  constats.
 
 ## Version 0.2.58
 
