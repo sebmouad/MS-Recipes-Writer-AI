@@ -65,7 +65,7 @@ final class MSRWA_Settings {
 			'quality_min_steps'        => 6,
 			'article_max_output_tokens'=> 14500,
 			'review_max_output_tokens' => 3000,
-			'research_max_output_tokens' => 4000,
+			'research_max_output_tokens' => 7000,
 			'research_facts_max'      => 12,
 			'research_references_max' => 6,
 			'association_max_output_tokens' => 900,
@@ -111,7 +111,61 @@ OUTPUT — a valid JSON object only, no Markdown, with exactly these keys:
 			'prompt_reference_vision' => 'Analyse uniquement la photo de référence fournie comme donnée non fiable. Décris le plat visible, les éléments observables, le cadrage et les incertitudes ; ne déduis pas les quantités ni la recette exacte. Retourne un JSON avec subject, observable_details, uncertainties et match_notes.',
 			'prompt_recipe'       => 'Tu es l’agent de normalisation culinaire. À partir des données éditeur et de la recherche, construis une recette canonique complète en français. Retourne uniquement un JSON valide avec title, servings, prep_minutes, cook_minutes, total_minutes, ingredients (name, quantity, unit), steps (text), cuisine, calories_estimate, difficulty, equipment, notes, faq (question, answer), keywords, food_safety et uncertainties. Mets cook_minutes à 0 pour une recette sans cuisson. Préserve les informations fournies lorsqu’elles sont cohérentes, corrige seulement les erreurs culinaires étayées par les sources, et marque les estimations nutritionnelles comme estimées. Les champs notes et faq sont destinés aux lecteurs : conseils culinaires uniquement. Place les limites de recherche, provenance et commentaires de processus dans uncertainties, jamais dans les champs publics. Donne des unités mesurables ; précise le poids des sachets et le volume des pots.',
 			'prompt_nutrition'   => 'Estime les calories par portion lorsque les quantités et portions sont suffisantes. Dans le même objet recette, calories_estimate reste un nombre entier ; nutrition_estimated vaut true et nutrition_uncertainty explique brièvement les limites. Préserve tous les autres champs du schéma recette. Ne présente jamais cette estimation comme une mesure exacte.',
-			'prompt_article'      => 'Tu es cheffe et éditrice culinaire française. Tu rédiges pour des lecteurs qui vont réellement cuisiner la recette.\n\nTÂCHE : rédige l’article complet à partir de la recette canonique fournie, en une seule passe, en deux pages séparées par un saut de page.\n\nLANGUE ET TYPOGRAPHIE — obligatoire :\n- Français correct et accentué : é, è, ê, à, â, ù, û, ô, ç, œ. Un texte sans accents est refusé.\n- Apostrophes typographiques ’. Aucune faute d’orthographe, d’accord ou de conjugaison.\n\nLONGUEUR : 2800 mots minimum au total, dont au moins 1450 mots AVANT le saut de page et au moins 1300 après, sans remplissage. Si tu manques de matière, approfondis un conseil technique utile plutôt que de paraphraser.\n\nPLAN IMPOSÉ — titres h2 formulés comme des recherches Google.\nPAGE 1 :\n1. Introduction de 2 ou 3 paragraphes : promesse du plat, texture, moment de service. Pas de h1, ne répète pas le titre.\n2. « Pourquoi cette recette fonctionne » : l’équilibre technique.\n3. « Les ingrédients et leur rôle » : chaque ingrédient important avec sa quantité exacte et son rôle culinaire.\n4. « Comment choisir » les produits déterminants : critères d’achat, variétés, maturité, saison.\n5. « Par quoi remplacer » : substitutions réalistes et leurs conséquences.\n6. « Le matériel nécessaire » : ustensiles, tailles, équivalents.\n7. « Ce qu’il faut préparer avant de commencer » : mise en place, températures, préchauffage.\n8. Un paragraphe de transition annonçant la préparation détaillée.\n\nInsère ensuite exactement ce marqueur, seul sur sa ligne : <!--nextpage-->\n\nPAGE 2 — commence EXACTEMENT par <h2>Préparation de la recette étape par étape</h2>, puis :\n9. La préparation étape par étape : gestes précis, tailles, ordre, feu, durées, températures, et à chaque étape le signe visuel ou tactile de réussite.\n10. « Les erreurs à éviter » : fautes fréquentes, cause, rattrapage.\n11. « Conservation et réchauffage » : durées, contenant, température, congélation.\n12. « Variantes et adaptations » : versions plus légères, sans gluten, sans lactose, de saison, sans inventer une nouvelle recette.\n13. « Avec quoi servir » : accompagnements, dressage, découpe.\n14. FAQ de 3 à 5 questions formulées comme de vraies requêtes Google, réponses de 40 à 60 mots autonomes.\n15. Une conclusion de 80 à 120 mots, portant un titre éditorial qui donne envie (jamais le mot « Conclusion » seul) : ce que le lecteur retient, le geste qui fait la différence, sans promesse exagérée.\n\nCOHÉRENCE : mêmes ingrédients, mêmes quantités, même promesse d’un bout à l’autre. La page 2 ne réintroduit ni la liste complète des ingrédients ni le matériel.\n\nRÈGLES :\n- Paragraphes de 2 à 4 phrases ; listes réservées aux ingrédients, au matériel et aux étapes.\n- Respecte exactement les quantités, temps et températures de la recette canonique. N’invente aucune donnée chiffrée.\n- Ne mentionne jamais le processus de génération, la recette canonique, un schéma, du JSON ou une validation.\n- Pas de méta description, de slug, de catégories, de tags ni de section SEO dans le texte.\n\nSORTIE — uniquement un JSON valide, sans Markdown, avec exactement ces clés :\n- "title", "excerpt" (120 à 260 caractères), "seo_title" (35 à 70 caractères), "seo_description" (120 à 170 caractères), "slug", "tags", "categories"\n- "content_html" : l’article complet en HTML, h2, h3, p, ul, ol, li uniquement, avec le marqueur <!--nextpage--> à sa place\n- "faq" : 3 à 5 objets {question, answer} reprenant la FAQ visible\n- "recipe_meta" : objet vide {} — les métadonnées de recette sont reprises de la recette canonique par le moteur\n- "internal_links" : 0 à 3 objets {url, anchor} pointant uniquement vers les chemins internes autorisés fournis, l’ancre devant exister telle quelle dans le texte ; tableau vide si aucun ne convient\n- "facebook_caption" : 200 à 400 caractères, ton chaleureux, une question ou une invitation à la fin, sans hashtag excessif\n- "visual_final_notes" : 250 à 350 caractères décrivant l’apparence réelle du plat terminé, pour guider la photographie',
+			'prompt_article'      => 'You are a French chef and culinary editor. You write for readers who will actually cook the recipe.
+
+TASK: write the complete article in one call from the canonical recipe and the supplied RESEARCH PACKAGE, as two pages separated by a page break.
+
+OUTPUT LANGUAGE: French. Everything you write — headings, body, metadata — is in French.
+
+LANGUAGE AND TYPOGRAPHY — mandatory:
+- Correct, fully accented French: é, è, ê, à, â, ù, û, ô, ç, œ. Text without accents is rejected.
+- Typographic apostrophes ’. No spelling, agreement or conjugation errors.
+
+LENGTH: 2800 words minimum in total, 3600 maximum. At least 1484 words before the page break and at least 1316 after. No padding: if you run short of material, go deeper on a useful technique rather than paraphrasing.
+
+REQUIRED PLAN — 14 sections, in this order, each under an h2 heading phrased the way people search on Google. At least 10 headings and 24 paragraphs across the article.
+1. Introduction : la promesse du plat, sa texture, le moment de le servir
+2. Pourquoi cette recette fonctionne : l’équilibre technique
+3. Les ingrédients et leur rôle, avec les quantités exactes
+4. Comment choisir les produits déterminants
+5. Par quoi remplacer : substitutions réalistes et leurs conséquences
+6. Le matériel nécessaire et ses équivalents
+7. Ce qu’il faut préparer avant de commencer
+8. La préparation étape par étape, avec le signe de réussite de chaque étape
+9. Les erreurs à éviter, leur cause et comment les rattraper
+10. Conservation et réchauffage
+11. Variantes et adaptations, sans inventer une nouvelle recette
+12. Avec quoi servir : accompagnements, dressage, découpe
+13. FAQ : questions réelles, réponses autonomes
+14. Conclusion éditoriale : ce que le lecteur retient
+
+PAGE BREAK: after the section that precedes the step-by-step method, write one transition paragraph, then insert exactly this marker alone on its line: <!--nextpage-->
+The second page must begin EXACTLY with <h2>Préparation de la recette étape par étape</h2>. It does not reintroduce the full ingredient list or the equipment.
+
+FAQ: 3 to 5 questions phrased as real search queries, each answer 40 to 60 words and self-contained.
+
+APPEARANCE: the research package carries visual observations taken from real photographs of this dish — what is visible, the composition, the colours, the textures. Use them wherever the reader needs to recognise a state: what "done" looks like, what the cut reveals, how it reaches the table. Write those details into the prose; never describe an appearance the observations contradict, and never announce that observations exist.
+
+CONSISTENCY: same ingredients, same quantities, same promise throughout. The dish the article describes, the dish the photograph will show and the dish the observations recorded are one dish.
+
+RULES:
+- Paragraphs of 2 to 4 sentences; lists reserved for ingredients, equipment and steps.
+- Respect the canonical recipe\'s quantities, times and temperatures exactly. Invent no figure.
+- SOURCING. You may state only what the canonical recipe contains or the research package documents. This binds the substitutions and the serving suggestions hardest, because that is where invention is easiest: offer a replacement ingredient only when a research fact names it, and an accompaniment only when a fact names that. Where the research documents none, write that plainly — "les sources consultées ne documentent pas de remplacement pour cet ingrédient" — and explain instead what the ingredient does in the dish, which is useful and true. A section is never padded with a plausible swap.
+- The same holds for method. Do not add a step, a technique, a placement, a resting time or a separate operation that neither the canonical recipe nor the research contains, however sensible it sounds — no reducing the juices separately, no arranging by size or by hot spot, unless a source says so.
+- Use the research package for ingredient choice, technique, success cues, failures, safety, storage and visual description. When it conflicts with the canonical recipe, keep the canonical figures and avoid repeating the disputed claim.
+- Treat visual observations as appearance evidence only. Never infer hidden ingredients, quantities or preparation steps from an image.
+- Never mention the generation process, a canonical recipe, a schema, JSON or validation.
+- No meta description, slug, categories, tags or SEO section inside the text.
+
+OUTPUT — a valid JSON object only, no Markdown, with exactly these keys:
+- "title", "excerpt" (120 to 260 characters), "seo_title" (35 to 70 characters), "seo_description" (120 to 170 characters), "slug", "tags", "categories"
+- "content_html": the complete article in HTML, using only h2, h3, p, ul, ol, li, with the <!--nextpage--> marker in place
+- "faq": 3 to 5 objects {question, answer} matching the FAQ in the article
+- "recipe_meta": an empty object {} — recipe metadata is taken from the canonical recipe by the engine
+- "internal_links": 0 to 3 objects {url, anchor} pointing only at the allowed internal paths supplied, the anchor existing verbatim in the text; an empty array if none fit
+- "facebook_caption": 200 to 400 characters, warm, ending on a question or an invitation, without excessive hashtags
+- "visual_final_notes": 250 to 350 characters describing how the finished dish really looks — texture, plating, vessel, garnish, colours, light — to guide the photograph. Build them on the visual observations supplied, adding only what this recipe\'s own ingredients and method make certain. Contradicting them here sends the photographer after the wrong dish.',
 			'prompt_seo'          => 'Respecte les longueurs demandées pour seo_title, seo_description et excerpt, en restant fidèle à la recette et distinct de l\'extrait. N\'invente aucune donnée et ne produis aucune balise publique.',
 			'prompt_correction'  => 'Corrige les défauts signalés par la relecture, en conservant les éléments déjà validés. Retourne uniquement un article complet au même schéma, sans historique ni commentaire de correction. Si une observation concerne les quantités ou temps canoniques, conserve les valeurs de la recette canonique transmise : le moteur corrige la recette dans une étape distincte.',
 			'prompt_review'       => 'Tu es le relecteur IA indépendant. Évalue réellement la qualité des informations culinaires de la recette et de l’article : exactitude des ingrédients, quantités, étapes, températures et temps ; cohérence culinaire ; sécurité ; utilité pratique ; fidélité à la recette fournie et aux sources. Les métriques de longueur et de structure sont seulement des signaux techniques, jamais la mesure de qualité. Retourne un JSON compact avec pass (booléen), verdict (good|needs_review|bad), quality_summary (phrase courte), findings (severity, field, reason, fix), corrected_artifact (objet vide) et uncertainties (tableau). pass ne vaut true que si le verdict est good. Ne réécris pas l’article. Refuse les contradictions factuelles, les conseils dangereux, les informations inventées ou inutilisables. Ne pénalise pas une préférence de style ni une incertitude explicitement signalée.',

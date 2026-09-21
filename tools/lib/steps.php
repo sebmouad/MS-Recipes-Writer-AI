@@ -155,12 +155,13 @@ function lab_build_input( $step, $prompt, $brief, $options ) {
 	$encode = static function ( $value ) { return json_encode( $value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ); };
 	$editor = lab_editor_brief( $brief );
 	$research = lab_research_package( $brief, $options );
+	$text_research = lab_research_for_text( $research );
 	$canonical = lab_canonical_recipe( $brief, $options );
 	if ( 'research' === $step ) {
 		return $prompt . "\nEDITOR BRIEF: " . $encode( $editor );
 	}
 	if ( 'canonical_recipe' === $step ) {
-		return $prompt . "\nEDITOR BRIEF: " . $encode( $editor ) . "\nRESEARCH PACKAGE: " . $encode( $research )
+		return $prompt . "\nEDITOR BRIEF: " . $encode( $editor ) . "\nRESEARCH PACKAGE: " . $encode( $text_research )
 			. "\n" . lab_observed_appearance( $research );
 	}
 	if ( 'article' === $step ) {
@@ -174,17 +175,17 @@ function lab_build_input( $step, $prompt, $brief, $options ) {
 		}
 		return $prompt . MSRWA_Quality::prompt_contract( $settings )
 			. "\nRecette canonique : " . $encode( $canonical )
-			. "\nRESEARCH PACKAGE: " . $encode( $research )
+			. "\nRESEARCH PACKAGE: " . $encode( $text_research )
 			. "\n" . lab_visual_brief( $canonical, $research )
 			. ( $feedback ? "\nREVIEW FINDINGS TO CORRECT IN THE COMPLETE RETURNED ARTICLE: " . $encode( $feedback ) : '' );
 	}
 	if ( 'review' === $step ) {
 		return $prompt . "\nCANONICAL RECIPE: " . $encode( $canonical )
-			. "\nRESEARCH PACKAGE: " . $encode( $research )
+			. "\nRESEARCH PACKAGE: " . $encode( $text_research )
 			. "\nARTICLE: " . $encode( lab_article_under_test( $options ) );
 	}
 	if ( 'fact_check' === $step ) {
-		return $prompt . "\nRESEARCH PACKAGE: " . $encode( $research )
+		return $prompt . "\nRESEARCH PACKAGE: " . $encode( $text_research )
 			. "\nCANONICAL RECIPE: " . $encode( $canonical )
 			. "\nARTICLE: " . $encode( lab_article_under_test( $options )['content_html'] ?? '' );
 	}
@@ -415,7 +416,7 @@ function lab_image_prompt( $kind, $brief, $options = array(), $findings = array(
 		. 'Recipe title: ' . (string) ( $canonical['title'] ?? $brief['title'] ) . "\n"
 		. 'Exact ingredients: ' . implode( ', ', $ingredients ) . "\n\n"
 		. lab_visual_brief( $canonical, $research ) . "\n"
-		. 'Research package, for anything the brief above does not cover: ' . $encode( $research ) . "\n";
+		. 'What the real photographs showed, for anything the brief above does not cover: ' . $encode( lab_research_for_image( $research ) ) . "\n";
 
 	if ( 'facebook' === $kind ) {
 		$all_steps = array_values( (array) ( $canonical['steps'] ?? array() ) );
@@ -440,6 +441,13 @@ function lab_image_prompt( $kind, $brief, $options = array(), $findings = array(
 				$prompt .= 'Canonical step pool, numbered in the order the recipe performs them: ' . implode( ' ', $steps ) . "\nSelect exactly " . $panels . " visually distinct moments using the storyboard contract, then lay them out in ascending step number; do not sample mechanically or show passive filler.\n";
 			}
 		}
+	}
+
+	// The provider rejects a prompt over 32000 characters, and did so once the
+	// research package grew. Fail here, where the cause is visible, not there.
+	if ( strlen( $prompt ) > 30000 ) {
+		fwrite( STDERR, 'The ' . $kind . " image prompt is " . strlen( $prompt ) . " characters; the provider refuses anything over 32000. Trim what lab_research_for_image() forwards.\n" );
+		exit( 1 );
 	}
 
 	$findings = array_values( array_filter( (array) $findings, 'is_array' ) );
@@ -474,6 +482,47 @@ function lab_regenerate_image( $kind, $brief, $options, $findings, $settings ) {
 	);
 	file_put_contents( preg_replace( '/\.[a-z0-9]+$/i', '.json', $destination ), json_encode( $meta, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) );
 	return array( 'path' => $result['path'], 'seconds' => $result['seconds'], 'cost' => $cost, 'usage' => $result['usage'] );
+}
+
+/**
+ * The part of the research an image model can act on.
+ *
+ * The whole package used to be sent, and it grew past the provider's 32,000
+ * character limit: the collage call was rejected outright. Temperatures, source
+ * URLs, food-safety rules and originality notes cannot change a photograph, and
+ * the visual brief already distils what can.
+ */
+function lab_research_for_image( $research ) {
+	$research = is_array( $research ) ? $research : array();
+	$observations = array();
+	foreach ( (array) ( $research['visual_observations'] ?? array() ) as $observation ) {
+		if ( ! is_array( $observation ) ) { continue; }
+		$observations[] = array(
+			'observable_details' => lab_observation_text( $observation['observable_details'] ?? '' ),
+			'composition' => lab_observation_text( $observation['composition'] ?? '' ),
+			'colours' => lab_observation_text( $observation['colours'] ?? '' ),
+			'textures' => lab_observation_text( $observation['textures'] ?? '' ),
+		);
+	}
+	return array(
+		'dish_identity' => $research['dish_identity'] ?? array(),
+		'visual_observations' => $observations,
+	);
+}
+
+/**
+ * The research a text step can act on.
+ *
+ * `originality_notes` describes how the research was conducted, `visual_references`
+ * are URLs, and `visual_observations` describe a photograph — none of it changes a
+ * recipe, a correction or a fact check, and the article receives the appearance
+ * distilled in its visual brief instead. Dropping them takes about 6 100 characters
+ * off every text call that carries the package.
+ */
+function lab_research_for_text( $research ) {
+	$research = is_array( $research ) ? $research : array();
+	foreach ( array( 'originality_notes', 'visual_references', 'visual_observations' ) as $key ) { unset( $research[ $key ] ); }
+	return $research;
 }
 
 /** The blocking findings the judge raised against one image. */

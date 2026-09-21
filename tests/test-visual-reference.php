@@ -27,7 +27,7 @@ msrwa_test_contains( $research, 'Do not copy a source', 'Research must not reuse
 $steps = file_get_contents( dirname( __DIR__ ) . '/tools/lib/steps.php' );
 foreach ( array( 'canonical_recipe', 'article', 'review' ) as $step ) {
 	msrwa_test_assert(
-		1 === preg_match( "/'" . $step . "' === \\\$step \\)\s*\{(.*?)\n\t\}/s", $steps, $block ) && false !== strpos( $block[1], '$research' ),
+		1 === preg_match( "/'" . $step . "' === \\\$step \\)\s*\{(.*?)\n\t\}/s", $steps, $block ) && ( false !== strpos( $block[1], '$research' ) || false !== strpos( $block[1], '$text_research' ) ),
 		'The ' . $step . ' step must receive the research package.'
 	);
 }

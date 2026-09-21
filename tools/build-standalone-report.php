@@ -13,6 +13,51 @@ foreach ( $required as $key ) {
 	}
 }
 
+/**
+ * The real photographs research found, and what the vision pass read from their
+ * bytes. Both halves matter: the provenance shows the observations came from a
+ * real source, and the observations show what was taken from it. Nothing here is
+ * republished — the links point at the source, the pictures stay with their owners.
+ */
+function report_visual_provenance( $research ) {
+	$references = (array) ( $research['visual_references'] ?? array() );
+	$observations = (array) ( $research['visual_observations'] ?? array() );
+	if ( ! $references && ! $observations ) { return '<p class="muted">Aucune photographie réelle n’a été trouvée pour cette recette.</p>'; }
+
+	$by_url = array();
+	foreach ( $observations as $observation ) {
+		if ( is_array( $observation ) && ! empty( $observation['image_url'] ) ) { $by_url[ (string) $observation['image_url'] ] = $observation; }
+	}
+
+	$html = '<div class="list">';
+	$index = 0;
+	foreach ( $references as $reference ) {
+		if ( ! is_array( $reference ) ) { continue; }
+		$index++;
+		$image = (string) ( $reference['image_url'] ?? '' );
+		$source = (string) ( $reference['source_url'] ?? '' );
+		$observation = $by_url[ $image ] ?? array();
+		$inspected = ! empty( $observation );
+		$html .= '<div class="list-item"><h3>Photographie ' . $index . ' <span class="pill ' . ( $inspected ? 'ok' : 'warn' ) . '">' . ( $inspected ? 'analysée' : 'non analysée' ) . '</span></h3>';
+		$html .= '<p><strong>' . report_h( $reference['title'] ?? 'Sans titre' ) . '</strong></p>';
+		$html .= '<p class="muted">Page source : <a href="' . report_h( $source ) . '" rel="nofollow noopener">' . report_h( $source ) . '</a></p>';
+		$html .= '<p class="muted">Fichier image : <a href="' . report_h( $image ) . '" rel="nofollow noopener">' . report_h( $image ) . '</a></p>';
+		if ( $inspected ) {
+			foreach ( array( 'observable_details' => 'Ce qui est visible', 'composition' => 'Composition', 'colours' => 'Couleurs', 'textures' => 'Textures', 'uncertainties' => 'Incertitudes' ) as $key => $label ) {
+				$value = $observation[ $key ] ?? '';
+				if ( is_array( $value ) ) { $value = implode( ' ', array_filter( array_map( 'strval', $value ) ) ); }
+				$value = trim( (string) $value );
+				if ( '' === $value ) { continue; }
+				$html .= '<p><strong>' . report_h( $label ) . ' :</strong> ' . report_h( $value ) . '</p>';
+			}
+		}
+		$html .= '</div>';
+	}
+	$html .= '</div>';
+	$html .= '<p class="muted" style="margin-top:18px">' . count( $references ) . ' photographie(s) citée(s), ' . count( $observations ) . ' analysée(s) à partir des octets réels.</p>';
+	return $html;
+}
+
 /** The approval verdict as four cards: the decision, then one per artifact. */
 function report_approval_cards( $verdict ) {
 	$verdict = is_array( $verdict ) ? $verdict : array();
@@ -107,6 +152,14 @@ $fact_check = report_run( $options['fact-check'] );
 $featured_meta = report_run( $options['featured-meta'] );
 $facebook_meta = report_run( $options['facebook-meta'] );
 $approval = report_run( $options['approval'] );
+$fixture = __DIR__ . '/fixtures/' . basename( (string) $options['brief'] ) . '.json';
+$fixture_data = file_exists( $fixture ) ? json_decode( (string) file_get_contents( $fixture ), true ) : array();
+$editor_brief = array(
+	'Titre demandé' => $fixture_data['title'] ?? $options['brief'],
+	'Consigne de l’éditeur' => $fixture_data['text'] ?? '',
+	'Point de départ' => $fixture_data['editor_input']['type'] ?? 'title',
+	'Images fournies par l’éditeur' => count( (array) ( $fixture_data['editor_input']['images'] ?? array() ) ),
+);
 
 $research_data = (array) $research['decoded_output'];
 $canonical_data = (array) $canonical['decoded_output'];
@@ -171,18 +224,20 @@ $html = '<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="
 :root{--ink:#241c17;--muted:#74685f;--paper:#fffdfa;--card:#fff;--accent:#a43d22;--accent2:#e6b45d;--line:#eadfd5;--ok:#1f7a4c;--warn:#a36014}*{box-sizing:border-box}html,body{max-width:100%;overflow-x:hidden}body{margin:0;background:#f4eee8;color:var(--ink);font:16px/1.62 system-ui,-apple-system,Segoe UI,sans-serif}main{width:min(100%,920px);margin:auto;background:var(--paper);box-shadow:0 0 60px #6a4a3220}.hero{padding:56px clamp(22px,6vw,64px);background:linear-gradient(125deg,#2c211a,#6f2f1f);color:#fff}.eyebrow{text-transform:uppercase;letter-spacing:.14em;font-size:.78rem;color:#f4c980}.hero h1{font:700 clamp(2.1rem,5vw,4rem)/1.04 Georgia,serif;margin:.25em 0}.hero p{max-width:700px;color:#f4e9df}.section{padding:42px clamp(20px,6vw,58px);border-bottom:1px solid var(--line);min-width:0}h2{font:700 clamp(1.65rem,3vw,2.5rem)/1.15 Georgia,serif;margin:0 0 24px;color:#55271d}h3{font:700 1.2rem Georgia,serif;color:#7a321f}.summary-grid,.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:18px}.image-grid{display:grid;grid-template-columns:1fr;gap:22px;max-width:700px;margin:auto}.card,.list-item,details{min-width:0;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:0 5px 18px #5a3a2010}.kpi{font:700 1.8rem Georgia,serif;color:var(--accent)}.muted{color:var(--muted)}.pill{display:inline-block;border-radius:99px;padding:.18rem .6rem;font-size:.78rem;font-weight:700;background:#eee}.pill.ok{background:#dff4e7;color:var(--ok)}.pill.warn{background:#fff0d5;color:var(--warn)}table{width:100%;border-collapse:collapse;min-width:760px}th,td{text-align:left;padding:11px;border-bottom:1px solid var(--line)}th{background:#f8f1eb}.table-wrap{width:100%;max-width:100%;overflow-x:auto}.image-card{margin:0;background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden}.image-card img{width:100%;height:auto;display:block}.image-card figcaption{padding:14px;color:var(--muted)}.article{font-family:Georgia,serif;font-size:1.06rem;max-width:740px;margin:auto;overflow-wrap:anywhere}.article h2{margin-top:2.2em}.article h3{margin-top:1.6em}.article li{margin:.45em 0}.page-break{display:flex;align-items:center;gap:14px;margin:52px 0;color:var(--accent);font:bold .78rem system-ui;text-transform:uppercase;letter-spacing:.14em}.page-break:before,.page-break:after{content:"";height:1px;background:var(--accent2);flex:1}.data>div{display:grid;grid-template-columns:minmax(120px,180px) minmax(0,1fr);gap:14px;padding:10px 0;border-bottom:1px solid var(--line)}dt{text-transform:capitalize;font-weight:700;color:#713823}dd{margin:0;min-width:0;overflow-wrap:anywhere}.list{display:grid;gap:10px;min-width:0}.data .list-item{box-shadow:none}.notes li{margin:.45em 0}details{margin:12px 0}summary{cursor:pointer;font-weight:700;color:#6b2d20;overflow-wrap:anywhere}pre{white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;background:#241e1a;color:#f7eee7;padding:18px;border-radius:10px;max-width:100%;max-height:560px;overflow:auto}.footer{padding:30px clamp(20px,6vw,58px);text-align:center;color:var(--muted)}@media(max-width:700px){.data>div{grid-template-columns:1fr}.hero{padding-top:40px}.section{padding-block:32px}.summary-grid,.cards{grid-template-columns:1fr}}
 </style></head><body><main><header class="hero"><div class="eyebrow">Test laboratoire complet · génération propre</div><h1>' . report_h( $title ) . '</h1><p>Rapport autonome contenant la recherche, la recette canonique, l’article final, le SEO, les contrôles qualité, les coûts, les temps et les deux visuels. Aucun fichier externe n’est nécessaire.</p></header>
 <section class="section"><h2>Résumé de la génération finale</h2><div class="summary-grid"><div class="card"><div class="muted">Temps cumulé</div><div class="kpi">' . number_format( $total_seconds, 1 ) . ' s</div></div><div class="card"><div class="muted">Coût cumulé</div><div class="kpi">$' . number_format( $total_cost, 4 ) . '</div></div><div class="card"><div class="muted">Jetons texte/image</div><div class="kpi">' . number_format( $total_in + $total_out ) . '</div><div class="muted">' . number_format( $total_in ) . ' entrée · ' . number_format( $total_out ) . ' sortie</div></div><div class="card"><div class="muted">Qualité article</div><div class="kpi">' . report_h( $article_data['quality_score'] ?? '98' ) . '/100</div><div class="muted">Contrat et structure validés</div></div></div><p class="muted">Seuls les appels retenus dans la génération finale sont comptabilisés. Les essais remplacés et échecs intermédiaires sont exclus.</p><div class="table-wrap"><table><thead><tr><th>Étape</th><th>Modèle</th><th>Temps</th><th>Entrée</th><th>Sortie</th><th>Coût</th><th>Verdict</th></tr></thead><tbody>' . $metric_rows . '</tbody></table></div></section>
-<section class="section"><h2>Visuels finaux</h2><div class="image-grid"><figure class="image-card"><img src="' . $featured_data . '" alt="Image à la une de ' . report_h( $title ) . '"><figcaption><strong>Image à la une.</strong> Carré 1024 × 1024, photographie culinaire éditoriale.</figcaption></figure><figure class="image-card facebook"><img src="' . $facebook_data . '" alt="Collage Facebook en six étapes de ' . report_h( $title ) . '"><figcaption><strong>Processus Facebook.</strong> Vertical 1024 × 1536, exactement six panneaux en grille 2 × 3, progression culinaire continue, sans texte.</figcaption></figure></div><p class="muted">Contrôle visuel manuel : géométrie, continuité, progression, ingrédients, cuisson, textures, absence de texte et lisibilité du plat final vérifiés.</p></section>
-<section class="section"><h2>Recette canonique</h2>' . report_value( $canonical_data ) . '</section>
-<section class="section"><h2>SEO, publication et données éditoriales</h2>' . report_value( $article_meta ) . '</section>
-<section class="section"><h2>Corrections finales après contrôle</h2><ul class="notes"><li>' . implode( '</li><li>', array_map( 'report_h', $correction_notes ) ) . '</li></ul><p class="muted">Ces corrections chirurgicales ont été appliquées au rendu ci-dessous après la dernière revue automatisée; elles ne modifient ni les quantités ni les étapes canoniques.</p></section>
-<section class="section"><h2>Article final prêt à publier</h2><article class="article">' . $content_html . '</article></section>
-<section class="section"><h2>Recherche complète</h2>' . report_value( $research_data ) . '</section>
-<section class="section"><h2>Approbation finale</h2>
+<section class="section"><h2>1 · Brief de l’éditeur</h2><p class="muted">Le point de départ : ce que l’éditeur a demandé, avant tout appel.</p>' . report_value( $editor_brief ) . '</section>
+<section class="section"><h2>2 · Photographies réelles trouvées et analysées</h2><p class="muted">La recherche cite des photographies réelles du plat, puis chacune est téléchargée et analysée à partir de ses octets. <strong>Aucune de ces images n’est republiée</strong> : seules les observations servent, et elles n’établissent qu’une apparence — jamais un ingrédient, une quantité ni une étape.</p>' . report_visual_provenance( $research_data ) . '</section>
+<section class="section"><h2>3 · Recherche complète</h2>' . report_value( $research_data ) . '</section>
+<section class="section"><h2>4 · Recette canonique</h2>' . report_value( $canonical_data ) . '</section>
+<section class="section"><h2>5 · Article final prêt à publier</h2><article class="article">' . $content_html . '</article></section>
+<section class="section"><h2>6 · SEO, publication et données éditoriales</h2>' . report_value( $article_meta ) . '</section>
+<section class="section"><h2>7 · Relecture, revue et vérification des faits</h2><div class="cards"><div class="card"><h3>Relecture</h3>' . report_value( $proofread_changes ) . '</div><div class="card"><h3>Revue qualité</h3>' . report_value( $review_data ) . '</div><div class="card"><h3>Fact-check</h3>' . report_value( $fact_data ) . '</div></div></section>
+<section class="section"><h2>8 · Visuels générés</h2><div class="image-grid"><figure class="image-card"><img src="' . $featured_data . '" alt="Image à la une de ' . report_h( $title ) . '"><figcaption><strong>Image à la une.</strong> Carré 1024 × 1024, photographie culinaire éditoriale.</figcaption></figure><figure class="image-card facebook"><img src="' . $facebook_data . '" alt="Collage Facebook en six étapes de ' . report_h( $title ) . '"><figcaption><strong>Processus Facebook.</strong> Vertical 1024 × 1536, exactement six panneaux en grille 2 × 3, progression culinaire continue, sans texte.</figcaption></figure></div><p class="muted">Contrôle visuel manuel : géométrie, continuité, progression, ingrédients, cuisson, textures, absence de texte et lisibilité du plat final vérifiés.</p></section>
+<section class="section"><h2>9 · Approbation finale</h2>
 <p class="muted">Un seul appel voit l\'article et les deux images ensemble, le seul moment où les trois peuvent être confrontés. Le réalisme photographique et les ingrédients principaux décident pour les images ; la recette et l\'article sont tenus à ce que la recherche documente.</p>
 <div class="summary-grid">' . report_approval_cards( $approval['decoded_output'] ) . '</div>
 <div style="margin-top:22px">' . report_value( $approval['decoded_output']['findings'] ?? array() ) . '</div></section>
 
-<section class="section"><h2>Relecture, revue et fact-check</h2><div class="cards"><div class="card"><h3>Relecture</h3>' . report_value( $proofread_changes ) . '</div><div class="card"><h3>Revue qualité</h3>' . report_value( $review_data ) . '</div><div class="card"><h3>Fact-check</h3>' . report_value( $fact_data ) . '</div></div></section>
+<section class="section"><h2>Corrections finales après contrôle</h2><ul class="notes"><li>' . implode( '</li><li>', array_map( 'report_h', $correction_notes ) ) . '</li></ul><p class="muted">Ces corrections chirurgicales ont été appliquées au rendu ci-dessous après la dernière revue automatisée; elles ne modifient ni les quantités ni les étapes canoniques.</p></section>
 <section class="section"><h2>Prompts et provenance</h2><p>Les clés API ne figurent jamais dans ce rapport. Les prompts exacts des appels retenus sont conservés ci-dessous pour audit.</p>' . $prompt_details . '</section>
 <section class="section"><h2>Données brutes A à Z</h2><p class="muted">Les blocs JSON ci-dessous conservent l’intégralité des sorties structurées sélectionnées.</p>' . $raw_details . '</section>
 <footer class="footer">Rapport généré le ' . report_h( gmdate( 'Y-m-d H:i:s' ) ) . ' UTC · MS Recipes Writer AI Prompt Lab</footer></main></body></html>';

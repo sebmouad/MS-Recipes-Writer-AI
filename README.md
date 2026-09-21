@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.59` est un socle installable : file persistante, pipeline de
+La version `0.2.60` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.
@@ -20,6 +20,48 @@ Le plugin est en cours de refonte éditoriale et budgétaire :
 Les coûts affichés sont des estimations calculées avec le catalogue configuré,
 non une facture fournisseur. `completed` signifie que le traitement est terminé,
 jamais qu’un texte est validé éditorialement.
+
+## Version 0.2.60
+
+Passage complet rejoué avec le code courant, **approuvé sans constat bloquant**,
+pour 0,1137 $ et environ quatre minutes de temps fournisseur.
+
+**Le rapport suit l'ordre d'exécution** et prouve la provenance : brief de
+l'éditeur, photographies réelles trouvées et analysées, recherche, recette,
+article, SEO, relecture, visuels, approbation. La section 2 liste chaque
+photographie citée avec sa page source et son fichier, dit si elle a été
+analysée, et montre ce que la vision en a lu. Aucune n'est republiée.
+
+**Élagage des prompts, partout où il réduit le coût** (directive du 21/09) :
+
+| Appel | Avant | Après |
+|---|---:|---:|
+| Collage Facebook | 33 091 car. — *refusé par le fournisseur* | 20 711 car. |
+| Image à la une | 0,0427 $ | **0,0266 $** |
+| Collage Facebook | 0,0443 $ | **0,0326 $** |
+| Recette canonique | 22 792 car. | 16 614 car. |
+| Article | 35 296 car. | 29 118 car. |
+
+Le collage dépassait la limite de 32 000 caractères du fournisseur et échouait
+en HTTP 400 : on envoyait tout le dossier de recherche à un modèle d'image, dont
+des températures, des URL et des règles d'hygiène qui ne changent aucune photo.
+Les étapes texte perdent de la même façon `originality_notes`,
+`visual_references` et `visual_observations` — l'apparence leur arrive distillée
+par le brief visuel. Gain réel : environ 27 % sur les images, où les jetons
+d'entrée sont facturés 5 $/M.
+
+**Trois défauts trouvés en chemin :**
+
+- `research_max_output_tokens` livré à 4 000 tronquait la recherche dès qu'on lui
+  demandait aussi les substitutions (5 567 jetons nécessaires). Quatrième
+  plafond trop bas — le laboratoire affiche désormais `!! TRUNCATED` dès qu'une
+  réponse s'arrête exactement sur son plafond.
+- Le prompt image dépassait la limite du fournisseur ; il échoue maintenant chez
+  nous, où la cause est lisible.
+- L'article inventait des substitutions et des gestes qu'aucune source ne
+  documente — cinq constats bloquants. Il ne peut plus proposer qu'un
+  remplacement attesté, et doit écrire franchement que les sources n'en
+  documentent aucun le cas échéant. Constats bloquants : **5 → 0**.
 
 ## Version 0.2.59
 

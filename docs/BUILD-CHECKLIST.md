@@ -184,7 +184,24 @@ cost) in the task before changing anything.
   Measured on the same run: the images fell to two minor findings while the
   article drew seven blocking ones — substitutions, accompaniments and buying
   criteria no source documents.
-- [ ] **A24 — The outline asks for content the strict rule forbids.** The article
+- [x] **A24 — The outline asked for content the strict rule forbids (closed
+  2026-09-21).** Research now gathers documented substitutions and
+  accompaniments, and the article may offer only what a fact names — where none
+  is documented it says so plainly instead of inventing a plausible swap. Same
+  rule for method: no step, placement or separate operation beyond the recipe
+  and the research. Blocking findings on the article went from 5 to 0.
+- [x] **A25 — Prompt trimming (owner directive, 2026-09-21).** The whole research
+  package was being sent to the image models, which pushed the collage past the
+  provider's 32 000-character limit and failed with HTTP 400. Images now receive
+  only the dish identity and the visual observations; text steps lose
+  `originality_notes`, `visual_references` and `visual_observations`, since the
+  visual brief carries appearance already. Featured 0.0427 → 0.0266 $, collage
+  0.0443 → 0.0326 $, about 27% where input tokens bill at $5/M. A guard now fails
+  an oversized prompt locally instead of at the provider.
+- [x] **A26 — Truncation is now visible.** A fourth ceiling silently ate a result:
+  `research_max_output_tokens` at 4 000 against the 5 567 the package needed. The
+  lab prints `!! TRUNCATED` whenever an answer stops exactly on its ceiling.
+- [ ] *(superseded)* **A24 — The outline asks for content the strict rule forbids.** The article
   plan requires a *substitutions* section, and every substitution the research
   does not document is now blocking. Research has been asked to gather
   substitutions and accompaniments; re-measure whether that clears the seven

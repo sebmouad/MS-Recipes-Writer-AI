@@ -134,6 +134,14 @@ printf( "%-28s %s\n", 'time', $result['seconds'] . 's' );
 printf( "%-28s in %d / out %d\n", 'tokens', (int) ( $result['usage']['input_tokens'] ?? 0 ), (int) ( $result['usage']['output_tokens'] ?? 0 ) );
 printf( "%-28s %s\n", 'cost', null === $cost ? 'unknown model rate' : sprintf( '$%.4f', $cost ) );
 printf( "%-28s %s\n", 'response status', (string) $result['status'] );
+
+// An answer that stops exactly on the ceiling was cut, whatever status the
+// provider reports. This has now bitten the article, the recipe, the approval
+// and research in turn, each time as a mysterious parse failure.
+$produced = (int) ( $result['usage']['output_tokens'] ?? 0 );
+if ( $produced > 0 && $produced >= $tokens ) {
+	printf( "\n!! TRUNCATED: %d output tokens against a ceiling of %d. Raise the step's max output setting; the answer below is incomplete and was billed in full.\n", $produced, $tokens );
+}
 echo "\nscorecard\n";
 foreach ( $scores['checks'] as $label => $check ) {
 	printf( "  %-1s %-30s %s\n", $check['pass'] ? '✓' : '✗', $label, $check['detail'] );
