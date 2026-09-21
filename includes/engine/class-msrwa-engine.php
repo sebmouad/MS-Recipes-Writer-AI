@@ -370,11 +370,17 @@ final class MSRWA_Engine {
 		// rather than regenerate images against a decision nobody made.
 		$sound = ! empty( $checks['valid JSON']['pass'] ) && ! empty( $checks['a verdict per artifact']['pass'] ) && ! empty( $checks['a refusal is justified']['pass'] );
 		$approved = $sound && ! empty( $verdict['approved'] );
+		$redraw = $sound && ! $approved ? MSRWA_Engine_Score::images_to_retry( $verdict ) : array();
 		$retry = '';
 		if ( ! $sound ) {
 			$retry = sprintf( 'The verdict is malformed (%d/%d contracts); asking again without touching the images.', $passed, count( $checks ) );
+		} elseif ( $redraw ) {
+			$retry = 'Refused; regenerating ' . implode( ', ', $redraw ) . '.';
 		} elseif ( ! $approved ) {
-			$retry = 'Refused; regenerating ' . ( implode( ', ', MSRWA_Engine_Score::images_to_retry( $verdict ) ) ?: 'nothing' ) . '.';
+			// A refusal the engine cannot act on is a decision, not a failed attempt.
+			// Asking the same judge the same question about the same artifacts is a
+			// second roll of the dice, and it was costing two calls per run.
+			$result->event( 'decision', $name, 'Refused on the article, which no retry here can change. The findings go to the editor.' );
 		}
 
 		return array(

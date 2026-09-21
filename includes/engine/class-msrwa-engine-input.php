@@ -341,6 +341,14 @@ final class MSRWA_Engine_Input {
 				. "\nCANONICAL RECIPE: " . $encode( $canonical )
 				. "\nARTICLE TO CORRECT: " . $encode( self::article( $brief )['content_html'] ?? '' );
 		}
+		if ( 'final_approval' === $step ) {
+			// The images travel beside this text, as bytes. Everything the judge
+			// measures them against has to be in here, or it judges pictures alone.
+			return $prompt . "\n\nCANONICAL RECIPE: " . $encode( $canonical )
+				. "\nRESEARCH PACKAGE: " . $encode( $text_research )
+				. "\n\n" . self::visual_brief( $canonical, $research )
+				. "\nARTICLE: " . $encode( self::article( $brief ) );
+		}
 		return $prompt;
 	}
 

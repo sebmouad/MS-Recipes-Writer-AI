@@ -127,4 +127,30 @@ $artifacts = array(
 $judged = MSRWA_Engine::run_step( 'final_approval', array( 'title' => 'Tarte aux pommes', 'artifacts' => $artifacts ) );
 msrwa_test_assert( false !== strpos( $judged->errors[0]['message'], 'no longer readable' ), 'An image the judge cannot read is named, not skipped: ' . $judged->errors[0]['message'] );
 
+// Every step that sends text to a model must carry what it is measured against.
+// The approval step had no branch at all, so it judged the two images with no
+// article, no recipe and no research, and refused for exactly that reason — at
+// full price, three times over, because a refusal it cannot act on was being
+// retried. Live running found it; nothing offline could have.
+$full = array(
+	'research' => array( 'ingredients' => array( array( 'name' => 'oignons' ) ), 'preparation' => array( array( 'text' => 'Confire', 'cue' => 'translucide' ) ), 'visual_observations' => array( array( 'colours' => 'ambré' ) ) ),
+	'canonical' => array( 'title' => 'Poulet yassa', 'ingredients' => array( array( 'quantity' => '4', 'name' => 'oignons' ) ), 'steps' => array( array( 'text' => 'Confire les oignons' ) ) ),
+	'article' => array( 'title' => 'Poulet yassa', 'content_html' => '<h2>Cuisson</h2><p>Confire les oignons 40 minutes.</p>' ),
+);
+$carries = array(
+	'canonical_recipe' => array( 'EDITOR BRIEF', 'RESEARCH PACKAGE' ),
+	'article' => array( 'Recette canonique', 'RESEARCH PACKAGE' ),
+	'review' => array( 'CANONICAL RECIPE', 'RESEARCH PACKAGE', 'ARTICLE' ),
+	'fact_check' => array( 'RESEARCH PACKAGE', 'CANONICAL RECIPE', 'ARTICLE' ),
+	'proofread' => array( 'RESEARCH PACKAGE', 'CANONICAL RECIPE', 'ARTICLE TO CORRECT' ),
+	'final_approval' => array( 'CANONICAL RECIPE', 'RESEARCH PACKAGE', 'ARTICLE' ),
+);
+foreach ( $carries as $step => $required ) {
+	$built = MSRWA_Engine_Input::build( $step, 'PROMPT', array_merge( array( 'title' => 'Poulet yassa', 'text' => '', 'images' => array() ), $full ) );
+	foreach ( $required as $marker ) {
+		msrwa_test_assert( false !== strpos( $built, $marker ), $step . ' must be sent its ' . $marker . '.' );
+	}
+	msrwa_test_assert( false !== strpos( $built, 'oignons' ), $step . ' must be sent the recipe it is measured against, not just its headings.' );
+}
+
 msrwa_test_done( 'engine' );

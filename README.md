@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.73` est un socle installable : file persistante, pipeline de
+La version `0.2.74` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.
@@ -22,6 +22,44 @@ Le plugin est en cours de refonte éditoriale et budgétaire :
 Les coûts affichés sont des estimations calculées avec le catalogue configuré,
 non une facture fournisseur. `completed` signifie que le traitement est terminé,
 jamais qu’un texte est validé éditorialement.
+
+## Version 0.2.74
+
+**Le juge ne recevait pas l'article.** `MSRWA_Engine_Input::build()` n'avait
+aucune branche pour l'approbation finale : elle retournait le prompt seul. Le
+juge voyait les deux images et rien d'autre — ni article, ni recette, ni
+recherche — et refusait en le disant : « L'article complet n'a pas été fourni ».
+
+Un passage complet sur le poulet yassa l'a montré : l'approbation a refusé trois
+fois de suite, au tarif plein, sans qu'aucun contrôle hors ligne ne puisse le
+voir. Corrigé et vérifié sur les mêmes artefacts : **10/10**, article jugé
+*conforme*, et le refus porte désormais sur ce qu'il doit — des poivrons et une
+tranche de citron absents de la recette, trois feuilles de laurier là où elle en
+prévoit une.
+
+**Un refus que le moteur ne peut pas corriger n'est plus réessayé.** Quand le
+verdict est sain, refusé, et qu'aucune image n'est mise en cause, reposer la
+même question au même juge sur les mêmes artefacts est un second coup de dé.
+C'est une décision, pas un essai raté : elle part à l'éditeur. Cela coûtait deux
+appels par passage.
+
+Un contrôle hors ligne vérifie maintenant que chaque étape reçoit ce à quoi elle
+est mesurée — recette, recherche, article — et il échoue bien si on retire la
+branche.
+
+### Premier passage complet du nouveau moteur
+
+Poulet yassa, dix étapes, bout en bout :
+
+| | |
+|---|---|
+| temps | 346,7 s |
+| coût | $0,1274 |
+| jetons | 120 217 entrée · 32 028 sortie |
+| texte / image à la une / collage / recherche | $0,0370 · $0,0278 · $0,0350 · $0,0277 |
+
+Recherche 14/14 avec deux photographies réelles lues dans leurs octets, recette
+4/4, article 10/10, revue 3/3, fact-check 5/5, corrections 2/2, langue 6/6.
 
 ## Version 0.2.73
 
