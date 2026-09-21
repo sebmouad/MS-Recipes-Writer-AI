@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.87` est un socle installable : file persistante, pipeline de
+La version `0.2.88` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.
@@ -22,6 +22,32 @@ Le plugin est en cours de refonte éditoriale et budgétaire :
 Les coûts affichés sont des estimations calculées avec le catalogue configuré,
 non une facture fournisseur. `completed` signifie que le traitement est terminé,
 jamais qu’un texte est validé éditorialement.
+
+## Version 0.2.88
+
+**Tout ce que le moteur rapporte est conservé, en lignes interrogeables.** Le
+moteur ne rend pas seulement un résultat : un chiffre et une grille de contrôle
+par étape, un compte de tokens et un prix par appel, un événement par chose
+survenue, et les productions elles-mêmes. Quatre tables les reçoivent —
+`lab_steps`, `lab_calls`, `lab_events`, `lab_artifacts` — au lieu d'un seul bloc
+JSON. Un bloc répond « que s'est-il passé au run 12 » ; des lignes répondent
+« combien coûte la revue sur tous les runs », qui est la question pour laquelle
+le laboratoire existe.
+
+Deux écrans les lisent. **Détail du run** montre chaque étape avec ses contrôles
+non satisfaits, chaque appel avec son modèle, son point d'entrée, sa part de
+cache et son prix, le verdict et ses remarques, les productions et leur taille,
+puis le déroulé complet. **Mesures** agrège les runs terminés : où part l'argent
+étape par étape, quel modèle est réellement facturé, quel contrôle nommé échoue
+et à quelle fréquence, et combien de fois le juge approuve quoi que ce soit.
+
+Un coût inconnu reste inconnu de bout en bout : la colonne est `NULL`, le total
+compte les étapes non tarifées à part, et l'écran écrit « tarif inconnu » plutôt
+qu'un zéro. Les tests le vérifient dans les deux sens.
+
+La suite charge désormais la vraie classe base de données plutôt qu'un
+stand-in : sa liste de tables et son filtrage des secrets sont ce sur quoi le
+plugin repose réellement.
 
 ## Version 0.2.87
 

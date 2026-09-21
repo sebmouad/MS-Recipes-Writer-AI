@@ -2,7 +2,7 @@
 /**
  * Plugin Name: MS Recipes Writer AI
  * Description: Génération éditoriale culinaire orchestrée avec fournisseurs IA, validation et file persistante.
- * Version: 0.2.87
+ * Version: 0.2.88
  * Author: Mouad Sebhaoui
  * License: GPL-2.0-or-later
  * Text Domain: ms-recipes-writer-ai
@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'MSRWA_VERSION', '0.2.87' );
+define( 'MSRWA_VERSION', '0.2.88' );
 define( 'MSRWA_FILE', __FILE__ );
 define( 'MSRWA_DIR', plugin_dir_path( __FILE__ ) );
 define( 'MSRWA_URL', plugin_dir_url( __FILE__ ) );
@@ -40,6 +40,7 @@ require_once MSRWA_DIR . 'includes/class-msrwa-queue.php';
 require_once MSRWA_DIR . 'includes/class-msrwa-lab.php';
 require_once MSRWA_DIR . 'includes/class-msrwa-lab-screen.php';
 require_once MSRWA_DIR . 'includes/class-msrwa-lab-config.php';
+require_once MSRWA_DIR . 'includes/class-msrwa-lab-stats.php';
 require_once MSRWA_DIR . 'includes/class-msrwa-rest.php';
 require_once MSRWA_DIR . 'includes/class-msrwa-admin.php';
 require_once MSRWA_DIR . 'includes/class-msrwa-plugin.php';

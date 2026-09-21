@@ -50,9 +50,12 @@ final class MSRWA_Lab {
 		return $id;
 	}
 
-	/** What a run knows before it has run anything. */
+	/**
+	 * What a run knows before it has run anything. The steps, calls, events and
+	 * artifacts live in their own tables; this holds only what has no row.
+	 */
 	private static function blank_state() {
-		return array( 'ok' => true, 'artifacts' => array(), 'steps' => array(), 'events' => array(), 'errors' => array(), 'totals' => array() );
+		return array( 'ok' => true, 'errors' => array(), 'totals' => array() );
 	}
 
 	public static function queue( $id, $delay = 5 ) {
@@ -137,12 +140,12 @@ final class MSRWA_Lab {
 		$id = (int) $run['id'];
 		$brief = (array) json_decode( (string) $run['brief_json'], true );
 		$config = self::configure( (array) json_decode( (string) $run['config_json'], true ) );
-		$state = (array) json_decode( (string) $run['result_json'], true );
-		$artifacts = (array) ( $state['artifacts'] ?? array() );
+		$state = self::state( $id );
+		$artifacts = (array) $state['artifacts'];
 		$registry = (array) ( $config['steps'] ?? array() );
 
 		$done = array();
-		foreach ( (array) ( $state['steps'] ?? array() ) as $step ) { $done[] = (string) $step['step']; }
+		foreach ( (array) $state['steps'] as $step ) { $done[] = (string) $step['step']; }
 		$remaining = array_values( array_diff( MSRWA_Engine_Steps::names( $registry ), $done ) );
 		if ( ! $remaining ) { self::finish( $id, empty( $state['ok'] ) ? 'failed' : 'done', '' ); return; }
 
@@ -169,31 +172,181 @@ final class MSRWA_Lab {
 		self::queue( $id, 2 );
 	}
 
-	/** Folds one tick's result into the run's own record. */
+	/**
+	 * Writes down everything one tick produced.
+	 *
+	 * The engine reports more than a run's outcome: a figure and a scorecard per
+	 * step, a token count and a price per call, an event per thing that happened,
+	 * and the artifacts themselves. All of it is kept, and kept in rows rather
+	 * than in one blob, so the laboratory can be asked what the review costs
+	 * across every run rather than only what happened in run twelve.
+	 */
 	private static function absorb( $id, array $state, array $tick, $wave_size ) {
 		global $wpdb;
+		$t = MSRWA_DB::tables();
+		$now = current_time( 'mysql', true );
+
+		foreach ( (array) ( $tick['steps'] ?? array() ) as $step ) {
+			$usage = (array) ( $step['usage'] ?? array() );
+			$wpdb->insert( $t['lab_steps'], array(
+				'run_id' => absint( $id ), 'step' => (string) $step['step'],
+				'provider' => (string) $step['provider'], 'model' => (string) $step['model'],
+				'seconds' => (float) $step['seconds'], 'attempts' => (int) $step['attempts'],
+				'input_tokens' => (int) ( $usage['input_tokens'] ?? 0 ), 'output_tokens' => (int) ( $usage['output_tokens'] ?? 0 ),
+				// A model with no published rate costs an unknown amount, not nothing:
+				// null is the honest column value and the totals count it separately.
+				'cost_usd' => null === $step['cost_usd'] ? null : (float) $step['cost_usd'],
+				'bucket' => MSRWA_Engine_Steps::bucket( (string) $step['step'] ),
+				'status' => (string) $step['status'],
+				'passed' => null === $step['passed'] ? null : (int) $step['passed'],
+				'total' => null === $step['total'] ? null : (int) $step['total'],
+				'checks_json' => wp_json_encode( MSRWA_DB::sanitize_persisted_data( (array) $step['checks'] ) ),
+				'error_message' => (string) $step['error'], 'created_at' => $now,
+			) );
+		}
+
 		// Each tick is one wave of a longer run, so its own opening and closing
 		// lines would read as a run starting and finishing over and over.
-		$events = array();
 		foreach ( (array) ( $tick['events'] ?? array() ) as $event ) {
 			if ( in_array( (string) $event['kind'], array( 'start', 'config', 'finish' ), true ) ) { continue; }
-			$events[] = $event;
+			$data = MSRWA_DB::sanitize_persisted_data( (array) ( $event['data'] ?? array() ) );
+			$wpdb->insert( $t['lab_events'], array(
+				'run_id' => absint( $id ), 'at_seconds' => (float) $event['at'], 'kind' => (string) $event['kind'],
+				'step' => (string) $event['step'], 'message' => (string) $event['message'],
+				'data_json' => wp_json_encode( $data ), 'created_at' => $now,
+			) );
+			if ( 'call' === (string) $event['kind'] ) { self::record_call( $id, (string) $event['step'], $data, $now ); }
+		}
+
+		foreach ( (array) ( $tick['artifacts'] ?? array() ) as $key => $value ) {
+			self::record_artifact( $id, (string) $key, $value, $now );
 		}
 
 		$state['ok'] = ! empty( $state['ok'] ) && ! empty( $tick['ok'] );
-		$state['artifacts'] = array_merge( (array) ( $state['artifacts'] ?? array() ), (array) ( $tick['artifacts'] ?? array() ) );
-		$state['steps'] = array_merge( (array) ( $state['steps'] ?? array() ), (array) ( $tick['steps'] ?? array() ) );
 		$state['errors'] = array_merge( (array) ( $state['errors'] ?? array() ), (array) ( $tick['errors'] ?? array() ) );
-		$state['events'] = array_merge( (array) ( $state['events'] ?? array() ), $events );
-		$state['totals'] = self::totals( $state['steps'] );
+		$totals = self::totals( self::steps( $id ) );
 
 		$wpdb->update( self::table(), array(
-			'result_json' => wp_json_encode( MSRWA_DB::sanitize_persisted_data( $state ) ),
-			'steps_done' => count( $state['steps'] ),
-			'cost_usd' => (float) $state['totals']['cost_usd'],
-			'seconds' => (float) $state['totals']['seconds'],
-			'updated_at' => current_time( 'mysql', true ),
+			'result_json' => wp_json_encode( array( 'ok' => (bool) $state['ok'], 'errors' => MSRWA_DB::sanitize_persisted_data( $state['errors'] ), 'totals' => $totals ) ),
+			'steps_done' => (int) $totals['steps'],
+			'cost_usd' => (float) $totals['cost_usd'],
+			'seconds' => (float) $totals['seconds'],
+			'updated_at' => $now,
 		), array( 'id' => absint( $id ) ), array( '%s', '%d', '%f', '%f', '%s' ), array( '%d' ) );
+	}
+
+	/** One provider call, as the engine reported it: who answered, how much of it was cached, what it cost. */
+	private static function record_call( $id, $step, array $data, $now ) {
+		global $wpdb;
+		$t = MSRWA_DB::tables();
+		$usage = (array) ( $data['usage'] ?? array() );
+		$wpdb->insert( $t['lab_calls'], array(
+			'run_id' => absint( $id ), 'step' => $step,
+			'provider' => (string) ( $data['provider'] ?? '' ), 'model' => (string) ( $data['model'] ?? '' ),
+			'tier' => (string) ( $data['tier'] ?? '' ), 'endpoint' => (string) ( $data['endpoint'] ?? '' ),
+			'seconds' => (float) ( $data['seconds'] ?? 0 ),
+			'input_tokens' => (int) ( $usage['input_tokens'] ?? 0 ), 'output_tokens' => (int) ( $usage['output_tokens'] ?? 0 ),
+			'cached_tokens' => (int) ( $usage['cached_input_tokens'] ?? 0 ),
+			'cost_usd' => isset( $data['cost_usd'] ) && null !== $data['cost_usd'] ? (float) $data['cost_usd'] : null,
+			'priced' => empty( $data['priced'] ) ? 0 : 1,
+			'status' => (string) ( $data['status'] ?? '' ), 'created_at' => $now,
+		) );
+	}
+
+	/**
+	 * An artifact, under its own name, replacing any earlier version of itself.
+	 *
+	 * A step may produce the same artifact twice — an image redrawn after a
+	 * refusal is the same featured image, not a second one — and what the run
+	 * ends with is what the reader would have got.
+	 */
+	private static function record_artifact( $id, $key, $value, $now ) {
+		global $wpdb;
+		$t = MSRWA_DB::tables();
+		$json = (string) wp_json_encode( MSRWA_DB::sanitize_persisted_data( $value ) );
+		$wpdb->query( $wpdb->prepare(
+			'INSERT INTO ' . $t['lab_artifacts'] . ' (run_id, artifact_key, content_json, bytes, created_at, updated_at) VALUES (%d, %s, %s, %d, %s, %s)'
+			. ' ON DUPLICATE KEY UPDATE content_json = VALUES(content_json), bytes = VALUES(bytes), updated_at = VALUES(updated_at)',
+			absint( $id ), $key, $json, strlen( $json ), $now, $now ) );
+	}
+
+	/** The steps a run has run, oldest first. */
+	public static function steps( $id ) {
+		global $wpdb;
+		$t = MSRWA_DB::tables();
+		$rows = (array) $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM ' . $t['lab_steps'] . ' WHERE run_id = %d ORDER BY id ASC', absint( $id ) ), ARRAY_A );
+		$out = array();
+		foreach ( $rows as $row ) {
+			$out[] = array(
+				'step' => $row['step'], 'model' => $row['model'], 'provider' => $row['provider'],
+				'seconds' => (float) $row['seconds'], 'attempts' => (int) $row['attempts'],
+				'usage' => array( 'input_tokens' => (int) $row['input_tokens'], 'output_tokens' => (int) $row['output_tokens'] ),
+				'cost_usd' => null === $row['cost_usd'] ? null : (float) $row['cost_usd'],
+				'status' => $row['status'],
+				'passed' => null === $row['passed'] ? null : (int) $row['passed'],
+				'total' => null === $row['total'] ? null : (int) $row['total'],
+				'checks' => (array) json_decode( (string) $row['checks_json'], true ),
+				'error' => (string) $row['error_message'],
+			);
+		}
+		return $out;
+	}
+
+	public static function calls( $id ) {
+		global $wpdb;
+		$t = MSRWA_DB::tables();
+		return (array) $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM ' . $t['lab_calls'] . ' WHERE run_id = %d ORDER BY id ASC', absint( $id ) ), ARRAY_A );
+	}
+
+	public static function events( $id ) {
+		global $wpdb;
+		$t = MSRWA_DB::tables();
+		$rows = (array) $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM ' . $t['lab_events'] . ' WHERE run_id = %d ORDER BY id ASC', absint( $id ) ), ARRAY_A );
+		$out = array();
+		foreach ( $rows as $row ) {
+			$out[] = array( 'at' => (float) $row['at_seconds'], 'kind' => $row['kind'], 'step' => $row['step'], 'message' => $row['message'], 'data' => (array) json_decode( (string) $row['data_json'], true ) );
+		}
+		return $out;
+	}
+
+	public static function artifacts( $id ) {
+		global $wpdb;
+		$t = MSRWA_DB::tables();
+		$rows = (array) $wpdb->get_results( $wpdb->prepare( 'SELECT artifact_key, content_json FROM ' . $t['lab_artifacts'] . ' WHERE run_id = %d ORDER BY id ASC', absint( $id ) ), ARRAY_A );
+		$out = array();
+		foreach ( $rows as $row ) { $out[ $row['artifact_key'] ] = json_decode( (string) $row['content_json'], true ); }
+		return $out;
+	}
+
+	/**
+	 * The whole run in the shape the engine returns and the report renders.
+	 *
+	 * Assembled from the rows rather than kept as a second copy: the tables are
+	 * the record, and this is the view of it the rest of the code already knows
+	 * how to read.
+	 */
+	public static function state( $id ) {
+		$run = self::get( $id );
+		$stored = $run ? (array) json_decode( (string) $run['result_json'], true ) : array();
+		$steps = self::steps( $id );
+		return array(
+			'ok' => ! isset( $stored['ok'] ) || (bool) $stored['ok'],
+			'totals' => self::totals( $steps ),
+			'steps' => $steps,
+			'artifacts' => self::artifacts( $id ),
+			'errors' => (array) ( $stored['errors'] ?? array() ),
+			'events' => self::events( $id ),
+		);
+	}
+
+	/** Deletes a run and everything the engine reported about it. */
+	public static function delete( $id ) {
+		global $wpdb;
+		$t = MSRWA_DB::tables();
+		foreach ( array( 'lab_steps', 'lab_calls', 'lab_events', 'lab_artifacts' ) as $table ) {
+			$wpdb->query( $wpdb->prepare( 'DELETE FROM ' . $t[ $table ] . ' WHERE run_id = %d', absint( $id ) ) );
+		}
+		return (bool) $wpdb->delete( self::table(), array( 'id' => absint( $id ) ), array( '%d' ) );
 	}
 
 	/** The run's totals, summed from its own steps rather than from any one tick. */

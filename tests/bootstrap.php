@@ -135,19 +135,7 @@ if ( ! class_exists( 'MSRWA_Settings' ) ) {
 	}
 }
 
-if ( ! class_exists( 'MSRWA_DB' ) ) {
-	class MSRWA_DB {
-		public static function tables() {
-			$tables = array();
-			foreach ( array( 'batches', 'jobs', 'events', 'calls', 'reservations', 'settings', 'settings_history', 'providers', 'models', 'prompts', 'artifacts', 'snapshots' ) as $table ) {
-				$tables[ $table ] = 'wp_msrwa_' . $table;
-			}
-			return $tables;
-		}
-		public static function event( ...$args ) { return true; }
-		public static function snapshot( ...$args ) { return 1; }
-		public static function store_artifact( ...$args ) { return 1; }
-		public static function store_artifacts( ...$args ) { return true; }
-		public static function store_article_quality( ...$args ) { return true; }
-	}
-}
+// The real class, not a stand-in: its table list and its secret-stripping are
+// what the plugin actually relies on, and a stub that drifts from them would
+// let a test pass over code that does not exist.
+if ( ! class_exists( 'MSRWA_DB' ) ) { require_once dirname( __DIR__ ) . '/includes/class-msrwa-db.php'; }
