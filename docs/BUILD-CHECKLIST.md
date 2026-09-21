@@ -1,5 +1,9 @@
 # Build checklist — for the model doing the work
 
+## Hotfix 0.3.2
+
+- [~] Restore credential sanitization, preserve partial settings saves, and handle the removed catalog table. Production settings class tested offline with OpenSSL; live WordPress save still requires deployment verification.
+
 ## Plugin operations 0.3.1 — 2026-09-21
 
 - [~] Unified responsive design tokens, mobile navigation, 44px controls, keyboard focus, selected-photo thumbnails, overflow hints and unsaved-settings warning. Visual browser validation remains pending.

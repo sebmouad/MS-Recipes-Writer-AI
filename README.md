@@ -2,6 +2,13 @@
 
 Plugin WordPress en construction pour la génération éditoriale culinaire orchestrée.
 
+## Version 0.3.2
+
+Corrige l’erreur fatale `secret_for_save()` lors de l’enregistrement des clés.
+Préserve les clés vides/masquées et les réglages non soumis. Le catalogue revient
+aux valeurs par défaut lorsque l’ancienne table des modèles n’existe plus.
+Test de régression utilisant la vraie classe de réglages et le chiffrement.
+
 ## Version 0.3.1
 
 Interface harmonisée : navigation mobile en deux colonnes, cibles tactiles de
@@ -27,7 +34,7 @@ cron réel et validité distante des clés restent à vérifier sur un site de t
 
 ## État actuel
 
-La version `0.3.1` est un socle installable : file persistante, pipeline de
+La version `0.3.2` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.

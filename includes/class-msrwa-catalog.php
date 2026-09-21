@@ -65,7 +65,7 @@ final class MSRWA_Catalog {
 		if ( ! class_exists( 'MSRWA_DB' ) ) { return self::defaults(); }
 		global $wpdb;
 		$t = MSRWA_DB::tables();
-		if ( ! MSRWA_DB::table_exists( $t['models'] ) ) { return self::defaults(); }
+		if ( empty( $t['models'] ) || ! MSRWA_DB::table_exists( $t['models'] ) ) { return self::defaults(); }
 		$where = $include_disabled ? '' : ' WHERE enabled = 1';
 		$rows = $wpdb->get_results( "SELECT * FROM {$t['models']}{$where} ORDER BY provider_key ASC,id ASC", ARRAY_A );
 		if ( ! $rows ) { return self::defaults(); }

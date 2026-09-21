@@ -468,7 +468,8 @@ SILENT FINAL CHECK BEFORE RETURNING — fix anything that fails:
 
 	/** Stores the difference from the defaults, with every key encrypted on the way in. */
 	public static function save( $raw, $source = 'admin' ) {
-		$clean = self::sanitize( (array) $raw );
+		// The credentials form only submits three fields; preserve all others.
+		$clean = self::sanitize( array_merge( self::get(), (array) $raw ) );
 		$defaults = self::defaults();
 		$stored = (array) get_option( self::OPTION, array() );
 		$out = array();
@@ -497,6 +498,14 @@ SILENT FINAL CHECK BEFORE RETURNING — fix anything that fails:
 	private static function secrets() { return array( 'openai_key', 'gemini_key', 'claude_key' ); }
 
 	private static function is_secret( $key ) { return in_array( $key, self::secrets(), true ); }
+
+	/** Empty, omitted or masked fields mean keep the stored credential. */
+	private static function secret_for_save( $key, $value ) {
+		if ( ! is_string( $value ) ) { return ''; }
+		$value = trim( $value );
+		if ( '' === $value || preg_match( '/[\x{2022}\x{2026}*]|\.{3}/u', $value ) ) { return ''; }
+		return $value;
+	}
 
 	/** Which providers have a key, for a screen that must not print one. */
 	public static function configured_providers() {
