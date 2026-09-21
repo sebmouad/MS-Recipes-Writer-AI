@@ -209,4 +209,40 @@ foreach ( array( 'prompt_source', 'prompt_chars', 'input_chars', 'attached', 'ce
 	msrwa_test_assert( array_key_exists( $field, $given ), 'The input report must carry ' . $field . '.' );
 }
 
+// Independent steps are asked together. The engine already knew which ones those
+// were; asking them one at a time was pure waiting — 138 seconds for the article
+// and both images where 71 would do.
+msrwa_test_assert( 4 === MSRWA_Engine_Config::create()->get( 'limits.concurrency' ), 'A wave runs four calls at once unless the caller says otherwise.' );
+msrwa_test_assert( 1 === MSRWA_Engine_Config::create( array( 'limits' => array( 'concurrency' => 0 ) ) )->get( 'limits.concurrency' ), 'Concurrency below one means one, not none.' );
+msrwa_test_assert( 12 === MSRWA_Engine_Config::create( array( 'limits' => array( 'concurrency' => 99 ) ) )->get( 'limits.concurrency' ), 'Concurrency is clamped to what a provider will tolerate.' );
+
+// Splitting the request from the reading of it must not change what a call is.
+$planned = MSRWA_Engine_Call::plan_text( 'openai', 'gpt-5.6-luna', 'bonjour', 500, true, false, array( 'text_endpoint' => 'https://example.test/v1', 'headers' => array( 'X: 1' ), 'has_key' => true, 'timeout' => 30 ) );
+msrwa_test_assert( 'https://example.test/v1' === $planned['request']['url'], 'A plan carries the endpoint it will call.' );
+msrwa_test_assert( 'bonjour' === $planned['request']['payload']['input'], 'A plan carries the input it will send.' );
+msrwa_test_assert( 500 === $planned['request']['payload']['max_output_tokens'], 'A plan carries its ceiling.' );
+msrwa_test_assert( 30 === $planned['request']['timeout'], 'A plan carries the configured timeout.' );
+
+// Reading an answer back is the same work whoever made the call.
+$read = MSRWA_Engine_Call::read( $planned, array( 'status' => 200, 'seconds' => 1.2, 'error' => '', 'raw' => json_encode( array(
+	'output_text' => '{"ok":true}', 'status' => 'completed', 'model' => 'gpt-5.6-luna',
+	'usage' => array( 'input_tokens' => 120, 'output_tokens' => 9, 'input_tokens_details' => array( 'cached_tokens' => 96 ) ),
+) ) ) );
+msrwa_test_assert( '{"ok":true}' === $read['text'], 'A read must return the answer.' );
+msrwa_test_assert( 96 === $read['usage']['cached_input_tokens'], 'A read must report what the provider served from its cache.' );
+msrwa_test_assert( 1.2 === $read['seconds'], 'A read must keep the call\'s own duration, not the wave\'s.' );
+
+$failed = MSRWA_Engine_Call::read( $planned, array( 'status' => 429, 'seconds' => 0.4, 'error' => '', 'raw' => 'slow down' ) );
+msrwa_test_assert( ! empty( $failed['error'] ), 'An HTTP failure inside a batch is still an error, not an exception.' );
+
+// One bad request must not disturb the others sharing its wave.
+$mixed = MSRWA_Engine_Call::http_many( array(
+	'good' => array( 'url' => 'https://example.test/one', 'headers' => array(), 'payload' => array(), 'timeout' => 1 ),
+	'bad'  => array( 'url' => 'not-a-url', 'headers' => array(), 'payload' => array(), 'timeout' => 1 ),
+), 4 );
+msrwa_test_assert( array( 'good', 'bad' ) === array_keys( $mixed ), 'Every request in a batch must come back under its own key.' );
+foreach ( $mixed as $name => $answer ) {
+	msrwa_test_assert( isset( $answer['status'] ) && isset( $answer['seconds'] ), $name . ' must come back in the shape of a call, however it went.' );
+}
+
 msrwa_test_done( 'engine' );

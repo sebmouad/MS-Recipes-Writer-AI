@@ -83,4 +83,25 @@ foreach ( MSRWA_Engine_Config::defaults()['tiers'] as $tier => $providers ) {
 	}
 }
 
+// Every method the engine calls on itself must exist. A refactor deleted
+// MSRWA_Engine::observe() along with the block around it; the whole offline
+// suite stayed green, and the failure surfaced as a fatal error mid-run against
+// a live provider, after the call had already been paid for.
+foreach ( $engine as $file ) {
+	$source = (string) file_get_contents( $file );
+	if ( ! preg_match( '/^final class (MSRWA_[A-Za-z_]+)/m', $source, $named ) ) { continue; }
+	$class = $named[1];
+	preg_match_all( '/self::([a-z_][a-zA-Z0-9_]*)\s*\(/', $source, $calls );
+	foreach ( array_unique( $calls[1] ) as $method ) {
+		msrwa_test_assert( method_exists( $class, $method ), $class . '::' . $method . '() is called in ' . basename( $file ) . ' and does not exist.' );
+	}
+	preg_match_all( '/(MSRWA_[A-Za-z_]+)::([a-z_][a-zA-Z0-9_]*)\s*\(/', $source, $others, PREG_SET_ORDER );
+	foreach ( $others as $call ) {
+		// A call the code itself guards with method_exists() is optional by design:
+		// the engine runs beside a plugin that may or may not have shipped it.
+		if ( ! class_exists( $call[1] ) || false !== strpos( $source, "method_exists( '" . $call[1] . "'" ) ) { continue; }
+		msrwa_test_assert( method_exists( $call[1], $call[2] ), $call[1] . '::' . $call[2] . '() is called in ' . basename( $file ) . ' and does not exist.' );
+	}
+}
+
 msrwa_test_done( 'engine configurability' );

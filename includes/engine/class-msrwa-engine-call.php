@@ -104,20 +104,165 @@ final class MSRWA_Engine_Call {
 	}
 
 	/**
+	 * Several HTTP calls at once, returned under the keys they were given.
+	 *
+	 * The engine knows which steps do not wait on each other — that is what
+	 * `needs` declares — but knowing it bought nothing while the calls were made
+	 * one after another. The article and both images take 138 seconds in a row
+	 * and 71 together; the two reviews take 65 and 33. PHP waits on the network
+	 * either way, so what is saved here is only the waiting.
+	 *
+	 * A request that fails comes back as a failed request, never as an exception,
+	 * and one failure does not disturb the others.
+	 */
+	public static function http_many( array $requests, $limit = 4 ) {
+		if ( ! $requests ) { return array(); }
+		if ( 1 === count( $requests ) || $limit < 2 ) {
+			$out = array();
+			foreach ( $requests as $key => $request ) {
+				$out[ $key ] = self::http( $request['url'], $request['headers'], $request['payload'], (int) ( $request['timeout'] ?? 600 ) );
+			}
+			return $out;
+		}
+
+		$results = array();
+		foreach ( array_chunk( $requests, max( 2, (int) $limit ), true ) as $chunk ) {
+			$multi = curl_multi_init();
+			$handles = array();
+			$started = microtime( true );
+			foreach ( $chunk as $key => $request ) {
+				$handle = curl_init( $request['url'] );
+				curl_setopt_array( $handle, array(
+					CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true,
+					CURLOPT_HTTPHEADER => $request['headers'],
+					CURLOPT_POSTFIELDS => json_encode( $request['payload'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ),
+					CURLOPT_TIMEOUT => (int) ( $request['timeout'] ?? 600 ),
+				) );
+				curl_multi_add_handle( $multi, $handle );
+				$handles[ $key ] = $handle;
+			}
+
+			do {
+				$status = curl_multi_exec( $multi, $running );
+				if ( $running ) { curl_multi_select( $multi, 1.0 ); }
+			} while ( $running && CURLM_OK === $status );
+
+			foreach ( $handles as $key => $handle ) {
+				// Each call's own time on the wire, not the wave's, so a step still
+				// reports what it took and the totals stay honest.
+				$seconds = round( (float) curl_getinfo( $handle, CURLINFO_TOTAL_TIME ), 1 );
+				$results[ $key ] = array(
+					'status' => (int) curl_getinfo( $handle, CURLINFO_RESPONSE_CODE ),
+					'raw' => (string) curl_multi_getcontent( $handle ),
+					'error' => (string) curl_error( $handle ),
+					'seconds' => $seconds > 0 ? $seconds : round( microtime( true ) - $started, 1 ),
+				);
+				curl_multi_remove_handle( $multi, $handle );
+				curl_close( $handle );
+			}
+			curl_multi_close( $multi );
+		}
+		return $results;
+	}
+
+	/**
 	 * One text call on any provider.
 	 *
 	 * $web_search asks for the provider's search tool; what that tool is called
 	 * comes from the configuration, not from here.
 	 */
 	public static function text( $provider, $model, $input, $max_tokens, $json_output = true, $web_search = false, $wire = array() ) {
+		$plan = self::plan_text( $provider, $model, $input, $max_tokens, $json_output, $web_search, $wire );
+		if ( isset( $plan['error'] ) ) { return array( 'error' => $plan['error'], 'seconds' => 0, 'usage' => array() ); }
+		$request = $plan['request'];
+		return self::read( $plan, self::http( $request['url'], $request['headers'], $request['payload'], (int) $request['timeout'] ) );
+	}
+
+	/**
+	 * Everything a text call needs, without making it.
+	 *
+	 * Splitting the request from the reading of it is what lets a wave of
+	 * independent steps go out together: the engine builds each plan, hands them
+	 * all to http_many(), and reads each answer back with read().
+	 */
+	public static function plan_text( $provider, $model, $input, $max_tokens, $json_output = true, $web_search = false, $wire = array() ) {
 		$wire = $wire ? $wire : self::shipped_wire( $provider, $model );
 		$unusable = self::unusable( $provider, $wire );
-		if ( '' !== $unusable ) { return array( 'error' => $unusable, 'seconds' => 0, 'usage' => array() ); }
+		if ( '' !== $unusable ) { return array( 'error' => $unusable ); }
 		$tools = $web_search ? (array) ( $wire['web_search_tool'] ?? array() ) : array();
-		if ( 'openai' === $provider ) { return self::text_openai( $model, $input, $max_tokens, $json_output, $tools, $wire ); }
-		if ( 'gemini' === $provider ) { return self::text_gemini( $model, $input, $max_tokens, $json_output, $tools, $wire ); }
-		if ( 'claude' === $provider ) { return self::text_claude( $model, $input, $max_tokens, $json_output, $tools, $wire ); }
-		return array( 'error' => 'unknown provider ' . $provider, 'seconds' => 0 );
+
+		if ( 'openai' === $provider ) {
+			$payload = array( 'model' => $model, 'input' => (string) $input, 'store' => false, 'max_output_tokens' => max( 16, (int) $max_tokens ) );
+			if ( $tools ) { $payload['tools'] = array( $tools ); }
+			if ( $json_output && ! $tools ) { $payload['text'] = array( 'format' => array( 'type' => 'json_object' ) ); }
+		} elseif ( 'gemini' === $provider ) {
+			$payload = array(
+				'contents' => array( array( 'role' => 'user', 'parts' => array( array( 'text' => (string) $input ) ) ) ),
+				'generationConfig' => array( 'maxOutputTokens' => max( 16, (int) $max_tokens ) ),
+			);
+			if ( $json_output && ! $tools ) { $payload['generationConfig']['responseMimeType'] = 'application/json'; }
+			// An empty tool object must reach the wire as {}, not as [].
+			if ( $tools ) { $payload['tools'] = array( array_map( static function ( $value ) { return array() === $value ? new stdClass() : $value; }, $tools ) ); }
+		} elseif ( 'claude' === $provider ) {
+			$instruction = $json_output ? "\n\nReturn only a valid JSON object, with no Markdown fence and no commentary." : '';
+			$payload = array(
+				'model' => $model, 'max_tokens' => max( 16, (int) $max_tokens ),
+				'messages' => array( array( 'role' => 'user', 'content' => (string) $input . $instruction ) ),
+			);
+			if ( $tools ) { $payload['tools'] = array( $tools ); }
+		} else {
+			return array( 'error' => 'unknown provider ' . $provider );
+		}
+
+		return array(
+			'kind' => 'text', 'provider' => $provider, 'model' => $model,
+			'request' => array( 'url' => $wire['text_endpoint'], 'headers' => $wire['headers'], 'payload' => $payload, 'timeout' => (int) ( $wire['timeout'] ?? 600 ) ),
+		);
+	}
+
+	/** Reads one answer back, whatever provider and kind of call produced it. */
+	public static function read( array $plan, array $result ) {
+		$provider = $plan['provider'];
+		$model = $plan['model'];
+		if ( 200 !== $result['status'] ) {
+			$label = 'image' === $plan['kind'] ? '' : ( 'judge' === $plan['kind'] ? 'judge ' : '' );
+			return array( 'error' => $label . 'HTTP ' . $result['status'] . ': ' . substr( $result['raw'], 0, 240 ), 'seconds' => $result['seconds'], 'usage' => array() );
+		}
+		$body = json_decode( $result['raw'], true );
+
+		if ( 'image' === $plan['kind'] ) {
+			$binary = base64_decode( (string) ( $body['data'][0]['b64_json'] ?? '' ), true );
+			if ( false === $binary || '' === $binary ) { return array( 'error' => 'no image payload returned', 'seconds' => $result['seconds'] ); }
+			file_put_contents( $plan['destination'], $binary );
+			return array( 'path' => $plan['destination'], 'bytes' => strlen( $binary ), 'seconds' => $result['seconds'], 'usage' => $body['usage'] ?? array(), 'model' => $body['model'] ?? $model );
+		}
+
+		$text = '';
+		if ( 'openai' === $provider ) {
+			if ( isset( $body['output_text'] ) && is_string( $body['output_text'] ) ) { $text = $body['output_text']; }
+			else {
+				foreach ( (array) ( $body['output'] ?? array() ) as $item ) {
+					foreach ( (array) ( $item['content'] ?? array() ) as $content ) { if ( isset( $content['text'] ) && is_string( $content['text'] ) ) { $text .= $content['text']; } }
+				}
+			}
+			// cached_tokens is what the provider reused from an identical prompt; it is
+			// billed at a discount, so it is the number that says whether caching works.
+			$usage = array( 'input_tokens' => (int) ( $body['usage']['input_tokens'] ?? 0 ), 'output_tokens' => (int) ( $body['usage']['output_tokens'] ?? 0 ), 'cached_input_tokens' => (int) ( $body['usage']['input_tokens_details']['cached_tokens'] ?? 0 ) );
+			$status = $body['status'] ?? '';
+			$model = $body['model'] ?? $model;
+		} elseif ( 'gemini' === $provider ) {
+			foreach ( (array) ( $body['candidates'][0]['content']['parts'] ?? array() ) as $part ) { if ( isset( $part['text'] ) ) { $text .= $part['text']; } }
+			$meta = $body['usageMetadata'] ?? array();
+			$usage = array( 'input_tokens' => (int) ( $meta['promptTokenCount'] ?? 0 ), 'output_tokens' => (int) ( $meta['candidatesTokenCount'] ?? 0 ) );
+			$status = $body['candidates'][0]['finishReason'] ?? '';
+		} else {
+			foreach ( (array) ( $body['content'] ?? array() ) as $block ) { if ( 'text' === ( $block['type'] ?? '' ) ) { $text .= $block['text']; } }
+			if ( 'text' === $plan['kind'] ) { $text = preg_replace( '/^```(?:json)?\s*|\s*```$/m', '', trim( $text ) ); }
+			$usage = array( 'input_tokens' => (int) ( $body['usage']['input_tokens'] ?? 0 ), 'output_tokens' => (int) ( $body['usage']['output_tokens'] ?? 0 ) );
+			$status = $body['stop_reason'] ?? '';
+			$model = $body['model'] ?? $model;
+		}
+		return array( 'text' => self::utf8( $text ), 'usage' => $usage, 'model' => $model, 'status' => $status, 'seconds' => $result['seconds'] );
 	}
 
 	/**
@@ -129,72 +274,30 @@ final class MSRWA_Engine_Call {
 		return MSRWA_Engine_Config::create()->provider( $provider, $model );
 	}
 
-	private static function text_openai( $model, $input, $max_tokens, $json_output, $tools, $wire ) {
-		$payload = array( 'model' => $model, 'input' => (string) $input, 'store' => false, 'max_output_tokens' => max( 16, (int) $max_tokens ) );
-		if ( $tools ) { $payload['tools'] = array( $tools ); }
-		if ( $json_output && ! $tools ) { $payload['text'] = array( 'format' => array( 'type' => 'json_object' ) ); }
-		$result = self::http( $wire['text_endpoint'], $wire['headers'], $payload, (int) ( $wire['timeout'] ?? 600 ) );
-		if ( 200 !== $result['status'] ) { return array( 'error' => 'HTTP ' . $result['status'] . ': ' . substr( $result['raw'], 0, 240 ), 'seconds' => $result['seconds'] ); }
-		$body = json_decode( $result['raw'], true );
-		$text = '';
-		if ( isset( $body['output_text'] ) && is_string( $body['output_text'] ) ) { $text = $body['output_text']; }
-		else {
-			foreach ( (array) ( $body['output'] ?? array() ) as $item ) {
-				foreach ( (array) ( $item['content'] ?? array() ) as $content ) { if ( isset( $content['text'] ) && is_string( $content['text'] ) ) { $text .= $content['text']; } }
-			}
-		}
-		// cached_tokens is what the provider reused from an identical prompt prefix; it
-		// is billed at a discount, so it is the number that says whether caching works.
-		return array( 'text' => self::utf8( $text ), 'usage' => array( 'input_tokens' => (int) ( $body['usage']['input_tokens'] ?? 0 ), 'output_tokens' => (int) ( $body['usage']['output_tokens'] ?? 0 ), 'cached_input_tokens' => (int) ( $body['usage']['input_tokens_details']['cached_tokens'] ?? 0 ) ), 'model' => $body['model'] ?? $model, 'status' => $body['status'] ?? '', 'seconds' => $result['seconds'] );
-	}
 
-	private static function text_gemini( $model, $input, $max_tokens, $json_output, $tools, $wire ) {
-		$payload = array(
-			'contents' => array( array( 'role' => 'user', 'parts' => array( array( 'text' => (string) $input ) ) ) ),
-			'generationConfig' => array( 'maxOutputTokens' => max( 16, (int) $max_tokens ) ),
-		);
-		if ( $json_output && ! $tools ) { $payload['generationConfig']['responseMimeType'] = 'application/json'; }
-		// An empty tool object must reach the wire as {}, not as [].
-		if ( $tools ) { $payload['tools'] = array( array_map( static function ( $value ) { return array() === $value ? new stdClass() : $value; }, $tools ) ); }
-		$result = self::http( $wire['text_endpoint'], $wire['headers'], $payload, (int) ( $wire['timeout'] ?? 600 ) );
-		if ( 200 !== $result['status'] ) { return array( 'error' => 'HTTP ' . $result['status'] . ': ' . substr( $result['raw'], 0, 240 ), 'seconds' => $result['seconds'] ); }
-		$body = json_decode( $result['raw'], true );
-		$text = '';
-		foreach ( (array) ( $body['candidates'][0]['content']['parts'] ?? array() ) as $part ) { if ( isset( $part['text'] ) ) { $text .= $part['text']; } }
-		$usage = $body['usageMetadata'] ?? array();
-		return array( 'text' => self::utf8( $text ), 'usage' => array( 'input_tokens' => (int) ( $usage['promptTokenCount'] ?? 0 ), 'output_tokens' => (int) ( $usage['candidatesTokenCount'] ?? 0 ) ), 'model' => $model, 'status' => $body['candidates'][0]['finishReason'] ?? '', 'seconds' => $result['seconds'] );
-	}
 
-	private static function text_claude( $model, $input, $max_tokens, $json_output, $tools, $wire ) {
-		$instruction = $json_output ? "\n\nReturn only a valid JSON object, with no Markdown fence and no commentary." : '';
-		$payload = array(
-			'model' => $model, 'max_tokens' => max( 16, (int) $max_tokens ),
-			'messages' => array( array( 'role' => 'user', 'content' => (string) $input . $instruction ) ),
-		);
-		if ( $tools ) { $payload['tools'] = array( $tools ); }
-		$result = self::http( $wire['text_endpoint'], $wire['headers'], $payload, (int) ( $wire['timeout'] ?? 600 ) );
-		if ( 200 !== $result['status'] ) { return array( 'error' => 'HTTP ' . $result['status'] . ': ' . substr( $result['raw'], 0, 240 ), 'seconds' => $result['seconds'] ); }
-		$body = json_decode( $result['raw'], true );
-		$text = '';
-		foreach ( (array) ( $body['content'] ?? array() ) as $block ) { if ( 'text' === ( $block['type'] ?? '' ) ) { $text .= $block['text']; } }
-		$text = preg_replace( '/^```(?:json)?\s*|\s*```$/m', '', trim( $text ) );
-		return array( 'text' => self::utf8( $text ), 'usage' => array( 'input_tokens' => (int) ( $body['usage']['input_tokens'] ?? 0 ), 'output_tokens' => (int) ( $body['usage']['output_tokens'] ?? 0 ) ), 'model' => $body['model'] ?? $model, 'status' => $body['stop_reason'] ?? '', 'seconds' => $result['seconds'] );
-	}
 
 	/** Generates one OpenAI image and writes it to the lab runs directory. */
 	public static function image( $prompt, $model, $size, $quality, $output_format, $destination, $wire = array(), $provider = 'openai' ) {
+		$plan = self::plan_image( $prompt, $model, $size, $quality, $output_format, $destination, $wire, $provider );
+		if ( isset( $plan['error'] ) ) { return array( 'error' => $plan['error'], 'seconds' => 0, 'usage' => array() ); }
+		$request = $plan['request'];
+		return self::read( $plan, self::http( $request['url'], $request['headers'], $request['payload'], (int) $request['timeout'] ) );
+	}
+
+	/** Everything one image generation needs, without making it. */
+	public static function plan_image( $prompt, $model, $size, $quality, $output_format, $destination, $wire = array(), $provider = 'openai' ) {
 		$wire = $wire ? $wire : self::shipped_wire( $provider, $model );
 		$unusable = self::unusable( $provider, $wire );
-		if ( '' !== $unusable ) { return array( 'error' => $unusable, 'seconds' => 0, 'usage' => array() ); }
-		if ( '' === (string) ( $wire['image_endpoint'] ?? '' ) ) { return array( 'error' => $provider . ' has no image endpoint configured.', 'seconds' => 0, 'usage' => array() ); }
-		$payload = array( 'model' => $model, 'prompt' => (string) $prompt, 'size' => $size, 'quality' => $quality, 'output_format' => $output_format, 'n' => 1 );
-		$result = self::http( $wire['image_endpoint'], $wire['headers'], $payload, (int) ( $wire['timeout'] ?? 600 ) );
-		if ( 200 !== $result['status'] ) { return array( 'error' => 'HTTP ' . $result['status'] . ': ' . substr( $result['raw'], 0, 240 ), 'seconds' => $result['seconds'] ); }
-		$body = json_decode( $result['raw'], true );
-		$binary = base64_decode( (string) ( $body['data'][0]['b64_json'] ?? '' ), true );
-		if ( false === $binary || '' === $binary ) { return array( 'error' => 'no image payload returned', 'seconds' => $result['seconds'] ); }
-		file_put_contents( $destination, $binary );
-		return array( 'path' => $destination, 'bytes' => strlen( $binary ), 'seconds' => $result['seconds'], 'usage' => $body['usage'] ?? array(), 'model' => $body['model'] ?? $model );
+		if ( '' !== $unusable ) { return array( 'error' => $unusable ); }
+		if ( '' === (string) ( $wire['image_endpoint'] ?? '' ) ) { return array( 'error' => $provider . ' has no image endpoint configured.' ); }
+		return array(
+			'kind' => 'image', 'provider' => $provider, 'model' => $model, 'destination' => $destination,
+			'request' => array(
+				'url' => $wire['image_endpoint'], 'headers' => $wire['headers'], 'timeout' => (int) ( $wire['timeout'] ?? 600 ),
+				'payload' => array( 'model' => $model, 'prompt' => (string) $prompt, 'size' => $size, 'quality' => $quality, 'output_format' => $output_format, 'n' => 1 ),
+			),
+		);
 	}
 
 	/**
@@ -297,9 +400,18 @@ final class MSRWA_Engine_Call {
 	 * $images is a list of array( 'label' => string, 'mime' => string, 'data' => base64 ).
 	 */
 	public static function judge( $provider, $model, $instruction, $images, $max_tokens = 2500, $wire = array() ) {
+		$plan = self::plan_judge( $provider, $model, $instruction, $images, $max_tokens, $wire );
+		if ( isset( $plan['error'] ) ) { return array( 'error' => $plan['error'], 'seconds' => 0, 'usage' => array() ); }
+		$request = $plan['request'];
+		return self::read( $plan, self::http( $request['url'], $request['headers'], $request['payload'], (int) $request['timeout'] ) );
+	}
+
+	/** Everything the judge needs to see the article and both images at once, without asking yet. */
+	public static function plan_judge( $provider, $model, $instruction, $images, $max_tokens = 2500, $wire = array() ) {
 		$wire = $wire ? $wire : self::shipped_wire( $provider, $model );
 		$unusable = self::unusable( $provider, $wire );
-		if ( '' !== $unusable ) { return array( 'error' => $unusable, 'seconds' => 0, 'usage' => array() ); }
+		if ( '' !== $unusable ) { return array( 'error' => $unusable ); }
+
 		if ( 'openai' === $provider ) {
 			$content = array( array( 'type' => 'input_text', 'text' => $instruction ) );
 			foreach ( $images as $image ) {
@@ -307,41 +419,27 @@ final class MSRWA_Engine_Call {
 				$content[] = array( 'type' => 'input_image', 'image_url' => 'data:' . $image['mime'] . ';base64,' . $image['data'] );
 			}
 			$payload = array( 'model' => $model, 'store' => false, 'max_output_tokens' => $max_tokens, 'input' => array( array( 'role' => 'user', 'content' => $content ) ), 'text' => array( 'format' => array( 'type' => 'json_object' ) ) );
-			$result = self::http( $wire['text_endpoint'], $wire['headers'], $payload, (int) ( $wire['timeout'] ?? 600 ) );
-			if ( 200 !== $result['status'] ) { return array( 'error' => 'judge HTTP ' . $result['status'] . ': ' . substr( $result['raw'], 0, 200 ), 'seconds' => $result['seconds'], 'usage' => array() ); }
-			$body = json_decode( $result['raw'], true );
-			$text = '';
-			foreach ( (array) ( $body['output'] ?? array() ) as $item ) { foreach ( (array) ( $item['content'] ?? array() ) as $part ) { if ( isset( $part['text'] ) ) { $text .= $part['text']; } } }
-			return array( 'text' => self::utf8( $text ), 'status' => $body['status'] ?? '', 'seconds' => $result['seconds'], 'usage' => array( 'input_tokens' => (int) ( $body['usage']['input_tokens'] ?? 0 ), 'output_tokens' => (int) ( $body['usage']['output_tokens'] ?? 0 ) ) );
-		}
-		if ( 'gemini' === $provider ) {
+		} elseif ( 'gemini' === $provider ) {
 			$parts = array( array( 'text' => $instruction ) );
 			foreach ( $images as $image ) {
 				$parts[] = array( 'text' => 'IMAGE — ' . $image['label'] );
 				$parts[] = array( 'inline_data' => array( 'mime_type' => $image['mime'], 'data' => $image['data'] ) );
 			}
 			$payload = array( 'contents' => array( array( 'role' => 'user', 'parts' => $parts ) ), 'generationConfig' => array( 'maxOutputTokens' => $max_tokens, 'responseMimeType' => 'application/json' ) );
-			$result = self::http( $wire['text_endpoint'], $wire['headers'], $payload, (int) ( $wire['timeout'] ?? 600 ) );
-			if ( 200 !== $result['status'] ) { return array( 'error' => 'judge HTTP ' . $result['status'] . ': ' . substr( $result['raw'], 0, 200 ), 'seconds' => $result['seconds'], 'usage' => array() ); }
-			$body = json_decode( $result['raw'], true );
-			$text = '';
-			foreach ( (array) ( $body['candidates'][0]['content']['parts'] ?? array() ) as $part ) { if ( isset( $part['text'] ) ) { $text .= $part['text']; } }
-			$usage = $body['usageMetadata'] ?? array();
-			return array( 'text' => self::utf8( $text ), 'status' => $body['candidates'][0]['finishReason'] ?? '', 'seconds' => $result['seconds'], 'usage' => array( 'input_tokens' => (int) ( $usage['promptTokenCount'] ?? 0 ), 'output_tokens' => (int) ( $usage['candidatesTokenCount'] ?? 0 ) ) );
+		} else {
+			$content = array();
+			foreach ( $images as $image ) {
+				$content[] = array( 'type' => 'text', 'text' => 'IMAGE — ' . $image['label'] );
+				$content[] = array( 'type' => 'image', 'source' => array( 'type' => 'base64', 'media_type' => $image['mime'], 'data' => $image['data'] ) );
+			}
+			$content[] = array( 'type' => 'text', 'text' => $instruction . "\n\nReturn only a valid JSON object, with no Markdown fence and no commentary." );
+			$payload = array( 'model' => $model, 'max_tokens' => $max_tokens, 'messages' => array( array( 'role' => 'user', 'content' => $content ) ) );
 		}
-		$content = array();
-		foreach ( $images as $image ) {
-			$content[] = array( 'type' => 'text', 'text' => 'IMAGE — ' . $image['label'] );
-			$content[] = array( 'type' => 'image', 'source' => array( 'type' => 'base64', 'media_type' => $image['mime'], 'data' => $image['data'] ) );
-		}
-		$content[] = array( 'type' => 'text', 'text' => $instruction . "\n\nReturn only a valid JSON object, with no Markdown fence and no commentary." );
-		$payload = array( 'model' => $model, 'max_tokens' => $max_tokens, 'messages' => array( array( 'role' => 'user', 'content' => $content ) ) );
-		$result = self::http( $wire['text_endpoint'], $wire['headers'], $payload, (int) ( $wire['timeout'] ?? 600 ) );
-		if ( 200 !== $result['status'] ) { return array( 'error' => 'judge HTTP ' . $result['status'] . ': ' . substr( $result['raw'], 0, 200 ), 'seconds' => $result['seconds'], 'usage' => array() ); }
-		$body = json_decode( $result['raw'], true );
-		$text = '';
-		foreach ( (array) ( $body['content'] ?? array() ) as $block ) { if ( 'text' === ( $block['type'] ?? '' ) ) { $text .= $block['text']; } }
-		return array( 'text' => self::utf8( $text ), 'status' => $body['stop_reason'] ?? '', 'seconds' => $result['seconds'], 'usage' => array( 'input_tokens' => (int) ( $body['usage']['input_tokens'] ?? 0 ), 'output_tokens' => (int) ( $body['usage']['output_tokens'] ?? 0 ) ) );
+
+		return array(
+			'kind' => 'judge', 'provider' => $provider, 'model' => $model,
+			'request' => array( 'url' => $wire['text_endpoint'], 'headers' => $wire['headers'], 'payload' => $payload, 'timeout' => (int) ( $wire['timeout'] ?? 600 ) ),
+		);
 	}
 
 	/** Replaces search-model guesses with observations made from the cited bytes. */

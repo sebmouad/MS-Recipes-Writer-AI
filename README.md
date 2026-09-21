@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.77` est un socle installable : file persistante, pipeline de
+La version `0.2.78` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.
@@ -22,6 +22,50 @@ Le plugin est en cours de refonte éditoriale et budgétaire :
 Les coûts affichés sont des estimations calculées avec le catalogue configuré,
 non une facture fournisseur. `completed` signifie que le traitement est terminé,
 jamais qu’un texte est validé éditorialement.
+
+## Version 0.2.78
+
+**Les étapes indépendantes partent ensemble.** Le moteur savait déjà lesquelles
+ne s'attendent pas — c'est ce que déclare `needs` — mais il les appelait l'une
+après l'autre. Ce qu'il y gagnait n'était que de l'attente.
+
+| Vague | avant | après |
+|---|---:|---:|
+| article + image à la une + collage | 137,9 s | **43,4 s** |
+| revue + fact-check | 65,0 s | **21,8 s** |
+| **passage complet** | **436 s** | **290 s** (−33 %) |
+
+Seule la première tentative est partagée. Une étape qu'il faut redemander l'est
+seule : à ce moment-là elle ne fait plus la même chose que les autres.
+
+Le transport se sépare en deux : `plan_text()`, `plan_image()`, `plan_judge()`
+préparent un appel, `read()` en lit la réponse. Un échec dans un lot reste un
+échec de cet appel-là et ne dérange pas les autres.
+
+**Le cache de prompts : mesuré, et inexploitable ici.** Un appel identique est
+mis en cache à 100 %. Le *même préfixe de 6 700 jetons avec une fin différente*
+ne l'est pas du tout — 0 %. Sur ce point d'accès le cache porte sur l'entrée
+entière, pas sur son préfixe : réorganiser le pipeline pour partager un préfixe
+n'aurait rien rapporté. `store: false` n'y est pour rien, contrairement à
+l'hypothèse de départ.
+
+**Une réponse qui n'analyse pas est conservée.** C'était le seul échec qu'un
+passage ne savait pas expliquer après coup : le barème disait « non analysable »
+et le texte était jeté. Le moteur en garde 2 000 caractères et dit comment il
+commence.
+
+Cela s'est payé immédiatement : la revue s'arrêtait pile sur son plafond de
+3 000 jetons, coupée au milieu de son JSON, facturée en entier, notée 0/3.
+**Sixième plafond de cette liste trouvé de cette façon** — porté à 6 000.
+
+**Et une régression trouvée par un nouveau contrôle.** En déplaçant un bloc,
+`MSRWA_Engine::observe()` a disparu avec lui. La suite hors ligne est restée
+verte ; la panne est sortie en erreur fatale au milieu d'un passage réel, après
+que l'appel a été payé. Un contrôle lit désormais le source du moteur et échoue
+si une méthode appelée n'existe pas.
+
+Passage complet vérifié : **approuvé**, les quatre verdicts `good`, aucun
+constat, 290 s, $0,1747.
 
 ## Version 0.2.77
 

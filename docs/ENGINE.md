@@ -48,6 +48,12 @@ The images depend on the recipe and the research, not on the article, so they
 are drawn while it is written. The approval judges the proofread text, because
 that is what a reader gets.
 
+**A wave's calls go out together.** `limits.concurrency` (4 by default, 1 to
+turn it off) decides how many are in flight at once. Only the first attempt is
+shared: a step that has to be asked again is asked on its own, because by then
+it is no longer doing the same thing as the others. Measured on one recipe:
+436s serial, 290s concurrent.
+
 ### Four call paths
 
 A step declares a capability and the engine routes on it:

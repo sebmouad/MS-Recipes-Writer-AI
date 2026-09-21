@@ -62,7 +62,10 @@ final class MSRWA_Engine_Config {
 				'research'         => 12000,
 				'canonical_recipe' => 4500,
 				'article'          => 14500,
-				'review'           => 3000,
+				// 3000 was too low: a review with a dozen findings stops exactly on it,
+				// is cut mid-object, parses as nothing and is billed in full. That is
+				// the sixth ceiling in this list to have been found that way.
+				'review'           => 6000,
 				'fact_check'       => 4000,
 				'proofread'        => 14500,
 				'final_approval'   => 14000,
@@ -93,6 +96,9 @@ final class MSRWA_Engine_Config {
 				'image_prompt_chars' => 30000,
 				'images_inspected'   => 3,
 				'http_timeout'       => 600,
+				// How many provider calls a wave may have in flight. One means the
+				// engine waits for each in turn, which is what it used to do.
+				'concurrency'        => 4,
 				'max_image_bytes'    => 10000000,
 				'observation_phrases'=> 8,
 			),
@@ -264,6 +270,7 @@ final class MSRWA_Engine_Config {
 		$values['limits']['budget_usd'] = max( 0.0, (float) ( $values['limits']['budget_usd'] ?? 0 ) );
 		$values['limits']['images_inspected'] = max( 0, min( 20, (int) ( $values['limits']['images_inspected'] ?? 3 ) ) );
 		$values['limits']['http_timeout'] = max( 5, min( 3600, (int) ( $values['limits']['http_timeout'] ?? 600 ) ) );
+		$values['limits']['concurrency'] = max( 1, min( 12, (int) ( $values['limits']['concurrency'] ?? 4 ) ) );
 		return $values;
 	}
 
