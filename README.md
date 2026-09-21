@@ -2,6 +2,34 @@
 
 Plugin WordPress en construction pour la génération éditoriale culinaire orchestrée.
 
+## Version 0.3.4
+
+**Un test refuse désormais qu'un appel statique ne mène nulle part.** Il existe à
+cause d'une panne réelle : la réécriture a supprimé la couche de stockage des
+réglages et emporté `secret_for_save()` avec elle, pendant que `sanitize()`
+continuait de l'appeler. PHP ne s'en aperçoit qu'au moment de l'appel — la suite
+est restée verte et l'enregistrement d'une clé est mort sur un écran, pas ici.
+
+`tests/test-resolves.php` parcourt le plugin et le moteur et vérifie que chaque
+`self::` et chaque `MSRWA_X::` résout vers quelque chose qui existe. Un appel
+protégé par `method_exists()` ou `class_exists()` a le droit d'être absent :
+c'est à cela que sert la protection.
+
+Il a trouvé treize autres appels du même genre, tous dans le code d'ancien
+pipeline resté dans les classes que le moteur utilise : `MSRWA_Images::featured`,
+`facebook`, `review`, `image_plan`, `MSRWA_Catalog::save_admin`, `sync` et leurs
+voisines appelaient `MSRWA_OpenAI`, `MSRWA_Providers`, `MSRWA_Router`,
+`MSRWA_Storage` et des méthodes de `MSRWA_DB` qui n'existent plus. Injoignables
+aujourd'hui, mais fatales le jour où quelque chose les appelle. Supprimées : 237
+lignes.
+
+**`MSRWA_Cost` dit maintenant la vérité sur ce qu'il sait.** Il demandait à un
+routeur quel modèle chaque étape utiliserait ; c'est le moteur qui choisit
+désormais, et il ne le lui dit pas. L'estimateur chiffre donc les modèles qu'on
+lui nomme, et une étape que personne n'a nommée est déclarée sans prix plutôt
+que gratuite. Rien dans le plugin ni dans le moteur ne l'appelle : `load.php` du
+moteur exige encore le fichier, sinon il serait supprimé.
+
 ## Version 0.3.3
 
 Accès globaux réservés aux administrateurs. Auteurs/rédacteurs et éditeurs
@@ -49,7 +77,7 @@ cron réel et validité distante des clés restent à vérifier sur un site de t
 
 ## État actuel
 
-La version `0.3.3` est un socle installable : file persistante, pipeline de
+La version `0.3.4` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.

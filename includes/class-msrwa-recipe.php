@@ -12,21 +12,6 @@ final class MSRWA_Recipe {
 		);
 	}
 
-	private static function images( $images ) {
-		if ( ! is_array( $images ) ) { return array(); }
-		$out = array();
-		foreach ( array_slice( $images, 0, 10 ) as $image ) {
-			if ( is_array( $image ) && ! empty( $image['path'] ) && class_exists( 'MSRWA_Storage' ) && MSRWA_Storage::is_private_path( $image['path'] ) ) {
-				$out[] = array( 'origin' => 'upload', 'path' => $image['path'], 'source_url' => '', 'mime' => sanitize_text_field( $image['mime'] ?? '' ), 'bytes' => absint( $image['bytes'] ?? 0 ), 'width' => absint( $image['width'] ?? 0 ), 'height' => absint( $image['height'] ?? 0 ), 'sha256' => sanitize_text_field( $image['sha256'] ?? '' ), 'original_name' => sanitize_file_name( $image['original_name'] ?? 'reference' ) );
-				continue;
-			}
-			$url = is_array( $image ) && isset( $image['url'] ) ? $image['url'] : $image;
-			$url = esc_url_raw( $url );
-			if ( $url && preg_match( '#^https?://#i', $url ) ) { $out[] = $url; }
-		}
-		return array_values( array_unique( $out ) );
-	}
-
 	public static function validate( $recipe ) {
 		$errors = array();
 		if ( ! is_array( $recipe ) ) { return array( 'recipe' => 'La recette canonique doit être un objet.' ); }
@@ -67,4 +52,19 @@ final class MSRWA_Recipe {
 		$to_index = array_search( $to, $stages, true );
 		return false !== $from_index && false !== $to_index && $to_index === $from_index + 1;
 	}
+	private static function images( $images ) {
+		if ( ! is_array( $images ) ) { return array(); }
+		$out = array();
+		foreach ( array_slice( $images, 0, 10 ) as $image ) {
+			if ( is_array( $image ) && ! empty( $image['path'] ) && class_exists( 'MSRWA_Storage' ) && MSRWA_Storage::is_private_path( $image['path'] ) ) {
+				$out[] = array( 'origin' => 'upload', 'path' => $image['path'], 'source_url' => '', 'mime' => sanitize_text_field( $image['mime'] ?? '' ), 'bytes' => absint( $image['bytes'] ?? 0 ), 'width' => absint( $image['width'] ?? 0 ), 'height' => absint( $image['height'] ?? 0 ), 'sha256' => sanitize_text_field( $image['sha256'] ?? '' ), 'original_name' => sanitize_file_name( $image['original_name'] ?? 'reference' ) );
+				continue;
+			}
+			$url = is_array( $image ) && isset( $image['url'] ) ? $image['url'] : $image;
+			$url = esc_url_raw( $url );
+			if ( $url && preg_match( '#^https?://#i', $url ) ) { $out[] = $url; }
+		}
+		return array_values( array_unique( $out ) );
+	}
+
 }

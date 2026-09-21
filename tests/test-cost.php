@@ -8,13 +8,6 @@ class MSRWA_Catalog {
 	public static $models = array();
 	public static function models( $all = false ) { return self::$models; }
 }
-class MSRWA_Router {
-	public static $route = array( 'provider' => 'openai', 'model' => 'text-1' );
-	public static function plan( $capability = 'text', $stage = '' ) {
-		if ( 'image_generation' === $capability ) { return array( 'provider' => 'openai', 'model' => 'image-1' ); }
-		return self::$route;
-	}
-}
 class MSRWA_Images {
 	public static function native_size( $ratio, $fallback ) {
 		$sizes = array( '1:1' => '1024x1024', '3:2' => '1536x1024', '2:3' => '1024x1536', '4:5' => '1024x1536' );
@@ -41,7 +34,27 @@ msrwa_test_settings( array(
 	'prompt_article' => str_repeat( 'a', 4000 ), 'web_search_tool_cost_usd' => 0.01, 'web_search_max_tool_calls' => 1,
 ) );
 $settings = MSRWA_Settings::get();
-$estimate = MSRWA_Cost::estimate( $settings );
+
+/**
+ * The estimator prices the models it is given.
+ *
+ * It used to ask a router which model each step would run on. The engine makes
+ * that choice now and never tells this class, so a caller names the models or
+ * the step has no price — which the estimate reports rather than guesses at.
+ */
+$plan = array();
+foreach ( MSRWA_Cost::steps( $settings ) as $name => $step ) {
+	$plan[ $name ] = 'image_generation' === $step['capability']
+		? array( 'provider' => 'openai', 'model' => 'image-1' )
+		: array( 'provider' => 'openai', 'model' => 'text-1' );
+}
+
+// Named nothing, it invents nothing: every step comes back unpriced.
+$blind_estimate = MSRWA_Cost::estimate( $settings );
+msrwa_test_assert( ! empty( $blind_estimate['unknown'] ), 'With no models named, the steps must be reported unpriced, not free.' );
+msrwa_test_assert( 0.0 === $blind_estimate['total']['min'], 'An unpriced estimate is not a zero-dollar estimate; got ' . $blind_estimate['total']['min'] );
+
+$estimate = MSRWA_Cost::estimate( $settings, $plan );
 
 // Four buckets, each with a minimum no greater than its maximum.
 msrwa_test_assert( array( 'article', 'featured', 'facebook', 'other' ) === array_keys( $estimate['buckets'] ), 'The estimate must report the four agreed buckets.' );
@@ -54,13 +67,13 @@ msrwa_test_assert( array() === $estimate['unknown'], 'No step may be unpriced wi
 
 // A longer article costs more, and only in its own bucket.
 msrwa_test_settings( array( 'max_corrections' => 2, 'quality_min_words' => 4000, 'quality_max_words' => 4400, 'max_reference_images' => 3, 'image_quality' => 'medium', 'featured_ratio' => '1:1', 'facebook_ratio' => '4:5', 'prompt_article' => str_repeat( 'a', 4000 ), 'web_search_tool_cost_usd' => 0.01, 'web_search_max_tool_calls' => 1 ) );
-$longer = MSRWA_Cost::estimate( MSRWA_Settings::get() );
+$longer = MSRWA_Cost::estimate( MSRWA_Settings::get(), $plan );
 msrwa_test_assert( $longer['buckets']['article']['min'] > $estimate['buckets']['article']['min'], 'More words must cost more in the article bucket.' );
 msrwa_test_assert( $longer['buckets']['featured'] === $estimate['buckets']['featured'], 'Word count must not move an image bucket.' );
 
 // Corrections raise only the maximum.
 msrwa_test_settings( array( 'max_corrections' => 0, 'quality_min_words' => 2800, 'quality_max_words' => 3200, 'max_reference_images' => 3, 'image_quality' => 'medium', 'featured_ratio' => '1:1', 'facebook_ratio' => '4:5', 'prompt_article' => str_repeat( 'a', 4000 ), 'web_search_tool_cost_usd' => 0.01, 'web_search_max_tool_calls' => 1 ) );
-$no_corrections = MSRWA_Cost::estimate( MSRWA_Settings::get() );
+$no_corrections = MSRWA_Cost::estimate( MSRWA_Settings::get(), $plan );
 msrwa_test_assert( abs( $no_corrections['buckets']['article']['min'] - $estimate['buckets']['article']['min'] ) < 0.000001, 'Corrections must not change the minimum.' );
 msrwa_test_assert( $no_corrections['buckets']['article']['max'] < $estimate['buckets']['article']['max'], 'Corrections must raise the maximum.' );
 

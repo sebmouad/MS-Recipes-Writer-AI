@@ -165,18 +165,22 @@ final class MSRWA_Cost {
 		return MSRWA_Images::native_size( $ratio, 'facebook' === $kind ? '1024x1536' : '1024x1024' );
 	}
 
-	/** The model a step would use: the frozen plan when there is one, the router otherwise. */
+
+	/**
+	 * The catalogue row for a step's model.
+	 *
+	 * The caller names the model. It used to fall back to a router that chose
+	 * one; the engine does that now and this class never sees its choice, so a
+	 * step nobody named has an unknown price — which `estimate()` already
+	 * reports rather than guesses at.
+	 */
 	private static function resolve_model( $name, $step, $catalog, $plan ) {
-		$provider = ''; $model = '';
-		if ( is_array( $plan ) && isset( $plan[ $name ]['provider'], $plan[ $name ]['model'] ) ) {
-			$provider = $plan[ $name ]['provider']; $model = $plan[ $name ]['model'];
-		} else {
-			$route = MSRWA_Router::plan( $step['capability'], $step['stage'] );
-			if ( is_wp_error( $route ) ) { return array(); }
-			$provider = $route['provider']; $model = $route['model'];
-		}
+		if ( ! is_array( $plan ) || ! isset( $plan[ $name ]['provider'], $plan[ $name ]['model'] ) ) { return array(); }
+		$provider = $plan[ $name ]['provider'];
+		$model = $plan[ $name ]['model'];
 		$row = isset( $catalog[ $provider ][ $model ] ) ? $catalog[ $provider ][ $model ] : array();
 		if ( $row ) { $row['id'] = $provider . ':' . $model; }
 		return $row;
 	}
+
 }

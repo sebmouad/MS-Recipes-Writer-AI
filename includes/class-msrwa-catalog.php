@@ -166,70 +166,10 @@ final class MSRWA_Catalog {
 		return $out;
 	}
 
-	public static function save_admin( $raw ) {
-		global $wpdb;
-		$t = MSRWA_DB::tables();
-		$raw = is_array( $raw ) ? $raw : array();
-		$known_providers = wp_list_pluck( self::providers(), 'provider_key' );
-		foreach ( $known_providers as $provider ) {
-			$data = isset( $raw['providers'][ $provider ] ) && is_array( $raw['providers'][ $provider ] ) ? $raw['providers'][ $provider ] : array();
-			$api_config = isset( $data['api_config'] ) && is_array( $data['api_config'] ) ? $data['api_config'] : array();
-			$clean_api = array();
-			foreach ( $api_config as $key => $value ) { $clean_api[ sanitize_key( $key ) ] = sanitize_text_field( $value ); }
-			$wpdb->update( $t['providers'], array( 'enabled' => empty( $data['enabled'] ) ? 0 : 1, 'api_config_json' => wp_json_encode( $clean_api ), 'updated_at' => current_time( 'mysql', true ) ), array( 'provider_key' => $provider ), array( '%d', '%s', '%s' ), array( '%s' ) );
-		}
-		$models = self::models( true );
-		foreach ( $models as $provider => $provider_models ) {
-			foreach ( $provider_models as $model_id => $model ) {
-				$data = isset( $raw['models'][ $provider ][ $model_id ] ) && is_array( $raw['models'][ $provider ][ $model_id ] ) ? $raw['models'][ $provider ][ $model_id ] : array();
-				$pricing = array( 'input' => max( 0, (float) ( $data['input'] ?? $model['input'] ?? 0 ) ), 'output' => max( 0, (float) ( $data['output'] ?? $model['output'] ?? 0 ) ), 'image_input' => max( 0, (float) ( $data['image_input'] ?? $model['image_input'] ?? 0 ) ), 'currency' => 'USD', 'unit' => 'million_tokens'  );
-				$pricing['image_tokens'] = self::sanitize_image_tokens( $data['image_tokens'] ?? ( $model['image_tokens'] ?? array() ) );
-				$capabilities = array();
-				foreach ( array( 'text', 'vision', 'web_search', 'image_generation' ) as $capability ) { $capabilities[ $capability ] = ! empty( $data[ $capability ] ); }
-				$api_specifics = isset( $data['api_specifics'] ) && is_array( $data['api_specifics'] ) ? $data['api_specifics'] : ( $model['api_specifics'] ?? array() );
-				$clean_specifics = array();
-				foreach ( $api_specifics as $key => $value ) { if ( is_scalar( $value ) ) { $clean_specifics[ sanitize_key( $key ) ] = sanitize_text_field( (string) $value ); } }
-				$wpdb->update( $t['models'], array( 'label' => sanitize_text_field( $data['label'] ?? $model['label'] ), 'stable' => empty( $data['stable'] ) ? 0 : 1, 'enabled' => empty( $data['enabled'] ) ? 0 : 1, 'capabilities_json' => wp_json_encode( $capabilities ), 'pricing_json' => wp_json_encode( $pricing ), 'api_specifics_json' => wp_json_encode( $clean_specifics ), 'source_url' => esc_url_raw( $data['source_url'] ?? $model['source'] ), 'verified_at' => current_time( 'mysql', true ), 'updated_at' => current_time( 'mysql', true ) ), array( 'provider_key' => $provider, 'model_id' => $model_id ), array( '%s', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s' ), array( '%s', '%s' ) );
-			}
-		}
-		MSRWA_DB::event( 'catalog_configuration_saved', 0, 0, array( 'providers' => count( $known_providers ), 'models' => array_sum( array_map( 'count', $models ) ) ) );
-	}
-
 	private static function save_status( $provider, $state ) {
 		global $wpdb;
 		$t = MSRWA_DB::tables();
 		return false !== $wpdb->update( $t['providers'], array( 'status_json' => wp_json_encode( is_array( $state ) ? $state : array() ), 'updated_at' => current_time( 'mysql', true ) ), array( 'provider_key' => sanitize_key( $provider ) ), array( '%s', '%s' ), array( '%s' ) );
 	}
 
-	public static function sync( $provider ) {
-		$provider = sanitize_key( $provider );
-		if ( ! in_array( $provider, array( 'openai', 'gemini' ), true ) ) { return new WP_Error( 'catalog_sync_unsupported', 'La synchronisation automatique de ce fournisseur n’est pas disponible.' ); }
-		if ( 'openai' === $provider ) {
-			$key = MSRWA_OpenAI::key();
-			if ( ! $key ) { return new WP_Error( 'missing_openai_key', 'Aucune clé OpenAI côté serveur.' ); }
-			$url = self::endpoint( 'openai', 'models_path' );
-			if ( ! $url ) { return new WP_Error( 'openai_models_endpoint_missing', 'Endpoint OpenAI Models non configuré.' ); }
-			$response = wp_remote_get( $url, array( 'timeout' => self::timeout( 'openai', 'timeout_text', 20 ), 'sslverify' => true, 'headers' => array( 'Authorization' => 'Bearer ' . $key ) ) );
-		} else {
-			$s = MSRWA_Settings::get();
-			$key = defined( 'MSRWA_GEMINI_KEY' ) && MSRWA_GEMINI_KEY ? MSRWA_GEMINI_KEY : ( getenv( 'MSRWA_GEMINI_KEY' ) ?: $s['gemini_key'] );
-			if ( ! $key ) { return new WP_Error( 'missing_gemini_key', 'Aucune clé Gemini côté serveur.' ); }
-			$url = self::endpoint( 'gemini', 'models_path' );
-			if ( ! $url ) { return new WP_Error( 'gemini_models_endpoint_missing', 'Endpoint Gemini Models non configuré.' ); }
-			$response = wp_remote_get( add_query_arg( 'key', $key, $url ), array( 'timeout' => self::timeout( 'gemini', 'timeout_text', 20 ), 'sslverify' => true ) );
-		}
-		if ( is_wp_error( $response ) ) { return new WP_Error( 'catalog_sync_network', $response->get_error_message(), array( 'status' => 502 ) ); }
-		$code = wp_remote_retrieve_response_code( $response );
-		$body = json_decode( wp_remote_retrieve_body( $response ), true );
-		if ( $code < 200 || $code >= 300 || ! is_array( $body ) ) { return new WP_Error( 'catalog_sync_response', 'La réponse du catalogue fournisseur est invalide.', array( 'status' => $code ?: 502 ) ); }
-		$rows = 'openai' === $provider ? ( isset( $body['data'] ) && is_array( $body['data'] ) ? $body['data'] : array() ) : ( isset( $body['models'] ) && is_array( $body['models'] ) ? $body['models'] : array() );
-		$ids = array();
-		foreach ( $rows as $row ) {
-			$id = 'openai' === $provider ? ( isset( $row['id'] ) ? $row['id'] : '' ) : ( isset( $row['name'] ) ? preg_replace( '#^models/#', '', $row['name'] ) : '' );
-			if ( $id ) { $ids[] = sanitize_text_field( $id ); }
-		}
-		$provider_state = array( 'available_ids' => array_values( array_unique( $ids ) ), 'checked_at' => current_time( 'mysql', true ), 'status' => 'ok' );
-		self::save_status( $provider, $provider_state );
-		return array( 'provider' => $provider, 'count' => count( $ids ), 'checked_at' => $provider_state['checked_at'] );
-	}
 }
