@@ -49,12 +49,11 @@ $result = MSRWA_Engine::run(
 | Class | Responsibility |
 | --- | --- |
 | `MSRWA_Engine` | The entry point: `run()`, `run_step()`, the wave loop and the retries |
-| `MSRWA_Engine_Config` | Three layers of settings — defaults, caller, this run |
+| `MSRWA_Engine_Config` | Every value the engine uses, in three layers — defaults, caller, this run |
 | `MSRWA_Engine_Steps` | What each step needs, produces, costs and asks a model for |
 | `MSRWA_Engine_Input` | What a step is given before it runs |
 | `MSRWA_Engine_Score` | Whether an answer satisfied its step's contract |
 | `MSRWA_Engine_Call` | Every provider call, normalized across three providers |
-| `MSRWA_Engine_Rates` | Published prices and tiers |
 | `MSRWA_Result` | What comes back: artifacts, steps, totals, errors, events |
 
 **Steps run in dependency waves.** `needs` declares what a step waits on, and

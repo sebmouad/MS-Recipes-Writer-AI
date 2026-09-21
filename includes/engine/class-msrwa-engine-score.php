@@ -16,9 +16,19 @@ final class MSRWA_Engine_Score {
 		return strtr( $text, $map );
 	}
 
+	/**
+	 * What counts as passed when the caller names no thresholds of its own.
+	 * Every number was put there by an answer that failed; every one is the
+	 * caller's to move.
+	 */
+	public static function thresholds( $given = array() ) {
+		return array_merge( MSRWA_Engine_Config::defaults()['thresholds'], (array) $given );
+	}
+
 	/** Scores an answer against the contract of its step. */
-	public static function step( $step, $text, $brief ) {
+	public static function step( $step, $text, $brief, $thresholds = array() ) {
 		$settings = MSRWA_Engine_Input::settings();
+		$limits = self::thresholds( $thresholds );
 		$checks = array();
 		$json = MSRWA_Json::decode( $text );
 		$checks['valid JSON'] = array( 'pass' => is_array( $json ), 'detail' => is_array( $json ) ? count( $json ) . ' keys' : 'not parseable' );
@@ -27,7 +37,7 @@ final class MSRWA_Engine_Score {
 		if ( 'research' === $step ) {
 			// An empty array is not evidence. Every one of these keys passing on zero
 			// entries is how a package with no facts and no sources scored 7/10.
-			$required = array( 'ingredients' => 4, 'preparation' => 4, 'references' => 2, 'visual_references' => 1, 'visual_observations' => 1, 'uncertainties' => 0 );
+			$required = (array) $limits['research_minimums'];
 			foreach ( $required as $key => $minimum ) {
 				$count = isset( $json[ $key ] ) && is_array( $json[ $key ] ) ? count( $json[ $key ] ) : -1;
 				$checks[ $key ] = array( 'pass' => $count >= $minimum, 'detail' => $count < 0 ? 'missing' : $count . ' entries, ' . $minimum . ' minimum' );
@@ -48,7 +58,7 @@ final class MSRWA_Engine_Score {
 			$outline = is_array( $json['recipe_outline'] ?? null ) ? $json['recipe_outline'] : array();
 			$timed = 0;
 			foreach ( array( 'servings', 'prep_minutes', 'cook_minutes', 'total_minutes' ) as $key ) { if ( null !== ( $outline[ $key ] ?? null ) && '' !== $outline[ $key ] ) { $timed++; } }
-			$checks['recipe outline'] = array( 'pass' => $timed >= 3, 'detail' => $timed . ' of 4 figures given' );
+			$checks['recipe outline'] = array( 'pass' => $timed >= (int) $limits['research_outline_figures'], 'detail' => $timed . ' of 4 figures given, ' . (int) $limits['research_outline_figures'] . ' required' );
 
 			$cued = 0;
 			foreach ( (array) ( $json['preparation'] ?? array() ) as $step ) { if ( is_array( $step ) && '' !== trim( (string) ( $step['cue'] ?? '' ) ) ) { $cued++; } }
@@ -91,9 +101,9 @@ final class MSRWA_Engine_Score {
 			}
 			$checks['required sections'] = array( 'pass' => empty( $missing ), 'detail' => $missing ? 'missing: ' . implode( ', ', $missing ) : count( self::required_sections() ) . '/' . count( self::required_sections() ) . ' present' );
 			$closing = self::closing_section( $content );
-			$checks['closing section'] = array( 'pass' => $closing['words'] >= 60 && ! $closing['is_question'], 'detail' => $closing['words'] . ' words under "' . mb_substr( $closing['heading'], 0, 40 ) . '"' );
+			$checks['closing section'] = array( 'pass' => $closing['words'] >= (int) $limits['article_closing_words'] && ! $closing['is_question'], 'detail' => $closing['words'] . ' words under "' . mb_substr( $closing['heading'], 0, 40 ) . '"' );
 			$accents = self::accent_density( $content );
-			$checks['French typography'] = array( 'pass' => $accents >= 12, 'detail' => sprintf( '%.1f accented characters per 1000 (French prose sits near 30)', $accents ) );
+			$checks['French typography'] = array( 'pass' => $accents >= (float) $limits['article_accents_per_1000'], 'detail' => sprintf( '%.1f accented characters per 1000 (French prose sits near 30)', $accents ) );
 			$checks['two parts'] = array( 'pass' => false !== strpos( $content, '<!--nextpage-->' ) || ! empty( $json['content_html_part2'] ), 'detail' => false !== strpos( $content, '<!--nextpage-->' ) ? 'page break present' : 'single block' );
 			$checks['no metadata in body'] = array( 'pass' => ! preg_match( '/meta.?description|slug\s*:|mots.?cl(é|e)s\s*:/iu', $content ), 'detail' => 'body carries prose only' );
 			$fields = array( 'title', 'excerpt', 'seo_title', 'seo_description', 'slug', 'tags', 'categories', 'recipe_meta', 'internal_links', 'facebook_caption', 'faq', 'visual_final_notes' );
@@ -117,13 +127,13 @@ final class MSRWA_Engine_Score {
 			$sourced = 0;
 			foreach ( $corrections as $correction ) { if ( ! empty( $correction['source'] ) ) { $sourced++; } }
 			$checks['each fix cites a source'] = array( 'pass' => count( $corrections ) === $sourced, 'detail' => $sourced . '/' . count( $corrections ) );
-			$checks['surgical'] = array( 'pass' => count( $corrections ) <= 12, 'detail' => count( $corrections ) . ' corrections proposed' );
+			$checks['surgical'] = array( 'pass' => count( $corrections ) <= (int) $limits['fact_check_max_fixes'], 'detail' => count( $corrections ) . ' corrections proposed, ' . (int) $limits['fact_check_max_fixes'] . ' the most that reads as a correction rather than a rewrite' );
 		}
 
 		if ( 'proofread' === $step ) {
 			$original = (string) ( MSRWA_Engine_Input::article( $brief )['content_html'] ?? '' );
 			$corrected = (string) ( $json['content_html'] ?? '' );
-			$checks['returns the article'] = array( 'pass' => mb_strlen( $corrected ) > 0.7 * mb_strlen( $original ), 'detail' => mb_strlen( $corrected ) . ' vs ' . mb_strlen( $original ) . ' characters' );
+			$checks['returns the article'] = array( 'pass' => mb_strlen( $corrected ) > (float) $limits['proofread_min_ratio'] * mb_strlen( $original ), 'detail' => mb_strlen( $corrected ) . ' vs ' . mb_strlen( $original ) . ' characters' );
 			$before_headings = count( MSRWA_Engine_Input::headings( $original ) );
 			$after_headings = count( MSRWA_Engine_Input::headings( $corrected ) );
 			$checks['structure preserved'] = array( 'pass' => $before_headings === $after_headings, 'detail' => $after_headings . ' headings vs ' . $before_headings );
@@ -132,7 +142,7 @@ final class MSRWA_Engine_Score {
 			preg_match_all( '/\d+(?:[.,]\d+)?/', strip_tags( $corrected ), $after_numbers );
 			sort( $before_numbers[0] ); sort( $after_numbers[0] );
 			$checks['no figure altered'] = array( 'pass' => $before_numbers[0] === $after_numbers[0], 'detail' => count( $after_numbers[0] ) . ' figures, ' . ( $before_numbers[0] === $after_numbers[0] ? 'identical' : 'CHANGED' ) );
-			$checks['French typography'] = array( 'pass' => self::accent_density( $corrected ) >= self::accent_density( $original ) - 1, 'detail' => sprintf( '%.1f vs %.1f per 1000', self::accent_density( $corrected ), self::accent_density( $original ) ) );
+			$checks['French typography'] = array( 'pass' => self::accent_density( $corrected ) >= self::accent_density( $original ) - (float) $limits['proofread_accent_slack'], 'detail' => sprintf( '%.1f vs %.1f per 1000', self::accent_density( $corrected ), self::accent_density( $original ) ) );
 		}
 
 		if ( 'review' === $step ) {
@@ -152,7 +162,7 @@ final class MSRWA_Engine_Score {
 	 * finding that refuses to approve, and a quote on every article finding, since a
 	 * paraphrase cannot be applied to the text.
 	 */
-	public static function approval( $verdict, $image_count, $expected_panels ) {
+	public static function approval( $verdict, $image_count, $expected_panels, $targets = array() ) {
 		$checks = array();
 		$readable = is_array( $verdict ) && ! empty( $verdict );
 		$checks['valid JSON'] = array( 'pass' => $readable, 'detail' => $readable ? count( $verdict ) . ' keys' : 'not parseable' );
@@ -161,12 +171,13 @@ final class MSRWA_Engine_Score {
 		$checks['approved is a boolean'] = array( 'pass' => isset( $verdict['approved'] ) && is_bool( $verdict['approved'] ), 'detail' => isset( $verdict['approved'] ) ? var_export( $verdict['approved'], true ) : 'missing' );
 
 		$verdicts = array( 'good', 'reservations', 'bad' );
+		$targets = $targets ? array_values( (array) $targets ) : array( 'article', 'featured_image', 'facebook_image', 'consistency' );
 		$missing = array();
-		foreach ( array( 'article', 'featured_image', 'facebook_image', 'consistency' ) as $target ) {
+		foreach ( $targets as $target ) {
 			$value = (string) ( $verdict[ $target ]['verdict'] ?? '' );
 			if ( ! in_array( $value, $verdicts, true ) ) { $missing[] = $target; }
 		}
-		$checks['a verdict per artifact'] = array( 'pass' => empty( $missing ), 'detail' => $missing ? 'missing or invalid: ' . implode( ', ', $missing ) : '4 verdicts' );
+		$checks['a verdict per artifact'] = array( 'pass' => empty( $missing ), 'detail' => $missing ? 'missing or invalid: ' . implode( ', ', $missing ) : count( $targets ) . ' verdicts' );
 
 		$realism = array();
 		foreach ( array( 'featured_image', 'facebook_image' ) as $target ) {
@@ -182,7 +193,6 @@ final class MSRWA_Engine_Score {
 		$blocking = 0;
 		$unquoted = 0;
 		$bad_target = 0;
-		$targets = array( 'article', 'featured_image', 'facebook_image', 'consistency' );
 		foreach ( $findings as $finding ) {
 			if ( 'blocking' === ( $finding['severity'] ?? '' ) ) { $blocking++; }
 			if ( ! in_array( (string) ( $finding['target'] ?? '' ), $targets, true ) ) { $bad_target++; }

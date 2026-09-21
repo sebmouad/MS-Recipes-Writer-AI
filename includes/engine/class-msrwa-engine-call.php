@@ -8,6 +8,13 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
  * describes what it wants rather than how each provider spells it. Nothing here
  * throws or exits: a missing key, a refused image, an HTTP error all come back
  * as an 'error' entry the caller records.
+ *
+ * Endpoints, headers, key names and each provider's spelling of "search the
+ * web" are not written here. They arrive as `$wire`, resolved by
+ * MSRWA_Engine_Config::provider(), so a caller can move an endpoint, add a
+ * header or point at a gateway without touching this file. What remains here is
+ * the one thing that genuinely differs between providers: the shape of the
+ * request body and where the answer sits in the response.
  */
 final class MSRWA_Engine_Call {
 
@@ -23,7 +30,7 @@ final class MSRWA_Engine_Call {
 	$loaded = true;
 	$file = dirname( __DIR__, 2 ) . '/.env.local';
 	if ( ! is_readable( $file ) ) { return; }
-	$allowed = array( 'OPENAI_API_KEY', 'GEMINI_API_KEY', 'ANTHROPIC_API_KEY' );
+	$allowed = self::known_key_names();
 	foreach ( file( $file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES ) as $line ) {
 		if ( ! preg_match( '/^([A-Z][A-Z0-9_]*)=(.*)$/', trim( $line ), $match ) || ! in_array( $match[1], $allowed, true ) || false !== getenv( $match[1] ) ) { continue; }
 		$value = trim( $match[2] );
@@ -46,18 +53,39 @@ final class MSRWA_Engine_Call {
 	}
 
 	/** Reports a provider that cannot be called at all, so a step fails with a reason. */
-	public static function unusable( $provider ) {
-		return '' === self::key( $provider ) ? 'No API key for ' . $provider . '.' : '';
+	public static function unusable( $provider, $wire = array() ) {
+		if ( $wire && empty( $wire['has_key'] ) ) { return 'No API key for ' . $provider . '.'; }
+		if ( ! $wire && '' === self::key( $provider ) ) { return 'No API key for ' . $provider . '.'; }
+		if ( $wire && '' === (string) ( $wire['text_endpoint'] ?? '' ) && '' === (string) ( $wire['image_endpoint'] ?? '' ) ) { return 'No endpoint configured for ' . $provider . '.'; }
+		return '';
 	}
 
-	public static function key( $provider ) {
+	/**
+	 * The key for a provider, from the environment names the configuration gives.
+	 * The names default to the shipped ones so a caller that configures nothing
+	 * still works; a caller that keeps its keys elsewhere passes its own.
+	 */
+	public static function key( $provider, $names = array() ) {
 		self::load_local_env();
-		$names = array( 'openai' => array( 'OPENAI_API_KEY', 'MSRWA_OPENAI_KEY' ), 'gemini' => array( 'GEMINI_API_KEY', 'MSRWA_GEMINI_KEY' ), 'claude' => array( 'ANTHROPIC_API_KEY', 'MSRWA_CLAUDE_KEY' ) );
-		foreach ( $names[ $provider ] ?? array() as $name ) {
+		if ( ! $names ) { $names = (array) ( MSRWA_Engine_Config::defaults()['providers'][ $provider ]['key_env'] ?? array() ); }
+		foreach ( (array) $names as $name ) {
 			$value = (string) getenv( $name );
 			if ( '' !== $value ) { return $value; }
 		}
 		return '';
+	}
+
+	/**
+	 * Every environment variable the shipped configuration names as holding a
+	 * key. It is the allowlist for .env.local: a stray file may set one of
+	 * these and nothing else, so it cannot reach into the rest of the process.
+	 */
+	private static function known_key_names() {
+		$names = array();
+		foreach ( (array) MSRWA_Engine_Config::defaults()['providers'] as $provider ) {
+			foreach ( (array) ( $provider['key_env'] ?? array() ) as $name ) { $names[] = $name; }
+		}
+		return $names;
 	}
 
 	public static function http( $url, $headers, $payload, $timeout = 600 ) {
@@ -75,21 +103,37 @@ final class MSRWA_Engine_Call {
 		return array( 'status' => $status, 'raw' => (string) $raw, 'error' => $error, 'seconds' => round( microtime( true ) - $started, 1 ) );
 	}
 
-	/** One text call on any provider. $tools is a normalised list, currently only web search. */
-	public static function text( $provider, $model, $input, $max_tokens, $json_output = true, $tools = array() ) {
-		$unusable = self::unusable( $provider );
+	/**
+	 * One text call on any provider.
+	 *
+	 * $web_search asks for the provider's search tool; what that tool is called
+	 * comes from the configuration, not from here.
+	 */
+	public static function text( $provider, $model, $input, $max_tokens, $json_output = true, $web_search = false, $wire = array() ) {
+		$wire = $wire ? $wire : self::shipped_wire( $provider, $model );
+		$unusable = self::unusable( $provider, $wire );
 		if ( '' !== $unusable ) { return array( 'error' => $unusable, 'seconds' => 0, 'usage' => array() ); }
-		if ( 'openai' === $provider ) { return self::text_openai( $model, $input, $max_tokens, $json_output, $tools ); }
-		if ( 'gemini' === $provider ) { return self::text_gemini( $model, $input, $max_tokens, $json_output, $tools ); }
-		if ( 'claude' === $provider ) { return self::text_claude( $model, $input, $max_tokens, $json_output, $tools ); }
+		$tools = $web_search ? (array) ( $wire['web_search_tool'] ?? array() ) : array();
+		if ( 'openai' === $provider ) { return self::text_openai( $model, $input, $max_tokens, $json_output, $tools, $wire ); }
+		if ( 'gemini' === $provider ) { return self::text_gemini( $model, $input, $max_tokens, $json_output, $tools, $wire ); }
+		if ( 'claude' === $provider ) { return self::text_claude( $model, $input, $max_tokens, $json_output, $tools, $wire ); }
 		return array( 'error' => 'unknown provider ' . $provider, 'seconds' => 0 );
 	}
 
-	private static function text_openai( $model, $input, $max_tokens, $json_output, $tools ) {
+	/**
+	 * The wire settings a caller that passed none would have got. It keeps every
+	 * entry point callable on its own — a test, an experiment — without making
+	 * the engine's own calls depend on anything written here.
+	 */
+	private static function shipped_wire( $provider, $model = '' ) {
+		return MSRWA_Engine_Config::create()->provider( $provider, $model );
+	}
+
+	private static function text_openai( $model, $input, $max_tokens, $json_output, $tools, $wire ) {
 		$payload = array( 'model' => $model, 'input' => (string) $input, 'store' => false, 'max_output_tokens' => max( 16, (int) $max_tokens ) );
-		if ( $tools ) { $payload['tools'] = array( array( 'type' => 'web_search' ) ); }
+		if ( $tools ) { $payload['tools'] = array( $tools ); }
 		if ( $json_output && ! $tools ) { $payload['text'] = array( 'format' => array( 'type' => 'json_object' ) ); }
-		$result = self::http( 'https://api.openai.com/v1/responses', array( 'Content-Type: application/json', 'Authorization: Bearer ' . self::key( 'openai' ) ), $payload );
+		$result = self::http( $wire['text_endpoint'], $wire['headers'], $payload, (int) ( $wire['timeout'] ?? 600 ) );
 		if ( 200 !== $result['status'] ) { return array( 'error' => 'HTTP ' . $result['status'] . ': ' . substr( $result['raw'], 0, 240 ), 'seconds' => $result['seconds'] ); }
 		$body = json_decode( $result['raw'], true );
 		$text = '';
@@ -104,15 +148,15 @@ final class MSRWA_Engine_Call {
 		return array( 'text' => self::utf8( $text ), 'usage' => array( 'input_tokens' => (int) ( $body['usage']['input_tokens'] ?? 0 ), 'output_tokens' => (int) ( $body['usage']['output_tokens'] ?? 0 ), 'cached_input_tokens' => (int) ( $body['usage']['input_tokens_details']['cached_tokens'] ?? 0 ) ), 'model' => $body['model'] ?? $model, 'status' => $body['status'] ?? '', 'seconds' => $result['seconds'] );
 	}
 
-	private static function text_gemini( $model, $input, $max_tokens, $json_output, $tools ) {
+	private static function text_gemini( $model, $input, $max_tokens, $json_output, $tools, $wire ) {
 		$payload = array(
 			'contents' => array( array( 'role' => 'user', 'parts' => array( array( 'text' => (string) $input ) ) ) ),
 			'generationConfig' => array( 'maxOutputTokens' => max( 16, (int) $max_tokens ) ),
 		);
 		if ( $json_output && ! $tools ) { $payload['generationConfig']['responseMimeType'] = 'application/json'; }
-		if ( $tools ) { $payload['tools'] = array( array( 'google_search' => new stdClass() ) ); }
-		$url = 'https://generativelanguage.googleapis.com/v1beta/models/' . rawurlencode( $model ) . ':generateContent';
-		$result = self::http( $url, array( 'Content-Type: application/json', 'x-goog-api-key: ' . self::key( 'gemini' ) ), $payload );
+		// An empty tool object must reach the wire as {}, not as [].
+		if ( $tools ) { $payload['tools'] = array( array_map( static function ( $value ) { return array() === $value ? new stdClass() : $value; }, $tools ) ); }
+		$result = self::http( $wire['text_endpoint'], $wire['headers'], $payload, (int) ( $wire['timeout'] ?? 600 ) );
 		if ( 200 !== $result['status'] ) { return array( 'error' => 'HTTP ' . $result['status'] . ': ' . substr( $result['raw'], 0, 240 ), 'seconds' => $result['seconds'] ); }
 		$body = json_decode( $result['raw'], true );
 		$text = '';
@@ -121,14 +165,14 @@ final class MSRWA_Engine_Call {
 		return array( 'text' => self::utf8( $text ), 'usage' => array( 'input_tokens' => (int) ( $usage['promptTokenCount'] ?? 0 ), 'output_tokens' => (int) ( $usage['candidatesTokenCount'] ?? 0 ) ), 'model' => $model, 'status' => $body['candidates'][0]['finishReason'] ?? '', 'seconds' => $result['seconds'] );
 	}
 
-	private static function text_claude( $model, $input, $max_tokens, $json_output, $tools ) {
+	private static function text_claude( $model, $input, $max_tokens, $json_output, $tools, $wire ) {
 		$instruction = $json_output ? "\n\nReturn only a valid JSON object, with no Markdown fence and no commentary." : '';
 		$payload = array(
 			'model' => $model, 'max_tokens' => max( 16, (int) $max_tokens ),
 			'messages' => array( array( 'role' => 'user', 'content' => (string) $input . $instruction ) ),
 		);
-		if ( $tools ) { $payload['tools'] = array( array( 'type' => 'web_search_20250305', 'name' => 'web_search', 'max_uses' => 3 ) ); }
-		$result = self::http( 'https://api.anthropic.com/v1/messages', array( 'Content-Type: application/json', 'x-api-key: ' . self::key( 'claude' ), 'anthropic-version: 2023-06-01' ), $payload );
+		if ( $tools ) { $payload['tools'] = array( $tools ); }
+		$result = self::http( $wire['text_endpoint'], $wire['headers'], $payload, (int) ( $wire['timeout'] ?? 600 ) );
 		if ( 200 !== $result['status'] ) { return array( 'error' => 'HTTP ' . $result['status'] . ': ' . substr( $result['raw'], 0, 240 ), 'seconds' => $result['seconds'] ); }
 		$body = json_decode( $result['raw'], true );
 		$text = '';
@@ -138,11 +182,13 @@ final class MSRWA_Engine_Call {
 	}
 
 	/** Generates one OpenAI image and writes it to the lab runs directory. */
-	public static function image( $prompt, $model, $size, $quality, $output_format, $destination ) {
-		$unusable = self::unusable( 'openai' );
+	public static function image( $prompt, $model, $size, $quality, $output_format, $destination, $wire = array(), $provider = 'openai' ) {
+		$wire = $wire ? $wire : self::shipped_wire( $provider, $model );
+		$unusable = self::unusable( $provider, $wire );
 		if ( '' !== $unusable ) { return array( 'error' => $unusable, 'seconds' => 0, 'usage' => array() ); }
+		if ( '' === (string) ( $wire['image_endpoint'] ?? '' ) ) { return array( 'error' => $provider . ' has no image endpoint configured.', 'seconds' => 0, 'usage' => array() ); }
 		$payload = array( 'model' => $model, 'prompt' => (string) $prompt, 'size' => $size, 'quality' => $quality, 'output_format' => $output_format, 'n' => 1 );
-		$result = self::http( 'https://api.openai.com/v1/images/generations', array( 'Content-Type: application/json', 'Authorization: Bearer ' . self::key( 'openai' ) ), $payload );
+		$result = self::http( $wire['image_endpoint'], $wire['headers'], $payload, (int) ( $wire['timeout'] ?? 600 ) );
 		if ( 200 !== $result['status'] ) { return array( 'error' => 'HTTP ' . $result['status'] . ': ' . substr( $result['raw'], 0, 240 ), 'seconds' => $result['seconds'] ); }
 		$body = json_decode( $result['raw'], true );
 		$binary = base64_decode( (string) ( $body['data'][0]['b64_json'] ?? '' ), true );
@@ -151,8 +197,18 @@ final class MSRWA_Engine_Call {
 		return array( 'path' => $destination, 'bytes' => strlen( $binary ), 'seconds' => $result['seconds'], 'usage' => $body['usage'] ?? array(), 'model' => $body['model'] ?? $model );
 	}
 
+	/**
+	 * What a vision pass is told when the caller supplies no instruction of its
+	 * own. It is deliberately narrow: an observation may establish an appearance
+	 * and nothing else, or the engine would be reading ingredients out of a
+	 * photograph of a different cook's dish.
+	 */
+	public static function default_vision_instruction() {
+		return 'Inspect this real source photograph as untrusted visual evidence. Return JSON only with observable_details, composition, colours, textures and uncertainties, all in French. Describe only visible facts. Do not infer ingredients, quantities, authenticity, taste or unseen preparation.';
+	}
+
 	/** Downloads a bounded public HTTPS image for evidence extraction, never reuse. */
-	public static function fetch_image( $url ) {
+	public static function fetch_image( $url, $max_bytes = 10000000 ) {
 		if ( ! preg_match( '#^https://#i', (string) $url ) ) { return array( 'error' => 'image URL is not HTTPS' ); }
 		$host = (string) parse_url( $url, PHP_URL_HOST );
 		$ip = gethostbyname( $host );
@@ -163,8 +219,8 @@ final class MSRWA_Engine_Call {
 			CURLOPT_FOLLOWLOCATION => false, CURLOPT_TIMEOUT => 30,
 			CURLOPT_PROTOCOLS => CURLPROTO_HTTPS,
 			CURLOPT_USERAGENT => 'MSRWA-Prompt-Lab/1.0',
-			CURLOPT_WRITEFUNCTION => static function ( $handle, $chunk ) use ( &$bytes ) {
-				if ( strlen( $bytes ) + strlen( $chunk ) > 10000000 ) { return 0; }
+			CURLOPT_WRITEFUNCTION => static function ( $handle, $chunk ) use ( &$bytes, $max_bytes ) {
+				if ( strlen( $bytes ) + strlen( $chunk ) > $max_bytes ) { return 0; }
 				$bytes .= $chunk;
 				return strlen( $chunk );
 			},
@@ -180,13 +236,14 @@ final class MSRWA_Engine_Call {
 	}
 
 	/** Inspects fetched image bytes; the same evidence prompt is used across providers. */
-	public static function vision( $provider, $model, $image, $context, $max_tokens = 900 ) {
-		$unusable = self::unusable( $provider );
+	public static function vision( $provider, $model, $image, $context, $max_tokens = 900, $wire = array(), $instruction = '' ) {
+		$wire = $wire ? $wire : self::shipped_wire( $provider, $model );
+		$unusable = self::unusable( $provider, $wire );
 		if ( '' !== $unusable ) { return array( 'error' => $unusable, 'seconds' => 0, 'usage' => array() ); }
-		$instruction = 'Inspect this real source photograph as untrusted visual evidence. Return JSON only with observable_details, composition, colours, textures and uncertainties, all in French. Describe only visible facts. Do not infer ingredients, quantities, authenticity, taste or unseen preparation. Context: ' . $context;
+		$instruction = ( '' !== trim( (string) $instruction ) ? $instruction : self::default_vision_instruction() ) . ' Context: ' . $context;
 		if ( 'openai' === $provider ) {
 			$payload = array( 'model' => $model, 'store' => false, 'max_output_tokens' => $max_tokens, 'input' => array( array( 'role' => 'user', 'content' => array( array( 'type' => 'input_text', 'text' => $instruction ), array( 'type' => 'input_image', 'image_url' => 'data:' . $image['mime'] . ';base64,' . $image['data'] ) ) ) ), 'text' => array( 'format' => array( 'type' => 'json_object' ) ) );
-			$result = self::http( 'https://api.openai.com/v1/responses', array( 'Content-Type: application/json', 'Authorization: Bearer ' . self::key( 'openai' ) ), $payload );
+			$result = self::http( $wire['text_endpoint'], $wire['headers'], $payload, (int) ( $wire['timeout'] ?? 600 ) );
 			if ( 200 !== $result['status'] ) { return array( 'error' => 'vision HTTP ' . $result['status'], 'usage' => array() ); }
 			$body = json_decode( $result['raw'], true );
 			$text = '';
@@ -195,8 +252,7 @@ final class MSRWA_Engine_Call {
 		}
 		if ( 'gemini' === $provider ) {
 			$payload = array( 'contents' => array( array( 'role' => 'user', 'parts' => array( array( 'text' => $instruction ), array( 'inline_data' => array( 'mime_type' => $image['mime'], 'data' => $image['data'] ) ) ) ) ), 'generationConfig' => array( 'maxOutputTokens' => $max_tokens, 'responseMimeType' => 'application/json' ) );
-			$url = 'https://generativelanguage.googleapis.com/v1beta/models/' . rawurlencode( $model ) . ':generateContent';
-			$result = self::http( $url, array( 'Content-Type: application/json', 'x-goog-api-key: ' . self::key( 'gemini' ) ), $payload );
+			$result = self::http( $wire['text_endpoint'], $wire['headers'], $payload, (int) ( $wire['timeout'] ?? 600 ) );
 			if ( 200 !== $result['status'] ) { return array( 'error' => 'vision HTTP ' . $result['status'], 'usage' => array() ); }
 			$body = json_decode( $result['raw'], true );
 			$text = (string) ( $body['candidates'][0]['content']['parts'][0]['text'] ?? '' );
@@ -204,7 +260,7 @@ final class MSRWA_Engine_Call {
 			return array( 'text' => $text, 'usage' => array( 'input_tokens' => (int) ( $usage['promptTokenCount'] ?? 0 ), 'output_tokens' => (int) ( $usage['candidatesTokenCount'] ?? 0 ) ) );
 		}
 		$payload = array( 'model' => $model, 'max_tokens' => $max_tokens, 'messages' => array( array( 'role' => 'user', 'content' => array( array( 'type' => 'image', 'source' => array( 'type' => 'base64', 'media_type' => $image['mime'], 'data' => $image['data'] ) ), array( 'type' => 'text', 'text' => $instruction ) ) ) ) );
-		$result = self::http( 'https://api.anthropic.com/v1/messages', array( 'Content-Type: application/json', 'x-api-key: ' . self::key( 'claude' ), 'anthropic-version: 2023-06-01' ), $payload );
+		$result = self::http( $wire['text_endpoint'], $wire['headers'], $payload, (int) ( $wire['timeout'] ?? 600 ) );
 		if ( 200 !== $result['status'] ) { return array( 'error' => 'vision HTTP ' . $result['status'], 'usage' => array() ); }
 		$body = json_decode( $result['raw'], true );
 		$text = '';
@@ -221,8 +277,9 @@ final class MSRWA_Engine_Call {
 	 *
 	 * $images is a list of array( 'label' => string, 'mime' => string, 'data' => base64 ).
 	 */
-	public static function judge( $provider, $model, $instruction, $images, $max_tokens = 2500 ) {
-		$unusable = self::unusable( $provider );
+	public static function judge( $provider, $model, $instruction, $images, $max_tokens = 2500, $wire = array() ) {
+		$wire = $wire ? $wire : self::shipped_wire( $provider, $model );
+		$unusable = self::unusable( $provider, $wire );
 		if ( '' !== $unusable ) { return array( 'error' => $unusable, 'seconds' => 0, 'usage' => array() ); }
 		if ( 'openai' === $provider ) {
 			$content = array( array( 'type' => 'input_text', 'text' => $instruction ) );
@@ -231,7 +288,7 @@ final class MSRWA_Engine_Call {
 				$content[] = array( 'type' => 'input_image', 'image_url' => 'data:' . $image['mime'] . ';base64,' . $image['data'] );
 			}
 			$payload = array( 'model' => $model, 'store' => false, 'max_output_tokens' => $max_tokens, 'input' => array( array( 'role' => 'user', 'content' => $content ) ), 'text' => array( 'format' => array( 'type' => 'json_object' ) ) );
-			$result = self::http( 'https://api.openai.com/v1/responses', array( 'Content-Type: application/json', 'Authorization: Bearer ' . self::key( 'openai' ) ), $payload );
+			$result = self::http( $wire['text_endpoint'], $wire['headers'], $payload, (int) ( $wire['timeout'] ?? 600 ) );
 			if ( 200 !== $result['status'] ) { return array( 'error' => 'judge HTTP ' . $result['status'] . ': ' . substr( $result['raw'], 0, 200 ), 'seconds' => $result['seconds'], 'usage' => array() ); }
 			$body = json_decode( $result['raw'], true );
 			$text = '';
@@ -245,8 +302,7 @@ final class MSRWA_Engine_Call {
 				$parts[] = array( 'inline_data' => array( 'mime_type' => $image['mime'], 'data' => $image['data'] ) );
 			}
 			$payload = array( 'contents' => array( array( 'role' => 'user', 'parts' => $parts ) ), 'generationConfig' => array( 'maxOutputTokens' => $max_tokens, 'responseMimeType' => 'application/json' ) );
-			$url = 'https://generativelanguage.googleapis.com/v1beta/models/' . rawurlencode( $model ) . ':generateContent';
-			$result = self::http( $url, array( 'Content-Type: application/json', 'x-goog-api-key: ' . self::key( 'gemini' ) ), $payload );
+			$result = self::http( $wire['text_endpoint'], $wire['headers'], $payload, (int) ( $wire['timeout'] ?? 600 ) );
 			if ( 200 !== $result['status'] ) { return array( 'error' => 'judge HTTP ' . $result['status'] . ': ' . substr( $result['raw'], 0, 200 ), 'seconds' => $result['seconds'], 'usage' => array() ); }
 			$body = json_decode( $result['raw'], true );
 			$text = '';
@@ -261,7 +317,7 @@ final class MSRWA_Engine_Call {
 		}
 		$content[] = array( 'type' => 'text', 'text' => $instruction . "\n\nReturn only a valid JSON object, with no Markdown fence and no commentary." );
 		$payload = array( 'model' => $model, 'max_tokens' => $max_tokens, 'messages' => array( array( 'role' => 'user', 'content' => $content ) ) );
-		$result = self::http( 'https://api.anthropic.com/v1/messages', array( 'Content-Type: application/json', 'x-api-key: ' . self::key( 'claude' ), 'anthropic-version: 2023-06-01' ), $payload );
+		$result = self::http( $wire['text_endpoint'], $wire['headers'], $payload, (int) ( $wire['timeout'] ?? 600 ) );
 		if ( 200 !== $result['status'] ) { return array( 'error' => 'judge HTTP ' . $result['status'] . ': ' . substr( $result['raw'], 0, 200 ), 'seconds' => $result['seconds'], 'usage' => array() ); }
 		$body = json_decode( $result['raw'], true );
 		$text = '';
@@ -270,13 +326,13 @@ final class MSRWA_Engine_Call {
 	}
 
 	/** Replaces search-model guesses with observations made from the cited bytes. */
-	public static function observe_images( $provider, $model, $package, $limit = 3 ) {
+	public static function observe_images( $provider, $model, $package, $limit = 3, $wire = array(), $max_bytes = 10000000, $instruction = '' ) {
 		$package['visual_observations'] = array();
 		$usage = array( 'input_tokens' => 0, 'output_tokens' => 0 );
 		foreach ( array_slice( (array) ( $package['visual_references'] ?? array() ), 0, $limit ) as $reference ) {
-			$image = self::fetch_image( $reference['image_url'] ?? '' );
+			$image = self::fetch_image( $reference['image_url'] ?? '', $max_bytes );
 			if ( isset( $image['error'] ) ) { $package['uncertainties'][] = 'Image non analysée : ' . $image['error']; continue; }
-			$vision = self::vision( $provider, $model, $image, (string) ( $reference['title'] ?? '' ) );
+			$vision = self::vision( $provider, $model, $image, (string) ( $reference['title'] ?? '' ), 900, $wire, $instruction );
 			$usage['input_tokens'] += (int) ( $vision['usage']['input_tokens'] ?? 0 );
 			$usage['output_tokens'] += (int) ( $vision['usage']['output_tokens'] ?? 0 );
 			$observed = MSRWA_Json::decode( (string) ( $vision['text'] ?? '' ) );

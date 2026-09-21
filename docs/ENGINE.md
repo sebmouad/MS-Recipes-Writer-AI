@@ -21,7 +21,6 @@ failure is a value, not an exception.**
 | `class-msrwa-engine-input.php` | What a step is given before it runs | 354 |
 | `class-msrwa-engine-score.php` | Whether an answer satisfied its step's contract | 278 |
 | `class-msrwa-engine-call.php` | Every provider call, normalized across three providers | 288 |
-| `class-msrwa-engine-rates.php` | Published prices and tiers | 72 |
 | `class-msrwa-result.php` | What comes back, and the progress report while it runs | 107 |
 | `prompts/*.tpl.txt` | The nine prompts. Engine data: it runs them, it carries them | — |
 | `load.php` | Loads the shared plugin classes, then the engine | — |
@@ -128,22 +127,49 @@ plugin runs cannot drift, because they are the same call.
 
 ## 3 · Defaults, and who overrides them
 
+**Nothing the engine does is hardcoded.** Provider endpoints, model prices,
+tiers, the step registry, the prompts, every scoring threshold and every ceiling
+is a configuration key. What `defaults()` holds is a default, not a law, and
+`tests/test-engine-configurable.php` reads the engine's own source and fails if
+a URL or a key name reappears in the code.
+
 Three layers, each overriding the one before:
 
 1. `MSRWA_Engine_Config::defaults()` — what the engine does when told nothing.
-   These are the measured values: routing, output ceilings, retry limits, image
-   quality and ratios. Every ceiling in that list has been too low at least
-   once, and a truncated answer is billed in full and scores zero.
+   The measured values. Every output ceiling in that list has been too low at
+   least once, and a truncated answer is billed in full and scores zero.
 2. **The caller** — what the plugin stores, or what a lab flag says.
 3. **This run** — what one job asks for, such as a retry at a higher tier.
 
+| Key | What it decides |
+|---|---|
+| `routing` | which provider and model serves each step |
+| `max_output` | the token ceiling per step |
+| `attempts` | how many times a step may be asked again |
+| `images` | quality, format, ratio, native size and panel count |
+| `limits` | budget, HTTP timeout, image byte cap, how many photographs are read |
+| `providers` | endpoints, headers, key variables, each provider's web-search tool |
+| `models` | price per million tokens, as `[input, output]` |
+| `tiers` | what `provider:low\|medium\|high` resolves to |
+| `steps` | overrides for the registry — label, bucket, dependencies, prompt file |
+| `prompts` | prompt text replacing the shipped templates |
+| `thresholds` | every number a scorecard compares against |
+| `settings` | prompt and quality settings the shared classes read |
+
+Overriding is surgical. A caller that moves one provider's endpoint keeps that
+provider's headers; a caller that recharges one step to another bucket keeps its
+dependencies; a caller that moves one threshold leaves the rest at the measured
+value. A caller may also **add** a step the engine has never had, and it takes
+part in the wave scheduling like any other.
+
 ```php
-'routing'    => array( 'article' => 'openai:medium', 'image' => 'openai:gpt-image-2.5-flare', … ),
-'max_output' => array( 'article' => 14500, 'research' => 12000, … ),
-'attempts'   => array( 'final_approval' => 3, 'default' => 1 ),
-'images'     => array( 'featured_quality' => 'medium', 'facebook_quality' => 'medium', … ),
-'limits'     => array( 'budget_usd' => 0.0, 'images_inspected' => 3, 'image_prompt_chars' => 30000 ),
-'settings'   => array( … ),   // prompt and quality settings the shared classes read
+$options['config'] = array(
+    'providers'  => array( 'openai' => array( 'text_endpoint' => 'https://my-gateway/v1/responses' ) ),
+    'models'     => array( 'openai' => array( 'my-model' => array( 1.0, 2.0 ) ) ),
+    'tiers'      => array( 'medium' => array( 'openai' => 'my-model' ) ),
+    'prompts'    => array( 'article' => $stored_prompt ),
+    'thresholds' => array( 'article_accents_per_1000' => 25 ),
+);
 ```
 
 **Layers two and three speak the engine's vocabulary.** A caller with its own
@@ -152,11 +178,14 @@ it cannot carry a mapping per caller — and when the plugin renames a setting,
 exactly one readable place breaks.
 
 A hand-edited value is clamped into what providers actually accept
-(`max_output` to 256–32000, `attempts` to 1–6). An unknown key is kept rather
-than rejected, so a newer caller and an older engine still work together.
+(`max_output` to 256–32000, `attempts` to 1–6, the timeout to 5–3600 seconds).
+An unknown key is kept rather than rejected, so a newer caller and an older
+engine still work together.
 
 The resolved configuration is recorded on the run — **minus `settings`, which
-can hold keys** — so a report can answer "what was this run with?" months later
+can hold keys, and minus the environment variable names, which say where a key
+is kept** — together with `_provenance`, which names the layer that decided each
+key. A report months later answers "what was this run with, and who decided"
 without guessing.
 
 ---
@@ -182,9 +211,27 @@ $result->to_array()  // the whole thing as plain data, for storage and for the r
 ```
 
 **Progress** is the observer: a callable given to `run()` and called with each
-event the moment it occurs — `start`, `wave`, `attempt`, `observe`, `step`,
-`warning`, `retry`, `error`, `finish`. It is the same stream the report renders
-afterwards, so a live progress bar and a post-hoc record cannot disagree.
+event the moment it occurs. It is the same stream the report renders afterwards,
+so a live progress bar and a post-hoc record cannot disagree.
+
+The engine reports what it did with the data, not only what it cost:
+
+| Event | What it says |
+|---|---|
+| `config` | which keys the caller overrode, and the full provenance |
+| `wave` | which steps may run together now |
+| `attempt` | which attempt of how many |
+| `input` | where the prompt came from, its size, the input size, the ceiling, which artifacts were attached, whether web search was on |
+| `call` | which endpoint answered, on which model and tier, tokens in and out, **how many the provider served from its own cache**, the price, the stop status |
+| `observe` | how many photographs were read from their bytes |
+| `warning` | an answer that stopped on the ceiling — cut, and billed in full |
+| `retry` | why the step is being asked again |
+| `decision` | a refusal the engine cannot act on, going to the editor |
+| `error` | a failure, naming its step |
+| `step` / `finish` | the summary per step, and for the run |
+
+Each step also records the prompt it ran, where that prompt came from, and the
+size of the input it was given, so a run explains itself without a replay.
 
 **A run stops rather than overspend.** With `limits.budget_usd` set, the engine
 refuses to start a step once the spend has reached it, and says so as an error
@@ -200,10 +247,12 @@ nothing, it shows what the run decided.
 
 In the order the run happened: the summary and the bill per budget bucket, the
 step table, the editor's brief, the real photographs and what was read from
-their bytes, the research, the canonical recipe, the finished article, the SEO
-metadata, the corrections actually applied to the text, both images, the
-approval verdict with blocking *and* minor findings, every check with what it
-measured, and the run's own timeline.
+their bytes, the research, the canonical recipe **read as a recipe**, the
+finished article, the SEO metadata, the corrections actually applied to the
+text, both images, the approval verdict with blocking *and* minor findings,
+every check with what it measured, one row per provider call (endpoint, tokens,
+cache hits, price), what each step was handed, the configuration with the layer
+that decided each key, and the run's own timeline.
 
 The detail is folded away until a reader opens it. Minor findings are shown as
 prominently as blocking ones, because a minor finding exists precisely so a

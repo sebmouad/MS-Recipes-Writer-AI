@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.75` est un socle installable : file persistante, pipeline de
+La version `0.2.76` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.
@@ -22,6 +22,60 @@ Le plugin est en cours de refonte éditoriale et budgétaire :
 Les coûts affichés sont des estimations calculées avec le catalogue configuré,
 non une facture fournisseur. `completed` signifie que le traitement est terminé,
 jamais qu’un texte est validé éditorialement.
+
+## Version 0.2.76
+
+**Rien n'est figé dans le moteur.** Points d'accès des fournisseurs, tarifs des
+modèles, paliers, registre des étapes, prompts, chaque seuil de notation et
+chaque plafond : tout est une clé de configuration, et l'appelant peut remplacer
+n'importe laquelle sans toucher à celles d'à côté.
+
+| Clé | Ce qu'elle décide |
+|---|---|
+| `providers` | points d'accès, en-têtes, variables de clé, outil de recherche web |
+| `models` | tarif par million de jetons, `[entrée, sortie]` |
+| `tiers` | ce que `fournisseur:low\|medium\|high` désigne |
+| `steps` | libellé, poste de budget, dépendances, gabarit de prompt |
+| `prompts` | le texte du prompt, à la place du gabarit livré |
+| `thresholds` | chaque nombre auquel un contrôle se compare |
+| `limits` | budget, délai HTTP, taille d'image, photographies analysées |
+
+La surcharge est chirurgicale : changer le point d'accès d'un fournisseur
+conserve ses en-têtes, recharger une étape sur un autre poste conserve ses
+dépendances, déplacer un seuil laisse les autres à leur valeur mesurée. Un
+appelant peut aussi **ajouter** une étape que le moteur n'a jamais eue ; elle
+prend part à l'ordonnancement par vagues comme les autres.
+
+`MSRWA_Engine_Rates` disparaît : les tarifs et les paliers sont dans la
+configuration, donc le laboratoire et le plugin ne peuvent plus diverger.
+`tests/test-engine-configurable.php` lit le code du moteur et échoue si une URL
+ou un nom de variable de clé y réapparaît.
+
+**Le moteur rend compte de ce qu'il fait des données, pas seulement de ce que
+cela coûte.** Trois nouveaux types d'événement :
+
+- `config` — quelles clés l'appelant a surchargées, et la provenance complète :
+  `engine`, `caller` ou `run`, pour chacune.
+- `input` — d'où vient le prompt, sa taille, la taille de l'entrée, le plafond de
+  sortie, quels artefacts étaient attachés, si la recherche web était active.
+- `call` — quel point d'accès a répondu, sur quel modèle et quel palier, les
+  jetons dans chaque sens, **combien le fournisseur a servis depuis son cache**,
+  le prix, le statut d'arrêt.
+
+Chaque étape enregistre aussi le prompt exécuté et d'où il venait.
+
+**Le rapport montre tout cela** : la recette canonique se lit enfin *comme une
+recette* — c'est la référence à laquelle tout se mesure, elle méritait mieux
+qu'un vidage clé/valeur — plus une ligne par appel fournisseur, ce que chaque
+étape a reçu, et la configuration effective avec la couche qui a décidé chaque
+clé.
+
+**Un bug trouvé par ce nouveau relevé.** Les noms de modèles contiennent des
+points, et la lecture par chemin pointé découpait dessus :
+`models.openai.gpt-5.6-luna` ne résolvait rien, et un passage complet se
+rapportait comme gratuit. Sans la ligne « tarif inconnu » par appel, un total à
+$0,00 serait passé pour une bonne nouvelle. Corrigé, et un contrôle vérifie
+désormais que **chaque modèle livré et chaque palier se tarifient**.
 
 ## Version 0.2.75
 

@@ -231,11 +231,130 @@ function report_scorecards( $steps ) {
 function report_timeline( $events ) {
 	$rows = '';
 	foreach ( (array) $events as $event ) {
-		if ( in_array( $event['kind'], array( 'start', 'wave', 'attempt' ), true ) && 'wave' !== $event['kind'] ) { continue; }
-		$tone = array( 'error' => 'bad', 'retry' => 'warn', 'warning' => 'warn' );
+		// The call and input detail have their own tables; the timeline is the story.
+		if ( in_array( $event['kind'], array( 'start', 'attempt', 'call', 'input', 'config' ), true ) ) { continue; }
+		$tone = array( 'error' => 'bad', 'retry' => 'warn', 'warning' => 'warn', 'decision' => 'warn' );
 		$rows .= '<div><dt><span class="pill ' . ( $tone[ $event['kind'] ] ?? 'ok' ) . '">' . report_h( $event['kind'] ) . '</span> ' . report_h( $event['at'] ) . ' s</dt><dd>' . report_h( $event['message'] ) . '</dd></div>';
 	}
 	return '<dl class="data">' . $rows . '</dl>';
+}
+
+
+/**
+ * The canonical recipe as a recipe, not as a key/value dump.
+ *
+ * It is the reference every figure in the article and every element in the
+ * images is measured against, so it earns being read at a glance. The fields
+ * shown are the ones the rich result needs; the rest stays in the raw JSON.
+ */
+function report_recipe_card( $recipe ) {
+	if ( ! $recipe ) { return '<p class="muted">Aucune recette canonique n’a été produite.</p>'; }
+
+	$figures = '';
+	foreach ( array( 'servings' => 'Parts', 'prep_minutes' => 'Préparation', 'cook_minutes' => 'Cuisson', 'total_minutes' => 'Total', 'calories_estimate' => 'Calories' ) as $key => $label ) {
+		if ( ! isset( $recipe[ $key ] ) || '' === $recipe[ $key ] || null === $recipe[ $key ] ) { continue; }
+		$unit = false !== strpos( $key, 'minutes' ) ? ' min' : ( 'calories_estimate' === $key ? ' kcal' : '' );
+		$figures .= '<div class="card"><div class="muted">' . report_h( $label ) . '</div><div class="kpi">' . report_h( $recipe[ $key ] ) . report_h( $unit ) . '</div></div>';
+	}
+
+	$ingredients = '';
+	foreach ( (array) ( $recipe['ingredients'] ?? array() ) as $item ) {
+		if ( ! is_array( $item ) ) { continue; }
+		$unit = trim( (string) ( $item['unit'] ?? '' ) );
+		$name = trim( (string) ( $item['name'] ?? '' ) );
+		// Models name the unit after the thing itself — "1 pâte, pâte sablée",
+		// "2 œufs, œufs". Printing both reads as a stutter, so the unit goes when
+		// the name already opens with it.
+		if ( '' !== $unit && 0 === mb_stripos( $name, $unit ) ) { $unit = ''; }
+		$measure = trim( (string) ( $item['quantity'] ?? '' ) . ' ' . $unit );
+		$ingredients .= '<li>' . ( '' !== $measure ? '<strong>' . report_h( $measure ) . '</strong> ' : '' ) . report_h( $name ) . '</li>';
+	}
+
+	$steps = '';
+	foreach ( (array) ( $recipe['steps'] ?? array() ) as $step ) {
+		$text = is_array( $step ) ? (string) ( $step['text'] ?? '' ) : (string) $step;
+		if ( '' === trim( $text ) ) { continue; }
+		$steps .= '<li>' . report_h( $text ) . '</li>';
+	}
+
+	$meta = array();
+	foreach ( array( 'cuisine' => 'Cuisine', 'recipe_category' => 'Catégorie', 'difficulty' => 'Difficulté' ) as $key => $label ) {
+		if ( ! empty( $recipe[ $key ] ) ) { $meta[] = report_h( $label ) . ' : <strong>' . report_h( $recipe[ $key ] ) . '</strong>'; }
+	}
+
+	return '<div class="recipe-card">'
+		. '<h3>' . report_h( $recipe['title'] ?? 'Sans titre' ) . '</h3>'
+		. ( empty( $recipe['description'] ) ? '' : '<p>' . report_h( $recipe['description'] ) . '</p>' )
+		. ( $meta ? '<p class="muted">' . implode( ' · ', $meta ) . '</p>' : '' )
+		. ( $figures ? '<div class="summary-grid">' . $figures . '</div>' : '' )
+		. ( $ingredients ? '<h4>Ingrédients</h4><ul class="ingredients">' . $ingredients . '</ul>' : '' )
+		. ( $steps ? '<h4>Préparation</h4><ol class="steps">' . $steps . '</ol>' : '' )
+		. '</div>';
+}
+
+/**
+ * What the run was configured with, and who decided it.
+ *
+ * Every value the engine uses is a configuration key, so "what was this run
+ * with" is answerable — but only if the answer is shown. `engine` means the
+ * measured default; `caller` and `run` mean somebody overrode it.
+ */
+function report_configuration( $config ) {
+	$provenance = (array) ( $config['_provenance'] ?? array() );
+	unset( $config['_provenance'] );
+	if ( ! $config ) { return '<p class="muted">La configuration de ce passage n’a pas été enregistrée.</p>'; }
+
+	$words = array( 'engine' => 'valeur par défaut du moteur', 'caller' => 'définie par l’appelant', 'run' => 'demandée pour ce passage' );
+	$rows = '';
+	foreach ( $config as $key => $value ) {
+		$layer = (string) ( $provenance[ $key ] ?? 'engine' );
+		$tone = 'engine' === $layer ? '' : 'warn';
+		$rows .= '<div><dt>' . report_h( str_replace( '_', ' ', $key ) ) . ' <span class="pill ' . $tone . '">' . report_h( $words[ $layer ] ?? $layer ) . '</span></dt><dd>' . report_value( $value ) . '</dd></div>';
+	}
+	$overridden = array_keys( array_filter( $provenance, static function ( $layer ) { return 'engine' !== $layer; } ) );
+	return '<p class="muted">' . ( $overridden ? report_h( implode( ', ', $overridden ) ) . ' — le reste est la valeur par défaut du moteur.' : 'Rien n’a été surchargé : ce passage a tourné entièrement sur les valeurs par défaut du moteur.' ) . '</p>'
+		. '<dl class="data">' . $rows . '</dl>';
+}
+
+/**
+ * One line per provider call: which endpoint answered, on what, how many tokens
+ * went each way, how many the provider served from its own cache, and what it
+ * cost. A bill that surprises somebody is explained from this table.
+ */
+function report_calls( $events ) {
+	$rows = '';
+	foreach ( (array) $events as $event ) {
+		if ( 'call' !== $event['kind'] ) { continue; }
+		$data = (array) $event['data'];
+		$usage = (array) ( $data['usage'] ?? array() );
+		$cached = (int) ( $usage['cached_input_tokens'] ?? 0 );
+		$rows .= '<tr>'
+			. '<td data-label="Étape">' . report_h( $event['step'] ) . '</td>'
+			. '<td data-label="Modèle">' . report_h( $data['model'] ?? '' ) . ( empty( $data['tier'] ) ? '' : ' <span class="muted">(' . report_h( $data['tier'] ) . ')</span>' ) . '</td>'
+			. '<td data-label="Point d’accès">' . report_h( preg_replace( '#^https?://([^/]+).*$#', '$1', (string) ( $data['endpoint'] ?? '' ) ) ) . '</td>'
+			. '<td data-label="Temps">' . report_h( $data['seconds'] ?? 0 ) . ' s</td>'
+			. '<td data-label="Entrée">' . number_format( (int) ( $usage['input_tokens'] ?? 0 ) ) . '</td>'
+			. '<td data-label="Depuis le cache">' . ( $cached ? number_format( $cached ) . ' (' . round( 100 * (float) ( $data['cached_ratio'] ?? 0 ) ) . '%)' : '—' ) . '</td>'
+			. '<td data-label="Sortie">' . number_format( (int) ( $usage['output_tokens'] ?? 0 ) ) . '</td>'
+			. '<td data-label="Coût">' . ( empty( $data['priced'] ) ? '<span class="pill warn">tarif inconnu</span>' : '$' . number_format( (float) $data['cost_usd'], 4 ) ) . '</td>'
+			. '</tr>';
+	}
+	if ( '' === $rows ) { return '<p class="muted">Aucun appel fournisseur n’a été enregistré pour ce passage.</p>'; }
+	return '<div class="table-wrap"><table><thead><tr><th>Étape</th><th>Modèle</th><th>Point d’accès</th><th>Temps</th><th>Entrée</th><th>Depuis le cache</th><th>Sortie</th><th>Coût</th></tr></thead><tbody>' . $rows . '</tbody></table></div>';
+}
+
+/** What each step was handed before it ran: its prompt, its size, its artifacts. */
+function report_inputs( $events ) {
+	$rows = '';
+	foreach ( (array) $events as $event ) {
+		if ( 'input' !== $event['kind'] ) { continue; }
+		$data = (array) $event['data'];
+		$attached = (array) ( $data['attached'] ?? array() );
+		$rows .= '<div><dt>' . report_h( $event['step'] ) . '</dt><dd>' . report_h( $event['message'] )
+			. ( $attached ? '<br><span class="muted">Artefacts : ' . report_h( implode( ', ', $attached ) ) . '</span>' : '' )
+			. '</dd></div>';
+	}
+	return $rows ? '<dl class="data">' . $rows . '</dl>' : '<p class="muted">Rien n’a été enregistré.</p>';
 }
 
 /** The whole page. */
@@ -312,7 +431,9 @@ function report_render( array $run ) {
 
 		. '<section class="section"><h2>3 · Recherche complète</h2><p class="muted">Les faits sourcés sur lesquels la recette et l’article s’appuient.</p>' . report_fold( 'Ouvrir le dossier de recherche', report_value( $research ) ) . '</section>'
 
-		. '<section class="section"><h2>4 · Recette canonique</h2><p class="muted">La référence : tout chiffre de l’article et tout élément des images s’y mesure.</p>' . report_fold( 'Ouvrir la recette complète', report_value( $canonical ), true ) . '</section>'
+		. '<section class="section"><h2>4 · Recette canonique</h2><p class="muted">La référence : tout chiffre de l’article et tout élément des images s’y mesure. Ce sont les champs que lit le résultat enrichi.</p>'
+		. report_recipe_card( $canonical )
+		. report_fold( 'Tous les champs de la recette', report_value( $canonical ) ) . '</section>'
 
 		. '<section class="section"><h2>5 · Article final prêt à publier</h2><article class="article">' . $content . '</article></section>'
 
@@ -336,6 +457,12 @@ function report_render( array $run ) {
 		. '<div class="findings-wrap">' . report_findings( $approval ) . '</div></section>'
 
 		. '<section class="section"><h2>Contrôles, étape par étape</h2><p class="muted">Chaque vérification qu’une étape a passée, avec ce qu’elle a mesuré. Un score se lit, il ne se croit pas.</p>' . report_scorecards( $run['steps'] ?? array() ) . '</section>'
+
+		. '<section class="section"><h2>Appels aux fournisseurs</h2><p class="muted">Ce que chaque appel a réellement fait. Les coûts sont des estimations calculées avec les tarifs configurés, jamais une facture.</p>' . report_calls( $run['events'] ?? array() ) . '</section>'
+
+		. '<section class="section"><h2>Ce que chaque étape a reçu</h2><p class="muted">D’où venait son prompt, sa taille, son plafond de sortie et les artefacts qui l’accompagnaient.</p>' . report_fold( 'Ouvrir le détail des entrées', report_inputs( $run['events'] ?? array() ) ) . '</section>'
+
+		. '<section class="section"><h2>Configuration de ce passage</h2><p class="muted">Rien n’est figé dans le moteur : chaque valeur ci-dessous est une clé de configuration, et chacune dit qui l’a décidée.</p>' . report_fold( 'Ouvrir la configuration effective', report_configuration( (array) ( $artifacts['config'] ?? array() ) ) ) . '</section>'
 
 		. '<section class="section"><h2>Déroulé de l’exécution</h2><p class="muted">Les vagues, les reprises et les avertissements, dans l’ordre où ils se sont produits.</p>' . report_fold( 'Ouvrir le déroulé', report_timeline( $run['events'] ?? array() ) ) . '</section>'
 

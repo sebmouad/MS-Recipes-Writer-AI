@@ -35,8 +35,9 @@ msrwa_test_assert( ! empty( $call['error'] ), 'A missing API key must come back 
 if ( false !== $before ) { putenv( 'OPENAI_API_KEY=' . $before ); }
 
 // An unroutable model is a value too.
-msrwa_test_assert( '' === MSRWA_Engine_Rates::model( 'nowhere', 'medium' ), 'An unknown provider resolves to no model rather than exiting.' );
-msrwa_test_assert( null === MSRWA_Engine_Rates::price( 'nowhere', 'nothing', array() ), 'An unpriced model is unknown, never free.' );
+$nowhere = MSRWA_Engine_Config::create( array(), array( 'routing' => array( 'article' => 'nowhere:medium' ) ) );
+msrwa_test_assert( '' === $nowhere->model_for( 'article' )['model'], 'An unknown provider resolves to no model rather than exiting.' );
+msrwa_test_assert( null === $nowhere->price( 'nowhere', 'nothing', array() ), 'An unpriced model is unknown, never free.' );
 
 // The order steps may run in. Three run beside each other in two of the waves,
 // which is where the wall clock is won.
@@ -151,6 +152,61 @@ foreach ( $carries as $step => $required ) {
 		msrwa_test_assert( false !== strpos( $built, $marker ), $step . ' must be sent its ' . $marker . '.' );
 	}
 	msrwa_test_assert( false !== strpos( $built, 'oignons' ), $step . ' must be sent the recipe it is measured against, not just its headings.' );
+}
+
+// Nothing the engine does is hardcoded. Every endpoint, price, tier, threshold,
+// step and prompt is a configuration key, and a caller replaces any of them
+// without touching the ones beside it.
+$tuned = MSRWA_Engine_Config::create(
+	array(
+		'providers'  => array( 'openai' => array( 'text_endpoint' => 'https://gateway.example.test/v1/responses' ) ),
+		'models'     => array( 'openai' => array( 'my-model' => array( 1.0, 2.0 ) ) ),
+		'tiers'      => array( 'medium' => array( 'openai' => 'my-model' ) ),
+		'thresholds' => array( 'article_accents_per_1000' => 25 ),
+		'steps'      => array( 'article' => array( 'bucket' => 'other' ) ),
+		'prompts'    => array( 'article' => 'MY OWN PROMPT in {{language}}' ),
+		'limits'     => array( 'http_timeout' => 42 ),
+	),
+	array( 'routing' => array( 'article' => 'openai:medium' ) )
+);
+$wire = $tuned->provider( 'openai', 'my-model' );
+msrwa_test_assert( 'my-model' === $tuned->model_for( 'article' )['model'], 'A caller may redefine what a tier resolves to.' );
+msrwa_test_assert( 3.0 === $tuned->price( 'openai', 'my-model', array( 'input_tokens' => 1000000, 'output_tokens' => 1000000 ) ), 'A caller may price a model the engine has never heard of.' );
+msrwa_test_assert( 'https://gateway.example.test/v1/responses' === $wire['text_endpoint'], 'A caller may point a provider at its own gateway.' );
+msrwa_test_assert( 42 === $wire['timeout'], 'A caller may set the HTTP timeout.' );
+msrwa_test_assert( false !== strpos( $tuned->provider( 'gemini', 'x' )['text_endpoint'], 'googleapis.com' ), 'Overriding one provider must leave the others alone.' );
+msrwa_test_assert( false !== strpos( implode( ' ', $wire['headers'] ), 'Authorization: Bearer' ), 'Overriding an endpoint must not drop the headers beside it.' );
+msrwa_test_assert( 25 === $tuned->thresholds()['article_accents_per_1000'], 'A caller may move a scoring threshold.' );
+msrwa_test_assert( 60 === $tuned->thresholds()['article_closing_words'], 'Moving one threshold must leave the others at their measured value.' );
+msrwa_test_assert( 'other' === $tuned->steps()['article']['bucket'], 'A caller may recharge a step to another budget bucket.' );
+msrwa_test_assert( array( 'research', 'canonical' ) === $tuned->steps()['article']['needs'], 'Retuning one field of a step must not erase the rest of it.' );
+msrwa_test_assert( 'caller' === $tuned->prompt( 'article' )['source'], 'A caller may supply the prompt text itself.' );
+msrwa_test_assert( false !== strpos( $tuned->prompt( 'article' )['text'], 'French' ), 'A caller-supplied prompt is compiled like any other.' );
+msrwa_test_assert( 'template article.tpl.txt' === MSRWA_Engine_Config::create()->prompt( 'article' )['source'], 'With no prompt given, the shipped template is used and says so.' );
+
+// A caller may add a step the engine has never had.
+$extended = MSRWA_Engine_Config::create( array( 'steps' => array( 'translate' => array( 'label' => 'Traduction', 'needs' => array( 'article' ), 'produces' => 'translated' ) ) ) );
+msrwa_test_assert( isset( $extended->steps()['translate'] ), 'A caller may add a step.' );
+msrwa_test_assert( 'text' === $extended->steps()['translate']['capability'], 'An added step gets sensible defaults for what it did not say.' );
+msrwa_test_assert( in_array( 'translate', MSRWA_Engine_Steps::ready( array( 'article' => true ), null, (array) $extended->get( 'steps' ) ), true ), 'An added step takes part in the wave scheduling like any other.' );
+
+// The record says who decided what, and never says where a key is kept.
+$recorded = $tuned->to_array();
+msrwa_test_assert( 'caller' === $recorded['_provenance']['providers'], 'The record must name the layer that set each value.' );
+msrwa_test_assert( 'run' === $recorded['_provenance']['routing'], 'A run-level override must be recorded as such.' );
+msrwa_test_assert( 'engine' === $recorded['_provenance']['images'], 'An untouched value must be recorded as the engine default.' );
+msrwa_test_assert( ! isset( $recorded['providers']['openai']['key_env'] ), 'The record must not say where an API key is kept.' );
+msrwa_test_assert( ! isset( $recorded['settings'] ), 'The record must never carry the settings, which hold keys.' );
+
+// The engine says what it did with the data, not only what it cost.
+$told = array();
+$reported = MSRWA_Engine::run( array( 'title' => 'Tarte aux pommes' ), array( 'only' => array( 'research' ) ), function ( $event ) use ( &$told ) { $told[ $event['kind'] ][] = $event; } );
+msrwa_test_assert( isset( $told['config'] ), 'A run must report what it was configured with.' );
+msrwa_test_assert( isset( $told['config'][0]['data']['provenance'] ), 'The configuration report must carry the provenance, not just a sentence.' );
+msrwa_test_assert( isset( $told['input'] ), 'A run must report what each step was given.' );
+$given = $told['input'][0]['data'];
+foreach ( array( 'prompt_source', 'prompt_chars', 'input_chars', 'attached', 'ceiling', 'web_search', 'route' ) as $field ) {
+	msrwa_test_assert( array_key_exists( $field, $given ), 'The input report must carry ' . $field . '.' );
 }
 
 msrwa_test_done( 'engine' );

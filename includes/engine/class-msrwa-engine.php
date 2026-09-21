@@ -41,16 +41,25 @@ final class MSRWA_Engine {
 		$result->artifact( 'config', $config->to_array() );
 		$result->artifact( 'brief', $brief );
 
+
+		$registry = (array) $config->get( 'steps', array() );
 		$only = array_values( array_filter( (array) ( $options['only'] ?? array() ) ) );
-		$remaining = $only ? array_values( array_intersect( MSRWA_Engine_Steps::names(), $only ) ) : MSRWA_Engine_Steps::names();
+		$remaining = $only ? array_values( array_intersect( MSRWA_Engine_Steps::names( $registry ), $only ) ) : MSRWA_Engine_Steps::names( $registry );
 		foreach ( (array) ( $input['artifacts'] ?? array() ) as $key => $value ) { $result->artifact( $key, $value ); }
 		$budget = (float) $config->get( 'limits.budget_usd', 0 );
 
+		// What this run is configured with, and who decided each part of it. A
+		// report months later answers "why did it do that" from here.
+		$decided = array();
+		foreach ( $config->provenance() as $key => $layer ) { if ( 'engine' !== $layer ) { $decided[] = $key . ' (' . $layer . ')'; } }
+		$result->event( 'config', 'run', $decided ? 'Overridden by the caller: ' . implode( ', ', $decided ) . '. Everything else is the engine default.' : 'Every value is the engine default; the caller overrode nothing.', array( 'provenance' => $config->provenance() ) );
+		$result->event( 'config', 'run', sprintf( '%d steps to run, %s budget: %s.', count( $remaining ), $budget > 0 ? sprintf( '$%.4f', $budget ) : 'no', implode( ', ', $remaining ) ), array( 'steps' => $remaining, 'budget_usd' => $budget ) );
+
 		while ( $remaining ) {
-			$wave = MSRWA_Engine_Steps::ready( $result->artifacts, $remaining );
+			$wave = MSRWA_Engine_Steps::ready( $result->artifacts, $remaining, $registry );
 			if ( ! $wave ) {
 				foreach ( $remaining as $name ) {
-					$result->fail( $name, 'Waiting on ' . implode( ', ', MSRWA_Engine_Steps::missing( $name, $result->artifacts ) ) . ', which never arrived.' );
+					$result->fail( $name, 'Waiting on ' . implode( ', ', MSRWA_Engine_Steps::missing( $name, $result->artifacts, $registry ) ) . ', which never arrived.' );
 				}
 				break;
 			}
@@ -105,10 +114,11 @@ final class MSRWA_Engine {
 	 * makes "retry until approved" converge instead of rolling the dice again.
 	 */
 	private static function perform( $name, MSRWA_Engine_Config $config, MSRWA_Result $result, array $options ) {
-		$step = MSRWA_Engine_Steps::get( $name );
+		$registry = (array) $config->get( 'steps', array() );
+		$step = MSRWA_Engine_Steps::get( $name, $registry );
 		if ( ! $step ) { return $result->fail( $name, 'Unknown step.' ); }
 
-		$missing = MSRWA_Engine_Steps::missing( $name, $result->artifacts );
+		$missing = MSRWA_Engine_Steps::missing( $name, $result->artifacts, $registry );
 		if ( $missing ) { return $result->fail( $name, 'Cannot run without ' . implode( ', ', $missing ) . '.' ); }
 
 		$attempts = $config->attempts( $name );
@@ -163,7 +173,7 @@ final class MSRWA_Engine {
 
 	/** One step, routed by what it asks a model for — or by asking none. */
 	private static function call( $name, MSRWA_Engine_Config $config, MSRWA_Result $result, array $options ) {
-		$capability = MSRWA_Engine_Steps::capability( $name );
+		$capability = MSRWA_Engine_Steps::capability( $name, (array) $config->get( 'steps', array() ) );
 		if ( 'none' === $capability ) { return self::apply_corrections( $result ); }
 		if ( 'image_generation' === $capability ) { return self::draw( $name, $config, $result, $options, array() ); }
 		if ( 'vision' === $capability ) { return self::decide( $name, $config, $result, $options ); }
@@ -218,17 +228,26 @@ final class MSRWA_Engine {
 		$route = $config->model_for( $name );
 		if ( '' === $route['model'] ) { return self::failed( 'No model resolves for route "' . $route['route'] . '".' ); }
 
-		$prompt = self::prompt( $name, $config );
-		if ( '' === $prompt ) { return self::failed( 'No prompt template for ' . $name . '.' ); }
+		$prompt = $config->prompt( $name );
+		if ( '' === $prompt['text'] ) { return self::failed( 'No prompt for ' . $name . ' (' . $prompt['source'] . ').' ); }
 
 		$brief = self::working_set( $name, $result );
 		if ( 'research' === $name && $brief['images'] ) { $brief['image_observations'] = self::observe_editor_images( $brief['images'], $config, $result ); }
-		$input = MSRWA_Engine_Input::build( $name, $prompt, $brief, $options );
-		$tools = 'web_search' === MSRWA_Engine_Steps::capability( $name ) ? array( array( 'type' => 'web_search' ) ) : array();
+		$input = MSRWA_Engine_Input::build( $name, $prompt['text'], $brief, $options );
+		$web_search = 'web_search' === MSRWA_Engine_Steps::capability( $name, (array) $config->get( 'steps', array() ) );
 		$ceiling = $config->max_output( $name );
 
-		$call = MSRWA_Engine_Call::text( $route['provider'], $route['model'], $input, $ceiling, true, $tools );
+		$attached = self::attached( $brief );
+		$result->event( 'input', $name, sprintf(
+			'Prompt from %s, %s characters in, ceiling %s tokens, %s attached%s.',
+			$prompt['source'], number_format( strlen( $input ) ), number_format( $ceiling ),
+			$attached ? implode( ' + ', $attached ) : 'nothing', $web_search ? ', web search on' : ''
+		), array( 'prompt_source' => $prompt['source'], 'prompt_chars' => strlen( $prompt['text'] ), 'input_chars' => strlen( $input ), 'attached' => $attached, 'ceiling' => $ceiling, 'web_search' => $web_search, 'route' => $route ) );
+
+		$wire = $config->provider( $route['provider'], $route['model'] );
+		$call = MSRWA_Engine_Call::text( $route['provider'], $route['model'], $input, $ceiling, true, $web_search, $wire );
 		if ( isset( $call['error'] ) ) { return self::failed( $call['error'], $call['seconds'] ?? 0, $route ); }
+		self::report_call( $result, $name, $route, $wire['text_endpoint'] ?? '', $call, $config );
 
 		if ( (int) ( $call['usage']['output_tokens'] ?? 0 ) >= $ceiling ) {
 			$result->event( 'warning', $name, sprintf( 'Stopped on the %d-token ceiling; the answer is cut and was billed in full.', $ceiling ) );
@@ -242,12 +261,13 @@ final class MSRWA_Engine {
 			$call['text'] = (string) json_encode( $answer, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
 		}
 
-		$scores = MSRWA_Engine_Score::step( $name, $call['text'], $brief );
+		$scores = MSRWA_Engine_Score::step( $name, $call['text'], $brief, $config->thresholds() );
 		return array(
-			'provider' => $route['provider'], 'model' => $route['model'], 'seconds' => $call['seconds'],
-			'usage' => $call['usage'], 'cost_usd' => (float) MSRWA_Engine_Rates::price( $route['provider'], $route['model'], $call['usage'] ),
+			'provider' => $route['provider'], 'model' => $route['model'], 'tier' => $route['tier'], 'seconds' => $call['seconds'],
+			'usage' => $call['usage'], 'cost_usd' => (float) $config->price( $route['provider'], $route['model'], $call['usage'] ),
 			'status' => (string) ( $call['status'] ?? '' ), 'passed' => $scores['passed'], 'total' => $scores['total'],
 			'checks' => $scores['checks'], 'error' => '', 'artifact' => $answer,
+			'prompt' => $prompt['text'], 'prompt_source' => $prompt['source'], 'input_chars' => strlen( $input ),
 			'retry' => $scores['pass'] ? '' : sprintf( 'Scored %d/%d; asking again.', $scores['passed'], $scores['total'] ),
 		);
 	}
@@ -266,7 +286,7 @@ final class MSRWA_Engine {
 		$route = $config->model_for( 'vision' );
 		if ( '' === $route['model'] ) { return $package; }
 		$limit = (int) $config->get( 'limits.images_inspected', 3 );
-		$observed = MSRWA_Engine_Call::observe_images( $route['provider'], $route['model'], $package, $limit );
+		$observed = MSRWA_Engine_Call::observe_images( $route['provider'], $route['model'], $package, $limit, $config->provider( $route['provider'], $route['model'] ), (int) $config->get( 'limits.max_image_bytes', 10000000 ), (string) $config->get( 'vision_instruction', '' ) );
 		$usage['input_tokens'] = (int) ( $usage['input_tokens'] ?? 0 ) + (int) ( $observed['usage']['input_tokens'] ?? 0 );
 		$usage['output_tokens'] = (int) ( $usage['output_tokens'] ?? 0 ) + (int) ( $observed['usage']['output_tokens'] ?? 0 );
 		$count = count( (array) ( $observed['package']['visual_observations'] ?? array() ) );
@@ -287,9 +307,9 @@ final class MSRWA_Engine {
 		$observed = array();
 		foreach ( array_slice( $images, 0, (int) $config->get( 'limits.images_inspected', 3 ) ) as $candidate ) {
 			$url = is_array( $candidate ) ? (string) ( $candidate['image_url'] ?? '' ) : (string) $candidate;
-			$image = MSRWA_Engine_Call::fetch_image( $url );
+			$image = MSRWA_Engine_Call::fetch_image( $url, (int) $config->get( 'limits.max_image_bytes', 10000000 ) );
 			if ( isset( $image['error'] ) ) { $observed[] = array( 'image_url' => $url, 'uncertainties' => $image['error'] ); continue; }
-			$vision = MSRWA_Engine_Call::vision( $route['provider'], $route['model'], $image, 'Image fournie par l’éditeur' );
+			$vision = MSRWA_Engine_Call::vision( $route['provider'], $route['model'], $image, 'Image fournie par l’éditeur', (int) $config->max_output( 'vision' ), $config->provider( $route['provider'], $route['model'] ), (string) $config->get( 'vision_instruction', '' ) );
 			$decoded = MSRWA_Json::decode( (string) ( $vision['text'] ?? '' ) );
 			$observed[] = is_array( $decoded ) ? array_merge( array( 'image_url' => $url ), $decoded ) : array( 'image_url' => $url, 'uncertainties' => 'Analyse visuelle non structurée.' );
 		}
@@ -321,16 +341,20 @@ final class MSRWA_Engine {
 		}
 
 		$format = (string) $config->get( 'images.format', 'webp' );
-		$size = MSRWA_Images::native_size( $config->get( 'images.' . $kind . '_ratio', 'featured' === $kind ? '1:1' : '2:3' ), 'featured' === $kind ? '1024x1024' : '1024x1536' );
+		$size = MSRWA_Images::native_size( $config->get( 'images.' . $kind . '_ratio', 'featured' === $kind ? '1:1' : '2:3' ), (string) $config->get( 'images.' . $kind . '_size', 'featured' === $kind ? '1024x1024' : '1024x1536' ) );
 		$quality = (string) $config->get( 'images.' . $kind . '_quality', MSRWA_Images::quality( $settings, $kind ) );
 		$destination = self::workspace( $options ) . '/' . $kind . '-' . gmdate( 'Ymd-His' ) . '-' . substr( md5( $prompt ), 0, 6 ) . '.' . $format;
 
-		$call = MSRWA_Engine_Call::image( $prompt, $route['model'], $size, $quality, $format, $destination );
+		$result->event( 'input', $name, sprintf( '%s prompt, %s characters, %s at %s quality%s.', ucfirst( $kind ), number_format( strlen( $prompt ) ), $size, $quality, $findings ? ', correcting ' . count( $findings ) . ' finding(s)' : '' ), array( 'prompt_chars' => strlen( $prompt ), 'size' => $size, 'quality' => $quality, 'format' => $format, 'corrections' => count( $findings ), 'route' => $route ) );
+
+		$wire = $config->provider( $route['provider'], $route['model'] );
+		$call = MSRWA_Engine_Call::image( $prompt, $route['model'], $size, $quality, $format, $destination, $wire, $route['provider'] );
 		if ( isset( $call['error'] ) ) { return self::failed( $call['error'], $call['seconds'] ?? 0, $route ); }
+		self::report_call( $result, $name, $route, $wire['image_endpoint'] ?? '', $call, $config );
 
 		return array(
-			'step' => $name, 'provider' => $route['provider'], 'model' => $route['model'], 'seconds' => $call['seconds'],
-			'usage' => $call['usage'], 'cost_usd' => (float) MSRWA_Engine_Rates::price( $route['provider'], $route['model'], $call['usage'] ),
+			'step' => $name, 'provider' => $route['provider'], 'model' => $route['model'], 'tier' => $route['tier'], 'seconds' => $call['seconds'],
+			'usage' => $call['usage'], 'cost_usd' => (float) $config->price( $route['provider'], $route['model'], $call['usage'] ),
 			'status' => '', 'passed' => null, 'total' => null, 'checks' => array(), 'error' => '', 'retry' => '',
 			'artifact' => array(
 				'kind' => $kind, 'path' => $call['path'], 'bytes' => $call['bytes'], 'mime' => 'image/' . $format,
@@ -345,8 +369,8 @@ final class MSRWA_Engine {
 		$route = $config->model_for( $name );
 		if ( '' === $route['model'] ) { return self::failed( 'No model resolves for route "' . $route['route'] . '".' ); }
 
-		$prompt = self::prompt( $name, $config );
-		if ( '' === $prompt ) { return self::failed( 'No prompt template for ' . $name . '.' ); }
+		$prompt = $config->prompt( $name );
+		if ( '' === $prompt['text'] ) { return self::failed( 'No prompt for ' . $name . ' (' . $prompt['source'] . ').' ); }
 
 		$brief = self::working_set( $name, $result );
 		$images = array();
@@ -356,12 +380,19 @@ final class MSRWA_Engine {
 			$images[] = $image;
 		}
 
-		$call = MSRWA_Engine_Call::judge( $route['provider'], $route['model'], MSRWA_Engine_Input::build( $name, $prompt, $brief, $options ), $images, $config->max_output( $name ) );
+		$input = MSRWA_Engine_Input::build( $name, $prompt['text'], $brief, $options );
+		$bytes = 0;
+		foreach ( $images as $image ) { $bytes += (int) $image['bytes']; }
+		$result->event( 'input', $name, sprintf( 'Prompt from %s, %s characters and %d image(s) totalling %s KB.', $prompt['source'], number_format( strlen( $input ) ), count( $images ), number_format( $bytes / 1024, 1 ) ), array( 'prompt_source' => $prompt['source'], 'input_chars' => strlen( $input ), 'images' => count( $images ), 'image_bytes' => $bytes, 'attached' => self::attached( $brief ), 'route' => $route ) );
+
+		$wire = $config->provider( $route['provider'], $route['model'] );
+		$call = MSRWA_Engine_Call::judge( $route['provider'], $route['model'], $input, $images, $config->max_output( $name ), $wire );
 		if ( isset( $call['error'] ) ) { return self::failed( $call['error'], $call['seconds'] ?? 0, $route ); }
+		self::report_call( $result, $name, $route, $wire['text_endpoint'] ?? '', $call, $config );
 
 		$verdict = MSRWA_Json::decode( $call['text'] );
 		$verdict = is_array( $verdict ) ? $verdict : array();
-		$checks = MSRWA_Engine_Score::approval( $verdict, count( $images ), (int) $config->get( 'images.collage_panels', 6 ) );
+		$checks = MSRWA_Engine_Score::approval( $verdict, count( $images ), (int) $config->get( 'images.collage_panels', 6 ), (array) $config->get( 'approval_targets', array() ) );
 		$passed = count( array_filter( $checks, static function ( $check ) { return ! empty( $check['pass'] ); } ) );
 
 		// A verdict that fails its own structural contract is not a refusal, it is a
@@ -384,10 +415,11 @@ final class MSRWA_Engine {
 		}
 
 		return array(
-			'provider' => $route['provider'], 'model' => $route['model'], 'seconds' => $call['seconds'],
-			'usage' => $call['usage'], 'cost_usd' => (float) MSRWA_Engine_Rates::price( $route['provider'], $route['model'], $call['usage'] ),
+			'provider' => $route['provider'], 'model' => $route['model'], 'tier' => $route['tier'], 'seconds' => $call['seconds'],
+			'usage' => $call['usage'], 'cost_usd' => (float) $config->price( $route['provider'], $route['model'], $call['usage'] ),
 			'status' => (string) ( $call['status'] ?? '' ), 'passed' => $passed, 'total' => count( $checks ),
 			'checks' => $checks, 'error' => '', 'artifact' => $verdict, 'approved' => $approved, 'retry' => $retry,
+			'prompt' => $prompt['text'], 'prompt_source' => $prompt['source'], 'input_chars' => strlen( $input ),
 		);
 	}
 
@@ -420,11 +452,43 @@ final class MSRWA_Engine {
 		) );
 	}
 
-	/** A step's prompt template, compiled against the settings in force. */
-	private static function prompt( $name, MSRWA_Engine_Config $config ) {
-		$file = MSRWA_Engine_Input::prompt_path( MSRWA_Engine_Steps::get( $name )['prompt'] ?? ( $name . '.tpl.txt' ) );
-		if ( ! is_readable( $file ) ) { return ''; }
-		return MSRWA_Prompt::compile( trim( (string) file_get_contents( $file ) ), MSRWA_Engine_Input::settings() );
+	/**
+	 * Says what one provider call actually did, the moment it returns.
+	 *
+	 * A cost and a duration on the step is the summary; this is the detail
+	 * underneath it — which endpoint answered, on which model and tier, how many
+	 * tokens went each way, how many of them the provider served from its cache,
+	 * and whether the answer stopped on the ceiling rather than finishing. A run
+	 * that costs more than expected is answered from these, not guessed at.
+	 */
+	private static function report_call( MSRWA_Result $result, $name, array $route, $endpoint, array $call, MSRWA_Engine_Config $config ) {
+		$usage = (array) ( $call['usage'] ?? array() );
+		$in = (int) ( $usage['input_tokens'] ?? 0 );
+		$out = (int) ( $usage['output_tokens'] ?? 0 );
+		$cached = (int) ( $usage['cached_input_tokens'] ?? 0 );
+		$cost = $config->price( $route['provider'], $route['model'], $usage );
+		$result->event( 'call', $name, sprintf(
+			'%s answered in %ss: %s in%s, %s out, %s.',
+			$route['model'], $call['seconds'],
+			number_format( $in ), $cached ? ' (' . number_format( $cached ) . ' cached, ' . round( 100 * $cached / max( 1, $in ) ) . '%)' : '',
+			number_format( $out ), null === $cost ? 'no published rate' : sprintf( '$%.4f', $cost )
+		), array(
+			'provider' => $route['provider'], 'model' => $route['model'], 'tier' => $route['tier'],
+			// The endpoint is recorded so a run through a gateway says so. It never
+			// carries a key: the key travels in a header, which is not recorded.
+			'endpoint' => $endpoint, 'seconds' => $call['seconds'], 'usage' => $usage,
+			'cached_ratio' => $in ? round( $cached / $in, 4 ) : 0.0,
+			'cost_usd' => $cost, 'priced' => null !== $cost, 'status' => (string) ( $call['status'] ?? '' ),
+		) );
+	}
+
+	/** Which artifacts a step was actually given, for the record of what it saw. */
+	private static function attached( array $brief ) {
+		$attached = array();
+		foreach ( array( 'research', 'canonical', 'article', 'feedback', 'image_observations' ) as $key ) {
+			if ( ! empty( $brief[ $key ] ) ) { $attached[] = $key; }
+		}
+		return $attached;
 	}
 
 	/** Reads a generated image back; the judge needs the bytes, not a path. */

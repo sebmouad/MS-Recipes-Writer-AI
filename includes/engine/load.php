@@ -20,7 +20,6 @@ foreach ( array( 'json', 'recipe', 'quality', 'prompt', 'images', 'catalog', 'co
 }
 unset( $msrwa_engine_dependency, $msrwa_engine_class );
 
-require_once __DIR__ . '/class-msrwa-engine-rates.php';
 require_once __DIR__ . '/class-msrwa-engine-call.php';
 require_once __DIR__ . '/class-msrwa-engine-config.php';
 require_once __DIR__ . '/class-msrwa-engine-steps.php';

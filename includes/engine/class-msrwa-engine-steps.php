@@ -12,7 +12,28 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
  */
 final class MSRWA_Engine_Steps {
 
-	public static function all() {
+	/**
+	 * The registry, with the caller's changes applied over it.
+	 *
+	 * A caller retunes a step by naming only what moves — a label, a bucket, a
+	 * dependency, a different prompt file — and adds one by giving a name the
+	 * registry does not have. Nothing here is fixed; this is the default.
+	 */
+	public static function all( $overrides = array() ) {
+		$steps = self::shipped();
+		foreach ( (array) $overrides as $name => $changes ) {
+			if ( ! is_array( $changes ) ) { continue; }
+			$steps[ $name ] = isset( $steps[ $name ] ) ? array_merge( $steps[ $name ], $changes ) : array_merge( self::blank(), $changes );
+		}
+		return $steps;
+	}
+
+	/** A step a caller adds, before it says anything about it. */
+	private static function blank() {
+		return array( 'label' => '', 'bucket' => 'other', 'capability' => 'text', 'prompt' => '', 'needs' => array(), 'produces' => '', 'expects' => '' );
+	}
+
+	private static function shipped() {
 		return array(
 			'research' => array(
 				'label' => 'Recherche', 'bucket' => 'other', 'capability' => 'web_search', 'prompt' => 'research.tpl.txt',
@@ -72,31 +93,31 @@ final class MSRWA_Engine_Steps {
 		);
 	}
 
-	public static function names() { return array_keys( self::all() ); }
+	public static function names( $overrides = array() ) { return array_keys( self::all( $overrides ) ); }
 
-	public static function get( $name ) {
-		$all = self::all();
+	public static function get( $name, $overrides = array() ) {
+		$all = self::all( $overrides );
 		return isset( $all[ $name ] ) ? $all[ $name ] : array();
 	}
 
 	/** The capability a step asks a model for: text, web_search, image_generation or vision. */
-	public static function capability( $name ) {
-		$step = self::get( $name );
+	public static function capability( $name, $overrides = array() ) {
+		$step = self::get( $name, $overrides );
 		return isset( $step['capability'] ) ? $step['capability'] : 'text';
 	}
 
 	/** Which of the four budget buckets a step's cost belongs to. */
-	public static function bucket( $name ) {
-		$step = self::get( $name );
+	public static function bucket( $name, $overrides = array() ) {
+		$step = self::get( $name, $overrides );
 		return isset( $step['bucket'] ) ? $step['bucket'] : 'other';
 	}
 
 	/** Steps whose inputs all exist, so they may run now — several at once when more than one qualifies. */
-	public static function ready( $done, $remaining = null ) {
-		$remaining = null === $remaining ? self::names() : $remaining;
+	public static function ready( $done, $remaining = null, $overrides = array() ) {
+		$remaining = null === $remaining ? self::names( $overrides ) : $remaining;
 		$ready = array();
 		foreach ( $remaining as $name ) {
-			$step = self::get( $name );
+			$step = self::get( $name, $overrides );
 			if ( ! $step ) { continue; }
 			$missing = array_diff( $step['needs'], array_keys( array_filter( $done, static function ( $value ) { return null !== $value && array() !== $value && '' !== $value; } ) ) );
 			if ( ! $missing ) { $ready[] = $name; }
@@ -105,8 +126,8 @@ final class MSRWA_Engine_Steps {
 	}
 
 	/** What a step still waits on, for an error a person can act on. */
-	public static function missing( $name, $done ) {
-		$step = self::get( $name );
+	public static function missing( $name, $done, $overrides = array() ) {
+		$step = self::get( $name, $overrides );
 		if ( ! $step ) { return array( 'unknown step' ); }
 		return array_values( array_diff( $step['needs'], array_keys( array_filter( $done ) ) ) );
 	}
