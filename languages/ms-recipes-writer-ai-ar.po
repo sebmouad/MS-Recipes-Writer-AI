@@ -1,0 +1,415 @@
+# Arabic translation for MS Recipes Writer AI.
+# Source strings are French.
+msgid ""
+msgstr ""
+"Project-Id-Version: MS Recipes Writer AI\n"
+"Language: ar\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5);\n"
+
+msgid "%1$d min %2$d s"
+msgstr "%1$d د %2$d ث"
+
+msgid "%1$d étapes sur %2$d"
+msgstr "%1$d من %2$d خطوة"
+
+msgid "%d appel(s) ont tourné sur un modèle sans tarif publié. La dépense ci-dessus est donc incomplète, et non pas exacte : elle ne compte pas ce qu’on ne sait pas chiffrer."
+msgstr "‏%d استدعاء جرى على نموذج بلا تسعيرة منشورة. المبلغ أعلاه ناقص لا دقيق: فهو لا يحسب ما يتعذّر تسعيره."
+
+msgid "%d au total"
+msgstr "‏%d إجمالاً"
+
+msgid "%d photographies"
+msgstr "‏%d صورة"
+
+msgid "%d recettes détectées"
+msgstr "‏%d وصفة مكتشفة"
+
+msgid "%d étape(s) sans tarif publié"
+msgstr "‏%d خطوة بلا تسعيرة منشورة"
+
+msgid "%s s"
+msgstr "%s ث"
+
+msgid "1 photographie"
+msgstr "صورة واحدة"
+
+msgid "1 recette détectée"
+msgstr "وصفة واحدة مكتشفة"
+
+msgid "30 jours"
+msgstr "٣٠ يوماً"
+
+msgid "7 jours"
+msgstr "٧ أيام"
+
+msgid "Accès refusé."
+msgstr "الوصول مرفوض."
+
+msgid "Analyse"
+msgstr "التحليل"
+
+msgid "Anglais"
+msgstr "الإنجليزية"
+
+msgid "Appariement enregistré."
+msgstr "حُفظ الاقتران."
+
+msgid "Appels"
+msgstr "الاستدعاءات"
+
+msgid "Arabe"
+msgstr "العربية"
+
+msgid "Arrêtés"
+msgstr "موقوفة"
+
+msgid "Artefact"
+msgstr "المُخرَج"
+
+msgid "Article et image à la une"
+msgstr "مقال وصورة رئيسية"
+
+msgid "Article seul"
+msgstr "مقال فقط"
+
+msgid "Article, image à la une et collage Facebook"
+msgstr "مقال وصورة رئيسية وملصق فيسبوك"
+
+msgid "Articles"
+msgstr "المقالات"
+
+msgid "Aucun contrôle en échec"
+msgstr "لا فحص فاشل"
+
+msgid "Aucune clé d’API n’est enregistrée, donc rien ne peut être généré. %s"
+msgstr "لا مفتاح واجهة برمجية محفوظ، فلا شيء يمكن توليده. %s"
+
+msgid "Aucune clé d’API n’est enregistrée. Un lot lancé maintenant échouerait à la première étape."
+msgstr "لا مفتاح واجهة برمجية محفوظ. أي دفعة تُطلق الآن ستفشل عند الخطوة الأولى."
+
+msgid "Aucune recette n’a encore tourné sur cette période."
+msgstr "لم تُنفَّذ أي وصفة في هذه الفترة بعد."
+
+msgid "Aucune recette pour l’instant"
+msgstr "لا وصفات بعد"
+
+msgid "Brouillon"
+msgstr "مسودة"
+
+msgid "Cache"
+msgstr "من الذاكرة"
+
+msgid "Ce qui a réellement été facturé, et quelle part de l’entrée le fournisseur a servie depuis son cache."
+msgstr "ما جرت فوترته فعلاً، وكم من المُدخل قدّمه المزوّد من ذاكرته."
+
+msgid "Ce qui est en cours, ce qui attend une relecture, et ce qui s’est arrêté."
+msgstr "ما يجري تنفيذه، وما ينتظر المراجعة، وما توقّف."
+
+msgid "Ce qu’il faut produire"
+msgstr "ما المطلوب إنتاجه"
+
+msgid "Chaque recette suit le même chemin. Les montants sont des ordres de grandeur mesurés, jamais une facture."
+msgstr "كل وصفة تسلك المسار نفسه. المبالغ تقديرات مقيسة، وليست فاتورة."
+
+msgid "Choisir dans la médiathèque"
+msgstr "اختر من مكتبة الوسائط"
+
+msgid "Collez vos recettes et ajoutez les photographies. Elles seront décrites puis associées ; vous confirmez l’appariement avant que quoi que ce soit ne soit généré."
+msgstr "الصق وصفاتك وأضف الصور. ستُوصَف ثم تُقرن؛ وأنت تؤكّد الاقتران قبل توليد أي شيء."
+
+msgid "Contrôle"
+msgstr "الفحص"
+
+msgid "Contrôles qui échouent"
+msgstr "الفحوص الفاشلة"
+
+msgid "Coût moy."
+msgstr "متوسط الكلفة"
+
+msgid "DISABLE_WP_CRON est actif. Les lots n’avanceront que si un cron serveur appelle wp-cron.php ; sans cela ils resteront en attente sans rien signaler."
+msgstr "‏DISABLE_WP_CRON مفعّل. لن تتقدّم الدفعات إلا إذا استدعى كرون الخادم wp-cron.php؛ وبدونه تبقى منتظرة دون إشعار."
+
+msgid "Demande une décision"
+msgstr "يحتاج قراراً"
+
+msgid "Description des photographies…"
+msgstr "جارٍ وصف الصور…"
+
+msgid "Durée moy."
+msgstr "متوسط المدة"
+
+msgid "Décrire et apparier"
+msgstr "صِف واقرن"
+
+msgid "Dépense"
+msgstr "الإنفاق"
+
+msgid "Déposez des recettes et des photographies pour lancer un lot."
+msgstr "أضف وصفات وصوراً لإطلاق دفعة."
+
+msgid "Déposez des recettes et des photographies pour lancer un premier lot."
+msgstr "أضف وصفات وصوراً لإطلاق دفعتك الأولى."
+
+msgid "En cours"
+msgstr "قيد التنفيذ"
+
+msgid "Enregistrement…"
+msgstr "جارٍ الحفظ…"
+
+msgid "Entrée"
+msgstr "المُدخل"
+
+msgid "Environ %1$s pour %3$d recette(s), et au maximum %2$s : le plafond arrête un run avant de le dépasser."
+msgstr "نحو %1$s لـ %3$d وصفة، وبحد أقصى %2$s: السقف يوقف التنفيذ قبل تجاوزه."
+
+msgid "Envoi au moteur…"
+msgstr "جارٍ الإرسال إلى المحرك…"
+
+msgid "Exéc."
+msgstr "مرات"
+
+msgid "Filtrer"
+msgstr "تصفية"
+
+msgid "Français"
+msgstr "الفرنسية"
+
+msgid "Il n’y a aucune recette dans ce texte."
+msgstr "لا توجد وصفة في هذا النص."
+
+msgid "La chaîne complète, jugement final compris : c’est le seul moment où le texte et les deux images sont confrontés."
+msgstr "السلسلة كاملة بما فيها الحكم النهائي: وهي اللحظة الوحيدة التي يُقارن فيها النص بالصورتين معاً."
+
+msgid "La langue de l’article, qui n’est pas celle de cette interface. Le plafond s’applique à chaque recette : au-delà, le run s’arrête plutôt que de dépenser."
+msgstr "لغة المقال، وهي غير لغة هذه الواجهة. السقف يسري على كل وصفة: وبتجاوزه يتوقف التنفيذ بدل الإنفاق."
+
+msgid "La langue et le plafond"
+msgstr "اللغة والسقف"
+
+msgid "Le juge"
+msgstr "الحَكَم"
+
+msgid "Le pass"
+msgstr "المِمَرّ"
+
+msgid "Les photographies"
+msgstr "الصور"
+
+msgid "Les recettes"
+msgstr "الوصفات"
+
+msgid "Lot"
+msgstr "دفعة"
+
+msgid "Lot introuvable."
+msgstr "الدفعة غير موجودة."
+
+msgid "Lu sur ce que le moteur a rapporté, jamais recalculé. Un coût inconnu reste inconnu jusqu’ici."
+msgstr "مقروء مما أبلغ عنه المحرك، دون إعادة حساب. والكلفة المجهولة تبقى مجهولة إلى هنا."
+
+msgid "MS Recipes Writer"
+msgstr "MS Recipes Writer"
+
+msgid "Modèle"
+msgstr "النموذج"
+
+msgid "Moteur"
+msgstr "المحرك"
+
+msgid "Nouveau lot"
+msgstr "دفعة جديدة"
+
+msgid "Ouvrir les réglages"
+msgstr "افتح الإعدادات"
+
+msgid "Par modèle"
+msgstr "حسب النموذج"
+
+msgid "Par étape"
+msgstr "حسب الخطوة"
+
+msgid "Pas de collage. Le jugement final ne s’exécute pas : il confronte le texte aux deux images, et il n’y en a qu’une."
+msgstr "بلا ملصق. الحكم النهائي لا يُنفَّذ: فهو يقارن النص بالصورتين، وليس هنا إلا واحدة."
+
+msgid "Photographies des recettes"
+msgstr "صور الوصفات"
+
+msgid "Plafond par recette"
+msgstr "السقف لكل وصفة"
+
+msgid "Recette"
+msgstr "وصفة"
+
+msgid "Retour au pass"
+msgstr "العودة إلى المِمَرّ"
+
+msgid "Rien ne correspond"
+msgstr "لا شيء مطابق"
+
+msgid "Rien ne tourne."
+msgstr "لا شيء قيد التنفيذ."
+
+msgid "Rien n’est écrit à cette étape : seules les photographies sont décrites. Vous verrez l’appariement avant de lancer quoi que ce soit."
+msgstr "لا يُكتب شيء في هذه المرحلة: تُوصف الصور فقط. وسترى الاقتران قبل إطلاق أي شيء."
+
+msgid "Rien à analyser"
+msgstr "لا شيء للتحليل"
+
+msgid "Run introuvable."
+msgstr "التنفيذ غير موجود."
+
+msgid "Rédacteur"
+msgstr "المحرِّر"
+
+msgid "Réglages"
+msgstr "الإعدادات"
+
+msgid "Sans dire lesquelles vont avec quoi : chacune sera décrite depuis ses propres pixels, puis associée à une recette. Une photographie est facturée une fois, même si vous corrigez ensuite l’association."
+msgstr "دون بيان أيّها لأيّ: ستُوصف كل صورة من وحدات بكسلها ثم تُقرن بوصفة. وتُحتسب كلفة الصورة مرة واحدة، حتى لو صحّحت الاقتران بعدها."
+
+msgid "Sans tarif"
+msgstr "بلا تسعيرة"
+
+msgid "Score"
+msgstr "النتيجة"
+
+msgid "Son avis porte sur sa propre production. Ce n’est jamais une validation éditoriale, et un taux d’approbation très bas ou très haut en dit autant sur le prompt que sur les articles."
+msgstr "رأيه في إنتاجه هو. وليس إجازة تحريرية أبداً، ونسبة قبول شديدة الانخفاض أو الارتفاع تقول عن الموجّه بقدر ما تقول عن المقالات."
+
+msgid "Sortie"
+msgstr "المُخرَج"
+
+msgid "Sur"
+msgstr "من"
+
+msgid "Sur quatorze jours"
+msgstr "على أربعة عشر يوماً"
+
+msgid "Taux"
+msgstr "النسبة"
+
+msgid "Terminés"
+msgstr "منتهية"
+
+msgid "Texte uniquement, relu et vérifié. Aucune image n’est générée."
+msgstr "نص فقط، مُدقَّق ومُتحقَّق منه. لا تُولَّد أي صورة."
+
+msgid "Titre"
+msgstr "العنوان"
+
+msgid "Tous"
+msgstr "الكل"
+
+msgid "Tout"
+msgstr "الكل"
+
+msgid "Toutes les recettes passées par le moteur, avec leur état et ce qu’elles ont coûté."
+msgstr "كل الوصفات التي مرّت بالمحرك، بحالتها وكلفتها."
+
+msgid "Toutes les étapes ont satisfait leurs contrôles sur cette période."
+msgstr "اجتازت كل الخطوات فحوصها في هذه الفترة."
+
+msgid "Un contrôle qui échoue une fois sur six est du bruit ; six fois sur six, c’est un contrat que le prompt ne tient pas."
+msgstr "فحص يفشل مرة من ست هو ضجيج؛ وستاً من ست فهو التزام لا يفي به الموجّه."
+
+msgid "Une erreur est survenue."
+msgstr "حدث خطأ."
+
+msgid "Une ligne de trois tirets ou plus sépare deux recettes. La première ligne de chaque bloc en devient le titre."
+msgstr "سطر من ثلاث شرطات أو أكثر يفصل وصفتين. والسطر الأول من كل كتلة يصير عنوانها."
+
+msgid "Verdicts"
+msgstr "الأحكام"
+
+msgid "Vos recettes passées par le moteur, avec leur état et ce qu’elles ont coûté."
+msgstr "وصفاتك التي مرّت بالمحرك، بحالتها وكلفتها."
+
+msgid "Vous n’avez pas accès à cet écran."
+msgstr "لا تملك صلاحية هذه الشاشة."
+
+msgid "approuvés"
+msgstr "مقبولة"
+
+msgid "arrêté"
+msgstr "موقوف"
+
+msgid "aucune photographie"
+msgstr "لا صور"
+
+msgid "aujourd’hui"
+msgstr "اليوم"
+
+msgid "bloquantes"
+msgstr "حاجبة"
+
+msgid "brouillons prêts"
+msgstr "مسودات جاهزة"
+
+msgid "coût moyen"
+msgstr "متوسط الكلفة"
+
+msgid "durée moyenne"
+msgstr "متوسط المدة"
+
+msgid "dépense"
+msgstr "الإنفاق"
+
+msgid "en attente"
+msgstr "في الانتظار"
+
+msgid "en cours"
+msgstr "قيد التنفيذ"
+
+msgid "il y a %s"
+msgstr "قبل %s"
+
+msgid "jugés"
+msgstr "محكوم فيها"
+
+msgid "par recette"
+msgstr "لكل وصفة"
+
+msgid "par recette, sur 30 jours"
+msgstr "لكل وصفة، على ٣٠ يوماً"
+
+msgid "recettes"
+msgstr "وصفات"
+
+msgid "remarques"
+msgstr "ملاحظات"
+
+msgid "réserves du juge"
+msgstr "تحفّظات الحَكَم"
+
+msgid "résultats"
+msgstr "النتائج"
+
+msgid "Échecs"
+msgstr "إخفاقات"
+
+msgid "Élargissez le filtre, ou repartez de la liste complète."
+msgstr "وسّع التصفية، أو عُد إلى القائمة الكاملة."
+
+msgid "Étape"
+msgstr "الخطوة"
+
+msgid "État"
+msgstr "الحالة"
+
+msgid "à relire"
+msgstr "للمراجعة"
+
+msgid "échec"
+msgstr "إخفاق"
+
+msgid "échecs"
+msgstr "إخفاقات"
+
+msgid "Langue de l’article"
+msgstr "لغة المقال"
+
+msgid "Tarte aux pommes normande\nPâte brisée, pommes, crème, calvados…\n\n---\n\nPoulet yassa\nPoulet, oignons, citron…"
+msgstr "تارت التفاح النورماندية\nعجينة مفتّتة، تفاح، قشدة، كالفادوس…\n\n---\n\nدجاج ياسا\nدجاج، بصل، ليمون…"

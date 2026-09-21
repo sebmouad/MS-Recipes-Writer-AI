@@ -56,4 +56,32 @@ $partial = msrwa_i18n_write_mo( array( 'Traduit' => 'Translated' ), $path );
 msrwa_test_assert( 1 === $partial, 'Only translated entries are written.' );
 unlink( $path );
 
+// The plugin claims three interface languages. A claim nobody checks is how a
+// release ships with half a screen in the wrong language.
+$source = array_keys( msrwa_i18n_extract() );
+foreach ( array( 'en_US', 'ar' ) as $locale ) {
+	$po = dirname( __DIR__ ) . '/languages/ms-recipes-writer-ai-' . $locale . '.po';
+	msrwa_test_assert( is_readable( $po ), 'A catalogue is shipped for ' . $locale . '.' );
+	if ( ! is_readable( $po ) ) { continue; }
+
+	$entries = msrwa_i18n_read_po( $po );
+	$missing = array_diff( $source, array_keys( $entries ) );
+	msrwa_test_assert( ! $missing, count( $missing ) . ' string(s) untranslated in ' . $locale . ": \n      " . implode( "\n      ", array_slice( $missing, 0, 12 ) ) );
+
+	// A .po nobody compiled is a .po WordPress never reads.
+	$mo = preg_replace( '/\.po$/', '.mo', $po );
+	msrwa_test_assert( is_readable( $mo ), 'The compiled catalogue is shipped for ' . $locale . '.' );
+	msrwa_test_assert( is_readable( $mo ) && filemtime( $mo ) >= filemtime( $po ), 'The compiled catalogue for ' . $locale . ' is older than its source; run tools/i18n.php compile.' );
+
+	// A translation that drops a placeholder produces a broken sentence at
+	// runtime, and gettext will not warn anybody.
+	foreach ( $entries as $from => $to ) {
+		preg_match_all( '/%[0-9]*\$?[sd]/', $from, $wanted );
+		preg_match_all( '/%[0-9]*\$?[sd]/', $to, $got );
+		sort( $wanted[0] );
+		sort( $got[0] );
+		msrwa_test_assert( $wanted[0] === $got[0], 'Placeholders differ in ' . $locale . ' for: ' . mb_substr( $from, 0, 60 ) );
+	}
+}
+
 msrwa_test_done( 'translation catalogues OK' );

@@ -54,7 +54,25 @@ final class MSRWA_Rights {
 
 	public static function may_write() { return self::can( self::CREATE ); }
 	public static function may_manage() { return self::can( self::MANAGE ); }
-	public static function may_see_everything() { return self::can( self::VIEW_ALL ) || self::can( self::MANAGE ); }
+	/**
+	 * Whether this reader sees other people's work.
+	 *
+	 * Deliberately narrower than it looks: holding `msrwa_view_all` is not
+	 * enough on its own. Sites carry that capability from an earlier version of
+	 * this plugin where it meant something else, and widening a writer's view
+	 * because of a leftover grant is how one writer reads another's drafts.
+	 * Only `msrwa_manage` — which administrators have — opens the whole list.
+	 */
+	public static function may_see_everything() { return self::can( self::MANAGE ); }
+
+	/**
+	 * Whether this reader is shown what things cost.
+	 *
+	 * Money is an operator's concern. A writer needs to know whether their
+	 * article is ready, not what the run was billed, and a screen that cannot
+	 * show a figure must not fetch it either.
+	 */
+	public static function may_see_money() { return self::can( self::MANAGE ); }
 
 	/** Whether this user may open one row, whoever owns it. */
 	public static function may_see( $owner_id ) {

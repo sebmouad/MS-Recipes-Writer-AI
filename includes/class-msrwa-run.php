@@ -152,42 +152,65 @@ final class MSRWA_Run {
 		self::queue( $id, 2 );
 	}
 
-	/** Writes down everything one tick produced. */
+	/**
+	 * Writes down everything one tick produced, in one statement per table.
+	 *
+	 * A wave reports several steps and a dozen events, and each one used to be
+	 * its own round trip. They are collected first and inserted together, which
+	 * also means a tick either records its wave or does not — rather than
+	 * stopping halfway through a list of events.
+	 */
 	private static function absorb( $id, array $state, array $tick ) {
 		global $wpdb;
 		$t = MSRWA_DB::tables();
 		$now = current_time( 'mysql', true );
+		$id = absint( $id );
 
+		$steps = array();
 		foreach ( (array) ( $tick['steps'] ?? array() ) as $step ) {
 			$usage = (array) ( $step['usage'] ?? array() );
-			$wpdb->insert( $t['steps'], array(
-				'run_id' => absint( $id ), 'step' => (string) $step['step'],
+			$checks = (array) $step['checks'];
+			$failed = 0;
+			foreach ( $checks as $check ) { if ( is_array( $check ) && empty( $check['pass'] ) ) { $failed++; } }
+
+			$steps[] = array(
+				'run_id' => $id, 'step' => (string) $step['step'],
 				'provider' => (string) $step['provider'], 'model' => (string) $step['model'],
 				'seconds' => (float) $step['seconds'], 'attempts' => (int) $step['attempts'],
 				'input_tokens' => (int) ( $usage['input_tokens'] ?? 0 ), 'output_tokens' => (int) ( $usage['output_tokens'] ?? 0 ),
-				// A model with no published rate costs an unknown amount, not nothing.
+				// A model with no published rate cost an unknown amount, not
+				// nothing. NULL is the honest column value and everything that
+				// reads it keeps the distinction.
 				'cost_usd' => null === $step['cost_usd'] ? null : (float) $step['cost_usd'],
 				'bucket' => MSRWA_Engine_Steps::bucket( (string) $step['step'] ),
 				'status' => (string) $step['status'],
 				'passed' => null === $step['passed'] ? null : (int) $step['passed'],
 				'total' => null === $step['total'] ? null : (int) $step['total'],
-				'checks_json' => wp_json_encode( MSRWA_DB::sanitize( (array) $step['checks'] ) ),
+				'checks_json' => (string) wp_json_encode( MSRWA_DB::sanitize( $checks ) ),
+				// Counted here so that asking which check keeps failing reads a
+				// number instead of parsing every blob ever stored.
+				'checks_failed' => $failed,
 				'error_message' => (string) $step['error'], 'created_at' => $now,
-			) );
+			);
 		}
+		MSRWA_DB::insert_many( $t['steps'], $steps );
 
-		// Each tick is one wave: retain its boundaries and configuration so the
-		// job report exposes the same evidence as the standalone lab.
+		$events = array();
+		$calls = array();
 		foreach ( (array) ( $tick['events'] ?? array() ) as $event ) {
-			// Keep configuration/provenance and wave boundaries for diagnostics.
+			// Each tick is one wave of a longer run: its own opening and closing
+			// lines would read as a run starting and finishing over and over.
+			if ( in_array( (string) $event['kind'], array( 'start', 'config', 'finish' ), true ) ) { continue; }
 			$data = MSRWA_DB::sanitize( (array) ( $event['data'] ?? array() ) );
-			$wpdb->insert( $t['events'], array(
-				'run_id' => absint( $id ), 'at_seconds' => (float) $event['at'], 'kind' => (string) $event['kind'],
+			$events[] = array(
+				'run_id' => $id, 'at_seconds' => (float) $event['at'], 'kind' => (string) $event['kind'],
 				'step' => (string) $event['step'], 'message' => (string) $event['message'],
-				'data_json' => wp_json_encode( $data ), 'created_at' => $now,
-			) );
-			if ( 'call' === (string) $event['kind'] ) { self::record_call( $id, (string) $event['step'], $data, $now ); }
+				'data_json' => (string) wp_json_encode( $data ), 'created_at' => $now,
+			);
+			if ( 'call' === (string) $event['kind'] ) { $calls[] = self::call_row( $id, (string) $event['step'], $data, $now ); }
 		}
+		MSRWA_DB::insert_many( $t['events'], $events );
+		MSRWA_DB::insert_many( $t['calls'], $calls );
 
 		foreach ( (array) ( $tick['artifacts'] ?? array() ) as $key => $value ) { self::record_artifact( $id, (string) $key, $value, $now ); }
 
@@ -201,15 +224,14 @@ final class MSRWA_Run {
 			'cost_usd' => (float) $totals['cost_usd'],
 			'seconds' => (float) $totals['seconds'],
 			'updated_at' => $now,
-		), array( 'id' => absint( $id ) ), array( '%s', '%d', '%f', '%f', '%s' ), array( '%d' ) );
+		), array( 'id' => $id ), array( '%s', '%d', '%f', '%f', '%s' ), array( '%d' ) );
 	}
 
-	private static function record_call( $id, $step, array $data, $now ) {
-		global $wpdb;
-		$t = MSRWA_DB::tables();
+	/** One provider call as the engine reported it, ready to be inserted with its neighbours. */
+	private static function call_row( $id, $step, array $data, $now ) {
 		$usage = (array) ( $data['usage'] ?? array() );
-		$wpdb->insert( $t['calls'], array(
-			'run_id' => absint( $id ), 'step' => $step,
+		return array(
+			'run_id' => absint( $id ), 'step' => (string) $step,
 			'provider' => (string) ( $data['provider'] ?? '' ), 'model' => (string) ( $data['model'] ?? '' ),
 			'tier' => (string) ( $data['tier'] ?? '' ), 'endpoint' => (string) ( $data['endpoint'] ?? '' ),
 			'seconds' => (float) ( $data['seconds'] ?? 0 ),
@@ -218,7 +240,7 @@ final class MSRWA_Run {
 			'cost_usd' => isset( $data['cost_usd'] ) && null !== $data['cost_usd'] ? (float) $data['cost_usd'] : null,
 			'priced' => empty( $data['priced'] ) ? 0 : 1,
 			'status' => (string) ( $data['status'] ?? '' ), 'created_at' => $now,
-		) );
+		);
 	}
 
 	/** An artifact under its own name, replacing any earlier version of itself. */

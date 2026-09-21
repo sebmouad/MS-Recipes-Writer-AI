@@ -23,6 +23,17 @@ final class MSRWA_Plugin {
 		}
 	}
 
+	/**
+	 * Old narration is dropped; the figures are kept.
+	 *
+	 * Events grow without limit and nobody reads the timeline of a run from
+	 * last spring. Steps, calls and artifacts are the evidence of what was
+	 * spent and produced, and they stay.
+	 */
+	public static function prune() {
+		MSRWA_DB::prune_events( (int) apply_filters( 'msrwa_event_retention_days', 90 ) );
+	}
+
 	public static function boot() {
 		add_filter( 'cron_schedules', array( __CLASS__, 'schedules' ) );
 		if ( wp_get_schedule( 'msrwa_cleanup' ) !== 'msrwa_five_minutes' ) {
@@ -32,6 +43,7 @@ final class MSRWA_Plugin {
 		add_action( 'rest_api_init', array( 'MSRWA_REST', 'register' ) );
 		add_action( 'msrwa_run_step', array( 'MSRWA_Run', 'tick' ) );
 		add_action( 'msrwa_cleanup', array( 'MSRWA_Run', 'recover_expired' ) );
+		add_action( 'msrwa_cleanup', array( __CLASS__, 'prune' ) );
 		if ( is_admin() ) { MSRWA_Admin::hooks(); }
 		if ( get_option( 'msrwa_db_version' ) !== MSRWA_VERSION ) { MSRWA_DB::install(); self::caps(); }
 	}

@@ -138,4 +138,16 @@ if ( ! class_exists( 'MSRWA_Settings' ) ) {
 // The real class, not a stand-in: its table list and its secret-stripping are
 // what the plugin actually relies on, and a stub that drifts from them would
 // let a test pass over code that does not exist.
+if ( ! function_exists( 'wp_dropdown_users' ) ) {
+	function wp_dropdown_users( $args = array() ) {
+		$name = isset( $args['name'] ) ? $args['name'] : 'user';
+		echo '<select name="' . esc_attr( $name ) . '" id="' . esc_attr( isset( $args['id'] ) ? $args['id'] : $name ) . '"><option value="0">'
+			. esc_html( isset( $args['show_option_all'] ) ? $args['show_option_all'] : '' ) . '</option></select>';
+	}
+}
+
+if ( ! function_exists( 'paginate_links' ) ) {
+	function paginate_links( $args = array() ) { return ''; }
+}
+
 if ( ! class_exists( 'MSRWA_DB' ) ) { require_once dirname( __DIR__ ) . '/includes/class-msrwa-db.php'; }

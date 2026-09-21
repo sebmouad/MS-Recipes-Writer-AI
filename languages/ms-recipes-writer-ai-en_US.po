@@ -1,0 +1,415 @@
+# English translation for MS Recipes Writer AI.
+# Source strings are French.
+msgid ""
+msgstr ""
+"Project-Id-Version: MS Recipes Writer AI\n"
+"Language: en_US\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "%1$d min %2$d s"
+msgstr "%1$d min %2$d s"
+
+msgid "%1$d étapes sur %2$d"
+msgstr "%1$d of %2$d steps"
+
+msgid "%d appel(s) ont tourné sur un modèle sans tarif publié. La dépense ci-dessus est donc incomplète, et non pas exacte : elle ne compte pas ce qu’on ne sait pas chiffrer."
+msgstr "%d call(s) ran on a model with no published rate. The figure above is therefore incomplete rather than exact: it leaves out what cannot be priced."
+
+msgid "%d au total"
+msgstr "%d in total"
+
+msgid "%d photographies"
+msgstr "%d photographs"
+
+msgid "%d recettes détectées"
+msgstr "%d recipes found"
+
+msgid "%d étape(s) sans tarif publié"
+msgstr "%d step(s) with no published rate"
+
+msgid "%s s"
+msgstr "%s s"
+
+msgid "1 photographie"
+msgstr "1 photograph"
+
+msgid "1 recette détectée"
+msgstr "1 recipe found"
+
+msgid "30 jours"
+msgstr "30 days"
+
+msgid "7 jours"
+msgstr "7 days"
+
+msgid "Accès refusé."
+msgstr "Access denied."
+
+msgid "Analyse"
+msgstr "Analysis"
+
+msgid "Anglais"
+msgstr "English"
+
+msgid "Appariement enregistré."
+msgstr "Pairing saved."
+
+msgid "Appels"
+msgstr "Calls"
+
+msgid "Arabe"
+msgstr "Arabic"
+
+msgid "Arrêtés"
+msgstr "Stopped"
+
+msgid "Artefact"
+msgstr "Artifact"
+
+msgid "Article et image à la une"
+msgstr "Article and featured image"
+
+msgid "Article seul"
+msgstr "Article only"
+
+msgid "Article, image à la une et collage Facebook"
+msgstr "Article, featured image and Facebook collage"
+
+msgid "Articles"
+msgstr "Articles"
+
+msgid "Aucun contrôle en échec"
+msgstr "No failing checks"
+
+msgid "Aucune clé d’API n’est enregistrée, donc rien ne peut être généré. %s"
+msgstr "No API key is stored, so nothing can be generated. %s"
+
+msgid "Aucune clé d’API n’est enregistrée. Un lot lancé maintenant échouerait à la première étape."
+msgstr "No API key is stored. A lot started now would fail at the first step."
+
+msgid "Aucune recette n’a encore tourné sur cette période."
+msgstr "No recipe has run in this period yet."
+
+msgid "Aucune recette pour l’instant"
+msgstr "No recipes yet"
+
+msgid "Brouillon"
+msgstr "Draft"
+
+msgid "Cache"
+msgstr "Cached"
+
+msgid "Ce qui a réellement été facturé, et quelle part de l’entrée le fournisseur a servie depuis son cache."
+msgstr "What was actually billed, and how much of the input the provider served from its cache."
+
+msgid "Ce qui est en cours, ce qui attend une relecture, et ce qui s’est arrêté."
+msgstr "What is running, what is waiting to be read, and what stopped."
+
+msgid "Ce qu’il faut produire"
+msgstr "What to produce"
+
+msgid "Chaque recette suit le même chemin. Les montants sont des ordres de grandeur mesurés, jamais une facture."
+msgstr "Every recipe takes the same path. The amounts are measured orders of magnitude, never an invoice."
+
+msgid "Choisir dans la médiathèque"
+msgstr "Choose from the media library"
+
+msgid "Collez vos recettes et ajoutez les photographies. Elles seront décrites puis associées ; vous confirmez l’appariement avant que quoi que ce soit ne soit généré."
+msgstr "Paste your recipes and add the photographs. They will be described and paired; you confirm the pairing before anything is generated."
+
+msgid "Contrôle"
+msgstr "Check"
+
+msgid "Contrôles qui échouent"
+msgstr "Failing checks"
+
+msgid "Coût moy."
+msgstr "Avg. cost"
+
+msgid "DISABLE_WP_CRON est actif. Les lots n’avanceront que si un cron serveur appelle wp-cron.php ; sans cela ils resteront en attente sans rien signaler."
+msgstr "DISABLE_WP_CRON is set. Lots will only advance if a server cron calls wp-cron.php; without one they wait without saying so."
+
+msgid "Demande une décision"
+msgstr "Needs a decision"
+
+msgid "Description des photographies…"
+msgstr "Describing the photographs…"
+
+msgid "Durée moy."
+msgstr "Avg. time"
+
+msgid "Décrire et apparier"
+msgstr "Describe and pair"
+
+msgid "Dépense"
+msgstr "Spend"
+
+msgid "Déposez des recettes et des photographies pour lancer un lot."
+msgstr "Drop in recipes and photographs to start a lot."
+
+msgid "Déposez des recettes et des photographies pour lancer un premier lot."
+msgstr "Drop in recipes and photographs to start your first lot."
+
+msgid "En cours"
+msgstr "Running"
+
+msgid "Enregistrement…"
+msgstr "Saving…"
+
+msgid "Entrée"
+msgstr "Input"
+
+msgid "Environ %1$s pour %3$d recette(s), et au maximum %2$s : le plafond arrête un run avant de le dépasser."
+msgstr "About %1$s for %3$d recipe(s), and at most %2$s: the ceiling stops a run before it goes over."
+
+msgid "Envoi au moteur…"
+msgstr "Sending to the engine…"
+
+msgid "Exéc."
+msgstr "Runs"
+
+msgid "Filtrer"
+msgstr "Filter"
+
+msgid "Français"
+msgstr "French"
+
+msgid "Il n’y a aucune recette dans ce texte."
+msgstr "There is no recipe in this text."
+
+msgid "La chaîne complète, jugement final compris : c’est le seul moment où le texte et les deux images sont confrontés."
+msgstr "The whole chain, final judgement included: the only point where the text and both images are checked against one another."
+
+msgid "La langue de l’article, qui n’est pas celle de cette interface. Le plafond s’applique à chaque recette : au-delà, le run s’arrête plutôt que de dépenser."
+msgstr "The article's language, which is not this interface's. The ceiling applies per recipe: beyond it, the run stops rather than spend."
+
+msgid "La langue et le plafond"
+msgstr "Language and ceiling"
+
+msgid "Le juge"
+msgstr "The judge"
+
+msgid "Le pass"
+msgstr "The pass"
+
+msgid "Les photographies"
+msgstr "The photographs"
+
+msgid "Les recettes"
+msgstr "The recipes"
+
+msgid "Lot"
+msgstr "Lot"
+
+msgid "Lot introuvable."
+msgstr "Lot not found."
+
+msgid "Lu sur ce que le moteur a rapporté, jamais recalculé. Un coût inconnu reste inconnu jusqu’ici."
+msgstr "Read from what the engine reported, never recalculated. An unknown cost stays unknown all the way here."
+
+msgid "MS Recipes Writer"
+msgstr "MS Recipes Writer"
+
+msgid "Modèle"
+msgstr "Model"
+
+msgid "Moteur"
+msgstr "Engine"
+
+msgid "Nouveau lot"
+msgstr "New lot"
+
+msgid "Ouvrir les réglages"
+msgstr "Open settings"
+
+msgid "Par modèle"
+msgstr "By model"
+
+msgid "Par étape"
+msgstr "By step"
+
+msgid "Pas de collage. Le jugement final ne s’exécute pas : il confronte le texte aux deux images, et il n’y en a qu’une."
+msgstr "No collage. The final judgement does not run: it checks the text against both images, and there is only one."
+
+msgid "Photographies des recettes"
+msgstr "Recipe photographs"
+
+msgid "Plafond par recette"
+msgstr "Ceiling per recipe"
+
+msgid "Recette"
+msgstr "Recipe"
+
+msgid "Retour au pass"
+msgstr "Back to the pass"
+
+msgid "Rien ne correspond"
+msgstr "Nothing matches"
+
+msgid "Rien ne tourne."
+msgstr "Nothing is running."
+
+msgid "Rien n’est écrit à cette étape : seules les photographies sont décrites. Vous verrez l’appariement avant de lancer quoi que ce soit."
+msgstr "Nothing is written at this stage: only the photographs are described. You will see the pairing before anything starts."
+
+msgid "Rien à analyser"
+msgstr "Nothing to analyse"
+
+msgid "Run introuvable."
+msgstr "Run not found."
+
+msgid "Rédacteur"
+msgstr "Writer"
+
+msgid "Réglages"
+msgstr "Settings"
+
+msgid "Sans dire lesquelles vont avec quoi : chacune sera décrite depuis ses propres pixels, puis associée à une recette. Une photographie est facturée une fois, même si vous corrigez ensuite l’association."
+msgstr "Without saying which goes with what: each will be described from its own pixels, then paired with a recipe. A photograph is billed once, even if you correct the pairing afterwards."
+
+msgid "Sans tarif"
+msgstr "Unpriced"
+
+msgid "Score"
+msgstr "Score"
+
+msgid "Son avis porte sur sa propre production. Ce n’est jamais une validation éditoriale, et un taux d’approbation très bas ou très haut en dit autant sur le prompt que sur les articles."
+msgstr "Its opinion is about its own output. It is never an editorial approval, and an approval rate that is very low or very high says as much about the prompt as about the articles."
+
+msgid "Sortie"
+msgstr "Output"
+
+msgid "Sur"
+msgstr "Of"
+
+msgid "Sur quatorze jours"
+msgstr "Over fourteen days"
+
+msgid "Taux"
+msgstr "Rate"
+
+msgid "Terminés"
+msgstr "Finished"
+
+msgid "Texte uniquement, relu et vérifié. Aucune image n’est générée."
+msgstr "Text only, proofread and checked. No image is generated."
+
+msgid "Titre"
+msgstr "Title"
+
+msgid "Tous"
+msgstr "All"
+
+msgid "Tout"
+msgstr "Everything"
+
+msgid "Toutes les recettes passées par le moteur, avec leur état et ce qu’elles ont coûté."
+msgstr "Every recipe that went through the engine, with its state and what it cost."
+
+msgid "Toutes les étapes ont satisfait leurs contrôles sur cette période."
+msgstr "Every step satisfied its checks in this period."
+
+msgid "Un contrôle qui échoue une fois sur six est du bruit ; six fois sur six, c’est un contrat que le prompt ne tient pas."
+msgstr "A check that fails once in six is noise; six times in six is a contract the prompt is not keeping."
+
+msgid "Une erreur est survenue."
+msgstr "Something went wrong."
+
+msgid "Une ligne de trois tirets ou plus sépare deux recettes. La première ligne de chaque bloc en devient le titre."
+msgstr "A line of three or more dashes separates two recipes. The first line of each block becomes its title."
+
+msgid "Verdicts"
+msgstr "Verdicts"
+
+msgid "Vos recettes passées par le moteur, avec leur état et ce qu’elles ont coûté."
+msgstr "Your recipes that went through the engine, with their state and what they cost."
+
+msgid "Vous n’avez pas accès à cet écran."
+msgstr "You do not have access to this screen."
+
+msgid "approuvés"
+msgstr "approved"
+
+msgid "arrêté"
+msgstr "stopped"
+
+msgid "aucune photographie"
+msgstr "no photographs"
+
+msgid "aujourd’hui"
+msgstr "today"
+
+msgid "bloquantes"
+msgstr "blocking"
+
+msgid "brouillons prêts"
+msgstr "drafts ready"
+
+msgid "coût moyen"
+msgstr "average cost"
+
+msgid "durée moyenne"
+msgstr "average time"
+
+msgid "dépense"
+msgstr "spend"
+
+msgid "en attente"
+msgstr "waiting"
+
+msgid "en cours"
+msgstr "running"
+
+msgid "il y a %s"
+msgstr "%s ago"
+
+msgid "jugés"
+msgstr "judged"
+
+msgid "par recette"
+msgstr "per recipe"
+
+msgid "par recette, sur 30 jours"
+msgstr "per recipe, over 30 days"
+
+msgid "recettes"
+msgstr "recipes"
+
+msgid "remarques"
+msgstr "findings"
+
+msgid "réserves du juge"
+msgstr "judge has reservations"
+
+msgid "résultats"
+msgstr "results"
+
+msgid "Échecs"
+msgstr "Failures"
+
+msgid "Élargissez le filtre, ou repartez de la liste complète."
+msgstr "Widen the filter, or go back to the full list."
+
+msgid "Étape"
+msgstr "Step"
+
+msgid "État"
+msgstr "State"
+
+msgid "à relire"
+msgstr "to review"
+
+msgid "échec"
+msgstr "failed"
+
+msgid "échecs"
+msgstr "failures"
+
+msgid "Langue de l’article"
+msgstr "Article language"
+
+msgid "Tarte aux pommes normande\nPâte brisée, pommes, crème, calvados…\n\n---\n\nPoulet yassa\nPoulet, oignons, citron…"
+msgstr "Normandy apple tart\nShortcrust, apples, cream, calvados…\n\n---\n\nChicken yassa\nChicken, onions, lemon…"

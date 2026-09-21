@@ -2,6 +2,48 @@
 
 Plugin WordPress en construction pour la génération éditoriale culinaire orchestrée.
 
+## Version 0.4.1
+
+**Une interface refondue, traduite, et une couche de données qui tient la
+charge.**
+
+**Le pass.** L'écran est construit autour de l'endroit qu'il remplace : le pass
+d'une cuisine, où le travail arrive sur un rail, chaque ticket portant son état
+sur sa tranche. On lit le rail avant de lire un ticket. L'ambre est la lampe
+au-dessus du pass — structurelle et jamais sémantique, pour qu'on n'ait jamais à
+se demander si elle veut dire « attention » ; les états gardent leurs propres
+couleurs. Les chiffres sont en chasse fixe et en chiffres tabulaires, parce que
+ces écrans sont des colonnes qu'on compare de haut en bas. Aucune police
+distante : un plugin qui appelle Google à chaque page d'administration est un
+problème de confidentialité sur le site de quelqu'un d'autre.
+
+Tout est en propriétés logiques, donc l'interface arabe se retourne sans une
+seule règle en plus, et chaque couleur est un jeton redéfini pour le thème
+sombre de WordPress.
+
+**Les écrans.** Le pass, un composeur numéroté — la séquence est réelle : rien
+ne s'apparie avant que les photographies ne soient choisies, rien ne part avant
+que l'appariement ne soit réglé —, une liste filtrable, une analyse, le moteur,
+les réglages.
+
+**Les droits, appliqués.** Un rédacteur voit son travail et pas celui des
+autres ; une capacité `msrwa_view_all` héritée d'une version antérieure
+n'élargit plus rien. Et l'argent regarde l'exploitant : un écran qui n'a pas le
+droit d'afficher un montant ne le demande pas non plus à la base.
+
+**Les données.** Les index suivent enfin les questions réellement posées
+(`owner_created`, `owner_recent`). Les écritures d'une vague partent en une
+requête par table au lieu d'une par ligne. Les fiches de contrôle comptent leurs
+échecs à l'écriture, dans une colonne indexée, donc « quel contrôle échoue le
+plus » lit des nombres au lieu d'analyser chaque bloc JSON jamais stocké. Et les
+événements — la narration, qui grossit sans fin — sont purgés au-delà de
+quatre-vingt-dix jours, pendant que les étapes, les appels et les productions
+restent : ce sont eux les preuves.
+
+**Trois langues, vérifiées.** Français, anglais, arabe. Un test refuse une
+chaîne non traduite, un `.mo` plus vieux que son `.po`, et une traduction qui
+perd un `%s` en route — gettext, lui, ne préviendrait personne.
+
 ## Version 0.4.0
 
 **Les fondations de la montée en gamme : droits, profils de sortie, langues.**
@@ -115,7 +157,7 @@ cron réel et validité distante des clés restent à vérifier sur un site de t
 
 ## État actuel
 
-La version `0.4.0` est un socle installable : file persistante, pipeline de
+La version `0.4.1` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.

@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
 final class MSRWA_DB {
 
 	/** Bumped whenever the schema below changes. */
-	const SCHEMA = 4;
+	const SCHEMA = 5;
 
 	public static function tables() {
 		global $wpdb;
@@ -57,9 +57,9 @@ final class MSRWA_DB {
 		foreach ( array(
 			"CREATE TABLE {$t['batches']} (\n id bigint(20) unsigned NOT NULL AUTO_INCREMENT,\n owner_id bigint(20) unsigned NOT NULL,\n label varchar(191) NOT NULL DEFAULT '',\n status varchar(32) NOT NULL DEFAULT 'matching',\n recipes smallint unsigned NOT NULL DEFAULT 0,\n images smallint unsigned NOT NULL DEFAULT 0,\n budget_usd decimal(12,6) NOT NULL DEFAULT 0,\n profile varchar(24) NOT NULL DEFAULT 'full',\n language varchar(8) NOT NULL DEFAULT 'fr',\n config_json longtext NULL,\n matching_json longtext NULL,\n error_message text NULL,\n created_at datetime NOT NULL,\n updated_at datetime NOT NULL,\n PRIMARY KEY (id),\n KEY owner_status (owner_id,status),\n KEY created_at (created_at)\n) $charset;",
 
-			"CREATE TABLE {$t['runs']} (\n id bigint(20) unsigned NOT NULL AUTO_INCREMENT,\n batch_id bigint(20) unsigned NOT NULL,\n owner_id bigint(20) unsigned NOT NULL,\n label varchar(191) NOT NULL DEFAULT '',\n brief_json longtext NULL,\n result_json longtext NULL,\n status varchar(32) NOT NULL DEFAULT 'queued',\n step varchar(120) NOT NULL DEFAULT '',\n steps_done smallint unsigned NOT NULL DEFAULT 0,\n steps_total smallint unsigned NOT NULL DEFAULT 0,\n cost_usd decimal(12,6) NOT NULL DEFAULT 0,\n seconds decimal(12,1) NOT NULL DEFAULT 0,\n approved tinyint(1) NULL,\n draft_post_id bigint(20) unsigned NOT NULL DEFAULT 0,\n workspace text NULL,\n error_message text NULL,\n lock_token varchar(64) NULL,\n lock_until datetime NULL,\n created_at datetime NOT NULL,\n updated_at datetime NOT NULL,\n PRIMARY KEY (id),\n KEY batch_status (batch_id,status),\n KEY owner_status (owner_id,status),\n KEY lock_until (lock_until)\n) $charset;",
+			"CREATE TABLE {$t['runs']} (\n id bigint(20) unsigned NOT NULL AUTO_INCREMENT,\n batch_id bigint(20) unsigned NOT NULL,\n owner_id bigint(20) unsigned NOT NULL,\n label varchar(191) NOT NULL DEFAULT '',\n brief_json longtext NULL,\n result_json longtext NULL,\n status varchar(32) NOT NULL DEFAULT 'queued',\n step varchar(120) NOT NULL DEFAULT '',\n steps_done smallint unsigned NOT NULL DEFAULT 0,\n steps_total smallint unsigned NOT NULL DEFAULT 0,\n cost_usd decimal(12,6) NOT NULL DEFAULT 0,\n seconds decimal(12,1) NOT NULL DEFAULT 0,\n approved tinyint(1) NULL,\n draft_post_id bigint(20) unsigned NOT NULL DEFAULT 0,\n workspace text NULL,\n error_message text NULL,\n lock_token varchar(64) NULL,\n lock_until datetime NULL,\n created_at datetime NOT NULL,\n updated_at datetime NOT NULL,\n PRIMARY KEY (id),\n KEY batch_status (batch_id,status),\n KEY owner_status (owner_id,status),\n KEY owner_created (owner_id,created_at),\n KEY owner_recent (owner_id,id),\n KEY lock_until (lock_until)\n) $charset;",
 
-			"CREATE TABLE {$t['steps']} (\n id bigint(20) unsigned NOT NULL AUTO_INCREMENT,\n run_id bigint(20) unsigned NOT NULL,\n step varchar(64) NOT NULL,\n provider varchar(32) NOT NULL DEFAULT '',\n model varchar(191) NOT NULL DEFAULT '',\n seconds decimal(10,1) NOT NULL DEFAULT 0,\n attempts tinyint unsigned NOT NULL DEFAULT 1,\n input_tokens int unsigned NOT NULL DEFAULT 0,\n output_tokens int unsigned NOT NULL DEFAULT 0,\n cost_usd decimal(12,6) NULL,\n bucket varchar(24) NOT NULL DEFAULT 'other',\n status varchar(48) NOT NULL DEFAULT '',\n passed smallint unsigned NULL,\n total smallint unsigned NULL,\n checks_json longtext NULL,\n error_message text NULL,\n created_at datetime NOT NULL,\n PRIMARY KEY (id),\n KEY run_step (run_id,step),\n KEY step_model (step,model)\n) $charset;",
+			"CREATE TABLE {$t['steps']} (\n id bigint(20) unsigned NOT NULL AUTO_INCREMENT,\n run_id bigint(20) unsigned NOT NULL,\n step varchar(64) NOT NULL,\n provider varchar(32) NOT NULL DEFAULT '',\n model varchar(191) NOT NULL DEFAULT '',\n seconds decimal(10,1) NOT NULL DEFAULT 0,\n attempts tinyint unsigned NOT NULL DEFAULT 1,\n input_tokens int unsigned NOT NULL DEFAULT 0,\n output_tokens int unsigned NOT NULL DEFAULT 0,\n cost_usd decimal(12,6) NULL,\n bucket varchar(24) NOT NULL DEFAULT 'other',\n status varchar(48) NOT NULL DEFAULT '',\n passed smallint unsigned NULL,\n total smallint unsigned NULL,\n checks_json longtext NULL,\n checks_failed smallint unsigned NOT NULL DEFAULT 0,\n error_message text NULL,\n created_at datetime NOT NULL,\n PRIMARY KEY (id),\n KEY run_step (run_id,step),\n KEY step_model (step,model),\n KEY step_failures (step,checks_failed)\n) $charset;",
 
 			"CREATE TABLE {$t['calls']} (\n id bigint(20) unsigned NOT NULL AUTO_INCREMENT,\n run_id bigint(20) unsigned NOT NULL,\n step varchar(64) NOT NULL,\n provider varchar(32) NOT NULL DEFAULT '',\n model varchar(191) NOT NULL DEFAULT '',\n tier varchar(24) NOT NULL DEFAULT '',\n endpoint text NULL,\n seconds decimal(10,1) NOT NULL DEFAULT 0,\n input_tokens int unsigned NOT NULL DEFAULT 0,\n output_tokens int unsigned NOT NULL DEFAULT 0,\n cached_tokens int unsigned NOT NULL DEFAULT 0,\n cost_usd decimal(12,6) NULL,\n priced tinyint(1) NOT NULL DEFAULT 1,\n status varchar(48) NOT NULL DEFAULT '',\n created_at datetime NOT NULL,\n PRIMARY KEY (id),\n KEY run_step (run_id,step),\n KEY provider_model (provider,model)\n) $charset;",
 
@@ -73,6 +73,13 @@ final class MSRWA_DB {
 			'language' => "ALTER TABLE {$t['batches']} ADD COLUMN language varchar(8) NOT NULL DEFAULT 'fr' AFTER profile",
 		) as $column => $statement ) {
 			if ( ! self::column_exists( $t['batches'], $column ) ) { $wpdb->query( $statement ); }
+		}
+		if ( ! self::column_exists( $t['steps'], 'checks_failed' ) ) {
+			$wpdb->query( "ALTER TABLE {$t['steps']} ADD COLUMN checks_failed smallint unsigned NOT NULL DEFAULT 0 AFTER checks_json" );
+			// Bounded and idempotent: it fills in what already exists without
+			// reading a whole table into memory on a site that has been running
+			// for a year.
+			self::backfill_check_counts();
 		}
 
 		self::drop_superseded();
@@ -94,6 +101,80 @@ final class MSRWA_DB {
 			if ( self::table_exists( $table ) ) { $wpdb->query( 'DROP TABLE ' . $table ); }
 		}
 		update_option( 'msrwa_superseded_dropped', 1, false );
+	}
+
+	/**
+	 * Counts the failing checks on steps stored before the column existed.
+	 *
+	 * In pages, oldest first, stopping when it runs out. Nothing here loads
+	 * more than a few hundred rows at a time, because this runs on activation
+	 * on somebody's live site and must not be the thing that exhausts its
+	 * memory limit.
+	 */
+	private static function backfill_check_counts() {
+		global $wpdb;
+		$t = self::tables();
+		$last = 0;
+		$guard = 0;
+		while ( $guard++ < 200 ) {
+			$rows = (array) $wpdb->get_results( $wpdb->prepare(
+				"SELECT id, checks_json FROM {$t['steps']} WHERE id > %d AND checks_json IS NOT NULL ORDER BY id ASC LIMIT 200", $last ), ARRAY_A );
+			if ( ! $rows ) { return; }
+			foreach ( $rows as $row ) {
+				$last = (int) $row['id'];
+				$failed = 0;
+				foreach ( (array) json_decode( (string) $row['checks_json'], true ) as $check ) {
+					if ( is_array( $check ) && empty( $check['pass'] ) ) { $failed++; }
+				}
+				if ( $failed ) { $wpdb->update( $t['steps'], array( 'checks_failed' => $failed ), array( 'id' => $last ), array( '%d' ), array( '%d' ) ); }
+			}
+		}
+	}
+
+	/**
+	 * Inserts many rows in one statement.
+	 *
+	 * A wave produces a dozen events and several steps, and each one was a
+	 * round trip to the database. One statement per table per tick instead,
+	 * with every value still passed through $wpdb->prepare.
+	 */
+	public static function insert_many( $table, array $rows ) {
+		global $wpdb;
+		if ( ! $rows ) { return 0; }
+		$columns = array_keys( $rows[0] );
+		$placeholders = array();
+		$values = array();
+
+		foreach ( $rows as $row ) {
+			$marks = array();
+			foreach ( $columns as $column ) {
+				$value = $row[ $column ] ?? null;
+				if ( null === $value ) { $marks[] = 'NULL'; continue; }
+				$marks[] = is_int( $value ) ? '%d' : ( is_float( $value ) ? '%f' : '%s' );
+				$values[] = $value;
+			}
+			$placeholders[] = '(' . implode( ',', $marks ) . ')';
+		}
+
+		$sql = 'INSERT INTO ' . $table . ' (`' . implode( '`,`', $columns ) . '`) VALUES ' . implode( ',', $placeholders );
+		return (int) $wpdb->query( $values ? $wpdb->prepare( $sql, $values ) : $sql );
+	}
+
+	/**
+	 * Drops the verbose half of old runs, keeping the figures.
+	 *
+	 * Events are the narration and grow without limit; steps, calls and
+	 * artifacts are the evidence and stay. Bounded per pass so a cron tick that
+	 * is killed halfway simply resumes on the next one.
+	 */
+	public static function prune_events( $days = 90, $limit = 2000 ) {
+		global $wpdb;
+		$t = self::tables();
+		$days = max( 7, (int) $days );
+		return (int) $wpdb->query( $wpdb->prepare(
+			"DELETE e FROM {$t['events']} e INNER JOIN {$t['runs']} r ON r.id = e.run_id
+			WHERE r.status NOT IN ('queued','running') AND r.updated_at < DATE_SUB(UTC_TIMESTAMP(), INTERVAL %d DAY)
+			LIMIT %d", $days, max( 100, (int) $limit ) ) );
 	}
 
 	public static function column_exists( $table, $column ) {

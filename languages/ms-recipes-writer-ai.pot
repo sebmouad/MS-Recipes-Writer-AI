@@ -11,20 +11,80 @@ msgstr ""
 msgid "%1$d min %2$d s"
 msgstr ""
 
+#: class-msrwa-ui.php:73
+msgid "%1$d étapes sur %2$d"
+msgstr ""
+
+#: class-msrwa-screen-analysis.php:40
+msgid "%d appel(s) ont tourné sur un modèle sans tarif publié. La dépense ci-dessus est donc incomplète, et non pas exacte : elle ne compte pas ce qu’on ne sait pas chiffrer."
+msgstr ""
+
+#: class-msrwa-screen-analysis.php:73
+msgid "%d au total"
+msgstr ""
+
+#: class-msrwa-admin.php:53
+msgid "%d photographies"
+msgstr ""
+
+#: class-msrwa-admin.php:50
+msgid "%d recettes détectées"
+msgstr ""
+
+#: class-msrwa-screen-pass.php:45
+msgid "%d étape(s) sans tarif publié"
+msgstr ""
+
 #: class-msrwa-i18n.php:73
 msgid "%s s"
 msgstr ""
 
-#: class-msrwa-admin.php:39 class-msrwa-admin.php:497 class-msrwa-admin.php:505
+#: class-msrwa-admin.php:51
+msgid "1 photographie"
+msgstr ""
+
+#: class-msrwa-admin.php:48
+msgid "1 recette détectée"
+msgstr ""
+
+#: class-msrwa-screen-analysis.php:56 class-msrwa-screen-pass.php:28
+msgid "30 jours"
+msgstr ""
+
+#: class-msrwa-screen-analysis.php:56
+msgid "7 jours"
+msgstr ""
+
+#: class-msrwa-admin.php:428 class-msrwa-admin.php:436
 msgid "Accès refusé."
+msgstr ""
+
+#: class-msrwa-admin.php:25 class-msrwa-screen-analysis.php:24
+msgid "Analyse"
 msgstr ""
 
 #: class-msrwa-profile.php:61
 msgid "Anglais"
 msgstr ""
 
+#: class-msrwa-admin.php:60
+msgid "Appariement enregistré."
+msgstr ""
+
+#: class-msrwa-screen-analysis.php:127
+msgid "Appels"
+msgstr ""
+
 #: class-msrwa-profile.php:62
 msgid "Arabe"
+msgstr ""
+
+#: class-msrwa-screen-articles.php:96
+msgid "Arrêtés"
+msgstr ""
+
+#: class-msrwa-screen-analysis.php:80
+msgid "Artefact"
 msgstr ""
 
 #: class-msrwa-profile.php:36
@@ -39,31 +99,451 @@ msgstr ""
 msgid "Article, image à la une et collage Facebook"
 msgstr ""
 
+#: class-msrwa-admin.php:24 class-msrwa-screen-articles.php:29
+msgid "Articles"
+msgstr ""
+
+#: class-msrwa-screen-analysis.php:151
+msgid "Aucun contrôle en échec"
+msgstr ""
+
+#: class-msrwa-screen-pass.php:64
+msgid "Aucune clé d’API n’est enregistrée, donc rien ne peut être généré. %s"
+msgstr ""
+
+#: class-msrwa-screen-compose.php:26
+msgid "Aucune clé d’API n’est enregistrée. Un lot lancé maintenant échouerait à la première étape."
+msgstr ""
+
+#: class-msrwa-screen-analysis.php:94
+msgid "Aucune recette n’a encore tourné sur cette période."
+msgstr ""
+
+#: class-msrwa-screen-articles.php:69
+msgid "Aucune recette pour l’instant"
+msgstr ""
+
+#: class-msrwa-ui.php:109
+msgid "Brouillon"
+msgstr ""
+
+#: class-msrwa-screen-analysis.php:129
+msgid "Cache"
+msgstr ""
+
+#: class-msrwa-screen-analysis.php:124
+msgid "Ce qui a réellement été facturé, et quelle part de l’entrée le fournisseur a servie depuis son cache."
+msgstr ""
+
+#: class-msrwa-screen-pass.php:25
+msgid "Ce qui est en cours, ce qui attend une relecture, et ce qui s’est arrêté."
+msgstr ""
+
+#: class-msrwa-screen-compose.php:48
+msgid "Ce qu’il faut produire"
+msgstr ""
+
+#: class-msrwa-screen-compose.php:49
+msgid "Chaque recette suit le même chemin. Les montants sont des ordres de grandeur mesurés, jamais une facture."
+msgstr ""
+
+#: class-msrwa-screen-compose.php:41
+msgid "Choisir dans la médiathèque"
+msgstr ""
+
+#: class-msrwa-screen-compose.php:20
+msgid "Collez vos recettes et ajoutez les photographies. Elles seront décrites puis associées ; vous confirmez l’appariement avant que quoi que ce soit ne soit généré."
+msgstr ""
+
+#: class-msrwa-screen-analysis.php:153
+msgid "Contrôle"
+msgstr ""
+
+#: class-msrwa-screen-analysis.php:149
+msgid "Contrôles qui échouent"
+msgstr ""
+
+#: class-msrwa-screen-analysis.php:99
+msgid "Coût moy."
+msgstr ""
+
+#: class-msrwa-screen-pass.php:70
+msgid "DISABLE_WP_CRON est actif. Les lots n’avanceront que si un cron serveur appelle wp-cron.php ; sans cela ils resteront en attente sans rien signaler."
+msgstr ""
+
+#: class-msrwa-screen-articles.php:93 class-msrwa-screen-pass.php:53
+msgid "Demande une décision"
+msgstr ""
+
+#: class-msrwa-admin.php:58
+msgid "Description des photographies…"
+msgstr ""
+
+#: class-msrwa-screen-analysis.php:98
+msgid "Durée moy."
+msgstr ""
+
+#: class-msrwa-screen-compose.php:84
+msgid "Décrire et apparier"
+msgstr ""
+
+#: class-msrwa-screen-analysis.php:100 class-msrwa-screen-analysis.php:131
+msgid "Dépense"
+msgstr ""
+
+#: class-msrwa-screen-pass.php:50
+msgid "Déposez des recettes et des photographies pour lancer un lot."
+msgstr ""
+
+#: class-msrwa-screen-articles.php:72
+msgid "Déposez des recettes et des photographies pour lancer un premier lot."
+msgstr ""
+
+#: class-msrwa-screen-articles.php:92 class-msrwa-screen-pass.php:50
+msgid "En cours"
+msgstr ""
+
+#: class-msrwa-admin.php:59
+msgid "Enregistrement…"
+msgstr ""
+
+#: class-msrwa-screen-analysis.php:101 class-msrwa-screen-analysis.php:128
+msgid "Entrée"
+msgstr ""
+
+#: class-msrwa-admin.php:56
+msgid "Environ %1$s pour %3$d recette(s), et au maximum %2$s : le plafond arrête un run avant de le dépasser."
+msgstr ""
+
+#: class-msrwa-admin.php:61
+msgid "Envoi au moteur…"
+msgstr ""
+
+#: class-msrwa-screen-analysis.php:97
+msgid "Exéc."
+msgstr ""
+
+#: class-msrwa-screen-articles.php:63
+msgid "Filtrer"
+msgstr ""
+
 #: class-msrwa-profile.php:60
 msgid "Français"
+msgstr ""
+
+#: class-msrwa-admin.php:57
+msgid "Il n’y a aucune recette dans ce texte."
 msgstr ""
 
 #: class-msrwa-profile.php:31
 msgid "La chaîne complète, jugement final compris : c’est le seul moment où le texte et les deux images sont confrontés."
 msgstr ""
 
-#: class-msrwa-admin.php:216
+#: class-msrwa-screen-compose.php:66
+msgid "La langue de l’article, qui n’est pas celle de cette interface. Le plafond s’applique à chaque recette : au-delà, le run s’arrête plutôt que de dépenser."
+msgstr ""
+
+#: class-msrwa-screen-compose.php:65
+msgid "La langue et le plafond"
+msgstr ""
+
+#: class-msrwa-screen-compose.php:68
+msgid "Langue de l’article"
+msgstr ""
+
+#: class-msrwa-screen-analysis.php:65
+msgid "Le juge"
+msgstr ""
+
+#: class-msrwa-admin.php:22 class-msrwa-screen-pass.php:24
+msgid "Le pass"
+msgstr ""
+
+#: class-msrwa-screen-compose.php:39
+msgid "Les photographies"
+msgstr ""
+
+#: class-msrwa-screen-compose.php:32
+msgid "Les recettes"
+msgstr ""
+
+#: class-msrwa-admin.php:30
+msgid "Lot"
+msgstr ""
+
+#: class-msrwa-admin.php:147
 msgid "Lot introuvable."
+msgstr ""
+
+#: class-msrwa-screen-analysis.php:25
+msgid "Lu sur ce que le moteur a rapporté, jamais recalculé. Un coût inconnu reste inconnu jusqu’ici."
+msgstr ""
+
+#: class-msrwa-admin.php:21
+msgid "MS Recipes Writer"
+msgstr ""
+
+#: class-msrwa-screen-analysis.php:126
+msgid "Modèle"
+msgstr ""
+
+#: class-msrwa-admin.php:26
+msgid "Moteur"
+msgstr ""
+
+#: class-msrwa-admin.php:23 class-msrwa-screen-articles.php:34 class-msrwa-screen-articles.php:73 class-msrwa-screen-compose.php:19 class-msrwa-screen-pass.php:30 class-msrwa-screen-pass.php:77
+msgid "Nouveau lot"
+msgstr ""
+
+#: class-msrwa-screen-pass.php:65
+msgid "Ouvrir les réglages"
+msgstr ""
+
+#: class-msrwa-screen-analysis.php:123
+msgid "Par modèle"
+msgstr ""
+
+#: class-msrwa-screen-analysis.php:93
+msgid "Par étape"
 msgstr ""
 
 #: class-msrwa-profile.php:37
 msgid "Pas de collage. Le jugement final ne s’exécute pas : il confronte le texte aux deux images, et il n’y en a qu’une."
 msgstr ""
 
-#: class-msrwa-admin.php:309
+#: class-msrwa-admin.php:54
+msgid "Photographies des recettes"
+msgstr ""
+
+#: class-msrwa-screen-compose.php:76
+msgid "Plafond par recette"
+msgstr ""
+
+#: class-msrwa-admin.php:31
+msgid "Recette"
+msgstr ""
+
+#: class-msrwa-screen-compose.php:22
+msgid "Retour au pass"
+msgstr ""
+
+#: class-msrwa-screen-articles.php:69
+msgid "Rien ne correspond"
+msgstr ""
+
+#: class-msrwa-screen-pass.php:50
+msgid "Rien ne tourne."
+msgstr ""
+
+#: class-msrwa-screen-compose.php:87
+msgid "Rien n’est écrit à cette étape : seules les photographies sont décrites. Vous verrez l’appariement avant de lancer quoi que ce soit."
+msgstr ""
+
+#: class-msrwa-screen-analysis.php:94
+msgid "Rien à analyser"
+msgstr ""
+
+#: class-msrwa-admin.php:240
 msgid "Run introuvable."
+msgstr ""
+
+#: class-msrwa-screen-articles.php:50
+msgid "Rédacteur"
+msgstr ""
+
+#: class-msrwa-admin.php:27
+msgid "Réglages"
+msgstr ""
+
+#: class-msrwa-screen-compose.php:40
+msgid "Sans dire lesquelles vont avec quoi : chacune sera décrite depuis ses propres pixels, puis associée à une recette. Une photographie est facturée une fois, même si vous corrigez ensuite l’association."
+msgstr ""
+
+#: class-msrwa-screen-analysis.php:132
+msgid "Sans tarif"
+msgstr ""
+
+#: class-msrwa-screen-analysis.php:103
+msgid "Score"
+msgstr ""
+
+#: class-msrwa-screen-analysis.php:66
+msgid "Son avis porte sur sa propre production. Ce n’est jamais une validation éditoriale, et un taux d’approbation très bas ou très haut en dit autant sur le prompt que sur les articles."
+msgstr ""
+
+#: class-msrwa-screen-analysis.php:102 class-msrwa-screen-analysis.php:130
+msgid "Sortie"
+msgstr ""
+
+#: class-msrwa-screen-analysis.php:154
+msgid "Sur"
+msgstr ""
+
+#: class-msrwa-screen-analysis.php:171
+msgid "Sur quatorze jours"
+msgstr ""
+
+#: class-msrwa-screen-compose.php:34
+msgid "Tarte aux pommes normande\nPâte brisée, pommes, crème, calvados…\n\n---\n\nPoulet yassa\nPoulet, oignons, citron…"
+msgstr ""
+
+#: class-msrwa-screen-analysis.php:155
+msgid "Taux"
+msgstr ""
+
+#: class-msrwa-screen-articles.php:94
+msgid "Terminés"
 msgstr ""
 
 #: class-msrwa-profile.php:43
 msgid "Texte uniquement, relu et vérifié. Aucune image n’est générée."
 msgstr ""
 
+#: class-msrwa-screen-articles.php:60
+msgid "Titre"
+msgstr ""
+
+#: class-msrwa-screen-articles.php:54 class-msrwa-screen-articles.php:91
+msgid "Tous"
+msgstr ""
+
+#: class-msrwa-screen-analysis.php:56
+msgid "Tout"
+msgstr ""
+
+#: class-msrwa-screen-articles.php:31
+msgid "Toutes les recettes passées par le moteur, avec leur état et ce qu’elles ont coûté."
+msgstr ""
+
+#: class-msrwa-screen-analysis.php:151
+msgid "Toutes les étapes ont satisfait leurs contrôles sur cette période."
+msgstr ""
+
+#: class-msrwa-screen-analysis.php:150
+msgid "Un contrôle qui échoue une fois sur six est du bruit ; six fois sur six, c’est un contrat que le prompt ne tient pas."
+msgstr ""
+
+#: class-msrwa-admin.php:47
+msgid "Une erreur est survenue."
+msgstr ""
+
+#: class-msrwa-screen-compose.php:33
+msgid "Une ligne de trois tirets ou plus sépare deux recettes. La première ligne de chaque bloc en devient le titre."
+msgstr ""
+
+#: class-msrwa-screen-analysis.php:80
+msgid "Verdicts"
+msgstr ""
+
+#: class-msrwa-screen-articles.php:32
+msgid "Vos recettes passées par le moteur, avec leur état et ce qu’elles ont coûté."
+msgstr ""
+
+#: class-msrwa-admin.php:67 class-msrwa-screen-analysis.php:16 class-msrwa-screen-articles.php:15 class-msrwa-screen-compose.php:15 class-msrwa-screen-pass.php:14
+msgid "Vous n’avez pas accès à cet écran."
+msgstr ""
+
+#: class-msrwa-screen-analysis.php:71
+msgid "approuvés"
+msgstr ""
+
+#: class-msrwa-ui.php:54
+msgid "arrêté"
+msgstr ""
+
+#: class-msrwa-screen-compose.php:42
+msgid "aucune photographie"
+msgstr ""
+
+#: class-msrwa-screen-pass.php:27
+msgid "aujourd’hui"
+msgstr ""
+
+#: class-msrwa-screen-analysis.php:76
+msgid "bloquantes"
+msgstr ""
+
+#: class-msrwa-screen-pass.php:37
+msgid "brouillons prêts"
+msgstr ""
+
+#: class-msrwa-screen-pass.php:41
+msgid "coût moyen"
+msgstr ""
+
+#: class-msrwa-screen-analysis.php:34
+msgid "durée moyenne"
+msgstr ""
+
+#: class-msrwa-screen-analysis.php:32
+msgid "dépense"
+msgstr ""
+
+#: class-msrwa-ui.php:52
+msgid "en attente"
+msgstr ""
+
+#: class-msrwa-screen-pass.php:36 class-msrwa-ui.php:53
+msgid "en cours"
+msgstr ""
+
 #: class-msrwa-i18n.php:61
 msgid "il y a %s"
+msgstr ""
+
+#: class-msrwa-screen-analysis.php:69
+msgid "jugés"
+msgstr ""
+
+#: class-msrwa-screen-analysis.php:33
+msgid "par recette"
+msgstr ""
+
+#: class-msrwa-screen-pass.php:46
+msgid "par recette, sur 30 jours"
+msgstr ""
+
+#: class-msrwa-screen-analysis.php:31
+msgid "recettes"
+msgstr ""
+
+#: class-msrwa-screen-analysis.php:75
+msgid "remarques"
+msgstr ""
+
+#: class-msrwa-screen-pass.php:38 class-msrwa-ui.php:58
+msgid "réserves du juge"
+msgstr ""
+
+#: class-msrwa-screen-articles.php:33
+msgid "résultats"
+msgstr ""
+
+#: class-msrwa-screen-analysis.php:104 class-msrwa-screen-analysis.php:154 class-msrwa-screen-articles.php:95
+msgid "Échecs"
+msgstr ""
+
+#: class-msrwa-screen-articles.php:71
+msgid "Élargissez le filtre, ou repartez de la liste complète."
+msgstr ""
+
+#: class-msrwa-screen-analysis.php:96 class-msrwa-screen-analysis.php:153
+msgid "Étape"
+msgstr ""
+
+#: class-msrwa-screen-articles.php:41
+msgid "État"
+msgstr ""
+
+#: class-msrwa-screen-pass.php:37 class-msrwa-ui.php:59
+msgid "à relire"
+msgstr ""
+
+#: class-msrwa-ui.php:55
+msgid "échec"
+msgstr ""
+
+#: class-msrwa-screen-pass.php:39
+msgid "échecs"
 msgstr ""
 
