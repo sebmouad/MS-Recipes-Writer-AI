@@ -13,6 +13,7 @@ final class MSRWA_Plugin {
 	public static function deactivate() {
 		wp_clear_scheduled_hook( 'msrwa_process_batch' );
 		wp_clear_scheduled_hook( 'msrwa_process_job' );
+		wp_clear_scheduled_hook( 'msrwa_lab_step' );
 		wp_clear_scheduled_hook( 'msrwa_cleanup' );
 	}
 
@@ -26,8 +27,10 @@ final class MSRWA_Plugin {
 		add_action( 'rest_api_init', array( 'MSRWA_REST', 'register' ) );
 		add_action( 'msrwa_process_batch', array( 'MSRWA_Queue', 'process_batch' ) );
 		add_action( 'msrwa_process_job', array( 'MSRWA_Pipeline', 'process_job' ) );
+		add_action( 'msrwa_lab_step', array( 'MSRWA_Lab', 'tick' ) );
 		add_action( 'msrwa_cleanup', array( 'MSRWA_DB', 'purge_expired' ) );
 		add_action( 'msrwa_cleanup', array( 'MSRWA_Queue', 'recover_expired' ) );
+		add_action( 'msrwa_cleanup', array( 'MSRWA_Lab', 'recover_expired' ) );
 		if ( is_admin() ) { MSRWA_Admin::hooks(); }
 		if ( MSRWA_DB::system_value( 'db_version' ) !== MSRWA_VERSION ) {
 			MSRWA_DB::install();

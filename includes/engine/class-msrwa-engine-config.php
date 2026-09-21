@@ -299,7 +299,7 @@ final class MSRWA_Engine_Config {
 	public function provider( $name, $model = '' ) {
 		$provider = (array) $this->get( 'providers.' . $name, array() );
 		if ( ! $provider ) { return array(); }
-		$key = MSRWA_Engine_Call::key( $name, (array) ( $provider['key_env'] ?? array() ) );
+		$key = $this->key_for( $name, $provider );
 		$replace = static function ( $text ) use ( $model, $key ) { return str_replace( array( '{{model}}', '{{key}}' ), array( rawurlencode( (string) $model ), $key ), (string) $text ); };
 		$provider['text_endpoint'] = $replace( $provider['text_endpoint'] ?? '' );
 		$provider['image_endpoint'] = $replace( $provider['image_endpoint'] ?? '' );
@@ -307,6 +307,24 @@ final class MSRWA_Engine_Config {
 		$provider['timeout'] = (int) $this->get( 'limits.http_timeout', 600 );
 		$provider['has_key'] = '' !== $key;
 		return $provider;
+	}
+
+	/**
+	 * The API key for a provider: the caller's own, or the environment's.
+	 *
+	 * The lab keeps its keys in the environment; WordPress keeps them encrypted
+	 * in its settings table and has no environment to read. So a caller may hand
+	 * the key over directly under `settings.keys.<provider>`, and it wins — an
+	 * administrator who typed a key into the plugin means that key, not whatever
+	 * the server happens to have exported.
+	 *
+	 * `settings` is the one branch of the configuration that never reaches a
+	 * stored record, which is why the key belongs there and nowhere else.
+	 */
+	private function key_for( $name, array $provider ) {
+		$supplied = (string) $this->get( 'settings.keys.' . $name, '' );
+		if ( '' !== trim( $supplied ) ) { return trim( $supplied ); }
+		return MSRWA_Engine_Call::key( $name, (array) ( $provider['key_env'] ?? array() ) );
 	}
 
 	/**

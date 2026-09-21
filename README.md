@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.84` est un socle installable : file persistante, pipeline de
+La version `0.2.85` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.
@@ -22,6 +22,25 @@ Le plugin est en cours de refonte éditoriale et budgétaire :
 Les coûts affichés sont des estimations calculées avec le catalogue configuré,
 non une facture fournisseur. `completed` signifie que le traitement est terminé,
 jamais qu’un texte est validé éditorialement.
+
+## Version 0.2.85
+
+**Le laboratoire devient exécutable depuis WordPress, en tâche de fond.** Un run
+dure environ quatre minutes et demie ; aucune requête PHP ne tient aussi
+longtemps. Le travail est donc découpé là où le moteur le découpe déjà — à la
+vague de dépendances : un tick de cron exécute une vague et consigne tout ce
+qu'elle a produit, le tick suivant reprend de là. Une requête tuée coûte au pire
+la vague en cours, jamais le run.
+
+Trois pièces : le moteur accepte désormais qu'on lui remette directement une clé
+d'API sous `settings.keys.<fournisseur>` — WordPress garde les siennes chiffrées
+dans sa table et n'a pas d'environnement où les exporter, et `settings` est la
+seule branche de configuration qui n'atteint jamais un enregistrement. Une table
+`lab_runs` tient les runs à l'écart des jobs éditoriaux, parce qu'une
+expérimentation n'a rien à faire dans les listes des rédacteurs. Et un worker
+verrouillé, sur le modèle de la file existante, avance un run d'une vague par
+tick, reprend un bail expiré et ne laisse jamais deux workers dépenser sur le
+même run.
 
 ## Version 0.2.84
 
