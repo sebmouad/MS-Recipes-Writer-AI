@@ -66,9 +66,14 @@ $prompt = file_get_contents( dirname( __DIR__ ) . '/tools/prompts/final_approval
 // each over-reached — a potted plant read as an ingredient, rice with a yassa
 // blocked, seventeen blocking findings on one tarte — so these are asserted.
 msrwa_test_contains( $prompt, 'the primary check', 'Realism must be named the primary check.' );
-msrwa_test_contains( $prompt, 'PRINCIPAL ingredients only', 'Fidelity must be limited to the ingredients that define the dish.' );
-msrwa_test_contains( $prompt, 'do not count', 'Counting objects in a photograph must not be a defect.' );
-msrwa_test_contains( $prompt, 'Do not inventory the frame', 'The judge must not audit the frame against the whole ingredient list.' );
+// The owner's rule, 2026-09-21, and it is asymmetric: an image may omit a
+// secondary ingredient, because it can be dissolved, buried or out of frame. It
+// may not add one, because a reader cooking the recipe cannot produce that plate.
+msrwa_test_contains( $prompt, 'Only the PRINCIPAL ingredients must be visible', 'Only principal ingredients may be reported missing.' );
+msrwa_test_contains( $prompt, 'Never report an ingredient as missing unless it is principal', 'A missing secondary ingredient must not be a finding.' );
+msrwa_test_contains( $prompt, 'is BLOCKING, however small', 'An ingredient that is not in the recipe must block.' );
+msrwa_test_contains( $prompt, 'Do not count either', 'Counting objects in a photograph must not be a defect.' );
+msrwa_test_contains( $prompt, 'nothing inedible is an ingredient', 'Styling props must not be read as ingredients.' );
 msrwa_test_contains( $prompt, 'SEVERITY:', 'Severity must be defined, or everything becomes blocking.' );
 // The leniency is for images only. The article and the recipe are what the
 // reader cooks from, so they are held to the research (owner, 2026-09-21).

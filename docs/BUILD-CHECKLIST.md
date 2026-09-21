@@ -227,6 +227,25 @@ cost) in the task before changing anything.
   before anything is removed: 152 calls, $5.18 measured. Generated reports left
   the repository — 8.8 MB of encoded images — and `tools/reports/` is ignored.
 
+- [x] **A27 — Absence and invention judged oppositely (owner directive,
+  2026-09-21).** Only a principal ingredient may be reported missing; any other
+  may be invisible without comment, since it can be dissolved, buried, absorbed
+  or out of frame. Anything edible that is visible and absent from the canonical
+  list is blocking however small, and for additions doubt resolves to blocking —
+  the reverse of the rest of the review. Measured on two dishes: tomato on the
+  lamb (blocked, corrected, approved in one retry, $0.0721) and a dozen
+  carrot-like pieces on the yassa against a recipe holding one habanero
+  (blocked, corrected to a single whole habanero, approved in one retry,
+  $0.0734).
+- [ ] **A28 — The judge sometimes returns a malformed verdict.** `gpt-5.6-luna`
+  closes the root object early and leaves the image verdicts outside it, which
+  read as "refused with no findings" and triggered an image regeneration against
+  a decision nobody made. The lab now re-asks for the judgement without touching
+  the images, and the scorecard fails such an answer on every contract. Seen in
+  roughly one call in three; a merge-the-objects parser was tried and reverted
+  because the answer is not recoverable — the root closes before the rest exists.
+  Worth re-measuring on another model before phase B.
+
 - [~] **A4 — Review.** Written in English; findings must name the section to patch. *Original:* **A4 — Review.** Returns a boolean verdict plus findings that name the
   **section to patch**, never a full rewrite instruction.
 - [~] **A5 — Fact check** (new step). Written; scored on whether it quotes the article verbatim rather than inventing a sentence to correct. *Original:* **A5 — Fact check** (new step). Compares the finished article to the

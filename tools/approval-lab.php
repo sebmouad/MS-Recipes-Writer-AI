@@ -86,6 +86,18 @@ for ( $attempt = 1; ; $attempt++ ) {
 	$checks = lab_score_approval( $verdict, count( $images ), (int) ( $settings['facebook_collage_steps'] ?? 6 ) );
 	$history[] = array( 'attempt' => $attempt, 'approved' => ! empty( $verdict['approved'] ), 'judge_cost_usd' => $cost, 'seconds' => $result['seconds'], 'images' => array_map( static function ( $image ) { return basename( $image['path'] ); }, $images ) );
 
+	// A verdict that fails its own structural contract is not a refusal, it is a
+	// non-answer: gpt-5.6-luna closed the root object early and left the image
+	// verdicts outside it, which reads as "refused, no findings". Ask again
+	// rather than regenerate images against a decision nobody made.
+	$structurally_sound = ! empty( $checks['valid JSON']['pass'] ) && ! empty( $checks['a verdict per artifact']['pass'] ) && ! empty( $checks['a refusal is justified']['pass'] );
+	if ( ! $structurally_sound ) {
+		if ( $attempt >= $attempts ) { break; }
+		$kept = count( array_filter( $checks, static function ( $check ) { return ! empty( $check['pass'] ); } ) );
+		printf( "\nthe verdict is malformed (%d/%d contracts); asking again without touching the images\n", $kept, count( $checks ) );
+		continue;
+	}
+
 	$retry = lab_images_to_retry( $verdict );
 	if ( ! $retry || $attempt >= $attempts ) { break; }
 

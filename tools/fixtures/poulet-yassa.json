@@ -269,95 +269,173 @@
   },
   "canonical": {
     "title": "Poulet yassa sénégalais",
-    "servings": 6,
-    "prep_minutes": 25,
-    "cook_minutes": 60,
-    "total_minutes": 85,
-    "cuisine": "Sénégalaise",
-    "difficulty": "Moyenne",
-    "calories_estimate": 480,
+    "description": "Poulet yassa sénégalais aux oignons fondants, morceaux dorés et sauce acidulée, un plat mijoté servi chaud au déjeuner ou au dîner.",
+    "servings": 4,
+    "prep_minutes": 390,
+    "cook_minutes": 87,
+    "total_minutes": 477,
+    "cuisine": "sénégalaise",
+    "recipe_category": "plat principal",
+    "difficulty": "intermédiaire",
+    "calories_estimate": 880,
     "ingredients": [
       {
-        "name": "Cuisses de poulet",
-        "quantity": "6",
-        "unit": "pièces"
-      },
-      {
-        "name": "Oignons",
-        "quantity": "1,5",
+        "name": "hauts de cuisse de poulet avec os et peau",
+        "quantity": 1.36,
         "unit": "kg"
       },
       {
-        "name": "Citrons jaunes",
-        "quantity": "4",
-        "unit": "pièces"
+        "name": "jus de citron",
+        "quantity": 120,
+        "unit": "ml"
       },
       {
-        "name": "Moutarde de Dijon",
-        "quantity": "3",
-        "unit": "cuillères à soupe"
+        "name": "vinaigre blanc",
+        "quantity": 60,
+        "unit": "ml"
       },
       {
-        "name": "Huile d'arachide",
-        "quantity": "5",
-        "unit": "cuillères à soupe"
+        "name": "moutarde de Dijon",
+        "quantity": 30,
+        "unit": "ml"
       },
       {
-        "name": "Feuille de laurier",
-        "quantity": "2",
+        "name": "gingembre frais râpé",
+        "quantity": 5,
+        "unit": "g"
+      },
+      {
+        "name": "sel",
+        "quantity": 5,
+        "unit": "g"
+      },
+      {
+        "name": "poivre moulu",
+        "quantity": 2.5,
+        "unit": "g"
+      },
+      {
+        "name": "ail écrasé",
+        "quantity": 5,
+        "unit": "gousses"
+      },
+      {
+        "name": "piment habanero",
+        "quantity": 1,
+        "unit": "pièce"
+      },
+      {
+        "name": "huile de colza",
+        "quantity": 60,
+        "unit": "ml"
+      },
+      {
+        "name": "feuilles de laurier",
+        "quantity": 2,
         "unit": "feuilles"
       },
       {
-        "name": "Piment antillais",
-        "quantity": "1",
-        "unit": "pièce"
+        "name": "gros oignons jaunes émincés",
+        "quantity": 2,
+        "unit": "oignons"
+      },
+      {
+        "name": "bouillon",
+        "quantity": 180,
+        "unit": "ml"
+      },
+      {
+        "name": "olives vertes dénoyautées",
+        "quantity": 180,
+        "unit": "ml"
       }
     ],
     "steps": [
       {
-        "text": "Mélanger jus de citron, moutarde, huile et oignons émincés pour la marinade."
+        "text": "Mélanger le jus de citron, le vinaigre blanc, la moutarde, le gingembre, le sel, le poivre, l’ail et le piment dans un grand récipient, jusqu’à obtenir une marinade homogène."
       },
       {
-        "text": "Faire mariner le poulet au moins 4 heures au réfrigérateur."
+        "text": "Ajouter le poulet, les oignons émincés et le laurier, puis enrober chaque morceau de marinade."
       },
       {
-        "text": "Égoutter le poulet et le colorer sur toutes ses faces."
+        "text": "Couvrir le récipient et réfrigérer le poulet pendant 6 heures, jusqu’à ce que la marinade ait bien imprégné les morceaux."
       },
       {
-        "text": "Faire compoter les oignons de la marinade à feu doux 30 minutes."
+        "text": "Égoutter le poulet, les oignons et le laurier en conservant séparément la marinade liquide."
       },
       {
-        "text": "Remettre le poulet dans les oignons avec le laurier et le piment entier."
+        "text": "Chauffer l’huile de colza dans une grande marmite à feu moyen, jusqu’à ce qu’elle soit fluide et chaude."
       },
       {
-        "text": "Laisser mijoter 25 minutes à couvert puis servir avec du riz blanc."
+        "text": "Faire dorer le poulet en plusieurs fois pendant environ 20 minutes au total, jusqu’à ce que la peau soit brun doré."
+      },
+      {
+        "text": "Cuire les oignons égouttés dans la même marmite pendant 12 minutes, jusqu’à ce qu’ils soient tendres et légèrement dorés."
+      },
+      {
+        "text": "Verser la marinade réservée et le bouillon sur les oignons, puis porter le liquide à frémissement."
+      },
+      {
+        "text": "Remettre le poulet et le laurier dans la marmite, couvrir et mijoter à feu doux pendant 30 minutes, jusqu’à ce que le poulet atteigne 74 °C à cœur."
+      },
+      {
+        "text": "Retirer le couvercle et poursuivre la cuisson pendant 20 minutes, jusqu’à ce que la sauce réduise et que les oignons commencent à caraméliser."
+      },
+      {
+        "text": "Ajouter les olives vertes et mijoter 5 minutes, jusqu’à ce qu’elles soient chaudes et que la sauce soit brillante."
       }
     ],
     "equipment": [
-      "Grande cocotte",
-      "Saladier",
-      "Presse-agrumes"
+      "grand récipient couvert",
+      "réfrigérateur",
+      "grande marmite ou cocotte avec couvercle",
+      "thermomètre de cuisson",
+      "cuillère en bois"
     ],
     "notes": [
-      "Le piment reste entier pour parfumer sans piquer."
+      "Le temps de préparation inclut les 6 heures de marinade au réfrigérateur; la préparation active prend environ 30 minutes.",
+      "La recette est servie chaude, traditionnellement avec du riz blanc; le riz n’est pas inclus dans les quantités de cette fiche.",
+      "La marinade est conservée puis portée à ébullition avec le bouillon avant d’être consommée.",
+      "Les oignons doivent être souples et luisants, et les morceaux de poulet présenter une surface dorée à très foncée avant le service."
     ],
     "faq": [
       {
-        "question": "Peut-on utiliser du blanc de poulet ?",
-        "answer": "Oui, mais réduisez le mijotage à 12 minutes pour éviter une viande sèche."
+        "question": "Peut-on faire mariner le poulet toute une nuit ?",
+        "answer": "Oui. Une marinade d’une nuit au réfrigérateur est recommandée par plusieurs sources, mais 6 heures constituent la durée retenue ici."
+      },
+      {
+        "question": "Comment savoir si le poulet est cuit ?",
+        "answer": "Mesurer 74 °C dans la partie la plus épaisse d’un morceau, sans toucher l’os. La chair doit être cuite à cœur."
+      },
+      {
+        "question": "Peut-on remplacer l’huile de colza ?",
+        "answer": "Oui, une huile végétale neutre convient également, comme le suggère la variante de Saveur."
       }
     ],
     "keywords": [
       "poulet yassa",
-      "sénégal",
-      "citron"
+      "cuisine sénégalaise",
+      "Casamance",
+      "poulet mariné",
+      "oignons caramélisés",
+      "citron",
+      "moutarde",
+      "olives vertes",
+      "plat mijoté"
     ],
     "food_safety": [
-      "Faire mariner le poulet au réfrigérateur.",
-      "Cuire le poulet à cœur avant de servir."
+      "Conserver le poulet cru et sa marinade au réfrigérateur, à 4 °C ou moins, pendant toute la durée de la marinade.",
+      "Éviter tout contact entre la marinade ayant contenu le poulet cru et les aliments prêts à consommer.",
+      "Porter la marinade à frémissement avec le bouillon avant de la servir, puis cuire le poulet jusqu’à 74 °C à cœur.",
+      "Réfrigérer les restes dans les 2 heures suivant la cuisson, ou dans l’heure si la température ambiante dépasse 32 °C.",
+      "Conserver les restes 3 à 4 jours au réfrigérateur à 4 °C ou moins et les réchauffer jusqu’à 74 °C.",
+      "La recette contient de la moutarde; elle ne contient ni œuf cru ni poisson cru."
     ],
     "uncertainties": [
-      "Le temps de marinade n'est pas inclus dans total_minutes."
+      "Les sources indiquent une durée minimale de marinade comprise entre 4 et 6 heures; 6 heures ont été retenues pour une marge de préparation sûre et cohérente.",
+      "Les variantes divergent sur la cuisson finale: la version retenue privilégie une cuisson couverte puis une réduction à découvert pour obtenir des oignons fondants et légèrement caramélisés.",
+      "Les olives, le bouillon, le vinaigre et le gingembre appartiennent à certaines variantes documentées; ils sont inclus ici selon la version Food Network.",
+      "L’estimation calorique varie selon la quantité de peau consommée et la sauce effectivement absorbée par chaque portion."
     ]
   }
 }

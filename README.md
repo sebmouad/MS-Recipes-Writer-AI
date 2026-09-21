@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.62` est un socle installable : file persistante, pipeline de
+La version `0.2.63` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.
@@ -20,6 +20,36 @@ Le plugin est en cours de refonte éditoriale et budgétaire :
 Les coûts affichés sont des estimations calculées avec le catalogue configuré,
 non une facture fournisseur. `completed` signifie que le traitement est terminé,
 jamais qu’un texte est validé éditorialement.
+
+## Version 0.2.63
+
+**Le juge traite désormais l'absence et l'invention de façon opposée**
+(directive du 21/09), et c'est la bonne asymétrie.
+
+- **Ce qui manque — indulgent.** Seuls les ingrédients *principaux* doivent être
+  visibles. Tout autre ingrédient peut être invisible sans que ce soit un
+  constat : il peut être dissous dans la sauce, enfoui sous une couche, déjà
+  absorbé ou hors cadre. Le comptage reste ignoré.
+- **Ce qui est ajouté — strict.** Tout élément comestible visible et absent de la
+  liste canonique est **bloquant**, si discret soit-il : un brin de romarin, une
+  feuille de laurier, un piment, un quartier de citron, une cuillerée de crème.
+  Un lecteur qui suit la recette ne produira pas cette assiette.
+- **Le doute penche vers le blocage**, à l'inverse du reste du contrôle : un
+  ingrédient inventé trompe celui qui cuisine.
+
+Mesuré sur deux plats. Souris d'agneau : des morceaux de tomate absents de la
+recette — bloqué, corrigé, approuvé en un tirage (0,0721 $). Poulet yassa : une
+douzaine de morceaux orange lus comme des carottes alors que la recette ne
+contient qu'**un** habanero — bloqué, corrigé, approuvé en un tirage (0,0734 $).
+La reprise a remplacé la douzaine par un seul habanero entier, exactement ce que
+la liste prévoit.
+
+**Un verdict mal formé n'est plus pris pour un refus.** `gpt-5.6-luna` ferme
+parfois l'objet racine trop tôt et laisse les verdicts d'images en dehors, ce
+qui se lisait comme « refusé, aucun constat » — et déclenchait une régénération
+d'images contre une décision que personne n'avait prise. Le laboratoire
+redemande le jugement sans toucher aux images. Observé sur environ un appel sur
+trois ; à surveiller.
 
 ## Version 0.2.62
 
