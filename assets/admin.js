@@ -178,3 +178,94 @@
     });
   }
 }());
+
+/**
+ * The laboratory screen.
+ *
+ * A run is carried by cron, so this only reads. It refreshes while anything is
+ * still moving and stops as soon as everything has settled — a page left open
+ * overnight must not poll until morning.
+ */
+(function () {
+  'use strict';
+
+  if (typeof MSRWA === 'undefined') return;
+
+  var form = document.getElementById('msrwa-lab-start');
+  var table = document.getElementById('msrwa-lab-runs');
+  if (!form || !table) return;
+
+  var chooser = document.getElementById('msrwa-lab-brief');
+  var titleRow = document.getElementById('msrwa-lab-title-row');
+  var status = document.getElementById('msrwa-lab-start-status');
+  var timer = null;
+
+  function call(url, options) {
+    options = options || {};
+    options.headers = Object.assign({ 'X-WP-Nonce': MSRWA.nonce, 'Content-Type': 'application/json' }, options.headers || {});
+    return fetch(MSRWA.api + url, options).then(function (response) {
+      return response.json().then(function (data) {
+        if (!response.ok) throw new Error(data.message || 'Une erreur est survenue.');
+        return data;
+      });
+    });
+  }
+
+  chooser.addEventListener('change', function () {
+    titleRow.style.display = '' === chooser.value ? '' : 'none';
+  });
+
+  form.addEventListener('submit', function (event) {
+    event.preventDefault();
+    var button = form.querySelector('button[type=submit]');
+    button.disabled = true;
+    status.textContent = 'Lancement…';
+    call('/lab/runs', {
+      method: 'POST',
+      body: JSON.stringify({
+        fixture: chooser.value,
+        title: (document.getElementById('msrwa-lab-title') || {}).value || '',
+        budget: parseFloat(document.getElementById('msrwa-lab-budget').value)
+      })
+    }).then(function (data) {
+      status.textContent = 'Run #' + data.id + ' en attente du cron.';
+      refresh();
+    }).catch(function (error) {
+      status.textContent = error.message;
+    }).finally(function () {
+      button.disabled = false;
+    });
+  });
+
+  table.addEventListener('click', function (event) {
+    var button = event.target.closest('.msrwa-lab-cancel');
+    if (!button) return;
+    button.disabled = true;
+    call('/lab/runs/' + button.dataset.run + '/cancel', { method: 'POST' })
+      .then(refresh)
+      .catch(function (error) { button.textContent = error.message; });
+  });
+
+  function refresh() {
+    return call('/lab/runs').then(function (data) {
+      var moving = false;
+      data.runs.forEach(function (run) {
+        var row = table.querySelector('tr[data-run="' + run.id + '"]');
+        if (!row) { window.location.reload(); return; }
+        row.querySelector('.msrwa-lab-state').textContent = run.status + (run.step && 'running' === run.status ? ' — ' + run.step : '');
+        row.querySelector('.msrwa-lab-steps').textContent = run.steps_done + ' / ' + run.steps_total;
+        row.querySelector('.msrwa-lab-cost').textContent = run.cost_usd.toFixed(4) + ' $';
+        row.querySelector('.msrwa-lab-seconds').textContent = run.seconds.toFixed(1) + ' s';
+        if ('queued' === run.status || 'running' === run.status) moving = true;
+      });
+      if (moving && !timer) { timer = window.setInterval(refresh, 5000); }
+      if (!moving && timer) { window.clearInterval(timer); timer = null; }
+    }).catch(function () {
+      // A refresh that fails says nothing about the run; cron carries it either
+      // way. Stop asking rather than fill the page with errors.
+      if (timer) { window.clearInterval(timer); timer = null; }
+    });
+  }
+
+  refresh();
+}());

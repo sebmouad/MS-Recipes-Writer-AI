@@ -60,4 +60,32 @@ $totals = $result->totals();
 msrwa_test_assert( 0.0271 === round( $totals['cost_usd'], 4 ), 'A run costs what all of its waves cost; got ' . $totals['cost_usd'] );
 msrwa_test_assert( 94.1 === round( $totals['seconds'], 1 ), 'A run takes what all of its waves took; got ' . $totals['seconds'] );
 
+// --- What the screen offers and what it renders -------------------------
+
+require_once dirname( __DIR__ ) . '/includes/class-msrwa-lab-screen.php';
+
+$fixtures = MSRWA_Lab_Screen::fixtures();
+msrwa_test_assert( isset( $fixtures['tarte-pommes'] ), 'The shipped briefs must be offered as a starting point.' );
+msrwa_test_assert( '' !== trim( (string) reset( $fixtures ) ), 'A brief is offered under its title, not its filename.' );
+
+$brief = MSRWA_Lab_Screen::brief( 'tarte-pommes' );
+msrwa_test_assert( '' !== (string) ( $brief['title'] ?? '' ), 'A chosen brief must carry a title into the run.' );
+
+// A name that walks out of the fixtures directory must find nothing.
+msrwa_test_assert( array() === MSRWA_Lab_Screen::brief( '../../wp-config' ), 'A brief name must never escape its directory.' );
+msrwa_test_assert( array() === MSRWA_Lab_Screen::brief( 'pas-un-brief' ), 'An unknown brief is empty, never a fatal.' );
+
+// The report the screen shows is the command line's own renderer, fed the
+// state the worker stored. Proving that here means the admin link cannot be
+// the first place it is tried.
+$saved = glob( dirname( __DIR__ ) . '/tools/runs/tarte-pommes-*.json' );
+if ( $saved ) {
+	sort( $saved );
+	$state = json_decode( (string) file_get_contents( end( $saved ) ), true );
+	require_once dirname( __DIR__ ) . '/tools/report.php';
+	$html = report_render( (array) $state );
+	msrwa_test_contains( $html, '<!doctype html', 'The report must be a whole document the browser can open.' );
+	msrwa_test_assert( strlen( $html ) > 10000, 'A report of a real run is not a stub; got ' . strlen( $html ) . ' characters.' );
+}
+
 msrwa_test_done( 'lab seams OK' );

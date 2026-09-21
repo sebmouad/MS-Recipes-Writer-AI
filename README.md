@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.85` est un socle installable : file persistante, pipeline de
+La version `0.2.86` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.
@@ -22,6 +22,21 @@ Le plugin est en cours de refonte éditoriale et budgétaire :
 Les coûts affichés sont des estimations calculées avec le catalogue configuré,
 non une facture fournisseur. `completed` signifie que le traitement est terminé,
 jamais qu’un texte est validé éditorialement.
+
+## Version 0.2.86
+
+**Un sous-menu « Laboratoire » : lancer un run, le regarder, lire son
+rapport.** On choisit un des sujets livrés avec le dépôt ou on tape un titre, on
+fixe un plafond de dépense, on lance. Le cron prend le relais — l'onglet peut
+être fermé, le run continue, et la page le retrouve exactement où il en est.
+
+Le rapport est celui de la ligne de commande, rendu par le même code, ouvert
+depuis la liste à n'importe quel moment : pendant un run il montre ce qui existe
+déjà. La page prévient quand aucune clé n'est enregistrée et quand
+`DISABLE_WP_CRON` est actif sans cron serveur en face, parce que ce sont les
+deux façons dont un run reste immobile sans rien dire.
+
+Réservé aux administrateurs : un run dépense de l'argent réel.
 
 ## Version 0.2.85
 

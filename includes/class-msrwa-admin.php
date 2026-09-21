@@ -50,6 +50,7 @@ final class MSRWA_Admin {
 		add_submenu_page( 'ms-recipes-writer-ai', 'Créer des Articles/Images', 'Créer des Articles/Images', 'edit_posts', 'ms-recipes-writer-ai', array( __CLASS__, 'page' ) );
 		add_submenu_page( 'ms-recipes-writer-ai', 'Statistiques', 'Statistiques', 'edit_posts', 'ms-recipes-writer-ai-stats', array( __CLASS__, 'stats_page' ) );
 		add_submenu_page( 'ms-recipes-writer-ai', 'Configuration', 'Configuration', 'manage_options', 'ms-recipes-writer-ai-settings', array( __CLASS__, 'settings_page' ) );
+		MSRWA_Lab_Screen::menu();
 		add_submenu_page( null, 'Détail du lot', 'Détail du lot', 'edit_posts', 'ms-recipes-writer-ai-job', array( __CLASS__, 'job_page' ) );
 		add_submenu_page( null, 'Détail du job', 'Détail du job', 'edit_posts', 'ms-recipes-writer-ai-job-detail', array( __CLASS__, 'job_detail_page' ) );
 	}

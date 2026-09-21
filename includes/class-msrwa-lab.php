@@ -154,10 +154,11 @@ final class MSRWA_Lab {
 		if ( $budget > 0 && $spent >= $budget ) { self::finish( $id, 'failed', sprintf( 'Budget de %.4f $ atteint avant %s.', $budget, implode( ', ', $wave ) ) ); return; }
 		if ( $budget > 0 ) { $config['limits']['budget_usd'] = max( 0.000001, $budget - $spent ); }
 
-		self::touch( $id, array( 'step' => implode( ', ', $wave ) ) );
+		$workspace = self::workspace( $id );
+		self::touch( $id, array( 'step' => implode( ', ', $wave ), 'workspace' => $workspace ) );
 		$result = MSRWA_Engine::run(
 			array_merge( $brief, array( 'artifacts' => $artifacts ) ),
-			array( 'config' => $config, 'only' => $wave, 'workspace' => self::workspace( $id ) )
+			array( 'config' => $config, 'only' => $wave, 'workspace' => $workspace )
 		);
 
 		self::absorb( $id, $state, $result->to_array(), count( $wave ) );

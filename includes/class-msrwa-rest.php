@@ -16,6 +16,11 @@ final class MSRWA_REST {
 		register_rest_route( 'msrwa/v1', '/batches/(?P<id>\d+)/pause', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_read' ), 'callback' => array( __CLASS__, 'pause_batch' ) ) );
 		register_rest_route( 'msrwa/v1', '/batches/(?P<id>\d+)/resume', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_read' ), 'callback' => array( __CLASS__, 'resume_batch' ) ) );
 		register_rest_route( 'msrwa/v1', '/batches/(?P<id>\d+)/cancel', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_read' ), 'callback' => array( __CLASS__, 'cancel_batch' ) ) );
+		register_rest_route( 'msrwa/v1', '/lab/runs', array(
+			array( 'methods' => 'GET', 'permission_callback' => array( __CLASS__, 'can_manage' ), 'callback' => array( __CLASS__, 'lab_runs' ) ),
+			array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_manage' ), 'callback' => array( __CLASS__, 'lab_start' ) ),
+		) );
+		register_rest_route( 'msrwa/v1', '/lab/runs/(?P<id>\d+)/cancel', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_manage' ), 'callback' => array( __CLASS__, 'lab_cancel' ) ) );
 		register_rest_route( 'msrwa/v1', '/stats', array( 'methods' => 'GET', 'permission_callback' => array( __CLASS__, 'can_read' ), 'callback' => array( __CLASS__, 'stats' ) ) );
 		register_rest_route( 'msrwa/v1', '/events', array( 'methods' => 'GET', 'permission_callback' => array( __CLASS__, 'can_read' ), 'callback' => array( __CLASS__, 'events' ) ) );
 		register_rest_route( 'msrwa/v1', '/export', array( 'methods' => 'GET', 'permission_callback' => array( __CLASS__, 'can_read' ), 'callback' => array( __CLASS__, 'export' ) ) );
@@ -277,5 +282,53 @@ final class MSRWA_REST {
 		$response->header( 'Content-Type', 'text/csv; charset=utf-8' );
 		$response->header( 'Content-Disposition', 'attachment; filename=msrwa-' . $dataset . '-' . gmdate( 'Ymd-His' ) . '.csv' );
 		return $response;
+	}
+
+	/**
+	 * The laboratory's runs, as the screen polls them.
+	 *
+	 * Only what the table shows: the stored result carries the whole run and is
+	 * far too large to hand back every two seconds.
+	 */
+	public static function lab_runs() {
+		$out = array();
+		foreach ( MSRWA_Lab::recent( 30 ) as $run ) {
+			$out[] = array(
+				'id' => (int) $run['id'],
+				'label' => (string) $run['label'],
+				'status' => (string) $run['status'],
+				'step' => (string) $run['step'],
+				'steps_done' => (int) $run['steps_done'],
+				'steps_total' => (int) $run['steps_total'],
+				'cost_usd' => (float) $run['cost_usd'],
+				'seconds' => (float) $run['seconds'],
+				'error_message' => (string) $run['error_message'],
+			);
+		}
+		return rest_ensure_response( array( 'runs' => $out ) );
+	}
+
+	/** Starts a run and hands back its number. Cron does the rest. */
+	public static function lab_start( $request ) {
+		$fixture = sanitize_key( (string) $request->get_param( 'fixture' ) );
+		$brief = '' !== $fixture ? MSRWA_Lab_Screen::brief( $fixture ) : array();
+		if ( ! $brief ) {
+			$title = sanitize_text_field( (string) $request->get_param( 'title' ) );
+			if ( '' === $title ) { return new WP_Error( 'msrwa_lab_no_brief', 'Donnez un sujet ou un titre.', array( 'status' => 400 ) ); }
+			$brief = array( 'type' => 'title', 'title' => $title, 'text' => '', 'images' => array() );
+		}
+
+		$budget = round( (float) $request->get_param( 'budget' ), 4 );
+		if ( $budget <= 0 ) { return new WP_Error( 'msrwa_lab_no_budget', 'Un run sans plafond de dépense n’est pas lancé d’ici.', array( 'status' => 400 ) ); }
+
+		$id = MSRWA_Lab::create( $brief, array( 'limits' => array( 'budget_usd' => $budget ) ) );
+		if ( ! $id ) { return new WP_Error( 'msrwa_lab_not_created', 'Le run n’a pas pu être enregistré.', array( 'status' => 500 ) ); }
+		return rest_ensure_response( array( 'id' => $id ) );
+	}
+
+	public static function lab_cancel( $request ) {
+		$run = MSRWA_Lab::get( absint( $request['id'] ) );
+		if ( ! $run || ! MSRWA_Lab::may_see( $run ) ) { return new WP_Error( 'msrwa_lab_not_found', 'Run introuvable.', array( 'status' => 404 ) ); }
+		return rest_ensure_response( array( 'cancelled' => MSRWA_Lab::cancel( (int) $run['id'] ) ) );
 	}
 }
