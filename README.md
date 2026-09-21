@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.74` est un socle installable : file persistante, pipeline de
+La version `0.2.75` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.
@@ -22,6 +22,26 @@ Le plugin est en cours de refonte éditoriale et budgétaire :
 Les coûts affichés sont des estimations calculées avec le catalogue configuré,
 non une facture fournisseur. `completed` signifie que le traitement est terminé,
 jamais qu’un texte est validé éditorialement.
+
+## Version 0.2.75
+
+**« Relancer jusqu'à approbation » est mesuré, pas supposé.** Sur les mêmes
+artefacts du poulet yassa : premier verdict *refusé* — des poivrons et une
+tranche de citron sur la photographie principale, absents de la recette ; trois
+feuilles de laurier là où elle en prévoit une. Les deux images sont redessinées
+avec ces constats portés dans le prompt comme corrections, et le second verdict
+**approuve**, ne laissant que trois constats mineurs sur la présentation, à
+l'appréciation de l'éditeur.
+
+$0,1414 et 78 s pour la boucle, contre $0,0075 pour un verdict qui approuve du
+premier coup. Ce qui compte : les ingrédients inventés ne sont pas revenus. Une
+correction n'est pas un second coup de dé.
+
+Les deux régénérations sont enregistrées comme leurs propres étapes, chacune
+avec son coût dans son propre poste de budget, et chaque image conserve les
+corrections dont elle est née.
+
+Mesures reportées dans [`docs/LAB-RESULTS.md`](docs/LAB-RESULTS.md).
 
 ## Version 0.2.74
 

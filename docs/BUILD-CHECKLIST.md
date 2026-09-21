@@ -135,6 +135,15 @@ cost) in the task before changing anything.
   guaranteed by construction, each panel able to carry the previous as a
   continuity reference). The second is an architecture change, so it is not made
   unilaterally.
+  **Retry until approved now runs in the engine, and was measured 2026-09-21**
+  on the poulet yassa. The first verdict refused both images — peppers and a
+  lemon slice in the featured photograph that the recipe does not contain, three
+  bay leaves where it calls for one. Both were regenerated with those findings
+  carried into the prompt as corrections, and the second verdict **approved**,
+  leaving only minor findings about presentation. One refusal, one redraw, one
+  approval: $0.1414 and 78 s for the loop, against $0.0075 for a verdict that
+  approves first time. The invented ingredients did not come back, which is the
+  part that matters: a correction is not another roll of the dice.
 
 - [~] **A19 — Research feeds every step, distilled (owner directive, 2026-09-21).**
   What research read and what it observed in real photographs now reaches the
@@ -325,9 +334,23 @@ cost) in the task before changing anything.
   ~186s against ~250s serial.
   Found while drawing the graph: approval depended on the raw article, so it
   judged text a reader never sees. It now depends on the proofread article.
-  *Remaining:* migrate step inputs and scoring out of `tools/lib/steps.php`,
-  collapse the eight CLI tools into one, and add the run-a-whole-recipe entry
-  point with its wave scheduler.
+  Stage two: step inputs, scoring and the prompts moved into the engine.
+  Stage three: `MSRWA_Engine::run()` and `run_step()`, the wave scheduler, the
+  budget stop, and four call paths chosen by the capability a step declares —
+  text, image generation, the judge that reads both images' bytes, and none at
+  all. The eight CLI tools became `tools/lab.php`; the HTML report reads one
+  `MSRWA_Result` rather than thirteen file paths.
+  Removing the tools exposed two gaps in the engine: inspecting the cited
+  photographs and the editor's own images existed only in `prompt-lab.php`, so a
+  plugin-driven run would have produced research with no visual observations at
+  all. Both passes are in the engine, billed to research.
+  **Measured end to end 2026-09-21** on the poulet yassa: ten steps, 346.7 s,
+  $0.1274 — text $0.0370, featured $0.0278, collage $0.0350, research and checks
+  $0.0277. Research 14/14 with two photographs read from their bytes, recipe
+  4/4, article 10/10, review 3/3, fact check 5/5, corrections 2/2, language 6/6.
+  That run also found the approval step was being sent no article at all; see
+  version 0.2.74. Contract in [`ENGINE.md`](ENGINE.md).
+  *Remaining:* the plugin — access, interface, parameter translation, storage.
 
 - [~] **A4 — Review.** Written in English; findings must name the section to patch. *Original:* **A4 — Review.** Returns a boolean verdict plus findings that name the
   **section to patch**, never a full rewrite instruction.

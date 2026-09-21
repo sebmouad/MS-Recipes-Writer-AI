@@ -10,6 +10,55 @@ php tools/lab.php step <step> --brief=<fixture> --provider=<openai|gemini|claude
 
 Measured 2026-09-20. Prices from `tools/lib/pricing.php`, verified the same day.
 
+## The whole engine, end to end — measured 2026-09-21
+
+Poulet yassa sénégalais, from a title alone, every step, `gpt-5.6-luna` for text
+and `gpt-image-2.5-flare` for images.
+
+| Step | Score | Time | Cost |
+|---|---|---:|---:|
+| research | 14/14 | 119.4 s | $0.0207 |
+| canonical recipe | 4/4 | 29.4 s | $0.0053 |
+| article | 10/10 | 51.8 s | $0.0098 |
+| featured image | — | 12.5 s | $0.0278 |
+| Facebook collage | — | 14.8 s | $0.0350 |
+| review | 3/3 | 17.9 s | $0.0046 |
+| fact check | 5/5 | 27.2 s | $0.0063 |
+| corrections | 2/2 | 0 s | $0.0000 |
+| proofread | 6/6 | 38.0 s | $0.0109 |
+| final approval | 10/10 | 29.3 s | $0.0075 |
+| **total** | | **346.7 s** | **$0.1274** |
+
+Budget buckets: text $0.0370, featured $0.0278, collage $0.0350, research and
+checks $0.0277. 120,217 input tokens, 32,028 output.
+
+Research read two of the three photographs it cited from their bytes; the third
+host refused the download, which the package records as an uncertainty rather
+than passing off as an observation.
+
+The approval figure above is the corrected one. In the run itself it cost
+$0.0070 across three refusals, because the step was being sent no article at
+all — see version 0.2.74. Nothing offline could have caught that: the step ran,
+returned valid JSON, and scored 9/10 on a contract that measures the verdict's
+shape, not what it was shown.
+
+## Retry until approved — measured 2026-09-21
+
+The same yassa artifacts, `--attempts=3`.
+
+| | Verdict | What it named | Cost |
+|---|---|---|---:|
+| attempt 1 | refused | peppers and a lemon slice on the featured photograph, absent from the recipe; three bay leaves where it calls for one | |
+| redraw | — | both images, with those findings carried into the prompt as corrections | $0.0639 |
+| attempt 2 | **approved** | three minor findings about presentation, left to the editor | |
+| | | **total** | **$0.1414 / 78 s** |
+
+A verdict that approves first time costs $0.0075. The loop costs about nineteen
+times that, and it is the accepted artifact that is paid for, not the attempt.
+What matters is that the invented ingredients did not come back: the second
+image answered the first verdict, which is the difference between a correction
+and another roll of the dice.
+
 ## Image quality and the Facebook collage — measured 2026-09-20
 
 `gpt-image-2.5-flare`, tarte normande, featured image 1024×1024 and collage
