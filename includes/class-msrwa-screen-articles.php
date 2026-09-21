@@ -74,9 +74,10 @@ final class MSRWA_Screen_Articles {
 				);
 				?>
 			<?php else : ?>
-				<div class="ms-rail">
+				<?php self::bulk_bar(); ?>
+				<div class="ms-rail" id="ms-bulk-rail">
 					<?php foreach ( $found['runs'] as $run ) : ?>
-						<?php MSRWA_UI::ticket( $run, admin_url( 'admin.php?page=msrwa-run&run_id=' . (int) $run['id'] ) ); ?>
+						<?php MSRWA_UI::ticket( $run, admin_url( 'admin.php?page=msrwa-run&run_id=' . (int) $run['id'] ), true ); ?>
 					<?php endforeach; ?>
 				</div>
 				<?php self::pages( $found, $filters ); ?>
@@ -84,6 +85,39 @@ final class MSRWA_Screen_Articles {
 		</section>
 		<?php
 		echo '</div>';
+	}
+
+	/**
+	 * One decision applied to several recipes.
+	 *
+	 * The first time a lot of ten fails on a bad key, cancelling them one at a
+	 * time is the difference between a tool somebody uses and one they dread.
+	 * Deleting is an administrator's, because it destroys the record of what
+	 * was spent.
+	 */
+	private static function bulk_bar() {
+		?>
+		<div class="ms-filters" id="ms-bulk">
+			<div>
+				<label for="ms-bulk-all"><?php esc_html_e( 'Sélection', 'ms-recipes-writer-ai' ); ?></label>
+				<label><input type="checkbox" id="ms-bulk-all"> <?php esc_html_e( 'tout', 'ms-recipes-writer-ai' ); ?></label>
+			</div>
+			<div>
+				<label for="ms-bulk-do"><?php esc_html_e( 'Action', 'ms-recipes-writer-ai' ); ?></label>
+				<select id="ms-bulk-do">
+					<option value="cancel"><?php esc_html_e( 'Arrêter', 'ms-recipes-writer-ai' ); ?></option>
+					<option value="retry"><?php esc_html_e( 'Reprendre', 'ms-recipes-writer-ai' ); ?></option>
+					<?php if ( MSRWA_Rights::may_delete() ) : ?>
+						<option value="delete"><?php esc_html_e( 'Supprimer', 'ms-recipes-writer-ai' ); ?></option>
+					<?php endif; ?>
+				</select>
+			</div>
+			<div>
+				<button class="button" id="ms-bulk-go" disabled><?php esc_html_e( 'Appliquer', 'ms-recipes-writer-ai' ); ?></button>
+				<span id="ms-bulk-status" class="ms-muted" aria-live="polite"></span>
+			</div>
+		</div>
+		<?php
 	}
 
 	private static function states() {

@@ -12,9 +12,11 @@ final class MSRWA_REST {
 		register_rest_route( 'msrwa/v1', '/estimate', array( 'methods' => 'GET', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'estimate' ) ) );
 		register_rest_route( 'msrwa/v1', '/batches', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'create' ) ) );
 		register_rest_route( 'msrwa/v1', '/batches/(?P<id>\d+)/pairs', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'pairs' ) ) );
+		register_rest_route( 'msrwa/v1', '/batches/(?P<id>\d+)/schedule', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'schedule' ) ) );
 		register_rest_route( 'msrwa/v1', '/batches/(?P<id>\d+)/dispatch', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'dispatch' ) ) );
 		register_rest_route( 'msrwa/v1', '/batches/(?P<id>\d+)/runs', array( 'methods' => 'GET', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'runs' ) ) );
 		register_rest_route( 'msrwa/v1', '/batches/(?P<id>\d+)', array( 'methods' => 'DELETE', 'permission_callback' => array( __CLASS__, 'can_manage' ), 'callback' => array( __CLASS__, 'remove' ) ) );
+		register_rest_route( 'msrwa/v1', '/runs/bulk', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'bulk' ) ) );
 		register_rest_route( 'msrwa/v1', '/runs/(?P<id>\d+)/retry', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'retry' ) ) );
 		register_rest_route( 'msrwa/v1', '/runs/(?P<id>\d+)/cancel', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'cancel' ) ) );
 	}
@@ -85,6 +87,15 @@ final class MSRWA_REST {
 		return rest_ensure_response( array( 'saved' => true ) );
 	}
 
+	/** Sets, or clears, the hour a lot is sent at. */
+	public static function schedule( WP_REST_Request $request ) {
+		$batch = self::batch( $request['id'] );
+		if ( ! $batch ) { return new WP_Error( 'msrwa_not_found', __( 'Lot introuvable.', 'ms-recipes-writer-ai' ), array( 'status' => 404 ) ); }
+		$when = MSRWA_Schedule::when( (int) $batch['id'], sanitize_text_field( (string) $request->get_param( 'at' ) ) );
+		if ( is_wp_error( $when ) ) { return $when; }
+		return rest_ensure_response( array( 'at' => $when ? gmdate( 'c', $when ) : null ) );
+	}
+
 	public static function dispatch( WP_REST_Request $request ) {
 		$batch = self::batch( $request['id'] );
 		if ( ! $batch ) { return new WP_Error( 'msrwa_not_found', 'Lot introuvable.', array( 'status' => 404 ) ); }
@@ -112,6 +123,47 @@ final class MSRWA_REST {
 			}
 		}
 		return rest_ensure_response( array( 'status' => (string) $batch['status'], 'runs' => $out ) );
+	}
+
+	/**
+	 * The same decision applied to several recipes.
+	 *
+	 * Each one is checked on its own: a selection that includes a recipe this
+	 * person may not touch, or one the action does not apply to, does that much
+	 * and reports the rest rather than refusing everything or doing it anyway.
+	 */
+	public static function bulk( WP_REST_Request $request ) {
+		$action = sanitize_key( (string) $request->get_param( 'do' ) );
+		if ( ! in_array( $action, array( 'cancel', 'retry', 'delete' ), true ) ) {
+			return new WP_Error( 'msrwa_unknown_action', __( 'Action inconnue.', 'ms-recipes-writer-ai' ), array( 'status' => 400 ) );
+		}
+		if ( 'delete' === $action && ! MSRWA_Rights::may_delete() ) {
+			return new WP_Error( 'msrwa_forbidden', __( 'La suppression est réservée aux administrateurs.', 'ms-recipes-writer-ai' ), array( 'status' => 403 ) );
+		}
+
+		$ids = array_slice( array_unique( array_filter( array_map( 'absint', (array) $request->get_param( 'runs' ) ) ) ), 0, 100 );
+		$done = 0;
+		$skipped = array();
+
+		foreach ( $ids as $id ) {
+			$run = MSRWA_Run::get( $id );
+			if ( ! $run || ! MSRWA_Run::may_see( $run ) ) { $skipped[] = $id; continue; }
+
+			if ( 'cancel' === $action ) {
+				if ( MSRWA_Run::cancel( $id ) ) { $done++; } else { $skipped[] = $id; }
+				continue;
+			}
+			if ( 'retry' === $action ) {
+				if ( MSRWA_Run::may_retry( $run ) && MSRWA_Run::retry( $id ) ) { $done++; } else { $skipped[] = $id; }
+				continue;
+			}
+			// Deleting destroys the evidence of what was spent, so a recipe
+			// still moving is never deleted out from under its own worker.
+			if ( in_array( (string) $run['status'], array( 'queued', 'running' ), true ) ) { $skipped[] = $id; continue; }
+			if ( MSRWA_Run::delete( $id ) ) { $done++; } else { $skipped[] = $id; }
+		}
+
+		return rest_ensure_response( array( 'done' => $done, 'skipped' => array_values( $skipped ) ) );
 	}
 
 	/** Picks a stopped run back up, without paying again for what succeeded. */

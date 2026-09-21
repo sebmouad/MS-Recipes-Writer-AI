@@ -14,6 +14,7 @@ final class MSRWA_Admin {
 		add_action( 'admin_post_msrwa_save_settings', array( __CLASS__, 'save_settings' ) );
 		add_action( 'admin_post_msrwa_save_engine', array( __CLASS__, 'save_engine' ) );
 		add_action( 'admin_post_msrwa_report', array( 'MSRWA_Operations', 'report' ) );
+		add_action( 'admin_post_msrwa_export', array( 'MSRWA_Export', 'send' ) );
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'assets' ) );
 	}
 
@@ -73,6 +74,14 @@ final class MSRWA_Admin {
 				'retrying' => __( 'Reprise…', 'ms-recipes-writer-ai' ),
 				/* translators: %s is a comma-separated list of step names. */
 				'unpriced' => __( 'Le total est incomplet : %s tourne(nt) sur un modèle sans tarif publié.', 'ms-recipes-writer-ai' ),
+				'onePicked' => __( '1 recette sélectionnée', 'ms-recipes-writer-ai' ),
+				/* translators: %d is a number of recipes. */
+				'manyPicked' => __( '%d recettes sélectionnées', 'ms-recipes-writer-ai' ),
+				'applying' => __( 'Application…', 'ms-recipes-writer-ai' ),
+				/* translators: %d is a number of recipes. */
+				'confirmDelete' => __( 'Supprimer %d recette(s) et tout ce que le moteur en a rapporté ? C’est irréversible.', 'ms-recipes-writer-ai' ),
+				/* translators: 1: how many were done, 2: how many were not. */
+				'someSkipped' => __( '%1$d traitée(s), %2$d ignorée(s) : l’action ne s’appliquait pas, ou elles ne vous appartiennent pas.', 'ms-recipes-writer-ai' ),
 			),
 		) );
 	}

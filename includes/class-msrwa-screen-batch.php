@@ -45,13 +45,22 @@ final class MSRWA_Screen_Batch {
 		if ( 'matching' === $batch['status'] ) {
 			MSRWA_UI::note( esc_html__( 'Les photographies sont en cours de description. Rechargez dans un instant.', 'ms-recipes-writer-ai' ) );
 		}
+		$waiting = MSRWA_Schedule::waiting_for( $batch );
+		if ( '' !== $waiting ) { MSRWA_UI::note( esc_html( $waiting ) ); }
 
-		self::pairing( $matching, $settling, (int) $batch['recipes'] );
+		// The form speaks the site's timezone; the column is UTC.
+		$scheduled = '';
+		if ( ! empty( $batch['dispatch_at'] ) ) {
+			$stamp = strtotime( $batch['dispatch_at'] . ' UTC' );
+			if ( $stamp ) { $scheduled = wp_date( 'Y-m-d\TH:i', $stamp ); }
+		}
+
+		self::pairing( $matching, $settling, (int) $batch['recipes'], $scheduled );
 		self::runs( $runs );
 		echo '</div>';
 	}
 
-	private static function pairing( array $matching, $settling, $recipe_count ) {
+	private static function pairing( array $matching, $settling, $recipe_count, $scheduled = '' ) {
 		$images = (array) ( $matching['images'] ?? array() );
 		$recipes = (array) ( $matching['recipes'] ?? array() );
 
@@ -63,7 +72,7 @@ final class MSRWA_Screen_Batch {
 				__( 'Aucune photographie', 'ms-recipes-writer-ai' ),
 				__( 'Les recettes seront générées sans photographie fournie : le moteur cherchera ses propres références.', 'ms-recipes-writer-ai' )
 			);
-			self::actions( $settling, $recipe_count );
+			self::actions( $settling, $recipe_count, $scheduled );
 			echo '</section>';
 			return;
 		}
@@ -109,7 +118,7 @@ final class MSRWA_Screen_Batch {
 			<?php
 		}
 
-		self::actions( $settling, $recipe_count );
+		self::actions( $settling, $recipe_count, $scheduled );
 		echo '</section>';
 	}
 
@@ -123,17 +132,22 @@ final class MSRWA_Screen_Batch {
 		return $words[ $level ] ?? $words['basse'];
 	}
 
-	private static function actions( $settling, $recipe_count ) {
+	private static function actions( $settling, $recipe_count, $scheduled = '' ) {
 		if ( ! $settling ) { return; }
 		echo '<div class="ms-filters" style="justify-content:space-between">';
 		echo '<div><button class="button" id="ms-save-pairs">' . esc_html__( 'Enregistrer l’appariement', 'ms-recipes-writer-ai' ) . '</button> '
 			. '<span id="ms-batch-status" class="ms-muted" aria-live="polite"></span></div>';
-		echo '<div><button class="button button-primary" id="ms-dispatch">'
+		echo '<div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">';
+		echo '<div><label for="ms-dispatch-at">' . esc_html__( 'Plus tard', 'ms-recipes-writer-ai' ) . '</label>'
+			. '<input type="datetime-local" id="ms-dispatch-at" value="' . esc_attr( $scheduled ) . '"></div>';
+		echo '<button class="button" id="ms-schedule">' . esc_html__( 'Programmer', 'ms-recipes-writer-ai' ) . '</button>';
+		echo '<button class="button button-primary" id="ms-dispatch">'
 			. esc_html( sprintf(
 				/* translators: %d is a number of recipes. */
 				_n( 'Lancer %d recette', 'Lancer %d recettes', (int) $recipe_count, 'ms-recipes-writer-ai' ),
 				(int) $recipe_count
-			) ) . '</button></div>';
+			) ) . '</button>';
+		echo '</div>';
 		echo '</div>';
 	}
 

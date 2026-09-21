@@ -728,3 +728,84 @@ msgstr "كل وصفة تسلك المسار نفسه. والمبالغ محسو�
 
 msgid "Le total est incomplet : %s tourne(nt) sur un modèle sans tarif publié."
 msgstr "المجموع ناقص: %s تجري على نموذج بلا تسعيرة منشورة."
+
+msgid "%1$d traitée(s), %2$d ignorée(s) : l’action ne s’appliquait pas, ou elles ne vous appartiennent pas."
+msgstr "‏%1$d مُنفَّذة، %2$d متجاوَزة: الإجراء لا ينطبق، أو أنها ليست لك."
+
+msgid "%d recettes sélectionnées"
+msgstr "‏%d وصفة مختارة"
+
+msgid "1 recette sélectionnée"
+msgstr "وصفة واحدة مختارة"
+
+msgid "Action"
+msgstr "الإجراء"
+
+msgid "Action inconnue."
+msgstr "إجراء غير معروف."
+
+msgid "Application…"
+msgstr "جارٍ التطبيق…"
+
+msgid "Appliquer"
+msgstr "طبّق"
+
+msgid "Arrêter"
+msgstr "إيقاف"
+
+msgid "Ce lot est déjà lancé."
+msgstr "هذه الدفعة أُطلقت بالفعل."
+
+msgid "Cette heure est déjà passée."
+msgstr "هذا الوقت قد مضى."
+
+msgid "Date illisible."
+msgstr "تاريخ غير مقروء."
+
+msgid "Envoi programmé le %s. Rien n’est dépensé d’ici là."
+msgstr "الإرسال مجدول في %s. ولا يُنفق شيء حتى ذلك الحين."
+
+msgid "Exporter"
+msgstr "تصدير"
+
+msgid "La même période, en CSV, pour les questions qu’un tableur répond mieux qu’un écran. Un coût inconnu y est vide, jamais zéro : une colonne de zéros s’additionne en un total qui n’a jamais existé."
+msgstr "الفترة نفسها بصيغة CSV، للأسئلة التي يجيبها الجدول أفضل من الشاشة. والكلفة المجهولة فارغة فيه لا صفر: فعمود من الأصفار يجمع مجموعاً لم يوجد قط."
+
+msgid "La suppression est réservée aux administrateurs."
+msgstr "الحذف مقصور على المديرين."
+
+msgid "Plus tard"
+msgstr "لاحقاً"
+
+msgid "Programmer"
+msgstr "جدولة"
+
+msgid "Supprimer"
+msgstr "حذف"
+
+msgid "Supprimer %d recette(s) et tout ce que le moteur en a rapporté ? C’est irréversible."
+msgstr "أتحذف %d وصفة وكل ما أبلغ عنه المحرك بشأنها؟ لا رجعة في ذلك."
+
+msgid "Sélection"
+msgstr "التحديد"
+
+msgid "Sélectionner %s"
+msgstr "تحديد %s"
+
+msgid "Toutes les cinq minutes (MS Recipes Writer)"
+msgstr "كل خمس دقائق (MS Recipes Writer)"
+
+msgid "Une ligne par appel"
+msgstr "سطر لكل استدعاء"
+
+msgid "Une ligne par recette"
+msgstr "سطر لكل وصفة"
+
+msgid "Une ligne par étape"
+msgstr "سطر لكل خطوة"
+
+msgid "Vous n’avez pas accès à cet export."
+msgstr "لا تملك صلاحية هذا التصدير."
+
+msgid "tout"
+msgstr "الكل"

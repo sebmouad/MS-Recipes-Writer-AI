@@ -163,6 +163,25 @@
     });
   }
 
+  var schedule = document.getElementById('ms-schedule');
+  if (schedule) {
+    schedule.addEventListener('click', function () {
+      schedule.disabled = true;
+      say(batchStatus, t.saving || '');
+      // The pairing is settled first, so a lot that leaves at three in the
+      // morning leaves with what is on screen now.
+      call('/batches/' + batch + '/pairs', { method: 'POST', body: JSON.stringify({ pairs: pairs() }) })
+        .then(function () {
+          return call('/batches/' + batch + '/schedule', {
+            method: 'POST',
+            body: JSON.stringify({ at: document.getElementById('ms-dispatch-at').value })
+          });
+        })
+        .then(function () { window.location.reload(); })
+        .catch(function (error) { say(batchStatus, error.message); schedule.disabled = false; });
+    });
+  }
+
   var dispatch = document.getElementById('ms-dispatch');
   if (dispatch) {
     dispatch.addEventListener('click', function () {
@@ -190,6 +209,57 @@
           say(document.getElementById('ms-run-status'), error.message);
           retry.disabled = false;
         });
+    });
+  }
+
+  // --- One decision, several recipes -------------------------------------
+
+  var bulk = document.getElementById('ms-bulk');
+  if (bulk) {
+    var rail = document.getElementById('ms-bulk-rail');
+    var all = document.getElementById('ms-bulk-all');
+    var go = document.getElementById('ms-bulk-go');
+    var bulkStatus = document.getElementById('ms-bulk-status');
+
+    function picked() {
+      return Array.prototype.filter.call(rail.querySelectorAll('.ms-pick-run'), function (box) { return box.checked; })
+        .map(function (box) { return parseInt(box.value, 10); });
+    }
+
+    function countPicked() {
+      var n = picked().length;
+      go.disabled = 0 === n;
+      say(bulkStatus, n ? (1 === n ? t.onePicked : (t.manyPicked || '').replace('%d', n)) : '');
+    }
+
+    all.addEventListener('change', function () {
+      rail.querySelectorAll('.ms-pick-run').forEach(function (box) { box.checked = all.checked; });
+      countPicked();
+    });
+    rail.addEventListener('change', function (event) {
+      if (event.target.classList.contains('ms-pick-run')) { countPicked(); }
+    });
+
+    go.addEventListener('click', function () {
+      var runs = picked();
+      var action = document.getElementById('ms-bulk-do').value;
+      if (!runs.length) return;
+      // Deleting destroys the record of what was spent and cannot be undone,
+      // so it is the one action that asks first.
+      if ('delete' === action && !window.confirm((t.confirmDelete || '').replace('%d', runs.length))) return;
+
+      go.disabled = true;
+      say(bulkStatus, t.applying || '');
+      call('/runs/bulk', { method: 'POST', body: JSON.stringify({ do: action, runs: runs }) })
+        .then(function (data) {
+          if (data.skipped && data.skipped.length) {
+            say(bulkStatus, (t.someSkipped || '').replace('%1$d', data.done).replace('%2$d', data.skipped.length));
+            window.setTimeout(function () { window.location.reload(); }, 2500);
+            return;
+          }
+          window.location.reload();
+        })
+        .catch(function (error) { say(bulkStatus, error.message); go.disabled = false; });
     });
   }
 

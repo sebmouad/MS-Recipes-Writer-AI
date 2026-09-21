@@ -12,6 +12,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) { define( 'ABSPATH', dirname( __DIR__ ) . '/' ); }
 if ( ! defined( 'ARRAY_A' ) ) { define( 'ARRAY_A', 'ARRAY_A' ); }
+if ( ! defined( 'ARRAY_N' ) ) { define( 'ARRAY_N', 'ARRAY_N' ); }
 if ( ! defined( 'MSRWA_VERSION' ) ) { define( 'MSRWA_VERSION', '0.0.0-test' ); }
 if ( ! defined( 'MSRWA_DIR' ) ) { define( 'MSRWA_DIR', dirname( __DIR__ ) . '/' ); }
 if ( ! defined( 'MSRWA_URL' ) ) { define( 'MSRWA_URL', 'https://example.test/wp-content/plugins/ms-recipes-writer-ai/' ); }
@@ -187,6 +188,9 @@ if ( ! function_exists( 'size_format' ) ) {
 	function size_format( $bytes, $decimals = 0 ) { return number_format( (float) $bytes / 1024, $decimals ) . ' KB'; }
 }
 
+if ( ! function_exists( 'wp_nonce_url' ) ) {
+	function wp_nonce_url( $url, $action = -1, $name = '_wpnonce' ) { return $url . '&' . $name . '=test'; }
+}
 if ( ! function_exists( 'wp_dropdown_users' ) ) {
 	function wp_dropdown_users( $args = array() ) {
 		$name = isset( $args['name'] ) ? $args['name'] : 'user';

@@ -728,3 +728,84 @@ msgstr "Every recipe takes the same path. The amounts are worked out from the ro
 
 msgid "Le total est incomplet : %s tourne(nt) sur un modèle sans tarif publié."
 msgstr "The total is incomplete: %s run(s) on a model with no published rate."
+
+msgid "%1$d traitée(s), %2$d ignorée(s) : l’action ne s’appliquait pas, ou elles ne vous appartiennent pas."
+msgstr "%1$d done, %2$d skipped: the action did not apply, or they are not yours."
+
+msgid "%d recettes sélectionnées"
+msgstr "%d recipes selected"
+
+msgid "1 recette sélectionnée"
+msgstr "1 recipe selected"
+
+msgid "Action"
+msgstr "Action"
+
+msgid "Action inconnue."
+msgstr "Unknown action."
+
+msgid "Application…"
+msgstr "Applying…"
+
+msgid "Appliquer"
+msgstr "Apply"
+
+msgid "Arrêter"
+msgstr "Stop"
+
+msgid "Ce lot est déjà lancé."
+msgstr "This lot has already started."
+
+msgid "Cette heure est déjà passée."
+msgstr "That time has already passed."
+
+msgid "Date illisible."
+msgstr "Unreadable date."
+
+msgid "Envoi programmé le %s. Rien n’est dépensé d’ici là."
+msgstr "Scheduled to send on %s. Nothing is spent until then."
+
+msgid "Exporter"
+msgstr "Export"
+
+msgid "La même période, en CSV, pour les questions qu’un tableur répond mieux qu’un écran. Un coût inconnu y est vide, jamais zéro : une colonne de zéros s’additionne en un total qui n’a jamais existé."
+msgstr "The same period as CSV, for questions a spreadsheet answers better than a screen. An unknown cost is empty there, never zero: a column of zeroes adds up to a total that never existed."
+
+msgid "La suppression est réservée aux administrateurs."
+msgstr "Deleting is for administrators only."
+
+msgid "Plus tard"
+msgstr "Later"
+
+msgid "Programmer"
+msgstr "Schedule"
+
+msgid "Supprimer"
+msgstr "Delete"
+
+msgid "Supprimer %d recette(s) et tout ce que le moteur en a rapporté ? C’est irréversible."
+msgstr "Delete %d recipe(s) and everything the engine reported about them? This cannot be undone."
+
+msgid "Sélection"
+msgstr "Selection"
+
+msgid "Sélectionner %s"
+msgstr "Select %s"
+
+msgid "Toutes les cinq minutes (MS Recipes Writer)"
+msgstr "Every five minutes (MS Recipes Writer)"
+
+msgid "Une ligne par appel"
+msgstr "One row per call"
+
+msgid "Une ligne par recette"
+msgstr "One row per recipe"
+
+msgid "Une ligne par étape"
+msgstr "One row per step"
+
+msgid "Vous n’avez pas accès à cet export."
+msgstr "You do not have access to this export."
+
+msgid "tout"
+msgstr "all"

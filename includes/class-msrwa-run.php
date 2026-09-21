@@ -357,6 +357,28 @@ final class MSRWA_Run {
 		if ( in_array( $status, array( 'failed', 'cancelled' ), true ) ) { MSRWA_Batch::settle( (int) ( self::get( $id )['batch_id'] ?? 0 ) ); }
 	}
 
+	/**
+	 * Removes one recipe and everything the engine reported about it.
+	 *
+	 * The draft it produced is left alone: it is an ordinary post, somebody may
+	 * have published it, and deleting a record of a run is not a reason to
+	 * delete a reader's article.
+	 */
+	public static function delete( $id ) {
+		global $wpdb;
+		$t = MSRWA_DB::tables();
+		$run = self::get( $id );
+		if ( ! $run || ! self::may_see( $run ) ) { return false; }
+		if ( in_array( (string) $run['status'], array( 'queued', 'running' ), true ) ) { return false; }
+
+		foreach ( array( 'steps', 'calls', 'events', 'artifacts' ) as $table ) {
+			$wpdb->query( $wpdb->prepare( 'DELETE FROM ' . $t[ $table ] . ' WHERE run_id = %d', absint( $id ) ) );
+		}
+		$wpdb->delete( self::table(), array( 'id' => absint( $id ) ), array( '%d' ) );
+		MSRWA_Batch::settle( (int) $run['batch_id'] );
+		return true;
+	}
+
 	/** Whether this run can be picked up again, and by this person. */
 	public static function may_retry( array $run ) {
 		return in_array( (string) $run['status'], array( 'failed', 'cancelled' ), true ) && self::may_see( $run );

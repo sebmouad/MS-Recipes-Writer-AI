@@ -81,12 +81,16 @@ final class MSRWA_UI {
 	 * which is the whole reason the rail exists: an editor glancing at the page
 	 * should see that something went wrong without reading a word.
 	 */
-	public static function ticket( array $run, $url ) {
+	public static function ticket( array $run, $url, $selectable = false ) {
 		$state = self::state_of( $run );
 		$spine = in_array( $state['tone'], array( 'live' ), true ) ? 'live' : ( 'stop' === $state['tone'] ? 'stop' : ( 'good' === $state['tone'] ? 'done' : '' ) );
 		?>
 		<article class="ms-ticket<?php echo $spine ? ' ms-ticket-' . esc_attr( $spine ) : ''; ?>" data-run="<?php echo esc_attr( $run['id'] ); ?>">
 			<div class="ms-ticket-title">
+				<?php if ( $selectable ) : ?>
+					<input type="checkbox" class="ms-pick-run" value="<?php echo esc_attr( $run['id'] ); ?>"
+						aria-label="<?php echo esc_attr( sprintf( /* translators: %s is a recipe title. */ __( 'Sélectionner %s', 'ms-recipes-writer-ai' ), $run['label'] ) ); ?>">
+				<?php endif; ?>
 				<span class="ms-ticket-no">#<?php echo esc_html( $run['id'] ); ?></span>
 				<a class="ms-ticket-name" href="<?php echo esc_url( $url ); ?>"><?php echo esc_html( $run['label'] ); ?></a>
 			</div>

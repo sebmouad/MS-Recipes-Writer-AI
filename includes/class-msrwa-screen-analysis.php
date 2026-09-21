@@ -48,6 +48,11 @@ final class MSRWA_Screen_Analysis {
 		self::checks( $days );
 		self::days();
 
+		echo '<section class="ms-card"><h2>' . esc_html__( 'Exporter', 'ms-recipes-writer-ai' ) . '</h2>';
+		echo '<p>' . esc_html__( 'La même période, en CSV, pour les questions qu’un tableur répond mieux qu’un écran. Un coût inconnu y est vide, jamais zéro : une colonne de zéros s’additionne en un total qui n’a jamais existé.', 'ms-recipes-writer-ai' ) . '</p>';
+		echo '<p>' . MSRWA_Export::links( $days ) . '</p>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- links() escapes its own.
+		echo '</section>';
+
 		echo '</div>';
 	}
 

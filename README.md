@@ -2,6 +2,34 @@
 
 Plugin WordPress en construction pour la génération éditoriale culinaire orchestrée.
 
+## Version 0.5.1
+
+**Export CSV, actions groupées, lots programmés.**
+
+**L'export.** Trois formes, parce qu'on pose trois questions : une ligne par
+recette pour « qu'a coûté le mois dernier », une par étape pour « où part
+l'argent », une par appel pour « quel modèle est réellement facturé ». Diffusé
+en flux et lu par pages de 500 : une année de runs n'a pas à tenir en mémoire
+avant que quiconque puisse télécharger. Un coût inconnu y est vide et jamais
+zéro — une colonne de zéros s'additionne en un total qui n'a jamais été payé —
+et le fichier commence par une marque d'ordre des octets, sans quoi Excel rend
+chaque accent illisible.
+
+**Les actions groupées.** Arrêter, reprendre ou supprimer plusieurs recettes
+d'un coup. Chacune est vérifiée séparément : une sélection qui contient une
+recette qu'on n'a pas le droit de toucher en fait autant qu'elle peut et signale
+le reste, plutôt que de tout refuser ou de tout faire. Une recette en cours
+n'est jamais supprimée sous son propre worker, et la suppression appartient aux
+administrateurs : elle détruit la trace de ce qui a été dépensé.
+
+**Les lots programmés.** L'appariement se fait tout de suite — c'est ce qu'il
+faut confirmer, et c'est la moitié bon marché. Ce qui attend, c'est l'envoi. Rien
+n'est dépensé jusqu'à l'heure dite, et rien n'est envoyé depuis un navigateur :
+le cron réclame le lot par un UPDATE conditionnel, donc deux passages simultanés
+ne peuvent pas l'envoyer deux fois. Le cron passe désormais toutes les cinq
+minutes, parce qu'un lot demandé à neuf heures qui part à dix a manqué son
+heure.
+
 ## Version 0.5.0
 
 **Le juge ne répond plus que de ce qu'on lui a montré** *(modification du moteur,
@@ -228,7 +256,7 @@ cron réel et validité distante des clés restent à vérifier sur un site de t
 
 ## État actuel
 
-La version `0.5.0` est un socle installable : file persistante, pipeline de
+La version `0.5.1` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.

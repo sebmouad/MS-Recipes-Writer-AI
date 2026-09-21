@@ -6,7 +6,9 @@ final class MSRWA_Plugin {
 	public static function activate() {
 		MSRWA_DB::install();
 		MSRWA_Rights::grant();
-		if ( ! wp_next_scheduled( 'msrwa_cleanup' ) ) { wp_schedule_event( time() + HOUR_IN_SECONDS, 'hourly', 'msrwa_cleanup' ); }
+		// Hourly is fine for tidying, but a lot asked for at nine o'clock should
+		// not wait until ten, so the same event runs every five minutes.
+		if ( ! wp_next_scheduled( 'msrwa_cleanup' ) ) { wp_schedule_event( time() + 300, 'msrwa_five_minutes', 'msrwa_cleanup' ); }
 	}
 
 	public static function deactivate() {
@@ -34,7 +36,14 @@ final class MSRWA_Plugin {
 		MSRWA_DB::prune_events( (int) apply_filters( 'msrwa_event_retention_days', 90 ) );
 	}
 
+	/** Five minutes, because a scheduled lot waiting an hour is a lot that missed its hour. */
+	public static function intervals( $schedules ) {
+		$schedules['msrwa_five_minutes'] = array( 'interval' => 300, 'display' => __( 'Toutes les cinq minutes (MS Recipes Writer)', 'ms-recipes-writer-ai' ) );
+		return $schedules;
+	}
+
 	public static function boot() {
+		add_filter( 'cron_schedules', array( __CLASS__, 'intervals' ) );
 		add_filter( 'cron_schedules', array( __CLASS__, 'schedules' ) );
 		if ( wp_get_schedule( 'msrwa_cleanup' ) !== 'msrwa_five_minutes' ) {
 			wp_clear_scheduled_hook( 'msrwa_cleanup' );
@@ -44,6 +53,7 @@ final class MSRWA_Plugin {
 		add_action( 'msrwa_run_step', array( 'MSRWA_Run', 'tick' ) );
 		add_action( 'msrwa_cleanup', array( 'MSRWA_Run', 'recover_expired' ) );
 		add_action( 'msrwa_cleanup', array( __CLASS__, 'prune' ) );
+		add_action( 'msrwa_cleanup', array( 'MSRWA_Schedule', 'due' ) );
 		if ( is_admin() ) { MSRWA_Admin::hooks(); MSRWA_Editor::hooks(); }
 		if ( get_option( 'msrwa_db_version' ) !== MSRWA_VERSION ) { MSRWA_DB::install(); self::caps(); }
 	}
