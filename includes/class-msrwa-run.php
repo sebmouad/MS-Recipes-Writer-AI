@@ -44,6 +44,7 @@ final class MSRWA_Run {
 	}
 
 	public static function queue( $id, $delay = 5 ) {
+		if ( wp_next_scheduled( 'msrwa_run_step', array( absint( $id ) ) ) ) { return; }
 		wp_schedule_single_event( time() + max( 1, (int) $delay ), 'msrwa_run_step', array( absint( $id ) ) );
 	}
 
@@ -170,10 +171,10 @@ final class MSRWA_Run {
 			) );
 		}
 
-		// Each tick is one wave of a longer run: its own opening and closing lines
-		// would read as a run starting and finishing over and over.
+		// Each tick is one wave: retain its boundaries and configuration so the
+		// job report exposes the same evidence as the standalone lab.
 		foreach ( (array) ( $tick['events'] ?? array() ) as $event ) {
-			if ( in_array( (string) $event['kind'], array( 'start', 'config', 'finish' ), true ) ) { continue; }
+			// Keep configuration/provenance and wave boundaries for diagnostics.
 			$data = MSRWA_DB::sanitize( (array) ( $event['data'] ?? array() ) );
 			$wpdb->insert( $t['events'], array(
 				'run_id' => absint( $id ), 'at_seconds' => (float) $event['at'], 'kind' => (string) $event['kind'],
@@ -234,6 +235,7 @@ final class MSRWA_Run {
 		foreach ( $rows as $row ) {
 			$out[] = array(
 				'step' => $row['step'], 'model' => $row['model'], 'provider' => $row['provider'],
+				'bucket' => $row['bucket'],
 				'seconds' => (float) $row['seconds'], 'attempts' => (int) $row['attempts'],
 				'usage' => array( 'input_tokens' => (int) $row['input_tokens'], 'output_tokens' => (int) $row['output_tokens'] ),
 				'cost_usd' => null === $row['cost_usd'] ? null : (float) $row['cost_usd'],
@@ -337,11 +339,14 @@ final class MSRWA_Run {
 	 */
 	public static function recover_expired() {
 		global $wpdb;
+		update_option( 'msrwa_watchdog_at', current_time( 'mysql', true ), false );
 		$stuck = (array) $wpdb->get_col( 'SELECT id FROM ' . self::table() . " WHERE status = 'running' AND lock_until IS NOT NULL AND lock_until < UTC_TIMESTAMP() LIMIT 20" );
 		foreach ( $stuck as $id ) {
-			$wpdb->query( $wpdb->prepare( 'UPDATE ' . self::table() . " SET status = 'queued', lock_token = NULL, lock_until = NULL, updated_at = %s WHERE id = %d", current_time( 'mysql', true ), absint( $id ) ) );
-			self::queue( (int) $id, 5 );
+			$changed = $wpdb->query( $wpdb->prepare( 'UPDATE ' . self::table() . " SET status = 'queued', lock_token = NULL, lock_until = NULL, updated_at = %s WHERE id = %d AND status = 'running' AND lock_until IS NOT NULL AND lock_until < UTC_TIMESTAMP()", current_time( 'mysql', true ), absint( $id ) ) );
+			if ( $changed ) { self::queue( (int) $id, 5 ); }
 		}
+		$queued = (array) $wpdb->get_col( 'SELECT id FROM ' . self::table() . " WHERE status = 'queued' ORDER BY updated_at ASC LIMIT 100" );
+		foreach ( $queued as $id ) { self::queue( (int) $id, 5 ); }
 	}
 
 	/** Where a run's generated images are written, under the uploads directory. */

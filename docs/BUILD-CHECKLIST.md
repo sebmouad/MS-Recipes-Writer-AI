@@ -1,5 +1,21 @@
 # Build checklist — for the model doing the work
 
+## Plugin operations 0.3.1 — 2026-09-21
+
+- [~] Unified responsive design tokens, mobile navigation, 44px controls, keyboard focus, selected-photo thumbnails, overflow hints and unsaved-settings warning. Visual browser validation remains pending.
+
+- [~] Shared page navigation, searchable/paginated owner-scoped Jobs, dedicated scheduler diagnostic page and recipe-count feedback on Write.
+
+- [~] Job detail embeds the lab report, with authenticated full-page and HTML download views; image paths confined to the job upload directory.
+- [~] Analytics: bounded period, statuses, steps, quality counts, model/provider usage, cache, events, artifacts and recent-job drilldown.
+- [~] Local settings diagnostics, JSON syntax tests, atomic rejection of invalid saves.
+- [~] Admin-only unsaved configuration preview, shared parsing with save, whole-list overrides and engine-resolved effective values.
+- [~] Five-minute cron watchdog, guarded expired-lease recovery, missing queued-event recovery and heartbeat visibility.
+- [~] Responsive tables, visible keyboard focus, retrying non-overlapping status polling.
+- [ ] Verify on a real WordPress/MySQL installation: report/images, mobile viewport, provider authentication and cron execution. No WordPress installation is available in the current repository.
+
+Offline suite: 20 passed; JavaScript syntax and diff whitespace checks passed. Engine files unchanged.
+
 Executable version of the agreed specification, in the order the owner set:
 **prove the prompts, then build everything, then deploy and improve on the
 live site.**

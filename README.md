@@ -2,9 +2,32 @@
 
 Plugin WordPress en construction pour la génération éditoriale culinaire orchestrée.
 
+## Version 0.3.1
+
+Interface harmonisée : navigation mobile en deux colonnes, cibles tactiles de
+44 px, champs et tableaux adaptatifs, focus clavier visible, aperçus des photos,
+indicateurs de défilement et avertissement pour les réglages non enregistrés.
+Les messages de suivi sont accessibles aux lecteurs d’écran.
+
+Navigation commune : Rédaction, Jobs (recherche, filtres et pagination),
+Statistiques, Planificateur, Moteur et Réglages. Les listes de jobs sont limitées
+au propriétaire pour les rédacteurs et accessibles globalement aux administrateurs.
+
+Rapport de job utilisant le rendu complet du lab, intégré, ouvrable en pleine
+page et téléchargeable avec images embarquées. Analytics par statut, étape,
+fournisseur/modèle, tokens/cache, qualité, événements et livrables. Diagnostics
+locaux des routes et configurations ; tests de syntaxe JSON avant sauvegarde.
+Simulation des réglages non enregistrés : routes, tarifs connus, sources et
+tailles des prompts, valeurs effectives. Aucun appel fournisseur ni sauvegarde.
+Sauvegarde atomique en cas de JSON invalide. Surveillance cron toutes les cinq
+minutes et réarmement des jobs en attente. Moteur inchangé.
+
+Validation hors ligne uniquement : installation WordPress, rendu navigateur,
+cron réel et validité distante des clés restent à vérifier sur un site de test.
+
 ## État actuel
 
-La version `0.3.0` est un socle installable : file persistante, pipeline de
+La version `0.3.1` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.

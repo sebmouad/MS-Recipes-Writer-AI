@@ -6,6 +6,17 @@ require __DIR__ . '/bootstrap.php';
 require_once dirname( __DIR__ ) . '/includes/engine/load.php';
 require_once dirname( __DIR__ ) . '/includes/class-msrwa-engine-settings.php';
 
+$GLOBALS['saved_engine_config'] = array( 'language' => 'fr' );
+function update_option( $name, $value, $autoload = false ) { $GLOBALS['saved_engine_config'] = $value; }
+$invalid = MSRWA_Engine_Settings::save( array( 'routing' => '{broken', 'language' => 'en' ) );
+msrwa_test_assert( array( 'routing' ) === $invalid, 'Malformed JSON identifies its group.' );
+msrwa_test_assert( array( 'language' => 'fr' ) === $GLOBALS['saved_engine_config'], 'Invalid submission preserves all saved settings atomically.' );
+$parsed = MSRWA_Engine_Settings::parse( array( 'attempts' => '{"default":3}' ) );
+msrwa_test_assert( 3 === $parsed['config']['attempts']['default'], 'Preview parses unsaved values.' );
+msrwa_test_assert( array( 'language' => 'fr' ) === $GLOBALS['saved_engine_config'], 'Preview never changes saved values.' );
+msrwa_test_assert( array( 'routing' ) === MSRWA_Engine_Settings::parse( array( 'routing' => array() ) )['invalid'], 'Non-string JSON input is rejected safely.' );
+msrwa_test_assert( array( 'price' => array( 1, 3 ) ) === MSRWA_Engine_Settings::difference( array( 'price' => array( 1, 3 ) ), array( 'price' => array( 1, 2 ) ) ), 'Price lists are retained whole, not sparse patches.' );
+
 $defaults = array( 'budget_usd' => 0.0, 'concurrency' => 4, 'nested' => array( 'a' => 1, 'b' => 2 ) );
 $diff = function ( $value, $default = null ) use ( $defaults ) { return MSRWA_Engine_Settings::difference( $value, null === $default ? $defaults : $default ); };
 

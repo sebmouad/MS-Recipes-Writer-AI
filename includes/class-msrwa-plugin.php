@@ -22,10 +22,20 @@ final class MSRWA_Plugin {
 	}
 
 	public static function boot() {
+		add_filter( 'cron_schedules', array( __CLASS__, 'schedules' ) );
+		if ( wp_get_schedule( 'msrwa_cleanup' ) !== 'msrwa_five_minutes' ) {
+			wp_clear_scheduled_hook( 'msrwa_cleanup' );
+			wp_schedule_event( time() + 300, 'msrwa_five_minutes', 'msrwa_cleanup' );
+		}
 		add_action( 'rest_api_init', array( 'MSRWA_REST', 'register' ) );
 		add_action( 'msrwa_run_step', array( 'MSRWA_Run', 'tick' ) );
 		add_action( 'msrwa_cleanup', array( 'MSRWA_Run', 'recover_expired' ) );
 		if ( is_admin() ) { MSRWA_Admin::hooks(); }
 		if ( get_option( 'msrwa_db_version' ) !== MSRWA_VERSION ) { MSRWA_DB::install(); }
+	}
+
+	public static function schedules( $schedules ) {
+		$schedules['msrwa_five_minutes'] = array( 'interval' => 300, 'display' => 'MS Recipes : toutes les cinq minutes' );
+		return $schedules;
 	}
 }

@@ -53,22 +53,29 @@ final class MSRWA_Engine_Settings {
 
 	/** The effective value of one group, for a screen that shows it in context. */
 	public static function effective( $group ) {
-		$defaults = (array) ( self::defaults()[ $group ] ?? array() );
-		$stored = self::stored();
-		return isset( $stored[ $group ] ) && is_array( $stored[ $group ] ) ? self::merge( $defaults, $stored[ $group ] ) : $defaults;
+		$effective = MSRWA_Engine_Config::create( self::stored() )->to_array();
+		return (array) ( $effective[ $group ] ?? array() );
 	}
 
 	/**
 	 * Stores only what differs from the engine's defaults. Returns the groups
-	 * whose JSON could not be read, so the screen can say which were ignored
-	 * rather than silently dropping them.
+	 * whose JSON could not be read. A malformed submission is rejected as a
+	 * whole rather than silently dropping any previously saved settings.
 	 */
 	public static function save( array $raw ) {
+		$parsed = self::parse( $raw );
+		if ( ! $parsed['invalid'] ) { update_option( self::OPTION, $parsed['config'], false ); }
+		return $parsed['invalid'];
+	}
+
+	/** Shared by saving and the non-mutating diagnostic preview. */
+	public static function parse( array $raw ) {
 		$defaults = self::defaults();
 		$config = array();
 		$invalid = array();
 
 		foreach ( array_keys( array_merge( self::simple(), self::structural() ) ) as $group ) {
+			if ( isset( $raw[ $group ] ) && ! is_string( $raw[ $group ] ) ) { $invalid[] = $group; continue; }
 			$text = trim( (string) ( $raw[ $group ] ?? '' ) );
 			if ( '' === $text ) { continue; }
 			$value = json_decode( $text, true );
@@ -80,8 +87,7 @@ final class MSRWA_Engine_Settings {
 		$language = sanitize_text_field( (string) ( $raw['language'] ?? '' ) );
 		if ( '' !== $language && $language !== (string) ( $defaults['language'] ?? '' ) ) { $config['language'] = $language; }
 
-		update_option( self::OPTION, $config, false );
-		return $invalid;
+		return array( 'config' => $config, 'invalid' => $invalid );
 	}
 
 	/** What in $value is not already what the engine would have done. */
@@ -90,6 +96,10 @@ final class MSRWA_Engine_Settings {
 		foreach ( $value as $key => $item ) {
 			if ( ! array_key_exists( $key, $default ) ) { $out[ $key ] = $item; continue; }
 			if ( is_array( $item ) && is_array( $default[ $key ] ) ) {
+				if ( array() === $item || array_keys( $item ) === range( 0, count( $item ) - 1 ) ) {
+					if ( $item !== $default[ $key ] ) { $out[ $key ] = $item; }
+					continue;
+				}
 				$nested = self::difference( $item, $default[ $key ] );
 				if ( $nested ) { $out[ $key ] = $nested; }
 				continue;
@@ -99,10 +109,4 @@ final class MSRWA_Engine_Settings {
 		return $out;
 	}
 
-	private static function merge( array $base, array $over ) {
-		foreach ( $over as $key => $value ) {
-			$base[ $key ] = is_array( $value ) && isset( $base[ $key ] ) && is_array( $base[ $key ] ) ? self::merge( $base[ $key ], $value ) : $value;
-		}
-		return $base;
-	}
 }
