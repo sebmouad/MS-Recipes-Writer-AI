@@ -66,8 +66,15 @@ final class MSRWA_Engine {
 
 			$result->event( 'wave', 'run', count( $wave ) > 1 ? 'These may run together: ' . implode( ', ', $wave ) : 'Next: ' . $wave[0], array( 'steps' => $wave ) );
 
-			if ( $budget > 0 && $result->totals()['cost_usd'] >= $budget ) {
-				foreach ( $wave as $name ) { $result->fail( $name, sprintf( 'Stopped at the $%.4f budget, before running %s.', $budget, $name ) ); }
+			$spent_so_far = $result->totals();
+			if ( $budget > 0 && ( $spent_so_far['cost_usd'] >= $budget || $spent_so_far['unpriced_steps'] > 0 ) ) {
+				// An unpriced call already made means the spend is not known to be
+				// under the budget, and a budget that cannot be checked is not a
+				// budget. Stopping is the conservative reading.
+				$why = $spent_so_far['unpriced_steps'] > 0 && $spent_so_far['cost_usd'] < $budget
+					? sprintf( '%d call(s) ran on a model with no published rate, so the $%.4f budget can no longer be verified', $spent_so_far['unpriced_steps'], $budget )
+					: sprintf( 'Stopped at the $%.4f budget', $budget );
+				foreach ( $wave as $name ) { $result->fail( $name, $why . ', before running ' . $name . '.' ); }
 				break;
 			}
 
@@ -149,7 +156,8 @@ final class MSRWA_Engine {
 
 			if ( '' === $outcome['retry'] || $attempt >= $attempts ) { break; }
 			$result->event( 'retry', $name, $outcome['retry'] );
-			$spent += self::before_retry( $name, $outcome, $config, $result, $options );
+			// Recorded as its own step inside before_retry(); not this step's cost.
+			self::before_retry( $name, $outcome, $config, $result, $options );
 		}
 
 		if ( '' === $outcome['error'] && isset( $outcome['artifact'] ) ) { $result->artifact( $step['produces'], $outcome['artifact'] ); }
@@ -180,6 +188,9 @@ final class MSRWA_Engine {
 			$result->artifact( $kind, $redrawn['artifact'] );
 			$result->step( $kind . '_image', array_diff_key( $redrawn, array( 'artifact' => 1, 'retry' => 1 ) ) );
 		}
+		// The redraws are steps of their own now, and totals() sums every step. What
+		// this returns is only for the run's budget arithmetic; adding it to the
+		// approval's cost as well charged each redraw twice — 22% of one real run.
 		return $spent;
 	}
 
@@ -342,7 +353,7 @@ final class MSRWA_Engine {
 			$scores = MSRWA_Engine_Score::step( $name, $call['text'], $brief, $config->thresholds() );
 			return array(
 				'provider' => $route['provider'], 'model' => $route['model'], 'tier' => $route['tier'], 'seconds' => $call['seconds'],
-				'usage' => $call['usage'], 'cost_usd' => (float) $config->price( $route['provider'], $route['model'], $call['usage'] ),
+				'usage' => $call['usage'], 'cost_usd' => $config->price( $route['provider'], $route['model'], $call['usage'] ),
 				'status' => (string) ( $call['status'] ?? '' ), 'passed' => $scores['passed'], 'total' => $scores['total'],
 				'checks' => $scores['checks'], 'error' => '', 'artifact' => $answer,
 				'prompt' => $prompt['text'], 'prompt_source' => $prompt['source'], 'input_chars' => strlen( $input ), 'unparsed' => $unparsed,
@@ -437,7 +448,7 @@ final class MSRWA_Engine {
 			self::report_call( $result, $name, $route, $wire['image_endpoint'] ?? '', $call, $config );
 			return array(
 				'step' => $name, 'provider' => $route['provider'], 'model' => $route['model'], 'tier' => $route['tier'], 'seconds' => $call['seconds'],
-				'usage' => $call['usage'], 'cost_usd' => (float) $config->price( $route['provider'], $route['model'], $call['usage'] ),
+				'usage' => $call['usage'], 'cost_usd' => $config->price( $route['provider'], $route['model'], $call['usage'] ),
 				'status' => '', 'passed' => null, 'total' => null, 'checks' => array(), 'error' => '', 'retry' => '',
 				'artifact' => array(
 					'kind' => $kind, 'path' => $call['path'], 'bytes' => $call['bytes'], 'mime' => 'image/' . $format,
@@ -486,8 +497,9 @@ final class MSRWA_Engine {
 			// a non-answer: a model that closes the root object early leaves the image
 			// verdicts outside it, which reads as "refused, no findings". Ask again
 			// rather than regenerate images against a decision nobody made.
-			$sound = ! empty( $checks['valid JSON']['pass'] ) && ! empty( $checks['a verdict per artifact']['pass'] ) && ! empty( $checks['a refusal is justified']['pass'] );
-			$approved = $sound && ! empty( $verdict['approved'] );
+			$gate = MSRWA_Engine_Score::accepts( $verdict, $checks );
+			$sound = $gate['sound'];
+			$approved = $gate['approved'];
 			$redraw = $sound && ! $approved ? MSRWA_Engine_Score::images_to_retry( $verdict ) : array();
 			$retry = '';
 			if ( ! $sound ) {
@@ -503,7 +515,7 @@ final class MSRWA_Engine {
 
 			return array(
 				'provider' => $route['provider'], 'model' => $route['model'], 'tier' => $route['tier'], 'seconds' => $call['seconds'],
-				'usage' => $call['usage'], 'cost_usd' => (float) $config->price( $route['provider'], $route['model'], $call['usage'] ),
+				'usage' => $call['usage'], 'cost_usd' => $config->price( $route['provider'], $route['model'], $call['usage'] ),
 				'status' => (string) ( $call['status'] ?? '' ), 'passed' => $passed, 'total' => count( $checks ),
 				'checks' => $checks, 'error' => '', 'artifact' => $verdict, 'approved' => $approved, 'retry' => $retry,
 				'prompt' => $prompt['text'], 'prompt_source' => $prompt['source'], 'input_chars' => strlen( $input ),
@@ -564,7 +576,7 @@ final class MSRWA_Engine {
 			'provider' => $route['provider'], 'model' => $route['model'], 'tier' => $route['tier'],
 			// The endpoint is recorded so a run through a gateway says so. It never
 			// carries a key: the key travels in a header, which is not recorded.
-			'endpoint' => $endpoint, 'seconds' => $call['seconds'], 'usage' => $usage,
+			'endpoint' => MSRWA_Engine_Config::redact_url( $endpoint ), 'seconds' => $call['seconds'], 'usage' => $usage,
 			'cached_ratio' => $in ? round( $cached / $in, 4 ) : 0.0,
 			'cost_usd' => $cost, 'priced' => null !== $cost, 'status' => (string) ( $call['status'] ?? '' ),
 		) );

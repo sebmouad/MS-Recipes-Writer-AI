@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.78` est un socle installable : file persistante, pipeline de
+La version `0.2.79` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.
@@ -22,6 +22,53 @@ Le plugin est en cours de refonte éditoriale et budgétaire :
 Les coûts affichés sont des estimations calculées avec le catalogue configuré,
 non une facture fournisseur. `completed` signifie que le traitement est terminé,
 jamais qu’un texte est validé éditorialement.
+
+## Version 0.2.79
+
+Premier lot de corrections issues de l'audit externe du 2026-09-21. Chaque
+constat a été **reproduit** avant d'être corrigé ; le script de régression que
+l'audit fournissait sans l'avoir exécuté échouait bien sur ses quatre
+assertions, et il entre dans la suite.
+
+**F01 — la porte d'acceptation (P0).** `decide()` vérifiait trois des contrats
+qu'il venait de noter et lisait `approved` avec `!empty()`. La chaîne `"false"`
+est vraie en PHP : elle approuvait. Et le contrôle « une approbation et un
+constat bloquant ne tiennent pas ensemble » était calculé puis ignoré. La
+décision est désormais dans `MSRWA_Engine_Score::accepts()`, testable seule :
+booléen `true` strict, zéro constat bloquant, et tous les contrats structurels —
+dont le réalisme de chaque image et la validité des cibles. Vérifié sur les neuf
+verdicts réels du dépôt : **aucune décision ne change**.
+
+**F03 — les redessins comptés deux fois.** Une image régénérée était
+enregistrée comme étape *et* rajoutée au coût de l'approbation. Prouvé sur un
+passage réel : $0,0281 comptés deux fois, **22 % de surcoût affiché**. Le
+passage complet de la 0.2.78 a réellement coûté **$0,1437**, pas $0,1747.
+
+**F05 — un tarif inconnu devenait zéro.** `(float) null` vaut `0.0` : un
+passage sur un modèle sans tarif publié s'affichait gratuit et franchissait le
+budget. Le coût inconnu reste inconnu, `totals()` compte les étapes non
+tarifées, et le budget s'arrête plutôt que de valider ce qu'il ne peut pas
+vérifier.
+
+**F11 — des identifiants pouvaient entrer dans les rapports.** Un appelant
+pointant vers sa propre passerelle peut écrire un jeton dans un en-tête ou dans
+l'URL. Les en-têtes sensibles, les `user:pass@` et les paramètres de clé sont
+masqués avant toute sérialisation et sur chaque événement d'appel.
+
+**F12 — les passages sauvegardés n'étaient pas déballés.** `--canonical=<run>.json`
+transmettait l'enveloppe entière — `ok`, `steps`, `totals`, `events` — à la
+place de la recette. Le chargeur extrait l'artefact nommé et refuse un passage
+qui ne le contient pas.
+
+**F35 — le rapport rendait du HTML de modèle tel quel.** L'article était
+concaténé dans la page. Il est reconstruit depuis une liste blanche : les
+balises dont une recette a besoin, aucun attribut sauf un `href` de schéma sûr.
+Vérifié : `<script>`, `<iframe>`, `onclick`, `onerror`, `javascript:` disparaissent ;
+titres, gras, listes, tableaux, liens et le marqueur de page survivent.
+
+Reste ouvert et demandant un arbitrage : le siège de test du transport, F02,
+F04, F06, F07 (admission stricte), et les deux contradictions de prompts
+F14/F15.
 
 ## Version 0.2.78
 

@@ -215,6 +215,48 @@ final class MSRWA_Engine_Score {
 		return $checks;
 	}
 
+	/**
+	 * Whether a verdict accepts the work. The gate, in one testable place.
+	 *
+	 * It used to live inside the engine's judging step, where it checked three of
+	 * the contracts it had just scored and then read `approved` with !empty().
+	 * That accepted the string "false", and it ignored the check that says a
+	 * blocking finding and an approval cannot both stand — so a verdict could
+	 * block and approve at once.
+	 */
+	public static function accepts( $verdict, $checks ) {
+		$verdict = is_array( $verdict ) ? $verdict : array();
+		$sound = true;
+		foreach ( self::mandatory_contracts() as $contract ) {
+			if ( empty( $checks[ $contract ]['pass'] ) ) { $sound = false; }
+		}
+		$blocking = 0;
+		foreach ( (array) ( $verdict['findings'] ?? array() ) as $finding ) {
+			if ( is_array( $finding ) && 'blocking' === ( $finding['severity'] ?? '' ) ) { $blocking++; }
+		}
+		return array(
+			'sound' => $sound,
+			'approved' => $sound && true === ( $verdict['approved'] ?? null ) && 0 === $blocking,
+			'blocking' => $blocking,
+		);
+	}
+
+	/**
+	 * The checks a verdict must pass before it means anything at all.
+	 *
+	 * A judge that did not say whether the images look like photographs, or that
+	 * filed a finding against a target that does not exist, has not finished the
+	 * job it was given. Neither is an editorial refusal; both are a non-answer,
+	 * and a non-answer must never read as approval.
+	 */
+	public static function mandatory_contracts() {
+		return array(
+			'valid JSON', 'a verdict per artifact', 'a refusal is justified',
+			'approved is a boolean', 'approval matches findings',
+			'realism judged separately', 'findings are addressed',
+		);
+	}
+
 	/** The blocking findings the judge raised against one image. */
 	public static function findings_for( $verdict, $target ) {
 		$out = array();

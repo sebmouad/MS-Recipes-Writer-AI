@@ -16,6 +16,40 @@
 
 function report_h( $value ) { return htmlspecialchars( (string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8' ); }
 
+/**
+ * The article, as HTML this page is willing to render.
+ *
+ * Everything else on this page is escaped; the article was concatenated in
+ * whole because it is meant to be read as formatted prose. But it is model
+ * output that has travelled through a saved run, and this report gets opened
+ * in a browser and shared. So it is rebuilt from an allowlist: the tags a
+ * recipe needs, no attributes except a safe href, and nothing else survives.
+ */
+function report_article_html( $html ) {
+	$html = (string) $html;
+	if ( '' === trim( $html ) ) { return ''; }
+
+	// Whole elements whose content is never prose, removed with their contents.
+	$html = preg_replace( '#<(script|style|iframe|object|embed|form|template|svg|math)\b[^>]*>.*?</\1\s*>#is', '', $html );
+	$html = preg_replace( '#<(script|style|iframe|object|embed|form|template|svg|math)\b[^>]*/?>#i', '', $html );
+	$html = preg_replace( '#<!--(?!nextpage).*?-->#s', '', $html );
+
+	$allowed = array( 'h2', 'h3', 'h4', 'p', 'ul', 'ol', 'li', 'strong', 'em', 'b', 'i', 'br', 'blockquote', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'a' );
+	return preg_replace_callback( '#</?([a-z0-9]+)\b([^>]*)>#i', static function ( $tag ) use ( $allowed ) {
+		$name = strtolower( $tag[1] );
+		if ( ! in_array( $name, $allowed, true ) ) { return ''; }
+		if ( '/' === substr( $tag[0], 1, 1 ) ) { return '</' . $name . '>'; }
+		// One attribute survives, and only when its scheme is one a reader can trust.
+		if ( 'a' === $name && preg_match( '#\bhref\s*=\s*("|\')(.*?)\1#is', $tag[2], $href ) ) {
+			$url = trim( html_entity_decode( $href[2], ENT_QUOTES, 'UTF-8' ) );
+			if ( preg_match( '#^(https?://|/|\#)#i', $url ) ) {
+				return '<a href="' . report_h( $url ) . '" rel="nofollow noopener">';
+			}
+		}
+		return '<' . $name . '>';
+	}, $html );
+}
+
 function report_is_list( $value ) { return is_array( $value ) && array_keys( $value ) === range( 0, count( $value ) - 1 ); }
 
 /** Any decoded answer as readable HTML, whatever shape it arrived in. */
@@ -33,6 +67,14 @@ function report_value( $value, $depth = 0 ) {
 		$html .= '<div><dt>' . report_h( str_replace( '_', ' ', $key ) ) . '</dt><dd>' . report_value( $item, $depth + 1 ) . '</dd></div>';
 	}
 	return $html . '</dl>';
+}
+
+/** A link, but only to somewhere a reader can safely be sent. */
+function report_link( $url ) {
+	$url = trim( (string) $url );
+	if ( '' === $url ) { return '<span class="muted">Non renseigné</span>'; }
+	if ( ! preg_match( '#^https?://#i', $url ) ) { return report_h( $url ) . ' <span class="pill warn">schéma refusé</span>'; }
+	return '<a href="' . report_h( $url ) . '" rel="nofollow noopener">' . report_h( $url ) . '</a>';
 }
 
 /** A section the reader opens only if they want the detail. */
@@ -69,8 +111,8 @@ function report_visual_provenance( $research ) {
 		$html .= '<div class="list-item"><h3>Photographie ' . $index . ' <span class="pill ' . ( $inspected ? 'ok' : 'warn' ) . '">' . ( $inspected ? 'analysée' : 'non analysée' ) . '</span>'
 			. ( $tier ? ' <span class="pill">' . ( 1 === $tier ? 'ce plat' : 'plat voisin' ) . '</span>' : '' ) . '</h3>';
 		$html .= '<p><strong>' . report_h( $reference['title'] ?? 'Sans titre' ) . '</strong></p>';
-		$html .= '<p class="muted">Page source : <a href="' . report_h( $source ) . '" rel="nofollow noopener">' . report_h( $source ) . '</a></p>';
-		$html .= '<p class="muted">Fichier image : <a href="' . report_h( $image ) . '" rel="nofollow noopener">' . report_h( $image ) . '</a></p>';
+		$html .= '<p class="muted">Page source : ' . report_link( $source ) . '</p>';
+		$html .= '<p class="muted">Fichier image : ' . report_link( $image ) . '</p>';
 		if ( $inspected ) {
 			foreach ( array( 'observable_details' => 'Ce qui est visible', 'composition' => 'Composition', 'colours' => 'Couleurs', 'textures' => 'Textures', 'uncertainties' => 'Incertitudes' ) as $key => $label ) {
 				$value = $observation[ $key ] ?? '';
@@ -139,7 +181,10 @@ function report_findings( $verdict ) {
  */
 function report_approval_cards( $verdict ) {
 	$verdict = is_array( $verdict ) ? $verdict : array();
-	$approved = ! empty( $verdict['approved'] );
+	// Only a real boolean approves. The string "false" is truthy in PHP, and a
+	// report that shows it as "Approuvé" is worse than one that shows nothing.
+	$approved = true === ( $verdict['approved'] ?? null );
+	$malformed = array_key_exists( 'approved', $verdict ) && ! is_bool( $verdict['approved'] );
 	$cards = '';
 	$labels = array( 'article' => 'Article', 'featured_image' => 'Image à la une', 'facebook_image' => 'Collage Facebook', 'consistency' => 'Cohérence des trois' );
 	foreach ( $labels as $key => $label ) {
@@ -149,7 +194,10 @@ function report_approval_cards( $verdict ) {
 		$realism = isset( $part['realism'] ) ? '<p class="muted">Réalisme photographique : <strong>' . report_h( $words[ (string) $part['realism'] ] ?? $part['realism'] ) . '</strong></p>' : '';
 		$cards .= '<div class="card"><h3>' . report_h( $label ) . '</h3><p><span class="pill ' . ( 'good' === $mark ? 'ok' : ( 'bad' === $mark ? 'bad' : 'warn' ) ) . '">' . report_h( $words[ $mark ] ?? $mark ) . '</span></p>' . $realism . '<p class="muted">' . report_h( $part['summary'] ?? '' ) . '</p></div>';
 	}
-	return '<p class="decision ' . ( $approved ? 'ok' : 'warn' ) . '">' . ( $approved ? 'Approuvé' : 'Refusé' ) . '</p><div class="summary-grid">' . $cards . '</div>';
+	$label = $malformed ? 'Verdict illisible' : ( $approved ? 'Approuvé' : 'Refusé' );
+	return '<p class="decision ' . ( $approved ? 'ok' : 'warn' ) . '">' . report_h( $label ) . '</p>'
+		. ( $malformed ? '<p class="muted">Le champ « approved » n’est pas un booléen ; ce verdict ne vaut pas approbation.</p>' : '' )
+		. '<div class="summary-grid">' . $cards . '</div>';
 }
 
 /** Corrections the engine applied to the text, and the ones only a person can make. */
@@ -171,7 +219,7 @@ function report_corrections( $corrected ) {
 			$html .= '<article class="finding"><blockquote class="finding-quote">' . report_h( $row['before'] ?? '' ) . '</blockquote>'
 				. '<p><span class="finding-label">Remplacée par</span> ' . report_h( $row['after'] ?? '' ) . '</p>'
 				. '<p><span class="finding-label">Pourquoi</span> ' . report_h( $row['reason'] ?? '' ) . '</p>'
-				. ( empty( $row['source'] ) ? '' : '<p class="muted">Source : <a href="' . report_h( $row['source'] ) . '" rel="nofollow noopener">' . report_h( $row['source'] ) . '</a></p>' )
+				. ( empty( $row['source'] ) ? '' : '<p class="muted">Source : ' . report_link( $row['source'] ) . '</p>' )
 				. '</article>';
 		}
 		$html .= '</div>';
@@ -370,7 +418,7 @@ function report_render( array $run ) {
 	$approval = (array) ( $artifacts['approval'] ?? array() );
 
 	// What a reader would get: the latest version of the text that exists.
-	$content = (string) ( $proofread['content_html'] ?? $corrected['content_html'] ?? $article['content_html'] ?? '' );
+	$content = report_article_html( (string) ( $proofread['content_html'] ?? $corrected['content_html'] ?? $article['content_html'] ?? '' ) );
 	$content = str_replace( '<!--nextpage-->', '<div class="page-break"><span>Deuxième partie</span></div>', $content );
 
 	$title = (string) ( $canonical['title'] ?? $article['title'] ?? $brief['title'] ?? 'Recette' );

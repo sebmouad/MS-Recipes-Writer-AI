@@ -106,7 +106,7 @@ function lab_artifacts( $step, $brief, array $options ) {
 		if ( ! empty( $resolved[ $key ] ) ) { $artifacts[ $key ] = $resolved[ $key ]; }
 	}
 	foreach ( array( 'review', 'fact_check', 'corrected', 'proofread' ) as $key ) {
-		if ( ! empty( $options[ str_replace( '_', '-', $key ) ] ) ) { $artifacts[ $key ] = lab_json_file( $options[ str_replace( '_', '-', $key ) ], $key ); }
+		if ( ! empty( $options[ str_replace( '_', '-', $key ) ] ) ) { $artifacts[ $key ] = lab_json_file( $options[ str_replace( '_', '-', $key ) ], $key, $key ); }
 	}
 	foreach ( array( 'featured', 'facebook' ) as $kind ) {
 		if ( empty( $options[ $kind ] ) ) { continue; }

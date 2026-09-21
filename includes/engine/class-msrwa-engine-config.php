@@ -369,8 +369,40 @@ final class MSRWA_Engine_Config {
 		unset( $values['settings'] );
 		foreach ( array_keys( (array) ( $values['providers'] ?? array() ) ) as $name ) {
 			unset( $values['providers'][ $name ]['key_env'] );
+			$values['providers'][ $name ] = self::redact( $values['providers'][ $name ] );
 		}
 		$values['_provenance'] = $this->provenance;
 		return $values;
+	}
+
+	/**
+	 * Removes credentials a caller wrote into its own configuration.
+	 *
+	 * The shipped rows carry {{key}}, which is a placeholder and safe to record.
+	 * A caller pointing at its own gateway may put a real token in a header or in
+	 * an endpoint's query string or userinfo, and this object is written into
+	 * saved runs and HTML reports that get shared.
+	 */
+	public static function redact( array $provider ) {
+		foreach ( array( 'headers' ) as $key ) {
+			foreach ( (array) ( $provider[ $key ] ?? array() ) as $index => $header ) {
+				$provider[ $key ][ $index ] = preg_replace(
+					'/^(\s*(?:authorization|x-api-key|api-key|x-goog-api-key|proxy-authorization)\s*:\s*)(?!\{\{key\}\}$)(?:bearer\s+)?\S.*$/i',
+					'$1[redacted]', (string) $header
+				);
+			}
+		}
+		foreach ( array( 'text_endpoint', 'image_endpoint' ) as $key ) {
+			$provider[ $key ] = self::redact_url( (string) ( $provider[ $key ] ?? '' ) );
+		}
+		return $provider;
+	}
+
+	/** An endpoint with any credential in its userinfo or query string removed. */
+	public static function redact_url( $url ) {
+		$url = (string) $url;
+		if ( '' === $url ) { return ''; }
+		$url = preg_replace( '#(://)[^/@\s]*:[^/@\s]*@#', '$1[redacted]@', $url );
+		return preg_replace( '/([?&](?:key|api_key|apikey|access_token|token|secret)=)(?!\{\{key\}\})[^&\s]+/i', '$1[redacted]', $url );
 	}
 }

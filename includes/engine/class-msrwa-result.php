@@ -64,7 +64,8 @@ final class MSRWA_Result {
 
 	private function describe( $outcome ) {
 		$score = null === $outcome['passed'] ? '' : sprintf( ' %d/%d', $outcome['passed'], $outcome['total'] );
-		return sprintf( '%s%s in %ss for $%.4f', $outcome['step'], $score, $outcome['seconds'], $outcome['cost_usd'] );
+		$cost = null === $outcome['cost_usd'] ? 'an unpublished rate' : sprintf( '$%.4f', $outcome['cost_usd'] );
+		return sprintf( '%s%s in %ss for %s', $outcome['step'], $score, $outcome['seconds'], $cost );
 	}
 
 	/** A failure the caller must see. The run continues; `ok` does not. */
@@ -82,9 +83,13 @@ final class MSRWA_Result {
 
 	/** Seconds, cost and tokens, plus the four budget buckets the owner reports on. */
 	public function totals() {
-		$totals = array( 'seconds' => 0.0, 'cost_usd' => 0.0, 'input_tokens' => 0, 'output_tokens' => 0, 'steps' => count( $this->steps ), 'buckets' => array( 'article' => 0.0, 'featured' => 0.0, 'facebook' => 0.0, 'other' => 0.0 ) );
+		$totals = array( 'seconds' => 0.0, 'cost_usd' => 0.0, 'unpriced_steps' => 0, 'input_tokens' => 0, 'output_tokens' => 0, 'steps' => count( $this->steps ), 'buckets' => array( 'article' => 0.0, 'featured' => 0.0, 'facebook' => 0.0, 'other' => 0.0 ) );
 		foreach ( $this->steps as $step ) {
 			$totals['seconds'] += (float) $step['seconds'];
+			// A model with no published rate costs an unknown amount, not nothing.
+			// Casting it to zero made a run with real token usage read as free, and
+			// let it sail past a budget that was meant to stop it.
+			if ( null === $step['cost_usd'] && ( (int) ( $step['usage']['input_tokens'] ?? 0 ) || (int) ( $step['usage']['output_tokens'] ?? 0 ) ) ) { $totals['unpriced_steps']++; }
 			$totals['cost_usd'] += (float) $step['cost_usd'];
 			$totals['input_tokens'] += (int) ( $step['usage']['input_tokens'] ?? 0 );
 			$totals['output_tokens'] += (int) ( $step['usage']['output_tokens'] ?? 0 );

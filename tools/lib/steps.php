@@ -50,11 +50,30 @@ function lab_settings() {
  * Reading a saved run off disk is the lab's business: the engine is handed data
  * and never a path, which is what lets the plugin call the same code.
  */
-function lab_json_file( $file, $what ) {
+function lab_json_file( $file, $what, $artifact = '' ) {
 	if ( ! file_exists( $file ) ) { fwrite( STDERR, "No such {$what}: {$file}\n" ); exit( 2 ); }
 	$data = json_decode( file_get_contents( $file ), true );
-	if ( isset( $data['output'] ) && is_string( $data['output'] ) ) { $data = MSRWA_Json::decode( $data['output'] ); }
 	if ( ! is_array( $data ) ) { fwrite( STDERR, "That {$what} is not valid JSON: {$file}\n" ); exit( 2 ); }
+
+	// A run saved by this lab is a MSRWA_Result: the artifacts sit under
+	// `artifacts`. Passing the whole envelope on as the artifact is how
+	// --canonical=<run>.json came to feed the recipe step a document containing
+	// ok, steps, totals and events instead of a recipe.
+	if ( isset( $data['artifacts'] ) && is_array( $data['artifacts'] ) ) {
+		$name = '' !== $artifact ? $artifact : $what;
+		if ( ! isset( $data['artifacts'][ $name ] ) || ! is_array( $data['artifacts'][ $name ] ) ) {
+			fwrite( STDERR, "That run carries no {$name} artifact: {$file}\n" );
+			exit( 2 );
+		}
+		return $data['artifacts'][ $name ];
+	}
+
+	// An older single-step run kept its answer as a JSON string under `output`.
+	if ( isset( $data['output'] ) && is_string( $data['output'] ) ) {
+		$decoded = MSRWA_Json::decode( $data['output'] );
+		if ( ! is_array( $decoded ) ) { fwrite( STDERR, "That {$what} is not valid JSON: {$file}\n" ); exit( 2 ); }
+		return $decoded;
+	}
 	return $data;
 }
 
@@ -62,12 +81,12 @@ function lab_brief( $name ) { return lab_json_file( dirname( __DIR__ ) . '/fixtu
 
 function lab_research_package( $brief, $options = array() ) {
 	$file = (string) ( $options['research'] ?? '' );
-	return '' === $file ? MSRWA_Engine_Input::research_package( $brief ) : lab_json_file( $file, 'research package' );
+	return '' === $file ? MSRWA_Engine_Input::research_package( $brief ) : lab_json_file( $file, 'research package', 'research' );
 }
 
 function lab_canonical_recipe( $brief, $options = array() ) {
 	$file = (string) ( $options['canonical'] ?? '' );
-	return '' === $file ? MSRWA_Engine_Input::canonical_recipe( $brief ) : lab_json_file( $file, 'canonical recipe' );
+	return '' === $file ? MSRWA_Engine_Input::canonical_recipe( $brief ) : lab_json_file( $file, 'canonical recipe', 'canonical' );
 }
 
 /**
@@ -84,7 +103,7 @@ function lab_article_under_test( $options ) {
 		$file = $candidates ? $candidates[0] : '';
 	}
 	if ( '' === $file ) { fwrite( STDERR, "No article to measure against. Run the article step first, or pass --article=<run.json>.\n" ); exit( 2 ); }
-	$article = lab_json_file( $file, 'article' );
+	$article = lab_json_file( $file, 'article', 'article' );
 	return $article;
 }
 
