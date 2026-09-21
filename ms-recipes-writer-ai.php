@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: MS Recipes Writer AI
- * Description: Génération éditoriale culinaire orchestrée avec fournisseurs IA, validation et file persistante.
- * Version: 0.2.89
+ * Description: Le rédacteur fournit plusieurs recettes et plusieurs photographies ; le plugin les apparie, construit un brief par recette et les envoie toutes au moteur.
+ * Version: 0.3.0
  * Author: Mouad Sebhaoui
  * License: GPL-2.0-or-later
  * Text Domain: ms-recipes-writer-ai
@@ -12,35 +12,31 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'MSRWA_VERSION', '0.2.89' );
+define( 'MSRWA_VERSION', '0.3.0' );
 define( 'MSRWA_FILE', __FILE__ );
 define( 'MSRWA_DIR', plugin_dir_path( __FILE__ ) );
 define( 'MSRWA_URL', plugin_dir_url( __FILE__ ) );
 
-require_once MSRWA_DIR . 'includes/class-msrwa-db.php';
-require_once MSRWA_DIR . 'includes/class-msrwa-settings.php';
-require_once MSRWA_DIR . 'includes/class-msrwa-catalog.php';
-require_once MSRWA_DIR . 'includes/class-msrwa-openai.php';
-require_once MSRWA_DIR . 'includes/class-msrwa-providers.php';
-require_once MSRWA_DIR . 'includes/class-msrwa-images.php';
-require_once MSRWA_DIR . 'includes/class-msrwa-storage.php';
-require_once MSRWA_DIR . 'includes/class-msrwa-publisher.php';
-require_once MSRWA_DIR . 'includes/class-msrwa-presentation.php';
-require_once MSRWA_DIR . 'includes/class-msrwa-lists.php';
-require_once MSRWA_DIR . 'includes/class-msrwa-stats.php';
-require_once MSRWA_DIR . 'includes/class-msrwa-router.php';
+// Shared logic the engine builds on. The engine loads these itself when it is
+// used without WordPress; here they are loaded once, first.
 require_once MSRWA_DIR . 'includes/class-msrwa-json.php';
 require_once MSRWA_DIR . 'includes/class-msrwa-recipe.php';
 require_once MSRWA_DIR . 'includes/class-msrwa-quality.php';
-require_once MSRWA_DIR . 'includes/class-msrwa-cost.php';
 require_once MSRWA_DIR . 'includes/class-msrwa-prompt.php';
+require_once MSRWA_DIR . 'includes/class-msrwa-images.php';
+require_once MSRWA_DIR . 'includes/class-msrwa-catalog.php';
+require_once MSRWA_DIR . 'includes/class-msrwa-cost.php';
+require_once MSRWA_DIR . 'includes/class-msrwa-settings.php';
 require_once MSRWA_DIR . 'includes/engine/load.php';
-require_once MSRWA_DIR . 'includes/class-msrwa-pipeline.php';
-require_once MSRWA_DIR . 'includes/class-msrwa-queue.php';
-require_once MSRWA_DIR . 'includes/class-msrwa-lab.php';
-require_once MSRWA_DIR . 'includes/class-msrwa-lab-screen.php';
-require_once MSRWA_DIR . 'includes/class-msrwa-lab-config.php';
-require_once MSRWA_DIR . 'includes/class-msrwa-lab-stats.php';
+
+// The plugin: one submission, matched, dispatched, and written down.
+require_once MSRWA_DIR . 'includes/class-msrwa-db.php';
+require_once MSRWA_DIR . 'includes/class-msrwa-engine-settings.php';
+require_once MSRWA_DIR . 'includes/class-msrwa-intake.php';
+require_once MSRWA_DIR . 'includes/class-msrwa-match.php';
+require_once MSRWA_DIR . 'includes/class-msrwa-run.php';
+require_once MSRWA_DIR . 'includes/class-msrwa-batch.php';
+require_once MSRWA_DIR . 'includes/class-msrwa-draft.php';
 require_once MSRWA_DIR . 'includes/class-msrwa-rest.php';
 require_once MSRWA_DIR . 'includes/class-msrwa-admin.php';
 require_once MSRWA_DIR . 'includes/class-msrwa-plugin.php';

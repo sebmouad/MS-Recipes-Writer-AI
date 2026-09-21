@@ -1,209 +1,16 @@
-(function () {
-  'use strict';
-
-  if (typeof MSRWA === 'undefined') return;
-
-  function request(url, options) {
-    options = options || {};
-    options.headers = options.headers || {};
-    options.headers['X-WP-Nonce'] = MSRWA.nonce;
-    return fetch(MSRWA.api + url, options).then(function (response) {
-      return response.json().then(function (data) {
-        if (!response.ok) throw new Error(data.message || 'Une erreur est survenue.');
-        return data;
-      });
-    });
-  }
-
-  function setMessage(message, text, isError) {
-    if (!message) return;
-    message.textContent = text;
-    message.classList.toggle('is-error', !!isError);
-    message.classList.toggle('is-success', !isError && !!text);
-  }
-
-  var form = document.getElementById('msrwa-create-form');
-  if (form) {
-    var recipe = document.getElementById('msrwa-recipe');
-    var imageUrls = document.getElementById('msrwa-image-urls');
-    var files = document.getElementById('msrwa-reference-files');
-    var fileHelp = document.getElementById('msrwa-files-help');
-    var submit = document.getElementById('msrwa-create');
-    var message = document.getElementById('msrwa-message');
-
-    if (recipe && !document.getElementById('msrwa-batch-help')) {
-      var batchHelp = document.createElement('span');
-      batchHelp.id = 'msrwa-batch-help';
-      batchHelp.className = 'description';
-      batchHelp.textContent = 'Pour créer plusieurs recettes dans un lot, séparez-les par une ligne --- . Les références sont ensuite associées automatiquement et les ambiguïtés sont signalées.';
-      recipe.parentNode.appendChild(batchHelp);
-    }
-
-    function selectedFilesMessage() {
-      if (!files || !fileHelp) return;
-      var count = files.files ? files.files.length : 0;
-      fileHelp.textContent = count ? count + ' image' + (count > 1 ? 's sélectionnées.' : ' sélectionnée.') : fileHelp.getAttribute('data-default');
-    }
-
-    if (fileHelp) fileHelp.setAttribute('data-default', fileHelp.textContent);
-    if (files) files.addEventListener('change', selectedFilesMessage);
-
-    form.addEventListener('submit', function (event) {
-      event.preventDefault();
-      var text = (recipe.value || '').trim();
-      if (!text) {
-        setMessage(message, 'Ajoutez le texte ou la recette à traiter.', true);
-        recipe.focus();
-        return;
-      }
-
-      var selected = files && files.files ? Array.prototype.slice.call(files.files) : [];
-      var maximum = parseInt(form.getAttribute('data-max-reference-images'), 10) || 10;
-      var urls = (imageUrls.value || '').split(/\r?\n/).map(function (url) { return url.trim(); }).filter(Boolean);
-      if (selected.length + urls.length > maximum) {
-        setMessage(message, 'Ajoutez au plus ' + maximum + ' images de référence.', true);
-        return;
-      }
-      for (var index = 0; index < selected.length; index += 1) {
-        if (!/^image\/(jpeg|png|webp|gif)$/i.test(selected[index].type) || selected[index].size > 10485760) {
-          setMessage(message, 'Chaque fichier doit être une image JPEG, PNG, WebP ou GIF de 10 Mo maximum.', true);
-          return;
-        }
-      }
-
-      var recipes = text.split(/\r?\n\s*---+\s*(?:\r?\n|$)/).map(function (entry) { return entry.trim(); }).filter(Boolean);
-      if (!recipes.length) {
-        setMessage(message, 'Ajoutez au moins une recette valide.', true);
-        return;
-      }
-      var data = new FormData();
-      data.append('items', JSON.stringify(recipes.map(function (entry) {
-        var title = entry.split(/\r?\n/).map(function (line) { return line.trim(); }).filter(Boolean)[0] || 'Recette à rédiger';
-        return { title: title.slice(0, 160), text: entry, images: urls };
-      })));
-      selected.forEach(function (file) { data.append('reference_files[]', file, file.name); });
-
-      submit.disabled = true;
-      setMessage(message, 'Création du lot et vérification des références…', false);
-      request('/batches', { method: 'POST', body: data })
-        .then(function (result) {
-          var suffix = result.reference_upload_errors && result.reference_upload_errors.length ? ' Certaines images ont été refusées : ' + result.reference_upload_errors.map(function (error) { return error.message; }).join(' ') : '';
-          setMessage(message, 'Lot #' + result.id + ' créé avec ' + (result.total || recipes.length) + ' recette(s). Les étapes restantes se poursuivent en arrière-plan.' + suffix, !!suffix);
-          if (!suffix) {
-            recipe.value = '';
-            imageUrls.value = '';
-            files.value = '';
-            selectedFilesMessage();
-          }
-        })
-        .catch(function (error) { setMessage(message, error.message, true); })
-        .finally(function () { submit.disabled = false; });
-    });
-  }
-
-  Array.prototype.forEach.call(document.querySelectorAll('.msrwa-test-provider'), function (button) {
-    button.addEventListener('click', function () {
-      var provider = button.getAttribute('data-provider');
-      var status = document.getElementById('msrwa-' + provider + '-status');
-      button.disabled = true;
-      setMessage(status, 'Test en cours…', false);
-      request(provider === 'openai' ? '/test/openai' : '/test/' + provider, { method: 'POST' })
-        .then(function (result) {
-          var usage = result.usage || {};
-          var tokens = usage.total_tokens || usage.input_tokens;
-          setMessage(status, provider + ' opérationnel — ' + result.model + (tokens ? ' — ' + tokens + ' tokens' : ''), false);
-        })
-        .catch(function (error) { setMessage(status, error.message, true); })
-        .finally(function () { button.disabled = false; });
-    });
-  });
-
-  Array.prototype.forEach.call(document.querySelectorAll('.msrwa-batch-action'), function (button) {
-    button.addEventListener('click', function () {
-      var batchId = button.getAttribute('data-batch-id');
-      var action = button.getAttribute('data-action');
-      if (!batchId || !action) return;
-      if (action === 'cancel' && !window.confirm('Annuler ce lot ? Les appels déjà acceptés par un fournisseur peuvent rester facturés.')) return;
-      button.disabled = true;
-      request('/batches/' + encodeURIComponent(batchId) + '/' + encodeURIComponent(action), { method: 'POST' })
-        .then(function () { window.location.reload(); })
-        .catch(function (error) { window.alert(error.message); })
-        .finally(function () { button.disabled = false; });
-    });
-  });
-
-  Array.prototype.forEach.call(document.querySelectorAll('.msrwa-job-action'), function (button) {
-    button.addEventListener('click', function () {
-      var jobId = button.getAttribute('data-job-id');
-      var action = button.getAttribute('data-action');
-      var container = button.closest('.msrwa-job-card, .msrwa-row-details, tr');
-      var status = container ? container.querySelector('.msrwa-job-action-status') : null;
-      if (!jobId || !action) return;
-      if (action === 'cancel' && !window.confirm('Annuler ce job ? Les appels déjà acceptés par un fournisseur peuvent rester facturés.')) return;
-      if (action === 'association' && !window.confirm('Confirmer cette association et reprendre le job ?')) return;
-      button.disabled = true;
-      setMessage(status, 'Action en cours…', false);
-      var requestOptions = { method: 'POST' };
-      if (action === 'association') {
-        requestOptions.headers = { 'Content-Type': 'application/json' };
-        requestOptions.body = JSON.stringify({ confirmed: true });
-      }
-      request('/jobs/' + encodeURIComponent(jobId) + '/' + encodeURIComponent(action), requestOptions)
-        .then(function (result) {
-          var labels = { retry: 'Relance planifiée.', cancel: 'Job annulé.', association: 'Association confirmée ; reprise planifiée.' };
-          setMessage(status, labels[action] || 'Action enregistrée.', false);
-          window.setTimeout(function () { window.location.reload(); }, 600);
-        })
-        .catch(function (error) { setMessage(status, error.message, true); })
-        .finally(function () { button.disabled = false; });
-    });
-  });
-
-  var firstProviderTest = document.querySelector('.msrwa-test-provider');
-  if (firstProviderTest) {
-    var syncWrap = document.createElement('p');
-    syncWrap.className = 'msrwa-catalog-sync';
-    syncWrap.innerHTML = '<label>Catalogue <select><option value="openai">OpenAI</option><option value="gemini">Gemini</option></select></label> <button type="button" class="button">Synchroniser le catalogue</button> <span role="status"></span>';
-    firstProviderTest.closest('p').parentNode.appendChild(syncWrap);
-    var select = syncWrap.querySelector('select');
-    var syncButton = syncWrap.querySelector('button');
-    var syncStatus = syncWrap.querySelector('span');
-    syncButton.addEventListener('click', function () {
-      syncButton.disabled = true;
-      setMessage(syncStatus, 'Synchronisation…', false);
-      request('/catalog/sync?provider=' + encodeURIComponent(select.value), { method: 'POST' })
-        .then(function (result) { setMessage(syncStatus, select.value + ' : ' + result.count + ' modèles vérifiés.', false); })
-        .catch(function (error) { setMessage(syncStatus, error.message, true); })
-        .finally(function () { syncButton.disabled = false; });
-    });
-  }
-}());
-
 /**
- * The laboratory screen.
- *
- * A run is carried by cron, so this only reads. It refreshes while anything is
- * still moving and stops as soon as everything has settled — a page left open
- * overnight must not poll until morning.
+ * The two screens that talk back: a new submission, and a batch being matched
+ * then run. Everything else on the admin side is rendered by PHP.
  */
 (function () {
   'use strict';
 
   if (typeof MSRWA === 'undefined') return;
 
-  var form = document.getElementById('msrwa-lab-start');
-  var table = document.getElementById('msrwa-lab-runs');
-  if (!form || !table) return;
-
-  var chooser = document.getElementById('msrwa-lab-brief');
-  var titleRow = document.getElementById('msrwa-lab-title-row');
-  var status = document.getElementById('msrwa-lab-start-status');
-  var timer = null;
-
-  function call(url, options) {
+  function call(path, options) {
     options = options || {};
     options.headers = Object.assign({ 'X-WP-Nonce': MSRWA.nonce, 'Content-Type': 'application/json' }, options.headers || {});
-    return fetch(MSRWA.api + url, options).then(function (response) {
+    return fetch(MSRWA.api + path, options).then(function (response) {
       return response.json().then(function (data) {
         if (!response.ok) throw new Error(data.message || 'Une erreur est survenue.');
         return data;
@@ -211,69 +18,116 @@
     });
   }
 
-  chooser.addEventListener('change', function () {
-    titleRow.style.display = '' === chooser.value ? '' : 'none';
-  });
+  function say(node, message) { if (node) node.textContent = message; }
 
-  form.addEventListener('submit', function (event) {
-    event.preventDefault();
-    var button = form.querySelector('button[type=submit]');
-    button.disabled = true;
-    status.textContent = 'Lancement…';
-    call('/lab/runs', {
-      method: 'POST',
-      body: JSON.stringify({
-        fixture: chooser.value,
-        title: (document.getElementById('msrwa-lab-title') || {}).value || '',
-        budget: parseFloat(document.getElementById('msrwa-lab-budget').value)
-      })
-    }).then(function (data) {
-      status.textContent = 'Run #' + data.id + ' en attente du cron.';
-      refresh();
-    }).catch(function (error) {
-      status.textContent = error.message;
-    }).finally(function () {
-      button.disabled = false;
+  // --- Nouveau lot -------------------------------------------------------
+
+  var form = document.getElementById('msrwa-new-batch');
+  if (form) {
+    var picker = null;
+    var chosen = [];
+    var field = document.getElementById('msrwa-images');
+    var count = document.getElementById('msrwa-image-count');
+    var status = document.getElementById('msrwa-new-status');
+
+    document.getElementById('msrwa-pick-images').addEventListener('click', function () {
+      if (!picker) {
+        picker = wp.media({ title: 'Photographies des recettes', multiple: true, library: { type: 'image' } });
+        picker.on('select', function () {
+          chosen = picker.state().get('selection').map(function (item) { return item.id; });
+          field.value = chosen.join(',');
+          say(count, chosen.length ? chosen.length + ' photographie(s)' : 'aucune');
+        });
+      }
+      picker.open();
     });
-  });
 
-  table.addEventListener('click', function (event) {
-    var cancel = event.target.closest('.msrwa-lab-cancel');
-    if (cancel) {
-      cancel.disabled = true;
-      call('/lab/runs/' + cancel.dataset.run + '/cancel', { method: 'POST' })
-        .then(refresh)
-        .catch(function (error) { cancel.textContent = error.message; });
-      return;
-    }
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+      var button = form.querySelector('button[type=submit]');
+      button.disabled = true;
+      // The photographs are described here, one call each, so this is the slow
+      // part of the submission and the only part that spends before a run.
+      say(status, 'Description des photographies…');
+      call('/batches', {
+        method: 'POST',
+        body: JSON.stringify({
+          recipes: document.getElementById('msrwa-recipes').value,
+          images: field.value,
+          budget: parseFloat(document.getElementById('msrwa-budget').value)
+        })
+      }).then(function (data) {
+        window.location = 'admin.php?page=msrwa-batch&batch_id=' + data.id;
+      }).catch(function (error) {
+        say(status, error.message);
+        button.disabled = false;
+      });
+    });
+  }
 
-    var remove = event.target.closest('.msrwa-lab-delete');
-    if (!remove) return;
-    // A run cost real money to produce and cannot be regenerated for free.
-    if (!window.confirm('Supprimer le run #' + remove.dataset.run + ' et tout ce que le moteur en a rapporté ?')) return;
-    remove.disabled = true;
-    call('/lab/runs/' + remove.dataset.run, { method: 'DELETE' })
-      .then(function () { window.location.reload(); })
-      .catch(function (error) { remove.textContent = error.message; remove.disabled = false; });
-  });
+  // --- Un lot : appariement puis runs ------------------------------------
+
+  var wrap = document.querySelector('.msrwa-wrap[data-batch]');
+  if (!wrap) return;
+  var batch = wrap.dataset.batch;
+  var batchStatus = document.getElementById('msrwa-batch-status');
+  var timer = null;
+
+  function pairs() {
+    return Array.prototype.map.call(document.querySelectorAll('.msrwa-pair'), function (select) {
+      return { image: parseInt(select.dataset.image, 10), recipe: '' === select.value ? null : parseInt(select.value, 10) };
+    });
+  }
+
+  var save = document.getElementById('msrwa-save-pairs');
+  if (save) {
+    save.addEventListener('click', function () {
+      save.disabled = true;
+      say(batchStatus, 'Enregistrement…');
+      call('/batches/' + batch + '/pairs', { method: 'POST', body: JSON.stringify({ pairs: pairs() }) })
+        .then(function () { say(batchStatus, 'Appariement enregistré.'); })
+        .catch(function (error) { say(batchStatus, error.message); })
+        .finally(function () { save.disabled = false; });
+    });
+  }
+
+  var dispatch = document.getElementById('msrwa-dispatch');
+  if (dispatch) {
+    dispatch.addEventListener('click', function () {
+      dispatch.disabled = true;
+      say(batchStatus, 'Envoi…');
+      // The pairing is saved first, so what is dispatched is always what is on
+      // screen rather than what was last confirmed.
+      call('/batches/' + batch + '/pairs', { method: 'POST', body: JSON.stringify({ pairs: pairs() }) })
+        .then(function () { return call('/batches/' + batch + '/dispatch', { method: 'POST' }); })
+        .then(function (data) {
+          say(batchStatus, data.started + ' recette(s) lancée(s).');
+          window.location.reload();
+        })
+        .catch(function (error) { say(batchStatus, error.message); dispatch.disabled = false; });
+    });
+  }
+
+  var table = document.getElementById('msrwa-runs');
+  if (!table) return;
 
   function refresh() {
-    return call('/lab/runs').then(function (data) {
+    return call('/batches/' + batch + '/runs').then(function (data) {
       var moving = false;
       data.runs.forEach(function (run) {
         var row = table.querySelector('tr[data-run="' + run.id + '"]');
         if (!row) { window.location.reload(); return; }
-        row.querySelector('.msrwa-lab-state').textContent = run.status + (run.step && 'running' === run.status ? ' — ' + run.step : '');
-        row.querySelector('.msrwa-lab-steps').textContent = run.steps_done + ' / ' + run.steps_total;
-        row.querySelector('.msrwa-lab-cost').textContent = run.cost_usd.toFixed(4) + ' $';
-        row.querySelector('.msrwa-lab-seconds').textContent = run.seconds.toFixed(1) + ' s';
+        row.querySelector('.msrwa-run-state').textContent = run.status + (run.step && 'running' === run.status ? ' — ' + run.step : '');
+        row.querySelector('.msrwa-run-steps').textContent = run.steps_done + ' / ' + run.steps_total;
+        row.querySelector('.msrwa-run-cost').textContent = run.cost_usd.toFixed(4) + ' $';
+        row.querySelector('.msrwa-run-seconds').textContent = run.seconds.toFixed(1) + ' s';
         if ('queued' === run.status || 'running' === run.status) moving = true;
       });
+      // A finished batch is a page whose drafts have appeared; reload once so
+      // their links are there rather than asking the reader to press refresh.
+      if (!moving && timer) { window.clearInterval(timer); timer = null; window.location.reload(); }
       if (moving && !timer) { timer = window.setInterval(refresh, 5000); }
-      if (!moving && timer) { window.clearInterval(timer); timer = null; }
     }).catch(function () {
-      // A refresh that fails says nothing about the run; cron carries it either
-      // way. Stop asking rather than fill the page with errors.
       if (timer) { window.clearInterval(timer); timer = null; }
     });
   }

@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.89` est un socle installable : file persistante, pipeline de
+La version `0.3.0` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.
@@ -22,6 +22,44 @@ Le plugin est en cours de refonte éditoriale et budgétaire :
 Les coûts affichés sont des estimations calculées avec le catalogue configuré,
 non une facture fournisseur. `completed` signifie que le traitement est terminé,
 jamais qu’un texte est validé éditorialement.
+
+## Version 0.3.0
+
+**Le plugin est réécrit autour d'un seul rôle.** Le rédacteur fournit plusieurs
+recettes et plusieurs photographies sans dire lesquelles vont ensemble. Le
+plugin décrit chaque photographie, l'associe à sa recette, montre l'appariement
+pour confirmation, construit un brief par recette et les envoie tous au moteur,
+qui les traite ensemble. Quand un run se termine, son article, ses images et sa
+fiche recette deviennent un brouillon WordPress.
+
+Le moteur n'a pas changé. L'appariement est une étape du plugin : il passe par
+la couche d'appel publique du moteur, avec son propre prompt, et rien dans
+`includes/engine/` ne sait qu'il existe. Deux passes, parce qu'elles ne coûtent
+pas la même chose : chaque photographie est décrite une fois, en parallèle —
+c'est la moitié chère, facturée à l'image — puis un seul appel de texte lit les
+descriptions en face des titres. Corriger une association ensuite ne coûte rien.
+
+Dans le doute, le modèle n'associe pas : une photographie laissée de côté coûte
+moins cher qu'une photographie attribuée au mauvais plat, qui illustrerait un
+article entier. Et le rédacteur garde le dernier mot avant tout lancement.
+
+**Ce qui a été supprimé.** L'ancien pipeline — `pipeline`, `queue`, `openai`,
+`providers`, `publisher`, `images` de génération, `lists`, `stats`, `storage`,
+`router`, `presentation` — faisait le travail que le moteur fait désormais
+seul, en double et différemment. Environ 3 700 lignes, avec leurs tables :
+`jobs`, `reservations`, `settings`, `settings_history`, `providers`, `models`,
+`prompts`, `snapshots` et les tables `lab_*` sont supprimées une fois, sous leur
+propre drapeau pour qu'une mise à jour ultérieure ne recommence pas.
+
+Ce que le moteur utilise est resté intact : `json`, `recipe`, `quality`,
+`prompt`, `images`, `catalog`, `cost`, et `MSRWA_Settings::defaults()`. Ce sont
+ses dépendances, pas du code applicatif ; les supprimer aurait modifié le
+moteur. Seul le stockage des réglages a changé de place — une option WordPress
+au lieu de deux tables et d'un historique.
+
+**Cinq tables** pour ce qui reste : `batches` (une soumission), `runs` (une
+recette), puis `steps`, `calls`, `events` et `artifacts` qui reçoivent tout ce
+que le moteur rapporte, en lignes plutôt qu'en un bloc JSON.
 
 ## Version 0.2.89
 
