@@ -468,12 +468,36 @@ final class MSRWA_Engine {
 		if ( '' === $prompt['text'] ) { return self::failed( 'No prompt for ' . $name . ' (' . $prompt['source'] . ').' ); }
 
 		$brief = self::working_set( $name, $result );
+
+		// Judge what was actually produced. A caller that did not ask for a
+		// collage has no collage to show, and failing the step for the absence
+		// of something nobody ordered made a whole class of run unjudgeable. An
+		// image that exists and cannot be read is still a failure: that is a
+		// broken run, not a smaller one.
 		$images = array();
-		foreach ( array( 'featured', 'facebook' ) as $kind ) {
-			$image = self::read_image( $result->artifacts[ $kind ] ?? array() );
+		$targets = array( 'article' );
+		foreach ( array( 'featured' => 'featured_image', 'facebook' => 'facebook_image' ) as $kind => $target ) {
+			if ( empty( $result->artifacts[ $kind ] ) ) { continue; }
+			$image = self::read_image( (array) $result->artifacts[ $kind ] );
 			if ( isset( $image['error'] ) ) { return self::failed( $image['error'], 0, $route ); }
 			$images[] = $image;
+			$targets[] = $target;
 		}
+		// Three artifacts can disagree with one another; two cannot.
+		if ( 2 === count( $images ) ) { $targets[] = 'consistency'; }
+
+		// The judge is told what it has, in the same order the images are
+		// attached, so "the list above is exhaustive" is true rather than a
+		// hopeful instruction.
+		$manifest = array();
+		if ( in_array( 'featured_image', $targets, true ) ) {
+			$manifest[] = '- the featured image, ' . (string) $config->get( 'images.featured_size', '1024x1024' ) . ';';
+		}
+		if ( in_array( 'facebook_image', $targets, true ) ) {
+			$manifest[] = '- the Facebook image, ' . (string) $config->get( 'images.facebook_size', '1024x1536' )
+				. ', a ' . (int) $config->get( 'images.collage_panels', 6 ) . '-panel preparation collage;';
+		}
+		$brief['images_received'] = $manifest ? implode( "\n", $manifest ) : '- no image at all: judge the text alone.';
 
 		$input = MSRWA_Engine_Input::build( $name, $prompt['text'], $brief, $options );
 		$bytes = 0;
@@ -484,13 +508,14 @@ final class MSRWA_Engine {
 		$plan = MSRWA_Engine_Call::plan_judge( $route['provider'], $route['model'], $input, $images, $config->max_output( $name ), $wire );
 		if ( isset( $plan['error'] ) ) { return self::failed( $plan['error'], 0, $route ); }
 
-		return array( 'plan' => $plan, 'finish' => static function ( $call ) use ( $name, $route, $wire, $config, $result, $images, $prompt, $input ) {
+		return array( 'plan' => $plan, 'finish' => static function ( $call ) use ( $name, $route, $wire, $config, $result, $images, $targets, $prompt, $input ) {
 			if ( isset( $call['error'] ) ) { return self::failed( $call['error'], $call['seconds'] ?? 0, $route ); }
 			self::report_call( $result, $name, $route, $wire['text_endpoint'] ?? '', $call, $config );
 
 			$verdict = MSRWA_Json::decode( $call['text'] );
 			$verdict = is_array( $verdict ) ? $verdict : array();
-			$checks = MSRWA_Engine_Score::approval( $verdict, count( $images ), (int) $config->get( 'images.collage_panels', 6 ), (array) $config->get( 'approval_targets', array() ) );
+			$configured = (array) $config->get( 'approval_targets', array() );
+			$checks = MSRWA_Engine_Score::approval( $verdict, count( $images ), (int) $config->get( 'images.collage_panels', 6 ), $configured ? $configured : $targets );
 			$passed = count( array_filter( $checks, static function ( $check ) { return ! empty( $check['pass'] ); } ) );
 
 			// A verdict that fails its own structural contract is not a refusal, it is

@@ -179,15 +179,22 @@ final class MSRWA_Engine_Score {
 		}
 		$checks['a verdict per artifact'] = array( 'pass' => empty( $missing ), 'detail' => $missing ? 'missing or invalid: ' . implode( ', ', $missing ) : count( $targets ) . ' verdicts' );
 
-		$realism = array();
-		foreach ( array( 'featured_image', 'facebook_image' ) as $target ) {
-			if ( ! in_array( (string) ( $verdict[ $target ]['realism'] ?? '' ), $verdicts, true ) ) { $realism[] = $target; }
+		// Only the images that were actually shown are asked about. A run that
+		// produced no collage cannot be marked down for failing to judge one.
+		$image_targets = array_values( array_intersect( array( 'featured_image', 'facebook_image' ), $targets ) );
+		if ( $image_targets ) {
+			$realism = array();
+			foreach ( $image_targets as $target ) {
+				if ( ! in_array( (string) ( $verdict[ $target ]['realism'] ?? '' ), $verdicts, true ) ) { $realism[] = $target; }
+			}
+			$checks['realism judged separately'] = array( 'pass' => empty( $realism ), 'detail' => $realism ? 'missing: ' . implode( ', ', $realism ) : count( $image_targets ) . ' image(s)' );
 		}
-		$checks['realism judged separately'] = array( 'pass' => empty( $realism ), 'detail' => $realism ? 'missing: ' . implode( ', ', $realism ) : 'both images' );
 
 		// The judge must count the panels it was shown, not repeat the number asked for.
-		$panels = $verdict['facebook_image']['panels_counted'] ?? null;
-		$checks['collage panels counted'] = array( 'pass' => is_int( $panels ) && $panels > 0, 'detail' => null === $panels ? 'missing' : $panels . ' counted, ' . $expected_panels . ' expected' );
+		if ( in_array( 'facebook_image', $targets, true ) ) {
+			$panels = $verdict['facebook_image']['panels_counted'] ?? null;
+			$checks['collage panels counted'] = array( 'pass' => is_int( $panels ) && $panels > 0, 'detail' => null === $panels ? 'missing' : $panels . ' counted, ' . $expected_panels . ' expected' );
+		}
 
 		$findings = array_values( array_filter( (array) ( $verdict['findings'] ?? array() ), 'is_array' ) );
 		$blocking = 0;

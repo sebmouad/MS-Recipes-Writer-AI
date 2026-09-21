@@ -71,6 +71,8 @@ final class MSRWA_Admin {
 				'saved' => __( 'Appariement enregistré.', 'ms-recipes-writer-ai' ),
 				'sending' => __( 'Envoi au moteur…', 'ms-recipes-writer-ai' ),
 				'retrying' => __( 'Reprise…', 'ms-recipes-writer-ai' ),
+				/* translators: %s is a comma-separated list of step names. */
+				'unpriced' => __( 'Le total est incomplet : %s tourne(nt) sur un modèle sans tarif publié.', 'ms-recipes-writer-ai' ),
 			),
 		) );
 	}

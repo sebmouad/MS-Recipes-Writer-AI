@@ -9,6 +9,7 @@ final class MSRWA_REST {
 	public static function register() {
 		register_rest_route( 'msrwa/v1', '/diagnostics/config', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_manage' ), 'callback' => array( 'MSRWA_Operations', 'preview' ) ) );
 		add_filter( 'rest_post_dispatch', array( __CLASS__, 'no_store' ), 10, 3 );
+		register_rest_route( 'msrwa/v1', '/estimate', array( 'methods' => 'GET', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'estimate' ) ) );
 		register_rest_route( 'msrwa/v1', '/batches', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'create' ) ) );
 		register_rest_route( 'msrwa/v1', '/batches/(?P<id>\d+)/pairs', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'pairs' ) ) );
 		register_rest_route( 'msrwa/v1', '/batches/(?P<id>\d+)/dispatch', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'dispatch' ) ) );
@@ -33,6 +34,23 @@ final class MSRWA_REST {
 
 	public static function can_create() { return current_user_can( 'msrwa_create' ) || current_user_can( 'manage_options' ); }
 	public static function can_manage() { return current_user_can( 'manage_options' ); }
+
+	/**
+	 * What a lot would cost, from the configuration that will actually run it.
+	 *
+	 * Derived rather than guessed: change a route on the Moteur screen and this
+	 * follows. It stays an estimate, and the ceiling beside it is the number
+	 * that cannot be exceeded.
+	 */
+	public static function estimate( WP_REST_Request $request ) {
+		$profile = sanitize_key( (string) $request->get_param( 'profile' ) );
+		$estimate = MSRWA_Estimate::lot(
+			MSRWA_Profile::exists( $profile ) ? $profile : MSRWA_Profile::FULL,
+			(int) $request->get_param( 'recipes' ),
+			(int) $request->get_param( 'images' )
+		);
+		return rest_ensure_response( $estimate );
+	}
 
 	/** Splits the submission, describes the photographs, pairs them. */
 	public static function create( WP_REST_Request $request ) {

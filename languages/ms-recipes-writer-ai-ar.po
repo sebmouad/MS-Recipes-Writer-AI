@@ -716,3 +716,15 @@ msgstr "خطوات"
 
 msgid "— aucune —"
 msgstr "— لا شيء —"
+
+msgid "Pas de collage. Le jugement final s’exécute quand même et confronte le texte à l’image produite ; il n’a simplement pas de collage à comparer."
+msgstr "بلا ملصق. يُنفَّذ الحكم النهائي مع ذلك ويقارن النص بالصورة المنتجة؛ لكن لا ملصق لديه ليقارنه."
+
+msgid "Texte uniquement, relu et vérifié. Aucune image n’est générée, et le jugement final n’aurait rien à regarder."
+msgstr "نص فقط، مُدقَّق ومُتحقَّق منه. لا تُولَّد أي صورة، ولن يكون لدى الحكم النهائي ما ينظر إليه."
+
+msgid "Chaque recette suit le même chemin. Les montants sont calculés depuis le routage et les tarifs réellement configurés — ce sont des estimations, jamais une facture."
+msgstr "كل وصفة تسلك المسار نفسه. والمبالغ محسوبة من التوجيه والتسعيرات المُعدّة فعلاً — تقديرات لا فاتورة."
+
+msgid "Le total est incomplet : %s tourne(nt) sur un modèle sans tarif publié."
+msgstr "المجموع ناقص: %s تجري على نموذج بلا تسعيرة منشورة."

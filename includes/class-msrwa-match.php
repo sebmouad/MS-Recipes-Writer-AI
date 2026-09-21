@@ -41,7 +41,10 @@ final class MSRWA_Match {
 
 	/** What each photograph actually shows, read from its own bytes, all at once. */
 	private static function describe( array $images, MSRWA_Engine_Config $config ) {
-		$route = $config->model_for( 'research' );
+		// Reading image bytes is the vision route's job. Asking for the research
+		// route happened to resolve to the same model today and would have
+		// quietly stopped doing so the moment somebody changed one of them.
+		$route = $config->model_for( 'vision' );
 		$wire = $config->provider( $route['provider'], $route['model'] );
 		$started = microtime( true );
 		$out = array( 'images' => array(), 'cost_usd' => 0.0, 'seconds' => 0.0, 'errors' => array() );

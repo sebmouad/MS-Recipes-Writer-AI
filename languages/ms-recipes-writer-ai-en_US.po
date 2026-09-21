@@ -716,3 +716,15 @@ msgstr "steps"
 
 msgid "— aucune —"
 msgstr "— none —"
+
+msgid "Pas de collage. Le jugement final s’exécute quand même et confronte le texte à l’image produite ; il n’a simplement pas de collage à comparer."
+msgstr "No collage. The final judgement still runs and checks the text against the image produced; it simply has no collage to compare."
+
+msgid "Texte uniquement, relu et vérifié. Aucune image n’est générée, et le jugement final n’aurait rien à regarder."
+msgstr "Text only, proofread and checked. No image is generated, and the final judgement would have nothing to look at."
+
+msgid "Chaque recette suit le même chemin. Les montants sont calculés depuis le routage et les tarifs réellement configurés — ce sont des estimations, jamais une facture."
+msgstr "Every recipe takes the same path. The amounts are worked out from the routing and rates actually configured — estimates, never an invoice."
+
+msgid "Le total est incomplet : %s tourne(nt) sur un modèle sans tarif publié."
+msgstr "The total is incomplete: %s run(s) on a model with no published rate."

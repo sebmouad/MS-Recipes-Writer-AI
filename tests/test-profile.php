@@ -18,13 +18,17 @@ msrwa_test_assert( ! isset( MSRWA_Profile::config( MSRWA_Profile::FULL, "fr" )["
 $featured = MSRWA_Profile::steps( MSRWA_Profile::FEATURED );
 msrwa_test_assert( ! in_array( 'facebook_image', $featured, true ), 'The featured profile draws no collage.' );
 msrwa_test_assert( in_array( 'featured_image', $featured, true ), 'The featured profile still draws its featured image.' );
-msrwa_test_assert( ! in_array( 'final_approval', $featured, true ), 'With one image there is nothing for the three-way judge to do.' );
+// The judge sees whatever was produced, so one image is still worth judging.
+msrwa_test_assert( in_array( 'final_approval', $featured, true ), 'One image is still judged; only the comparison between two is lost.' );
 foreach ( array( 'review', 'fact_check', 'proofread' ) as $check ) {
 	msrwa_test_assert( in_array( $check, $featured, true ), 'The text checks run in every profile; ' . $check . ' is missing.' );
 }
 
 $article = MSRWA_Profile::steps( MSRWA_Profile::ARTICLE );
-msrwa_test_assert( ! array_intersect( array( 'featured_image', 'facebook_image', 'final_approval' ), $article ), 'The article profile generates no image at all.' );
+msrwa_test_assert( ! array_intersect( array( 'featured_image', 'facebook_image' ), $article ), 'The article profile generates no image at all.' );
+// With nothing drawn, the judge would add nothing the text checks have not
+// already done, so the call is saved rather than spent.
+msrwa_test_assert( ! in_array( 'final_approval', $article, true ), 'With no image there is nothing for the judge to look at.' );
 msrwa_test_assert( in_array( 'proofread', $article, true ), 'An article-only run is still proofread.' );
 
 // The point of the whole design: every remaining step must be runnable. A step

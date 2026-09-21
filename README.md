@@ -2,6 +2,44 @@
 
 Plugin WordPress en construction pour la génération éditoriale culinaire orchestrée.
 
+## Version 0.5.0
+
+**Le juge ne répond plus que de ce qu'on lui a montré** *(modification du moteur,
+approuvée)*. Il réclamait les deux images par leur nom et faisait échouer
+l'étape si l'une manquait — donc un run qui produisait délibérément une seule
+image ne pouvait jamais être jugé, et se voyait reprocher l'absence de ce que
+personne n'avait commandé.
+
+Désormais l'étape joint les images qui existent, dit au juge lesquelles dans son
+propre prompt, et ne lui demande de verdict que sur celles-là. Une image
+présente mais illisible reste un échec : c'est un run cassé, pas un run plus
+petit. Et une image qu'on lui a bien montrée et qu'il n'a pas jugée reste une
+faute — le contrat n'est pas devenu une suggestion. Conséquence : le profil
+« article et image à la une » a de nouveau un jugement final.
+
+**Les estimations de prix, calculées et non devinées.** Elles viennent du
+routage, des modèles, des plafonds de sortie et des tarifs que le moteur résout
+réellement : changez une route sur l'écran Moteur et l'estimation suit. Le
+composeur affiche deux nombres, parce que ce sont deux choses différentes : ce
+que le lot coûtera probablement, et le plafond qu'il ne peut pas dépasser.
+
+Deux bugs réels trouvés en la construisant. Les étapes d'image ne passent pas
+par leur propre nom mais par `routing.image` : les chiffrer sur la route texte
+donnait un collage à un vingt-cinquième de son prix. Et l'appariement lisait les
+images via la route `research` au lieu de `vision` — même modèle aujourd'hui,
+faux dès que l'une des deux change. Un test compare désormais l'estimation à
+deux runs réellement facturés : 0,1119 $ estimé contre 0,1165 $ et 0,1128 $
+mesurés.
+
+**Les anciennes tables ne sont plus supprimées.** Une mise à jour qui détruit des
+données est une mise à jour qu'on ne peut pas annuler. Elles restent en place,
+inertes ; `MSRWA_DB::dormant()` dit lesquelles sont encore là, et leur
+suppression appartient au propriétaire du site.
+
+**`tools/promote.php`**, que les tests réclamaient depuis longtemps sans qu'il
+existe : il recopie un gabarit de prompt dans les valeurs par défaut des
+réglages, au lieu d'un copier-coller qui dérive.
+
 ## Version 0.4.2
 
 **Tous les écrans sont refondus, et deux manques réels sont comblés.**
@@ -190,7 +228,7 @@ cron réel et validité distante des clés restent à vérifier sur un site de t
 
 ## État actuel
 
-La version `0.4.2` est un socle installable : file persistante, pipeline de
+La version `0.5.0` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.

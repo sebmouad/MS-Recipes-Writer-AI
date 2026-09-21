@@ -18,11 +18,11 @@ final class MSRWA_Profile {
 	/**
 	 * The three shapes of output, most complete first.
 	 *
-	 * The final judge is the only place the article and both images are checked
-	 * against one another, and the engine asks it for both images by name. So it
-	 * runs for the full profile and not for the others — not as a saving, but
-	 * because with one image or none there is nothing for it to compare. The
-	 * text checks — review, fact check, proofreading — run in every profile.
+	 * The final judge sees the article beside whatever images were produced, so
+	 * it runs wherever there is an image to look at. With no image at all there
+	 * is nothing for it to do that the text checks — review, fact check,
+	 * proofreading — do not already do, so the article-only profile skips it and
+	 * saves the call. Those text checks run in every profile.
 	 */
 	public static function all() {
 		return array(
@@ -30,19 +30,16 @@ final class MSRWA_Profile {
 				'label' => __( 'Article, image à la une et collage Facebook', 'ms-recipes-writer-ai' ),
 				'description' => __( 'La chaîne complète, jugement final compris : c’est le seul moment où le texte et les deux images sont confrontés.', 'ms-recipes-writer-ai' ),
 				'drop' => array(),
-				'estimate_usd' => 0.12,
 			),
 			self::FEATURED => array(
 				'label' => __( 'Article et image à la une', 'ms-recipes-writer-ai' ),
-				'description' => __( 'Pas de collage. Le jugement final ne s’exécute pas : il confronte le texte aux deux images, et il n’y en a qu’une.', 'ms-recipes-writer-ai' ),
-				'drop' => array( 'facebook_image', 'final_approval' ),
-				'estimate_usd' => 0.08,
+				'description' => __( 'Pas de collage. Le jugement final s’exécute quand même et confronte le texte à l’image produite ; il n’a simplement pas de collage à comparer.', 'ms-recipes-writer-ai' ),
+				'drop' => array( 'facebook_image' ),
 			),
 			self::ARTICLE => array(
 				'label' => __( 'Article seul', 'ms-recipes-writer-ai' ),
-				'description' => __( 'Texte uniquement, relu et vérifié. Aucune image n’est générée.', 'ms-recipes-writer-ai' ),
+				'description' => __( 'Texte uniquement, relu et vérifié. Aucune image n’est générée, et le jugement final n’aurait rien à regarder.', 'ms-recipes-writer-ai' ),
 				'drop' => array( 'featured_image', 'facebook_image', 'final_approval' ),
-				'estimate_usd' => 0.05,
 			),
 		);
 	}
@@ -104,8 +101,4 @@ final class MSRWA_Profile {
 		return self::language_exists( $language ) ? array( 'language' => (string) $language ) : array();
 	}
 
-	/** A rough figure to show before anything is spent. It is never an invoice. */
-	public static function estimate( $profile, $recipes ) {
-		return round( (float) self::get( $profile )['estimate_usd'] * max( 1, (int) $recipes ), 2 );
-	}
 }

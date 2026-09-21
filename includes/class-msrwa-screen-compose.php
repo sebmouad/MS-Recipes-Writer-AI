@@ -46,7 +46,7 @@ final class MSRWA_Screen_Compose {
 
 			<section class="ms-step">
 				<h3><?php esc_html_e( 'Ce qu’il faut produire', 'ms-recipes-writer-ai' ); ?></h3>
-				<p><?php esc_html_e( 'Chaque recette suit le même chemin. Les montants sont des ordres de grandeur mesurés, jamais une facture.', 'ms-recipes-writer-ai' ); ?></p>
+				<p><?php esc_html_e( 'Chaque recette suit le même chemin. Les montants sont calculés depuis le routage et les tarifs réellement configurés — ce sont des estimations, jamais une facture.', 'ms-recipes-writer-ai' ); ?></p>
 				<div class="ms-choices">
 					<?php foreach ( MSRWA_Profile::all() as $key => $profile ) : ?>
 						<label class="ms-choice">
@@ -55,7 +55,7 @@ final class MSRWA_Screen_Compose {
 								<strong><?php echo esc_html( $profile['label'] ); ?></strong>
 								<small><?php echo esc_html( $profile['description'] ); ?></small>
 							</span>
-							<span class="ms-choice-cost">~ <?php echo esc_html( MSRWA_I18N::money( $profile['estimate_usd'], 2 ) ); ?></span>
+							<span class="ms-choice-cost" data-profile-cost="<?php echo esc_attr( $key ); ?>">~ <?php echo esc_html( MSRWA_I18N::money( MSRWA_Estimate::recipe( $key )['cost_usd'], 4 ) ); ?></span>
 						</label>
 					<?php endforeach; ?>
 				</div>

@@ -45,22 +45,40 @@
     var picker = null;
     var chosen = [];
 
+    var pending = null;
+
     function refreshEstimate() {
       var count = countRecipes(recipes.value);
-      var profile = compose.querySelector('input[name=profile]:checked');
-      var per = profile ? parseFloat(profile.closest('.ms-choice').querySelector('.ms-choice-cost').textContent.replace(/[^\d.]/g, '')) : 0;
-      var cap = parseFloat(document.getElementById('ms-budget').value) || 0;
-
       say(recipeCount, count ? (count === 1 ? t.oneRecipe : (t.manyRecipes || '').replace('%d', count)) : '');
       if (!count) { say(estimate, ''); return; }
 
-      // Two numbers, and they are different things: what this is likely to
-      // cost, and the most it is allowed to cost. Showing only the first is
-      // how a surprise bill happens.
-      say(estimate, (t.estimate || '')
-        .replace('%1$s', money(per * count))
-        .replace('%2$s', money(cap * count))
-        .replace('%3$d', count));
+      // The figure comes from the server, because it is worked out from the
+      // routing and rates actually configured rather than from anything this
+      // script could know. Debounced: somebody typing a long recipe should not
+      // ask a hundred times.
+      window.clearTimeout(pending);
+      pending = window.setTimeout(function () {
+        var profile = compose.querySelector('input[name=profile]:checked');
+        var query = '?profile=' + encodeURIComponent(profile ? profile.value : '') +
+          '&recipes=' + count + '&images=' + chosen.length;
+
+        call('/estimate' + query).then(function (data) {
+          var cap = (parseFloat(document.getElementById('ms-budget').value) || 0) * count;
+          // Two numbers, and they are different things: what this is likely to
+          // cost, and the most it is allowed to cost. Showing only the first is
+          // how a surprise bill happens.
+          var line = (t.estimate || '')
+            .replace('%1$s', money(data.cost_usd))
+            .replace('%2$s', money(cap))
+            .replace('%3$d', count);
+          if (data.unpriced && data.unpriced.length) {
+            line += ' ' + (t.unpriced || '').replace('%s', data.unpriced.join(', '));
+          }
+          say(estimate, line);
+        }).catch(function () {
+          say(estimate, '');
+        });
+      }, 400);
     }
 
     recipes.addEventListener('input', refreshEstimate);

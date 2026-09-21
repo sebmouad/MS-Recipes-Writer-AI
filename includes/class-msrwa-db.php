@@ -35,9 +35,12 @@ final class MSRWA_DB {
 	/**
 	 * Tables from the plugin that stood here before this one.
 	 *
-	 * They belong to a pipeline that no longer exists: the engine does that work
-	 * now, and nothing left in the code can read them. They are dropped once,
-	 * deliberately, rather than left to sit as a schema nobody maintains.
+	 * Nothing left in the code can read them, but they are not touched. A
+	 * plugin update that destroys data is a plugin update nobody can undo, and
+	 * the owner would rather drop them himself once he is satisfied than
+	 * discover on activation that he cannot get them back.
+	 *
+	 * Listed here so it is on the record which tables are dormant.
 	 */
 	private static function superseded() {
 		global $wpdb;
@@ -82,25 +85,17 @@ final class MSRWA_DB {
 			self::backfill_check_counts();
 		}
 
-		self::drop_superseded();
 		update_option( 'msrwa_schema', self::SCHEMA, false );
 		update_option( 'msrwa_db_version', MSRWA_VERSION, false );
 	}
 
-	/**
-	 * Drops the previous plugin's tables, once.
-	 *
-	 * Guarded by its own flag rather than by the version, so a later upgrade
-	 * cannot run it a second time against tables a site has since created for
-	 * its own reasons.
-	 */
-	private static function drop_superseded() {
-		global $wpdb;
-		if ( get_option( 'msrwa_superseded_dropped' ) ) { return; }
+	/** Which of the previous plugin's tables are still on disk, for a screen to report. */
+	public static function dormant() {
+		$found = array();
 		foreach ( self::superseded() as $table ) {
-			if ( self::table_exists( $table ) ) { $wpdb->query( 'DROP TABLE ' . $table ); }
+			if ( self::table_exists( $table ) ) { $found[] = $table; }
 		}
-		update_option( 'msrwa_superseded_dropped', 1, false );
+		return $found;
 	}
 
 	/**

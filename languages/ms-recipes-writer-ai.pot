@@ -63,7 +63,7 @@ msgstr ""
 msgid "Analyse"
 msgstr ""
 
-#: class-msrwa-profile.php:61
+#: class-msrwa-profile.php:58
 msgid "Anglais"
 msgstr ""
 
@@ -79,7 +79,7 @@ msgstr ""
 msgid "Appels"
 msgstr ""
 
-#: class-msrwa-profile.php:62
+#: class-msrwa-profile.php:59
 msgid "Arabe"
 msgstr ""
 
@@ -91,11 +91,11 @@ msgstr ""
 msgid "Artefact"
 msgstr ""
 
-#: class-msrwa-profile.php:36
+#: class-msrwa-profile.php:35
 msgid "Article et image à la une"
 msgstr ""
 
-#: class-msrwa-profile.php:42
+#: class-msrwa-profile.php:40
 msgid "Article seul"
 msgstr ""
 
@@ -199,7 +199,7 @@ msgstr ""
 msgid "Cet article a été généré. Les contrôles ci-dessous portent sur ce que la machine a produit ; ils ne remplacent pas votre relecture, et rien ici ne vaut approbation."
 msgstr ""
 
-#: class-msrwa-rest.php:103
+#: class-msrwa-rest.php:121
 msgid "Cette recette n’est pas arrêtée."
 msgstr ""
 
@@ -208,7 +208,7 @@ msgid "Chaque photographie a été décrite depuis ses propres pixels, puis rapp
 msgstr ""
 
 #: class-msrwa-screen-compose.php:49
-msgid "Chaque recette suit le même chemin. Les montants sont des ordres de grandeur mesurés, jamais une facture."
+msgid "Chaque recette suit le même chemin. Les montants sont calculés depuis le routage et les tarifs réellement configurés — ce sont des estimations, jamais une facture."
 msgstr ""
 
 #: class-msrwa-screen-settings.php:31
@@ -347,7 +347,7 @@ msgstr ""
 msgid "Filtrer"
 msgstr ""
 
-#: class-msrwa-profile.php:60
+#: class-msrwa-profile.php:57
 msgid "Français"
 msgstr ""
 
@@ -401,6 +401,10 @@ msgstr ""
 
 #: class-msrwa-admin.php:26 class-msrwa-screen-pass.php:24
 msgid "Le pass"
+msgstr ""
+
+#: class-msrwa-admin.php:75
+msgid "Le total est incomplet : %s tourne(nt) sur un modèle sans tarif publié."
 msgstr ""
 
 #: class-msrwa-screen-settings.php:21
@@ -503,8 +507,8 @@ msgstr ""
 msgid "Par étape"
 msgstr ""
 
-#: class-msrwa-profile.php:37
-msgid "Pas de collage. Le jugement final ne s’exécute pas : il confronte le texte aux deux images, et il n’y en a qu’une."
+#: class-msrwa-profile.php:36
+msgid "Pas de collage. Le jugement final s’exécute quand même et confronte le texte à l’image produite ; il n’a simplement pas de collage à comparer."
 msgstr ""
 
 #: class-msrwa-screen-batch.php:121
@@ -535,7 +539,7 @@ msgstr ""
 msgid "Recette"
 msgstr ""
 
-#: class-msrwa-rest.php:102 class-msrwa-screen-run.php:18
+#: class-msrwa-rest.php:120 class-msrwa-screen-run.php:18
 msgid "Recette introuvable."
 msgstr ""
 
@@ -639,8 +643,8 @@ msgstr ""
 msgid "Terminés"
 msgstr ""
 
-#: class-msrwa-profile.php:43
-msgid "Texte uniquement, relu et vérifié. Aucune image n’est générée."
+#: class-msrwa-profile.php:41
+msgid "Texte uniquement, relu et vérifié. Aucune image n’est générée, et le jugement final n’aurait rien à regarder."
 msgstr ""
 
 #: class-msrwa-screen-articles.php:60
@@ -691,7 +695,7 @@ msgstr ""
 msgid "Vos recettes passées par le moteur, avec leur état et ce qu’elles ont coûté."
 msgstr ""
 
-#: class-msrwa-admin.php:79 class-msrwa-admin.php:87 class-msrwa-screen-analysis.php:16 class-msrwa-screen-articles.php:15 class-msrwa-screen-batch.php:16 class-msrwa-screen-compose.php:15 class-msrwa-screen-engine.php:16 class-msrwa-screen-pass.php:14 class-msrwa-screen-run.php:15 class-msrwa-screen-settings.php:15
+#: class-msrwa-admin.php:81 class-msrwa-admin.php:89 class-msrwa-screen-analysis.php:16 class-msrwa-screen-articles.php:15 class-msrwa-screen-batch.php:16 class-msrwa-screen-compose.php:15 class-msrwa-screen-engine.php:16 class-msrwa-screen-pass.php:14 class-msrwa-screen-run.php:15 class-msrwa-screen-settings.php:15
 msgid "Vous n’avez pas accès à cet écran."
 msgstr ""
 
