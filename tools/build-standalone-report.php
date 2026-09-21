@@ -58,6 +58,55 @@ function report_visual_provenance( $research ) {
 	return $html;
 }
 
+/**
+ * The findings, written for the editor who has to act on them rather than as a
+ * JSON dump. Blocking findings state what must change; minor ones are shown just
+ * as prominently, because they are precisely the calls an editor makes and the
+ * reason a minor finding exists at all is that a person should decide.
+ */
+function report_findings( $verdict ) {
+	$findings = array_values( array_filter( (array) ( ( is_array( $verdict ) ? $verdict : array() )['findings'] ?? array() ), 'is_array' ) );
+	$groups = array( 'blocking' => array(), 'minor' => array() );
+	foreach ( $findings as $finding ) {
+		$severity = 'blocking' === ( $finding['severity'] ?? '' ) ? 'blocking' : 'minor';
+		$groups[ $severity ][] = $finding;
+	}
+	$targets = array( 'article' => 'Article', 'featured_image' => 'Image à la une', 'facebook_image' => 'Collage Facebook', 'consistency' => 'Cohérence' );
+
+	$html = '';
+	foreach ( array(
+		'blocking' => array( 'Constats bloquants', 'À corriger avant publication.', 'bad' ),
+		'minor' => array( 'Constats mineurs — à l’appréciation de l’éditeur', 'Rien n’empêche de publier. Chacun est un choix : corriger, ou accepter et passer.', 'warn' ),
+	) as $severity => $meta ) {
+		list( $title, $note, $tone ) = $meta;
+		$rows = $groups[ $severity ];
+		$html .= '<h3 class="finding-title">' . report_h( $title ) . ' <span class="pill ' . ( $rows ? $tone : 'ok' ) . '">' . count( $rows ) . '</span></h3>';
+		if ( ! $rows ) {
+			$html .= '<p class="muted">Aucun.</p>';
+			continue;
+		}
+		$html .= '<p class="muted">' . report_h( $note ) . '</p><div class="findings">';
+		foreach ( $rows as $finding ) {
+			$target = (string) ( $finding['target'] ?? '' );
+			$html .= '<article class="finding ' . report_h( $severity ) . '">';
+			$html .= '<p class="finding-head"><span class="pill ' . ( 'blocking' === $severity ? 'bad' : 'warn' ) . '">' . ( 'blocking' === $severity ? 'Bloquant' : 'Mineur' ) . '</span> <strong>' . report_h( $targets[ $target ] ?? $target ) . '</strong></p>';
+			$quote = trim( (string) ( $finding['quote'] ?? '' ) );
+			if ( '' !== $quote ) { $html .= '<blockquote class="finding-quote">' . report_h( $quote ) . '</blockquote>'; }
+			$html .= '<p><span class="finding-label">Ce qui ne va pas</span> ' . report_h( $finding['reason'] ?? '' ) . '</p>';
+			$fix = trim( (string) ( $finding['fix'] ?? '' ) );
+			if ( '' !== $fix ) { $html .= '<p><span class="finding-label">Correction proposée</span> ' . report_h( $fix ) . '</p>'; }
+			$html .= '</article>';
+		}
+		$html .= '</div>';
+	}
+	return $html;
+}
+
+/** A section the reader opens only if they want the detail. */
+function report_fold( $summary, $body, $open = false ) {
+	return '<details class="fold"' . ( $open ? ' open' : '' ) . '><summary>' . report_h( $summary ) . '</summary><div class="fold-body">' . $body . '</div></details>';
+}
+
 /** The approval verdict as four cards: the decision, then one per artifact. */
 function report_approval_cards( $verdict ) {
 	$verdict = is_array( $verdict ) ? $verdict : array();
@@ -67,8 +116,9 @@ function report_approval_cards( $verdict ) {
 	foreach ( $labels as $key => $label ) {
 		$part = isset( $verdict[ $key ] ) && is_array( $verdict[ $key ] ) ? $verdict[ $key ] : array();
 		$mark = (string) ( $part['verdict'] ?? '—' );
-		$realism = isset( $part['realism'] ) ? '<p class="muted">Réalisme : ' . report_h( $part['realism'] ) . '</p>' : '';
-		$cards .= '<div class="card"><h3>' . report_h( $label ) . '</h3><p><span class="pill ' . ( 'good' === $mark ? 'ok' : 'warn' ) . '">' . report_h( $mark ) . '</span></p>' . $realism . '<p class="muted">' . report_h( $part['summary'] ?? '' ) . '</p></div>';
+		$words = array( 'good' => 'Conforme', 'reservations' => 'Réserves', 'bad' => 'Non conforme' );
+		$realism = isset( $part['realism'] ) ? '<p class="muted">Réalisme photographique : <strong>' . report_h( $words[ (string) $part['realism'] ] ?? $part['realism'] ) . '</strong></p>' : '';
+		$cards .= '<div class="card"><h3>' . report_h( $label ) . '</h3><p><span class="pill ' . ( 'good' === $mark ? 'ok' : ( 'bad' === $mark ? 'bad' : 'warn' ) ) . '">' . report_h( $words[ $mark ] ?? $mark ) . '</span></p>' . $realism . '<p class="muted">' . report_h( $part['summary'] ?? '' ) . '</p></div>';
 	}
 	return $cards;
 }
@@ -206,7 +256,17 @@ foreach ( $runs as $label => $run ) {
 		if ( isset( $run['decoded_output']['pass'] ) ) { $verdict = (bool) $run['decoded_output']['pass']; }
 	}
 	if ( false !== strpos( $label, '(final_approval)' ) && isset( $run['decoded_output']['approved'] ) ) { $verdict = (bool) $run['decoded_output']['approved']; }
-	$metric_rows .= '<tr><td>' . report_h( $label ) . '</td><td>' . report_h( $run['model'] ?? 'gpt-5.6-luna' ) . '</td><td>' . report_h( $run['seconds'] ?? 0 ) . ' s</td><td>' . number_format( (int) ( $run['usage']['input_tokens'] ?? 0 ) ) . '</td><td>' . number_format( (int) ( $run['usage']['output_tokens'] ?? 0 ) ) . '</td><td>$' . number_format( (float) ( $run['cost_usd'] ?? 0 ), 4 ) . '</td><td><span class="pill ' . ( $verdict ? 'ok' : 'warn' ) . '">' . ( $verdict ? 'Validé' : 'Réserves' ) . '</span></td></tr>';
+	// data-label carries the column name so the same markup can stack on a phone
+	// instead of forcing the page sideways.
+	$metric_rows .= '<tr>'
+		. '<td data-label="Étape">' . report_h( $label ) . '</td>'
+		. '<td data-label="Modèle">' . report_h( $run['model'] ?? 'gpt-5.6-luna' ) . '</td>'
+		. '<td data-label="Temps">' . report_h( $run['seconds'] ?? 0 ) . ' s</td>'
+		. '<td data-label="Entrée">' . number_format( (int) ( $run['usage']['input_tokens'] ?? 0 ) ) . '</td>'
+		. '<td data-label="Sortie">' . number_format( (int) ( $run['usage']['output_tokens'] ?? 0 ) ) . '</td>'
+		. '<td data-label="Coût">$' . number_format( (float) ( $run['cost_usd'] ?? 0 ), 4 ) . '</td>'
+		. '<td data-label="Verdict"><span class="pill ' . ( $verdict ? 'ok' : 'warn' ) . '">' . ( $verdict ? 'Validé' : 'Réserves' ) . '</span></td>'
+		. '</tr>';
 }
 
 $prompt_details = '';
@@ -221,25 +281,79 @@ foreach ( array( 'Recherche' => $research_data, 'Recette canonique' => $canonica
 }
 
 $html = '<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' . report_h( $title ) . ' — Rapport complet</title><style>
-:root{--ink:#241c17;--muted:#74685f;--paper:#fffdfa;--card:#fff;--accent:#a43d22;--accent2:#e6b45d;--line:#eadfd5;--ok:#1f7a4c;--warn:#a36014}*{box-sizing:border-box}html,body{max-width:100%;overflow-x:hidden}body{margin:0;background:#f4eee8;color:var(--ink);font:16px/1.62 system-ui,-apple-system,Segoe UI,sans-serif}main{width:min(100%,920px);margin:auto;background:var(--paper);box-shadow:0 0 60px #6a4a3220}.hero{padding:56px clamp(22px,6vw,64px);background:linear-gradient(125deg,#2c211a,#6f2f1f);color:#fff}.eyebrow{text-transform:uppercase;letter-spacing:.14em;font-size:.78rem;color:#f4c980}.hero h1{font:700 clamp(2.1rem,5vw,4rem)/1.04 Georgia,serif;margin:.25em 0}.hero p{max-width:700px;color:#f4e9df}.section{padding:42px clamp(20px,6vw,58px);border-bottom:1px solid var(--line);min-width:0}h2{font:700 clamp(1.65rem,3vw,2.5rem)/1.15 Georgia,serif;margin:0 0 24px;color:#55271d}h3{font:700 1.2rem Georgia,serif;color:#7a321f}.summary-grid,.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:18px}.image-grid{display:grid;grid-template-columns:1fr;gap:22px;max-width:700px;margin:auto}.card,.list-item,details{min-width:0;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:0 5px 18px #5a3a2010}.kpi{font:700 1.8rem Georgia,serif;color:var(--accent)}.muted{color:var(--muted)}.pill{display:inline-block;border-radius:99px;padding:.18rem .6rem;font-size:.78rem;font-weight:700;background:#eee}.pill.ok{background:#dff4e7;color:var(--ok)}.pill.warn{background:#fff0d5;color:var(--warn)}table{width:100%;border-collapse:collapse;min-width:760px}th,td{text-align:left;padding:11px;border-bottom:1px solid var(--line)}th{background:#f8f1eb}.table-wrap{width:100%;max-width:100%;overflow-x:auto}.image-card{margin:0;background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden}.image-card img{width:100%;height:auto;display:block}.image-card figcaption{padding:14px;color:var(--muted)}.article{font-family:Georgia,serif;font-size:1.06rem;max-width:740px;margin:auto;overflow-wrap:anywhere}.article h2{margin-top:2.2em}.article h3{margin-top:1.6em}.article li{margin:.45em 0}.page-break{display:flex;align-items:center;gap:14px;margin:52px 0;color:var(--accent);font:bold .78rem system-ui;text-transform:uppercase;letter-spacing:.14em}.page-break:before,.page-break:after{content:"";height:1px;background:var(--accent2);flex:1}.data>div{display:grid;grid-template-columns:minmax(120px,180px) minmax(0,1fr);gap:14px;padding:10px 0;border-bottom:1px solid var(--line)}dt{text-transform:capitalize;font-weight:700;color:#713823}dd{margin:0;min-width:0;overflow-wrap:anywhere}.list{display:grid;gap:10px;min-width:0}.data .list-item{box-shadow:none}.notes li{margin:.45em 0}details{margin:12px 0}summary{cursor:pointer;font-weight:700;color:#6b2d20;overflow-wrap:anywhere}pre{white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;background:#241e1a;color:#f7eee7;padding:18px;border-radius:10px;max-width:100%;max-height:560px;overflow:auto}.footer{padding:30px clamp(20px,6vw,58px);text-align:center;color:var(--muted)}@media(max-width:700px){.data>div{grid-template-columns:1fr}.hero{padding-top:40px}.section{padding-block:32px}.summary-grid,.cards{grid-template-columns:1fr}}
+:root{--ink:#241c17;--muted:#74685f;--paper:#fffdfa;--card:#fff;--accent:#a43d22;--accent2:#e6b45d;--line:#eadfd5;--ok:#1f7a4c;--warn:#a36014}*{box-sizing:border-box}html,body{max-width:100%;overflow-x:hidden}body{margin:0;background:#f4eee8;color:var(--ink);font:16px/1.62 system-ui,-apple-system,Segoe UI,sans-serif}main{width:min(100%,920px);margin:auto;background:var(--paper);box-shadow:0 0 60px #6a4a3220}.hero{padding:56px clamp(22px,6vw,64px);background:linear-gradient(125deg,#2c211a,#6f2f1f);color:#fff}.eyebrow{text-transform:uppercase;letter-spacing:.14em;font-size:.78rem;color:#f4c980}.hero h1{font:700 clamp(2.1rem,5vw,4rem)/1.04 Georgia,serif;margin:.25em 0}.hero p{max-width:700px;color:#f4e9df}.section{padding:42px clamp(20px,6vw,58px);border-bottom:1px solid var(--line);min-width:0}h2{font:700 clamp(1.65rem,3vw,2.5rem)/1.15 Georgia,serif;margin:0 0 24px;color:#55271d}h3{font:700 1.2rem Georgia,serif;color:#7a321f}.summary-grid,.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:18px}.image-grid{display:grid;grid-template-columns:1fr;gap:22px;max-width:700px;margin:auto}.card,.list-item,details{min-width:0;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:0 5px 18px #5a3a2010}.kpi{font:700 1.8rem Georgia,serif;color:var(--accent)}.muted{color:var(--muted)}.pill{display:inline-block;border-radius:99px;padding:.18rem .6rem;font-size:.78rem;font-weight:700;background:#eee}.pill.ok{background:#dff4e7;color:var(--ok)}.pill.warn{background:#fff0d5;color:var(--warn)}table{width:100%;border-collapse:collapse;min-width:640px}th,td{text-align:left;padding:11px;border-bottom:1px solid var(--line)}th{background:#f8f1eb}.table-wrap{width:100%;max-width:100%;overflow-x:auto}.image-card{margin:0;background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden}.image-card img{width:100%;height:auto;display:block}.image-card figcaption{padding:14px;color:var(--muted)}.article{font-family:Georgia,serif;font-size:1.06rem;max-width:740px;margin:auto;overflow-wrap:anywhere}.article h2{margin-top:2.2em}.article h3{margin-top:1.6em}.article li{margin:.45em 0}.page-break{display:flex;align-items:center;gap:14px;margin:52px 0;color:var(--accent);font:bold .78rem system-ui;text-transform:uppercase;letter-spacing:.14em}.page-break:before,.page-break:after{content:"";height:1px;background:var(--accent2);flex:1}.data>div{display:grid;grid-template-columns:minmax(120px,180px) minmax(0,1fr);gap:14px;padding:10px 0;border-bottom:1px solid var(--line)}dt{text-transform:capitalize;font-weight:700;color:#713823}dd{margin:0;min-width:0;overflow-wrap:anywhere}.list{display:grid;gap:10px;min-width:0}.data .list-item{box-shadow:none}.notes li{margin:.45em 0}details{margin:12px 0}summary{cursor:pointer;font-weight:700;color:#6b2d20;overflow-wrap:anywhere}pre{white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;background:#241e1a;color:#f7eee7;padding:18px;border-radius:10px;max-width:100%;max-height:560px;overflow:auto}.footer{padding:30px clamp(20px,6vw,58px);text-align:center;color:var(--muted)}@media(max-width:700px){.data>div{grid-template-columns:1fr}.hero{padding-top:40px}.section{padding-block:32px}.summary-grid,.cards{grid-template-columns:1fr}}
+
+/* Findings, written for an editor deciding what to do. */
+.findings-wrap{margin-top:26px}
+.finding-title{display:flex;align-items:center;gap:10px;margin:28px 0 6px;font-size:1.05rem}
+.findings{display:grid;gap:14px;margin-top:14px}
+.finding{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--warn);border-radius:12px;padding:16px 18px;box-shadow:0 4px 14px #5a3a200d}
+.finding.blocking{border-left-color:#b3311f}
+.finding-head{margin:0 0 10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.finding p{margin:.4em 0}
+.finding-label{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700}
+.finding-quote{margin:.6em 0;padding:.6em .9em;border-left:3px solid var(--accent2);background:#fdf7ef;font-family:Georgia,serif;font-style:italic;overflow-wrap:anywhere}
+.pill.bad{background:#fadedb;color:#9c2a1a}
+
+/* Folds: the page reads short, and opens where the reader wants depth. */
+details.fold{margin:14px 0;border:1px solid var(--line);border-radius:12px;background:var(--card);padding:0;box-shadow:none;overflow:hidden}
+details.fold>summary{list-style:none;cursor:pointer;padding:15px 18px;font-weight:700;color:#6b2d20;display:flex;align-items:center;gap:10px}
+details.fold>summary::-webkit-details-marker{display:none}
+details.fold>summary::before{content:"+";font:700 1.15rem/1 system-ui;color:var(--accent);width:1rem;flex:none}
+details.fold[open]>summary::before{content:"–"}
+details.fold[open]>summary{border-bottom:1px solid var(--line)}
+details.fold>.fold-body{padding:18px}
+details.fold:focus-within{outline:2px solid var(--accent2);outline-offset:2px}
+
+/* Phone. The grids collapse, the type steps down, nothing runs off the side. */
+@media(max-width:640px){
+  .hero{padding:34px 18px}
+  .section{padding:26px 18px}
+  h2{font-size:1.4rem;margin-bottom:16px}
+  .image-grid{gap:16px}
+  details.fold>summary{padding:13px 14px}
+  details.fold>.fold-body{padding:14px}
+  .finding{padding:14px}
+  .data>div{grid-template-columns:1fr;gap:4px}
+  dt{font-size:.78rem;text-transform:uppercase;letter-spacing:.08em}
+  pre{font-size:11px;padding:12px}
+  .kpi{font-size:1.45rem}
+}
+@media(prefers-reduced-motion:no-preference){details.fold>.fold-body{animation:fold .18s ease-out}}
+@keyframes fold{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+
+/* The metrics table stacks on a phone. A seven-column table cannot be read
+   sideways, and its min-width was dragging the whole page past the viewport. */
+@media(max-width:640px){
+  .table-wrap{overflow-x:visible}
+  table{min-width:0;display:block}
+  thead{display:none}
+  tbody,tr,td{display:block;width:auto}
+  tr{border:1px solid var(--line);border-radius:12px;background:var(--card);padding:6px 4px;margin-bottom:12px}
+  td{border:0;padding:7px 12px;display:flex;justify-content:space-between;align-items:baseline;gap:14px}
+  td+td{border-top:1px dashed var(--line)}
+  td:before{content:attr(data-label);font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;flex:none}
+  td:first-child{font-weight:700;color:#713823}
+  .hero h1,h2,h3{overflow-wrap:anywhere}
+}
 </style></head><body><main><header class="hero"><div class="eyebrow">Test laboratoire complet · génération propre</div><h1>' . report_h( $title ) . '</h1><p>Rapport autonome contenant la recherche, la recette canonique, l’article final, le SEO, les contrôles qualité, les coûts, les temps et les deux visuels. Aucun fichier externe n’est nécessaire.</p></header>
 <section class="section"><h2>Résumé de la génération finale</h2><div class="summary-grid"><div class="card"><div class="muted">Temps cumulé</div><div class="kpi">' . number_format( $total_seconds, 1 ) . ' s</div></div><div class="card"><div class="muted">Coût cumulé</div><div class="kpi">$' . number_format( $total_cost, 4 ) . '</div></div><div class="card"><div class="muted">Jetons texte/image</div><div class="kpi">' . number_format( $total_in + $total_out ) . '</div><div class="muted">' . number_format( $total_in ) . ' entrée · ' . number_format( $total_out ) . ' sortie</div></div><div class="card"><div class="muted">Qualité article</div><div class="kpi">' . report_h( $article_data['quality_score'] ?? '98' ) . '/100</div><div class="muted">Contrat et structure validés</div></div></div><p class="muted">Seuls les appels retenus dans la génération finale sont comptabilisés. Les essais remplacés et échecs intermédiaires sont exclus.</p><div class="table-wrap"><table><thead><tr><th>Étape</th><th>Modèle</th><th>Temps</th><th>Entrée</th><th>Sortie</th><th>Coût</th><th>Verdict</th></tr></thead><tbody>' . $metric_rows . '</tbody></table></div></section>
 <section class="section"><h2>1 · Brief de l’éditeur</h2><p class="muted">Le point de départ : ce que l’éditeur a demandé, avant tout appel.</p>' . report_value( $editor_brief ) . '</section>
-<section class="section"><h2>2 · Photographies réelles trouvées et analysées</h2><p class="muted">La recherche cite des photographies réelles du plat, puis chacune est téléchargée et analysée à partir de ses octets. <strong>Aucune de ces images n’est republiée</strong> : seules les observations servent, et elles n’établissent qu’une apparence — jamais un ingrédient, une quantité ni une étape.</p>' . report_visual_provenance( $research_data ) . '</section>
-<section class="section"><h2>3 · Recherche complète</h2>' . report_value( $research_data ) . '</section>
-<section class="section"><h2>4 · Recette canonique</h2>' . report_value( $canonical_data ) . '</section>
+<section class="section"><h2>2 · Photographies réelles trouvées et analysées</h2><p class="muted">La recherche cite des photographies réelles du plat, puis chacune est téléchargée et analysée à partir de ses octets. <strong>Aucune de ces images n’est republiée</strong> : seules les observations servent, et elles n’établissent qu’une apparence — jamais un ingrédient, une quantité ni une étape.</p>' . report_fold( 'Voir les photographies et ce qui en a été lu', report_visual_provenance( $research_data ) ) . '</section>
+<section class="section"><h2>3 · Recherche complète</h2><p class="muted">Les faits sourcés sur lesquels la recette et l’article s’appuient.</p>' . report_fold( 'Ouvrir le dossier de recherche', report_value( $research_data ) ) . '</section>
+<section class="section"><h2>4 · Recette canonique</h2><p class="muted">La référence : tout chiffre de l’article et tout élément des images s’y mesure.</p>' . report_fold( 'Ouvrir la recette complète', report_value( $canonical_data ), true ) . '</section>
 <section class="section"><h2>5 · Article final prêt à publier</h2><article class="article">' . $content_html . '</article></section>
-<section class="section"><h2>6 · SEO, publication et données éditoriales</h2>' . report_value( $article_meta ) . '</section>
-<section class="section"><h2>7 · Relecture, revue et vérification des faits</h2><div class="cards"><div class="card"><h3>Relecture</h3>' . report_value( $proofread_changes ) . '</div><div class="card"><h3>Revue qualité</h3>' . report_value( $review_data ) . '</div><div class="card"><h3>Fact-check</h3>' . report_value( $fact_data ) . '</div></div></section>
+<section class="section"><h2>6 · SEO, publication et données éditoriales</h2>' . report_fold( 'Ouvrir les métadonnées de publication', report_value( $article_meta ) ) . '</section>
+<section class="section"><h2>7 · Relecture, revue et vérification des faits</h2><p class="muted">Trois passes indépendantes sur le texte, avant que les images ne soient jugées.</p>' . report_fold( 'Correction du français (proofread)', report_value( $proofread_changes ) ) . '' . report_fold( 'Revue éditoriale (review)', report_value( $review_data ) ) . '' . report_fold( 'Vérification des faits (fact_check)', report_value( $fact_data ) ) . '</section>
 <section class="section"><h2>8 · Visuels générés</h2><div class="image-grid"><figure class="image-card"><img src="' . $featured_data . '" alt="Image à la une de ' . report_h( $title ) . '"><figcaption><strong>Image à la une.</strong> Carré 1024 × 1024, photographie culinaire éditoriale.</figcaption></figure><figure class="image-card facebook"><img src="' . $facebook_data . '" alt="Collage Facebook en six étapes de ' . report_h( $title ) . '"><figcaption><strong>Processus Facebook.</strong> Vertical 1024 × 1536, exactement six panneaux en grille 2 × 3, progression culinaire continue, sans texte.</figcaption></figure></div><p class="muted">Contrôle visuel manuel : géométrie, continuité, progression, ingrédients, cuisson, textures, absence de texte et lisibilité du plat final vérifiés.</p></section>
 <section class="section"><h2>9 · Approbation finale</h2>
 <p class="muted">Un seul appel voit l\'article et les deux images ensemble, le seul moment où les trois peuvent être confrontés. Le réalisme photographique et les ingrédients principaux décident pour les images ; la recette et l\'article sont tenus à ce que la recherche documente.</p>
 <div class="summary-grid">' . report_approval_cards( $approval['decoded_output'] ) . '</div>
-<div style="margin-top:22px">' . report_value( $approval['decoded_output']['findings'] ?? array() ) . '</div></section>
+<div class="findings-wrap">' . report_findings( $approval['decoded_output'] ) . '</div></section>
 
 <section class="section"><h2>Corrections finales après contrôle</h2><ul class="notes"><li>' . implode( '</li><li>', array_map( 'report_h', $correction_notes ) ) . '</li></ul><p class="muted">Ces corrections chirurgicales ont été appliquées au rendu ci-dessous après la dernière revue automatisée; elles ne modifient ni les quantités ni les étapes canoniques.</p></section>
 <section class="section"><h2>Prompts et provenance</h2><p>Les clés API ne figurent jamais dans ce rapport. Les prompts exacts des appels retenus sont conservés ci-dessous pour audit.</p>' . $prompt_details . '</section>
-<section class="section"><h2>Données brutes A à Z</h2><p class="muted">Les blocs JSON ci-dessous conservent l’intégralité des sorties structurées sélectionnées.</p>' . $raw_details . '</section>
+<section class="section"><h2>Données brutes A à Z</h2><p class="muted">L’intégralité des sorties, pour qui veut vérifier ligne à ligne.</p>' . report_fold( 'Ouvrir les données brutes', '' . $raw_details . '' ) . '</section>
 <footer class="footer">Rapport généré le ' . report_h( gmdate( 'Y-m-d H:i:s' ) ) . ' UTC · MS Recipes Writer AI Prompt Lab</footer></main></body></html>';
 
 $directory = dirname( $options['output'] );

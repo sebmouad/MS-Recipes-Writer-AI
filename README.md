@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.60` est un socle installable : file persistante, pipeline de
+La version `0.2.61` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.
@@ -20,6 +20,27 @@ Le plugin est en cours de refonte éditoriale et budgétaire :
 Les coûts affichés sont des estimations calculées avec le catalogue configuré,
 non une facture fournisseur. `completed` signifie que le traitement est terminé,
 jamais qu’un texte est validé éditorialement.
+
+## Version 0.2.61
+
+L'intégration continue ne teste plus PHP 7.4. La matrice se limite à PHP 8.1 et
+8.3, et les deux documents qui annonçaient encore 7.4 sont corrigés : un dépôt
+ne doit pas revendiquer une compatibilité qu'il ne vérifie plus.
+
+Le rapport HTML a par ailleurs été revu :
+
+- **Sections dépliables.** Photographies analysées, dossier de recherche,
+  recette, métadonnées SEO, relecture et données brutes s'ouvrent à la demande.
+  La page se lit court et se creuse où le lecteur veut.
+- **Constats mineurs visibles.** Ils étaient noyés dans un bloc JSON ; ils
+  forment maintenant des fiches au même titre que les bloquants, avec la phrase
+  en cause, ce qui ne va pas et la correction proposée — ce sont précisément les
+  arbitrages qui reviennent à l'éditeur.
+- **Responsive corrigé.** Le tableau des étapes forçait une largeur minimale de
+  760 px ; sur mobile il s'empile en fiches, chaque valeur portant son intitulé.
+  Rendu vérifié dans un vrai navigateur avant envoi.
+- Les verdicts s'affichent en français (`Conforme`, `Réserves`, `Non conforme`)
+  au lieu des valeurs brutes du modèle.
 
 ## Version 0.2.60
 
@@ -406,7 +427,7 @@ Corrige deux pertes de résultat mesurées sur de vraies réponses de modèles, 
 - Actions par job directement dans la liste : relance, annulation et confirmation d’association, avec les mêmes garde-fous que le détail du lot.
 - Avertissement de file d’attente sur l’écran de création lorsque des traitements sont interrompus ou que la planification WordPress ne tourne plus ; détail réservé aux administrateurs.
 - Statistiques alignées sur le verdict de livraison : taux de contrôles réussis par article, distinct du taux de conformité structurelle, et score moyen lu sur le verdict enregistré.
-- Suite de tests hors ligne outillée : `php tests/run.php` (lint + tests), harnais partagé `tests/bootstrap.php`, double `$wpdb` enregistreur, intégration continue PHP 7.4/8.1/8.3.
+- Suite de tests hors ligne outillée : `php tests/run.php` (lint + tests), harnais partagé `tests/bootstrap.php`, double `$wpdb` enregistreur, intégration continue PHP 8.1/8.3.
 - Documentation de reprise dans le dépôt : `CLAUDE.md`, `docs/ARCHITECTURE.md`, `docs/ROADMAP.md`, `docs/TESTING.md`.
 
 ## Version 0.2.40

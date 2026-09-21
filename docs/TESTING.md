@@ -23,7 +23,7 @@ real-image provenance rules. Maintained lab prompts can be compared with the
 plugin defaults before promotion.
 
 The offline runner exits non-zero on any lint or test failure; CI
-(`.github/workflows/ci.yml`) runs it on PHP 7.4, 8.1 and 8.3.
+(`.github/workflows/ci.yml`) runs it on PHP 8.1 and 8.3.
 
 ## Credentials
 
