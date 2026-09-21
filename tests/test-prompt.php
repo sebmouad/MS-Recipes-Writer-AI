@@ -38,7 +38,8 @@ msrwa_test_missing( $unknown, 'not_a_variable', 'An unknown variable must not le
 // The standalone lab keeps one research-centred contract per active stage.
 require_once dirname( __DIR__ ) . '/tools/lib/steps.php';
 $lab_steps = lab_steps();
-msrwa_test_assert( array( 'research', 'canonical_recipe', 'article', 'review', 'fact_check', 'proofread' ) === array_keys( $lab_steps ), 'The lab must expose only the active text pipeline.' );
+$active = array_values( array_diff( array_keys( $lab_steps ), array( 'research_recipe' ) ) );
+msrwa_test_assert( array( 'research', 'canonical_recipe', 'article', 'review', 'fact_check', 'proofread' ) === $active, 'The lab must expose the active text pipeline, plus rejected experiments that stay re-runnable.' );
 $lab_prompts = glob( dirname( __DIR__ ) . '/tools/prompts/*.txt' );
 msrwa_test_assert( 9 === count( $lab_prompts ), 'The lab must keep one maintained prompt for six text stages, two image stages and the final approval.' );
 $brief = lab_brief( 'tarte-pommes' );

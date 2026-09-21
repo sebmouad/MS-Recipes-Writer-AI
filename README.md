@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.66` est un socle installable : file persistante, pipeline de
+La version `0.2.67` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.
@@ -20,6 +20,17 @@ Le plugin est en cours de refonte éditoriale et budgétaire :
 Les coûts affichés sont des estimations calculées avec le catalogue configuré,
 non une facture fournisseur. `completed` signifie que le traitement est terminé,
 jamais qu’un texte est validé éditorialement.
+
+## Version 0.2.67
+
+Le gabarit fusionné rejeté quitte `tools/prompts/` pour `tools/experiments/`.
+Il restait dans le jeu actif et faisait échouer deux contrôles qui comptent les
+prompts livrés — et j'avais poussé la 0.2.66 sans les relancer, ce qui est
+exactement la règle que ce dépôt s'impose.
+
+`tools/experiments/README.md` conserve la mesure, la raison du rejet et la
+commande pour la rejouer. Le laboratoire sait toujours exécuter l'expérience :
+une réponse mesurée doit survivre à la question.
 
 ## Version 0.2.66
 

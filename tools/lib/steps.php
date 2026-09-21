@@ -46,10 +46,10 @@ function lab_steps() {
 			'expects' => 'a sourced research package: ingredients, method and real-image observations',
 		),
 		'research_recipe' => array(
-			'prompts' => array( 'prompt_research' ), 'file' => 'research_recipe.tpl.txt', 'json' => true,
+			'prompts' => array( 'prompt_research' ), 'file' => '../experiments/research_recipe.tpl.txt', 'json' => true,
 			'max_output' => (int) $s['research_max_output_tokens'] + (int) $s['canonical_max_output_tokens'],
 			'tools' => array( array( 'type' => 'web_search' ) ),
-			'expects' => 'the research package and the canonical recipe from one call',
+			'expects' => 'the research package and the canonical recipe from one call (measured and rejected; see tools/experiments)',
 		),
 		'canonical_recipe' => array(
 			'prompts' => array( 'prompt_recipe', 'prompt_nutrition' ), 'file' => 'canonical_recipe.tpl.txt', 'json' => true, 'max_output' => (int) $s['canonical_max_output_tokens'],
