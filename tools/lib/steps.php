@@ -563,7 +563,7 @@ function lab_score( $step, $text, $brief, $options = array() ) {
 	if ( 'research' === $step ) {
 		// An empty array is not evidence. Every one of these keys passing on zero
 		// entries is how a package with no facts and no sources scored 7/10.
-		$required = array( 'ingredient_facts' => 3, 'preparation_facts' => 3, 'references' => 2, 'visual_references' => 1, 'visual_observations' => 1, 'uncertainties' => 0 );
+		$required = array( 'ingredients' => 4, 'preparation' => 4, 'references' => 2, 'visual_references' => 1, 'visual_observations' => 1, 'uncertainties' => 0 );
 		foreach ( $required as $key => $minimum ) {
 			$count = isset( $json[ $key ] ) && is_array( $json[ $key ] ) ? count( $json[ $key ] ) : -1;
 			$checks[ $key ] = array( 'pass' => $count >= $minimum, 'detail' => $count < 0 ? 'missing' : $count . ' entries, ' . $minimum . ' minimum' );
@@ -578,6 +578,27 @@ function lab_score( $step, $text, $brief, $options = array() ) {
 		$checks['real image provenance'] = array( 'pass' => $real_images > 0, 'detail' => $real_images . ' image references with HTTPS image and source URLs' );
 		$observed = count( (array) ( $json['visual_observations'] ?? array() ) );
 		$checks['images inspected'] = array( 'pass' => $observed > 0, 'detail' => $observed . ' visual observations extracted from image bytes' );
+
+		// The package now carries the recipe the sources describe, so the canonical
+		// step builds rather than invents. An outline with no times is not an outline.
+		$outline = is_array( $json['recipe_outline'] ?? null ) ? $json['recipe_outline'] : array();
+		$timed = 0;
+		foreach ( array( 'servings', 'prep_minutes', 'cook_minutes', 'total_minutes' ) as $key ) { if ( null !== ( $outline[ $key ] ?? null ) && '' !== $outline[ $key ] ) { $timed++; } }
+		$checks['recipe outline'] = array( 'pass' => $timed >= 3, 'detail' => $timed . ' of 4 figures given' );
+
+		$cued = 0;
+		foreach ( (array) ( $json['preparation'] ?? array() ) as $step ) { if ( is_array( $step ) && '' !== trim( (string) ( $step['cue'] ?? '' ) ) ) { $cued++; } }
+		$steps_total = count( (array) ( $json['preparation'] ?? array() ) );
+		$checks['every step has its sign'] = array( 'pass' => $steps_total > 0 && $cued === $steps_total, 'detail' => $cued . ' of ' . $steps_total . ' steps carry a visible cue' );
+
+		$sourced = 0;
+		foreach ( (array) ( $json['ingredients'] ?? array() ) as $ingredient ) { if ( is_array( $ingredient ) && '' !== trim( (string) ( $ingredient['source_url'] ?? '' ) ) ) { $sourced++; } }
+		$ingredients_total = count( (array) ( $json['ingredients'] ?? array() ) );
+		$checks['every ingredient is sourced'] = array( 'pass' => $ingredients_total > 0 && $sourced === $ingredients_total, 'detail' => $sourced . ' of ' . $ingredients_total . ' carry a source' );
+
+		$tier1 = 0;
+		foreach ( (array) ( $json['visual_references'] ?? array() ) as $reference ) { if ( is_array( $reference ) && 1 === (int) ( $reference['tier'] ?? 0 ) ) { $tier1++; } }
+		$checks['photographs of this dish'] = array( 'pass' => $tier1 > 0, 'detail' => $tier1 . ' tier-1 references, ' . ( count( (array) ( $json['visual_references'] ?? array() ) ) - $tier1 ) . ' tier-2' );
 	}
 
 	if ( 'canonical_recipe' === $step ) {

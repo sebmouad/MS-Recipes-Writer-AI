@@ -78,7 +78,9 @@ function lab_call_openai( $model, $input, $max_tokens, $json_output, $tools ) {
 			foreach ( (array) ( $item['content'] ?? array() ) as $content ) { if ( isset( $content['text'] ) && is_string( $content['text'] ) ) { $text .= $content['text']; } }
 		}
 	}
-	return array( 'text' => lab_utf8( $text ), 'usage' => array( 'input_tokens' => (int) ( $body['usage']['input_tokens'] ?? 0 ), 'output_tokens' => (int) ( $body['usage']['output_tokens'] ?? 0 ) ), 'model' => $body['model'] ?? $model, 'status' => $body['status'] ?? '', 'seconds' => $result['seconds'] );
+	// cached_tokens is what the provider reused from an identical prompt prefix; it
+	// is billed at a discount, so it is the number that says whether caching works.
+	return array( 'text' => lab_utf8( $text ), 'usage' => array( 'input_tokens' => (int) ( $body['usage']['input_tokens'] ?? 0 ), 'output_tokens' => (int) ( $body['usage']['output_tokens'] ?? 0 ), 'cached_input_tokens' => (int) ( $body['usage']['input_tokens_details']['cached_tokens'] ?? 0 ) ), 'model' => $body['model'] ?? $model, 'status' => $body['status'] ?? '', 'seconds' => $result['seconds'] );
 }
 
 function lab_call_gemini( $model, $input, $max_tokens, $json_output, $tools ) {

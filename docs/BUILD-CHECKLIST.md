@@ -264,6 +264,31 @@ cost) in the task before changing anything.
   in this project set below what the step needs. `tools/judge-stability.php`
   exists so this is re-measurable rather than re-argued.
 
+- [x] **A30 — Research carries the recipe, and images are tiered (owner
+  directive, 2026-09-21).** The package now returns what the sources say the
+  recipe is — outline, ingredients with role and essential flag, numbered steps
+  each with the visible cue that ends it, substitutions, accompaniments, common
+  failures, storage — every line with its source. Images come in two tiers: real
+  photographs of this dish (three, across three domains) and, as a fallback for
+  visual direction only, up to two of a close variant, each marked with its tier.
+  Measured 14/14 on the lamb: 10 ingredients all sourced, 10 steps all cued,
+  3 tier-1 references. `research_max_output_tokens` 7 000 → 12 000.
+- [x] **A31 — Exchange format and caching, measured (2026-09-21).**
+  `tools/format-cost.php` reads the provider's own input_tokens for several
+  renderings of one package. Pipe-delimited records beat compact JSON by 1.6%,
+  indented lines are worse than JSON, and pretty JSON costs 13% more — a saving
+  already taken. **Changing format is not worth the loss of a format everyone can
+  read.**
+  Caching is the opposite: an identical prompt replayed caches 6 825 of 6 828
+  input tokens, 99.96%. Two recipes sharing a 1 622-token template prefix cached
+  nothing, so the win is on repeats, not across recipes. That makes every retry
+  path we built — the malformed-verdict re-ask, regeneration after a refusal —
+  nearly free on input, and it is why retry-until-approved costs less than the
+  per-call price suggests.
+  *Not pursued:* reordering prompts to grow a shared prefix. The measurement says
+  cross-recipe caching did not fire at 1 622 tokens, so there is nothing yet to
+  optimise towards; re-measure if prompts grow.
+
 - [~] **A4 — Review.** Written in English; findings must name the section to patch. *Original:* **A4 — Review.** Returns a boolean verdict plus findings that name the
   **section to patch**, never a full rewrite instruction.
 - [~] **A5 — Fact check** (new step). Written; scored on whether it quotes the article verbatim rather than inventing a sentence to correct. *Original:* **A5 — Fact check** (new step). Compares the finished article to the

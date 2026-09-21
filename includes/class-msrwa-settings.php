@@ -65,7 +65,7 @@ final class MSRWA_Settings {
 			'quality_min_steps'        => 6,
 			'article_max_output_tokens'=> 14500,
 			'review_max_output_tokens' => 3000,
-			'research_max_output_tokens' => 7000,
+			'research_max_output_tokens' => 12000,
 			'research_facts_max'      => 12,
 			'research_references_max' => 6,
 			'association_max_output_tokens' => 900,
@@ -96,16 +96,23 @@ RULES:
 - Return visual_observations as an empty array. The lab downloads each cited image and replaces this field with a separate vision analysis of the real bytes; never guess visual details from search snippets.
 - Do not copy a source\'s prose, write the article, or output a finished recipe.
 - At most 10 ingredient facts, 12 preparation facts and 6 references.
-- Give exactly 3 visual references, each from a DIFFERENT domain. This is a minimum as much as a maximum: some hosts refuse to serve their images to anyone but their own pages, and a single refusal would otherwise leave the writer with no observed appearance at all. Prefer hosts that serve images directly over large media CDNs, which refuse most often.
+- IMAGES, IN TWO TIERS. Tier 1 is what matters: real photographs of THIS dish, cooked and served, from recipe pages, cooking schools or publications. Give 3 of them, each from a different domain, because some hosts refuse to serve their images to anyone but their own pages and a single refusal would leave the writer with no observed appearance at all. Prefer hosts that serve images directly over large media CDNs, which refuse most often.
+  Tier 2 is a fallback for visual direction only: up to 2 photographs of a close variant of the dish, the same dish plated differently, or its defining component — useful when tier 1 is thin or the dish is rarely photographed. Mark each image with its tier so a later step knows how much weight it carries. Never use an illustration, a render, a stock watermark preview, an AI-generated image or an image made for this task, in either tier.
+- THE RECIPE ITSELF. Return what the sources actually say the recipe is: the ingredients with the quantities they give, the steps in the order they perform them, the times and temperatures, the yield. This is the material the canonical recipe is built from, so a gap here becomes an invention later. Mark an ingredient essential when the dish is not itself without it. Give each step the visible sign that it is done, in the sources\' own terms, because that sign is what a cook and a photograph both need.
 
 OUTPUT — a valid JSON object only, no Markdown, with exactly these keys:
 - "dish_identity": {name, confidence, evidence} — values in French
-- "ingredient_facts": array of {source_url, text} — text in French, one usable fact each
-- "preparation_facts": array of {source_url, text} — text in French, one usable fact each
+- "recipe_outline": {servings, prep_minutes, cook_minutes, total_minutes, category, cuisine, difficulty, source_url} — integers for the minutes and the yield, French for the rest, and null for anything no source gives
+- "ingredients": array of {name, quantity, unit, role, essential, source_url} — name and role in French, role being what it does in the dish in a few words, essential a boolean
+- "preparation": array of {step, action, cue, minutes, temperature_c, source_url} — step an integer from 1 upward in the order the recipe is performed, action and cue in French, cue being the visible sign that the step is done, minutes and temperature_c integers or null
+- "substitutions": array of {ingredient, replacement, note, source_url} — only replacements a source states
+- "accompaniments": array of {name, note, source_url} — only what a source says the dish is served with
+- "common_failures": array of {problem, cause, remedy, source_url} — all in French
+- "storage": array of {method, duration, note, source_url}
 - "food_safety": array of {source_url, text}
 - "references": array of {url, title, publisher}
-- "visual_references": array of {image_url, source_url, title} for real source photographs only
-- "visual_observations": array of {image_url, source_url, observable_details, composition, colours, textures, uncertainties} — all descriptive values in French
+- "visual_references": array of {image_url, source_url, title, tier} — tier is 1 for this dish, 2 for a variant used only for visual direction
+- "visual_observations": array of {image_url, source_url, tier, observable_details, composition, colours, textures, uncertainties} — descriptive values in French
 - "uncertainties": array of strings in French naming conflicts or missing evidence
 - "originality_notes": array of strings in French explaining how copying and unsupported inference were avoided',
 			'prompt_association'  => 'Associe chaque titre, texte et image à la bonne recette sans inventer de correspondance. Retourne une confiance et signale les associations ambiguës à l’éditeur.',
@@ -613,7 +620,7 @@ The result must equal or exceed a professionally art-directed social recipe tuto
 		$out['article_pagination_split_percent'] = isset( $raw['article_pagination_split_percent'] ) ? min( 70, max( 30, absint( $raw['article_pagination_split_percent'] ) ) ) : $defaults['article_pagination_split_percent'];
 		$out['internal_links_max'] = isset( $raw['internal_links_max'] ) ? min( 10, max( 0, absint( $raw['internal_links_max'] ) ) ) : $defaults['internal_links_max'];
 		$out['quality_min_score'] = isset( $raw['quality_min_score'] ) ? min( 100, max( 1, absint( $raw['quality_min_score'] ) ) ) : $defaults['quality_min_score'];
-		foreach ( array( 'quality_min_words' => array( 300, 8000 ), 'quality_max_words' => array( 500, 10000 ), 'quality_min_headings' => array( 3, 80 ), 'quality_min_paragraphs' => array( 5, 150 ), 'quality_min_ingredients' => array( 1, 50 ), 'quality_min_steps' => array( 1, 40 ), 'article_max_output_tokens' => array( 1000, 20000 ), 'review_max_output_tokens' => array( 500, 10000 ), 'research_max_output_tokens' => array( 500, 10000 ), 'research_facts_max' => array( 3, 30 ), 'research_references_max' => array( 1, 20 ), 'association_max_output_tokens' => array( 200, 5000 ), 'canonical_max_output_tokens' => array( 500, 10000 ), 'router_max_output_tokens' => array( 100, 3000 ), 'vision_max_output_tokens' => array( 200, 5000 ), 'image_review_max_output_tokens' => array( 200, 5000 ), 'approval_max_output_tokens' => array( 1000, 24000 ) ) as $key => $limits ) {
+		foreach ( array( 'quality_min_words' => array( 300, 8000 ), 'quality_max_words' => array( 500, 10000 ), 'quality_min_headings' => array( 3, 80 ), 'quality_min_paragraphs' => array( 5, 150 ), 'quality_min_ingredients' => array( 1, 50 ), 'quality_min_steps' => array( 1, 40 ), 'article_max_output_tokens' => array( 1000, 20000 ), 'review_max_output_tokens' => array( 500, 10000 ), 'research_max_output_tokens' => array( 500, 20000 ), 'research_facts_max' => array( 3, 30 ), 'research_references_max' => array( 1, 20 ), 'association_max_output_tokens' => array( 200, 5000 ), 'canonical_max_output_tokens' => array( 500, 10000 ), 'router_max_output_tokens' => array( 100, 3000 ), 'vision_max_output_tokens' => array( 200, 5000 ), 'image_review_max_output_tokens' => array( 200, 5000 ), 'approval_max_output_tokens' => array( 1000, 24000 ) ) as $key => $limits ) {
 			$value = isset( $raw[ $key ] ) ? absint( $raw[ $key ] ) : $defaults[ $key ];
 			$out[ $key ] = min( $limits[1], max( $limits[0], $value ) );
 		}

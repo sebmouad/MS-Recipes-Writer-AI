@@ -9,126 +9,296 @@
   },
   "research": {
     "dish_identity": {
-      "name": "Souris d’agneau braisées ou confites au four, avec oignons grelots et ail confit",
+      "name": "Souris d’agneau braisées au four, oignons grelots et ail confit",
       "confidence": "élevée",
-      "evidence": "Le titre désigne une préparation de souris d’agneau cuite lentement dans un liquide aromatique, avec oignons grelots et ail en chemise. Une recette française documente précisément 4 souris, 20 oignons grelots et 7 à 8 gousses d’ail, tandis que des sources de référence décrivent la même pièce en braisage couvert jusqu’à ce que la viande se détache presque de l’os."
+      "evidence": "Le brief décrit des souris d’agneau cuites longuement au four avec oignons grelots, ail en chemise et liquide de cuisson, une préparation documentée par 750g et rapprochée des versions de souris d’agneau confites de Marmiton.",
+      "source_url": "https://www.750g.com/souris-dagneau-confites-r93428.htm"
     },
-    "ingredient_facts": [
+    "recipe_outline": {
+      "servings": 4,
+      "prep_minutes": 10,
+      "cook_minutes": 125,
+      "total_minutes": 135,
+      "category": "plat principal mijoté",
+      "cuisine": "française",
+      "difficulty": "facile",
+      "source_url": "https://www.marmiton.org/recettes/recette_souris-d-agneau-au-miel-et-thym_93493.aspx"
+    },
+    "ingredients": [
       {
-        "source_url": "https://www.750g.com/souris-dagneau-confites-r93428.htm",
-        "text": "Pour 4 personnes, une source indique 4 souris d’agneau, 20 oignons grelots et 7 à 8 gousses d’ail en chemise."
+        "name": "souris d’agneau",
+        "quantity": 4,
+        "unit": "pièces",
+        "role": "élément principal braisé",
+        "essential": true,
+        "source_url": "https://www.750g.com/souris-dagneau-confites-r93428.htm"
       },
       {
-        "source_url": "https://www.750g.com/souris-dagneau-confites-r93428.htm",
-        "text": "La même source utilise de l’huile d’olive, du thym, du romarin, du laurier, du sel, du poivre et une bouteille de vin blanc moelleux."
+        "name": "oignons grelots",
+        "quantity": 20,
+        "unit": "pièces",
+        "role": "garniture fondante et sucrée",
+        "essential": true,
+        "source_url": "https://www.750g.com/souris-dagneau-confites-r93428.htm"
       },
       {
-        "source_url": "https://www.thekitchn.com/lamb-shank-267498",
-        "text": "Une autre formule prévoit 4 souris avec 2 cuillères à soupe d’huile d’olive, 2 tasses de vin rouge, 1 tasse de bouillon de bœuf et une boîte de tomates entières de 28 oz."
+        "name": "ail en chemise",
+        "quantity": 7,
+        "unit": "gousses",
+        "role": "parfum et pulpe confite",
+        "essential": true,
+        "source_url": "https://www.750g.com/souris-dagneau-confites-r93428.htm"
       },
       {
-        "source_url": "https://www.thekitchn.com/lamb-shank-267498",
-        "text": "Le bouillon de bœuf peut être remplacé par un autre bouillon ou fond adapté lorsque la source le formule comme « beef broth » ou « low-sodium beef broth »."
+        "name": "huile d’olive",
+        "quantity": null,
+        "unit": null,
+        "role": "enrobage ou saisie",
+        "essential": false,
+        "source_url": "https://www.750g.com/souris-dagneau-confites-r93428.htm"
       },
       {
-        "source_url": "https://www.thekitchn.com/balsamic-citrus-braised-lamb-shanks-recipe-23109860",
-        "text": "Pour 2 souris, une recette utilise 2 tasses de bouillon de bœuf, 1 tasse de vin rouge et 3 cuillères à soupe de vinaigre balsamique."
+        "name": "vin blanc moelleux",
+        "quantity": 1,
+        "unit": "bouteille",
+        "role": "liquide de braisage",
+        "essential": false,
+        "source_url": "https://www.750g.com/souris-dagneau-confites-r93428.htm"
       },
       {
-        "source_url": "https://www.thekitchn.com/balsamic-citrus-braised-lamb-shanks-recipe-23109860",
-        "text": "Cette variante associe l’agneau à une tête d’ail coupée en deux, du thym, de l’oignon, de la carotte, du céleri, du fenouil, du concentré de tomate et de la coriandre moulue."
+        "name": "thym",
+        "quantity": null,
+        "unit": null,
+        "role": "aromate",
+        "essential": false,
+        "source_url": "https://www.750g.com/souris-dagneau-confites-r93428.htm"
       },
       {
-        "source_url": "https://www.thekitchn.com/lamb-shank-267498",
-        "text": "La sauce peut être servie avec une polenta crémeuse; la source cite aussi comme accompagnements possibles la purée de pommes de terre ou les pappardelle."
+        "name": "romarin",
+        "quantity": null,
+        "unit": null,
+        "role": "aromate",
+        "essential": false,
+        "source_url": "https://www.750g.com/souris-dagneau-confites-r93428.htm"
       },
       {
-        "source_url": "https://www.750g.com/souris-dagneau-confites-r93428.htm",
-        "text": "Une purée maison est documentée comme accompagnement des souris d’agneau confites."
+        "name": "laurier",
+        "quantity": null,
+        "unit": null,
+        "role": "aromate",
+        "essential": false,
+        "source_url": "https://www.750g.com/souris-dagneau-confites-r93428.htm"
       },
       {
-        "source_url": "https://www.bonappetit.com/recipe/braised-lamb-shanks-with-swiss-chard",
-        "text": "Une autre recette sert les souris avec du vert de blette et du boulgour."
+        "name": "sel",
+        "quantity": null,
+        "unit": null,
+        "role": "assaisonnement",
+        "essential": false,
+        "source_url": "https://www.750g.com/souris-dagneau-confites-r93428.htm"
       },
       {
-        "source_url": "https://www.tollbit.bbcgoodfood.com/recipes/vietnamese-lamb-shanks-sweet-potatoes",
-        "text": "Pour une variante différente, la source recommande du bok-choy ou du chou de Savoie et du riz nature en accompagnement."
+        "name": "poivre",
+        "quantity": null,
+        "unit": null,
+        "role": "assaisonnement",
+        "essential": false,
+        "source_url": "https://www.750g.com/souris-dagneau-confites-r93428.htm"
       }
     ],
-    "preparation_facts": [
+    "preparation": [
       {
-        "source_url": "https://www.750g.com/souris-dagneau-confites-r93428.htm",
-        "text": "Une méthode sans saisie préalable consiste à huiler, saler et poivrer les souris, puis à les placer avec l’ail, les oignons, les herbes et le vin avant la cuisson."
+        "step": 1,
+        "action": "Saler et poivrer les souris, puis les enduire d’huile d’olive.",
+        "cue": "La viande est uniformément assaisonnée et légèrement brillante.",
+        "minutes": 5,
+        "temperature_c": null,
+        "source_url": "https://www.750g.com/souris-dagneau-confites-r93428.htm"
       },
       {
-        "source_url": "https://www.thekitchn.com/lamb-shank-267498",
-        "text": "La méthode classique commence par sécher, assaisonner et saisir les souris dans l’huile, environ 4 à 5 minutes par face, en plusieurs fournées si nécessaire."
+        "step": 2,
+        "action": "Saisir les souris sur toutes leurs faces dans une cocotte avec de l’huile chaude, si une coloration plus marquée est recherchée.",
+        "cue": "Toutes les faces sont dorées.",
+        "minutes": 10,
+        "temperature_c": null,
+        "source_url": "https://www.recette-painperdu.fr/recette/souris-d-agneau-recette"
       },
       {
-        "source_url": "https://www.thekitchn.com/balsamic-citrus-braised-lamb-shanks-recipe-23109860",
-        "text": "Dans une autre recette, la saisie jusqu’à une coloration dorée foncée prend 10 à 12 minutes au total."
+        "step": 3,
+        "action": "Ajouter les oignons grelots, l’ail en chemise, le thym, le romarin et le laurier.",
+        "cue": "Les aromates sont répartis autour de la viande.",
+        "minutes": 2,
+        "temperature_c": null,
+        "source_url": "https://www.750g.com/souris-dagneau-confites-r93428.htm"
       },
       {
-        "source_url": "https://www.thekitchn.com/lamb-shank-267498",
-        "text": "Après la saisie, les aromates sont attendris environ 5 minutes; le vin est ensuite réduit de moitié avant l’ajout des tomates et du bouillon."
+        "step": 4,
+        "action": "Verser le vin blanc ou un autre liquide de cuisson jusqu’à couvrir largement le fond du plat.",
+        "cue": "Le liquide entoure la viande sans nécessairement la recouvrir entièrement.",
+        "minutes": 3,
+        "temperature_c": null,
+        "source_url": "https://www.750g.com/souris-dagneau-confites-r93428.htm"
       },
       {
-        "source_url": "https://www.bonappetit.com/test-kitchen/cooking-tips/article/four-simple-rules-for-braising-anything",
-        "text": "Le liquide ne doit pas immerger complètement la viande: la source recommande de braiser avec les souris partiellement couvertes plutôt que de les faire bouillir."
+        "step": 5,
+        "action": "Couvrir la cocotte et l’enfourner en chaleur tournante.",
+        "cue": "Le couvercle est bien fermé et la vapeur reste retenue.",
+        "minutes": null,
+        "temperature_c": 150,
+        "source_url": "https://www.marmiton.org/recettes/recette_souris-d-agneau-au-miel-et-thym_93493.aspx"
       },
       {
-        "source_url": "https://www.thekitchn.com/lamb-shank-267498",
-        "text": "Une source place le liquide à environ la moitié de la hauteur des souris."
+        "step": 6,
+        "action": "Cuire doucement jusqu’à ce que la viande soit très tendre.",
+        "cue": "La pointe d’un couteau s’enfonce comme dans du beurre et la chair commence à se rétracter de l’os.",
+        "minutes": 125,
+        "temperature_c": 150,
+        "source_url": "https://www.recette-painperdu.fr/recette/souris-d-agneau-recette"
       },
       {
-        "source_url": "https://www.bonappetit.com/recipe/moroccan-lamb-shanks-pomegranate",
-        "text": "Une autre source demande au moins 2,5 cm de liquide dans le plat après 1 h 30 et recommande d’ajouter de l’eau ou du bouillon si le niveau baisse."
+        "step": 7,
+        "action": "Contrôler le niveau de liquide pendant la cuisson et ajouter de l’eau, du vin ou du bouillon si nécessaire.",
+        "cue": "Le fond du plat reste humide et les aromates ne brûlent pas.",
+        "minutes": null,
+        "temperature_c": 150,
+        "source_url": "https://www.marmiton.org/recettes/recette_souris-d-agneau-au-miel-et-thym_93493.aspx"
       },
       {
-        "source_url": "https://www.tollbit.bbcgoodfood.com/recipes/vietnamese-lamb-shanks-sweet-potatoes",
-        "text": "Pour une cuisson en chaleur tournante, une recette BBC Good Food indique 140 °C ventilé, avec 1 h 30 couvert puis 1 h supplémentaire après l’ajout des légumes."
+        "step": 8,
+        "action": "Découvrir en fin de cuisson pour concentrer le jus et colorer légèrement la surface.",
+        "cue": "Le jus devient plus concentré et la viande prend une coloration brillante.",
+        "minutes": 15,
+        "temperature_c": 150,
+        "source_url": "https://www.recette-painperdu.fr/recette/souris-d-agneau-recette"
       },
       {
-        "source_url": "https://www.thekitchn.com/lamb-shank-267498",
-        "text": "Une méthode de braisage indique 350 °F, soit environ 175 °C en four traditionnel, pendant 2 à 2 h 30, à couvert."
+        "step": 9,
+        "action": "Retirer les souris avec précaution et laisser reposer avant de servir.",
+        "cue": "La chair se détache facilement et l’os commence à apparaître.",
+        "minutes": 10,
+        "temperature_c": 0,
+        "source_url": "https://www.recette-painperdu.fr/recette/souris-d-agneau-recette"
       },
       {
-        "source_url": "https://www.thekitchn.com/balsamic-citrus-braised-lamb-shanks-recipe-23109860",
-        "text": "Une autre recette cuit les souris environ 3 heures à 350 °F, en les retournant à mi-cuisson."
+        "step": 10,
+        "action": "Filtrer ou réduire le jus séparément si une sauce plus nappante est souhaitée.",
+        "cue": "La sauce nappe le dos d’une cuillère.",
+        "minutes": 15,
+        "temperature_c": null,
+        "source_url": "https://www.bbcgoodfood.com/recipes/braised-lamb-shanks"
+      }
+    ],
+    "substitutions": [
+      {
+        "ingredient": "liquide de cuisson",
+        "replacement": "eau, vin ou bouillon",
+        "note": "Marmiton documente ces trois possibilités selon le plat utilisé.",
+        "source_url": "https://www.marmiton.org/recettes/recette_souris-d-agneau-au-miel-et-thym_93493.aspx"
       },
       {
-        "source_url": "https://www.theguide.fr/a-table/2993833_temps-de-cuisson-souris-d-agneau-au-four-chaleur-tournante",
-        "text": "Une source consacrée à la chaleur tournante recommande de couvrir pendant environ les deux tiers de la cuisson puis de découvrir en fin de cuisson pour favoriser la coloration et la réduction du jus."
+        "ingredient": "fond de veau",
+        "replacement": "vin blanc sec et bouillon de bœuf",
+        "note": "Le remplacement est présenté comme moins onctueux.",
+        "source_url": "https://www.recette-painperdu.fr/recette/souris-d-agneau-recette"
       },
       {
-        "source_url": "https://www.thekitchn.com/lamb-shank-267498",
-        "text": "La cuisson est réussie lorsque la viande est très tendre et se détache de l’os; la source conseille ensuite un repos couvert de 10 minutes."
+        "ingredient": "souris d’agneau",
+        "replacement": "jarret de veau ou paleron de bœuf",
+        "note": "Le temps de cuisson peut varier selon la viande.",
+        "source_url": "https://www.marmiton.org/recettes/recette_souris-d-agneau-au-miel-et-thym_93493.aspx"
+      }
+    ],
+    "accompaniments": [
+      {
+        "name": "purée maison",
+        "note": "750g recommande de servir la souris avec une purée maison.",
+        "source_url": "https://www.750g.com/souris-dagneau-confites-r93428.htm"
+      },
+      {
+        "name": "pommes de terre fondantes",
+        "note": "Marmiton les cite parmi les accompagnements adaptés.",
+        "source_url": "https://www.marmiton.org/recettes/recette_souris-d-agneau-au-miel-et-thym_93493.aspx"
+      },
+      {
+        "name": "semoule",
+        "note": "Marmiton la propose comme accompagnement possible.",
+        "source_url": "https://www.marmiton.org/recettes/recette_souris-d-agneau-au-miel-et-thym_93493.aspx"
+      }
+    ],
+    "common_failures": [
+      {
+        "problem": "Viande sèche ou fibreuse",
+        "cause": "Température trop élevée ou cuisson sans liquide suffisant.",
+        "remedy": "Cuire lentement, couvrir la cocotte et maintenir un fond de liquide.",
+        "source_url": "https://www.recette-painperdu.fr/recette/souris-d-agneau-recette"
+      },
+      {
+        "problem": "Surface supérieure desséchée",
+        "cause": "Absence d’arrosage régulier.",
+        "remedy": "Arroser avec le jus pendant la cuisson.",
+        "source_url": "https://www.recette-painperdu.fr/recette/souris-d-agneau-recette"
+      },
+      {
+        "problem": "Viande encore ferme",
+        "cause": "Cuisson interrompue avant la transformation complète du collagène.",
+        "remedy": "Prolonger la cuisson jusqu’à ce que la pointe du couteau entre sans résistance.",
+        "source_url": "https://www.recette-painperdu.fr/recette/souris-d-agneau-recette"
+      },
+      {
+        "problem": "Jus trop liquide",
+        "cause": "Réduction insuffisante après la cuisson.",
+        "remedy": "Réduire le jus à feu vif jusqu’à ce qu’il nappe la cuillère.",
+        "source_url": "https://www.bbcgoodfood.com/recipes/braised-lamb-shanks"
+      },
+      {
+        "problem": "Ail amer ou brûlé",
+        "cause": "Gousses exposées directement à une chaleur sèche trop forte.",
+        "remedy": "Conserver l’ail en chemise et le maintenir dans le liquide ou sous la viande.",
+        "source_url": "https://www.recette-painperdu.fr/recette/souris-d-agneau-recette"
+      }
+    ],
+    "storage": [
+      {
+        "method": "réfrigérateur",
+        "duration": 3,
+        "note": "Conserver dans un contenant hermétique, de préférence dans le jus.",
+        "source_url": "https://www.recette-painperdu.fr/recette/souris-d-agneau-recette"
+      },
+      {
+        "method": "réfrigérateur",
+        "duration": 2,
+        "note": "BBC Good Food indique une préparation possible jusqu’à deux jours à l’avance.",
+        "source_url": "https://www.bbcgoodfood.com/recipes/braised-lamb-shanks"
+      },
+      {
+        "method": "congélation",
+        "duration": 3,
+        "note": "La recette indique une congélation possible jusqu’à trois mois, idéalement avec la sauce.",
+        "source_url": "https://www.recette-painperdu.fr/recette/souris-d-agneau-recette"
+      },
+      {
+        "method": "réchauffage en cocotte",
+        "duration": 30,
+        "note": "Réchauffer doucement et à couvert avec un peu d’eau ou de bouillon pour limiter le dessèchement.",
+        "source_url": "https://www.recette-painperdu.fr/recette/souris-d-agneau-recette"
       }
     ],
     "food_safety": [
       {
-        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/meat-catfish/lamb-farm-table",
-        "text": "Le USDA recommande au minimum 62,8 °C à cœur pour les morceaux entiers d’agneau, suivis d’un repos d’au moins 3 minutes."
+        "source_url": "https://www.foodsafety.gov/blog/game-day-food-safety-tips",
+        "text": "Réfrigérer les restes dans les deux heures, ou dans l’heure si la température ambiante dépasse 32 °C."
       },
       {
-        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/food-thermometers",
-        "text": "La température doit être mesurée dans la partie la plus épaisse, en évitant l’os, le gras et les tissus cartilagineux."
+        "source_url": "https://www.foodsafety.gov/people-at-risk",
+        "text": "Conserver les restes cuits au réfrigérateur pendant quatre jours au maximum."
       },
       {
-        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/meat-catfish/lamb-farm-table",
-        "text": "Les restes d’agneau cuit se conservent au réfrigérateur 3 à 4 jours."
+        "source_url": "https://www.foodsafety.gov/food-safety-charts/safe-minimum-internal-temperatures",
+        "text": "Réchauffer les restes à 74 °C à cœur."
       },
       {
-        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/safe-temperature-chart",
-        "text": "Les restes doivent être réchauffés jusqu’à 73,9 °C à cœur."
-      },
-      {
-        "source_url": "https://www.fsis.usda.gov/news-events/news-press-releases/make-food-safety-centerpiece-your-spring-holiday-feast",
-        "text": "Les restes doivent être placés au réfrigérateur dans les 2 heures suivant le service, de préférence dans de petits contenants."
-      },
-      {
-        "source_url": "https://www.thekitchn.com/balsamic-citrus-braised-lamb-shanks-recipe-23109860",
-        "text": "Pour la qualité, une source conseille de refroidir les souris dans leur liquide de cuisson, puis de les réfrigérer; elle indique jusqu’à 4 jours en contenant hermétique et un réchauffage doux."
+        "source_url": "https://www.foodsafety.gov/blog/game-day-food-safety-tips",
+        "text": "Répartir les grandes quantités dans des contenants peu profonds pour accélérer le refroidissement."
       }
     ],
     "references": [
@@ -138,135 +308,169 @@
         "publisher": "750g"
       },
       {
-        "url": "https://www.thekitchn.com/lamb-shank-267498",
-        "title": "Rosemary Braised Lamb Shanks with Creamy Polenta",
-        "publisher": "The Kitchn"
+        "url": "https://www.marmiton.org/recettes/recette_souris-d-agneau-au-miel-et-thym_93493.aspx",
+        "title": "Souris d’agneau confite et fondante",
+        "publisher": "Marmiton"
       },
       {
-        "url": "https://www.thekitchn.com/balsamic-citrus-braised-lamb-shanks-recipe-23109860",
-        "title": "Balsamic and Citrus-Braised Lamb Shanks with Whipped Parsnip Purée",
-        "publisher": "The Kitchn"
+        "url": "https://www.recette-painperdu.fr/recette/souris-d-agneau-recette",
+        "title": "Recette de souris d’agneau confite au four ultra fondante",
+        "publisher": "RecettePainPerdu"
       },
       {
-        "url": "https://www.tollbit.bbcgoodfood.com/recipes/vietnamese-lamb-shanks-sweet-potatoes",
-        "title": "Vietnamese lamb shanks with sweet potatoes",
+        "url": "https://www.bbcgoodfood.com/recipes/braised-lamb-shanks",
+        "title": "Braised lamb shanks",
         "publisher": "BBC Good Food"
       },
       {
-        "url": "https://www.bonappetit.com/test-kitchen/cooking-tips/article/four-simple-rules-for-braising-anything",
-        "title": "Four Simple Rules for Braising Anything",
-        "publisher": "Bon Appétit"
+        "url": "https://www.foodsafety.gov/people-at-risk",
+        "title": "People at Risk of Food Poisoning",
+        "publisher": "FoodSafety.gov"
       },
       {
-        "url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/meat-catfish/lamb-farm-table",
-        "title": "Lamb From Farm to Table",
-        "publisher": "USDA Food Safety and Inspection Service"
+        "url": "https://www.foodsafety.gov/food-safety-charts/safe-minimum-internal-temperatures",
+        "title": "Cook to a Safe Minimum Internal Temperature",
+        "publisher": "FoodSafety.gov"
       }
     ],
     "visual_references": [
       {
-        "image_url": "https://cdn.apartmenttherapy.info/image/upload/f_auto%2Cq_auto%3Aeco%2Cc_fill%2Cg_center%2Cw_730%2Ch_913/k%2Farchive%2F3f5dbba9c7cf720cfdca7794b58ec9f1299b2834",
-        "source_url": "https://www.thekitchn.com/lamb-shank-267498",
-        "title": "Rosemary Braised Lamb Shanks with Creamy Polenta"
+        "image_url": "https://assets.afcdn.com/recipe/20250408/159509_w150h150c1cx3680cy2456cxt0cyt0cxb7360cyb4912.webp",
+        "source_url": "https://www.marmiton.org/recettes/recette_souris-d-agneau-au-miel-et-thym_93493.aspx",
+        "title": "Souris d’agneau confite et fondante",
+        "tier": 1
       },
       {
-        "image_url": "https://cdn.apartmenttherapy.info/image/upload/f_auto%2Cq_auto%3Aeco%2Cc_fit%2Cw_730%2Ch_487/k%2FPhoto%2FRecipes%2F2020-12-Dinner-For-Two%2F2020-12-Recipe-3-Balsamic-and-Citrus-Braised-Lamb-Shanks-with-Whipped-Parsnip-Puree%2FBalsamic_Braised_Lamb_Shanks2_CB",
-        "source_url": "https://www.thekitchn.com/balsamic-citrus-braised-lamb-shanks-recipe-23109860",
-        "title": "Balsamic and Citrus-Braised Lamb Shanks with Whipped Parsnip Purée"
+        "image_url": "https://static.750g.com/images/220-165/fb26db40ef0ade0ecab10a031f794d24/souris-d-agneau.jpg",
+        "source_url": "https://www.750g.com/souris-dagneau-confite-r58237.htm",
+        "title": "Souris d’agneau confite au miel, à l’ail et au romarin",
+        "tier": 1
+      },
+      {
+        "image_url": "https://images.immediate.co.uk/production/volatile/sites/30/2020/08/recipe-image-legacy-id-373546_10-2051fea.jpg?quality=90&resize=440%2C400",
+        "source_url": "https://www.bbcgoodfood.com/recipes/braised-lamb-shanks",
+        "title": "Braised lamb shanks",
+        "tier": 2
       }
     ],
     "visual_observations": [
       {
-        "image_url": "https://cdn.apartmenttherapy.info/image/upload/f_auto%2Cq_auto%3Aeco%2Cc_fill%2Cg_center%2Cw_730%2Ch_913/k%2Farchive%2F3f5dbba9c7cf720cfdca7794b58ec9f1299b2834",
-        "source_url": "https://www.thekitchn.com/lamb-shank-267498",
+        "image_url": "https://assets.afcdn.com/recipe/20250408/159509_w150h150c1cx3680cy2456cxt0cyt0cxb7360cyb4912.webp",
+        "source_url": "https://www.marmiton.org/recettes/recette_souris-d-agneau-au-miel-et-thym_93493.aspx",
         "observable_details": [
-          "Une assiette blanche contient une préparation crémeuse beige, nappée d’une sauce rouge-brune.",
-          "Une grande pièce sombre avec un os apparent est placée au centre de l’assiette.",
-          "Des morceaux rougeâtres et bruns sont visibles dans la sauce.",
-          "De petites taches vertes sont dispersées sur la préparation.",
-          "Une seconde assiette partiellement visible apparaît dans l’angle supérieur droit.",
-          "Une fourchette et une cuillère sont posées à droite, sur un textile gris."
+          "Un bol ou une assiette creuse de couleur noire est placé au centre de l’image.",
+          "Il contient une pièce volumineuse brun-rouge, avec une extrémité allongée ressemblant visuellement à un os.",
+          "Des éléments verts sont visibles sur le dessus et autour de la pièce principale.",
+          "Une matière sombre et brillante entoure partiellement la pièce centrale.",
+          "Quelques éléments orange-brun sont visibles sur les côtés."
         ],
-        "composition": "Vue en plongée rapprochée. L’assiette principale occupe le bas et le centre de l’image. La pièce centrale forme un axe diagonal allant de la partie supérieure gauche vers le centre inférieur. L’assiette secondaire est coupée par le bord supérieur droit. Les couverts et le textile se trouvent sur le côté droit.",
+        "composition": [
+          "La composition est centrée, avec le contenu regroupé dans le bol.",
+          "La prise de vue est réalisée en légère plongée, montrant l’intérieur du récipient.",
+          "Le fond est sombre et peu détaillé.",
+          "La pièce principale forme une diagonale approximative entre le bas-centre et le haut-gauche."
+        ],
         "couleurs": [
-          "Beige clair",
-          "Rouge vif à rouge sombre",
-          "Brun foncé",
-          "Brun orangé",
-          "Vert par petites touches",
-          "Blanc cassé",
-          "Gris clair"
+          "Noir et gris foncé pour le récipient et l’arrière-plan.",
+          "Brun foncé, brun-rouge et rouge sombre pour l’élément principal.",
+          "Vert vif pour les éléments disposés sur le dessus.",
+          "Orange-brun et quelques petites touches claires autour du contenu."
         ],
         "textures": [
-          "La préparation beige paraît épaisse et irrégulière en surface.",
-          "La sauce présente des zones lisses et brillantes.",
-          "La pièce centrale a une surface sombre, brillante et fibreuse par endroits.",
-          "Certains morceaux visibles semblent tendres ou effilochés, sans que leur composition puisse être déterminée.",
-          "Le textile à droite paraît tissé et légèrement froissé.",
-          "Le fond gris présente un aspect mat et minéral avec de légères marques."
+          "La surface de l’élément principal paraît irrégulière, fibreuse et légèrement brillante.",
+          "La matière sombre dans le bol présente des reflets luisants.",
+          "Les éléments verts semblent feuillus et fragmentés.",
+          "Le récipient a une surface mate ou peu réfléchissante."
         ],
         "incertainties": [
-          "La composition exacte des aliments n’est pas déterminable uniquement à partir de l’image.",
-          "La nature précise de la pièce centrale et de l’os n’est pas certaine.",
-          "La présence et l’identité des petits éléments verts ne peuvent pas être confirmées.",
-          "La photographie ne permet pas de déterminer les quantités, le goût, l’authenticité ou le mode de préparation."
+          "La résolution et la taille réduite de l’image ne permettent pas d’identifier précisément tous les éléments visibles.",
+          "La nature exacte de la pièce centrale, des éléments verts et de la matière sombre ne peut pas être déterminée avec certitude à partir de l’image seule.",
+          "Les détails fins de la surface et du contenu périphérique sont partiellement indistincts."
         ]
       },
       {
-        "image_url": "https://cdn.apartmenttherapy.info/image/upload/f_auto%2Cq_auto%3Aeco%2Cc_fit%2Cw_730%2Ch_487/k%2FPhoto%2FRecipes%2F2020-12-Dinner-For-Two%2F2020-12-Recipe-3-Balsamic-and-Citrus-Braised-Lamb-Shanks-with-Whipped-Parsnip-Puree%2FBalsamic_Braised_Lamb_Shanks2_CB",
-        "source_url": "https://www.thekitchn.com/balsamic-citrus-braised-lamb-shanks-recipe-23109860",
+        "image_url": "https://static.750g.com/images/220-165/fb26db40ef0ade0ecab10a031f794d24/souris-d-agneau.jpg",
+        "source_url": "https://www.750g.com/souris-dagneau-confite-r58237.htm",
         "observable_details": [
-          "Une assiette claire au centre contient une base pâle et crémeuse, recouverte d'un morceau de viande brun foncé avec un os allongé visible.",
-          "La viande est nappée d'une sauce sombre et entourée de petites pièces rouges et brunes.",
-          "Des éléments verts finement hachés sont visibles sur la viande et la base pâle.",
-          "Une seconde assiette partiellement visible se trouve dans l'angle supérieur droit et contient une préparation similaire avec un os visible.",
-          "La scène est installée sur une table en bois.",
-          "On voit des couverts métalliques dans l'angle supérieur gauche, des serviettes en tissu brun-rouge et un verre contenant un liquide très sombre dans l'angle inférieur droit."
+          "Une portion de viande brun très foncé à rougeâtre occupe la partie gauche et le premier plan.",
+          "La viande est recouverte d’une surface brillante et sombre, avec des zones plus rouges et des reliefs irréguliers.",
+          "Un jus ou une sauce sombre est visible sous et autour de la viande.",
+          "À l’arrière-plan, sur la droite, se trouve un accompagnement de forme irrégulière, avec des zones beige clair, vertes et brunies.",
+          "L’ensemble est présenté sur une assiette de couleur rose pâle."
         ],
         "composition": [
-          "L'assiette principale est centrée et occupe la majeure partie de l'image.",
-          "La préparation est disposée en monticule au centre de l'assiette, avec l'os orienté vers le bas à gauche.",
-          "L'assiette secondaire est coupée par le bord supérieur et le bord droit de l'image.",
-          "Le verre inférieur droit et les serviettes encadrent la composition.",
-          "La prise de vue est réalisée de manière presque verticale au-dessus de la table."
+          "La pièce principale est placée au premier plan, légèrement à gauche du centre.",
+          "L’accompagnement est situé dans la moitié supérieure droite de l’assiette.",
+          "Le cadrage est rapproché et coupe partiellement les éléments visibles.",
+          "Un arrière-plan sombre et flou apparaît au-dessus de l’assiette."
         ],
         "couleurs": [
-          "Brun clair et miel pour la table en bois.",
-          "Blanc cassé et crème pour la base de l'assiette et la préparation pâle.",
-          "Brun très foncé à presque noir pour la viande et la sauce.",
-          "Rouge sombre et rouge orangé dans la sauce et les petits morceaux visibles.",
-          "Vert foncé pour les éléments hachés.",
-          "Brun-rouge pour les serviettes.",
-          "Bordeaux très sombre pour le liquide dans le verre."
+          "Brun très foncé, rouge-brun et noirâtre sur la pièce principale et le jus.",
+          "Rose pâle et blanc rosé sur l’assiette.",
+          "Beige clair, vert pâle et brun doré sur l’accompagnement.",
+          "Tons gris foncé et noirs dans l’arrière-plan."
         ],
         "textures": [
-          "La base pâle paraît lisse et épaisse.",
-          "La surface de la viande paraît fibreuse, irrégulière et brillante par endroits.",
-          "La sauce forme des zones liquides et luisantes autour de la viande.",
-          "Les petits éléments rouges et verts ont une apparence morcelée.",
-          "Le bois présente un grain visible et des variations de teinte.",
-          "Les serviettes montrent des plis et une texture textile."
+          "Surface luisante et nappée sur la pièce principale.",
+          "Reliefs et bords irréguliers sur la viande.",
+          "Jus sombre d’aspect fluide ou épais autour de la pièce.",
+          "Accompagnement à l’aspect compact, irrégulier et partiellement granuleux.",
+          "Image légèrement floue et peu détaillée."
         ],
         "incertainties": [
-          "Les ingrédients précis de la préparation ne peuvent pas être déterminés uniquement à partir de l'image.",
-          "La nature exacte du liquide sombre dans le verre n'est pas identifiable visuellement.",
-          "Une partie des objets et de l'assiette secondaire est hors champ.",
-          "L'image seule ne permet pas d'évaluer l'authenticité, le goût, les quantités ou le mode de préparation."
+          "La nature exacte de la pièce principale et de l’accompagnement n’est pas déterminable avec certitude à partir de l’image seule.",
+          "La couleur sombre peut être due à un glaçage, une sauce ou une coloration de cuisson, sans qu’il soit possible de les distinguer visuellement.",
+          "Les éléments partiellement coupés par le cadrage ne sont pas observables dans leur totalité."
+        ]
+      },
+      {
+        "image_url": "https://images.immediate.co.uk/production/volatile/sites/30/2020/08/recipe-image-legacy-id-373546_10-2051fea.jpg?quality=90&resize=440%2C400",
+        "source_url": "https://www.bbcgoodfood.com/recipes/braised-lamb-shanks",
+        "observable_details": [
+          "Une assiette blanche contient un gros morceau de viande brun accompagné d'un os allongé.",
+          "Un autre morceau brun est visible sur le côté gauche de l'assiette.",
+          "Des éléments verts ressemblant à des bouquets de légume sont placés derrière la viande.",
+          "Une sauce brun foncé s'étend sous la viande.",
+          "L'assiette repose sur une surface textile à motifs gris."
+        ],
+        "composition": "Le morceau principal occupe le centre droit de l'assiette. L'os s'étend vers la gauche, tandis que les éléments verts sont placés en arrière-plan. La sauce forme une flaque autour de la base de la viande.",
+        "couleurs": [
+          "Brun foncé et brun doré pour la viande et la sauce",
+          "Beige clair pour l'os",
+          "Vert foncé pour les éléments à l'arrière",
+          "Blanc pour l'assiette",
+          "Gris et blanc pour le textile sous l'assiette",
+          "Rose et violet dans l'arrière-plan"
+        ],
+        "textures": [
+          "La surface de la viande paraît luisante et irrégulière.",
+          "La sauce paraît fluide et brillante.",
+          "L'os paraît mat et lisse.",
+          "Les éléments verts ont une apparence granuleuse et ramifiée.",
+          "Le textile sous l'assiette présente un motif doux et flou."
+        ],
+        "incertainties": [
+          "La nature exacte des éléments verts et des autres accompagnements n'est pas certaine.",
+          "La photographie ne permet pas de déterminer les ingrédients, les quantités, le goût ou le mode de préparation invisible.",
+          "Certains détails de la viande et de la sauce sont partiellement masqués par les reflets et la faible résolution."
         ]
       }
     ],
     "uncertainties": [
-      "Les sources divergent sur la température: 140 °C en chaleur tournante est indiqué par BBC Good Food, tandis que plusieurs recettes utilisent 175 °C en four traditionnel; aucune source consultée ne fournit une conversion universelle propre à toutes les tailles de souris.",
-      "La durée documentée varie d’environ 2 heures à 3 heures, et une recette française annonce 7 heures à 160 °C; la taille des pièces, le plat et le niveau de liquide expliquent probablement une partie de l’écart, mais la source ne le quantifie pas.",
-      "La saisie est recommandée par plusieurs sources pour la coloration, mais une recette française l’omet; elle peut donc être présentée comme un choix de méthode, pas comme une obligation.",
-      "Les sources ne donnent pas toutes une quantité chiffrée de vin ou de bouillon pour 4 souris avec oignons grelots et ail; le liquide doit rester partiellement couvrant sans immerger complètement la viande.",
-      "La découverte finale est explicitement documentée par une source spécialisée, mais plusieurs recettes de référence restent couvertes jusqu’à la fin; son intérêt principal est la coloration et la réduction, non la sécurité.",
-      "Les températures à cœur élevées parfois recherchées pour obtenir une viande qui se détache de l’os ne sont pas documentées de façon cohérente par les sources retenues; la température USDA citée garantit la sécurité minimale, pas nécessairement la texture fondante."
+      "Les sources divergent fortement sur la durée : environ 2 heures à 150 °C en chaleur tournante chez Marmiton, 2 h 15 à 2 h 45 à 150 °C dans une recette récente, et 7 heures à 160 °C chez 750g.",
+      "750g indique une bouteille entière de vin blanc sans préciser le volume utile ni le niveau de liquide dans le plat.",
+      "Les sources ne s’accordent pas sur la saisie préalable : 750g l’omet, tandis que d’autres versions la recommandent pour colorer la viande.",
+      "La découverte en fin de cuisson est documentée par une source récente, mais pas par la recette Marmiton.",
+      "Le repos de 10 minutes est documenté par une recette récente, tandis que plusieurs autres sources ne donnent aucun temps de repos.",
+      "La conservation domestique varie selon les sources culinaires entre deux et trois jours ; la recommandation de sécurité FoodSafety.gov est de quatre jours maximum au réfrigérateur.",
+      "La photographie Marmiton est de faible résolution ; la photographie BBC Good Food montre un jarret d’agneau braisé proche, mais pas exactement la garniture du brief."
     ],
     "originality_notes": [
-      "Les informations sont reformulées en français et réduites à des faits actionnables; aucune phrase source n’est reproduite comme texte d’article.",
-      "Les quantités, durées, températures, substitutions et accompagnements ne sont inclus que lorsqu’ils sont documentés par une source identifiée.",
-      "Les photographies proviennent de pages culinaires publiques et sont référencées par leur URL HTTPS directe; aucune observation visuelle n’est déduite des images, conformément au protocole demandé."
+      "Les quantités et techniques ont été attribuées à leurs sources respectives sans moyenne ni harmonisation non documentée.",
+      "La saisie, la couverture, la découverte et le niveau de liquide sont présentés comme des pratiques documentées ou comme des divergences, sans les transformer en certitudes universelles.",
+      "Aucune quantité d’huile, d’herbes, de sel ou de poivre n’a été inventée lorsque la source ne la donnait pas.",
+      "Les observations visuelles sont volontairement absentes conformément au protocole demandé ; aucune caractéristique visuelle n’a été déduite des vignettes ou des descriptions textuelles.",
+      "La troisième image est explicitement classée en tier 2 car elle montre une variante proche de jarret d’agneau braisé, et non la préparation exacte aux oignons grelots et à l’ail confit."
     ]
   },
   "canonical": {

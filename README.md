@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.64` est un socle installable : file persistante, pipeline de
+La version `0.2.65` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.
@@ -20,6 +20,55 @@ Le plugin est en cours de refonte éditoriale et budgétaire :
 Les coûts affichés sont des estimations calculées avec le catalogue configuré,
 non une facture fournisseur. `completed` signifie que le traitement est terminé,
 jamais qu’un texte est validé éditorialement.
+
+## Version 0.2.65
+
+**La recherche devient le socle réel du pipeline.** Elle ne rend plus des faits
+épars mais la recette telle que les sources la décrivent, sourcée ligne à ligne :
+
+- `recipe_outline` — portions, temps de préparation, de cuisson, total, catégorie,
+  cuisine, difficulté ;
+- `ingredients` — nom, quantité, unité, **rôle dans le plat**, caractère
+  **essentiel**, et sa source ;
+- `preparation` — étapes numérotées dans l'ordre réellement exécuté, chacune avec
+  son **repère visuel de fin** et, quand la source les donne, minutes et
+  température ;
+- `substitutions`, `accompaniments`, `common_failures`, `storage` — uniquement ce
+  qu'une source atteste.
+
+**Les images sont désormais hiérarchisées.** Rang 1 : de vraies photographies de
+*ce* plat, trois sur trois domaines différents. Rang 2 : jusqu'à deux
+photographies d'une variante proche ou du composant caractéristique, réservées à
+la direction visuelle quand le rang 1 est mince. Chaque image porte son rang, si
+bien qu'une étape ultérieure sait le poids à lui accorder.
+
+Mesuré sur la souris d'agneau : **14/14**, 10 ingrédients tous sourcés, 10 étapes
+portant toutes leur repère, 3 références rang 1. `research_max_output_tokens`
+passe de 7 000 à 12 000 — le paquet plus riche dépassait l'ancien plafond.
+
+### Format d'échange et cache : mesurés, pas supposés
+
+`tools/format-cost.php` compare plusieurs rendus du même paquet et lit les jetons
+*facturés par le fournisseur*, pas une estimation.
+
+| Format | Caractères | Jetons | Coût |
+|---|---:|---:|---:|
+| enregistrements « pipe » | 9 406 | **2 461** | 0,00053 $ |
+| JSON compact (actuel) | 9 649 | 2 500 | 0,00054 $ |
+| lignes indentées | 9 781 | 2 609 | 0,00056 $ |
+| JSON indenté | 11 448 | 2 871 | 0,00062 $ |
+
+**Changer de format ne vaut pas la peine : 1,6 %.** Le gain réel avait déjà été
+pris en abandonnant le JSON indenté (−13 %). Le tokeniseur digère très bien la
+ponctuation JSON, et nous perdrions un format que tout le monde sait lire.
+
+**Le cache, lui, est massif — mais seulement sur les appels identiques.** Un même
+prompt rejoué : **6 825 jetons sur 6 828 mis en cache**, soit 99,96 %. Deux
+recettes différentes partageant 1 622 jetons de gabarit : **0**. Conséquence
+directe et utile : les reprises — la relance d'un jugement mal formé, la
+régénération après refus — ne coûtent presque rien en entrée. La stratégie
+« réessayer jusqu'à approbation » que vous avez choisie est donc moins chère que
+le prix affiché par appel ne le laisse croire.
 
 ## Version 0.2.64
 
