@@ -49,9 +49,18 @@ final class MSRWA_Engine_Steps {
 				'needs' => array( 'research', 'canonical', 'article' ), 'produces' => 'fact_check',
 				'expects' => 'only the passages the sources contradict, quoted verbatim',
 			),
+			'corrections' => array(
+				// No model runs here. The fact check returns the sentence it objects to
+				// verbatim and the sentence that replaces it, so applying them is a
+				// substitution, not a judgement — free, exact, and recorded either way.
+				'label' => 'Corrections factuelles', 'bucket' => 'article', 'capability' => 'none', 'prompt' => '',
+				'needs' => array( 'article', 'review', 'fact_check' ), 'produces' => 'corrected',
+				'expects' => 'the article with every verbatim correction applied, and the rest reported',
+			),
 			'proofread' => array(
 				'label' => 'Correction', 'bucket' => 'article', 'capability' => 'text', 'prompt' => 'proofread.tpl.txt',
-				'needs' => array( 'article' ), 'produces' => 'proofread',
+				// Language is corrected last, on the text the facts have already been fixed in.
+				'needs' => array( 'corrected' ), 'produces' => 'proofread',
 				'expects' => 'the same article with its language corrected and every figure untouched',
 			),
 			'final_approval' => array(

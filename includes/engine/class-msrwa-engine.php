@@ -161,12 +161,56 @@ final class MSRWA_Engine {
 		return $spent;
 	}
 
-	/** One step, one provider call, routed by what the step asks a model for. */
+	/** One step, routed by what it asks a model for — or by asking none. */
 	private static function call( $name, MSRWA_Engine_Config $config, MSRWA_Result $result, array $options ) {
 		$capability = MSRWA_Engine_Steps::capability( $name );
+		if ( 'none' === $capability ) { return self::apply_corrections( $result ); }
 		if ( 'image_generation' === $capability ) { return self::draw( $name, $config, $result, $options, array() ); }
 		if ( 'vision' === $capability ) { return self::decide( $name, $config, $result, $options ); }
 		return self::write( $name, $config, $result, $options );
+	}
+
+	/**
+	 * Applies the fact check's corrections to the article, in code.
+	 *
+	 * The fact check quotes the sentence it objects to verbatim and gives the
+	 * sentence that replaces it, so this needs no model and no judgement: either
+	 * the quoted sentence is in the article, and it is replaced exactly, or it is
+	 * not, and the correction is reported for a person to make. Until this
+	 * existed the findings were produced and then applied by hand.
+	 *
+	 * A review finding carries no quote — it is advice about a section — so none
+	 * are applied here. They travel to the editor with the rest.
+	 */
+	private static function apply_corrections( MSRWA_Result $result ) {
+		$article = (array) ( $result->artifacts['article'] ?? array() );
+		$html = (string) ( $article['content_html'] ?? '' );
+		$applied = array();
+		$unapplied = array();
+
+		foreach ( (array) ( ( (array) ( $result->artifacts['fact_check'] ?? array() ) )['corrections'] ?? array() ) as $correction ) {
+			if ( ! is_array( $correction ) ) { continue; }
+			$before = trim( (string) ( $correction['before'] ?? '' ) );
+			$after = trim( (string) ( $correction['after'] ?? '' ) );
+			if ( '' === $before || $before === $after ) { continue; }
+			// The fact check answers in plain sentences while the article is HTML, so a
+			// sentence broken by a tag cannot be substituted. Say so rather than guess.
+			if ( false === mb_strpos( $html, $before ) ) { $unapplied[] = $correction; continue; }
+			$html = str_replace( $before, $after, $html );
+			$applied[] = $correction;
+		}
+
+		$article['content_html'] = $html;
+		$checks = array(
+			'every correction applied' => array( 'pass' => ! $unapplied, 'detail' => $unapplied ? count( $applied ) . ' applied, ' . count( $unapplied ) . ' could not be located in the HTML' : count( $applied ) . ' applied' ),
+			'the article survived' => array( 'pass' => '' !== $html, 'detail' => mb_strlen( $html ) . ' characters' ),
+		);
+		return array(
+			'provider' => '', 'model' => '', 'seconds' => 0, 'usage' => array(), 'cost_usd' => 0.0, 'status' => '',
+			'passed' => count( array_filter( $checks, static function ( $check ) { return $check['pass']; } ) ), 'total' => count( $checks ),
+			'checks' => $checks, 'error' => '', 'retry' => '',
+			'artifact' => array_merge( $article, array( 'corrections_applied' => $applied, 'corrections_for_the_editor' => $unapplied ) ),
+		);
 	}
 
 	/** A step that returns JSON: research, the recipe, the article and the three reviews. */
@@ -292,9 +336,14 @@ final class MSRWA_Engine {
 		$brief = (array) ( $result->artifacts['brief'] ?? array() );
 		$article = (array) ( $result->artifacts['article'] ?? array() );
 
-		// The proofread article is what a reader gets, so it is what the approval judges.
-		if ( 'final_approval' === $name && ! empty( $result->artifacts['proofread'] ) ) {
-			$article = array_merge( $article, (array) $result->artifacts['proofread'] );
+		// Each later step reads the latest article there is: the reviews read the
+		// draft they are reviewing, proofreading reads the one the facts were fixed
+		// in, and the approval judges what a reader would actually get.
+		// Oldest first, so the newest version is the one that ends up on top.
+		foreach ( array( 'corrected' => array( 'proofread', 'final_approval' ), 'proofread' => array( 'final_approval' ) ) as $source => $steps ) {
+			if ( in_array( $name, $steps, true ) && ! empty( $result->artifacts[ $source ] ) ) {
+				$article = array_merge( $article, (array) $result->artifacts[ $source ] );
+			}
 		}
 
 		// A rewrite carries what the reviews found; a first draft carries nothing.

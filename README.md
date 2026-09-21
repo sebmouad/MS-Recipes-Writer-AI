@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.71` est un socle installable : file persistante, pipeline de
+La version `0.2.72` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.
@@ -20,6 +20,40 @@ Le plugin est en cours de refonte éditoriale et budgétaire :
 Les coûts affichés sont des estimations calculées avec le catalogue configuré,
 non une facture fournisseur. `completed` signifie que le traitement est terminé,
 jamais qu’un texte est validé éditorialement.
+
+## Version 0.2.72
+
+**La boucle de correction se referme.** La revue et le fact-check produisaient
+des constats depuis des semaines et rien ne les appliquait — en réalité je les
+appliquais à la main, dans le générateur de rapport, codés en dur par recette.
+
+Le fact-check cite déjà mot pour mot la phrase qu'il conteste et fournit celle
+qui la remplace ; son propre barème vérifie que la citation est bien dans
+l'article. L'appliquer est donc une substitution, pas un jugement : aucun modèle
+ne tourne, cela ne coûte rien, et rien ne peut être inventé.
+
+La nouvelle étape `corrections` enregistre les deux moitiés : ce qu'elle a
+appliqué, et ce qu'elle n'a pas su localiser dans le HTML — le fact-check répond
+en phrases simples alors que l'article est du HTML, donc une phrase coupée par
+une balise est un cas réel. Ce reste part à l'éditeur au lieu de disparaître.
+
+Un constat de revue ne porte pas de citation : c'est un avis sur une section.
+Aucun n'est appliqué ici ; ils accompagnent le reste jusqu'à l'éditeur.
+
+La correction de langue tourne désormais sur le texte déjà corrigé sur le fond,
+pour la même raison que l'approbation était passée derrière la relecture :
+corriger la langue d'un paragraphe sur le point d'être remplacé est du travail
+perdu.
+
+| Vague | Étapes simultanées |
+|---|---|
+| 1 | recherche |
+| 2 | recette canonique |
+| 3 | **article, image à la une, collage** |
+| 4 | **revue, fact-check** |
+| 5 | corrections factuelles (aucun modèle) |
+| 6 | correction de langue |
+| 7 | approbation finale |
 
 ## Version 0.2.71
 

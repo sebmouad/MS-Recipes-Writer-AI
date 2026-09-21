@@ -63,14 +63,24 @@ everything whose inputs exist may run together:
 | 1 | research |
 | 2 | canonical recipe |
 | 3 | **article, featured image, Facebook collage** |
-| 4 | **review, fact check, proofread** |
-| 5 | final approval |
+| 4 | **review, fact check** |
+| 5 | apply corrections (no model runs) |
+| 6 | proofread |
+| 7 | final approval |
 
-**Three call paths**, chosen by the capability a step declares: text (including
-the web-searching research step), image generation, and the judge that reads
-both images' bytes alongside the article. A refused approval regenerates the
-images the judge blocked, carrying its findings as corrections, then asks
-again — that is what makes "retry until approved" converge rather than reroll.
+**Four call paths**, chosen by the capability a step declares: text (including
+the web-searching research step), image generation, the judge that reads both
+images' bytes alongside the article, and none at all. A refused approval
+regenerates the images the judge blocked, carrying its findings as corrections,
+then asks again — that is what makes "retry until approved" converge rather
+than reroll.
+
+**The correction loop closes in code.** The fact check quotes the sentence it
+objects to verbatim and supplies the sentence that replaces it, so applying it
+is a substitution, not a judgement: no model runs, nothing costs anything, and
+a correction whose quote cannot be located in the HTML is handed to the editor
+rather than dropped. A review finding carries no quote — it is advice about a
+section — so none are applied; they travel to the editor with the rest.
 
 ## Files
 

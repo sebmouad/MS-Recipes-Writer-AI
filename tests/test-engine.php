@@ -54,17 +54,39 @@ msrwa_test_assert( array( 'research' ) === $waves[0], 'Research opens the pipeli
 msrwa_test_assert( array( 'canonical_recipe' ) === $waves[1], 'The recipe follows research alone.' );
 msrwa_test_assert( 3 === count( $waves[2] ), 'The article and both images do not wait on each other.' );
 msrwa_test_assert( in_array( 'featured_image', $waves[2], true ) && in_array( 'article', $waves[2], true ), 'Images need the recipe, not the article.' );
-msrwa_test_assert( 3 === count( $waves[3] ), 'The three text reviews are independent of one another.' );
-msrwa_test_assert( array( 'final_approval' ) === $waves[4], 'Approval is last: it judges the article a reader would get.' );
+msrwa_test_assert( array( 'review', 'fact_check' ) === $waves[3], 'The two text reviews are independent of one another.' );
+msrwa_test_assert( array( 'corrections' ) === $waves[4], 'Facts are corrected once both reviews have reported.' );
+msrwa_test_assert( array( 'proofread' ) === $waves[5], 'Language is corrected last, on the text the facts were fixed in.' );
+msrwa_test_assert( array( 'final_approval' ) === $waves[6], 'Approval is last: it judges the article a reader would get.' );
 
 $missing = MSRWA_Engine_Steps::missing( 'article', array( 'research' => true ) );
 msrwa_test_assert( array( 'canonical' ) === $missing, 'A step must say what it is still waiting for.' );
 
-// Every step names a prompt that exists, or the run fails at the provider.
+// Every step that calls a model names a prompt that exists, or the run fails there.
 foreach ( MSRWA_Engine_Steps::all() as $name => $step ) {
+	if ( 'none' === $step['capability'] ) {
+		msrwa_test_assert( '' === $step['prompt'], $name . ' asks no model, so it must name no prompt.' );
+		continue;
+	}
 	msrwa_test_assert( ! empty( $step['prompt'] ), $name . ' must name its prompt template.' );
 	msrwa_test_assert( is_readable( MSRWA_Engine_Input::prompt_path( $step['prompt'] ) ), $step['prompt'] . ' must exist beside the engine.' );
 }
+
+// The fact check's corrections are applied in code, not by hand and not by a model.
+$reviewed = MSRWA_Engine::run_step( 'corrections', array( 'title' => 'Tarte', 'artifacts' => array(
+	'article' => array( 'content_html' => '<p>Cuire 45 minutes à 180 °C.</p><p>Reposer 10 minutes.</p>' ),
+	'review' => array( 'pass' => false, 'findings' => array( array( 'severity' => 'minor', 'section' => 'Cuisson', 'reason' => 'Trop court', 'fix' => 'Développer' ) ) ),
+	'fact_check' => array( 'pass' => false, 'corrections' => array(
+		array( 'before' => 'Cuire 45 minutes à 180 °C.', 'after' => 'Cuire 40 minutes à 180 °C.', 'source' => 'https://example.org' ),
+		array( 'before' => 'Une phrase que l’article ne contient pas.', 'after' => 'Peu importe.', 'source' => 'https://example.org' ),
+	) ),
+) ) );
+$corrected = $reviewed->artifacts['corrected'];
+msrwa_test_assert( false !== strpos( $corrected['content_html'], 'Cuire 40 minutes' ), 'A correction quoted verbatim must be applied exactly.' );
+msrwa_test_assert( false !== strpos( $corrected['content_html'], 'Reposer 10 minutes' ), 'Nothing the fact check did not name may change.' );
+msrwa_test_assert( 1 === count( $corrected['corrections_applied'] ), 'What was applied is recorded.' );
+msrwa_test_assert( 1 === count( $corrected['corrections_for_the_editor'] ), 'A correction that cannot be located is handed to a person, never dropped.' );
+msrwa_test_assert( 0.0 === $reviewed->totals()['cost_usd'], 'Applying a verbatim substitution calls no model and costs nothing.' );
 
 // Configuration speaks the engine's vocabulary, and the caller overrides it in that
 // vocabulary — never the other way round.
