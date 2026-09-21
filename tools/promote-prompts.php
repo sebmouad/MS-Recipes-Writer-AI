@@ -26,7 +26,7 @@ $map = array(
 $file = $dir . 'includes/class-msrwa-settings.php';
 $source = file_get_contents( $file );
 foreach ( $map as $template => $key ) {
-	$compiled = MSRWA_Prompt::compile( trim( file_get_contents( $dir . 'tools/prompts/' . $template ) ), lab_settings() );
+	$compiled = MSRWA_Prompt::compile( trim( file_get_contents( MSRWA_Engine_Input::prompt_path( $template ) ) ), lab_settings() );
 	if ( false !== strpos( $compiled, '{{' ) ) { fwrite( STDERR, "Unresolved placeholder in {$template}\n" ); exit( 1 ); }
 	$pattern = "/('" . $key . "'\s*=>\s*)'.*?',\n/s";
 	if ( ! preg_match( $pattern, $source ) ) { fwrite( STDERR, "No setting {$key}\n" ); continue; }

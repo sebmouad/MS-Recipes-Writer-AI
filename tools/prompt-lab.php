@@ -15,7 +15,7 @@
  *
  * The maintained lab prompt for every stage is declared by lab_steps(). Use
  * --shipped=1 to compare it with the current plugin default. Experimental
- * variants may still use tools/prompts/<step>.<variant>.txt temporarily.
+ * variants may still use includes/engine/prompts/<step>.<variant>.txt temporarily.
  */
 define( 'MSRWA_LAB', true );
 require __DIR__ . '/lib/steps.php';
@@ -38,7 +38,7 @@ if ( 'list' === $command ) {
 		printf( "%-18s %-26s %s\n", $name, $definition['file'], $definition['expects'] );
 	}
 	echo "\nMaintained prompt files:\n";
-	foreach ( glob( __DIR__ . '/prompts/*.txt' ) as $file ) { echo '  ' . basename( $file ) . "\n"; }
+	foreach ( glob( MSRWA_Engine_Input::prompt_path( '*.txt' ) ) as $file ) { echo '  ' . basename( $file ) . "\n"; }
 	exit( 0 );
 }
 
@@ -52,7 +52,7 @@ if ( 'show' === $command ) {
 if ( 'promote' === $command ) {
 	$variant = $argv[3] ?? '';
 	if ( '' === $variant ) { fwrite( STDERR, "Usage: promote <step> <variant>\n" ); exit( 2 ); }
-	$file = __DIR__ . '/prompts/' . $step . '.' . $variant . '.txt';
+	$file = MSRWA_Engine_Input::prompt_path( $step . '.' . $variant . '.txt' );
 	if ( ! file_exists( $file ) ) { fwrite( STDERR, "No such variant: {$file}\n" ); exit( 2 ); }
 	echo "Copy this text into the '" . $steps[ $step ]['prompts'][0] . "' default in includes/class-msrwa-settings.php,\n";
 	echo "then run php tests/run.php and commit. The database is seeded from those defaults.\n\n";

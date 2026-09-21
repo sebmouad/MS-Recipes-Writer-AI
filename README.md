@@ -4,7 +4,7 @@ Plugin WordPress en construction pour la génération éditoriale culinaire orch
 
 ## État actuel
 
-La version `0.2.69` est un socle installable : file persistante, pipeline de
+La version `0.2.70` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.
@@ -20,6 +20,38 @@ Le plugin est en cours de refonte éditoriale et budgétaire :
 Les coûts affichés sont des estimations calculées avec le catalogue configuré,
 non une facture fournisseur. `completed` signifie que le traitement est terminé,
 jamais qu’un texte est validé éditorialement.
+
+## Version 0.2.70
+
+Deuxième étape du déplacement : **tout le comportement est dans le moteur**.
+
+| Classe | Rôle | Lignes |
+|---|---|---:|
+| `MSRWA_Engine_Config` | valeurs par défaut, réglages du plugin, demandes d'un passage | 195 |
+| `MSRWA_Engine_Steps` | ce qu'exige chaque étape, donc l'ordre et le parallélisme | 98 |
+| `MSRWA_Engine_Input` | ce qu'une étape reçoit avant de tourner | 420 |
+| `MSRWA_Engine_Score` | ce qui compte comme réussi, vérifié sur les données rendues | 278 |
+| `MSRWA_Engine_Call` | tous les appels fournisseurs, normalisés | 277 |
+| `MSRWA_Engine_Rates` | tarifs publiés et paliers | 72 |
+| `MSRWA_Result` | l'enveloppe rendue, et le rapport d'avancement | 107 |
+
+`tools/lib/steps.php` passe de **762 à 157 lignes** : il ne reste que ce qui est
+propre au laboratoire — amorçage des doubles de test, lecture des réglages
+livrés, registre pour la ligne de commande — et des adaptateurs vers le moteur.
+
+**Les prompts déménagent dans `includes/engine/prompts/`.** Ce sont les données
+du moteur : il les exécute, il les porte. Les fiches d'essai restent côté
+laboratoire, qui indique sa racine au moteur.
+
+**La configuration se résout en trois couches**, chacune écrasant la
+précédente : les valeurs par défaut du moteur, les réglages du plugin traduits
+dans le vocabulaire du moteur, puis ce que demande ce passage précis. Le
+résultat effectif est consigné sur l'exécution — clés d'API exclues — pour qu'un
+rapport puisse répondre des mois plus tard à « avec quoi cela a-t-il tourné ».
+
+Une valeur écrite à la main est ramenée dans ce que les fournisseurs acceptent
+réellement, et une clé inconnue est ignorée plutôt que refusée : un plugin plus
+ancien et un moteur plus récent continuent de fonctionner ensemble.
 
 ## Version 0.2.69
 

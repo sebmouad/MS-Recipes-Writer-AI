@@ -29,7 +29,7 @@ $canonical = lab_canonical_recipe( $brief, $options );
 $research = lab_research_package( $brief, $options );
 $article = lab_article_under_test( $options );
 $encode = static function ( $value ) { return json_encode( $value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ); };
-$prompt = MSRWA_Prompt::compile( trim( file_get_contents( __DIR__ . '/prompts/final_approval.tpl.txt' ) ), $settings )
+$prompt = MSRWA_Prompt::compile( trim( file_get_contents( MSRWA_Engine_Input::prompt_path( 'final_approval.tpl.txt' ) ) ), $settings )
 	. "\n\nCANONICAL RECIPE: " . $encode( $canonical )
 	. "\nRESEARCH PACKAGE: " . $encode( lab_research_for_text( $research ) )
 	. "\n\n" . lab_visual_brief( $canonical, $research )

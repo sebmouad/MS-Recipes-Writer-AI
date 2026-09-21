@@ -67,7 +67,7 @@ php tools/image-lab.php facebook --brief=tarte-pommes --research=tools/runs/rese
 
 Maintained prompts are used by default. Add `--shipped=1` to `show` or `run`
 to compare the plugin's current configured default. A temporary experiment may
-use `--variant=name` and `tools/prompts/<step>.name.txt`; delete it after the
+use `--variant=name` and `includes/engine/prompts/<step>.name.txt`; delete it after the
 comparison so the directory remains an inventory of active contracts.
 
 ## Acceptance rule

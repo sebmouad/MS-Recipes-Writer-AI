@@ -34,6 +34,17 @@ final class MSRWA_Engine_Call {
 	}
 	}
 
+	/**
+	 * Drops bytes that are not valid UTF-8.
+	 *
+	 * An answer stopped at max_tokens ends mid-character, and that one broken
+	 * sequence makes json_encode return false for the whole string — a 14 500
+	 * token answer was once billed and stored as an empty one.
+	 */
+	public static function utf8( $text ) {
+		return MSRWA_Json::valid_utf8( $text );
+	}
+
 	/** Reports a provider that cannot be called at all, so a step fails with a reason. */
 	public static function unusable( $provider ) {
 		return '' === self::key( $provider ) ? 'No API key for ' . $provider . '.' : '';

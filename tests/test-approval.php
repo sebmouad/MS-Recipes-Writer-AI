@@ -60,7 +60,7 @@ foreach ( array( null, array(), 'refus' ) as $broken ) {
 }
 
 // The prompt must keep the three distinctions that were wrong when first measured.
-$prompt = file_get_contents( dirname( __DIR__ ) . '/tools/prompts/final_approval.tpl.txt' );
+$prompt = file_get_contents( dirname( __DIR__ ) . '/includes/engine/prompts/final_approval.tpl.txt' );
 // The owner's direction, 2026-09-21: realism is the gate, principal ingredients
 // only, and small details are not worth refusing over. Four earlier calibrations
 // each over-reached — a potted plant read as an ingredient, rice with a yassa

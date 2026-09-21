@@ -39,13 +39,13 @@ msrwa_test_missing( $unknown, 'not_a_variable', 'An unknown variable must not le
 require_once dirname( __DIR__ ) . '/tools/lib/steps.php';
 $lab_steps = lab_steps();
 msrwa_test_assert( array( 'research', 'canonical_recipe', 'article', 'review', 'fact_check', 'proofread' ) === array_keys( $lab_steps ), 'The lab must expose only the active text pipeline.' );
-$lab_prompts = glob( dirname( __DIR__ ) . '/tools/prompts/*.txt' );
+$lab_prompts = glob( dirname( __DIR__ ) . '/includes/engine/prompts/*.txt' );
 msrwa_test_assert( 9 === count( $lab_prompts ), 'The lab must keep one maintained prompt for six text stages, two image stages and the final approval.' );
 $brief = lab_brief( 'tarte-pommes' );
 $article_input = lab_build_input( 'article', lab_prompt( 'article' ), $brief, array() );
 msrwa_test_contains( $article_input, 'RESEARCH PACKAGE:', 'The article lab input must carry the shared research package.' );
 msrwa_test_contains( $article_input, 'observed in photographs of it', 'Real-image observations must reach the article, distilled rather than raw.' );
-$facebook_template = file_get_contents( dirname( __DIR__ ) . '/tools/prompts/facebook_image.tpl.txt' );
+$facebook_template = file_get_contents( dirname( __DIR__ ) . '/includes/engine/prompts/facebook_image.tpl.txt' );
 $facebook_prompt = MSRWA_Prompt::compile( $facebook_template, lab_settings() );
 msrwa_test_contains( $facebook_prompt, 'One vertical 2:3 canvas at 1024x1536', 'The Facebook benchmark must compile to the dominant reference geometry.' );
 msrwa_test_contains( $facebook_prompt, 'EXACTLY 6 equal panels', 'The Facebook collage must require a strict six-panel grid.' );

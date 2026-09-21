@@ -23,13 +23,15 @@ msrwa_test_missing( $research, '{{', 'The shipped prompt must be compiled, with 
 //    downloads a cited image to look at it; it does not hand it to the reader.
 msrwa_test_contains( $research, 'Do not copy a source', 'Research must not reuse a source\'s work.' );
 
-// 3. The lab must hand the package to every step that describes the dish.
-$steps = file_get_contents( dirname( __DIR__ ) . '/tools/lib/steps.php' );
-foreach ( array( 'canonical_recipe', 'article', 'review' ) as $step ) {
-	msrwa_test_assert(
-		1 === preg_match( "/'" . $step . "' === \\\$step \\)\s*\{(.*?)\n\t\}/s", $steps, $block ) && ( false !== strpos( $block[1], '$research' ) || false !== strpos( $block[1], '$text_research' ) ),
-		'The ' . $step . ' step must receive the research package.'
-	);
+require_once dirname( __DIR__ ) . '/tools/lib/steps.php';
+$brief = lab_brief( 'tarte-pommes' );
+
+// 3. Every step that describes the dish receives the research, checked by
+//    building the real input rather than by reading the source for a variable.
+foreach ( array( 'canonical_recipe', 'article', 'review', 'fact_check' ) as $step ) {
+	$built = MSRWA_Engine_Input::build( $step, 'PROMPT', $brief, array() );
+	msrwa_test_contains( $built, 'RESEARCH', 'The ' . $step . ' step must receive the research package.' );
+	msrwa_test_contains( $built, 'ingredient', 'The ' . $step . ' step must receive the research contents, not an empty shell.' );
 }
 
 // 4. Every brief carries a package, so the lab measures the chain rather than an
@@ -43,8 +45,7 @@ foreach ( glob( dirname( __DIR__ ) . '/tools/fixtures/*.json' ) as $file ) {
 // The owner's directive, 2026-09-21: what research read and what it saw in real
 // photographs must reach every later step, not only the images. Raw JSON is not
 // enough — the distilled brief is what an image model and a judge can obey.
-require_once dirname( __DIR__ ) . '/tools/lib/steps.php';
-$brief = lab_brief( 'tarte-pommes' );
+
 $recipe_input = lab_build_input( 'canonical_recipe', 'PROMPT', $brief, array() );
 msrwa_test_contains( $recipe_input, 'OBSERVED APPEARANCE', 'The recipe must receive what the photographs showed.' );
 msrwa_test_contains( $recipe_input, 'never an ingredient, a quantity or a step', 'An observation may establish appearance only.' );

@@ -429,7 +429,7 @@ Verify: exactly six equal cells; correct archetype; one clear advance per panel;
 
 The result must equal or exceed a professionally art-directed social recipe tutorial in layout discipline, continuity, instructional clarity, food physics and final-shot appetite appeal.',
 		);
-		$facebook_prompt = dirname( __DIR__ ) . '/tools/prompts/facebook_image.tpl.txt';
+		$facebook_prompt = __DIR__ . '/engine/prompts/facebook_image.tpl.txt';
 		if ( is_readable( $facebook_prompt ) ) { $defaults['prompt_facebook_image'] = trim( file_get_contents( $facebook_prompt ) ); }
 		return $defaults;
 	}

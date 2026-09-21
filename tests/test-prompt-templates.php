@@ -6,7 +6,7 @@ require __DIR__ . '/bootstrap.php';
 msrwa_test_load( 'images', 'prompt' );
 require_once dirname( __DIR__ ) . '/tools/lib/steps.php';
 
-$templates = glob( dirname( __DIR__ ) . '/tools/prompts/*.txt' );
+$templates = glob( dirname( __DIR__ ) . '/includes/engine/prompts/*.txt' );
 msrwa_test_assert( 9 === count( $templates ), 'Nine prompts: six text stages, two images and the final approval.' );
 
 foreach ( $templates as $path ) {
@@ -46,7 +46,7 @@ $shipped = array(
 foreach ( $shipped as $template => $key ) {
 	msrwa_test_assert( 1 === preg_match( "/'" . $key . "'\s*=>\s*'(.*?)',\n/s", $source, $match ), $key . ' must ship a default.' );
 	$default = str_replace( array( "\\'", '\\\\' ), array( "'", '\\' ), $match[1] );
-	$compiled = MSRWA_Prompt::compile( file_get_contents( dirname( __DIR__ ) . '/tools/prompts/' . $template ), lab_settings() );
+	$compiled = MSRWA_Prompt::compile( file_get_contents( dirname( __DIR__ ) . '/includes/engine/prompts/' . $template ), lab_settings() );
 	msrwa_test_assert( $default === $compiled, $key . ' must ship exactly what ' . $template . ' compiles to; run tools/promote.' );
 }
 
