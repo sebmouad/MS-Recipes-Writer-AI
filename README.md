@@ -2,6 +2,28 @@
 
 Plugin WordPress en construction pour la génération éditoriale culinaire orchestrée.
 
+## Version 0.5.3
+
+**Correction de la 0.5.2 : l'article relu reste stocké.** Ne pas dupliquer ce que
+WordPress garde était juste pour l'essentiel — deux versions intermédiaires de
+l'article que plus personne ne lit, la recette et le verdict qui vivent dans des
+métadonnées que ce plugin a lui-même écrites, et les fichiers d'image en double
+sur le disque. Soixante-dix kilobytes par run, sans rien perdre.
+
+Mais pas pour l'article relu. `post_content`, c'est ce qu'un relecteur a modifié
+depuis ; l'artefact, c'est ce que la machine a réellement produit. Les confondre
+supprime la seule réponse possible à « est-ce le modèle qui a écrit cette
+affirmation, ou quelqu'un l'a-t-il ajoutée ensuite ? » — et toute mesure de la
+qualité du moteur faite sur un texte corrigé mesure les relecteurs. C'est aussi
+ce qui fait qu'un run survit à la suppression de son brouillon.
+
+Les deux sont donc lus côte à côte, et l'écran d'une recette le dit quand ils
+divergent : « le brouillon a été modifié depuis sa génération, les contrôles
+ci-dessous portent sur ce que la machine a écrit ».
+
+**Un brouillon supprimé définitivement détache le run** au lieu de le laisser
+pointer vers un article qui n'existe plus. Le run garde ce qu'il a produit.
+
 ## Version 0.5.2
 
 **Ce que WordPress stocke n'est plus stocké une seconde fois.**
@@ -281,7 +303,7 @@ cron réel et validité distante des clés restent à vérifier sur un site de t
 
 ## État actuel
 
-La version `0.5.2` est un socle installable : file persistante, pipeline de
+La version `0.5.3` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.

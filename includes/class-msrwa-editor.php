@@ -16,6 +16,23 @@ final class MSRWA_Editor {
 	public static function hooks() {
 		add_action( 'add_meta_boxes_post', array( __CLASS__, 'register' ) );
 		add_filter( 'display_post_states', array( __CLASS__, 'state' ), 10, 2 );
+		add_action( 'before_delete_post', array( __CLASS__, 'forget' ) );
+	}
+
+	/**
+	 * A draft deleted for good is no longer the run's draft.
+	 *
+	 * Without this the run would keep pointing at a post that no longer exists,
+	 * and every screen reading through to WordPress would find a hole. The run
+	 * itself is untouched: it still holds what the machine produced, which is
+	 * why that copy was kept.
+	 */
+	public static function forget( $post_id ) {
+		global $wpdb;
+		$run_id = (int) get_post_meta( (int) $post_id, '_msrwa_run_id', true );
+		if ( ! $run_id ) { return; }
+		$t = MSRWA_DB::tables();
+		$wpdb->update( $t['runs'], array( 'draft_post_id' => 0, 'updated_at' => current_time( 'mysql', true ) ), array( 'id' => $run_id ) );
 	}
 
 	public static function register( $post ) {

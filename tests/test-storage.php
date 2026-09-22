@@ -30,12 +30,14 @@ MSRWA_Run::release_stored( 4 );
 $log = $GLOBALS['wpdb']->log();
 
 msrwa_test_contains( $log, 'DELETE FROM wp_msrwa_artifacts WHERE run_id = 4', 'The duplicated artifacts are removed.' );
-foreach ( array( 'article', 'corrected', 'proofread', 'canonical', 'approval' ) as $key ) {
-	msrwa_test_contains( $log, "'" . $key . "'", $key . ' is one of the copies WordPress keeps.' );
+foreach ( array( 'article', 'corrected', 'canonical', 'approval' ) as $key ) {
+	msrwa_test_contains( $log, "'" . $key . "'", $key . ' is a copy WordPress keeps, so this one goes.' );
 }
-// Everything else has no home in WordPress and must survive.
-foreach ( array( 'research', 'review', 'fact_check', 'featured', 'facebook' ) as $key ) {
-	msrwa_test_missing( $log, "'" . $key . "'", $key . ' has no WordPress copy and must be kept.' );
+// Everything with no WordPress home survives — and so does the proofread
+// article, which is the machine's own output. post_content is what an editor
+// has since changed; measuring the engine against that would measure editors.
+foreach ( array( 'research', 'review', 'fact_check', 'featured', 'facebook', 'proofread' ) as $key ) {
+	msrwa_test_missing( $log, "'" . $key . "'", $key . ' must be kept.' );
 }
 
 // And reading them back reaches through to WordPress rather than returning a
@@ -54,7 +56,8 @@ $GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
 $GLOBALS['wpdb']->on( 'SELECT * FROM', array( array( 'id' => 4, 'batch_id' => 1, 'owner_id' => 1, 'status' => 'done', 'draft_post_id' => 77 ) ) );
 $read = $rehydrate->invoke( null, 4, array( 'research' => array( 'kept' => true ), 'featured' => array( 'kind' => 'featured', 'path' => '/gone.webp' ) ) );
 
-msrwa_test_contains( ( $read['proofread']['content_html'] ?? '' ), 'Le texte relu', 'The article is read back from the post.' );
+msrwa_test_contains( ( $read['published']['content_html'] ?? '' ), 'Le texte relu', 'What the reader gets is read back from the post.' );
+msrwa_test_assert( isset( $read['proofread'] ), 'And the machine’s own version is still there beside it.' );
 msrwa_test_assert( 'Tarte' === ( $read['canonical']['title'] ?? '' ), 'The recipe is read back from post meta.' );
 msrwa_test_assert( true === ( $read['approval']['approved'] ?? null ), 'The verdict is read back from post meta.' );
 msrwa_test_assert( 91 === ( $read['featured']['attachment_id'] ?? 0 ), 'An image points at the media library copy.' );

@@ -38,6 +38,7 @@ final class MSRWA_Screen_Run {
 			), 'warn' );
 		}
 
+		self::edited( $state['artifacts'] );
 		self::verdict( $approval );
 		self::steps( $state['steps'] );
 
@@ -84,6 +85,27 @@ final class MSRWA_Screen_Run {
 				. esc_html__( 'Reprendre', 'ms-recipes-writer-ai' ) . '</button> <span class="ms-muted" id="ms-run-status" aria-live="polite"></span>';
 		}
 		return $out;
+	}
+
+	/**
+	 * Whether anybody has changed the article since the machine wrote it.
+	 *
+	 * Worth saying out loud on a screen that reports how the engine performed:
+	 * a check that passed on the machine's text tells you nothing about a
+	 * paragraph an editor added afterwards, and this is the only place that
+	 * distinction is visible.
+	 */
+	private static function edited( array $artifacts ) {
+		$machine = (string) ( ( (array) ( $artifacts['proofread'] ?? array() ) )['content_html'] ?? '' );
+		$published = (string) ( ( (array) ( $artifacts['published'] ?? array() ) )['content_html'] ?? '' );
+		if ( '' === $machine || '' === $published || $machine === $published ) { return; }
+
+		$difference = abs( mb_strlen( $published ) - mb_strlen( $machine ) );
+		MSRWA_UI::note( esc_html( sprintf(
+			/* translators: %s is a number of characters. */
+			__( 'Le brouillon a été modifié depuis sa génération : %s caractères d’écart. Les contrôles ci-dessous portent sur ce que la machine a écrit, pas sur la version actuelle.', 'ms-recipes-writer-ai' ),
+			number_format_i18n( $difference )
+		) ) );
 	}
 
 	/**

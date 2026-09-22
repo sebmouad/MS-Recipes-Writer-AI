@@ -809,3 +809,6 @@ msgstr "لا تملك صلاحية هذا التصدير."
 
 msgid "tout"
 msgstr "الكل"
+
+msgid "Le brouillon a été modifié depuis sa génération : %s caractères d’écart. Les contrôles ci-dessous portent sur ce que la machine a écrit, pas sur la version actuelle."
+msgstr "عُدّلت المسودة منذ توليدها: فارق %s حرف. والفحوص أدناه تخصّ ما كتبته الآلة، لا النسخة الحالية."

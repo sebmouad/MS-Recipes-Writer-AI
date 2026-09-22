@@ -294,19 +294,27 @@ final class MSRWA_Run {
 	}
 
 	/**
-	 * Artifacts WordPress itself stores once a draft exists.
+	 * Artifacts WordPress stores, that this plugin therefore need not.
 	 *
-	 * The article ends up in post_content, the recipe and the verdict in post
-	 * meta, the images in the media library. Keeping a second copy in this
-	 * plugin's tables buys nothing and costs a great deal: the article alone was
-	 * held three times over — as written, as corrected and as proofread — for
-	 * some ninety kilobytes a run.
+	 * `article` and `corrected` are superseded the moment proofreading runs:
+	 * nothing reads them and they were sixty kilobytes of the same text twice.
+	 * `canonical` and `approval` live in post meta, which this plugin wrote
+	 * itself and no editor edits, so that copy is as good as this one.
 	 *
-	 * They stay while the run is in flight, because the engine reads them back
-	 * on every cron tick. They go the moment WordPress has them.
+	 * `proofread` is deliberately NOT in this list, and that is the whole
+	 * argument. post_content is what the editor has since changed; this is what
+	 * the machine actually produced. Keeping both is what makes "did the model
+	 * write that claim, or did someone add it" a question with an answer — and
+	 * every measurement of the engine's quality depends on reading its own
+	 * output rather than a corrected version of it. It also means a run survives
+	 * an editor deleting the draft.
+	 *
+	 * They stay while the run is in flight either way: the engine reads them
+	 * back on every cron tick, and until the draft exists they are the only
+	 * copy there is.
 	 */
 	private static function kept_by_wordpress() {
-		return array( 'article', 'corrected', 'proofread', 'canonical', 'approval' );
+		return array( 'article', 'corrected', 'canonical', 'approval' );
 	}
 
 	public static function artifacts( $id ) {
@@ -333,8 +341,12 @@ final class MSRWA_Run {
 		$post = get_post( $post_id );
 		if ( ! $post ) { return $artifacts; }
 
+		// What the reader will actually get, beside what the machine wrote. The
+		// two differ as soon as an editor touches the draft, and a screen that
+		// showed only one of them would be answering the wrong question.
+		$artifacts['published'] = array( 'title' => $post->post_title, 'content_html' => $post->post_content );
 		if ( ! isset( $artifacts['proofread'] ) ) {
-			$artifacts['proofread'] = array( 'title' => $post->post_title, 'content_html' => $post->post_content );
+			$artifacts['proofread'] = $artifacts['published'];
 		}
 		if ( ! isset( $artifacts['canonical'] ) ) {
 			$recipe = json_decode( (string) get_post_meta( $post_id, '_msrwa_recipe', true ), true );

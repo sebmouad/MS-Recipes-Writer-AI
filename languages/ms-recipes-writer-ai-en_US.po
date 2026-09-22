@@ -809,3 +809,6 @@ msgstr "You do not have access to this export."
 
 msgid "tout"
 msgstr "all"
+
+msgid "Le brouillon a été modifié depuis sa génération : %s caractères d’écart. Les contrôles ci-dessous portent sur ce que la machine a écrit, pas sur la version actuelle."
+msgstr "The draft has been edited since it was generated: %s characters apart. The checks below are about what the machine wrote, not the current version."
