@@ -981,6 +981,18 @@ msgstr "Delete this lot and everything the engine reported about it? Any drafts 
 msgid "Supprimer le lot"
 msgstr "Delete the lot"
 
+msgid "La langue"
+msgstr "The language"
+
+msgid "La langue de l’article, qui n’est pas celle de cette interface."
+msgstr "The article’s language, which is not this interface’s."
+
+msgid "La valeur proposée sur un nouveau lot, et celle qui s’applique à un lot déposé par quelqu’un qui ne voit pas les montants."
+msgstr "The figure offered on a new lot, and the one that applies to a lot submitted by somebody who is not shown money."
+
+msgid "Par recette"
+msgstr "Per recipe"
+
 msgid "%d remarque bloquante"
 msgid_plural "%d remarques bloquantes"
 msgstr[0] "%d blocking finding"

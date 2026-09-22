@@ -69,9 +69,12 @@ final class MSRWA_REST {
 		$ids = is_string( $ids ) ? array_filter( array_map( 'absint', explode( ',', $ids ) ) ) : (array) $ids;
 		$images = MSRWA_Intake::images( $ids );
 
-		$budget = current_user_can( 'manage_options' ) ? (float) $request->get_param( 'budget' ) : (float) ( MSRWA_Settings::get()['per_recipe_budget_usd'] ?? 0.20 );
+		// The per-recipe ceiling is the site's unless the person may set it. It
+		// used to be worked out here and then not used, so anybody who could
+		// submit a lot could name their own ceiling by posting one.
+		$budget = MSRWA_Rights::may_see_money() ? (float) $request->get_param( 'budget' ) : (float) ( MSRWA_Settings::get()['per_recipe_budget_usd'] ?? 0.20 );
 		$id = MSRWA_Batch::create(
-			$recipes, $images, (float) $request->get_param( 'budget' ),
+			$recipes, $images, $budget,
 			sanitize_key( (string) $request->get_param( 'profile' ) ),
 			sanitize_key( (string) $request->get_param( 'language' ) )
 		);

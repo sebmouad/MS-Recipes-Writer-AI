@@ -76,6 +76,24 @@ msrwa_test_missing( $engine['html'] ?? '', 'key_env', 'The engine screen does no
 
 msrwa_test_contains( ( msrwa_render( array( 'MSRWA_Screen_Pass', 'render' ) )['html'] ?? '' ), 'ms-empty', 'With nothing to show, the pass invites the reader to act.' );
 
+// --- A writer is never shown money, on the way in either ----------------
+
+$GLOBALS['msrwa_test_options'][ MSRWA_Settings::OPTION ] = array( 'per_recipe_budget_usd' => 0.33 );
+
+msrwa_test_as_editor( 7 );
+$GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
+$html = msrwa_render( array( 'MSRWA_Screen_Compose', 'render' ) )['html'] ?? '';
+msrwa_test_missing( $html, 'id="ms-budget"', 'A writer is not asked for a ceiling they are not allowed to see.' );
+msrwa_test_missing( $html, 'plafond', 'A writer is not told about ceilings on the way in either.' );
+
+msrwa_test_as_admin();
+$GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
+$html = msrwa_render( array( 'MSRWA_Screen_Compose', 'render' ) )['html'] ?? '';
+msrwa_test_contains( $html, 'id="ms-budget"', 'Somebody who may set a ceiling is asked for one.' );
+msrwa_test_contains( $html, 'value="0.33"', 'The ceiling offered is the site’s, not a number hardcoded in a template.' );
+
+unset( $GLOBALS['msrwa_test_options'][ MSRWA_Settings::OPTION ] );
+
 // --- Throwing a lot away is an administrator's, and never mid-flight ----
 
 function msrwa_batch_html( $status, $owner ) {

@@ -93,6 +93,7 @@ final class MSRWA_Admin {
 				'confirmDelete' => __( 'Supprimer %d recette(s) et tout ce que le moteur en a rapporté ? C’est irréversible.', 'ms-recipes-writer-ai' ),
 				'confirmBatchDelete' => __( 'Supprimer ce lot et tout ce que le moteur en a rapporté ? Les brouillons déjà produits sont conservés. C’est irréversible.', 'ms-recipes-writer-ai' ),
 				'passUrl' => admin_url( 'admin.php?page=msrwa' ),
+				'perRecipeCeiling' => (float) ( MSRWA_Settings::get()['per_recipe_budget_usd'] ?? 0.20 ),
 				/* translators: 1: how many were done, 2: how many were not. */
 				'someSkipped' => __( '%1$d traitée(s), %2$d ignorée(s) : l’action ne s’appliquait pas, ou elles ne vous appartiennent pas.', 'ms-recipes-writer-ai' ),
 			),

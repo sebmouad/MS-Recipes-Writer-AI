@@ -15,7 +15,7 @@ msgstr ""
 msgid "%1$d min %2$d s"
 msgstr ""
 
-#: class-msrwa-admin.php:97
+#: class-msrwa-admin.php:98
 msgid "%1$d traitée(s), %2$d ignorée(s) : l’action ne s’appliquait pas, ou elles ne vous appartiennent pas."
 msgstr ""
 
@@ -23,11 +23,11 @@ msgstr ""
 msgid "%1$d étapes sur %2$d"
 msgstr ""
 
-#: class-msrwa-screen-settings.php:196
+#: class-msrwa-screen-settings.php:201
 msgid "%1$s run(s), %2$s lignes de déroulé"
 msgstr ""
 
-#: class-msrwa-screen-settings.php:89
+#: class-msrwa-screen-settings.php:94
 msgid "%1$s sur %2$s"
 msgstr ""
 
@@ -119,7 +119,7 @@ msgstr ""
 msgid "Action"
 msgstr ""
 
-#: class-msrwa-rest.php:147 class-msrwa-rest.php:170
+#: class-msrwa-rest.php:150 class-msrwa-rest.php:173
 msgid "Action inconnue."
 msgstr ""
 
@@ -159,7 +159,7 @@ msgstr ""
 msgid "Arrêter"
 msgstr ""
 
-#: class-msrwa-rest.php:229
+#: class-msrwa-rest.php:232
 msgid "Arrêtez les recettes avant de supprimer le lot."
 msgstr ""
 
@@ -267,7 +267,7 @@ msgstr ""
 msgid "Ce qui a réellement été facturé, par quel point d’entrée, et quelle part de l’entrée a été servie depuis le cache du fournisseur."
 msgstr ""
 
-#: class-msrwa-screen-settings.php:159
+#: class-msrwa-screen-settings.php:164
 msgid "Ce qui est conservé"
 msgstr ""
 
@@ -299,7 +299,7 @@ msgstr ""
 msgid "Cette heure est déjà passée."
 msgstr ""
 
-#: class-msrwa-rest.php:216
+#: class-msrwa-rest.php:219
 msgid "Cette recette n’est pas arrêtée."
 msgstr ""
 
@@ -359,7 +359,7 @@ msgstr ""
 msgid "Coût moy."
 msgstr ""
 
-#: class-msrwa-screen-settings.php:117
+#: class-msrwa-screen-settings.php:122
 msgid "DISABLE_WP_CRON est actif. C’est la configuration recommandée, mais elle suppose qu’un cron serveur appelle wp-cron.php : sans lui, les recettes resteront en attente indéfiniment."
 msgstr ""
 
@@ -375,7 +375,7 @@ msgstr ""
 msgid "Demande une décision"
 msgstr ""
 
-#: class-msrwa-screen-settings.php:207
+#: class-msrwa-screen-settings.php:212
 msgid "Dernier passage il y a %1$s : %2$s lignes de déroulé, %3$s productions, %4$s runs."
 msgstr ""
 
@@ -395,7 +395,7 @@ msgstr ""
 msgid "Durée moy."
 msgstr ""
 
-#: class-msrwa-screen-compose.php:86
+#: class-msrwa-screen-compose.php:90
 msgid "Décrire et apparier"
 msgstr ""
 
@@ -415,7 +415,7 @@ msgstr ""
 msgid "Déposez des recettes et des photographies pour lancer un premier lot."
 msgstr ""
 
-#: class-msrwa-screen-run.php:241 class-msrwa-screen-settings.php:154
+#: class-msrwa-screen-run.php:241 class-msrwa-screen-settings.php:159
 msgid "Déroulé"
 msgstr ""
 
@@ -427,11 +427,11 @@ msgstr ""
 msgid "Enregistrement…"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:85 class-msrwa-screen-settings.php:63
+#: class-msrwa-screen-engine.php:85 class-msrwa-screen-settings.php:68
 msgid "Enregistrer"
 msgstr ""
 
-#: class-msrwa-screen-settings.php:177
+#: class-msrwa-screen-settings.php:182
 msgid "Enregistrer les durées"
 msgstr ""
 
@@ -499,7 +499,7 @@ msgstr ""
 msgid "La couche appelante, telle quelle. Vide signifie que tout suit le moteur."
 msgstr ""
 
-#: class-msrwa-screen-settings.php:78
+#: class-msrwa-screen-settings.php:83
 msgid "La dépense du site entier, pas celle d’un rédacteur : un plafond appartient au site, et quelqu’un qui n’en verrait que sa part ne comprendrait jamais pourquoi son lot a été refusé."
 msgstr ""
 
@@ -515,7 +515,15 @@ msgstr ""
 msgid "La file n’avance pas : la plus ancienne recette attend depuis %s et rien ne tourne. Sur un site peu visité, c’est le cron."
 msgstr ""
 
-#: class-msrwa-screen-compose.php:68
+#: class-msrwa-screen-compose.php:67
+msgid "La langue"
+msgstr ""
+
+#: class-msrwa-screen-compose.php:70
+msgid "La langue de l’article, qui n’est pas celle de cette interface."
+msgstr ""
+
+#: class-msrwa-screen-compose.php:69
 msgid "La langue de l’article, qui n’est pas celle de cette interface. Le plafond s’applique à chaque recette : au-delà, le run s’arrête plutôt que de dépenser."
 msgstr ""
 
@@ -527,12 +535,16 @@ msgstr ""
 msgid "La même période, en CSV, pour les questions qu’un tableur répond mieux qu’un écran. Un coût inconnu y est vide, jamais zéro : une colonne de zéros s’additionne en un total qui n’a jamais existé."
 msgstr ""
 
-#: class-msrwa-screen-settings.php:154
+#: class-msrwa-screen-settings.php:159
 msgid "La narration minute par minute. La table qui grossit le plus vite, et celle que personne ne relit."
 msgstr ""
 
-#: class-msrwa-rest.php:178
+#: class-msrwa-rest.php:181
 msgid "La suppression est réservée aux administrateurs."
+msgstr ""
+
+#: class-msrwa-screen-settings.php:56
+msgid "La valeur proposée sur un nouveau lot, et celle qui s’applique à un lot déposé par quelqu’un qui ne voit pas les montants."
 msgstr ""
 
 #: class-msrwa-screen-batch.php:162
@@ -541,7 +553,7 @@ msgid_plural "Lancer %d recettes"
 msgstr[0] ""
 msgstr[1] ""
 
-#: class-msrwa-screen-compose.php:70
+#: class-msrwa-screen-compose.php:72
 msgid "Langue de l’article"
 msgstr ""
 
@@ -553,11 +565,11 @@ msgstr ""
 msgid "Le brouillon a été modifié depuis sa génération : %s caractères d’écart. Les contrôles ci-dessous portent sur ce que la machine a écrit, pas sur la version actuelle."
 msgstr ""
 
-#: class-msrwa-screen-settings.php:155
+#: class-msrwa-screen-settings.php:160
 msgid "Le dossier de recherche, l’article tel que la machine l’a écrit, les prompts d’image. Le verdict, la revue et la recette restent quoi qu’il arrive."
 msgstr ""
 
-#: class-msrwa-screen-settings.php:120
+#: class-msrwa-screen-settings.php:125
 msgid "Le dossier des téléversements n’est pas accessible en écriture : aucune image générée ne pourra être enregistrée."
 msgstr ""
 
@@ -569,7 +581,7 @@ msgstr ""
 msgid "Le juge n’a rien relevé. Votre relecture reste la seule validation."
 msgstr ""
 
-#: class-msrwa-screen-settings.php:214
+#: class-msrwa-screen-settings.php:219
 msgid "Le nettoyage n’a encore jamais tourné."
 msgstr ""
 
@@ -625,7 +637,7 @@ msgstr ""
 msgid "Lot %d"
 msgstr ""
 
-#: class-msrwa-rest.php:99 class-msrwa-rest.php:228 class-msrwa-schedule.php:22 class-msrwa-screen-batch.php:19
+#: class-msrwa-rest.php:102 class-msrwa-rest.php:231 class-msrwa-schedule.php:22 class-msrwa-screen-batch.php:19
 msgid "Lot introuvable."
 msgstr ""
 
@@ -637,7 +649,7 @@ msgstr ""
 msgid "L’avis du moteur sur sa propre production. Ce n’est pas une validation éditoriale : c’est à vous de décider si l’article part."
 msgstr ""
 
-#: class-msrwa-rest.php:175
+#: class-msrwa-rest.php:178
 msgid "L’ordre de la file est réservé aux administrateurs."
 msgstr ""
 
@@ -665,7 +677,7 @@ msgstr ""
 msgid "Nettoyage…"
 msgstr ""
 
-#: class-msrwa-screen-settings.php:217
+#: class-msrwa-screen-settings.php:222
 msgid "Nettoyer maintenant"
 msgstr ""
 
@@ -697,7 +709,7 @@ msgstr ""
 msgid "Ouvrir les réglages"
 msgstr ""
 
-#: class-msrwa-screen-settings.php:77
+#: class-msrwa-screen-settings.php:82
 msgid "Où en sont les plafonds"
 msgstr ""
 
@@ -709,12 +721,16 @@ msgstr ""
 msgid "Où part l’argent"
 msgstr ""
 
-#: class-msrwa-screen-settings.php:54
+#: class-msrwa-screen-settings.php:59
 msgid "Par jour"
 msgstr ""
 
 #: class-msrwa-screen-analysis.php:217 class-msrwa-screen-analysis.php:219
 msgid "Par modèle"
+msgstr ""
+
+#: class-msrwa-screen-settings.php:54
+msgid "Par recette"
 msgstr ""
 
 #: class-msrwa-screen-analysis.php:187 class-msrwa-screen-analysis.php:189
@@ -737,7 +753,7 @@ msgstr ""
 msgid "Photographies des recettes"
 msgstr ""
 
-#: class-msrwa-screen-compose.php:78
+#: class-msrwa-screen-compose.php:81
 msgid "Plafond par recette"
 msgstr ""
 
@@ -761,7 +777,7 @@ msgstr ""
 msgid "Productions"
 msgstr ""
 
-#: class-msrwa-screen-settings.php:155
+#: class-msrwa-screen-settings.php:160
 msgid "Productions lourdes"
 msgstr ""
 
@@ -777,7 +793,7 @@ msgstr ""
 msgid "Recette"
 msgstr ""
 
-#: class-msrwa-rest.php:215 class-msrwa-screen-run.php:18
+#: class-msrwa-rest.php:218 class-msrwa-screen-run.php:18
 msgid "Recette introuvable."
 msgstr ""
 
@@ -829,7 +845,7 @@ msgstr ""
 msgid "Rien n’est figé dans le moteur : routage, plafonds, tentatives, tarifs, gabarits, registre des étapes. Seule la différence avec ses valeurs par défaut est conservée."
 msgstr ""
 
-#: class-msrwa-screen-compose.php:89
+#: class-msrwa-screen-compose.php:93
 msgid "Rien n’est écrit à cette étape : seules les photographies sont décrites. Vous verrez l’appariement avant de lancer quoi que ce soit."
 msgstr ""
 
@@ -837,7 +853,7 @@ msgstr ""
 msgid "Rien à analyser"
 msgstr ""
 
-#: class-msrwa-screen-settings.php:156
+#: class-msrwa-screen-settings.php:161
 msgid "Runs entiers"
 msgstr ""
 
@@ -897,7 +913,7 @@ msgstr ""
 msgid "Sur quatorze jours"
 msgstr ""
 
-#: class-msrwa-screen-settings.php:58
+#: class-msrwa-screen-settings.php:63
 msgid "Sur trente jours"
 msgstr ""
 
@@ -965,7 +981,7 @@ msgstr ""
 msgid "Toutes les étapes ont satisfait leurs contrôles sur cette période."
 msgstr ""
 
-#: class-msrwa-screen-settings.php:160
+#: class-msrwa-screen-settings.php:165
 msgid "Trois durées, parce que trois choses vieillissent différemment. À zéro, rien de cette sorte n’est jamais supprimé."
 msgstr ""
 
@@ -977,11 +993,11 @@ msgstr ""
 msgid "Un contrôle qui échoue une fois sur six est du bruit ; six fois sur six, c’est un contrat que le prompt ne tient pas."
 msgstr ""
 
-#: class-msrwa-screen-settings.php:185
+#: class-msrwa-screen-settings.php:190
 msgid "Un filtre impose une autre durée pour : %s. C’est le filtre qui s’applique, pas ce qui est saisi ici."
 msgstr ""
 
-#: class-msrwa-screen-settings.php:220
+#: class-msrwa-screen-settings.php:225
 msgid "Un passage est borné : il retire ce qu’il peut sans faire tomber la requête, et reprend au suivant. Chaque durée est aussi un filtre — msrwa_retention_events_days, msrwa_retention_artifacts_days, msrwa_retention_runs_days."
 msgstr ""
 
@@ -1025,19 +1041,19 @@ msgstr ""
 msgid "Vous n’avez pas accès à cet export."
 msgstr ""
 
-#: class-msrwa-admin.php:103 class-msrwa-admin.php:111 class-msrwa-screen-analysis.php:16 class-msrwa-screen-articles.php:15 class-msrwa-screen-batch.php:16 class-msrwa-screen-compose.php:15 class-msrwa-screen-engine.php:16 class-msrwa-screen-pass.php:14 class-msrwa-screen-run.php:15 class-msrwa-screen-settings.php:15
+#: class-msrwa-admin.php:104 class-msrwa-admin.php:112 class-msrwa-screen-analysis.php:16 class-msrwa-screen-articles.php:15 class-msrwa-screen-batch.php:16 class-msrwa-screen-compose.php:15 class-msrwa-screen-engine.php:16 class-msrwa-screen-pass.php:14 class-msrwa-screen-run.php:15 class-msrwa-screen-settings.php:15
 msgid "Vous n’avez pas accès à cet écran."
 msgstr ""
 
-#: class-msrwa-screen-settings.php:127
+#: class-msrwa-screen-settings.php:132
 msgid "WordPress"
 msgstr ""
 
-#: class-msrwa-screen-settings.php:156
+#: class-msrwa-screen-settings.php:161
 msgid "Y compris les chiffres. Laissé à zéro par défaut : une ligne d’étape est le seul témoignage de ce qu’un run a coûté. Un run qui a produit un brouillon n’est jamais supprimé."
 msgstr ""
 
-#: class-msrwa-screen-settings.php:132
+#: class-msrwa-screen-settings.php:137
 msgid "accessibles"
 msgstr ""
 
@@ -1057,7 +1073,7 @@ msgstr ""
 msgid "attend votre confirmation"
 msgstr ""
 
-#: class-msrwa-screen-settings.php:128
+#: class-msrwa-screen-settings.php:133
 msgid "aucun entretien planifié"
 msgstr ""
 
@@ -1069,7 +1085,7 @@ msgstr ""
 msgid "aucune photographie"
 msgstr ""
 
-#: class-msrwa-screen-pass.php:27 class-msrwa-screen-settings.php:80
+#: class-msrwa-screen-pass.php:27 class-msrwa-screen-settings.php:85
 msgid "aujourd’hui"
 msgstr ""
 
@@ -1081,7 +1097,7 @@ msgstr ""
 msgid "bloquantes"
 msgstr ""
 
-#: class-msrwa-screen-settings.php:132
+#: class-msrwa-screen-settings.php:137
 msgid "bloqués"
 msgstr ""
 
@@ -1113,7 +1129,7 @@ msgstr ""
 msgid "coût moyen"
 msgstr ""
 
-#: class-msrwa-screen-settings.php:126
+#: class-msrwa-screen-settings.php:131
 msgid "cron"
 msgstr ""
 
@@ -1133,7 +1149,7 @@ msgstr ""
 msgid "dépense"
 msgstr ""
 
-#: class-msrwa-screen-settings.php:124 class-msrwa-ui.php:62
+#: class-msrwa-screen-settings.php:129 class-msrwa-ui.php:62
 msgid "en attente"
 msgstr ""
 
@@ -1161,7 +1177,7 @@ msgstr ""
 msgid "inchangée"
 msgstr ""
 
-#: class-msrwa-screen-settings.php:173
+#: class-msrwa-screen-settings.php:178
 msgid "jours"
 msgstr ""
 
@@ -1225,7 +1241,7 @@ msgstr ""
 msgid "plafond %s"
 msgstr ""
 
-#: class-msrwa-screen-settings.php:192
+#: class-msrwa-screen-settings.php:197
 msgid "poids actuel"
 msgstr ""
 
@@ -1249,7 +1265,7 @@ msgstr ""
 msgid "résultats"
 msgstr ""
 
-#: class-msrwa-screen-settings.php:127
+#: class-msrwa-screen-settings.php:132
 msgid "serveur"
 msgstr ""
 
@@ -1265,11 +1281,11 @@ msgstr ""
 msgid "tout"
 msgstr ""
 
-#: class-msrwa-screen-settings.php:80
+#: class-msrwa-screen-settings.php:85
 msgid "trente jours"
 msgstr ""
 
-#: class-msrwa-screen-settings.php:131
+#: class-msrwa-screen-settings.php:136
 msgid "téléversements"
 msgstr ""
 
@@ -1293,7 +1309,7 @@ msgstr ""
 msgid "État"
 msgstr ""
 
-#: class-msrwa-screen-settings.php:114
+#: class-msrwa-screen-settings.php:119
 msgid "État de la machinerie"
 msgstr ""
 

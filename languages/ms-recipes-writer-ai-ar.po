@@ -981,6 +981,18 @@ msgstr "حذف هذه الدفعة وكل ما أبلغ عنه المحرّك ب
 msgid "Supprimer le lot"
 msgstr "حذف الدفعة"
 
+msgid "La langue"
+msgstr "اللغة"
+
+msgid "La langue de l’article, qui n’est pas celle de cette interface."
+msgstr "لغة المقال، وهي ليست لغة هذه الواجهة."
+
+msgid "La valeur proposée sur un nouveau lot, et celle qui s’applique à un lot déposé par quelqu’un qui ne voit pas les montants."
+msgstr "القيمة المقترحة على أي دفعة جديدة، وهي نفسها التي تُطبَّق على دفعة يودعها شخص لا تُعرض عليه المبالغ."
+
+msgid "Par recette"
+msgstr "لكل وصفة"
+
 msgid "%d remarque bloquante"
 msgid_plural "%d remarques bloquantes"
 msgstr[0] "لا ملاحظات حاجبة"

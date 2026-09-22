@@ -64,8 +64,10 @@ final class MSRWA_Screen_Compose {
 			</section>
 
 			<section class="ms-step">
-				<h3><?php esc_html_e( 'La langue et le plafond', 'ms-recipes-writer-ai' ); ?></h3>
-				<p><?php esc_html_e( 'La langue de l’article, qui n’est pas celle de cette interface. Le plafond s’applique à chaque recette : au-delà, le run s’arrête plutôt que de dépenser.', 'ms-recipes-writer-ai' ); ?></p>
+				<h3><?php echo esc_html( MSRWA_Rights::may_see_money() ? __( 'La langue et le plafond', 'ms-recipes-writer-ai' ) : __( 'La langue', 'ms-recipes-writer-ai' ) ); ?></h3>
+				<p><?php echo esc_html( MSRWA_Rights::may_see_money()
+					? __( 'La langue de l’article, qui n’est pas celle de cette interface. Le plafond s’applique à chaque recette : au-delà, le run s’arrête plutôt que de dépenser.', 'ms-recipes-writer-ai' )
+					: __( 'La langue de l’article, qui n’est pas celle de cette interface.', 'ms-recipes-writer-ai' ) ); ?></p>
 				<p>
 					<label for="ms-language"><strong><?php esc_html_e( 'Langue de l’article', 'ms-recipes-writer-ai' ); ?></strong></label><br>
 					<select id="ms-language" name="language">
@@ -74,10 +76,12 @@ final class MSRWA_Screen_Compose {
 						<?php endforeach; ?>
 					</select>
 				</p>
-				<p>
-					<label for="ms-budget"><strong><?php esc_html_e( 'Plafond par recette', 'ms-recipes-writer-ai' ); ?></strong></label><br>
-					<input type="number" id="ms-budget" name="budget" value="0.20" step="0.01" min="0.01" class="small-text ms-num"> $
-				</p>
+				<?php if ( MSRWA_Rights::may_see_money() ) : ?>
+					<p>
+						<label for="ms-budget"><strong><?php esc_html_e( 'Plafond par recette', 'ms-recipes-writer-ai' ); ?></strong></label><br>
+						<input type="number" id="ms-budget" name="budget" value="<?php echo esc_attr( (float) ( MSRWA_Settings::get()['per_recipe_budget_usd'] ?? 0.20 ) ); ?>" step="0.01" min="0.01" class="small-text ms-num"> $
+					</p>
+				<?php endif; ?>
 			</section>
 
 			<div class="ms-card">

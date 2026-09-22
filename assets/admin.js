@@ -42,6 +42,7 @@
     var imageCount = document.getElementById('ms-image-count');
     var estimate = document.getElementById('ms-estimate');
     var status = document.getElementById('ms-compose-status');
+    var budgetField = document.getElementById('ms-budget');
     var picker = null;
     var chosen = [];
 
@@ -63,7 +64,7 @@
           '&recipes=' + count + '&images=' + chosen.length;
 
         call('/estimate' + query).then(function (data) {
-          var cap = (parseFloat(document.getElementById('ms-budget').value) || 0) * count;
+          var cap = ceiling() * count;
           // Two numbers, and they are different things: what this is likely to
           // cost, and the most it is allowed to cost. Showing only the first is
           // how a surprise bill happens.
@@ -81,8 +82,14 @@
       }, 400);
     }
 
+    // A writer is never shown money, so the field is simply not there for
+    // them; the site's own ceiling, sent with the strings, stands in.
+    function ceiling() {
+      return budgetField ? (parseFloat(budgetField.value) || 0) : (parseFloat(t.perRecipeCeiling) || 0);
+    }
+
     recipes.addEventListener('input', refreshEstimate);
-    document.getElementById('ms-budget').addEventListener('input', refreshEstimate);
+    if (budgetField) { budgetField.addEventListener('input', refreshEstimate); }
     compose.querySelectorAll('input[name=profile]').forEach(function (input) { input.addEventListener('change', refreshEstimate); });
 
     document.getElementById('ms-pick').addEventListener('click', function () {
@@ -123,7 +130,7 @@
         body: JSON.stringify({
           recipes: recipes.value,
           images: field.value,
-          budget: parseFloat(document.getElementById('ms-budget').value),
+          budget: ceiling(),
           profile: (compose.querySelector('input[name=profile]:checked') || {}).value,
           language: document.getElementById('ms-language').value
         })

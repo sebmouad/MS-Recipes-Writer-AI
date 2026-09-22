@@ -2,6 +2,25 @@
 
 Plugin WordPress en construction pour la génération éditoriale culinaire orchestrée.
 
+## Version 0.7.7
+
+**Le plafond par recette n'était pas un plafond.**
+
+`create()` calculait bien le plafond à retenir — celui du site si la personne
+n'a pas le droit de le fixer — puis passait à la place celui envoyé par le
+navigateur. Le calcul ne servait à rien. N'importe qui pouvant déposer un lot
+pouvait donc annoncer son propre plafond par recette.
+
+Le formulaire y participait : il affichait le champ à tout le monde, avec
+`0.20` écrit en dur dans le gabarit, alors qu'un rédacteur ne voit jamais un
+montant nulle part ailleurs dans le plugin. Le champ n'apparaît plus que pour
+qui a le droit de le régler, et la valeur proposée vient des réglages.
+
+Où l'on ajoute enfin le troisième plafond à l'écran qui en annonçait trois et
+n'en montrait que deux : « par recette » se règle à côté de celui du jour et de
+celui des trente jours, et c'est cette valeur-là qui s'applique à un lot déposé
+par quelqu'un qui ne voit pas les montants.
+
 ## Version 0.7.6
 
 **Un lot auquel on renonce peut enfin être jeté.**
@@ -511,7 +530,7 @@ cron réel et validité distante des clés restent à vérifier sur un site de t
 
 ## État actuel
 
-La version `0.7.6` est un socle installable : file persistante, pipeline de
+La version `0.7.7` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.

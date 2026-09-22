@@ -51,6 +51,11 @@ final class MSRWA_Screen_Settings {
 				<p><?php esc_html_e( 'Trois plafonds, pour trois craintes différentes. Celui par recette arrête un article emballé ; celui du jour arrête un mauvais après-midi ; celui du mois arrête un mauvais mois que personne n’a vu venir. Ils sont vérifiés avant qu’un lot parte et avant chaque vague de chaque recette, parce qu’un lot qui tenait au départ peut cesser de tenir en cours de route. À zéro, aucun plafond.', 'ms-recipes-writer-ai' ); ?></p>
 				<?php $settings = MSRWA_Settings::get(); ?>
 				<p>
+					<label for="ms-per-recipe"><strong><?php esc_html_e( 'Par recette', 'ms-recipes-writer-ai' ); ?></strong></label><br>
+					<input type="number" id="ms-per-recipe" name="msrwa_settings[per_recipe_budget_usd]" value="<?php echo esc_attr( (float) ( $settings['per_recipe_budget_usd'] ?? 0.20 ) ); ?>" step="0.01" min="0" class="small-text ms-num"> $
+					<br><small class="ms-muted"><?php esc_html_e( 'La valeur proposée sur un nouveau lot, et celle qui s’applique à un lot déposé par quelqu’un qui ne voit pas les montants.', 'ms-recipes-writer-ai' ); ?></small>
+				</p>
+				<p>
 					<label for="ms-daily"><strong><?php esc_html_e( 'Par jour', 'ms-recipes-writer-ai' ); ?></strong></label><br>
 					<input type="number" id="ms-daily" name="msrwa_settings[daily_budget_usd]" value="<?php echo esc_attr( (float) ( $settings['daily_budget_usd'] ?? 0 ) ); ?>" step="0.5" min="0" class="small-text ms-num"> $
 				</p>
