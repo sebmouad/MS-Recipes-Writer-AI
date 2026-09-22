@@ -23,6 +23,8 @@ final class MSRWA_Draft {
 		if ( ! $run || (int) $run['draft_post_id'] ) { return 0; }
 
 		$artifacts = MSRWA_Run::artifacts( $run_id );
+		// The latest version there is: proofread if it ran, otherwise corrected,
+		// otherwise the draft as first written.
 		$article = (array) ( $artifacts['proofread'] ?? $artifacts['corrected'] ?? $artifacts['article'] ?? array() );
 		$html = (string) ( $article['content_html'] ?? '' );
 		if ( '' === trim( $html ) ) { return 0; }
@@ -46,6 +48,11 @@ final class MSRWA_Draft {
 		global $wpdb;
 		$t = MSRWA_DB::tables();
 		$wpdb->update( $t['runs'], array( 'draft_post_id' => (int) $post_id, 'updated_at' => current_time( 'mysql', true ) ), array( 'id' => absint( $run_id ) ) );
+
+		// WordPress now holds the article, the recipe, the verdict and the
+		// images. A second copy in this plugin's tables would only be the older
+		// one: an editor corrects the post, not the row.
+		MSRWA_Run::release_stored( $run_id );
 		return (int) $post_id;
 	}
 

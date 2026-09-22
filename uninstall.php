@@ -22,7 +22,7 @@ foreach ( array( 'batches', 'runs', 'steps', 'calls', 'events', 'artifacts' ) as
 	$wpdb->query( 'DROP TABLE IF EXISTS ' . $msrwa_prefix . $msrwa_table ); // phpcs:ignore WordPress.DB
 }
 
-foreach ( array( 'msrwa_settings', 'msrwa_engine_config', 'msrwa_schema', 'msrwa_db_version', 'msrwa_superseded_dropped', 'msrwa_watchdog_at' ) as $msrwa_option ) {
+foreach ( array( 'msrwa_settings', 'msrwa_engine_config', 'msrwa_schema', 'msrwa_db_version', 'msrwa_superseded_dropped', 'msrwa_duplicates_reclaimed', 'msrwa_watchdog_at' ) as $msrwa_option ) {
 	delete_option( $msrwa_option );
 }
 

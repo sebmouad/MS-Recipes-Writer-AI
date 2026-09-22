@@ -188,6 +188,36 @@ if ( ! function_exists( 'size_format' ) ) {
 	function size_format( $bytes, $decimals = 0 ) { return number_format( (float) $bytes / 1024, $decimals ) . ' KB'; }
 }
 
+// Posts and their meta live in memory, so a class that reads back from
+// WordPress is exercised rather than stubbed out.
+$GLOBALS['msrwa_test_posts'] = array();
+$GLOBALS['msrwa_test_meta'] = array();
+
+if ( ! function_exists( 'trailingslashit' ) ) {
+	function trailingslashit( $value ) { return rtrim( (string) $value, '/\\' ) . '/'; }
+}
+if ( ! function_exists( 'get_post' ) ) {
+	function get_post( $id = 0 ) { return $GLOBALS['msrwa_test_posts'][ (int) $id ] ?? null; }
+}
+if ( ! function_exists( 'get_post_meta' ) ) {
+	function get_post_meta( $id, $key = '', $single = false ) {
+		$meta = $GLOBALS['msrwa_test_meta'][ (int) $id ] ?? array();
+		if ( '' === $key ) { return $meta; }
+		return $meta[ $key ] ?? '';
+	}
+}
+if ( ! function_exists( 'update_post_meta' ) ) {
+	function update_post_meta( $id, $key, $value ) { $GLOBALS['msrwa_test_meta'][ (int) $id ][ $key ] = $value; return true; }
+}
+if ( ! function_exists( 'get_attached_file' ) ) {
+	function get_attached_file( $id ) { return '/uploads/attachment-' . (int) $id . '.webp'; }
+}
+if ( ! function_exists( 'wp_delete_file' ) ) {
+	function wp_delete_file( $path ) { $GLOBALS['msrwa_test_deleted'][] = $path; }
+}
+if ( ! function_exists( 'wp_mkdir_p' ) ) {
+	function wp_mkdir_p( $path ) { return is_dir( $path ) || mkdir( $path, 0777, true ); }
+}
 if ( ! function_exists( 'wp_nonce_url' ) ) {
 	function wp_nonce_url( $url, $action = -1, $name = '_wpnonce' ) { return $url . '&' . $name . '=test'; }
 }

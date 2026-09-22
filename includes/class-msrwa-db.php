@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
 final class MSRWA_DB {
 
 	/** Bumped whenever the schema below changes. */
-	const SCHEMA = 6;
+	const SCHEMA = 7;
 
 	public static function tables() {
 		global $wpdb;
@@ -88,8 +88,36 @@ final class MSRWA_DB {
 			self::backfill_check_counts();
 		}
 
+		self::reclaim_duplicates();
 		update_option( 'msrwa_schema', self::SCHEMA, false );
 		update_option( 'msrwa_db_version', MSRWA_VERSION, false );
+	}
+
+	/**
+	 * Releases the artifacts WordPress already holds, on runs that predate the
+	 * plugin knowing not to store them twice.
+	 *
+	 * In pages, once, under its own flag. It only removes rows for runs that
+	 * actually produced a draft, so a run whose only copy is here keeps it.
+	 */
+	private static function reclaim_duplicates() {
+		global $wpdb;
+		if ( get_option( 'msrwa_duplicates_reclaimed' ) ) { return; }
+		$t = self::tables();
+		if ( ! self::table_exists( $t['runs'] ) || ! self::table_exists( $t['artifacts'] ) ) { return; }
+
+		$guard = 0;
+		$last = 0;
+		while ( $guard++ < 200 ) {
+			$ids = (array) $wpdb->get_col( $wpdb->prepare(
+				"SELECT id FROM {$t['runs']} WHERE draft_post_id > 0 AND id > %d ORDER BY id ASC LIMIT 100", $last ) );
+			if ( ! $ids ) { break; }
+			foreach ( $ids as $id ) {
+				$last = (int) $id;
+				MSRWA_Run::release_stored( $last );
+			}
+		}
+		update_option( 'msrwa_duplicates_reclaimed', 1, false );
 	}
 
 	/** Which of the previous plugin's tables are still on disk, for a screen to report. */

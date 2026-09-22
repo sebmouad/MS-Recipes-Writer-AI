@@ -293,13 +293,112 @@ final class MSRWA_Run {
 		return $out;
 	}
 
+	/**
+	 * Artifacts WordPress itself stores once a draft exists.
+	 *
+	 * The article ends up in post_content, the recipe and the verdict in post
+	 * meta, the images in the media library. Keeping a second copy in this
+	 * plugin's tables buys nothing and costs a great deal: the article alone was
+	 * held three times over — as written, as corrected and as proofread — for
+	 * some ninety kilobytes a run.
+	 *
+	 * They stay while the run is in flight, because the engine reads them back
+	 * on every cron tick. They go the moment WordPress has them.
+	 */
+	private static function kept_by_wordpress() {
+		return array( 'article', 'corrected', 'proofread', 'canonical', 'approval' );
+	}
+
 	public static function artifacts( $id ) {
 		global $wpdb;
 		$t = MSRWA_DB::tables();
 		$rows = (array) $wpdb->get_results( $wpdb->prepare( 'SELECT artifact_key, content_json FROM ' . $t['artifacts'] . ' WHERE run_id = %d ORDER BY id ASC', absint( $id ) ), ARRAY_A );
 		$out = array();
 		foreach ( $rows as $row ) { $out[ $row['artifact_key'] ] = json_decode( (string) $row['content_json'], true ); }
-		return $out;
+		return self::rehydrate( $id, $out );
+	}
+
+	/**
+	 * Reads back from WordPress what this plugin stopped storing.
+	 *
+	 * So every screen, and the full report, keep working as though nothing had
+	 * been removed — the copy they read is simply the one an editor may since
+	 * have corrected, which is the more useful one anyway.
+	 */
+	private static function rehydrate( $id, array $artifacts ) {
+		$run = self::get( $id );
+		$post_id = $run ? (int) $run['draft_post_id'] : 0;
+		if ( ! $post_id ) { return $artifacts; }
+
+		$post = get_post( $post_id );
+		if ( ! $post ) { return $artifacts; }
+
+		if ( ! isset( $artifacts['proofread'] ) ) {
+			$artifacts['proofread'] = array( 'title' => $post->post_title, 'content_html' => $post->post_content );
+		}
+		if ( ! isset( $artifacts['canonical'] ) ) {
+			$recipe = json_decode( (string) get_post_meta( $post_id, '_msrwa_recipe', true ), true );
+			if ( is_array( $recipe ) ) { $artifacts['canonical'] = $recipe; }
+		}
+		if ( ! isset( $artifacts['approval'] ) ) {
+			$verdict = json_decode( (string) get_post_meta( $post_id, '_msrwa_judge_report', true ), true );
+			if ( is_array( $verdict ) ) { $artifacts['approval'] = $verdict; }
+		}
+		foreach ( array( 'featured', 'facebook' ) as $kind ) {
+			if ( ! isset( $artifacts[ $kind ] ) ) { continue; }
+			$attachment = (int) get_post_meta( $post_id, '_msrwa_' . $kind . '_image_id', true );
+			if ( ! $attachment ) { continue; }
+			// The generated file was removed once the media library had it, so
+			// anything reading a path is pointed at the library's copy.
+			$artifacts[ $kind ]['path'] = (string) get_attached_file( $attachment );
+			$artifacts[ $kind ]['attachment_id'] = $attachment;
+		}
+		return $artifacts;
+	}
+
+	/**
+	 * Drops what WordPress now holds, once it actually holds it.
+	 *
+	 * Called after the draft exists, never before: until then these rows are
+	 * the only copy, and the next cron tick needs them.
+	 */
+	public static function release_stored( $id ) {
+		global $wpdb;
+		$run = self::get( $id );
+		if ( ! $run || ! (int) $run['draft_post_id'] ) { return 0; }
+
+		$t = MSRWA_DB::tables();
+		$keys = self::kept_by_wordpress();
+		$placeholders = implode( ',', array_fill( 0, count( $keys ), '%s' ) );
+		$removed = (int) $wpdb->query( $wpdb->prepare(
+			'DELETE FROM ' . $t['artifacts'] . ' WHERE run_id = %d AND artifact_key IN (' . $placeholders . ')',
+			array_merge( array( absint( $id ) ), $keys ) ) );
+
+		// The engine wrote each image into the run's workspace and the draft
+		// copied it into the media library. Two files, one of which nothing will
+		// ever open again.
+		foreach ( array( 'featured', 'facebook' ) as $kind ) {
+			if ( ! get_post_meta( (int) $run['draft_post_id'], '_msrwa_' . $kind . '_image_id', true ) ) { continue; }
+			$stored = self::artifact_path( $id, $kind );
+			if ( '' !== $stored && is_file( $stored ) ) { wp_delete_file( $stored ); }
+		}
+		return $removed;
+	}
+
+	/** The workspace path an image artifact was written to, if it is still recorded. */
+	private static function artifact_path( $id, $kind ) {
+		global $wpdb;
+		$t = MSRWA_DB::tables();
+		$json = $wpdb->get_var( $wpdb->prepare( 'SELECT content_json FROM ' . $t['artifacts'] . ' WHERE run_id = %d AND artifact_key = %s', absint( $id ), $kind ) );
+		$artifact = json_decode( (string) $json, true );
+		$path = is_array( $artifact ) ? (string) ( $artifact['path'] ?? '' ) : '';
+
+		// Never delete outside this run's own directory, whatever a stored path
+		// happens to say.
+		$root = realpath( self::workspace( $id ) );
+		$real = $path ? realpath( $path ) : false;
+		if ( ! $root || ! $real || 0 !== strpos( $real, $root . DIRECTORY_SEPARATOR ) ) { return ''; }
+		return $real;
 	}
 
 	/**

@@ -2,6 +2,31 @@
 
 Plugin WordPress en construction pour la génération éditoriale culinaire orchestrée.
 
+## Version 0.5.2
+
+**Ce que WordPress stocke n'est plus stocké une seconde fois.**
+
+L'article finit dans `post_content`, la recette et le verdict dans les
+métadonnées, les images dans la médiathèque. En garder une copie dans les tables
+du plugin n'apportait rien et coûtait cher : l'article seul était conservé trois
+fois — tel qu'écrit, tel que corrigé, tel que relu — soit environ 90 ko sur les
+171 ko d'un run. Les deux images existaient aussi en double sur le disque, une
+fois dans le dossier de travail et une fois dans la médiathèque.
+
+Les artefacts restent tant que le run est en vol : le moteur les relit à chaque
+tick de cron, et jusqu'à ce que le brouillon existe ils sont l'unique copie. Ils
+partent au moment où WordPress les a — jamais avant, et seulement ceux-là. La
+recherche, la revue, la vérification des faits et les prompts d'image n'ont pas
+d'équivalent dans WordPress et sont conservés.
+
+Ensuite, tout écran qui les lit va les chercher dans WordPress, de sorte que
+rien ne change pour le lecteur — et la copie qu'il obtient est celle qu'un
+relecteur a peut-être corrigée depuis, c'est-à-dire la bonne.
+
+Un passage unique, borné et idempotent, libère au démarrage les doublons des
+runs déjà terminés. Et un chemin enregistré qui sortirait du dossier de travail
+du run n'est jamais supprimé, quoi qu'il prétende être.
+
 ## Version 0.5.1
 
 **Export CSV, actions groupées, lots programmés.**
@@ -256,7 +281,7 @@ cron réel et validité distante des clés restent à vérifier sur un site de t
 
 ## État actuel
 
-La version `0.5.1` est un socle installable : file persistante, pipeline de
+La version `0.5.2` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.
