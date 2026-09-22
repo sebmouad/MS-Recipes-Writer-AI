@@ -960,6 +960,12 @@ msgstr "%s of cost"
 msgid "%s du temps"
 msgstr "%s of time"
 
+msgid "Remettre dans l’ordre"
+msgstr "Put back in order"
+
+msgid "passe devant"
+msgstr "moved to the front"
+
 msgid "%d remarque bloquante"
 msgid_plural "%d remarques bloquantes"
 msgstr[0] "%d blocking finding"

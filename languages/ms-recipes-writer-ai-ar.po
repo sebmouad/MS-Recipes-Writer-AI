@@ -960,6 +960,12 @@ msgstr "%s من التكلفة"
 msgid "%s du temps"
 msgstr "%s من الوقت"
 
+msgid "Remettre dans l’ordre"
+msgstr "إعادته إلى ترتيبه"
+
+msgid "passe devant"
+msgstr "مقدَّمة في الصف"
+
 msgid "%d remarque bloquante"
 msgid_plural "%d remarques bloquantes"
 msgstr[0] "لا ملاحظات حاجبة"

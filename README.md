@@ -2,6 +2,19 @@
 
 Plugin WordPress en construction pour la génération éditoriale culinaire orchestrée.
 
+## Version 0.7.3
+
+**La priorité se voit, et se règle là où on la regarde.**
+
+Faire passer une recette devant les autres existait depuis 0.7.0, mais en
+action groupée seulement, et rien n'en montrait le résultat : on cliquait dans
+le vide. La priorité apparaît maintenant sur le ticket de la recette, tant
+qu'elle attend, et le bouton est sur la page de la recette elle-même — celle
+qu'on regarde quand on se demande pourquoi celle-ci n'est toujours pas partie.
+
+Il n'y est que pendant l'attente. Réordonner une recette qui tourne déjà ne
+change rien, et le proposer laisserait croire le contraire.
+
 ## Version 0.7.2
 
 **Quatre défauts visuels, dont deux ne se voyaient que sur un téléphone.**
@@ -443,7 +456,7 @@ cron réel et validité distante des clés restent à vérifier sur un site de t
 
 ## État actuel
 
-La version `0.7.2` est un socle installable : file persistante, pipeline de
+La version `0.7.3` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.

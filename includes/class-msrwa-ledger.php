@@ -271,7 +271,7 @@ final class MSRWA_Ledger {
 		// money columns are not fetched for them either: a figure that cannot
 		// be displayed has no business crossing the wire, and `SELECT *` on a
 		// table holding longtext is wasteful besides.
-		$columns = 'r.id, r.batch_id, r.owner_id, r.label, r.status, r.step, r.steps_done, r.steps_total, r.approved, r.draft_post_id, r.error_message, r.created_at';
+		$columns = 'r.id, r.batch_id, r.owner_id, r.label, r.status, r.step, r.steps_done, r.steps_total, r.approved, r.priority, r.draft_post_id, r.error_message, r.created_at';
 		if ( MSRWA_Rights::may_see_money() ) { $columns .= ', r.cost_usd, r.seconds'; }
 
 		$rows = (array) $wpdb->get_results( $wpdb->prepare(

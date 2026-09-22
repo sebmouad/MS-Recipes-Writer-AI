@@ -115,6 +115,9 @@ final class MSRWA_UI {
 				<?php if ( '' !== (string) ( $run['step'] ?? '' ) && 'running' === $run['status'] ) : ?>
 					<span class="ms-key" data-field="step"><?php echo esc_html( $run['step'] ); ?></span>
 				<?php endif; ?>
+				<?php if ( 'queued' === $run['status'] && (int) ( $run['priority'] ?? 0 ) > 0 ) : ?>
+					<span class="ms-key"><?php esc_html_e( 'passe devant', 'ms-recipes-writer-ai' ); ?></span>
+				<?php endif; ?>
 			</div>
 			<div class="ms-ticket-side">
 				<?php echo self::progress( $run['steps_done'], $run['steps_total'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>

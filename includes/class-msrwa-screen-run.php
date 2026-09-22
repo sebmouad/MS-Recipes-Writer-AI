@@ -82,9 +82,19 @@ final class MSRWA_Screen_Run {
 
 		if ( MSRWA_Run::may_retry( $run ) ) {
 			$out .= '<button class="button ms-retry" data-run="' . esc_attr( $run['id'] ) . '">'
-				. esc_html__( 'Reprendre', 'ms-recipes-writer-ai' ) . '</button> <span class="ms-muted" id="ms-run-status" aria-live="polite"></span>';
+				. esc_html__( 'Reprendre', 'ms-recipes-writer-ai' ) . '</button> ';
 		}
-		return $out;
+
+		// Only while it is waiting: reordering a recipe that is already running
+		// changes nothing, and offering it would say otherwise.
+		if ( MSRWA_Rights::may_manage() && 'queued' === (string) $run['status'] ) {
+			$ahead = (int) ( $run['priority'] ?? 0 ) > 0;
+			$out .= '<button class="button ms-priority" data-run="' . esc_attr( $run['id'] ) . '" data-priority="' . ( $ahead ? '0' : '5' ) . '">'
+				. esc_html( $ahead ? __( 'Remettre dans l’ordre', 'ms-recipes-writer-ai' ) : __( 'Faire passer devant', 'ms-recipes-writer-ai' ) )
+				. '</button> ';
+		}
+
+		return $out . '<span class="ms-muted" id="ms-run-status" aria-live="polite"></span>';
 	}
 
 	/**

@@ -212,6 +212,25 @@
     });
   }
 
+  // --- Moving one recipe up the queue -------------------------------------
+
+  var priority = document.querySelector('.ms-priority');
+  if (priority) {
+    priority.addEventListener('click', function () {
+      priority.disabled = true;
+      say(document.getElementById('ms-run-status'), t.applying || '');
+      call('/runs/bulk', {
+        method: 'POST',
+        body: JSON.stringify({ do: 'prioritise', runs: [Number(priority.dataset.run)], priority: Number(priority.dataset.priority) })
+      })
+        .then(function () { window.location.reload(); })
+        .catch(function (error) {
+          say(document.getElementById('ms-run-status'), error.message);
+          priority.disabled = false;
+        });
+    });
+  }
+
   // --- Holding the queue --------------------------------------------------
 
   var queueToggle = document.getElementById('ms-queue-toggle');
