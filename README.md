@@ -76,14 +76,14 @@ identifiant de modèle, et cet identifiant n’apparaissait nulle part. Une
 troisième colonne le montre désormais, avec son tarif, et prévient quand il
 n’en a pas.
 
-**Ce que cela a immédiatement révélé.** Cinq des neuf combinaisons
-fournisseur × niveau désignent un modèle dont ce plugin ne connaît pas le
-tarif — l’estimation qui doit refuser un lot trop cher ne peut donc pas les
-voir. Et `claude:low` nomme `claude-haiku-4-5`, alors qu’Anthropic sert
-`claude-haiku-4-5-20251001` : toute étape routée là échoue, après avoir payé
-toutes celles d’avant. La table `tiers` appartient au moteur, donc rien n’y a
-été touché ; la correction est proposée dans
-[`.claude/docs/ENGINE.md`](.claude/docs/ENGINE.md) §7, avec le relevé complet.
+**Ce que cela a immédiatement révélé.** `claude:low` nomme
+`claude-haiku-4-5`, alors qu’Anthropic sert `claude-haiku-4-5-20251001` :
+toute étape routée là échoue, après avoir payé toutes celles d’avant. Et il
+existe deux listes de tarifs qui divergent — celle du moteur, sur laquelle il
+facture, et celle du plugin — ce qui est exactement la manière dont une
+estimation cesse un jour de correspondre à une facture. La table `tiers`
+appartient au moteur, donc rien n’y a été touché ; les deux constats sont
+relevés dans [`.claude/docs/ENGINE.md`](.claude/docs/ENGINE.md) §7.
 
 **La liste des modèles du fournisseur ne part plus à la poubelle.** La
 vérification des clés interroge `/models` chez chacun — c’est gratuit et c’est

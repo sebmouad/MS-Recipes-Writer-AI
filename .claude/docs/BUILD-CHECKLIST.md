@@ -43,8 +43,9 @@ run carries.
 - [x] The model list each provider actually serves, fetched live and read back:
   Gemini returned 59 identifiers and Anthropic 12, and comparing them to the
   engine's `tiers` map found `claude:low` naming `claude-haiku-4-5`, which
-  Anthropic does not serve. Proposed in ENGINE.md §7; the Diagnostic screen
-  turns the routing red for it.
+  Anthropic does not serve, and a second price list in the plugin that
+  disagrees with the engine's. Both in ENGINE.md §7; the Diagnostic screen
+  turns the routing red for the first.
 - [ ] Image steps, the final judge and the matcher live — need a reachable and
   funded OpenAI or Gemini key.
 - [ ] The same suite on MySQL.

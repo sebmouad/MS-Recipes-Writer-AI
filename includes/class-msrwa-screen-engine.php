@@ -160,15 +160,20 @@ final class MSRWA_Screen_Engine {
 		// name, two of which this plugin has no price for and one of which its
 		// provider does not serve at all.
 		$resolved = array();
+		// The engine's own price list, which is the one it bills against. The
+		// plugin ships a second, shorter list in MSRWA_Catalog for the models
+		// it documents; reading that one here reported four perfectly priced
+		// models as unpriced.
+		$prices = (array) $config->get( 'models', array() );
 		$tiers = (array) $config->get( 'tiers', array() );
 		foreach ( $tiers as $tier => $by_provider ) {
 			foreach ( (array) $by_provider as $provider => $model ) {
-				$resolved[ $provider . ':' . $tier ] = self::describe_model( $provider, (string) $model, $catalog );
+				$resolved[ $provider . ':' . $tier ] = self::describe_model( $provider, (string) $model, $prices );
 			}
 		}
 		foreach ( $image_models as $entry ) {
 			list( $provider, $model ) = array_pad( explode( ':', $entry['value'], 2 ), 2, '' );
-			$resolved[ $entry['value'] ] = self::describe_model( $provider, $model, $catalog );
+			$resolved[ $entry['value'] ] = self::describe_model( $provider, $model, $prices );
 		}
 
 		$listed = array();
@@ -342,14 +347,14 @@ final class MSRWA_Screen_Engine {
 		<?php
 	}
 
-	private static function describe_model( $provider, $model, array $catalog ) {
-		$known = $catalog[ $provider ][ $model ] ?? null;
+	private static function describe_model( $provider, $model, array $prices ) {
+		$rate = $prices[ $provider ][ $model ] ?? null;
+		$priced = is_array( $rate ) && isset( $rate[0], $rate[1] );
 		return array(
 			'id' => $model,
-			'label' => $known ? (string) $known['label'] : $model,
-			'input' => $known ? (float) ( $known['input'] ?? 0 ) : null,
-			'output' => $known ? (float) ( $known['output'] ?? 0 ) : null,
-			'priced' => (bool) $known,
+			'input' => $priced ? (float) $rate[0] : null,
+			'output' => $priced ? (float) $rate[1] : null,
+			'priced' => $priced,
 			'served' => MSRWA_Catalog::served( $provider, $model ),
 		);
 	}
