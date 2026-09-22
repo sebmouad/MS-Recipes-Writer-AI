@@ -34,7 +34,7 @@ final class MSRWA_Screen_Batch {
 				__( 'langue', 'ms-recipes-writer-ai' ) => MSRWA_I18N::language_name( $batch['language'] ),
 				MSRWA_Rights::may_see_money() ? __( 'plafond', 'ms-recipes-writer-ai' ) : '' => MSRWA_Rights::may_see_money() ? MSRWA_I18N::money( $batch['budget_usd'], 2 ) : '',
 			) ),
-			'<a class="button" href="' . esc_url( admin_url( 'admin.php?page=msrwa' ) ) . '">' . esc_html__( 'Retour au pass', 'ms-recipes-writer-ai' ) . '</a>'
+			self::head_actions( $batch )
 		);
 
 		echo '<p class="ms-muted">' . esc_html( $profile['label'] ) . ' — ' . esc_html( $profile['description'] ) . '</p>';
@@ -128,6 +128,23 @@ final class MSRWA_Screen_Batch {
 			'basse' => __( 'Peu sûr — à confirmer', 'ms-recipes-writer-ai' ),
 		);
 		return $words[ $level ] ?? $words['basse'];
+	}
+
+	/**
+	 * Leaving, and — for a lot that is not moving — throwing it away.
+	 *
+	 * A lot decided against had nowhere to go: it sat on the pass waiting for a
+	 * confirmation that was never coming. Deleting removes the lot and what the
+	 * engine reported about it; the drafts it produced are ordinary posts and
+	 * are left exactly where they are.
+	 */
+	private static function head_actions( array $batch ) {
+		$out = '<a class="button" href="' . esc_url( admin_url( 'admin.php?page=msrwa' ) ) . '">' . esc_html__( 'Retour au pass', 'ms-recipes-writer-ai' ) . '</a> ';
+		if ( MSRWA_Rights::may_delete() && 'running' !== (string) $batch['status'] ) {
+			$out .= '<button class="button ms-danger" id="ms-batch-delete" data-batch="' . esc_attr( $batch['id'] ) . '">'
+				. esc_html__( 'Supprimer le lot', 'ms-recipes-writer-ai' ) . '</button> ';
+		}
+		return $out . '<span id="ms-batch-head-status" class="ms-muted" aria-live="polite"></span>';
 	}
 
 	private static function actions( $settling, $recipe_count, $scheduled = '' ) {

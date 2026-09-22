@@ -972,6 +972,15 @@ msgstr "لم ينطلق بعد"
 msgid "attend votre confirmation"
 msgstr "بانتظار تأكيدك"
 
+msgid "Arrêtez les recettes avant de supprimer le lot."
+msgstr "أوقِف الوصفات قبل حذف الدفعة."
+
+msgid "Supprimer ce lot et tout ce que le moteur en a rapporté ? Les brouillons déjà produits sont conservés. C’est irréversible."
+msgstr "حذف هذه الدفعة وكل ما أبلغ عنه المحرّك بشأنها؟ تُحفظ المسودات التي أُنتجت فعلًا. لا يمكن التراجع عن ذلك."
+
+msgid "Supprimer le lot"
+msgstr "حذف الدفعة"
+
 msgid "%d remarque bloquante"
 msgid_plural "%d remarques bloquantes"
 msgstr[0] "لا ملاحظات حاجبة"

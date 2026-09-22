@@ -225,8 +225,8 @@ final class MSRWA_REST {
 
 	public static function remove( WP_REST_Request $request ) {
 		$batch = self::batch( $request['id'] );
-		if ( ! $batch ) { return new WP_Error( 'msrwa_not_found', 'Lot introuvable.', array( 'status' => 404 ) ); }
-		if ( 'running' === $batch['status'] ) { return new WP_Error( 'msrwa_running', 'Arrêtez les runs avant de supprimer le lot.', array( 'status' => 409 ) ); }
+		if ( ! $batch ) { return new WP_Error( 'msrwa_not_found', __( 'Lot introuvable.', 'ms-recipes-writer-ai' ), array( 'status' => 404 ) ); }
+		if ( 'running' === $batch['status'] ) { return new WP_Error( 'msrwa_running', __( 'Arrêtez les recettes avant de supprimer le lot.', 'ms-recipes-writer-ai' ), array( 'status' => 409 ) ); }
 		return rest_ensure_response( array( 'deleted' => MSRWA_Batch::delete( (int) $batch['id'] ) ) );
 	}
 }

@@ -76,6 +76,28 @@ msrwa_test_missing( $engine['html'] ?? '', 'key_env', 'The engine screen does no
 
 msrwa_test_contains( ( msrwa_render( array( 'MSRWA_Screen_Pass', 'render' ) )['html'] ?? '' ), 'ms-empty', 'With nothing to show, the pass invites the reader to act.' );
 
+// --- Throwing a lot away is an administrator's, and never mid-flight ----
+
+function msrwa_batch_html( $status, $owner ) {
+	$GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
+	$GLOBALS['wpdb']->on( 'FROM wp_msrwa_batches WHERE id', array(
+		array( 'id' => 4, 'owner_id' => $owner, 'label' => 'Plats du soir', 'status' => $status, 'recipes' => 2, 'images' => 0,
+			'budget_usd' => 0.2, 'profile' => 'article', 'language' => 'fr', 'dispatch_at' => null,
+			'config_json' => '', 'matching_json' => '', 'error_message' => '', 'created_at' => '2026-09-01 00:00:00', 'updated_at' => '2026-09-01 00:00:00' ),
+	) );
+	$_GET = array( 'batch_id' => 4 );
+	$out = msrwa_render( array( 'MSRWA_Screen_Batch', 'render' ) );
+	$_GET = array();
+	return $out['html'] ?? '';
+}
+
+msrwa_test_as_admin( 1 );
+msrwa_test_contains( msrwa_batch_html( 'ready', 1 ), 'ms-batch-delete', 'An administrator can throw away a lot that is not moving.' );
+msrwa_test_missing( msrwa_batch_html( 'running', 1 ), 'ms-batch-delete', 'A lot with recipes in flight is never deleted from under them.' );
+
+msrwa_test_as_editor( 7 );
+msrwa_test_missing( msrwa_batch_html( 'ready', 7 ), 'ms-batch-delete', 'A writer cannot throw away a lot, not even their own.' );
+
 // --- A lot that has not left is still somebody's ------------------------
 
 msrwa_test_as_editor( 7 );

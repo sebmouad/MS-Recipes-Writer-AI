@@ -2,6 +2,21 @@
 
 Plugin WordPress en construction pour la génération éditoriale culinaire orchestrée.
 
+## Version 0.7.6
+
+**Un lot auquel on renonce peut enfin être jeté.**
+
+La route existait depuis longtemps ; aucun bouton ne l'appelait. Un lot décidé
+contre restait donc sur le pass, à attendre une confirmation qui n'arriverait
+jamais — ce qui était supportable tant que rien ne le listait, et ne l'est plus
+depuis 0.7.5.
+
+Réservé aux administrateurs, et refusé tant que des recettes tournent : on ne
+supprime pas un lot sous les pieds de ses propres runs. Les brouillons déjà
+produits sont des articles comme les autres et ne bougent pas. Le bouton est
+rouge, parce qu'un bouton qui détruit quelque chose doit le dire avant qu'on
+appuie, pas seulement dans la boîte de dialogue.
+
 ## Version 0.7.5
 
 **Un lot qui n'est pas encore parti existe enfin quelque part.**
@@ -496,7 +511,7 @@ cron réel et validité distante des clés restent à vérifier sur un site de t
 
 ## État actuel
 
-La version `0.7.5` est un socle installable : file persistante, pipeline de
+La version `0.7.6` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.

@@ -153,6 +153,11 @@
    two cards; on a settings page long enough to scroll it stays in reach. */
 .ms-save { display: flex; justify-content: flex-end; align-items: center; gap: 12px; padding: 12px 16px; }
 
+/* A button that destroys something says so before it is pressed, not only in
+   the dialog afterwards. */
+.button.ms-danger { color: var(--ms-stop); border-color: var(--ms-stop); }
+.button.ms-danger:hover, .button.ms-danger:focus { color: var(--ms-stop); border-color: var(--ms-stop); background: var(--ms-stop-soft); }
+
 /* One line of a card: some words on the left, the control that acts on them
    pushed to the right, and both on their own line when there is no room. */
 .ms-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }

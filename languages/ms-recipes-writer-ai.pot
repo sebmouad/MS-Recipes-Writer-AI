@@ -15,7 +15,7 @@ msgstr ""
 msgid "%1$d min %2$d s"
 msgstr ""
 
-#: class-msrwa-admin.php:95
+#: class-msrwa-admin.php:97
 msgid "%1$d traitée(s), %2$d ignorée(s) : l’action ne s’appliquait pas, ou elles ne vous appartiennent pas."
 msgstr ""
 
@@ -157,6 +157,10 @@ msgstr ""
 
 #: class-msrwa-screen-articles.php:108
 msgid "Arrêter"
+msgstr ""
+
+#: class-msrwa-rest.php:229
+msgid "Arrêtez les recettes avant de supprimer le lot."
 msgstr ""
 
 #: class-msrwa-screen-articles.php:133
@@ -431,7 +435,7 @@ msgstr ""
 msgid "Enregistrer les durées"
 msgstr ""
 
-#: class-msrwa-screen-batch.php:136
+#: class-msrwa-screen-batch.php:153
 msgid "Enregistrer l’appariement"
 msgstr ""
 
@@ -531,7 +535,7 @@ msgstr ""
 msgid "La suppression est réservée aux administrateurs."
 msgstr ""
 
-#: class-msrwa-screen-batch.php:145
+#: class-msrwa-screen-batch.php:162
 msgid "Lancer %d recette"
 msgid_plural "Lancer %d recettes"
 msgstr[0] ""
@@ -605,7 +609,7 @@ msgstr ""
 msgid "Les recettes"
 msgstr ""
 
-#: class-msrwa-screen-batch.php:160
+#: class-msrwa-screen-batch.php:177
 msgid "Les recettes avancent ensemble, une vague par tick de cron. Vous pouvez fermer cet onglet."
 msgstr ""
 
@@ -621,7 +625,7 @@ msgstr ""
 msgid "Lot %d"
 msgstr ""
 
-#: class-msrwa-rest.php:99 class-msrwa-schedule.php:22 class-msrwa-screen-batch.php:19
+#: class-msrwa-rest.php:99 class-msrwa-rest.php:228 class-msrwa-schedule.php:22 class-msrwa-screen-batch.php:19
 msgid "Lot introuvable."
 msgstr ""
 
@@ -741,7 +745,7 @@ msgstr ""
 msgid "Plafonds de dépense"
 msgstr ""
 
-#: class-msrwa-screen-batch.php:139
+#: class-msrwa-screen-batch.php:156
 msgid "Plus tard"
 msgstr ""
 
@@ -761,7 +765,7 @@ msgstr ""
 msgid "Productions lourdes"
 msgstr ""
 
-#: class-msrwa-screen-batch.php:141
+#: class-msrwa-screen-batch.php:158
 msgid "Programmer"
 msgstr ""
 
@@ -781,7 +785,7 @@ msgstr ""
 msgid "Recette pour la photographie %s"
 msgstr ""
 
-#: class-msrwa-screen-batch.php:154 class-msrwa-screen-pass.php:136
+#: class-msrwa-screen-batch.php:171 class-msrwa-screen-pass.php:136
 msgid "Recettes"
 msgstr ""
 
@@ -809,7 +813,7 @@ msgstr ""
 msgid "Retour au lot"
 msgstr ""
 
-#: class-msrwa-screen-batch.php:37 class-msrwa-screen-compose.php:22
+#: class-msrwa-screen-batch.php:142 class-msrwa-screen-compose.php:22
 msgid "Retour au pass"
 msgstr ""
 
@@ -875,6 +879,14 @@ msgstr ""
 
 #: class-msrwa-admin.php:93
 msgid "Supprimer %d recette(s) et tout ce que le moteur en a rapporté ? C’est irréversible."
+msgstr ""
+
+#: class-msrwa-admin.php:94
+msgid "Supprimer ce lot et tout ce que le moteur en a rapporté ? Les brouillons déjà produits sont conservés. C’est irréversible."
+msgstr ""
+
+#: class-msrwa-screen-batch.php:145
+msgid "Supprimer le lot"
 msgstr ""
 
 #: class-msrwa-screen-analysis.php:248
@@ -1013,7 +1025,7 @@ msgstr ""
 msgid "Vous n’avez pas accès à cet export."
 msgstr ""
 
-#: class-msrwa-admin.php:101 class-msrwa-admin.php:109 class-msrwa-screen-analysis.php:16 class-msrwa-screen-articles.php:15 class-msrwa-screen-batch.php:16 class-msrwa-screen-compose.php:15 class-msrwa-screen-engine.php:16 class-msrwa-screen-pass.php:14 class-msrwa-screen-run.php:15 class-msrwa-screen-settings.php:15
+#: class-msrwa-admin.php:103 class-msrwa-admin.php:111 class-msrwa-screen-analysis.php:16 class-msrwa-screen-articles.php:15 class-msrwa-screen-batch.php:16 class-msrwa-screen-compose.php:15 class-msrwa-screen-engine.php:16 class-msrwa-screen-pass.php:14 class-msrwa-screen-run.php:15 class-msrwa-screen-settings.php:15
 msgid "Vous n’avez pas accès à cet écran."
 msgstr ""
 

@@ -248,6 +248,23 @@
     });
   }
 
+  // --- Throwing a lot away ------------------------------------------------
+
+  var batchDelete = document.getElementById('ms-batch-delete');
+  if (batchDelete) {
+    batchDelete.addEventListener('click', function () {
+      if (!window.confirm(t.confirmBatchDelete)) { return; }
+      batchDelete.disabled = true;
+      say(document.getElementById('ms-batch-head-status'), t.applying || '');
+      call('/batches/' + batchDelete.dataset.batch, { method: 'DELETE' })
+        .then(function () { window.location.href = t.passUrl; })
+        .catch(function (error) {
+          say(document.getElementById('ms-batch-head-status'), error.message);
+          batchDelete.disabled = false;
+        });
+    });
+  }
+
   // --- Clearing what has outlived its usefulness --------------------------
 
   var prune = document.getElementById('ms-prune');

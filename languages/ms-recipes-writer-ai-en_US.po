@@ -972,6 +972,15 @@ msgstr "Not gone yet"
 msgid "attend votre confirmation"
 msgstr "waiting for you"
 
+msgid "Arrêtez les recettes avant de supprimer le lot."
+msgstr "Stop the recipes before deleting the lot."
+
+msgid "Supprimer ce lot et tout ce que le moteur en a rapporté ? Les brouillons déjà produits sont conservés. C’est irréversible."
+msgstr "Delete this lot and everything the engine reported about it? Any drafts it already produced are kept. This cannot be undone."
+
+msgid "Supprimer le lot"
+msgstr "Delete the lot"
+
 msgid "%d remarque bloquante"
 msgid_plural "%d remarques bloquantes"
 msgstr[0] "%d blocking finding"
