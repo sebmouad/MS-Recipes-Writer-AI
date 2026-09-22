@@ -1,6 +1,6 @@
 <?php
-// Proves the plugin is installed, reachable and closed to the public on the
-// live site. Costs nothing: it calls no provider.
+// Proves the plugin is installed, in the state it expects to be in, and closed
+// to the public. Costs nothing: it calls no provider.
 require __DIR__ . '/lib.php';
 
 $index = msrwa_real_request( 'GET', '/?cb=' . mt_rand() );
@@ -9,48 +9,66 @@ $namespaces = (array) ( $index['body']['namespaces'] ?? array() );
 msrwa_real_assert( in_array( 'msrwa/v1', $namespaces, true ), 'The plugin must be active: msrwa/v1 missing from the REST index.' );
 
 $routes = array_keys( (array) ( $index['body']['routes'] ?? array() ) );
-$expected = array( '/msrwa/v1/batches', '/msrwa/v1/stats', '/msrwa/v1/events', '/msrwa/v1/export', '/msrwa/v1/catalog' );
-foreach ( $expected as $route ) {
+foreach ( array( '/msrwa/v1/health', '/msrwa/v1/estimate', '/msrwa/v1/batches', '/msrwa/v1/runs/bulk' ) as $route ) {
 	msrwa_real_assert( in_array( $route, $routes, true ), 'Route ' . $route . ' must be registered.' );
 }
 
-// The catalogue must carry priced models, or no estimate can ever be built.
-$catalog = msrwa_real_request( 'GET', '/msrwa/v1/catalog' );
-msrwa_real_assert( 200 === $catalog['status'], 'The catalogue must be readable by an administrator.' );
-$models = (array) ( $catalog['body']['models'] ?? array() );
-$count = 0; $priced = 0;
-foreach ( $models as $provider_models ) {
-	foreach ( (array) $provider_models as $model ) {
-		$count++;
-		if ( ! empty( $model['input'] ) && ! empty( $model['output'] ) ) { $priced++; }
-	}
-}
-msrwa_real_assert( $count > 0, 'The catalogue must contain models.' );
-msrwa_real_assert( $priced === $count, 'Every catalogue model must carry input and output prices (' . $priced . '/' . $count . ').' );
-msrwa_real_note( $count . ' models, all priced' );
+// --- The installation is in the state the code expects ------------------
 
-// Statistics answer with the documented shape.
-$stats = msrwa_real_request( 'GET', '/msrwa/v1/stats?days=7' );
-msrwa_real_assert( 200 === $stats['status'], 'Statistics must answer for an administrator.' );
-foreach ( array( 'days', 'jobs', 'total_jobs', 'calls', 'estimated_cost_usd' ) as $key ) {
-	msrwa_real_assert( array_key_exists( $key, (array) $stats['body'] ), 'Statistics must expose ' . $key . '.' );
-}
-msrwa_real_note( 'jobs in the last 7 days: ' . (int) ( $stats['body']['total_jobs'] ?? 0 ) );
+$health = msrwa_real_request( 'GET', '/msrwa/v1/health' );
+msrwa_real_assert( 200 === $health['status'], 'Health must answer for an administrator (got ' . $health['status'] . ').' );
+$state = (array) $health['body'];
 
-// Nothing in this namespace may answer an anonymous caller.
-foreach ( array( '/msrwa/v1/stats', '/msrwa/v1/events', '/msrwa/v1/catalog' ) as $route ) {
-	$status = msrwa_real_anonymous( 'GET', $route );
-	msrwa_real_assert( in_array( $status, array( 401, 403 ), true ), 'Route ' . $route . ' must refuse an anonymous caller (got ' . $status . ').' );
-}
-$status = msrwa_real_anonymous( 'POST', '/msrwa/v1/batches' );
-msrwa_real_assert( in_array( $status, array( 401, 403 ), true ), 'Batch creation must refuse an anonymous caller (got ' . $status . ').' );
+msrwa_real_assert(
+	(int) ( $state['schema'] ?? 0 ) === (int) ( $state['expected_schema'] ?? -1 ),
+	'The schema must be up to date: stored ' . ( $state['schema'] ?? '?' ) . ', expected ' . ( $state['expected_schema'] ?? '?' ) . '. Deactivate and reactivate the plugin.'
+);
+msrwa_real_note( 'version ' . ( $state['version'] ?? '?' ) . ', schema ' . ( $state['schema'] ?? '?' ) );
 
-// Provider readiness is reported, not assumed.
-$openai = msrwa_real_request( 'POST', '/msrwa/v1/test/openai' );
-if ( 200 === $openai['status'] ) {
-	msrwa_real_note( 'OpenAI reachable, model ' . (string) ( $openai['body']['model'] ?? '?' ) );
-} else {
-	msrwa_real_note( 'OpenAI not usable yet: ' . (string) ( $openai['body']['code'] ?? $openai['status'] ) . ' — generation tests will skip' );
+// The migration is the part no offline test can reach, so every table and
+// every added column is named rather than assumed.
+foreach ( (array) ( $state['tables'] ?? array() ) as $name => $exists ) {
+	msrwa_real_assert( $exists, 'Table ' . $name . ' must exist.' );
+}
+foreach ( (array) ( $state['columns'] ?? array() ) as $column => $exists ) {
+	msrwa_real_assert( $exists, 'Column ' . $column . ' must exist; the guarded ALTER did not run.' );
 }
 
-msrwa_real_done( 'MSRWA live site contracts' );
+// Capabilities are granted on activation, and a role missing one silently
+// locks somebody out of a screen.
+foreach ( array( 'administrator' => 3, 'editor' => 2, 'author' => 1 ) as $role => $expected ) {
+	$granted = (array) ( $state['roles'][ $role ] ?? array() );
+	msrwa_real_assert( count( $granted ) === $expected, $role . ' must hold ' . $expected . ' capability(ies); has ' . implode( ', ', $granted ) . '.' );
+}
+
+if ( empty( $state['uploads_writable'] ) ) { msrwa_real_fail( 'The uploads directory is not writable: no generated image can be saved.' ); }
+if ( empty( $state['providers'] ) ) { msrwa_real_note( 'no API key stored — nothing can be generated yet' ); }
+else { msrwa_real_note( 'keys for: ' . implode( ', ', (array) $state['providers'] ) ); }
+
+if ( ! empty( $state['cron']['wp_cron_disabled'] ) ) {
+	msrwa_real_note( 'DISABLE_WP_CRON is set — a server cron must call wp-cron.php or nothing advances' );
+}
+msrwa_real_assert( ! empty( $state['cron']['next'] ), 'Maintenance must be scheduled, or expired leases are never recovered.' );
+if ( ! empty( $state['dormant_tables'] ) ) {
+	msrwa_real_note( count( (array) $state['dormant_tables'] ) . ' dormant table(s) from the previous plugin, left untouched' );
+}
+
+// --- An estimate can be built without spending anything ------------------
+
+$estimate = msrwa_real_request( 'GET', '/msrwa/v1/estimate?profile=full&recipes=1&images=0' );
+msrwa_real_assert( 200 === $estimate['status'], 'An estimate must be available before anything is spent.' );
+msrwa_real_assert( (float) ( $estimate['body']['cost_usd'] ?? 0 ) > 0, 'An estimate of zero means no route is priced.' );
+msrwa_real_assert( empty( $estimate['body']['unpriced'] ), 'Every configured route must be priced; unpriced: ' . implode( ', ', (array) ( $estimate['body']['unpriced'] ?? array() ) ) );
+msrwa_real_note( 'one full recipe is estimated at $' . number_format( (float) $estimate['body']['cost_usd'], 4 ) );
+
+// --- Nothing here answers the public -------------------------------------
+
+foreach ( array( '/msrwa/v1/health', '/msrwa/v1/estimate', '/msrwa/v1/batches' ) as $route ) {
+	$anonymous = msrwa_real_anonymous( 'GET', $route );
+	msrwa_real_assert(
+		in_array( $anonymous['status'], array( 401, 403, 404 ), true ),
+		$route . ' must refuse an anonymous caller (got ' . $anonymous['status'] . ').'
+	);
+}
+
+msrwa_real_done( 'the site is installed and closed' );

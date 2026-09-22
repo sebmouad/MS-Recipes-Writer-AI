@@ -34,6 +34,54 @@ final class MSRWA_Operations {
 		}
 	}
 
+	/**
+	 * Whether this installation is actually in the state the plugin expects.
+	 *
+	 * Written for the real test layer, which drives a live site over REST and
+	 * otherwise has no way to look at a table. It reads nothing sensitive: the
+	 * shape of the schema, which capabilities exist, whether cron is armed and
+	 * whether uploads can be written. No key, no content, no spend.
+	 */
+	public static function health() {
+		if ( ! MSRWA_Rights::may_manage() ) { return new WP_Error( 'forbidden', __( 'Accès refusé.', 'ms-recipes-writer-ai' ), array( 'status' => 403 ) ); }
+
+		$tables = array();
+		foreach ( MSRWA_DB::tables() as $name => $table ) { $tables[ $name ] = MSRWA_DB::table_exists( $table ); }
+
+		$columns = array();
+		$t = MSRWA_DB::tables();
+		foreach ( array( 'batches' => array( 'profile', 'language', 'dispatch_at' ), 'steps' => array( 'checks_failed' ) ) as $table => $wanted ) {
+			foreach ( $wanted as $column ) { $columns[ $table . '.' . $column ] = MSRWA_DB::column_exists( $t[ $table ], $column ); }
+		}
+
+		$roles = array();
+		foreach ( MSRWA_Rights::roles() as $role_name => $capabilities ) {
+			$role = get_role( $role_name );
+			$roles[ $role_name ] = $role ? array_values( array_filter( $capabilities, static function ( $capability ) use ( $role ) { return $role->has_cap( $capability ); } ) ) : array();
+		}
+
+		$uploads = wp_upload_dir();
+		$next = wp_next_scheduled( 'msrwa_cleanup' );
+
+		return rest_ensure_response( array(
+			'version' => MSRWA_VERSION,
+			'schema' => (int) get_option( 'msrwa_schema', 0 ),
+			'expected_schema' => MSRWA_DB::SCHEMA,
+			'tables' => $tables,
+			'columns' => $columns,
+			'roles' => $roles,
+			'providers' => MSRWA_Settings::configured_providers(),
+			'cron' => array(
+				'next' => $next ? gmdate( 'c', $next ) : null,
+				'wp_cron_disabled' => defined( 'DISABLE_WP_CRON' ) && DISABLE_WP_CRON,
+			),
+			'uploads_writable' => (bool) wp_is_writable( $uploads['basedir'] ),
+			// Tables from the plugin that stood here before this one. Reported
+			// so an operator can decide to drop them; never dropped from here.
+			'dormant_tables' => MSRWA_DB::dormant(),
+		) );
+	}
+
 	/** The lab renderer is shared verbatim; only its input is adapted for WP. */
 	public static function report() {
 		$id = absint( $_GET['run_id'] ?? 0 );

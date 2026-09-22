@@ -2,6 +2,32 @@
 
 Plugin WordPress en construction pour la génération éditoriale culinaire orchestrée.
 
+## Version 0.5.4
+
+**Les tests réels, et une documentation qui décrit le plugin qui existe.**
+
+`GET /msrwa/v1/health` dit dans quel état est vraiment l'installation : version
+et version de schéma, présence de chaque table et de chaque colonne ajoutée,
+capacités réellement accordées à chaque rôle, cron armé, dossier de
+téléversement accessible, tables dormantes de l'ancien plugin. Rien de sensible
+— pas de clé, pas de contenu, aucune dépense. Elle existe parce que la couche de
+tests réels pilote un site vivant par REST et n'a sinon aucun moyen de regarder
+une table.
+
+`tests/real/test-site.php` vérifie tout cela plus le refus de tout appel
+anonyme. `tests/real/test-flow.php` fait un lot complet de bout en bout sur le
+profil le moins cher : soumission, appariement, envoi, attente du cron,
+brouillon créé, et trois vérifications qui ne peuvent se faire qu'en vrai — le
+run n'a pas dépassé son plafond, il a coûté quelque chose, et l'estimation était
+dans la bonne région. Il refuse de démarrer sans `MSRWA_TEST_BUDGET_USD` : il
+dépense de l'argent réel.
+
+`docs/ARCHITECTURE.md` décrivait l'ancien pipeline, supprimé depuis plusieurs
+versions — pire qu'une absence de documentation. Réécrit : la forme d'un run, la
+ligne autour du moteur, l'appariement comme étape du plugin, le modèle de
+données et ce qui n'y est délibérément pas stocké deux fois, les droits, les
+écrans, les routes, et dix invariants.
+
 ## Version 0.5.3
 
 **Correction de la 0.5.2 : l'article relu reste stocké.** Ne pas dupliquer ce que
@@ -303,7 +329,7 @@ cron réel et validité distante des clés restent à vérifier sur un site de t
 
 ## État actuel
 
-La version `0.5.3` est un socle installable : file persistante, pipeline de
+La version `0.5.4` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.

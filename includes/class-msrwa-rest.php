@@ -9,6 +9,7 @@ final class MSRWA_REST {
 	public static function register() {
 		register_rest_route( 'msrwa/v1', '/diagnostics/config', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_manage' ), 'callback' => array( 'MSRWA_Operations', 'preview' ) ) );
 		add_filter( 'rest_post_dispatch', array( __CLASS__, 'no_store' ), 10, 3 );
+		register_rest_route( 'msrwa/v1', '/health', array( 'methods' => 'GET', 'permission_callback' => array( __CLASS__, 'can_manage' ), 'callback' => array( 'MSRWA_Operations', 'health' ) ) );
 		register_rest_route( 'msrwa/v1', '/estimate', array( 'methods' => 'GET', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'estimate' ) ) );
 		register_rest_route( 'msrwa/v1', '/batches', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'create' ) ) );
 		register_rest_route( 'msrwa/v1', '/batches/(?P<id>\d+)/pairs', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'pairs' ) ) );

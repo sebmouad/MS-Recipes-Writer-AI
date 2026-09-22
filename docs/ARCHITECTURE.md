@@ -1,264 +1,195 @@
 # Architecture
 
-MS Recipes Writer AI turns a culinary brief into a reviewed WordPress draft:
-a queue of jobs walks a fixed pipeline, every provider call is priced and
-logged, and the result is measured before an editor is asked to look at it.
+The plugin has one job. A writer hands over several recipes and several
+photographs without saying which go together; the plugin works out the pairing,
+builds a brief per recipe, sends every one of them to the engine, and turns what
+comes back into a WordPress draft.
 
-Everything below describes the code as it is, not as it is planned. Planned
-work lives in [ROADMAP.md](ROADMAP.md).
+Everything below describes the code as it is. [`ENGINE.md`](ENGINE.md) is the
+engine's own contract and is the document to read before changing anything
+under `includes/engine/`.
 
-## Runtime shape
+## The shape of a run
 
 ```
-Composer form (admin)
-        │  POST /wp-json/msrwa/v1/batches
-        ▼
-    batch row ──► job rows (one per recipe)
-        │
-        │  MSRWA_Queue::schedule_batch → schedule_job (Action Scheduler or WP-Cron)
-        ▼
-    MSRWA_Pipeline::process_job  ── one stage per invocation, re-scheduled after each
-        │
-        ▼
-    MSRWA_Publisher::create_draft ──► WordPress draft + editorial report + stored verdict
+Composer  ── POST /msrwa/v1/batches
+   │          recipes split, photographs described, pairing proposed
+   ▼
+batch row (status: matching → ready)
+   │
+   │  the writer confirms or corrects the pairing, then dispatches
+   ▼
+run rows, one per recipe (queued)
+   │
+   │  msrwa_run_step, one cron tick per dependency wave
+   ▼
+MSRWA_Run::advance ──► MSRWA_Engine::run( only: this wave )
+   │                      steps, calls, events, artifacts written down
+   ▼
+MSRWA_Draft::create ──► WordPress draft + media library + post meta
+   │
+   ▼
+MSRWA_Run::release_stored ──► the copies WordPress now holds are dropped
 ```
 
-A job advances one stage per worker run. Each run acquires a lease
-(`lock_token`, `lock_until`), does one stage, persists artifacts, then
-schedules the next run. A crashed worker leaves an expired lease that
-`MSRWA_Queue::recover_expired()` returns to `retry_wait`.
+A whole run takes some four and a half minutes, which no PHP request survives.
+So it is cut where the engine already cuts it — at the dependency wave. One tick
+runs the waves that are ready, writes down what they produced, and schedules the
+next. Nothing is held between ticks: a request the host kills costs at most the
+wave it was in, `MSRWA_Run::recover_expired()` returns the lease, and the run
+resumes from the last step that finished.
 
-## The engine
+## The engine, and the line around it
 
-[`ENGINE.md`](ENGINE.md) is its full contract; this is the short version.
+`includes/engine/` makes a recipe. It touches no WordPress function, reads
+nothing from disk beyond its own prompts, and never exits: it takes a brief and
+returns a `MSRWA_Result`. The command-line lab and this plugin call the same
+code, which is what stops a prompt proven at the bench from drifting away from
+the one that runs in production.
 
-`includes/engine/` is the part that makes a recipe. It touches no WordPress
-function, reads nothing from disk beyond its own prompts, and never exits: it
-takes a brief and returns a `MSRWA_Result`. The plugin and the prompt lab both
-call it, which is what stops a prompt proven at the bench from drifting away
-from the one that runs in production.
+The plugin adapts to the engine, never the reverse. Everything the plugin wants
+differently is expressed as the engine's own caller configuration:
 
-```php
-$result = MSRWA_Engine::run(
-    array( 'title' => 'Souris d’agneau au four' ),          // the editor’s brief
-    array( 'config' => $engine_config, 'workspace' => $dir ),
-    function ( $event ) { /* progress, as it happens */ }
-);
-```
+- **which steps run** — `MSRWA_Profile` turns "article only" into a step list
+  plus the `needs` those dropped steps leave dangling;
+- **which language** — the engine's own `language` key;
+- **which models, ceilings, prices, prompts** — `MSRWA_Engine_Settings` stores
+  only the difference from the engine's defaults and hands it over as the caller
+  layer;
+- **the API keys** — under `settings.keys.<provider>`, the one branch of the
+  engine's configuration that never reaches a stored record.
 
-| Class | Responsibility |
-| --- | --- |
-| `MSRWA_Engine` | The entry point: `run()`, `run_step()`, the wave loop and the retries |
-| `MSRWA_Engine_Config` | Every value the engine uses, in three layers — defaults, caller, this run |
-| `MSRWA_Engine_Steps` | What each step needs, produces, costs and asks a model for |
-| `MSRWA_Engine_Input` | What a step is given before it runs |
-| `MSRWA_Engine_Score` | Whether an answer satisfied its step's contract |
-| `MSRWA_Engine_Call` | Every provider call, normalized across three providers |
-| `MSRWA_Result` | What comes back: artifacts, steps, totals, errors, events |
+Seven classes are the engine's own dependencies rather than application code and
+must not be treated as the plugin's to delete: `MSRWA_Json`, `MSRWA_Recipe`,
+`MSRWA_Quality`, `MSRWA_Prompt`, `MSRWA_Images`, `MSRWA_Catalog`, `MSRWA_Cost`,
+along with `MSRWA_Settings::defaults()`, which `Prompt`, `Quality` and `Images`
+all read.
 
-**Steps run in dependency waves.** `needs` declares what a step waits on, and
-everything whose inputs exist may run together:
+## Matching is the plugin's own step
 
-| Wave | Steps that may run at once |
-| --- | --- |
-| 1 | research |
-| 2 | canonical recipe |
-| 3 | **article, featured image, Facebook collage** |
-| 4 | **review, fact check** |
-| 5 | apply corrections (no model runs) |
-| 6 | proofread |
-| 7 | final approval |
+Pairing photographs with recipes happens before any engine run and uses the
+engine only the way any caller may: through `MSRWA_Engine_Call`, with a prompt of
+its own. Nothing in `includes/engine/` knows it exists.
 
-**Four call paths**, chosen by the capability a step declares: text (including
-the web-searching research step), image generation, the judge that reads both
-images' bytes alongside the article, and none at all. A refused approval
-regenerates the images the judge blocked, carrying its findings as corrections,
-then asks again — that is what makes "retry until approved" converge rather
-than reroll.
+Two passes, because they cost differently. Every photograph is described once,
+concurrently — the expensive half, billed per image. Then one cheap text call
+reads the descriptions against the recipe titles. Describing a photograph twice
+for two candidate recipes would pay twice for the same photograph, and correcting
+a pairing afterwards is therefore free.
 
-**The correction loop closes in code.** The fact check quotes the sentence it
-objects to verbatim and supplies the sentence that replaces it, so applying it
-is a substitution, not a judgement: no model runs, nothing costs anything, and
-a correction whose quote cannot be located in the HTML is handed to the editor
-rather than dropped. A review finding carries no quote — it is advice about a
-section — so none are applied; they travel to the editor with the rest.
-
-## Files
-
-| File | Responsibility |
-| --- | --- |
-| `ms-recipes-writer-ai.php` | Bootstrap, constants, require order, activation hooks |
-| `includes/class-msrwa-plugin.php` | Hook registration, capabilities, migration trigger |
-| `includes/class-msrwa-db.php` | Schema, migrations, artifacts, snapshots, events, calls, budget reservations |
-| `includes/class-msrwa-settings.php` | Settings store, defaults, sanitization, prompt versions |
-| `includes/class-msrwa-catalog.php` | Provider/model catalogue, capabilities, pricing |
-| `includes/class-msrwa-router.php` | Model selection per stage (automatic prefilter or manual) |
-| `includes/class-msrwa-openai.php`, `class-msrwa-providers.php` | Transport adapters, token and cost capture |
-| `includes/class-msrwa-recipe.php` | Input normalization, canonical schema validation, **stage vocabulary** |
-| `includes/class-msrwa-pipeline.php` | The stage machine: association → research → recipe → article → review → images → final review → draft |
-| `includes/class-msrwa-quality.php` | Deterministic structural gate (score /100, blockers, benchmark) |
-| `includes/class-msrwa-publisher.php` | Draft creation, meta, internal links, editorial report, stored verdict |
-| `includes/class-msrwa-presentation.php` | Public vocabulary: state and **article** quality, batch aggregation |
-| `includes/class-msrwa-lists.php` | Filtered, scoped, paginated reads for the admin lists |
-| `includes/class-msrwa-stats.php` | Aggregates, exports, event feed |
-| `includes/class-msrwa-queue.php` | Leases, concurrency, batch lifecycle, health |
-| `includes/class-msrwa-rest.php` | `msrwa/v1` endpoints |
-| `includes/class-msrwa-admin.php` | Menus, screens, rendering |
-| `includes/class-msrwa-images.php`, `class-msrwa-storage.php` | Image generation/validation, private temporary files |
+In doubt the model does not pair. A photograph left aside costs less than one
+attached to the wrong dish, which would illustrate a whole article.
 
 ## Data model
 
-All tables are prefixed `{$wpdb->prefix}msrwa_`. `MSRWA_DB::tables()` is the
-only place table names are built.
+Six tables, all prefixed `wp_msrwa_`.
 
-- **batches** — one creation run. `total` must equal the number of job rows or
-  the batch can never complete.
-- **jobs** — one recipe. Carries `status`, `stage`, lease columns, cost, the
-  linked `draft_post_id`, and the stored article verdict
-  (`quality_score`, `quality_passed`, `quality_checked_at`).
-- **artifacts** — versioned JSON per job and key (`article`, `canonical`,
-  `quality_report`, `editorial_review`, …). One row is `current`, older ones
-  are `superseded`.
-- **snapshots** — immutable copies of inputs, model plans, settings, decisions.
-- **events** — the decision timeline. **calls** — every provider request with
-  tokens, cost, HTTP status and redacted payloads.
-- **reservations** — budget held before a call, then settled or released under
-  a MySQL advisory lock.
+| table | one row per | holds |
+|---|---|---|
+| `batches` | submission | recipes, photographs, profile, language, ceiling, the pairing |
+| `runs` | recipe | state, progress, cost, seconds, the draft it became |
+| `steps` | step attempted | model, seconds, tokens, cost, scorecard, failed-check count |
+| `calls` | provider call | endpoint, tier, tokens, cached share, price |
+| `events` | thing that happened | the timeline |
+| `artifacts` | named output | what the engine produced |
 
-Secrets never reach these tables: `MSRWA_DB::sanitize_persisted_data()`
-redacts key-like names and drops binary payloads before any write.
+Rows rather than one JSON blob per run, deliberately: a blob answers *what
+happened in run twelve*, rows answer *what the review costs across every run*,
+and the second is the question worth asking.
 
-## Statuses, states and stages
+Settings live in two options, not tables: `msrwa_settings` (the difference from
+the shipped defaults, keys encrypted) and `msrwa_engine_config` (the difference
+from the engine's defaults).
 
-Three vocabularies exist; do not mix them.
+### What is not stored twice, and what deliberately is
 
-- **Job status** (internal, in the database): `queued`, `running`,
-  `retry_wait`, `paused`, `paused_budget`, `awaiting_input`, `awaiting_admin`,
-  `needs_review`, `uncertain`, `failed`, `completed`, `cancelled`.
-- **Public state** (`MSRWA_Presentation::state()`): `encours`, `completed`,
-  `error`, `canceled`. `completed` means processing ended, never that the text
-  is editorially approved.
-- **Stage** (`MSRWA_Recipe::stages()`): `intake`, `association`, `research`,
-  `canonical_recipe`, `article`, `review`, `featured_image`, `facebook_image`,
-  `final_review`, `draft`. Transitions are forward-only and validated by
-  `MSRWA_Recipe::can_transition()`. Anything that lists stages must read this
-  method, never a hand-written copy.
+Once a draft exists, WordPress holds the article in `post_content`, the recipe
+and the verdict in post meta, and the images in the media library. Those copies
+are released from `artifacts`: `article` and `corrected` are superseded versions
+nobody reads, and `canonical` and `approval` live in meta this plugin wrote
+itself.
 
-## Quality is a property of the article
+`proofread` is kept, and that is the one deliberate duplicate. `post_content` is
+what an editor has since changed; the artifact is what the machine produced.
+Collapsing them removes the only answer to *did the model write that claim, or
+did somebody add it* — and any measurement of the engine taken from corrected
+text measures editors instead. It also means a run survives its draft being
+deleted.
 
-A job that produced no article has no quality. `MSRWA_Presentation::quality()`
-returns `code => 'none'` for it, and `MSRWA_Presentation::batch()` averages
-only over the articles a batch produced.
-
-Two measurements exist and answer different questions:
-
-1. `MSRWA_Quality::evaluate()` — the deterministic structural gate run during
-   the pipeline: length, headings, paragraphs, recipe completeness, SEO
-   lengths, distribution. Produces `quality_report` (score /100, `pass`,
-   findings, benchmark) and can send a job back for correction.
-2. `MSRWA_Publisher::editorial_report()` — the delivery verdict, combining the
-   structural score with the AI review result, image reviews and delivery
-   findings. Produces `editorial_review` and `status`
-   (`checks_passed` / `needs_review`).
-
-The second is what editors see. It is written to the job row by
-`MSRWA_DB::store_article_quality()` when the draft is created, so lists can
-filter and sort on it without decoding artifacts. `quality_checked_at` marks a
-row as measured; rows created before the columns existed are backfilled once
-during migration.
-
-Badge codes: `good` (completed and every check passed), `review`, `incomplete`
-(failed), `uncertain`, `pending` (not measured yet), `none` (no article).
+Everything else has no WordPress home and stays: the research package, the
+review, the fact check, the image prompts.
 
 ## Permissions
 
-Current access rule (0.3.3): only `manage_options` grants global data access.
-Authors, editors and an existing custom `writer` role receive `msrwa_create`
-and own-job access. Legacy `msrwa_view_all` alone does not bypass ownership.
-Editorial screens expose only their own recipes, article content, images,
-quality verdict and publication links. Full reports, costs, technical events,
-global statistics and settings are administrator-only. REST polling removes
-technical/cost fields for non-administrators; editor budgets are resolved server-side.
-The historical capability table below describes the previous architecture.
+Three capabilities, decided in one place — `MSRWA_Rights` — because scattered
+checks are how a list ends up scoped on one screen and not the next.
 
-| Capability | Meaning |
-| --- | --- |
-| `msrwa_create` | May create batches (editors, administrators) |
-| `msrwa_view_own` | May read their own jobs |
-| `msrwa_view_all` | May read every editor's jobs (administrators) |
-| `msrwa_manage` / `manage_options` | Configuration, catalogue sync, provider tests |
+| capability | may |
+|---|---|
+| `msrwa_create` | submit work, see and act on their own |
+| `msrwa_view_all` | see everyone's work |
+| `msrwa_manage` | settings, the engine, analysis, deletion, the whole ledger |
 
-Scoping is enforced **in the query layer**, never in the template:
-`MSRWA_Lists::sanitize_args()` pins `author` to the current user unless the
-reader has `msrwa_view_all`, so a forged `msrwa_author` parameter cannot widen
-a result set. REST callbacks re-check ownership row by row.
+`manage_options` is honoured everywhere as a superset. `msrwa_view_all` alone
+does **not** widen a writer's view: sites carry that capability from an earlier
+version where it meant something else.
 
-## Admin screens
+`MSRWA_Rights::scope_sql()` returns the owner clause rather than leaving callers
+to apply it. A query that forgets it has no `WHERE` at all and fails review,
+where one that forgets an inline check quietly shows another writer's work.
 
-- **Créer des Articles/Images** (`page()`) — composer plus two lists:
-  **Articles** (default) and **Jobs**, both filtered, scoped and paginated by
-  `MSRWA_Lists`. The jobs view also holds the batch controls.
-- **Détail du lot** (`job_page()`) — batch KPIs, job cards, timeline, calls.
-- **Détail du job** (`job_detail_page()`) — the full diagnostic: inputs, model
-  plan, calls with redacted payloads, artifacts, snapshots, timeline.
-- **Statistiques** (`stats_page()`) — cost, activity, article quality, exports.
-- **Configuration** (`settings_page()`) — modes, budgets, prompts, catalogue,
-  queue health, history.
-- **Laboratoire** (`MSRWA_Lab_Screen::page()`) — start a whole engine run on one
-  brief and watch it. Administrators only: a run spends real money.
-- **Détail du run** (`detail()`) — every figure the engine reported about one
-  run: steps with their unmet checks, calls with model, endpoint, cache share
-  and price, the verdict and its findings, artifacts, timeline.
-- **Mesures** (`measures()`) — the same data across runs: cost per step, spend
-  per model, which named check fails and how often, how often the judge approves.
-- **Moteur** (`MSRWA_Lab_Config::page()`) — every engine parameter. Only the
-  difference from the engine's defaults is stored.
+Money is an operator's concern: a screen that may not show a figure does not
+fetch it either — `MSRWA_Ledger::runs()` changes its `SELECT` list by capability.
+
+## Screens
+
+| screen | who | what |
+|---|---|---|
+| Le pass | writer | what is running, what waits to be read, what stopped |
+| Nouveau lot | writer | recipes, photographs, profile, language, ceiling |
+| Lot | writer | the pairing to confirm, then its recipes |
+| Recette | writer | the verdict, the steps; diagnostics for managers only |
+| Articles | writer | every run, filtered, with bulk actions |
+| Analyse | manager | cost by step, by model, by day; failing checks; CSV export |
+| Moteur | manager | every engine parameter, and where each step would route |
+| Réglages | manager | keys, and whether the machinery is actually running |
+
+Plus a meta box on the post editor, because a writer opens the article, not this
+plugin, and a warning on a dashboard nobody opened has warned nobody.
+
+The interface ships in French, English and Arabic. `tools/i18n.php` extracts and
+compiles the catalogues, because there is no gettext toolchain and no build step.
 
 ## REST
 
-Namespace `msrwa/v1`, all authenticated through WordPress cookies and nonce:
-`POST /batches`, `GET /batches/{id}`, `POST /batches/{id}/{pause|resume|cancel}`,
-`POST /jobs/{id}/{retry|cancel|association}`, `GET /stats`, `GET /events`,
-`GET /export`, `GET /catalog`, `POST /catalog/sync`, `POST /test/{provider}`,
-`GET|POST /lab/runs`, `DELETE /lab/runs/{id}`, `POST /lab/runs/{id}/cancel`.
+Namespace `msrwa/v1`, WordPress cookies and nonce, every response `no-store`
+(a page cache once served an application-password response to the public).
 
-## The laboratory
-
-A whole engine run takes some four and a half minutes, which no PHP request
-survives. So the run is cut where the engine already cuts it — at the dependency
-wave. One `msrwa_lab_step` cron tick claims the run with a lease, runs the waves
-that are ready, writes down everything they produced and schedules the next
-tick. Nothing is held between ticks: a request the host kills costs at most the
-wave it was in, `MSRWA_Lab::recover_expired()` puts the run back in the queue,
-and it resumes from the last step that finished.
-
-What the engine reports is stored as rows, not as one blob: `lab_steps` (figures
-and scorecard per step), `lab_calls` (model, endpoint, tokens, cache share,
-price), `lab_events` (the timeline) and `lab_artifacts` (what was produced, one
-row per name, replaced when a step produces it again). `MSRWA_Lab::state()`
-assembles them back into the shape the engine returns, which is what the next
-tick reads and what the HTML report renders — so the rows are the record and
-nothing is kept twice.
-
-Keys reach the engine under `settings.keys.<provider>`, the one branch of the
-engine's configuration that never enters a stored record. WordPress keeps them
-encrypted in its settings table and has no environment to export them into.
+`GET|POST /batches`, `DELETE /batches/{id}`, `POST /batches/{id}/{pairs|schedule|dispatch}`,
+`GET /batches/{id}/runs`, `POST /runs/bulk`, `POST /runs/{id}/{retry|cancel}`,
+`GET /estimate`, `GET /health`, `POST /diagnostics/config`.
 
 ## Invariants
 
-Break these and the plugin misreports itself:
+Break these and the plugin misreports itself.
 
-1. A batch's `total` equals the number of its job rows.
-2. Quality belongs to an article; a job without one shows no verdict.
-3. `MSRWA_Presentation::state()` is the only public state vocabulary.
-4. Stage lists come from `MSRWA_Recipe::stages()`.
-5. List queries are scoped by capability before they run.
-6. A lab run's cost is `NULL` when the model carries no published rate, never
-   zero, and the totals count those steps separately. A run whose spend cannot
-   be verified is not a run that was free.
-7. Every top-level engine configuration group is reachable from the Moteur
-   screen. `tests/test-lab-config.php` fails when one is not.
-8. Nothing writes a provider key, a private path or binary data into
-   artifacts, snapshots, events or calls.
-9. A worker never resumes a paused, cancelled or awaiting-decision job.
-10. Costs displayed are estimates from the captured catalogue, never an invoice.
+1. **The plugin adapts to the engine.** Anything the plugin needs differently is
+   caller configuration. An engine change is the owner's decision, not a
+   convenience.
+2. **A cost is `NULL` when the model carries no published rate** — never zero —
+   and every total carries the count of unpriced steps beside it. A run whose
+   spend cannot be verified is not a run that was free.
+3. **`done` is not editorial approval.** A finished run is waiting for a reader.
+   No screen phrases it as validation.
+4. **The judge's verdict is the engine's opinion of its own output**, and is
+   never presented as a decision to publish.
+5. **List queries carry `MSRWA_Rights::scope_sql()`** before they run.
+6. **Nothing stored carries a key, a private path or a binary payload** —
+   everything passes through `MSRWA_DB::sanitize()`.
+7. **Every top-level engine configuration group is reachable** from the Moteur
+   screen; `tests/test-engine-settings.php` fails when one is not.
+8. **Every static call resolves** — `tests/test-resolves.php`. PHP only notices a
+   missing method at the moment of the call, which once let a fatal ship green.
+9. **Artifacts are released only after the draft exists**, and `proofread` is
+   never released.
+10. **A run still moving is never deleted** under its own worker.

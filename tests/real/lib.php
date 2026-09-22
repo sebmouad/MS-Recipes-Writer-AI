@@ -46,6 +46,8 @@ function msrwa_real_anonymous( $method, $path, $timeout = 60 ) {
 	return (int) shell_exec( $command );
 }
 
+function wp_strip_all_tags_compat( $value ) { return trim( preg_replace( '/\s+/', ' ', strip_tags( (string) $value ) ) ); }
+
 function wp_json_encode_compat( $value ) { return json_encode( $value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ); }
 
 /** Refuses to spend past the cap the owner set for one run. */
