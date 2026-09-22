@@ -228,3 +228,6 @@ Break these and the plugin misreports itself.
 14. **A lot whose recipe is estimated above its per-recipe ceiling is refused at
     dispatch.** Stopping it part way would pay for everything before the stop
     and deliver nothing.
+15. **Model output written to a meta key a third-party plugin reads is stripped
+    of markup first**, in `MSRWA_Draft::map_recipe()` as everywhere else in that
+    file. A card plugin's own template is not this plugin's to trust.

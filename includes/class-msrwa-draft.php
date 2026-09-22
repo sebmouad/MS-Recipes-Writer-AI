@@ -118,20 +118,28 @@ final class MSRWA_Draft {
 		}
 		if ( $categories ) { wp_set_post_categories( $post_id, array_unique( $categories ), false ); }
 
-		self::map_recipe( $post_id, $canonical, $article );
+		self::map_recipe( $post_id, $canonical, $seo_title, $seo_description );
 	}
 
 	/**
 	 * The recipe fields, under the meta keys the site's recipe card reads.
 	 * The mapping is a setting because every card plugin names them differently.
+	 *
+	 * Every other field this file writes is stripped of markup before it is
+	 * stored; this mapping used to be the one exception, handing a card plugin
+	 * whatever the model wrote, unread. A card plugin's own template is not
+	 * this plugin's to trust — the fields it maps are user-facing text, not code.
 	 */
-	private static function map_recipe( $post_id, array $canonical, array $article ) {
+	private static function map_recipe( $post_id, array $canonical, $seo_title, $seo_description ) {
 		$mapping = (array) ( MSRWA_Settings::get()['integration_mapping'] ?? array() );
-		$values = $canonical;
-		$values['seo_title'] = $article['seo_title'] ?? '';
-		$values['seo_description'] = $article['seo_description'] ?? '';
+		$values = self::strip_deep( $canonical );
+		// Stripped again here even though describe() already stripped these two:
+		// this mapping is the sink a card plugin trusts, so it strips on its own
+		// terms rather than on a caller's discipline it cannot see from here.
+		$values['seo_title'] = self::strip_deep( (string) $seo_title );
+		$values['seo_description'] = self::strip_deep( (string) $seo_description );
 		// The recipe calls them steps; the cards that read this meta call them instructions.
-		if ( isset( $canonical['steps'] ) ) { $values['instructions'] = $canonical['steps']; }
+		if ( isset( $values['steps'] ) ) { $values['instructions'] = $values['steps']; }
 		foreach ( $mapping as $field => $meta_key ) {
 			$meta_key = sanitize_key( (string) $meta_key );
 			if ( '' === $meta_key || 'facebook_meta' === $field || ! isset( $values[ $field ] ) ) { continue; }
@@ -143,6 +151,12 @@ final class MSRWA_Draft {
 			}
 			update_post_meta( $post_id, $meta_key, $value );
 		}
+	}
+
+	/** Every string a model wrote, anywhere in a value, stripped of markup. */
+	private static function strip_deep( $value ) {
+		if ( is_array( $value ) ) { return array_map( array( __CLASS__, 'strip_deep' ), $value ); }
+		return is_string( $value ) ? trim( wp_strip_all_tags( $value ) ) : $value;
 	}
 
 	/** A list the model may have written as an array or as "a, b, c". */

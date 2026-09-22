@@ -5,9 +5,9 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.8.1
+## État actuel — 0.8.2
 
-La version `0.8.1` est installable et vérifiée de bout en bout sur un vrai
+La version `0.8.2` est installable et vérifiée de bout en bout sur un vrai
 WordPress (7.1.1) : un lot part, le cron le fait avancer vague par vague, et un
 brouillon arrive avec son article, sa recette, son extrait, ses étiquettes, ses
 métadonnées SEO et ses données structurées Recipe.
@@ -49,6 +49,41 @@ cron serveur doit appeler `wp-cron.php` toutes les cinq minutes.
 - [`docs/ENGINE.md`](docs/ENGINE.md) — le contrat du moteur, et les changements
   proposés qui attendent l’accord du propriétaire.
 - [`docs/TESTING.md`](docs/TESTING.md) — suite hors ligne et tests réels.
+
+## Version 0.8.2
+
+**Un modèle généré pouvait écrire dans la fiche recette d’une extension tierce
+sans y être lu.** Chaque champ que `MSRWA_Draft` écrit passe par
+`wp_strip_all_tags()` avant d’être stocké — sauf, jusqu’ici, ceux que
+`map_recipe()` transmet aux clés que le réglage *mapping* choisit pour la
+fiche recette d’un site : le titre et la description SEO y arrivaient tels
+quels, de même que la description, les notes et les instructions de la
+recette elle-même. Une extension de fiche recette qui n’échappe pas ce qu’elle
+affiche transformerait une réponse du modèle en script exécuté pour chaque
+visiteur. Ces champs sont désormais nettoyés au même titre que tout le reste,
+et le titre et la description SEO le sont deux fois plutôt qu’une : une fois
+dans `describe()`, une fois dans `map_recipe()` lui-même, pour que la fonction
+reste sûre même appelée autrement demain. Trouvé par une revue de sécurité de
+la branche, vérifié par un nouveau test qui fait écrire au modèle un
+`<script>` et confirme qu’aucune des cinq clés mappées ne le porte.
+
+**Vérifié dans un vrai navigateur, comme administrateur et comme éditeur.**
+Dix-neuf vérifications automatisées contre le site local : réglages
+enregistrés et relus, vérification des clés en direct, estimation en direct
+sur l’écran de dépôt, création puis envoi réel d’un lot, écrans Analyse et
+Pass, purge de rétention — puis, avec un compte éditeur distinct : aucun
+montant sur aucun écran, aucun lien vers Réglages, Moteur ou Analyse, refus au
+niveau de WordPress lui-même sur les trois (403, avant que l’écran ne soit
+seulement atteint), aucun champ de plafond sur le dépôt.
+
+**Où en sont les trois fournisseurs, pour ce lancement.** Aucun des trois ne
+peut aujourd’hui mener une recette jusqu’au bout depuis cette machine :
+OpenAI reste injoignable au niveau réseau ; la clé Claude répond désormais
+« solde insuffisant » à chaque appel ; la clé Gemini écrit du texte sans
+problème mais son outil de recherche web — que l’étape recherche exige —
+répond `429` ou `503` à chaque tentative, ce qui ressemble à un palier gratuit
+trop bas pour la recherche web plutôt qu’à une clé invalide. Détaillé dans
+[`PLAN.md`](docs/PLAN.md), « Ce dont j’ai besoin de vous ».
 
 ## Version 0.8.1
 

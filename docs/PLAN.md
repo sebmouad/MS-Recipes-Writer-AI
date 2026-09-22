@@ -133,13 +133,24 @@ on a real site; Arabic has not been run live yet.
 
 ## What I need from you
 
-1. **An OpenAI or Gemini key usable from a test machine that can reach them.**
-   The keys you sent work for Claude; the sandbox used for 0.8.0 could not reach
-   OpenAI or Gemini at all, so images, the final judge and photograph matching
-   have not run live yet. Please also **rotate the three keys** you pasted into
-   the chat.
+1. **A provider that can actually finish a recipe.** As of 0.8.1, all three are
+   blocked, each a different way: OpenAI's API is still unreachable from this
+   sandbox (a network policy on the test environment, not the key). The Claude
+   key now answers "Your credit balance is too low" on every call — it worked
+   for 0.8.0, so the account has since run out; it needs a top-up. The Gemini
+   key generates text fine, but the `research` step's web-search tool
+   (`google_search` grounding) answers `429 RESOURCE_EXHAUSTED` or
+   `503 UNAVAILABLE` on every attempt — free-tier Gemini projects carry a very
+   small grounding allowance, so this most likely needs billing enabled on that
+   Google Cloud project. Any one of the three unblocks a full live run; I
+   verified everything else — every screen, every setting, the ceiling that
+   refuses a lot for free, the key-check, and a real (if not-yet-complete)
+   dispatch — with the keys as they stand today. Please also **rotate the three
+   keys** you pasted into the chat, as asked for 0.8.0 and still true: a key
+   typed into a conversation should not go on being the live one.
 2. **A staging copy of the real site** (MySQL), with an administrator's
-   application password — the 0.8.0 verification ran on a local SQLite site.
+   application password — the 0.8.0 and 0.8.1 verification both ran on a local
+   SQLite site, for lack of one.
 3. **A decision on the four engine changes** proposed in
    [`ENGINE.md`](ENGINE.md) §7. None is applied until you say so.
 
