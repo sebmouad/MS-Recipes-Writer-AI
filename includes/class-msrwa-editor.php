@@ -59,6 +59,7 @@ final class MSRWA_Editor {
 
 		if ( ! is_array( $report ) ) {
 			echo '<p class="ms-muted">' . esc_html__( 'Aucun jugement final n’a été rendu pour cet article — le profil choisi ne l’exécutait pas, ou la recette s’est arrêtée avant.', 'ms-recipes-writer-ai' ) . '</p>';
+			self::extras( $post->ID );
 			self::link( $run_id, $run );
 			echo '</div>';
 			return;
@@ -100,8 +101,33 @@ final class MSRWA_Editor {
 			}
 		}
 
+		self::extras( $post->ID );
 		self::link( $run_id, $run );
 		echo '</div>';
+	}
+
+	/**
+	 * What the article wrote about itself for search and social. An SEO plugin
+	 * shows its own copy when it is installed; this is for every other site, and
+	 * for the Facebook caption, which no plugin holds.
+	 */
+	private static function extras( $post_id ) {
+		$fields = array(
+			'_msrwa_seo_title' => __( 'Titre SEO', 'ms-recipes-writer-ai' ),
+			'_msrwa_seo_description' => __( 'Méta-description', 'ms-recipes-writer-ai' ),
+			'_msrwa_facebook_caption' => __( 'Légende Facebook', 'ms-recipes-writer-ai' ),
+		);
+		$rows = array();
+		foreach ( $fields as $key => $label ) {
+			$value = (string) get_post_meta( $post_id, $key, true );
+			if ( '' !== $value ) { $rows[ $label ] = $value; }
+		}
+		if ( ! $rows ) { return; }
+		echo '<details class="ms-extras"><summary>' . esc_html__( 'Référencement et réseaux sociaux', 'ms-recipes-writer-ai' ) . '</summary><dl>';
+		foreach ( $rows as $label => $value ) {
+			echo '<dt>' . esc_html( $label ) . '</dt><dd><textarea readonly rows="' . ( mb_strlen( $value ) > 180 ? 4 : 2 ) . '" class="widefat">' . esc_textarea( $value ) . '</textarea></dd>';
+		}
+		echo '</dl></details>';
 	}
 
 	private static function link( $run_id, $run ) {
