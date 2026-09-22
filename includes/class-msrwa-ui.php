@@ -29,6 +29,16 @@ final class MSRWA_UI {
 		echo '</div>';
 	}
 
+	/**
+	 * A table too wide for the screen, made reachable rather than crushed.
+	 *
+	 * A region that scrolls with the mouse and not with the keyboard is a table
+	 * some readers simply cannot see the end of, so it is focusable and named.
+	 */
+	public static function scroll( $label ) {
+		return '<div class="ms-scroll" tabindex="0" role="region" aria-label="' . esc_attr( $label ) . '">';
+	}
+
 	public static function figures( array $figures ) {
 		echo '<dl class="ms-figures">';
 		foreach ( $figures as $entry ) {

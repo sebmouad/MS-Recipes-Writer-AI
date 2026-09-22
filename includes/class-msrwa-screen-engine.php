@@ -82,7 +82,7 @@ final class MSRWA_Screen_Engine {
 				<?php endforeach; ?>
 			<?php endforeach; ?>
 
-			<?php submit_button( __( 'Enregistrer', 'ms-recipes-writer-ai' ) ); ?>
+			<div class="ms-card ms-save"><?php submit_button( __( 'Enregistrer', 'ms-recipes-writer-ai' ), 'primary', 'submit', false ); ?></div>
 		</form>
 
 		<?php MSRWA_Operations::diagnostics(); ?>

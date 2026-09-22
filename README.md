@@ -2,6 +2,31 @@
 
 Plugin WordPress en construction pour la génération éditoriale culinaire orchestrée.
 
+## Version 0.7.2
+
+**Quatre défauts visuels, dont deux ne se voyaient que sur un téléphone.**
+
+Un tableau large était écrasé jusqu'à ce qu'un nom de modèle se casse en trois
+morceaux au milieu d'un trait d'union. Dans une zone qui défile, c'est
+désormais le contenu qui décide de la largeur : une ligne par ligne, et on fait
+défiler. Les deux dégradés qui suivent le contenu et les deux qui ne bougent
+pas laissent une ombre du côté où il reste quelque chose à voir — sans quoi
+rien n'indique qu'il y a une suite. Ces zones sont aussi atteignables au
+clavier et nommées : une région qui défile à la souris mais pas au clavier est
+un tableau dont certains lecteurs ne verront jamais la fin.
+
+La grille de chiffres peignait ses propres filets. Avec cinq tuiles sur deux
+colonnes, la case vide se lisait comme un bloc de couleur. Les filets
+appartiennent maintenant aux tuiles, et la case qui reste est simplement vide.
+
+Le bouton d'enregistrement flottait entre deux cartes, alors que partout
+ailleurs dans le plugin un bouton qui termine un formulaire est dans une
+carte. Il y est.
+
+Et le nouveau tableau des postes tient sur un téléphone : la barre disparaît
+sous 782 px, parce que la part est écrite à côté d'elle et que la largeur va au
+texte.
+
 ## Version 0.7.1
 
 **Deux questions que le tableau par étape ne répondait pas.**
@@ -418,7 +443,7 @@ cron réel et validité distante des clés restent à vérifier sur un site de t
 
 ## État actuel
 
-La version `0.7.1` est un socle installable : file persistante, pipeline de
+La version `0.7.2` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.

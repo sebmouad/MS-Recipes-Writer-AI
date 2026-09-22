@@ -164,7 +164,8 @@ final class MSRWA_Screen_Run {
 
 	private static function steps( array $steps ) {
 		if ( ! $steps ) { return; }
-		echo '<section class="ms-card ms-card-flush"><h2>' . esc_html__( 'Étapes', 'ms-recipes-writer-ai' ) . '</h2><div class="ms-scroll"><table class="ms-table"><thead><tr>'
+		echo '<section class="ms-card ms-card-flush"><h2>' . esc_html__( 'Étapes', 'ms-recipes-writer-ai' ) . '</h2>'
+			. MSRWA_UI::scroll( __( 'Étapes', 'ms-recipes-writer-ai' ) ) . '<table class="ms-table"><thead><tr>' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- scroll() escapes its own.
 			. '<th>' . esc_html__( 'Étape', 'ms-recipes-writer-ai' ) . '</th>';
 		if ( MSRWA_Rights::may_read_diagnostics() ) { echo '<th>' . esc_html__( 'Modèle', 'ms-recipes-writer-ai' ) . '</th>'; }
 		echo '<th class="ms-num">' . esc_html__( 'Durée', 'ms-recipes-writer-ai' ) . '</th>';
@@ -197,7 +198,7 @@ final class MSRWA_Screen_Run {
 		if ( ! $calls ) { return; }
 		echo '<section class="ms-card ms-card-flush"><h2>' . esc_html__( 'Appels', 'ms-recipes-writer-ai' ) . '</h2>';
 		echo '<p>' . esc_html__( 'Ce qui a réellement été facturé, par quel point d’entrée, et quelle part de l’entrée a été servie depuis le cache du fournisseur.', 'ms-recipes-writer-ai' ) . '</p>';
-		echo '<div class="ms-scroll"><table class="ms-table"><thead><tr>'
+		echo MSRWA_UI::scroll( __( 'Appels', 'ms-recipes-writer-ai' ) ) . '<table class="ms-table"><thead><tr>' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- scroll() escapes its own.
 			. '<th>' . esc_html__( 'Étape', 'ms-recipes-writer-ai' ) . '</th><th>' . esc_html__( 'Modèle', 'ms-recipes-writer-ai' ) . '</th>'
 			. '<th class="ms-num">' . esc_html__( 'Entrée', 'ms-recipes-writer-ai' ) . '</th><th class="ms-num">' . esc_html__( 'Cache', 'ms-recipes-writer-ai' ) . '</th>'
 			. '<th class="ms-num">' . esc_html__( 'Sortie', 'ms-recipes-writer-ai' ) . '</th><th class="ms-num">' . esc_html__( 'Durée', 'ms-recipes-writer-ai' ) . '</th>'

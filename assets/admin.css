@@ -140,11 +140,23 @@
  * typographic decision the rest of the design is built around.
  */
 
-.ms-figures { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1px; background: var(--ms-line); border: 1px solid var(--ms-line); border-radius: var(--ms-radius); overflow: hidden; }
-.ms-figure { background: var(--ms-raised); padding: 15px 17px; }
+/* The hairlines belong to the tiles, not to the grid behind them: an odd
+   number of figures leaves a track empty, and a grid that paints its own
+   background shows that emptiness as a block of rule colour. */
+.ms-figures { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1px; background: var(--ms-raised); border: 1px solid var(--ms-line); border-radius: var(--ms-radius); overflow: hidden; }
+.ms-figure { background: var(--ms-raised); padding: 15px 17px; outline: 1px solid var(--ms-line); }
 .ms-figure dt, .ms-figure > span { display: block; margin: 0 0 7px; font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: var(--ms-ink-faint); }
 .ms-figure dd, .ms-figure > strong { display: block; margin: 0; font-family: var(--ms-mono); font-size: 25px; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.05; letter-spacing: -0.02em; }
 .ms-figure small { display: block; margin-block-start: 6px; font-family: inherit; font-size: 12px; color: var(--ms-ink-soft); }
+
+/* The button that ends a form belongs to the form, not to the space between
+   two cards; on a settings page long enough to scroll it stays in reach. */
+.ms-save { display: flex; justify-content: flex-end; align-items: center; gap: 12px; padding: 12px 16px; }
+
+/* One line of a card: some words on the left, the control that acts on them
+   pushed to the right, and both on their own line when there is no room. */
+.ms-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.ms-row > :last-child { margin-inline-start: auto; }
 
 /* --- The rail ---------------------------------------------------------
  * The signature. One ticket per run, its state carried on a spine at the
@@ -207,7 +219,22 @@
 
 /* --- Tables ------------------------------------------------------------ */
 
-.ms-scroll { overflow-x: auto; }
+/* A wide table scrolls; it is not squeezed until a model name breaks one
+   character per line. The two gradients that move with the content and the two
+   that do not leave a shadow at whichever edge still has something behind it. */
+.ms-scroll {
+	overflow-x: auto;
+	overscroll-behavior-x: contain;
+	background:
+		linear-gradient(to right, var(--ms-raised), rgba(0, 0, 0, 0)) 0 0 / 28px 100% no-repeat local,
+		linear-gradient(to left, var(--ms-raised), rgba(0, 0, 0, 0)) 100% 0 / 28px 100% no-repeat local,
+		radial-gradient(farthest-side at 0 50%, rgba(15, 23, 32, .14), rgba(0, 0, 0, 0)) 0 0 / 12px 100% no-repeat scroll,
+		radial-gradient(farthest-side at 100% 50%, rgba(15, 23, 32, .14), rgba(0, 0, 0, 0)) 100% 0 / 12px 100% no-repeat scroll;
+}
+/* Inside a scrolling region the content sets the width, so a model name or a
+   duration never breaks mid-token to fit a column that was always too narrow. */
+.ms-scroll > .ms-table td, .ms-scroll > .ms-table th { white-space: nowrap; }
+.ms-scroll:focus-visible { outline: 2px solid var(--ms-lamp); outline-offset: -2px; }
 .ms-table { inline-size: 100%; border-collapse: collapse; font-size: 13px; }
 .ms-table th, .ms-table td { padding: 10px 16px; text-align: start; vertical-align: top; border-block-end: 1px solid var(--ms-line-soft); }
 .ms-table th { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--ms-ink-faint); background: var(--ms-sunk); font-weight: 650; }
@@ -215,6 +242,13 @@
 .ms-table td.ms-num, .ms-table th.ms-num { text-align: end; font-family: var(--ms-mono); font-variant-numeric: tabular-nums; }
 .ms-table .ms-key { font-family: var(--ms-mono); font-size: 12px; color: var(--ms-ink-soft); }
 .ms-table small { display: block; color: var(--ms-ink-soft); margin-block-start: 3px; }
+
+/* A label, a bar and its figures. The bar takes whatever the figures leave. */
+.ms-share td { vertical-align: middle; }
+.ms-share .ms-share-label { inline-size: 1%; white-space: nowrap; }
+.ms-share .ms-num { inline-size: 1%; white-space: nowrap; }
+.ms-share .ms-bar { inline-size: auto; }
+.ms-share .ms-progress { inline-size: 100%; }
 
 /* --- Filters ----------------------------------------------------------- */
 
@@ -289,6 +323,14 @@
 .ms-muted { color: var(--ms-ink-soft); }
 .ms-num, .ms-key { font-family: var(--ms-mono); font-variant-numeric: tabular-nums; }
 .ms-code { font-family: var(--ms-mono); font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere; background: var(--ms-sunk); border: 1px solid var(--ms-line-soft); border-radius: 6px; padding: 12px 14px; max-height: 420px; overflow: auto; }
+
+@media (max-width: 782px) {
+	/* The share is written beside the bar, so on a phone the bar is the part
+	   worth spending the width on — and it is the part there is no width for. */
+	.ms-share .ms-bar { display: none; }
+	.ms-share td { padding-inline: 10px; }
+	.ms-share td.ms-num, .ms-share td.ms-share-label { white-space: normal; }
+}
 
 @media (max-width: 960px) {
 	.ms-grid-2, .ms-grid-3 { grid-template-columns: 1fr; }

@@ -83,17 +83,18 @@ final class MSRWA_Screen_Pass {
 			MSRWA_UI::note( esc_html__( 'La file est suspendue. Rien de nouveau ne part ; ce qui est déjà commencé garde tout ce qui a été fait et reprendra à l’endroit exact.', 'ms-recipes-writer-ai' ), 'warn' );
 		}
 
-		echo '<div class="ms-filters" style="background:none;border:0;padding:0">';
-		echo '<div><span class="ms-muted">' . esc_html( sprintf(
+		echo '<div class="ms-row">';
+		echo '<span class="ms-muted">' . esc_html( sprintf(
 			/* translators: 1: recipes waiting, 2: recipes working. */
 			__( '%1$d en attente, %2$d en cours', 'ms-recipes-writer-ai' ),
 			$state['waiting'], $state['working']
-		) ) . '</span></div>';
+		) ) . '</span>';
 
 		if ( MSRWA_Rights::may_manage() ) {
-			echo '<div><button class="button" id="ms-queue-toggle" data-held="' . ( $state['held'] ? '1' : '0' ) . '">'
+			echo '<span id="ms-queue-status" class="ms-muted" aria-live="polite"></span>';
+			echo '<button class="button" id="ms-queue-toggle" data-held="' . ( $state['held'] ? '1' : '0' ) . '">'
 				. esc_html( $state['held'] ? __( 'Reprendre la file', 'ms-recipes-writer-ai' ) : __( 'Suspendre la file', 'ms-recipes-writer-ai' ) )
-				. '</button> <span id="ms-queue-status" class="ms-muted" aria-live="polite"></span></div>';
+				. '</button>';
 		}
 		echo '</div></section>';
 	}

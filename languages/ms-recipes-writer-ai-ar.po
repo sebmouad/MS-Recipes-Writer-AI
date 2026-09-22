@@ -924,9 +924,6 @@ msgstr "ثلاثون يومًا"
 msgid "%1$s sur les %2$d jours précédents"
 msgstr "%1$s مقارنةً بالـ%2$d يومًا السابقة"
 
-msgid "%1$s, %2$s du temps"
-msgstr "%1$s، %2$s من الوقت"
-
 msgid "Les quatre postes du moteur, dépense et temps passé. Le temps n’est pas la dépense : une image coûte cher et va vite, une relecture est l’inverse."
 msgstr "بنود المحرّك الأربعة: ما أنفقه كلٌّ منها والوقت الذي استغرقه. الوقت ليس الإنفاق: الصورة مكلفة وسريعة، والمراجعة عكس ذلك."
 
@@ -950,6 +947,18 @@ msgstr "السقف %s"
 
 msgid "stable sur %d jours"
 msgstr "مستقر على %d يومًا"
+
+msgid "Poste"
+msgstr "البند"
+
+msgid "Temps"
+msgstr "الوقت"
+
+msgid "%s du coût"
+msgstr "%s من التكلفة"
+
+msgid "%s du temps"
+msgstr "%s من الوقت"
 
 msgid "%d remarque bloquante"
 msgid_plural "%d remarques bloquantes"

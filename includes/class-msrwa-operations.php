@@ -147,7 +147,7 @@ final class MSRWA_Operations {
 	private static function table( $title, array $rows ) {
 		echo '<section class="ms-card ms-card-flush"><h2>' . esc_html( $title ) . '</h2>';
 		if ( ! $rows ) { echo '<p class="ms-muted" style="padding:0 20px 18px">' . esc_html__( 'Aucune donnée.', 'ms-recipes-writer-ai' ) . '</p></section>'; return; }
-		echo '<div class="ms-scroll" tabindex="0" role="region" aria-label="' . esc_attr( $title ) . '"><table class="ms-table"><thead><tr>';
+		echo MSRWA_UI::scroll( $title ) . '<table class="ms-table"><thead><tr>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- scroll() escapes its own.
 		foreach ( array_keys( $rows[0] ) as $key ) { echo '<th scope="col">' . esc_html( str_replace( '_', ' ', $key ) ) . '</th>'; }
 		echo '</tr></thead><tbody>';
 		foreach ( $rows as $row ) { echo '<tr>'; foreach ( $row as $value ) { echo '<td>' . esc_html( null === $value ? '—' : $value ) . '</td>'; } echo '</tr>'; }

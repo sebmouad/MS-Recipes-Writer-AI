@@ -60,7 +60,7 @@ final class MSRWA_Screen_Settings {
 				</p>
 			</section>
 
-			<?php submit_button( __( 'Enregistrer', 'ms-recipes-writer-ai' ) ); ?>
+			<div class="ms-card ms-save"><?php submit_button( __( 'Enregistrer', 'ms-recipes-writer-ai' ), 'primary', 'submit', false ); ?></div>
 		</form>
 
 		<?php self::budget(); ?>
@@ -76,14 +76,14 @@ final class MSRWA_Screen_Settings {
 
 		echo '<section class="ms-card"><h2>' . esc_html__( 'Où en sont les plafonds', 'ms-recipes-writer-ai' ) . '</h2>';
 		echo '<p>' . esc_html__( 'La dépense du site entier, pas celle d’un rédacteur : un plafond appartient au site, et quelqu’un qui n’en verrait que sa part ne comprendrait jamais pourquoi son lot a été refusé.', 'ms-recipes-writer-ai' ) . '</p>';
-		echo '<table class="ms-table"><tbody>';
+		echo '<table class="ms-table ms-share"><tbody>';
 		foreach ( array( 'daily' => __( 'aujourd’hui', 'ms-recipes-writer-ai' ), 'monthly' => __( 'trente jours', 'ms-recipes-writer-ai' ) ) as $name => $label ) {
 			$budget = $state[ $name ];
 			if ( ! $budget['ceiling'] ) { continue; }
-			echo '<tr><td style="inline-size:140px">' . esc_html( $label ) . '</td>'
-				. '<td><span class="ms-progress" style="inline-size:100%">'
+			echo '<tr><td class="ms-share-label">' . esc_html( $label ) . '</td>'
+				. '<td class="ms-bar"><span class="ms-progress">'
 				. '<i style="inline-size:' . (int) $budget['share'] . '%' . ( $budget['exceeded'] ? ';background:var(--ms-stop)' : '' ) . '"></i></span></td>'
-				. '<td class="ms-num" style="inline-size:200px">'
+				. '<td class="ms-num">'
 				. esc_html( sprintf(
 					/* translators: 1: amount spent, 2: the ceiling. */
 					__( '%1$s sur %2$s', 'ms-recipes-writer-ai' ),

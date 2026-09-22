@@ -924,9 +924,6 @@ msgstr "thirty days"
 msgid "%1$s sur les %2$d jours précédents"
 msgstr "%1$s on the previous %2$d days"
 
-msgid "%1$s, %2$s du temps"
-msgstr "%1$s, %2$s of the time"
-
 msgid "Les quatre postes du moteur, dépense et temps passé. Le temps n’est pas la dépense : une image coûte cher et va vite, une relecture est l’inverse."
 msgstr "The engine’s four items, what each spent and how long it took. Time is not spend: an image is expensive and quick, a proofread is the other way round."
 
@@ -950,6 +947,18 @@ msgstr "ceiling %s"
 
 msgid "stable sur %d jours"
 msgstr "steady over %d days"
+
+msgid "Poste"
+msgstr "Item"
+
+msgid "Temps"
+msgstr "Time"
+
+msgid "%s du coût"
+msgstr "%s of cost"
+
+msgid "%s du temps"
+msgstr "%s of time"
 
 msgid "%d remarque bloquante"
 msgid_plural "%d remarques bloquantes"
