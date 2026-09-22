@@ -317,7 +317,7 @@
           Object.keys(data).forEach(function (provider) {
             var row = document.createElement('li');
             var state = document.createElement('span');
-            state.className = 'ms-state ms-state-' + ({ ok: 'good', refused: 'stop', unreachable: 'warn', missing: 'idle' }[data[provider].state] || 'idle');
+            state.className = 'ms-state ms-state-' + ({ ok: 'good', blocked: 'stop', refused: 'stop', unreachable: 'warn', missing: 'idle' }[data[provider].state] || 'idle');
             state.textContent = data[provider].label;
             row.appendChild(state);
             row.appendChild(document.createTextNode(' ' + data[provider].message));

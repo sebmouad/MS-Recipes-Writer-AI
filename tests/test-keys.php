@@ -27,4 +27,36 @@ foreach ( $probes as $provider => $probe ) {
 	msrwa_test_missing( $probe['url'], 'secret', $provider . ' never carries its key in the URL, where logs would keep it.' );
 }
 
+// --- What the provider said on a real call -------------------------------
+
+// The probe cannot see any of this: an account with no credit lists models
+// perfectly happily, so a green verdict was reported for an account that could
+// not pay for a single word, twice, against two different providers.
+msrwa_test_assert( 'credit' === MSRWA_Keys::refusal( 'HTTP 400: {"error":{"message":"Your credit balance is too low to access the Anthropic API."}}' ), 'An empty Anthropic account reads as a credit problem.' );
+msrwa_test_assert( 'credit' === MSRWA_Keys::refusal( 'HTTP 429: {"error":{"code":"insufficient_quota"}}' ), 'And so does an OpenAI account with no balance.' );
+msrwa_test_assert( 'credit' === MSRWA_Keys::refusal( 'billing_not_active' ), 'And an account that was never activated.' );
+
+// Google says "check your plan and billing details" while the account is fully
+// funded. Reading that as an empty wallet sent an administrator to top up one
+// that was already full, so it must stay a quota answer.
+msrwa_test_assert( 'quota' === MSRWA_Keys::refusal( 'HTTP 429: {"error":{"code":429,"message":"You exceeded your current quota, please check your plan and billing details."}}' ), 'Google’s exhausted quota is a quota problem, not an empty wallet.' );
+msrwa_test_assert( 'quota' === MSRWA_Keys::refusal( 'RESOURCE_EXHAUSTED' ), 'And so is a bare RESOURCE_EXHAUSTED.' );
+msrwa_test_assert( '' === MSRWA_Keys::refusal( 'HTTP 500: upstream timed out' ), 'A provider outage says nothing about the account.' );
+msrwa_test_assert( '' === MSRWA_Keys::refusal( '' ), 'And neither does silence.' );
+
+// Only a green verdict is corrected: a refused key is the more urgent news,
+// and an unreachable provider has told us nothing about its billing.
+$ok = array( 'state' => 'ok', 'message' => 'clé acceptée' );
+msrwa_test_assert( 'blocked' === MSRWA_Keys::temper( $ok, 'credit' )['state'], 'A key that works on an account that cannot pay is not reported green.' );
+msrwa_test_assert( 'blocked' === MSRWA_Keys::temper( $ok, 'quota' )['state'], 'Nor is one whose quota is spent.' );
+msrwa_test_assert( $ok === MSRWA_Keys::temper( $ok, '' ), 'With nothing recorded against it, the probe’s verdict stands.' );
+foreach ( array( 'refused', 'unreachable', 'missing' ) as $state ) {
+	$verdict = array( 'state' => $state, 'message' => 'x' );
+	msrwa_test_assert( $verdict === MSRWA_Keys::temper( $verdict, 'credit' ), 'A ' . $state . ' verdict is left as it is.' );
+}
+msrwa_test_assert(
+	false === strpos( MSRWA_Keys::temper( $ok, 'credit' )['message'], 'clé acceptée' ),
+	'And it stops claiming the key was accepted.'
+);
+
 msrwa_test_done( 'key check' );

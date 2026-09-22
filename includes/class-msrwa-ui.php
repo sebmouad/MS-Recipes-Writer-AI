@@ -128,12 +128,9 @@ final class MSRWA_UI {
 		// Checked first: a provider out of credit answers 400 or 429 with a
 		// message about billing, and no amount of retrying fixes that.
 		//
-		// Only the unmistakable wordings count. Google's rate limit reads "You
-		// exceeded your current quota, please check your plan and billing
-		// details" — it carries the word billing and the word quota while the
-		// account is perfectly well funded, and matching either sent an
-		// administrator off to top up a wallet that was already full.
-		if ( preg_match( '/credit balance|insufficient_quota|billing_not_active|account is not active/i', $said ) ) {
+		// The reading is MSRWA_Keys', so that this sentence and the one the
+		// diagnostic screen prints about the same account cannot disagree.
+		if ( 'credit' === MSRWA_Keys::refusal( $said ) ) {
 			return array( 'stop', __( 'Le compte du service d’écriture n’a plus de crédit. Un administrateur doit le recharger, puis reprendre la recette : rien de ce qui est fait n’est perdu.', 'ms-recipes-writer-ai' ) );
 		}
 		if ( preg_match( '/no api key|api key|clé/i', $said ) && ! preg_match( '/HTTP 40[13]/', $said ) ) {

@@ -81,6 +81,31 @@ final class MSRWA_Diagnostics {
 		if ( ! $configured ) {
 			return self::check( 'stop', __( 'Clés d’API', 'ms-recipes-writer-ai' ), __( 'Aucune clé enregistrée : aucune recette ne peut partir.', 'ms-recipes-writer-ai' ), __( 'Réglages → Clés d’API, puis « Vérifier les clés ».', 'ms-recipes-writer-ai' ) );
 		}
+		// A key can be perfectly valid and still buy nothing. This is the one
+		// place that can say so without calling anybody: the provider already
+		// refused a real call, and the refusal was written down.
+		$empty = array();
+		$throttled = array();
+		foreach ( $configured as $provider ) {
+			$refusal = MSRWA_Keys::last_refusal( $provider );
+			if ( 'credit' === $refusal ) { $empty[] = $provider; }
+			if ( 'quota' === $refusal ) { $throttled[] = $provider; }
+		}
+		if ( $empty ) {
+			return self::check( 'stop', __( 'Clés d’API', 'ms-recipes-writer-ai' ), sprintf(
+				/* translators: %s is a comma-separated list of provider names. */
+				__( 'Le compte est à court de crédit chez : %s. La clé est bonne ; c’est le compte qui ne peut plus payer, et toute recette s’arrêtera à sa première étape.', 'ms-recipes-writer-ai' ),
+				implode( ', ', $empty )
+			), __( 'Recharger le compte chez le fournisseur, puis reprendre les recettes arrêtées.', 'ms-recipes-writer-ai' ) );
+		}
+		if ( $throttled ) {
+			return self::check( 'warn', __( 'Clés d’API', 'ms-recipes-writer-ai' ), sprintf(
+				/* translators: %s is a comma-separated list of provider names. */
+				__( 'Le quota du compte a été atteint récemment chez : %s. La clé est bonne ; la limite est du côté du fournisseur.', 'ms-recipes-writer-ai' ),
+				implode( ', ', $throttled )
+			), __( 'Attendre que le quota se réinitialise, ou relever la limite du compte chez le fournisseur.', 'ms-recipes-writer-ai' ) );
+		}
+
 		return self::check( 'good', __( 'Clés d’API', 'ms-recipes-writer-ai' ), sprintf(
 			/* translators: %s is a comma-separated list of provider names. */
 			__( 'Enregistrée(s) pour : %s. Une clé enregistrée n’est pas une clé valide — « Vérifier les clés » le dit gratuitement.', 'ms-recipes-writer-ai' ),
