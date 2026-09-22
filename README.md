@@ -5,9 +5,9 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.8.2
+## État actuel — 0.9.0
 
-La version `0.8.2` est installable et vérifiée de bout en bout sur un vrai
+La version `0.9.0` est installable et vérifiée de bout en bout sur un vrai
 WordPress (7.1.1) : un lot part, le cron le fait avancer vague par vague, et un
 brouillon arrive avec son article, sa recette, son extrait, ses étiquettes, ses
 métadonnées SEO et ses données structurées Recipe.
@@ -63,6 +63,58 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.9.0
+
+**Le verdict du juge arrive enfin dans l’éditeur que les sites utilisent.** Il
+voyageait avec le brouillon jusqu’à une boîte classique, et l’éditeur de blocs
+replie ces boîtes derrière un tiroir fermé au bas de l’écran — la boîte était
+bien dans la page, dans un conteneur en `display: none`, derrière une barre de
+32 pixels que personne n’a de raison d’ouvrir. La seule chose que cette
+extension promet de mettre sous les yeux d’un relecteur avant publication
+n’était donc, sur la plupart des sites, sous les yeux de personne.
+`assets/editor.js` enregistre le même verdict à deux endroits : un panneau dans
+la colonne de l’article, et le contrôle d’avant-publication, qui s’ouvre de
+lui-même quand une remarque est bloquante — le moment où la question se pose
+vraiment. La boîte classique reste pour l’éditeur classique, et les deux lisent
+désormais le même `MSRWA_Editor::verdict()`.
+
+**Un écran Diagnostic.** Huit contrôles, dans l’ordre où une recette les
+rencontre : tables et schéma, clés, routage, file et cron, téléversements,
+droits, plafonds, tables laissées par une version précédente. Chacun dit ce qui
+a été mesuré et, quand ce n’est pas vert, quoi faire. Dessous, les mêmes
+constats en un bloc à copier pour une demande d’aide, sans clé, sans chemin et
+sans adresse du site. Rien n’y appelle un fournisseur : l’écran est consultable
+pendant qu’un lot tourne.
+
+**Le menu dit combien de brouillons attendent.** Dans la pastille que
+WordPress utilise déjà pour les commentaires et les mises à jour, et avec la
+même portée que partout ailleurs : un rédacteur voit les siens, un
+administrateur voit tout. Un lot parti le soir n’attend plus que quelqu’un
+pense à ouvrir le pass.
+
+**Une limite de débit n’est plus annoncée comme un compte vide.** Google
+répond à une requête freinée par « You exceeded your current quota, please
+check your plan and billing details » — une phrase qui contient *billing* et
+*quota* alors que le compte est approvisionné. `MSRWA_UI::reason()` en
+concluait qu’il fallait recharger, et la branche qui dit « réessayez plus
+tard » était inatteignable pour ce fournisseur. Elle ne reconnaît plus comme
+compte vide que les formulations qui le sont sans ambiguïté.
+
+**Les messages d’erreur sont traduits.** Les vingt-deux `WP_Error` que l’API
+REST renvoie — et que le script affiche tels quels — étaient des littéraux
+français, invisibles pour l’extracteur puisque rien ne les enveloppait. Un
+rédacteur anglophone lisait « Aucune recette dans ce qui a été fourni. » Tous
+passent par `__()`, et un test refuse désormais un `WP_Error` construit avec un
+littéral.
+
+**Rangement.** Tous les documents passent sous `.claude/docs/`, la racine ne
+garde que ce `README.md` et `CLAUDE.md`, et `tests/test-docs.php` vérifie que
+chaque lien relatif de chaque document mène quelque part. Le README perd ses
+deux dernières sections, qui décrivaient des écrans disparus depuis la 0.3.0.
+`MSRWA_Estimate` et `MSRWA_Batch` cessent de porter chacun une copie identique
+de la même fusion récursive de configuration, et quatre règles CSS que rien
+n’émettait sont retirées.
 
 ## Version 0.8.2
 
