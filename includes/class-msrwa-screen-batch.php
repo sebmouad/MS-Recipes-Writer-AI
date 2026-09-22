@@ -88,12 +88,10 @@ final class MSRWA_Screen_Batch {
 				(string) $image['file']
 			);
 			?>
-			<div class="ms-pair">
-				<div>
-					<?php if ( ! empty( $image['url'] ) ) : ?>
-						<img src="<?php echo esc_url( $image['url'] ); ?>" alt="<?php echo esc_attr( (string) ( $image['dish'] ?? '' ) ); ?>" loading="lazy">
-					<?php endif; ?>
-				</div>
+			<div class="ms-pair<?php echo empty( $image['url'] ) ? ' ms-pair-blind' : ''; ?>">
+				<?php if ( ! empty( $image['url'] ) ) : ?>
+					<div><img src="<?php echo esc_url( $image['url'] ); ?>" alt="<?php echo esc_attr( (string) ( $image['dish'] ?? '' ) ); ?>" loading="lazy"></div>
+				<?php endif; ?>
 				<div>
 					<p class="ms-pair-says">
 						<?php if ( '' !== (string) ( $image['dish'] ?? '' ) ) : ?><strong><?php echo esc_html( $image['dish'] ); ?></strong> — <?php endif; ?>

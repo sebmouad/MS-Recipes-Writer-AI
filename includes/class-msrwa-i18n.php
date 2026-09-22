@@ -61,9 +61,15 @@ final class MSRWA_I18N {
 		return sprintf( __( 'il y a %s', 'ms-recipes-writer-ai' ), human_time_diff( $timestamp, time() ) );
 	}
 
-	/** An amount of money, always said to be an estimate where it is one. */
+	/**
+	 * An amount in dollars, written the way the reader's language writes it.
+	 *
+	 * French puts the sign after the number and English before it, and hard
+	 * coding either makes the other look like a translation nobody finished.
+	 */
 	public static function money( $amount, $decimals = 4 ) {
-		return number_format_i18n( (float) $amount, $decimals ) . ' $';
+		/* translators: %s is an amount of money. Put the currency sign where your language puts it. */
+		return sprintf( __( '%s $', 'ms-recipes-writer-ai' ), number_format_i18n( (float) $amount, $decimals ) );
 	}
 
 	public static function seconds( $seconds ) {

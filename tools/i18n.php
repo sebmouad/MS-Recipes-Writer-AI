@@ -38,6 +38,21 @@ function msrwa_i18n_extract() {
 				$strings[ $text ][] = basename( $file ) . ':' . $line;
 			}
 		}
+
+		// _n( 'one', 'many', $count, 'domain' ). Missed by the pattern above,
+		// which is how three plural strings shipped in French inside an English
+		// interface without anything noticing.
+		$plural = '/\b_n\(\s*([\'"])((?:\\\\.|(?!\1).)*)\1\s*,\s*([\'"])((?:\\\\.|(?!\3).)*)\3\s*,/';
+		if ( preg_match_all( $plural, $source, $found, PREG_OFFSET_CAPTURE | PREG_SET_ORDER ) ) {
+			foreach ( $found as $match ) {
+				$line = substr_count( substr( $source, 0, $match[0][1] ), "\n" ) + 1;
+				$one = stripcslashes( $match[2][0] );
+				$many = stripcslashes( $match[4][0] );
+				if ( ! isset( $strings[ $one ] ) ) { $strings[ $one ] = array(); }
+				$strings[ $one ][] = basename( $file ) . ':' . $line;
+				$GLOBALS['msrwa_i18n_plurals'][ $one ] = $many;
+			}
+		}
 		unset( $lines );
 	}
 
@@ -58,9 +73,15 @@ function msrwa_i18n_write_pot( array $strings ) {
 		. "\"Content-Transfer-Encoding: 8bit\\n\"\n"
 		. "\"X-Generator: tools/i18n.php\\n\"\n\n";
 
+	$plurals = (array) ( $GLOBALS['msrwa_i18n_plurals'] ?? array() );
 	foreach ( $strings as $text => $places ) {
 		$out .= '#: ' . implode( ' ', array_unique( $places ) ) . "\n";
 		$out .= 'msgid "' . msrwa_i18n_po_escape( $text ) . "\"\n";
+		if ( isset( $plurals[ $text ] ) ) {
+			$out .= 'msgid_plural "' . msrwa_i18n_po_escape( $plurals[ $text ] ) . "\"\n";
+			$out .= "msgstr[0] \"\"\nmsgstr[1] \"\"\n\n";
+			continue;
+		}
 		$out .= "msgstr \"\"\n\n";
 	}
 
@@ -69,29 +90,71 @@ function msrwa_i18n_write_pot( array $strings ) {
 	return $path;
 }
 
-/** Reads a .po into msgid => msgstr, ignoring anything untranslated. */
+/**
+ * Reads a .po into msgid => msgstr, ignoring anything untranslated.
+ *
+ * A plural entry becomes one catalogue entry whose key is the singular and the
+ * plural joined by a NUL, and whose value is every form joined the same way.
+ * That is exactly what a .mo holds and what gettext looks for, so nothing
+ * downstream needs to know plurals exist.
+ */
 function msrwa_i18n_read_po( $file ) {
 	$entries = array();
 	$id = null;
-	$str = null;
+	$plural = null;
+	$forms = array();
+	$single = null;
 	$mode = '';
+
+	$flush = static function () use ( &$entries, &$id, &$plural, &$forms, &$single ) {
+		if ( null === $id || '' === $id ) { return; }
+		if ( null !== $plural ) {
+			$filled = array_filter( $forms, static function ( $form ) { return '' !== $form; } );
+			if ( count( $filled ) === count( $forms ) && $forms ) {
+				$entries[ $id . "\0" . $plural ] = implode( "\0", $forms );
+			}
+			return;
+		}
+		if ( null !== $single && '' !== $single ) { $entries[ $id ] = $single; }
+	};
+
 	foreach ( explode( "\n", (string) file_get_contents( $file ) ) as $line ) {
 		$line = trim( $line );
 		if ( '' === $line || 0 === strpos( $line, '#' ) ) { continue; }
+
+		if ( 0 === strpos( $line, 'msgid_plural ' ) ) {
+			$plural = msrwa_i18n_po_unescape( substr( $line, 13 ) );
+			$mode = 'plural';
+			continue;
+		}
 		if ( 0 === strpos( $line, 'msgid ' ) ) {
-			if ( null !== $id && null !== $str && '' !== $str ) { $entries[ $id ] = $str; }
+			$flush();
 			$id = msrwa_i18n_po_unescape( substr( $line, 6 ) );
-			$str = null;
+			$plural = null;
+			$forms = array();
+			$single = null;
 			$mode = 'id';
 			continue;
 		}
-		if ( 0 === strpos( $line, 'msgstr ' ) ) { $str = msrwa_i18n_po_unescape( substr( $line, 7 ) ); $mode = 'str'; continue; }
+		if ( preg_match( '/^msgstr\[(\d+)\] (.*)$/', $line, $match ) ) {
+			$forms[ (int) $match[1] ] = msrwa_i18n_po_unescape( $match[2] );
+			$mode = 'form' . (int) $match[1];
+			continue;
+		}
+		if ( 0 === strpos( $line, 'msgstr ' ) ) {
+			$single = msrwa_i18n_po_unescape( substr( $line, 7 ) );
+			$mode = 'str';
+			continue;
+		}
 		if ( '"' === substr( $line, 0, 1 ) ) {
 			$piece = msrwa_i18n_po_unescape( $line );
-			if ( 'id' === $mode ) { $id .= $piece; } elseif ( 'str' === $mode ) { $str .= $piece; }
+			if ( 'id' === $mode ) { $id .= $piece; }
+			elseif ( 'plural' === $mode ) { $plural .= $piece; }
+			elseif ( 'str' === $mode ) { $single .= $piece; }
+			elseif ( 0 === strpos( $mode, 'form' ) ) { $forms[ (int) substr( $mode, 4 ) ] .= $piece; }
 		}
 	}
-	if ( null !== $id && null !== $str && '' !== $str ) { $entries[ $id ] = $str; }
+	$flush();
 	unset( $entries[''] );
 	return $entries;
 }
@@ -170,7 +233,9 @@ $strings = msrwa_i18n_extract();
 printf( "%d translatable string(s) in the source\n", count( $strings ) );
 foreach ( glob( msrwa_i18n_root() . '/languages/*.po' ) as $po ) {
 	$entries = msrwa_i18n_read_po( $po );
-	$missing = array_diff( array_keys( $strings ), array_keys( $entries ) );
+	$known = array();
+	foreach ( array_keys( $entries ) as $key ) { $known[] = strtok( $key, "\0" ); }
+	$missing = array_diff( array_keys( $strings ), $known );
 	printf( "%-30s %3d translated, %3d missing\n", basename( $po ), count( $entries ), count( $missing ) );
 	if ( in_array( '--missing', $argv, true ) ) {
 		foreach ( $missing as $text ) { echo '    ' . $text . "\n"; }

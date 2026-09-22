@@ -65,7 +65,11 @@ foreach ( array( 'en_US', 'ar' ) as $locale ) {
 	if ( ! is_readable( $po ) ) { continue; }
 
 	$entries = msrwa_i18n_read_po( $po );
-	$missing = array_diff( $source, array_keys( $entries ) );
+	// A plural entry is keyed by its singular and plural joined by a NUL, the
+	// way a .mo holds it. The source only ever names the singular.
+	$known = array();
+	foreach ( array_keys( $entries ) as $key ) { $known[] = strtok( $key, "\0" ); }
+	$missing = array_diff( $source, $known );
 	msrwa_test_assert( ! $missing, count( $missing ) . ' string(s) untranslated in ' . $locale . ": \n      " . implode( "\n      ", array_slice( $missing, 0, 12 ) ) );
 
 	// A .po nobody compiled is a .po WordPress never reads.
@@ -76,11 +80,27 @@ foreach ( array( 'en_US', 'ar' ) as $locale ) {
 	// A translation that drops a placeholder produces a broken sentence at
 	// runtime, and gettext will not warn anybody.
 	foreach ( $entries as $from => $to ) {
+		// A plural's forms may legitimately drop the number — Arabic says
+		// "one recipe" without a digit — so each form is checked against the
+		// form of the source it corresponds to, not against the singular.
+		if ( false !== strpos( $from, "\0" ) ) { continue; }
 		preg_match_all( '/%[0-9]*\$?[sd]/', $from, $wanted );
 		preg_match_all( '/%[0-9]*\$?[sd]/', $to, $got );
 		sort( $wanted[0] );
 		sort( $got[0] );
 		msrwa_test_assert( $wanted[0] === $got[0], 'Placeholders differ in ' . $locale . ' for: ' . mb_substr( $from, 0, 60 ) );
+	}
+}
+
+// A plural entry must carry a form for every plural the language declares, or
+// gettext falls through to the original on the counts it cannot find.
+foreach ( array( 'en_US' => 2, 'ar' => 6 ) as $locale => $forms ) {
+	$po = dirname( __DIR__ ) . '/languages/ms-recipes-writer-ai-' . $locale . '.po';
+	if ( ! is_readable( $po ) ) { continue; }
+	foreach ( msrwa_i18n_read_po( $po ) as $key => $value ) {
+		if ( false === strpos( $key, "\0" ) ) { continue; }
+		$given = count( explode( "\0", $value ) );
+		msrwa_test_assert( $given === $forms, $locale . ' declares ' . $forms . ' plural form(s) but gives ' . $given . ' for: ' . strtok( $key, "\0" ) );
 	}
 }
 

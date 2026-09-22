@@ -31,9 +31,17 @@ final class MSRWA_Admin {
 		add_submenu_page( 'msrwa', __( 'Moteur', 'ms-recipes-writer-ai' ), __( 'Moteur', 'ms-recipes-writer-ai' ), $manage, 'msrwa-engine', array( 'MSRWA_Screen_Engine', 'render' ) );
 		add_submenu_page( 'msrwa', __( 'Réglages', 'ms-recipes-writer-ai' ), __( 'Réglages', 'ms-recipes-writer-ai' ), $manage, 'msrwa-settings', array( 'MSRWA_Screen_Settings', 'render' ) );
 
-		// Reached from a ticket, never from the menu.
-		add_submenu_page( null, __( 'Lot', 'ms-recipes-writer-ai' ), __( 'Lot', 'ms-recipes-writer-ai' ), $write, 'msrwa-batch', array( 'MSRWA_Screen_Batch', 'render' ) );
-		add_submenu_page( null, __( 'Recette', 'ms-recipes-writer-ai' ), __( 'Recette', 'ms-recipes-writer-ai' ), $write, 'msrwa-run', array( 'MSRWA_Screen_Run', 'render' ) );
+		// Reached from a ticket, never from the menu. Registered under the real
+		// parent and then hidden, rather than with a null parent: WordPress no
+		// longer finds a title for a page parented to nothing, and every such
+		// screen carries a deprecation notice across the top of the admin.
+		// `options.php` is a real page and not a menu, so a child of it is
+		// registered with a title and an access check but appears nowhere.
+		// A null parent leaves WordPress unable to find a title, which puts a
+		// deprecation notice across the top of every such screen; removing the
+		// submenu afterwards takes the access check with it and returns 403.
+		add_submenu_page( 'options.php', __( 'Lot', 'ms-recipes-writer-ai' ), __( 'Lot', 'ms-recipes-writer-ai' ), $write, 'msrwa-batch', array( 'MSRWA_Screen_Batch', 'render' ) );
+		add_submenu_page( 'options.php', __( 'Recette', 'ms-recipes-writer-ai' ), __( 'Recette', 'ms-recipes-writer-ai' ), $write, 'msrwa-run', array( 'MSRWA_Screen_Run', 'render' ) );
 	}
 
 	public static function assets( $hook ) {

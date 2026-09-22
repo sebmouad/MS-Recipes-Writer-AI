@@ -812,3 +812,72 @@ msgstr "الكل"
 
 msgid "Le brouillon a été modifié depuis sa génération : %s caractères d’écart. Les contrôles ci-dessous portent sur ce que la machine a écrit, pas sur la version actuelle."
 msgstr "عُدّلت المسودة منذ توليدها: فارق %s حرف. والفحوص أدناه تخصّ ما كتبته الآلة، لا النسخة الحالية."
+
+msgid "%1$s run(s), %2$s lignes de déroulé"
+msgstr "‏%1$s تنفيذ، %2$s سطر مسار"
+
+msgid "Ce qui est conservé"
+msgstr "ما يُحتفظ به"
+
+msgid "Chaque durée est un filtre : msrwa_retention_events_days, msrwa_retention_artifacts_days, msrwa_retention_runs_days. À zéro, rien n’est jamais supprimé."
+msgstr "كل مدة مرشِّح: msrwa_retention_events_days و msrwa_retention_artifacts_days و msrwa_retention_runs_days. وعند الصفر لا يُحذف شيء أبداً."
+
+msgid "Trois durées, parce que trois choses vieillissent différemment. Le déroulé est de la narration et personne ne relit celui d’un run du printemps dernier. Les productions lourdes — le dossier de recherche, l’article tel que la machine l’a écrit, les prompts d’image — valent des mois : c’est de là qu’on répond à une question sur la qualité. Les chiffres, eux, ne sont jamais supprimés par défaut : une ligne d’étape pèse quelques dizaines d’octets et c’est le seul témoignage de ce qu’un run a coûté."
+msgstr "ثلاث مدد، لأن ثلاثة أشياء تشيخ بمعدلات مختلفة. المسار سرد، ولا أحد يعيد قراءة مسار تنفيذ من الربيع الماضي. أما المُخرَجات الثقيلة — ملف البحث، والمقال كما كتبته الآلة، وموجّهات الصور — فتساوي شهوراً: منها يُجاب عن سؤال الجودة. والأرقام لا تُحذف افتراضياً: سطر الخطوة يزن عشرات البايتات وهو الشاهد الوحيد على كلفة التنفيذ."
+
+msgid "conservé indéfiniment"
+msgstr "محفوظ بلا أجل"
+
+msgid "déroulé"
+msgstr "المسار"
+
+msgid "jamais supprimés"
+msgstr "لا تُحذف أبداً"
+
+msgid "jours"
+msgstr "يوماً"
+
+msgid "jours ; verdict, revue et recette restent"
+msgstr "يوماً؛ ويبقى الحكم والمراجعة والوصفة"
+
+msgid "jours, sauf ceux qui ont produit un brouillon"
+msgstr "يوماً، عدا ما أنتج مسودة"
+
+msgid "poids actuel"
+msgstr "الوزن الحالي"
+
+msgid "productions lourdes"
+msgstr "مخرجات ثقيلة"
+
+msgid "runs entiers"
+msgstr "تنفيذات كاملة"
+
+msgid "%s $"
+msgstr "%s $"
+
+msgid "%d remarque bloquante"
+msgid_plural "%d remarques bloquantes"
+msgstr[0] "لا ملاحظات حاجبة"
+msgstr[1] "ملاحظة حاجبة واحدة"
+msgstr[2] "ملاحظتان حاجبتان"
+msgstr[3] "%d ملاحظات حاجبة"
+msgstr[4] "%d ملاحظة حاجبة"
+msgstr[5] "%d ملاحظة حاجبة"
+
+msgid "%d recette"
+msgid_plural "%d recettes"
+msgstr[0] "لا وصفات"
+msgstr[1] "وصفة واحدة"
+msgstr[2] "وصفتان"
+msgstr[3] "%d وصفات"
+msgstr[4] "%d وصفة"
+msgstr[5] "%d وصفة"
+
+msgid "Lancer %d recette"
+msgid_plural "Lancer %d recettes"
+msgstr[0] "لا شيء لإطلاقه"
+msgstr[1] "أطلق وصفة واحدة"
+msgstr[2] "أطلق وصفتين"
+msgstr[3] "أطلق %d وصفات"
+msgstr[4] "أطلق %d وصفة"
+msgstr[5] "أطلق %d وصفة"

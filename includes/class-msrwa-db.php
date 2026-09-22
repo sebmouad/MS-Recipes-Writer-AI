@@ -186,23 +186,6 @@ final class MSRWA_DB {
 		return (int) $wpdb->query( $values ? $wpdb->prepare( $sql, $values ) : $sql );
 	}
 
-	/**
-	 * Drops the verbose half of old runs, keeping the figures.
-	 *
-	 * Events are the narration and grow without limit; steps, calls and
-	 * artifacts are the evidence and stay. Bounded per pass so a cron tick that
-	 * is killed halfway simply resumes on the next one.
-	 */
-	public static function prune_events( $days = 90, $limit = 2000 ) {
-		global $wpdb;
-		$t = self::tables();
-		$days = max( 7, (int) $days );
-		return (int) $wpdb->query( $wpdb->prepare(
-			"DELETE e FROM {$t['events']} e INNER JOIN {$t['runs']} r ON r.id = e.run_id
-			WHERE r.status NOT IN ('queued','running') AND r.updated_at < DATE_SUB(UTC_TIMESTAMP(), INTERVAL %d DAY)
-			LIMIT %d", $days, max( 100, (int) $limit ) ) );
-	}
-
 	public static function column_exists( $table, $column ) {
 		global $wpdb;
 		if ( ! self::table_exists( $table ) ) { return false; }

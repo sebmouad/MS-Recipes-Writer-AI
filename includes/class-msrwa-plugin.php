@@ -4,6 +4,9 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
 final class MSRWA_Plugin {
 
 	public static function activate() {
+		// The interval this plugin schedules on must be registered before the
+		// event is scheduled, and activation does not run boot().
+		add_filter( 'cron_schedules', array( __CLASS__, 'intervals' ) );
 		MSRWA_DB::install();
 		MSRWA_Rights::grant();
 		// Hourly is fine for tidying, but a lot asked for at nine o'clock should
@@ -25,20 +28,25 @@ final class MSRWA_Plugin {
 		}
 	}
 
-	/**
-	 * Old narration is dropped; the figures are kept.
-	 *
-	 * Events grow without limit and nobody reads the timeline of a run from
-	 * last spring. Steps, calls and artifacts are the evidence of what was
-	 * spent and produced, and they stay.
-	 */
+	/** Whatever the retention policy says has outlived its usefulness. */
 	public static function prune() {
-		MSRWA_DB::prune_events( (int) apply_filters( 'msrwa_event_retention_days', 90 ) );
+		MSRWA_Retention::sweep();
 	}
 
-	/** Five minutes, because a scheduled lot waiting an hour is a lot that missed its hour. */
+	/**
+	 * Five minutes, because a lot scheduled for nine that leaves at ten has
+	 * missed its hour.
+	 *
+	 * The label is only translated once translations may be loaded. Activation
+	 * schedules this event, and activation runs before `init`: asking for a
+	 * translation there makes WordPress complain, on every first activation,
+	 * about a domain loaded too early.
+	 */
 	public static function intervals( $schedules ) {
-		$schedules['msrwa_five_minutes'] = array( 'interval' => 300, 'display' => __( 'Toutes les cinq minutes (MS Recipes Writer)', 'ms-recipes-writer-ai' ) );
+		$schedules['msrwa_five_minutes'] = array(
+			'interval' => 300,
+			'display' => did_action( 'init' ) ? __( 'Toutes les cinq minutes (MS Recipes Writer)', 'ms-recipes-writer-ai' ) : 'Toutes les cinq minutes (MS Recipes Writer)',
+		);
 		return $schedules;
 	}
 

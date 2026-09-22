@@ -86,12 +86,55 @@ final class MSRWA_Screen_Settings {
 				'label' => __( 'téléversements', 'ms-recipes-writer-ai' ),
 				'value' => $writable ? __( 'accessibles', 'ms-recipes-writer-ai' ) : __( 'bloqués', 'ms-recipes-writer-ai' ),
 			),
+		) );
+		echo '</section>';
+
+		self::retention();
+	}
+
+	/**
+	 * What is kept, for how long, and what that currently weighs.
+	 *
+	 * On the same screen as the keys because it is the other thing an operator
+	 * comes here to check, and because a plugin that quietly grows without
+	 * limit should at least say how big it has got.
+	 */
+	private static function retention() {
+		$policy = MSRWA_Retention::policy();
+		$weight = MSRWA_Retention::weight();
+
+		echo '<section class="ms-card"><h2>' . esc_html__( 'Ce qui est conservé', 'ms-recipes-writer-ai' ) . '</h2>';
+		echo '<p>' . esc_html__( 'Trois durées, parce que trois choses vieillissent différemment. Le déroulé est de la narration et personne ne relit celui d’un run du printemps dernier. Les productions lourdes — le dossier de recherche, l’article tel que la machine l’a écrit, les prompts d’image — valent des mois : c’est de là qu’on répond à une question sur la qualité. Les chiffres, eux, ne sont jamais supprimés par défaut : une ligne d’étape pèse quelques dizaines d’octets et c’est le seul témoignage de ce qu’un run a coûté.', 'ms-recipes-writer-ai' ) . '</p>';
+
+		MSRWA_UI::figures( array(
 			array(
-				'label' => __( 'rétention', 'ms-recipes-writer-ai' ),
-				'value' => number_format_i18n( (int) apply_filters( 'msrwa_event_retention_days', 90 ) ),
-				'note' => __( 'jours de déroulé conservés ; les chiffres restent', 'ms-recipes-writer-ai' ),
+				'label' => __( 'déroulé', 'ms-recipes-writer-ai' ),
+				'value' => $policy['events'] ? number_format_i18n( $policy['events'] ) : '∞',
+				'note' => $policy['events'] ? __( 'jours', 'ms-recipes-writer-ai' ) : __( 'conservé indéfiniment', 'ms-recipes-writer-ai' ),
+			),
+			array(
+				'label' => __( 'productions lourdes', 'ms-recipes-writer-ai' ),
+				'value' => $policy['artifacts'] ? number_format_i18n( $policy['artifacts'] ) : '∞',
+				'note' => $policy['artifacts'] ? __( 'jours ; verdict, revue et recette restent', 'ms-recipes-writer-ai' ) : __( 'conservé indéfiniment', 'ms-recipes-writer-ai' ),
+			),
+			array(
+				'label' => __( 'runs entiers', 'ms-recipes-writer-ai' ),
+				'value' => $policy['runs'] ? number_format_i18n( $policy['runs'] ) : '∞',
+				'note' => $policy['runs'] ? __( 'jours, sauf ceux qui ont produit un brouillon', 'ms-recipes-writer-ai' ) : __( 'jamais supprimés', 'ms-recipes-writer-ai' ),
+			),
+			array(
+				'label' => __( 'poids actuel', 'ms-recipes-writer-ai' ),
+				'value' => size_format( $weight['artifact_bytes'] ),
+				'note' => sprintf(
+					/* translators: 1: number of runs, 2: number of timeline entries. */
+					__( '%1$s run(s), %2$s lignes de déroulé', 'ms-recipes-writer-ai' ),
+					number_format_i18n( $weight['runs'] ),
+					number_format_i18n( $weight['events'] )
+				),
 			),
 		) );
+
+		echo '<p class="ms-muted">' . esc_html__( 'Chaque durée est un filtre : msrwa_retention_events_days, msrwa_retention_artifacts_days, msrwa_retention_runs_days. À zéro, rien n’est jamais supprimé.', 'ms-recipes-writer-ai' ) . '</p>';
 		echo '</section>';
 	}
 }

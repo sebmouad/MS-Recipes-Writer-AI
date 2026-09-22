@@ -169,11 +169,13 @@
 .ms-ticket-done { border-inline-start-color: var(--ms-good); }
 .ms-ticket-stop { border-inline-start-color: var(--ms-stop); }
 
-.ms-ticket-title { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; min-width: 0; }
+.ms-ticket-title { grid-column: 1; grid-row: 1; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; min-width: 0; }
 .ms-ticket-no { font-family: var(--ms-mono); font-size: 12px; font-weight: 600; color: var(--ms-lamp); letter-spacing: .02em; }
 .ms-ticket-name { font-weight: 600; overflow-wrap: anywhere; }
-.ms-ticket-meta { grid-column: 1; display: flex; gap: 14px; flex-wrap: wrap; font-family: var(--ms-mono); font-size: 12px; color: var(--ms-ink-soft); font-variant-numeric: tabular-nums; }
-.ms-ticket-side { grid-row: 1 / span 2; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+.ms-ticket-meta { grid-column: 1; grid-row: 2; display: flex; gap: 14px; flex-wrap: wrap; font-family: var(--ms-mono); font-size: 12px; color: var(--ms-ink-soft); font-variant-numeric: tabular-nums; }
+/* Both the row and the column, or auto-placement hands this the first column
+   and the ticket reads state-first with its own name pushed to the far edge. */
+.ms-ticket-side { grid-column: 2; grid-row: 1 / span 2; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
 
 /* --- State -------------------------------------------------------------
  * The word carries the meaning; the dot is a second signal for someone
@@ -255,6 +257,9 @@
 /* --- Pairing ----------------------------------------------------------- */
 
 .ms-pair { display: grid; grid-template-columns: 92px minmax(0, 1fr) 220px; gap: 16px; align-items: start; padding: 15px 20px; border-block-end: 1px solid var(--ms-line-soft); }
+/* A photograph with no preview leaves no column: an empty 92px gutter down
+   the page reads as something that failed to load. */
+.ms-pair-blind { grid-template-columns: minmax(0, 1fr) 220px; }
 .ms-pair img { inline-size: 92px; block-size: 92px; object-fit: cover; border-radius: 6px; border: 1px solid var(--ms-line); display: block; }
 .ms-pair select { inline-size: 100%; }
 .ms-pair-file { font-family: var(--ms-mono); font-size: 11px; color: var(--ms-ink-faint); margin-block-start: 6px; overflow-wrap: anywhere; }
@@ -287,9 +292,10 @@
 
 @media (max-width: 960px) {
 	.ms-grid-2, .ms-grid-3 { grid-template-columns: 1fr; }
-	.ms-pair { grid-template-columns: 72px minmax(0, 1fr); }
+	.ms-pair, .ms-pair-blind { grid-template-columns: 72px minmax(0, 1fr); }
 	.ms-pair select { grid-column: 1 / -1; }
 	.ms-timeline > div { grid-template-columns: 1fr; gap: 2px; }
 	.ms-ticket { grid-template-columns: 1fr; }
-	.ms-ticket-side { grid-row: auto; justify-content: flex-start; }
+	.ms-ticket-title, .ms-ticket-meta, .ms-ticket-side { grid-column: 1; grid-row: auto; }
+	.ms-ticket-side { justify-content: flex-start; }
 }

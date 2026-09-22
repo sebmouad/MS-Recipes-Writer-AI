@@ -80,7 +80,7 @@ final class MSRWA_Ledger {
 				AVG(s.input_tokens) input_tokens, AVG(s.output_tokens) output_tokens,
 				SUM(CASE WHEN s.error_message <> '' THEN 1 ELSE 0 END) failures,
 				SUM(CASE WHEN s.cost_usd IS NULL THEN 1 ELSE 0 END) unpriced,
-				AVG(CASE WHEN s.total > 0 THEN s.passed / s.total END) score
+				AVG(CASE WHEN s.total > 0 THEN s.passed * 1.0 / s.total END) score
 			FROM {$t['steps']} s INNER JOIN {$t['runs']} r ON r.id = s.run_id
 			WHERE {$scope}{$since}
 			GROUP BY s.step, s.bucket ORDER BY spend DESC", ARRAY_A );

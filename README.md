@@ -2,6 +2,41 @@
 
 Plugin WordPress en construction pour la génération éditoriale culinaire orchestrée.
 
+## Version 0.6.0
+
+**Installé sur un vrai WordPress, et six bugs que seul un vrai WordPress
+pouvait montrer.**
+
+`DELETE ... INNER JOIN ... LIMIT` ne fonctionne nulle part : MySQL interdit
+LIMIT sur un DELETE multi-tables, SQLite n'a pas cette syntaxe du tout. La purge
+des événements, livrée en 0.4.1, n'avait donc jamais supprimé la moindre ligne —
+et la suite passait au vert parce qu'un faux `wpdb` accepte n'importe quelle
+chaîne. Les lignes sont désormais choisies puis supprimées par leur identifiant.
+
+`add_submenu_page( null, … )` met un avertissement de dépréciation en travers de
+chaque écran concerné ; `remove_submenu_page` emporte le contrôle d'accès avec
+lui et rend 403. Les écrans atteints depuis un ticket sont maintenant rattachés
+à `options.php`, qui existe sans être un menu.
+
+Le filtre `cron_schedules` traduisait son libellé pendant l'activation, avant
+`init` : WordPress s'en plaignait à chaque première activation.
+
+`AVG(passed / total)` est une division entière : le score de recherche
+s'affichait à 0 % au lieu de 93 %. L'extracteur de chaînes ne connaissait pas
+`_n()`, donc trois pluriels étaient restés en français dans l'interface
+anglaise. Et le format monétaire était figé à la française : `0,36 $` en
+anglais.
+
+Enfin, un ticket affichait son état avant son nom : une ligne de grille placée
+sans sa colonne laisse le placement automatique prendre la première.
+
+**Politique de rétention.** Trois durées, parce que trois choses vieillissent
+différemment : le déroulé (90 jours), les productions lourdes (365 jours, en
+gardant verdict, revue et recette), les runs entiers (jamais, sauf demande
+explicite, et jamais ceux qui ont produit un brouillon). Chacune est un filtre ;
+à zéro rien n'est supprimé. L'écran Réglages dit ce qui est gardé et ce que cela
+pèse.
+
 ## Version 0.5.4
 
 **Les tests réels, et une documentation qui décrit le plugin qui existe.**
@@ -329,7 +364,7 @@ cron réel et validité distante des clés restent à vérifier sur un site de t
 
 ## État actuel
 
-La version `0.5.4` est un socle installable : file persistante, pipeline de
+La version `0.6.0` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.

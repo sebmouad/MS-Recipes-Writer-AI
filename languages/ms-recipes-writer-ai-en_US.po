@@ -812,3 +812,60 @@ msgstr "all"
 
 msgid "Le brouillon a été modifié depuis sa génération : %s caractères d’écart. Les contrôles ci-dessous portent sur ce que la machine a écrit, pas sur la version actuelle."
 msgstr "The draft has been edited since it was generated: %s characters apart. The checks below are about what the machine wrote, not the current version."
+
+msgid "%1$s run(s), %2$s lignes de déroulé"
+msgstr "%1$s run(s), %2$s timeline entries"
+
+msgid "Ce qui est conservé"
+msgstr "What is kept"
+
+msgid "Chaque durée est un filtre : msrwa_retention_events_days, msrwa_retention_artifacts_days, msrwa_retention_runs_days. À zéro, rien n’est jamais supprimé."
+msgstr "Each age is a filter: msrwa_retention_events_days, msrwa_retention_artifacts_days, msrwa_retention_runs_days. At zero, nothing is ever removed."
+
+msgid "Trois durées, parce que trois choses vieillissent différemment. Le déroulé est de la narration et personne ne relit celui d’un run du printemps dernier. Les productions lourdes — le dossier de recherche, l’article tel que la machine l’a écrit, les prompts d’image — valent des mois : c’est de là qu’on répond à une question sur la qualité. Les chiffres, eux, ne sont jamais supprimés par défaut : une ligne d’étape pèse quelques dizaines d’octets et c’est le seul témoignage de ce qu’un run a coûté."
+msgstr "Three ages, because three things decay at different rates. The timeline is narration and nobody rereads one from last spring. The heavy output — the research package, the article as the machine wrote it, the image prompts — is worth months: that is what a question about quality is answered from. The figures are never removed by default: a step row weighs a few dozen bytes and is the only record of what a run cost."
+
+msgid "conservé indéfiniment"
+msgstr "kept indefinitely"
+
+msgid "déroulé"
+msgstr "timeline"
+
+msgid "jamais supprimés"
+msgstr "never removed"
+
+msgid "jours"
+msgstr "days"
+
+msgid "jours ; verdict, revue et recette restent"
+msgstr "days; verdict, review and recipe stay"
+
+msgid "jours, sauf ceux qui ont produit un brouillon"
+msgstr "days, except those that produced a draft"
+
+msgid "poids actuel"
+msgstr "current weight"
+
+msgid "productions lourdes"
+msgstr "heavy output"
+
+msgid "runs entiers"
+msgstr "whole runs"
+
+msgid "%s $"
+msgstr "$%s"
+
+msgid "%d remarque bloquante"
+msgid_plural "%d remarques bloquantes"
+msgstr[0] "%d blocking finding"
+msgstr[1] "%d blocking findings"
+
+msgid "%d recette"
+msgid_plural "%d recettes"
+msgstr[0] "%d recipe"
+msgstr[1] "%d recipes"
+
+msgid "Lancer %d recette"
+msgid_plural "Lancer %d recettes"
+msgstr[0] "Start %d recipe"
+msgstr[1] "Start %d recipes"
