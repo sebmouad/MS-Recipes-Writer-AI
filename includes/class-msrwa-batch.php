@@ -199,11 +199,11 @@ final class MSRWA_Batch {
 	public static function config_overrides( $id ) {
 		$batch = self::get( $id );
 		$overrides = $batch ? (array) json_decode( (string) $batch['config_json'], true ) : array();
-		$config = self::merge( MSRWA_Engine_Settings::stored(), $overrides );
+		$config = MSRWA_Engine_Settings::merge( MSRWA_Engine_Settings::stored(), $overrides );
 		if ( $batch ) {
 			// What this batch asked to produce, and in which language, expressed
 			// as the engine's own configuration rather than as a special case.
-			$config = self::merge( $config, MSRWA_Profile::config( $batch['profile'], $batch['language'], (array) ( $config['steps'] ?? array() ) ) );
+			$config = MSRWA_Engine_Settings::merge( $config, MSRWA_Profile::config( $batch['profile'], $batch['language'], (array) ( $config['steps'] ?? array() ) ) );
 			$config['limits']['budget_usd'] = (float) $batch['budget_usd'];
 		}
 		$config['settings'] = array_merge( MSRWA_Settings::engine_settings(), (array) ( $config['settings'] ?? array() ) );
@@ -213,13 +213,6 @@ final class MSRWA_Batch {
 	public static function config_for( $id ) { return self::config_overrides( $id ); }
 
 	private static function engine_config( array $overrides ) { return MSRWA_Engine_Config::create( $overrides ); }
-
-	private static function merge( array $base, array $over ) {
-		foreach ( $over as $key => $value ) {
-			$base[ $key ] = is_array( $value ) && isset( $base[ $key ] ) && is_array( $base[ $key ] ) ? self::merge( $base[ $key ], $value ) : $value;
-		}
-		return $base;
-	}
 
 	/** Deletes a batch, its runs and everything the engine reported about them. */
 	public static function delete( $id ) {

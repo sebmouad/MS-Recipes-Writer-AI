@@ -130,10 +130,6 @@
 .ms-card-flush > h2 { padding: 18px 20px 0; }
 .ms-card-flush > h2 + p { padding: 0 20px 14px; margin: 0; }
 
-.ms-grid { display: grid; gap: var(--ms-gap); }
-.ms-grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.ms-grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-
 /* --- Figures ----------------------------------------------------------
  * Every number on these screens is read down a column against its
  * neighbours, so all of them are monospaced and tabular. This is the
@@ -338,7 +334,6 @@
 }
 
 @media (max-width: 960px) {
-	.ms-grid-2, .ms-grid-3 { grid-template-columns: 1fr; }
 	.ms-pair, .ms-pair-blind { grid-template-columns: 72px minmax(0, 1fr); }
 	.ms-pair select { grid-column: 1 / -1; }
 	.ms-timeline > div { grid-template-columns: 1fr; gap: 2px; }

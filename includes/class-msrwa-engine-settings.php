@@ -109,4 +109,19 @@ final class MSRWA_Engine_Settings {
 		return $out;
 	}
 
+	/**
+	 * One configuration laid over another, branch by branch.
+	 *
+	 * The inverse of difference(), and the operation every caller performs to
+	 * put a lot's overrides over the site's: it lived twice, identically, in
+	 * MSRWA_Estimate and MSRWA_Batch, which is one copy too many for a
+	 * recursive function that decides what the engine is handed.
+	 */
+	public static function merge( array $base, array $over ) {
+		foreach ( $over as $key => $value ) {
+			$base[ $key ] = is_array( $value ) && isset( $base[ $key ] ) && is_array( $base[ $key ] ) ? self::merge( $base[ $key ], $value ) : $value;
+		}
+		return $base;
+	}
+
 }

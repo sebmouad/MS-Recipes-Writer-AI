@@ -39,7 +39,7 @@ final class MSRWA_Estimate {
 	 * cannot be completed says so instead of reading low.
 	 */
 	public static function recipe( $profile, array $overrides = array() ) {
-		$config = MSRWA_Engine_Config::create( self::merge( MSRWA_Engine_Settings::stored(), $overrides ) );
+		$config = MSRWA_Engine_Config::create( MSRWA_Engine_Settings::merge( MSRWA_Engine_Settings::stored(), $overrides ) );
 		$registry = (array) $config->get( 'steps', array() );
 		$shape = self::shape();
 
@@ -89,7 +89,7 @@ final class MSRWA_Estimate {
 	 */
 	public static function lot( $profile, $recipes, $images, array $overrides = array() ) {
 		$recipe = self::recipe( $profile, $overrides );
-		$config = MSRWA_Engine_Config::create( self::merge( MSRWA_Engine_Settings::stored(), $overrides ) );
+		$config = MSRWA_Engine_Config::create( MSRWA_Engine_Settings::merge( MSRWA_Engine_Settings::stored(), $overrides ) );
 		// The pairing reads image bytes, so it is priced on the vision route the
 		// matcher actually uses.
 		$route = $config->model_for( 'vision' );
@@ -124,12 +124,5 @@ final class MSRWA_Estimate {
 		if ( 'image_generation' === $capability ) { return 'image'; }
 		if ( 'vision' === $capability ) { return 'vision'; }
 		return $name;
-	}
-
-	private static function merge( array $base, array $over ) {
-		foreach ( $over as $key => $value ) {
-			$base[ $key ] = is_array( $value ) && isset( $base[ $key ] ) && is_array( $base[ $key ] ) ? self::merge( $base[ $key ], $value ) : $value;
-		}
-		return $base;
 	}
 }
