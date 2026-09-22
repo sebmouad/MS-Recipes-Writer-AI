@@ -469,8 +469,13 @@ Measured on the live site: 293s of provider work inside a 10-minute wall clock,
 - [ ] **T1.4 — Live recompute in settings.** The eight numbers on screen,
   updated without reloading through `POST /estimate`, refused to a user without
   `manage_options`.
-- [ ] **T1.5 — Budgets reduced to daily and monthly.** No per-recipe budget, no
-  cost-driven stop inside a job: running jobs finish, new batches are refused.
+- [~] **T1.5 — Budgets reduced to daily and monthly.** `MSRWA_Budget` reads two
+  ceilings from the settings, counts what the whole site has spent over one day
+  and over thirty, and refuses. A new lot is refused against its estimate before
+  it starts; a recipe already running is parked back in the queue before its next
+  wave rather than failed, so nothing it has produced is lost and it resumes on
+  its own once there is room. A ceiling of zero is no ceiling. Offline coverage
+  in `tests/test-budget-and-queue.php`.
 
 ## B3 — Model policy and escalation
 
@@ -540,6 +545,13 @@ Measured on the live site: 293s of provider work inside a 10-minute wall clock,
   numbers are visible on screen.
 
 ## Decisions this checklist encodes
+
+Amended 2026-09-22: *no step ever stopped for cost* now reads **no work ever
+lost to cost**. A recipe that reaches a ceiling mid-lot is put back in the queue
+before its next wave, keeping every step it finished, and starts again on its
+own once there is room. Nothing is killed in flight and nothing is marked
+failed, but the site no longer spends past its ceiling to finish a lot that was
+cheap when it was dispatched.
 
 Agreed 2026-09-20: 2800 words split 1500/1300 · one quality contract, no modes ·
 editable enforced outline · own meta plus Recipe JSON-LD · research, gate,

@@ -47,6 +47,7 @@ final class MSRWA_Screen_Pass {
 			),
 		) );
 
+		self::queue();
 		self::rail( __( 'En cours', 'ms-recipes-writer-ai' ), $moving['runs'], __( 'Rien ne tourne.', 'ms-recipes-writer-ai' ), __( 'Déposez des recettes et des photographies pour lancer un lot.', 'ms-recipes-writer-ai' ), true );
 
 		if ( $attention['runs'] ) {
@@ -54,6 +55,47 @@ final class MSRWA_Screen_Pass {
 		}
 
 		echo '</div>';
+	}
+
+	/**
+	 * The queue, and the one control that matters when something is wrong.
+	 *
+	 * A hold stops new waves without losing anything. It is here, on the first
+	 * screen, because the moment it is needed is the moment several recipes are
+	 * spending money and nobody yet knows why.
+	 */
+	private static function queue() {
+		$state = MSRWA_Queue::state();
+		if ( ! MSRWA_Rights::may_manage() && ! $state['held'] ) { return; }
+
+		// A ceiling that has been reached also makes the queue sit still, and
+		// blaming cron for it would send somebody to the wrong place.
+		if ( MSRWA_Queue::stalled() && '' === MSRWA_Budget::refusal() ) {
+			MSRWA_UI::note( esc_html( sprintf(
+				/* translators: %s is a duration, e.g. "20 minutes". */
+				__( 'La file n’avance pas : la plus ancienne recette attend depuis %s et rien ne tourne. Sur un site peu visité, c’est le cron.', 'ms-recipes-writer-ai' ),
+				human_time_diff( time() - $state['waiting_seconds'], time() )
+			) ), 'warn' );
+		}
+
+		echo '<section class="ms-card" id="ms-queue"><h2>' . esc_html__( 'La file', 'ms-recipes-writer-ai' ) . '</h2>';
+		if ( $state['held'] ) {
+			MSRWA_UI::note( esc_html__( 'La file est suspendue. Rien de nouveau ne part ; ce qui est déjà commencé garde tout ce qui a été fait et reprendra à l’endroit exact.', 'ms-recipes-writer-ai' ), 'warn' );
+		}
+
+		echo '<div class="ms-filters" style="background:none;border:0;padding:0">';
+		echo '<div><span class="ms-muted">' . esc_html( sprintf(
+			/* translators: 1: recipes waiting, 2: recipes working. */
+			__( '%1$d en attente, %2$d en cours', 'ms-recipes-writer-ai' ),
+			$state['waiting'], $state['working']
+		) ) . '</span></div>';
+
+		if ( MSRWA_Rights::may_manage() ) {
+			echo '<div><button class="button" id="ms-queue-toggle" data-held="' . ( $state['held'] ? '1' : '0' ) . '">'
+				. esc_html( $state['held'] ? __( 'Reprendre la file', 'ms-recipes-writer-ai' ) : __( 'Suspendre la file', 'ms-recipes-writer-ai' ) )
+				. '</button> <span id="ms-queue-status" class="ms-muted" aria-live="polite"></span></div>';
+		}
+		echo '</div></section>';
 	}
 
 	/** The two ways a run sits still without saying anything. */
@@ -65,6 +107,9 @@ final class MSRWA_Screen_Pass {
 				'<a href="' . esc_url( admin_url( 'admin.php?page=msrwa-settings' ) ) . '">' . esc_html__( 'Ouvrir les réglages', 'ms-recipes-writer-ai' ) . '</a>'
 			), 'stop' );
 		}
+
+		$refusal = MSRWA_Budget::refusal();
+		if ( '' !== $refusal ) { MSRWA_UI::note( esc_html( $refusal ), 'stop' ); }
 
 		if ( defined( 'DISABLE_WP_CRON' ) && DISABLE_WP_CRON && MSRWA_Rights::may_manage() ) {
 			MSRWA_UI::note( __( 'DISABLE_WP_CRON est actif. Les lots n’avanceront que si un cron serveur appelle wp-cron.php ; sans cela ils resteront en attente sans rien signaler.', 'ms-recipes-writer-ai' ), 'warn' );

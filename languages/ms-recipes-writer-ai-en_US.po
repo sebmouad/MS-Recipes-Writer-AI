@@ -771,6 +771,9 @@ msgstr "Export"
 msgid "La même période, en CSV, pour les questions qu’un tableur répond mieux qu’un écran. Un coût inconnu y est vide, jamais zéro : une colonne de zéros s’additionne en un total qui n’a jamais existé."
 msgstr "The same period as CSV, for questions a spreadsheet answers better than a screen. An unknown cost is empty there, never zero: a column of zeroes adds up to a total that never existed."
 
+msgid "L’ordre de la file est réservé aux administrateurs."
+msgstr "The order of the queue is for administrators only."
+
 msgid "La suppression est réservée aux administrateurs."
 msgstr "Deleting is for administrators only."
 
@@ -854,6 +857,69 @@ msgstr "whole runs"
 
 msgid "%s $"
 msgstr "$%s"
+
+msgid "%1$d en attente, %2$d en cours"
+msgstr "%1$d waiting, %2$d running"
+
+msgid "%1$s sur %2$s"
+msgstr "%1$s of %2$s"
+
+msgid "Ce lot a déjà été lancé."
+msgstr "This batch has already been started."
+
+msgid "Ce lot est estimé à %1$s et il ne reste que %2$s sous le plafond. Réduisez le lot, ou relevez le plafond dans les réglages."
+msgstr "This batch is estimated at %1$s and only %2$s is left under the ceiling. Make the batch smaller, or raise the ceiling in the settings."
+
+msgid "Faire passer devant"
+msgstr "Move to the front"
+
+msgid "La dépense du site entier, pas celle d’un rédacteur : un plafond appartient au site, et quelqu’un qui n’en verrait que sa part ne comprendrait jamais pourquoi son lot a été refusé."
+msgstr "The whole site’s spend, not one writer’s: a ceiling belongs to the site, and someone shown only their own share would never understand why their batch was refused."
+
+msgid "La file"
+msgstr "The queue"
+
+msgid "La file est suspendue. Rien de nouveau ne part ; ce qui est déjà commencé garde tout ce qui a été fait et reprendra à l’endroit exact."
+msgstr "The queue is on hold. Nothing new starts; anything already under way keeps everything it has done and resumes at the exact same place."
+
+msgid "La file n’avance pas : la plus ancienne recette attend depuis %s et rien ne tourne. Sur un site peu visité, c’est le cron."
+msgstr "The queue is not moving: the oldest recipe has been waiting for %s and nothing is running. On a quiet site, that means cron."
+
+msgid "Le plafond des trente derniers jours est atteint : %1$s dépensés sur %2$s."
+msgstr "The thirty-day ceiling has been reached: %1$s spent of %2$s."
+
+msgid "Le plafond du jour est atteint : %1$s dépensés sur %2$s. Rien de plus ne sera lancé avant demain."
+msgstr "Today’s ceiling has been reached: %1$s spent of %2$s. Nothing more will start before tomorrow."
+
+msgid "Où en sont les plafonds"
+msgstr "Where the ceilings stand"
+
+msgid "Par jour"
+msgstr "Per day"
+
+msgid "Plafonds de dépense"
+msgstr "Spending ceilings"
+
+msgid "Reprendre la file"
+msgstr "Resume the queue"
+
+msgid "Reprise de la file…"
+msgstr "Resuming the queue…"
+
+msgid "Sur trente jours"
+msgstr "Over thirty days"
+
+msgid "Suspendre la file"
+msgstr "Hold the queue"
+
+msgid "Suspension…"
+msgstr "Holding…"
+
+msgid "Trois plafonds, pour trois craintes différentes. Celui par recette arrête un article emballé ; celui du jour arrête un mauvais après-midi ; celui du mois arrête un mauvais mois que personne n’a vu venir. Ils sont vérifiés avant qu’un lot parte et avant chaque vague de chaque recette, parce qu’un lot qui tenait au départ peut cesser de tenir en cours de route. À zéro, aucun plafond."
+msgstr "Three ceilings, for three different fears. The per-recipe one stops a runaway article; the daily one stops a bad afternoon; the monthly one stops a bad month nobody saw coming. They are checked before a batch starts and before every wave of every recipe, because a batch that fit at the start can stop fitting along the way. At zero, no ceiling."
+
+msgid "trente jours"
+msgstr "thirty days"
 
 msgid "%d remarque bloquante"
 msgid_plural "%d remarques bloquantes"

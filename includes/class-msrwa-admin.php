@@ -86,6 +86,8 @@ final class MSRWA_Admin {
 				/* translators: %d is a number of recipes. */
 				'manyPicked' => __( '%d recettes sélectionnées', 'ms-recipes-writer-ai' ),
 				'applying' => __( 'Application…', 'ms-recipes-writer-ai' ),
+				'holding' => __( 'Suspension…', 'ms-recipes-writer-ai' ),
+				'releasing' => __( 'Reprise de la file…', 'ms-recipes-writer-ai' ),
 				/* translators: %d is a number of recipes. */
 				'confirmDelete' => __( 'Supprimer %d recette(s) et tout ce que le moteur en a rapporté ? C’est irréversible.', 'ms-recipes-writer-ai' ),
 				/* translators: 1: how many were done, 2: how many were not. */

@@ -212,6 +212,23 @@
     });
   }
 
+  // --- Holding the queue --------------------------------------------------
+
+  var queueToggle = document.getElementById('ms-queue-toggle');
+  if (queueToggle) {
+    queueToggle.addEventListener('click', function () {
+      var held = '1' === queueToggle.dataset.held;
+      queueToggle.disabled = true;
+      say(document.getElementById('ms-queue-status'), held ? t.releasing : t.holding);
+      call('/queue', { method: 'POST', body: JSON.stringify({ do: held ? 'release' : 'hold' }) })
+        .then(function () { window.location.reload(); })
+        .catch(function (error) {
+          say(document.getElementById('ms-queue-status'), error.message);
+          queueToggle.disabled = false;
+        });
+    });
+  }
+
   // --- One decision, several recipes -------------------------------------
 
   var bulk = document.getElementById('ms-bulk');

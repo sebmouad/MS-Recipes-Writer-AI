@@ -771,6 +771,9 @@ msgstr "تصدير"
 msgid "La même période, en CSV, pour les questions qu’un tableur répond mieux qu’un écran. Un coût inconnu y est vide, jamais zéro : une colonne de zéros s’additionne en un total qui n’a jamais existé."
 msgstr "الفترة نفسها بصيغة CSV، للأسئلة التي يجيبها الجدول أفضل من الشاشة. والكلفة المجهولة فارغة فيه لا صفر: فعمود من الأصفار يجمع مجموعاً لم يوجد قط."
 
+msgid "L’ordre de la file est réservé aux administrateurs."
+msgstr "ترتيب الصف مقصور على المديرين."
+
 msgid "La suppression est réservée aux administrateurs."
 msgstr "الحذف مقصور على المديرين."
 
@@ -854,6 +857,69 @@ msgstr "تنفيذات كاملة"
 
 msgid "%s $"
 msgstr "%s $"
+
+msgid "%1$d en attente, %2$d en cours"
+msgstr "%1$d قيد الانتظار، %2$d قيد التنفيذ"
+
+msgid "%1$s sur %2$s"
+msgstr "%1$s من %2$s"
+
+msgid "Ce lot a déjà été lancé."
+msgstr "أُطلقت هذه الدفعة من قبل."
+
+msgid "Ce lot est estimé à %1$s et il ne reste que %2$s sous le plafond. Réduisez le lot, ou relevez le plafond dans les réglages."
+msgstr "تُقدَّر هذه الدفعة بـ %1$s ولم يبقَ تحت السقف سوى %2$s. قلّص الدفعة، أو ارفع السقف من الإعدادات."
+
+msgid "Faire passer devant"
+msgstr "تقديمها في الصف"
+
+msgid "La dépense du site entier, pas celle d’un rédacteur : un plafond appartient au site, et quelqu’un qui n’en verrait que sa part ne comprendrait jamais pourquoi son lot a été refusé."
+msgstr "إنفاق الموقع بأكمله، لا إنفاق محرّر بعينه: السقف ملك للموقع، ومن لا يرى سوى حصته لن يفهم أبدًا سبب رفض دفعته."
+
+msgid "La file"
+msgstr "الصف"
+
+msgid "La file est suspendue. Rien de nouveau ne part ; ce qui est déjà commencé garde tout ce qui a été fait et reprendra à l’endroit exact."
+msgstr "الصف موقوف مؤقتًا. لا ينطلق شيء جديد؛ وما بدأ فعلًا يحتفظ بكل ما أُنجز ويستأنف من الموضع نفسه."
+
+msgid "La file n’avance pas : la plus ancienne recette attend depuis %s et rien ne tourne. Sur un site peu visité, c’est le cron."
+msgstr "الصف لا يتقدّم: أقدم وصفة تنتظر منذ %s ولا شيء قيد التنفيذ. على موقع قليل الزيارات، السبب هو الكرون."
+
+msgid "Le plafond des trente derniers jours est atteint : %1$s dépensés sur %2$s."
+msgstr "بلغ سقف الثلاثين يومًا الأخيرة: أُنفق %1$s من %2$s."
+
+msgid "Le plafond du jour est atteint : %1$s dépensés sur %2$s. Rien de plus ne sera lancé avant demain."
+msgstr "بلغ سقف اليوم: أُنفق %1$s من %2$s. لن يُطلق شيء آخر قبل الغد."
+
+msgid "Où en sont les plafonds"
+msgstr "أين وصلت السقوف"
+
+msgid "Par jour"
+msgstr "في اليوم"
+
+msgid "Plafonds de dépense"
+msgstr "سقوف الإنفاق"
+
+msgid "Reprendre la file"
+msgstr "استئناف الصف"
+
+msgid "Reprise de la file…"
+msgstr "جارٍ استئناف الصف…"
+
+msgid "Sur trente jours"
+msgstr "على ثلاثين يومًا"
+
+msgid "Suspendre la file"
+msgstr "تعليق الصف"
+
+msgid "Suspension…"
+msgstr "جارٍ التعليق…"
+
+msgid "Trois plafonds, pour trois craintes différentes. Celui par recette arrête un article emballé ; celui du jour arrête un mauvais après-midi ; celui du mois arrête un mauvais mois que personne n’a vu venir. Ils sont vérifiés avant qu’un lot parte et avant chaque vague de chaque recette, parce qu’un lot qui tenait au départ peut cesser de tenir en cours de route. À zéro, aucun plafond."
+msgstr "ثلاثة سقوف، لثلاثة مخاوف مختلفة. سقف الوصفة الواحدة يوقف مقالًا انفلت؛ وسقف اليوم يوقف بعد ظهيرة سيئة؛ وسقف الشهر يوقف شهرًا سيئًا لم يره أحد قادمًا. تُفحص قبل انطلاق أي دفعة وقبل كل موجة من كل وصفة، لأن دفعة كانت تسع في البداية قد تكفّ عن أن تسع في الطريق. عند الصفر، لا سقف."
+
+msgid "trente jours"
+msgstr "ثلاثون يومًا"
 
 msgid "%d remarque bloquante"
 msgid_plural "%d remarques bloquantes"

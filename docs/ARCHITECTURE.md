@@ -39,6 +39,12 @@ next. Nothing is held between ticks: a request the host kills costs at most the
 wave it was in, `MSRWA_Run::recover_expired()` returns the lease, and the run
 resumes from the last step that finished.
 
+Two things can stop a tick before it claims anything: an operator hold
+(`MSRWA_Queue`) and a spending ceiling the site has reached (`MSRWA_Budget`).
+Either one parks the run — back to `queued`, lease released, `updated_at`
+untouched so it keeps its place in line — and it resumes by itself when the hold
+lifts or the day rolls over. Neither is a failure, and neither loses a step.
+
 ## The engine, and the line around it
 
 `includes/engine/` makes a recipe. It touches no WordPress function, reads
@@ -167,7 +173,7 @@ Namespace `msrwa/v1`, WordPress cookies and nonce, every response `no-store`
 
 `GET|POST /batches`, `DELETE /batches/{id}`, `POST /batches/{id}/{pairs|schedule|dispatch}`,
 `GET /batches/{id}/runs`, `POST /runs/bulk`, `POST /runs/{id}/{retry|cancel}`,
-`GET /estimate`, `GET /health`, `POST /diagnostics/config`.
+`GET /estimate`, `GET /health`, `GET|POST /queue`, `POST /diagnostics/config`.
 
 ## Invariants
 
@@ -193,3 +199,8 @@ Break these and the plugin misreports itself.
 9. **Artifacts are released only after the draft exists**, and `proofread` is
    never released.
 10. **A run still moving is never deleted** under its own worker.
+11. **A budget belongs to the site, not to a reader.** `MSRWA_Budget::spent()`
+    is deliberately unscoped: a writer refused a lot has to be able to see the
+    figure that refused it.
+12. **A ceiling parks a run; it never fails one.** Nothing about the article
+    went wrong, so nothing it produced is thrown away.

@@ -115,7 +115,14 @@ final class MSRWA_Batch {
 		global $wpdb;
 		$batch = self::get( $id );
 		if ( ! $batch ) { return new WP_Error( 'msrwa_no_batch', 'Lot introuvable.' ); }
-		if ( 'ready' !== $batch['status'] ) { return new WP_Error( 'msrwa_not_ready', 'Ce lot a déjà été lancé.' ); }
+		if ( 'ready' !== $batch['status'] ) { return new WP_Error( 'msrwa_not_ready', __( 'Ce lot a déjà été lancé.', 'ms-recipes-writer-ai' ) ); }
+
+		// Refusing to start is free; stopping halfway is not. The estimate is
+		// what the site is about to commit, so the ceiling is checked against
+		// it rather than only against what has already been spent.
+		$estimate = MSRWA_Estimate::lot( $batch['profile'], (int) $batch['recipes'], 0, self::config_overrides( $id ) );
+		$refusal = MSRWA_Budget::refusal( (float) $estimate['cost_usd'] );
+		if ( '' !== $refusal ) { return new WP_Error( 'msrwa_over_budget', $refusal ); }
 
 		$matching = self::matching( $id );
 		$config = self::config_overrides( $id );

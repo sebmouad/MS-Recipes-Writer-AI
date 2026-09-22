@@ -17,6 +17,10 @@ final class MSRWA_REST {
 		register_rest_route( 'msrwa/v1', '/batches/(?P<id>\d+)/dispatch', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'dispatch' ) ) );
 		register_rest_route( 'msrwa/v1', '/batches/(?P<id>\d+)/runs', array( 'methods' => 'GET', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'runs' ) ) );
 		register_rest_route( 'msrwa/v1', '/batches/(?P<id>\d+)', array( 'methods' => 'DELETE', 'permission_callback' => array( __CLASS__, 'can_manage' ), 'callback' => array( __CLASS__, 'remove' ) ) );
+		register_rest_route( 'msrwa/v1', '/queue', array(
+			array( 'methods' => 'GET', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'queue' ) ),
+			array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_manage' ), 'callback' => array( __CLASS__, 'queue_control' ) ),
+		) );
 		register_rest_route( 'msrwa/v1', '/runs/bulk', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'bulk' ) ) );
 		register_rest_route( 'msrwa/v1', '/runs/(?P<id>\d+)/retry', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'retry' ) ) );
 		register_rest_route( 'msrwa/v1', '/runs/(?P<id>\d+)/cancel', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'cancel' ) ) );
@@ -126,6 +130,22 @@ final class MSRWA_REST {
 		return rest_ensure_response( array( 'status' => (string) $batch['status'], 'runs' => $out ) );
 	}
 
+	/** What the queue is doing, for the screen that watches it. */
+	public static function queue() {
+		$state = MSRWA_Queue::state();
+		$state['stalled'] = MSRWA_Queue::stalled();
+		$state['budget'] = MSRWA_Budget::state();
+		return rest_ensure_response( $state );
+	}
+
+	/** Holding the queue, and letting it go again. */
+	public static function queue_control( WP_REST_Request $request ) {
+		$action = sanitize_key( (string) $request->get_param( 'do' ) );
+		if ( 'hold' === $action ) { MSRWA_Queue::hold(); return rest_ensure_response( array( 'held' => true ) ); }
+		if ( 'release' === $action ) { return rest_ensure_response( array( 'held' => false, 'rearmed' => MSRWA_Queue::release() ) ); }
+		return new WP_Error( 'msrwa_unknown_action', __( 'Action inconnue.', 'ms-recipes-writer-ai' ), array( 'status' => 400 ) );
+	}
+
 	/**
 	 * The same decision applied to several recipes.
 	 *
@@ -135,14 +155,20 @@ final class MSRWA_REST {
 	 */
 	public static function bulk( WP_REST_Request $request ) {
 		$action = sanitize_key( (string) $request->get_param( 'do' ) );
-		if ( ! in_array( $action, array( 'cancel', 'retry', 'delete' ), true ) ) {
+		if ( ! in_array( $action, array( 'cancel', 'retry', 'delete', 'prioritise' ), true ) ) {
 			return new WP_Error( 'msrwa_unknown_action', __( 'Action inconnue.', 'ms-recipes-writer-ai' ), array( 'status' => 400 ) );
+		}
+		// Order across the queue is a decision over other people's work, so it
+		// is not a writer's to make on their own recipes.
+		if ( 'prioritise' === $action && ! MSRWA_Rights::may_manage() ) {
+			return new WP_Error( 'msrwa_forbidden', __( 'L’ordre de la file est réservé aux administrateurs.', 'ms-recipes-writer-ai' ), array( 'status' => 403 ) );
 		}
 		if ( 'delete' === $action && ! MSRWA_Rights::may_delete() ) {
 			return new WP_Error( 'msrwa_forbidden', __( 'La suppression est réservée aux administrateurs.', 'ms-recipes-writer-ai' ), array( 'status' => 403 ) );
 		}
 
 		$ids = array_slice( array_unique( array_filter( array_map( 'absint', (array) $request->get_param( 'runs' ) ) ) ), 0, 100 );
+		$priority = $request->has_param( 'priority' ) ? (int) $request->get_param( 'priority' ) : null;
 		$done = 0;
 		$skipped = array();
 
@@ -150,6 +176,11 @@ final class MSRWA_REST {
 			$run = MSRWA_Run::get( $id );
 			if ( ! $run || ! MSRWA_Run::may_see( $run ) ) { $skipped[] = $id; continue; }
 
+			if ( 'prioritise' === $action ) {
+				MSRWA_Queue::prioritise( $id, null === $priority ? 5 : $priority );
+				$done++;
+				continue;
+			}
 			if ( 'cancel' === $action ) {
 				if ( MSRWA_Run::cancel( $id ) ) { $done++; } else { $skipped[] = $id; }
 				continue;

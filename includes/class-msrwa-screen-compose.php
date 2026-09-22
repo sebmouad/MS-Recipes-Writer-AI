@@ -25,6 +25,8 @@ final class MSRWA_Screen_Compose {
 		if ( ! MSRWA_Settings::configured_providers() ) {
 			MSRWA_UI::note( __( 'Aucune clé d’API n’est enregistrée. Un lot lancé maintenant échouerait à la première étape.', 'ms-recipes-writer-ai' ), 'stop' );
 		}
+		$refusal = MSRWA_Budget::refusal();
+		if ( '' !== $refusal ) { MSRWA_UI::note( esc_html( $refusal ), 'stop' ); }
 		?>
 		<form id="ms-compose" class="ms-steps">
 

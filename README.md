@@ -2,6 +2,34 @@
 
 Plugin WordPress en construction pour la génération éditoriale culinaire orchestrée.
 
+## Version 0.7.0
+
+**Des plafonds de dépense, et une file qu'on peut tenir.**
+
+Trois craintes, trois plafonds. Celui du jour arrête un mauvais après-midi ;
+celui des trente derniers jours arrête un mauvais mois que personne n'a vu
+venir ; celui de la recette existait déjà. Ils comptent la dépense du site
+entier, pas celle d'un rédacteur : quelqu'un qui n'en verrait que sa part ne
+comprendrait jamais pourquoi son lot a été refusé. À zéro, aucun plafond.
+
+Un lot est refusé avant de partir, contre son estimation, parce que refuser de
+commencer ne coûte rien. Et une recette déjà en route est remise dans la file
+avant sa vague suivante plutôt que marquée en échec : elle garde toutes les
+étapes déjà faites et repart d'elle-même dès qu'il y a de la place. Cela amende
+une décision du 20 septembre — « aucune étape jamais arrêtée pour le coût »
+devient « aucun travail jamais perdu à cause du coût » : un lot bon marché au
+départ ne dépasse plus le plafond simplement parce qu'il avait commencé.
+
+La file, elle, se suspend. Rien de nouveau ne part ; ce qui est déjà commencé
+garde tout et reprendra exactement là où il s'était arrêté. C'est le geste dont
+on a besoin au moment précis où plusieurs recettes tournent, dépensent, et où
+l'on ne sait pas encore pourquoi. Une recette peut aussi passer devant les
+autres : une petite priorité sur la ligne, pas une seconde file, parce que deux
+files finissent toujours par diverger.
+
+Et quand la file n'avance plus, l'écran le dit — en nommant le cron, sauf quand
+c'est un plafond, auquel cas il nomme le plafond.
+
 ## Version 0.6.0
 
 **Installé sur un vrai WordPress, et six bugs que seul un vrai WordPress
@@ -364,7 +392,7 @@ cron réel et validité distante des clés restent à vérifier sur un site de t
 
 ## État actuel
 
-La version `0.6.0` est un socle installable : file persistante, pipeline de
+La version `0.7.0` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.

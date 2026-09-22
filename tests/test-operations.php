@@ -24,7 +24,9 @@ msrwa_test_assert( '' === $image['path'], 'Missing images are safe placeholders.
 $GLOBALS['wpdb']->on( "status = 'running'", array( 17 ) );
 MSRWA_Run::recover_expired();
 msrwa_test_contains( $GLOBALS['wpdb']->log(), "WHERE id = 17 AND status = 'running' AND lock_until IS NOT NULL AND lock_until < UTC_TIMESTAMP()", 'Recovery rechecks lease and status atomically.' );
-msrwa_test_contains( $GLOBALS['wpdb']->log(), "WHERE status = 'queued' ORDER BY updated_at ASC LIMIT 100", 'Watchdog also checks queued jobs with missing events.' );
+// Priority first, then age: a recipe pushed to the front of the queue should
+// not wait behind everything that merely arrived earlier.
+msrwa_test_contains( $GLOBALS['wpdb']->log(), "WHERE status = 'queued' ORDER BY priority DESC, updated_at ASC LIMIT 100", 'The watchdog re-arms waiting jobs in priority order.' );
 msrwa_test_assert( isset( $GLOBALS['ops_options']['msrwa_watchdog_at'] ), 'Watchdog records heartbeat.' );
 require_once MSRWA_DIR . 'tools/report.php';
 $html = report_render( array( 'artifacts' => array(), 'steps' => array(), 'events' => array(), 'totals' => array(), 'ok' => false ) );

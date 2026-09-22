@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
 final class MSRWA_DB {
 
 	/** Bumped whenever the schema below changes. */
-	const SCHEMA = 7;
+	const SCHEMA = 8;
 
 	public static function tables() {
 		global $wpdb;
@@ -60,7 +60,7 @@ final class MSRWA_DB {
 		foreach ( array(
 			"CREATE TABLE {$t['batches']} (\n id bigint(20) unsigned NOT NULL AUTO_INCREMENT,\n owner_id bigint(20) unsigned NOT NULL,\n label varchar(191) NOT NULL DEFAULT '',\n status varchar(32) NOT NULL DEFAULT 'matching',\n recipes smallint unsigned NOT NULL DEFAULT 0,\n images smallint unsigned NOT NULL DEFAULT 0,\n budget_usd decimal(12,6) NOT NULL DEFAULT 0,\n profile varchar(24) NOT NULL DEFAULT 'full',\n language varchar(8) NOT NULL DEFAULT 'fr',\n dispatch_at datetime NULL,\n config_json longtext NULL,\n matching_json longtext NULL,\n error_message text NULL,\n created_at datetime NOT NULL,\n updated_at datetime NOT NULL,\n PRIMARY KEY (id),\n KEY owner_status (owner_id,status),\n KEY created_at (created_at),\n KEY waiting (status,dispatch_at)\n) $charset;",
 
-			"CREATE TABLE {$t['runs']} (\n id bigint(20) unsigned NOT NULL AUTO_INCREMENT,\n batch_id bigint(20) unsigned NOT NULL,\n owner_id bigint(20) unsigned NOT NULL,\n label varchar(191) NOT NULL DEFAULT '',\n brief_json longtext NULL,\n result_json longtext NULL,\n status varchar(32) NOT NULL DEFAULT 'queued',\n step varchar(120) NOT NULL DEFAULT '',\n steps_done smallint unsigned NOT NULL DEFAULT 0,\n steps_total smallint unsigned NOT NULL DEFAULT 0,\n cost_usd decimal(12,6) NOT NULL DEFAULT 0,\n seconds decimal(12,1) NOT NULL DEFAULT 0,\n approved tinyint(1) NULL,\n draft_post_id bigint(20) unsigned NOT NULL DEFAULT 0,\n workspace text NULL,\n error_message text NULL,\n lock_token varchar(64) NULL,\n lock_until datetime NULL,\n created_at datetime NOT NULL,\n updated_at datetime NOT NULL,\n PRIMARY KEY (id),\n KEY batch_status (batch_id,status),\n KEY owner_status (owner_id,status),\n KEY owner_created (owner_id,created_at),\n KEY owner_recent (owner_id,id),\n KEY lock_until (lock_until)\n) $charset;",
+			"CREATE TABLE {$t['runs']} (\n id bigint(20) unsigned NOT NULL AUTO_INCREMENT,\n batch_id bigint(20) unsigned NOT NULL,\n owner_id bigint(20) unsigned NOT NULL,\n label varchar(191) NOT NULL DEFAULT '',\n brief_json longtext NULL,\n result_json longtext NULL,\n status varchar(32) NOT NULL DEFAULT 'queued',\n step varchar(120) NOT NULL DEFAULT '',\n steps_done smallint unsigned NOT NULL DEFAULT 0,\n steps_total smallint unsigned NOT NULL DEFAULT 0,\n cost_usd decimal(12,6) NOT NULL DEFAULT 0,\n seconds decimal(12,1) NOT NULL DEFAULT 0,\n approved tinyint(1) NULL,\n priority tinyint NOT NULL DEFAULT 0,\n draft_post_id bigint(20) unsigned NOT NULL DEFAULT 0,\n workspace text NULL,\n error_message text NULL,\n lock_token varchar(64) NULL,\n lock_until datetime NULL,\n created_at datetime NOT NULL,\n updated_at datetime NOT NULL,\n PRIMARY KEY (id),\n KEY batch_status (batch_id,status),\n KEY owner_status (owner_id,status),\n KEY queue_order (status,priority,id),\n KEY owner_created (owner_id,created_at),\n KEY owner_recent (owner_id,id),\n KEY lock_until (lock_until)\n) $charset;",
 
 			"CREATE TABLE {$t['steps']} (\n id bigint(20) unsigned NOT NULL AUTO_INCREMENT,\n run_id bigint(20) unsigned NOT NULL,\n step varchar(64) NOT NULL,\n provider varchar(32) NOT NULL DEFAULT '',\n model varchar(191) NOT NULL DEFAULT '',\n seconds decimal(10,1) NOT NULL DEFAULT 0,\n attempts tinyint unsigned NOT NULL DEFAULT 1,\n input_tokens int unsigned NOT NULL DEFAULT 0,\n output_tokens int unsigned NOT NULL DEFAULT 0,\n cost_usd decimal(12,6) NULL,\n bucket varchar(24) NOT NULL DEFAULT 'other',\n status varchar(48) NOT NULL DEFAULT '',\n passed smallint unsigned NULL,\n total smallint unsigned NULL,\n checks_json longtext NULL,\n checks_failed smallint unsigned NOT NULL DEFAULT 0,\n error_message text NULL,\n created_at datetime NOT NULL,\n PRIMARY KEY (id),\n KEY run_step (run_id,step),\n KEY step_model (step,model),\n KEY step_failures (step,checks_failed)\n) $charset;",
 
@@ -76,6 +76,9 @@ final class MSRWA_DB {
 			'language' => "ALTER TABLE {$t['batches']} ADD COLUMN language varchar(8) NOT NULL DEFAULT 'fr' AFTER profile",
 		) as $column => $statement ) {
 			if ( ! self::column_exists( $t['batches'], $column ) ) { $wpdb->query( $statement ); }
+		}
+		if ( ! self::column_exists( $t['runs'], 'priority' ) ) {
+			$wpdb->query( "ALTER TABLE {$t['runs']} ADD COLUMN priority tinyint NOT NULL DEFAULT 0 AFTER approved" );
 		}
 		if ( ! self::column_exists( $t['batches'], 'dispatch_at' ) ) {
 			$wpdb->query( "ALTER TABLE {$t['batches']} ADD COLUMN dispatch_at datetime NULL AFTER language" );

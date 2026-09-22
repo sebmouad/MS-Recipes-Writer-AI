@@ -76,6 +76,17 @@ final class MSRWA_Run {
 	 */
 	public static function tick( $id ) {
 		$id = absint( $id );
+
+		// Two reasons not to start another wave, and one thing to do about
+		// either: put the recipe back in the queue with every step it has
+		// already finished, and let it resume where it stopped. Nothing is lost
+		// and nothing more is spent.
+		//
+		// The ceilings are read here and not only when a lot is dispatched,
+		// because a lot that was affordable when it started can stop being
+		// affordable while it runs — which is exactly what a runaway looks like.
+		if ( MSRWA_Queue::held() || '' !== MSRWA_Budget::refusal() ) { self::park( $id ); return; }
+
 		$token = wp_generate_password( 32, false, false );
 		if ( ! self::claim( $id, $token ) ) { return; }
 
@@ -459,6 +470,18 @@ final class MSRWA_Run {
 		$wpdb->query( $wpdb->prepare( 'UPDATE ' . self::table() . ' SET lock_token = NULL, lock_until = NULL WHERE id = %d AND lock_token = %s', absint( $id ), $token ) );
 	}
 
+	/**
+	 * Sends a recipe back to the queue without touching what it has produced.
+	 *
+	 * Not a failure: nothing about the article went wrong. `updated_at` is
+	 * deliberately left alone, so a recipe parked over and over does not look
+	 * newer than the ones that have genuinely been waiting behind it.
+	 */
+	private static function park( $id ) {
+		global $wpdb;
+		$wpdb->update( self::table(), array( 'status' => 'queued', 'lock_token' => null, 'lock_until' => null ), array( 'id' => absint( $id ) ) );
+	}
+
 	private static function finish( $id, $status, $message ) {
 		global $wpdb;
 		$wpdb->update( self::table(), array(
@@ -535,12 +558,14 @@ final class MSRWA_Run {
 	public static function recover_expired() {
 		global $wpdb;
 		update_option( 'msrwa_watchdog_at', current_time( 'mysql', true ), false );
-		$stuck = (array) $wpdb->get_col( 'SELECT id FROM ' . self::table() . " WHERE status = 'running' AND lock_until IS NOT NULL AND lock_until < UTC_TIMESTAMP() LIMIT 20" );
+		$stuck = (array) $wpdb->get_col( 'SELECT id FROM ' . self::table() . " WHERE status = 'running' AND lock_until IS NOT NULL AND lock_until < UTC_TIMESTAMP() ORDER BY priority DESC, id ASC LIMIT 20" );
 		foreach ( $stuck as $id ) {
 			$changed = $wpdb->query( $wpdb->prepare( 'UPDATE ' . self::table() . " SET status = 'queued', lock_token = NULL, lock_until = NULL, updated_at = %s WHERE id = %d AND status = 'running' AND lock_until IS NOT NULL AND lock_until < UTC_TIMESTAMP()", current_time( 'mysql', true ), absint( $id ) ) );
 			if ( $changed ) { self::queue( (int) $id, 5 ); }
 		}
-		$queued = (array) $wpdb->get_col( 'SELECT id FROM ' . self::table() . " WHERE status = 'queued' ORDER BY updated_at ASC LIMIT 100" );
+		// Priority first, then age: a recipe somebody pushed to the front of the
+		// queue should not wait behind everything that happened to arrive first.
+		$queued = (array) $wpdb->get_col( 'SELECT id FROM ' . self::table() . " WHERE status = 'queued' ORDER BY priority DESC, updated_at ASC LIMIT 100" );
 		foreach ( $queued as $id ) { self::queue( (int) $id, 5 ); }
 	}
 

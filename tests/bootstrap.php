@@ -91,7 +91,10 @@ if ( ! function_exists( 'paginate_links' ) ) {
 		return $out;
 	}
 }
-if ( ! function_exists( 'wp_next_scheduled' ) ) { function wp_next_scheduled( $hook ) { return 1789003600; } }
+// A test that cares whether an event was scheduled sets this to false first;
+// everything else reads a site whose cron is already armed.
+$GLOBALS['msrwa_test_next_scheduled'] = 1789003600;
+if ( ! function_exists( 'wp_next_scheduled' ) ) { function wp_next_scheduled( $hook, $args = array() ) { return $GLOBALS['msrwa_test_next_scheduled']; } }
 $GLOBALS['msrwa_test_scheduled'] = array();
 if ( ! function_exists( 'wp_schedule_single_event' ) ) { function wp_schedule_single_event( $timestamp, $hook, $args = array() ) { $GLOBALS['msrwa_test_scheduled'][] = array( 'hook' => $hook, 'args' => $args, 'delay' => $timestamp - current_time( 'timestamp', true ) ); return true; } }
 if ( ! function_exists( 'wp_clear_scheduled_hook' ) ) { function wp_clear_scheduled_hook( $hook ) { return true; } }

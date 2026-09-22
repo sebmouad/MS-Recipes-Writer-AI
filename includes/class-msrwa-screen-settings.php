@@ -46,11 +46,56 @@ final class MSRWA_Screen_Settings {
 					</p>
 				<?php endforeach; ?>
 			</section>
+			<section class="ms-card">
+				<h2><?php esc_html_e( 'Plafonds de dépense', 'ms-recipes-writer-ai' ); ?></h2>
+				<p><?php esc_html_e( 'Trois plafonds, pour trois craintes différentes. Celui par recette arrête un article emballé ; celui du jour arrête un mauvais après-midi ; celui du mois arrête un mauvais mois que personne n’a vu venir. Ils sont vérifiés avant qu’un lot parte et avant chaque vague de chaque recette, parce qu’un lot qui tenait au départ peut cesser de tenir en cours de route. À zéro, aucun plafond.', 'ms-recipes-writer-ai' ); ?></p>
+				<?php $settings = MSRWA_Settings::get(); ?>
+				<p>
+					<label for="ms-daily"><strong><?php esc_html_e( 'Par jour', 'ms-recipes-writer-ai' ); ?></strong></label><br>
+					<input type="number" id="ms-daily" name="msrwa_settings[daily_budget_usd]" value="<?php echo esc_attr( (float) ( $settings['daily_budget_usd'] ?? 0 ) ); ?>" step="0.5" min="0" class="small-text ms-num"> $
+				</p>
+				<p>
+					<label for="ms-monthly"><strong><?php esc_html_e( 'Sur trente jours', 'ms-recipes-writer-ai' ); ?></strong></label><br>
+					<input type="number" id="ms-monthly" name="msrwa_settings[monthly_budget_usd]" value="<?php echo esc_attr( (float) ( $settings['monthly_budget_usd'] ?? 0 ) ); ?>" step="1" min="0" class="small-text ms-num"> $
+				</p>
+			</section>
+
 			<?php submit_button( __( 'Enregistrer', 'ms-recipes-writer-ai' ) ); ?>
 		</form>
+
+		<?php self::budget(); ?>
 		<?php
 		self::health();
 		echo '</div>';
+	}
+
+	/** Where each ceiling stands right now. */
+	private static function budget() {
+		$state = MSRWA_Budget::state();
+		if ( ! $state['daily']['ceiling'] && ! $state['monthly']['ceiling'] ) { return; }
+
+		echo '<section class="ms-card"><h2>' . esc_html__( 'Où en sont les plafonds', 'ms-recipes-writer-ai' ) . '</h2>';
+		echo '<p>' . esc_html__( 'La dépense du site entier, pas celle d’un rédacteur : un plafond appartient au site, et quelqu’un qui n’en verrait que sa part ne comprendrait jamais pourquoi son lot a été refusé.', 'ms-recipes-writer-ai' ) . '</p>';
+		echo '<table class="ms-table"><tbody>';
+		foreach ( array( 'daily' => __( 'aujourd’hui', 'ms-recipes-writer-ai' ), 'monthly' => __( 'trente jours', 'ms-recipes-writer-ai' ) ) as $name => $label ) {
+			$budget = $state[ $name ];
+			if ( ! $budget['ceiling'] ) { continue; }
+			echo '<tr><td style="inline-size:140px">' . esc_html( $label ) . '</td>'
+				. '<td><span class="ms-progress" style="inline-size:100%">'
+				. '<i style="inline-size:' . (int) $budget['share'] . '%' . ( $budget['exceeded'] ? ';background:var(--ms-stop)' : '' ) . '"></i></span></td>'
+				. '<td class="ms-num" style="inline-size:200px">'
+				. esc_html( sprintf(
+					/* translators: 1: amount spent, 2: the ceiling. */
+					__( '%1$s sur %2$s', 'ms-recipes-writer-ai' ),
+					MSRWA_I18N::money( $budget['spent'], 2 ),
+					MSRWA_I18N::money( $budget['ceiling'], 2 )
+				) ) . '</td></tr>';
+		}
+		echo '</tbody></table>';
+
+		$refusal = MSRWA_Budget::refusal();
+		if ( '' !== $refusal ) { MSRWA_UI::note( esc_html( $refusal ), 'stop' ); }
+		echo '</section>';
 	}
 
 	/**
