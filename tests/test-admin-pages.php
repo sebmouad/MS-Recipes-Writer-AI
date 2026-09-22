@@ -54,4 +54,36 @@ msrwa_test_assert( 'à relire' === MSRWA_UI::state_of( array( 'status' => 'done'
 msrwa_test_contains( MSRWA_UI::state_of( array( 'status' => 'done', 'approved' => 0 ) )['label'], 'réserves', 'A judge’s objection is reported as the judge’s, not as a failure.' );
 msrwa_test_assert( 'échec' === MSRWA_UI::state_of( array( 'status' => 'failed' ) )['label'], 'A failure says so plainly.' );
 
+// --- The menu says how much is waiting, for this reader ------------------
+
+require_once dirname( __DIR__ ) . '/includes/class-msrwa-admin.php';
+$waiting = new ReflectionMethod( MSRWA_Admin::class, 'title_with_waiting' );
+$waiting->setAccessible( true );
+
+// A fresh install has no tables until the first admin page load migrates them,
+// so the menu must not go looking for a count in one that is not there yet.
+$GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
+delete_option( 'msrwa_schema' );
+msrwa_test_assert( 'Titre' === $waiting->invoke( null, 'Titre' ), 'Before the tables exist the menu is just its title.' );
+msrwa_test_assert( ! $GLOBALS['wpdb']->queries, 'And it asks the database nothing.' );
+
+update_option( 'msrwa_schema', MSRWA_DB::SCHEMA );
+
+// Nothing waiting is not a badge reading zero: WordPress hides the bubble.
+$GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
+msrwa_test_assert( 'Titre' === $waiting->invoke( null, 'Titre' ), 'With nothing to read the menu carries no bubble.' );
+
+$GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
+$GLOBALS['wpdb']->on( 'FROM wp_msrwa_runs', array( array( 'moving' => 1, 'to_read' => 3, 'reserved' => 0, 'failed' => 2, 'total' => 6 ) ) );
+msrwa_test_as_editor( 7 );
+$title = (string) $waiting->invoke( null, 'Titre' );
+msrwa_test_contains( $title, 'count-3', 'Three drafts waiting put a three in the menu.' );
+msrwa_test_contains( $title, 'update-plugins', 'It is the bubble WordPress already styles.' );
+// The number is the reader's own: a count taken across everyone's work would
+// tell an editor about drafts they are not allowed to open.
+msrwa_test_contains( $GLOBALS['wpdb']->log(), 'owner_id = 7', 'The count is scoped to the reader, like every other list.' );
+// Failures are on the pass, not in the badge: a provider blip would otherwise
+// leave a red number in the sidebar that nobody can act on.
+msrwa_test_missing( $title, 'count-5', 'The badge counts drafts to read, not everything that happened.' );
+
 msrwa_test_done( 'screens and permissions' );

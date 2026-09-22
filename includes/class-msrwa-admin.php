@@ -23,7 +23,8 @@ final class MSRWA_Admin {
 		$write = MSRWA_Rights::CREATE;
 		$manage = MSRWA_Rights::MANAGE;
 
-		add_menu_page( __( 'MS Recipes Writer', 'ms-recipes-writer-ai' ), __( 'MS Recipes Writer', 'ms-recipes-writer-ai' ), $write, 'msrwa', array( 'MSRWA_Screen_Pass', 'render' ), 'dashicons-food', 58 );
+		$title = __( 'MS Recipes Writer', 'ms-recipes-writer-ai' );
+		add_menu_page( $title, self::title_with_waiting( $title ), $write, 'msrwa', array( 'MSRWA_Screen_Pass', 'render' ), 'dashicons-food', 58 );
 		add_submenu_page( 'msrwa', __( 'Le pass', 'ms-recipes-writer-ai' ), __( 'Le pass', 'ms-recipes-writer-ai' ), $write, 'msrwa', array( 'MSRWA_Screen_Pass', 'render' ) );
 		add_submenu_page( 'msrwa', __( 'Nouveau lot', 'ms-recipes-writer-ai' ), __( 'Nouveau lot', 'ms-recipes-writer-ai' ), $write, 'msrwa-compose', array( 'MSRWA_Screen_Compose', 'render' ) );
 		add_submenu_page( 'msrwa', __( 'Articles', 'ms-recipes-writer-ai' ), __( 'Articles', 'ms-recipes-writer-ai' ), $write, 'msrwa-articles', array( 'MSRWA_Screen_Articles', 'render' ) );
@@ -43,6 +44,31 @@ final class MSRWA_Admin {
 		// submenu afterwards takes the access check with it and returns 403.
 		add_submenu_page( 'options.php', __( 'Lot', 'ms-recipes-writer-ai' ), __( 'Lot', 'ms-recipes-writer-ai' ), $write, 'msrwa-batch', array( 'MSRWA_Screen_Batch', 'render' ) );
 		add_submenu_page( 'options.php', __( 'Recette', 'ms-recipes-writer-ai' ), __( 'Recette', 'ms-recipes-writer-ai' ), $write, 'msrwa-run', array( 'MSRWA_Screen_Run', 'render' ) );
+	}
+
+	/**
+	 * The menu title, carrying how many drafts are waiting for this reader.
+	 *
+	 * An editor had no way to learn that work had arrived without opening the
+	 * pass and looking, so a lot finished at three in the morning waited until
+	 * somebody thought to check. This is the signal WordPress itself uses for
+	 * comments and updates, and it means the same thing here.
+	 *
+	 * The count is `MSRWA_Ledger::now()`, which scopes to the reader: an editor
+	 * is told about their own drafts, a manager about every one. Nothing is
+	 * cached — it is a single aggregate over a table retention keeps small, and
+	 * a cache would buy a stale number an uninstall would then have to clean up.
+	 */
+	private static function title_with_waiting( $title ) {
+		// A fresh install has no tables yet, and the first admin page load is
+		// where the migration runs. Asking now would be a query against nothing.
+		if ( ! get_option( 'msrwa_schema', 0 ) ) { return $title; }
+
+		$waiting = (int) MSRWA_Ledger::now()['to_read'];
+		if ( $waiting < 1 ) { return $title; }
+
+		return $title . ' <span class="update-plugins count-' . $waiting . '"><span class="plugin-count">'
+			. esc_html( number_format_i18n( $waiting ) ) . '</span></span>';
 	}
 
 	public static function assets( $hook ) {
