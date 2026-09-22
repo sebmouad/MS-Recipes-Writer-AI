@@ -2,6 +2,24 @@
 
 Plugin WordPress en construction pour la génération éditoriale culinaire orchestrée.
 
+## Version 0.7.8
+
+**L'estimation en direct ne marchait sur aucun site aux permaliens simples.**
+
+Sans permaliens jolis, WordPress sert son API sous
+`?rest_route=/msrwa/v1`. Le script collait `'/estimate?profile=…'` au bout :
+le `?` tombait donc à l'intérieur de la valeur de `rest_route`, qui devenait
+`/msrwa/v1/estimate?profile=full`, une route qui n'existe pas. 404, silence, et
+le seul chiffre que l'écran de dépôt affiche avant de dépenser quoi que ce soit
+restait vide.
+
+Les paramètres sont désormais assemblés à un seul endroit, qui choisit le
+séparateur selon ce que la base laisse disponible. Un test refuse tout appel
+qui recollerait une chaîne de requête sur son chemin.
+
+Trouvé en cliquant dans l'installation locale, pas dans la suite : c'est
+précisément ce qu'un test hors ligne ne peut pas voir.
+
 ## Version 0.7.7
 
 **Le plafond par recette n'était pas un plafond.**
@@ -530,7 +548,7 @@ cron réel et validité distante des clés restent à vérifier sur un site de t
 
 ## État actuel
 
-La version `0.7.7` est un socle installable : file persistante, pipeline de
+La version `0.7.8` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.

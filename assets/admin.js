@@ -12,10 +12,25 @@
 
   var t = MSRWA.text || {};
 
-  function call(path, options) {
+  /**
+   * A site without pretty permalinks is served ?rest_route=/msrwa/v1, so a
+   * path with its own "?" pasted on the end lands inside that value and the
+   * route is never found. The parameters are therefore assembled here, with
+   * whichever separator the base has left available.
+   */
+  function endpoint(path, params) {
+    var url = MSRWA.api + path;
+    var query = Object.keys(params || {}).map(function (key) {
+      return encodeURIComponent(key) + '=' + encodeURIComponent(params[key]);
+    }).join('&');
+    if (!query) return url;
+    return url + (url.indexOf('?') === -1 ? '?' : '&') + query;
+  }
+
+  function call(path, options, params) {
     options = options || {};
     options.headers = Object.assign({ 'X-WP-Nonce': MSRWA.nonce, 'Content-Type': 'application/json' }, options.headers || {});
-    return fetch(MSRWA.api + path, options).then(function (response) {
+    return fetch(endpoint(path, params), options).then(function (response) {
       return response.json().then(function (data) {
         if (!response.ok) throw new Error(data.message || t.failed || 'Erreur.');
         return data;
@@ -60,10 +75,12 @@
       window.clearTimeout(pending);
       pending = window.setTimeout(function () {
         var profile = compose.querySelector('input[name=profile]:checked');
-        var query = '?profile=' + encodeURIComponent(profile ? profile.value : '') +
-          '&recipes=' + count + '&images=' + chosen.length;
 
-        call('/estimate' + query).then(function (data) {
+        call('/estimate', {}, {
+          profile: profile ? profile.value : '',
+          recipes: count,
+          images: chosen.length
+        }).then(function (data) {
           var cap = ceiling() * count;
           // Two numbers, and they are different things: what this is likely to
           // cost, and the most it is allowed to cost. Showing only the first is

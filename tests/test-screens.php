@@ -152,4 +152,13 @@ $waiting['priority'] = 5;
 ob_start(); MSRWA_UI::ticket( $waiting, '#' ); $html = ob_get_clean();
 msrwa_test_missing( $html, 'passe devant', 'A recipe already running is past the queue.' );
 
+// --- The REST base is not always a path ---------------------------------
+
+// On a site without pretty permalinks the base is ?rest_route=/msrwa/v1, so a
+// path carrying its own "?" lands inside that value and the route is never
+// found. Every parameter goes through endpoint(), which picks the separator.
+$script = (string) file_get_contents( MSRWA_DIR . 'assets/admin.js' );
+msrwa_test_assert( ! preg_match( "/call\(\s*'\/[^']*'\s*\+[^,)]*\?/", $script ), 'No call pastes a query string onto its path.' );
+msrwa_test_contains( $script, "url.indexOf('?') === -1 ? '?' : '&'", 'The separator is chosen from what the base already has.' );
+
 msrwa_test_done( 'screens render and refuse correctly' );
