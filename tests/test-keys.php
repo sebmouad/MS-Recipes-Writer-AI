@@ -59,4 +59,31 @@ msrwa_test_assert(
 	'And it stops claiming the key was accepted.'
 );
 
+// --- The list the probe downloads, which used to be thrown away ----------
+
+// Three providers, three shapes. These are the real ones, trimmed: Gemini
+// prefixes every name with `models/`, which is not the identifier the engine
+// routes to, and getting that wrong would mark every Gemini model unserved.
+$openai = '{"object":"list","data":[{"id":"gpt-5.6-luna","object":"model"},{"id":"gpt-image-2.5-flare","object":"model"}]}';
+msrwa_test_assert( array( 'gpt-5.6-luna', 'gpt-image-2.5-flare' ) === MSRWA_Keys::model_ids( 'openai', $openai ), 'OpenAI lists its models under data[].id.' );
+
+$claude = '{"data":[{"type":"model","id":"claude-sonnet-5"},{"type":"model","id":"claude-opus-5"}],"has_more":false}';
+msrwa_test_assert( array( 'claude-sonnet-5', 'claude-opus-5' ) === MSRWA_Keys::model_ids( 'claude', $claude ), 'Claude uses the same shape.' );
+
+$gemini = '{"models":[{"name":"models/gemini-3.5-flash","displayName":"Gemini"},{"name":"models/gemini-2.5-pro"}]}';
+msrwa_test_assert( array( 'gemini-3.5-flash', 'gemini-2.5-pro' ) === MSRWA_Keys::model_ids( 'gemini', $gemini ), 'Gemini lists under models[].name, and the models/ prefix is not part of the identifier.' );
+
+// Nothing usable must produce nothing, never a half-list: an empty answer is
+// what stops the catalogue from forgetting everything it knew.
+foreach ( array( '', 'not json at all', '[]', '{}', '{"data":[]}', '{"data":[{"object":"model"}]}', 'null' ) as $body ) {
+	msrwa_test_assert( array() === MSRWA_Keys::model_ids( 'openai', $body ), 'An answer with no identifiers in it yields none.' );
+}
+msrwa_test_assert( array( 'gpt-5' ) === MSRWA_Keys::model_ids( 'openai', '{"data":[{"id":"gpt-5"},{"id":"gpt-5"},{"id":"  "}]}' ), 'Repeats and blanks are dropped.' );
+
+// The probe must fetch the whole list, not the one row it needed when only the
+// status code was read.
+foreach ( MSRWA_Keys::probes() as $provider => $probe ) {
+	msrwa_test_assert( 0 === preg_match( '/(limit|pageSize)=1\b/', $probe['url'] ), $provider . ' asks for the full list, not a single row.' );
+}
+
 msrwa_test_done( 'key check' );

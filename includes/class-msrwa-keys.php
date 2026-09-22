@@ -24,8 +24,8 @@ final class MSRWA_Keys {
 	public static function probes() {
 		return array(
 			'openai' => array( 'label' => 'OpenAI', 'url' => 'https://api.openai.com/v1/models', 'headers' => static function ( $key ) { return array( 'Authorization' => 'Bearer ' . $key ); } ),
-			'gemini' => array( 'label' => 'Gemini', 'url' => 'https://generativelanguage.googleapis.com/v1beta/models?pageSize=1', 'headers' => static function ( $key ) { return array( 'x-goog-api-key' => $key ); } ),
-			'claude' => array( 'label' => 'Claude', 'url' => 'https://api.anthropic.com/v1/models?limit=1', 'headers' => static function ( $key ) { return array( 'x-api-key' => $key, 'anthropic-version' => '2023-06-01' ); } ),
+			'gemini' => array( 'label' => 'Gemini', 'url' => 'https://generativelanguage.googleapis.com/v1beta/models?pageSize=200', 'headers' => static function ( $key ) { return array( 'x-goog-api-key' => $key ); } ),
+			'claude' => array( 'label' => 'Claude', 'url' => 'https://api.anthropic.com/v1/models?limit=1000', 'headers' => static function ( $key ) { return array( 'x-api-key' => $key, 'anthropic-version' => '2023-06-01' ); } ),
 		);
 	}
 
@@ -38,10 +38,51 @@ final class MSRWA_Keys {
 				$out[ $provider ] = array( 'label' => $probe['label'], 'state' => 'missing', 'message' => __( 'aucune clé enregistrée', 'ms-recipes-writer-ai' ) );
 				continue;
 			}
-			$response = wp_remote_get( $probe['url'], array( 'timeout' => 15, 'headers' => call_user_func( $probe['headers'], $keys[ $provider ] ) ) );
-			$out[ $provider ] = array( 'label' => $probe['label'] ) + self::temper( self::verdict( $response ), self::last_refusal( $provider ) );
+			$response = wp_remote_get( $probe['url'], array( 'timeout' => 20, 'headers' => call_user_func( $probe['headers'], $keys[ $provider ] ) ) );
+			$verdict = self::temper( self::verdict( $response ), self::last_refusal( $provider ) );
+
+			// The list was always downloaded and always thrown away: only the
+			// status code was read. It is the one thing the provider knows and
+			// this plugin cannot — which model identifiers still answer — so it
+			// is kept, and a route to a name the provider no longer serves can
+			// be caught before a lot pays its way to that step.
+			$listed = self::model_ids( $provider, wp_remote_retrieve_body( $response ) );
+			if ( $listed && class_exists( 'MSRWA_Catalog' ) ) {
+				MSRWA_Catalog::remember_models( $provider, $listed );
+				$verdict['models'] = count( $listed );
+			}
+
+			$out[ $provider ] = array( 'label' => $probe['label'] ) + $verdict;
 		}
 		return $out;
+	}
+
+	/**
+	 * The model identifiers in one provider's listing.
+	 *
+	 * Three providers, three shapes, and Google prefixes every name with
+	 * `models/` — which is not the identifier the engine routes to. Pure, so
+	 * each shape is held by a test rather than by a live call nobody can make
+	 * from a laptop with no key.
+	 */
+	public static function model_ids( $provider, $body ) {
+		$data = json_decode( (string) $body, true );
+		if ( ! is_array( $data ) ) { return array(); }
+		$rows = array();
+		if ( 'gemini' === $provider ) {
+			$rows = (array) ( $data['models'] ?? array() );
+		} else {
+			$rows = (array) ( $data['data'] ?? array() );
+		}
+		$ids = array();
+		foreach ( $rows as $row ) {
+			if ( ! is_array( $row ) ) { continue; }
+			$id = (string) ( $row['id'] ?? $row['name'] ?? '' );
+			if ( 'gemini' === $provider && 0 === strpos( $id, 'models/' ) ) { $id = substr( $id, 7 ); }
+			$id = trim( $id );
+			if ( '' !== $id ) { $ids[] = $id; }
+		}
+		return array_values( array_unique( $ids ) );
 	}
 
 	/**
