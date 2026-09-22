@@ -89,4 +89,13 @@ msrwa_real_assert( 'draft' === (string) ( $draft['body']['status'] ?? '' ), 'It 
 msrwa_real_assert( '' !== trim( (string) ( $draft['body']['content']['raw'] ?? '' ) ), 'A draft with no article in it is worse than no draft.' );
 msrwa_real_note( 'draft #' . $post . ': ' . wp_strip_all_tags_compat( (string) ( $draft['body']['title']['raw'] ?? '' ) ) );
 
+// What the article wrote about itself must reach the post: proofreading returns
+// the body alone, and taking its artifact whole once left every draft without
+// an excerpt or a slug.
+msrwa_real_assert( '' !== trim( (string) ( $draft['body']['excerpt']['raw'] ?? '' ) ), 'The draft must carry the article’s excerpt.' );
+msrwa_real_assert( '' !== trim( (string) ( $draft['body']['slug'] ?? '' ) ) || '' !== trim( (string) ( $draft['body']['generated_slug'] ?? '' ) ), 'The draft must carry a slug.' );
+msrwa_real_assert( ! empty( $draft['body']['tags'] ), 'The article’s tags must be on the draft.' );
+
+msrwa_real_note( 'excerpt ' . mb_strlen( (string) ( $draft['body']['excerpt']['raw'] ?? '' ) ) . ' chars, ' . count( (array) ( $draft['body']['tags'] ?? array() ) ) . ' tag(s)' );
+
 msrwa_real_done( 'one lot, end to end' );

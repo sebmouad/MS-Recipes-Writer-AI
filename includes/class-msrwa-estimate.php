@@ -110,6 +110,15 @@ final class MSRWA_Estimate {
 		);
 	}
 
+	/**
+	 * Whether a recipe expected to cost $per_recipe runs under $ceiling. Zero
+	 * or less is no ceiling; an unpriced estimate cannot be said not to fit.
+	 */
+	public static function fits( $per_recipe, $ceiling ) {
+		$ceiling = (float) $ceiling;
+		return $ceiling <= 0 || (float) $per_recipe <= $ceiling;
+	}
+
 	/** Which routing key the engine will actually use for a step. */
 	public static function route_for( $name, $capability ) {
 		if ( 'image_generation' === $capability ) { return 'image'; }

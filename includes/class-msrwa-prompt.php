@@ -116,7 +116,7 @@ final class MSRWA_Prompt {
 	}
 
 	private static function language_name( $settings ) {
-		$codes = array( 'fr' => 'French', 'en' => 'English', 'es' => 'Spanish' );
+		$codes = array( 'fr' => 'French', 'en' => 'English', 'ar' => 'Arabic', 'es' => 'Spanish' );
 		$code = (string) ( $settings['site_language'] ?? 'fr' );
 		return $codes[ $code ] ?? $codes['fr'];
 	}

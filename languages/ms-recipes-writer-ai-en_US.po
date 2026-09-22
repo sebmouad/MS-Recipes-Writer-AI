@@ -1007,3 +1007,186 @@ msgid "Lancer %d recette"
 msgid_plural "Lancer %d recettes"
 msgstr[0] "Start %d recipe"
 msgstr[1] "Start %d recipes"
+
+msgid "Arrêtée à la demande. Elle peut être reprise là où elle s’était arrêtée."
+msgstr "Stopped on request. It can be resumed where it left off."
+
+msgid "Attention : une recette est estimée à %1$s, au-dessus du plafond de %2$s. Elle s’arrêterait en route ; le lot sera refusé au lancement. Relevez le plafond ou choisissez une sortie plus légère."
+msgstr "Careful: one recipe is estimated at %1$s, above the %2$s ceiling. It would stop part way, so the lot will be refused when sent. Raise the ceiling or choose a lighter output."
+
+msgid "Avec le routage actuel, une recette complète est estimée à %s. Un plafond en dessous refuse le lot au lancement ; laissez de la marge pour les reprises."
+msgstr "With the current routing, one complete recipe is estimated at %s. A lower ceiling refuses the lot when it is sent; leave room for retries."
+
+msgid "Ce lot dépasse le plafond par recette fixé pour le site : il s’arrêterait en route. Choisissez une sortie plus légère, ou demandez à un administrateur de relever le plafond."
+msgstr "This lot is over the site’s per-recipe ceiling and would stop part way. Choose a lighter output, or ask an administrator to raise the ceiling."
+
+msgid "Ce lot dépasse le plafond par recette fixé pour le site et sera refusé au lancement. Choisissez une sortie plus légère, ou demandez à un administrateur de relever le plafond."
+msgstr "This lot is over the site’s per-recipe ceiling and will be refused when sent. Choose a lighter output, or ask an administrator to raise the ceiling."
+
+msgid "Ce que chaque article doit être. Ces réglages atteignent directement les prompts et les contrôles du moteur."
+msgstr "What every article must be. These settings go straight into the engine’s prompts and checks."
+
+msgid "Chaque recette suit le même chemin. Plus il y a d’images, plus la recette demande de travail."
+msgstr "Every recipe takes the same path. The more images, the more work a recipe takes."
+
+msgid "Collage Facebook"
+msgstr "Facebook collage"
+
+msgid "Contrôle final"
+msgstr "Final check"
+
+msgid "Correction de la langue"
+msgstr "Language correction"
+
+msgid "Corrections"
+msgstr "Corrections"
+
+msgid "Couper l’article en deux pages"
+msgstr "Split the article into two pages"
+
+msgid "Demande à chaque fournisseur la liste de ses modèles : gratuit, et la seule preuve qu’un vrai appel passera."
+msgstr "Asks each provider for its list of models: free, and the only proof a real call will get through."
+
+msgid "En attente : la file est suspendue par un administrateur. Elle repartira d’elle-même quand la file reprendra."
+msgstr "Waiting: an administrator has held the queue. It will start by itself when the queue resumes."
+
+msgid "En attente de son tour. Elle partira d’elle-même ; rien à faire."
+msgstr "Waiting for its turn. It will start by itself; nothing to do."
+
+msgid "En cours d’écriture : %1$d étape(s) sur %2$d. Vous pouvez quitter cette page, le travail continue."
+msgstr "Being written: %1$d of %2$d step(s). You can leave this page; the work carries on."
+
+msgid "Image à la une"
+msgstr "Featured image"
+
+msgid "La recette s’est arrêtée avant la fin. La reprendre relance seulement ce qui a échoué."
+msgstr "The recipe stopped before the end. Resuming it only reruns what failed."
+
+msgid "La recette s’est arrêtée à l’étape « %s ». La reprendre relance seulement ce qui a échoué."
+msgstr "The recipe stopped at the “%s” step. Resuming it only reruns what failed."
+
+msgid "Langue des articles"
+msgstr "Article language"
+
+msgid "Le brouillon est prêt à être relu. Rien n’est publié tant que vous ne le décidez pas."
+msgstr "The draft is ready to be read. Nothing is published until you decide."
+
+msgid "Le brouillon est prêt, mais le contrôle final a relevé des points à vérifier. Lisez-les avant de publier."
+msgstr "The draft is ready, but the final check raised points to verify. Read them before publishing."
+
+msgid "Le minimum est une exigence : un article plus court échoue à son contrôle. Plus de mots coûtent plus cher à écrire et à relire."
+msgstr "The minimum is a requirement: a shorter article fails its check. More words cost more to write and to review."
+
+msgid "Le plafond de dépense de cette recette a été atteint avant la fin. Ce qui est fait est gardé ; un administrateur peut relever le plafond et la reprendre."
+msgstr "This recipe reached its spending ceiling before the end. What is done is kept; an administrator can raise the ceiling and resume it."
+
+msgid "Le service d’écriture a refusé la clé du site. Un administrateur doit la vérifier dans les réglages, puis reprendre la recette."
+msgstr "The writing service refused the site’s key. An administrator must check it in the settings, then resume the recipe."
+
+msgid "Le service d’écriture n’a pas répondu à temps. Reprendre la recette suffit en général : rien de ce qui est fait n’est perdu."
+msgstr "The writing service did not answer in time. Resuming the recipe is usually enough: nothing already done is lost."
+
+msgid "Le service d’écriture était saturé. Reprendre la recette un peu plus tard suffit en général."
+msgstr "The writing service was overloaded. Resuming the recipe a little later is usually enough."
+
+msgid "Le site n’est relié à aucun service d’écriture pour une étape de cette recette. Un administrateur doit enregistrer la clé, puis la reprendre."
+msgstr "The site is not connected to a writing service for one of this recipe’s steps. An administrator must save the key, then resume it."
+
+msgid "Le travail est terminé, mais aucun brouillon n’a pu être créé. Un administrateur doit regarder le détail."
+msgstr "The work is finished, but no draft could be created. An administrator needs to look at the details."
+
+msgid "Les articles"
+msgstr "Articles"
+
+msgid "Longueur"
+msgstr "Length"
+
+msgid "Légende Facebook"
+msgstr "Facebook caption"
+
+msgid "Méta-description"
+msgstr "Meta description"
+
+msgid "Nombre de mots maximal"
+msgstr "Maximum number of words"
+
+msgid "Proposée par défaut sur chaque nouveau lot. Un lot peut toujours en demander une autre."
+msgstr "Offered by default on every new lot. A lot can always ask for another."
+
+msgid "Publier la recette en données structurées (Recipe JSON-LD)"
+msgstr "Publish the recipe as structured data (Recipe JSON-LD)"
+
+msgid "Recette de référence"
+msgstr "Reference recipe"
+
+msgid "Recherche"
+msgstr "Research"
+
+msgid "Relecture éditoriale"
+msgstr "Editorial review"
+
+msgid "Rédaction"
+msgstr "Writing"
+
+msgid "Référencement et réseaux sociaux"
+msgstr "Search and social"
+
+msgid "Sur les articles publiés seulement. Ce que Google lit pour afficher une recette enrichie : temps, portions, ingrédients, étapes, calories."
+msgstr "On published articles only. What Google reads to show a rich recipe result: times, servings, ingredients, steps, calories."
+
+msgid "Titre SEO"
+msgstr "SEO title"
+
+msgid "Titre qui ouvre la seconde page"
+msgstr "Heading that opens the second page"
+
+msgid "Une extension de recettes active imprime déjà les siennes : rien n’est ajouté, pour ne pas décrire deux fois le même plat."
+msgstr "An active recipe plugin already prints its own: nothing is added, so the same dish is not described twice."
+
+msgid "Une recette de ce lot est estimée à %1$s, au-dessus de son plafond de %2$s : elle s’arrêterait en route après avoir dépensé. Relevez le plafond ou choisissez une sortie plus légère."
+msgstr "One recipe in this lot is estimated at %1$s, above its %2$s ceiling: it would stop part way after spending. Raise the ceiling or choose a lighter output."
+
+msgid "Vos recettes passées par le moteur, avec leur état et leur brouillon."
+msgstr "Your recipes that went through the engine, with their state and their draft."
+
+msgid "Vérification des faits"
+msgstr "Fact check"
+
+msgid "Vérification…"
+msgstr "Checking…"
+
+msgid "Vérifier les clés"
+msgstr "Check the keys"
+
+msgid "arrêtée"
+msgstr "stopped"
+
+msgid "aucune clé enregistrée"
+msgstr "no key saved"
+
+msgid "clé acceptée"
+msgstr "key accepted"
+
+msgid "clé acceptée, mais le quota est atteint pour l’instant"
+msgstr "key accepted, but the quota is reached for now"
+
+msgid "clé refusée par le fournisseur : vérifiez-la ou remplacez-la"
+msgstr "key refused by the provider: check it or replace it"
+
+msgid "faite"
+msgstr "done"
+
+msgid "injoignable depuis ce serveur : le pare-feu de l’hébergeur bloque peut-être la sortie"
+msgstr "unreachable from this server: the host’s firewall may be blocking outgoing calls"
+
+msgid "le fournisseur répond %d : réessayez plus tard"
+msgstr "the provider answers %d: try again later"
+
+msgid "mots"
+msgstr "words"
+
+msgid "à"
+msgstr "to"
+
+msgid "Le compte du service d’écriture n’a plus de crédit. Un administrateur doit le recharger, puis reprendre la recette : rien de ce qui est fait n’est perdu."
+msgstr "The writing service’s account has run out of credit. An administrator must top it up, then resume the recipe: nothing already done is lost."

@@ -133,7 +133,7 @@ final class MSRWA_Operations {
 	 * prove it works — only that a call would be attempted.
 	 */
 	public static function diagnostics() {
-		$config = MSRWA_Engine_Config::create( MSRWA_Engine_Settings::stored(), array( 'settings' => array( 'keys' => MSRWA_Settings::engine_keys() ) ) );
+		$config = MSRWA_Engine_Config::create( MSRWA_Engine_Settings::stored(), array( 'settings' => MSRWA_Settings::engine_settings() ) );
 		$rows = array();
 		foreach ( $config->steps() as $step => $definition ) {
 			$route = $config->model_for( $step );

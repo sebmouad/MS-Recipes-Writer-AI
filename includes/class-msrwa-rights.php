@@ -21,12 +21,17 @@ final class MSRWA_Rights {
 	const VIEW_ALL = 'msrwa_view_all';
 	const MANAGE = 'msrwa_manage';
 
-	/** The roles this plugin grants on activation, and what each one gets. */
+	/**
+	 * The roles this plugin grants, on activation and on every upgrade, and
+	 * what each one gets. Only an administrator sees everyone's work, so
+	 * `msrwa_view_all` belongs to administrators alone.
+	 */
 	public static function roles() {
 		return array(
 			'administrator' => array( self::CREATE, self::VIEW_ALL, self::MANAGE ),
-			'editor' => array( self::CREATE, self::VIEW_ALL ),
+			'editor' => array( self::CREATE ),
 			'author' => array( self::CREATE ),
+			'writer' => array( self::CREATE ),
 		);
 	}
 

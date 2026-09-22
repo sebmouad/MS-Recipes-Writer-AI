@@ -145,6 +145,17 @@ final class MSRWA_Batch {
 		$estimate = MSRWA_Estimate::lot( $batch['profile'], (int) $batch['recipes'], 0, self::config_overrides( $id ) );
 		$refusal = MSRWA_Budget::refusal( (float) $estimate['cost_usd'] );
 		if ( '' !== $refusal ) { return new WP_Error( 'msrwa_over_budget', $refusal ); }
+		// The per-recipe ceiling stops a run before the step that would cross it.
+		// A recipe expected to cost more than its ceiling would be stopped part
+		// way through, having paid for everything before the stop and delivered
+		// nothing — so it is refused here, where refusing costs nothing.
+		if ( ! MSRWA_Estimate::fits( (float) $estimate['per_recipe_usd'], (float) $batch['budget_usd'] ) ) {
+			return new WP_Error( 'msrwa_over_ceiling', MSRWA_Rights::may_see_money()
+				/* translators: 1: estimated cost per recipe, 2: the per-recipe ceiling. */
+				? sprintf( __( 'Une recette de ce lot est estimée à %1$s, au-dessus de son plafond de %2$s : elle s’arrêterait en route après avoir dépensé. Relevez le plafond ou choisissez une sortie plus légère.', 'ms-recipes-writer-ai' ), MSRWA_I18N::money( (float) $estimate['per_recipe_usd'], 4 ), MSRWA_I18N::money( (float) $batch['budget_usd'], 2 ) )
+				: __( 'Ce lot dépasse le plafond par recette fixé pour le site : il s’arrêterait en route. Choisissez une sortie plus légère, ou demandez à un administrateur de relever le plafond.', 'ms-recipes-writer-ai' )
+			);
+		}
 
 		$matching = self::matching( $id );
 		$config = self::config_overrides( $id );
@@ -195,8 +206,7 @@ final class MSRWA_Batch {
 			$config = self::merge( $config, MSRWA_Profile::config( $batch['profile'], $batch['language'], (array) ( $config['steps'] ?? array() ) ) );
 			$config['limits']['budget_usd'] = (float) $batch['budget_usd'];
 		}
-		$keys = MSRWA_Settings::engine_keys();
-		if ( $keys ) { $config['settings'] = array_merge( (array) ( $config['settings'] ?? array() ), array( 'keys' => $keys ) ); }
+		$config['settings'] = array_merge( MSRWA_Settings::engine_settings(), (array) ( $config['settings'] ?? array() ) );
 		return $config;
 	}
 

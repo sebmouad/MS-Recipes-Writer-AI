@@ -58,6 +58,19 @@ msrwa_test_assert( 'en' === MSRWA_Profile::config( MSRWA_Profile::FULL, 'en' )['
 msrwa_test_assert( ! isset( MSRWA_Profile::config( MSRWA_Profile::FULL, 'klingon' )['language'] ), 'An unknown language is ignored, not passed on.' );
 msrwa_test_assert( 3 === count( MSRWA_Profile::languages() ), 'Three languages are offered.' );
 
+// The prompts read the language from settings.site_language; the engine's own
+// `language` key is read by nothing. A lot asked for in English was written in
+// French until the language travelled where the prompts look.
+foreach ( array( 'en', 'ar', 'fr' ) as $code ) {
+	$config = MSRWA_Profile::config( MSRWA_Profile::ARTICLE, $code );
+	msrwa_test_assert( $code === ( $config['settings']['site_language'] ?? '' ), 'The ' . $code . ' lot must reach the prompts as site_language.' );
+}
+msrwa_test_assert( 0 === MSRWA_Profile::config( MSRWA_Profile::FULL, 'en' )['thresholds']['article_accents_per_1000'], 'An English article is not failed for lacking French accents.' );
+msrwa_test_assert( ! isset( MSRWA_Profile::config( MSRWA_Profile::FULL, 'fr' )['thresholds'] ), 'French keeps the measured accent threshold.' );
+msrwa_test_assert( 'Step-by-step preparation' === MSRWA_Profile::config( MSRWA_Profile::ARTICLE, 'en' )['settings']['article_page2_heading'], 'An English lot on a French site turns its page in English.' );
+msrwa_test_assert( ! isset( MSRWA_Profile::config( MSRWA_Profile::ARTICLE, 'fr' )['settings']['article_page2_heading'] ), 'A lot in the site language keeps the heading the site chose.' );
+msrwa_test_assert( false !== strpos( MSRWA_Prompt::compile( 'Write in {{language}}.', array( 'site_language' => 'ar' ) ), 'Arabic' ), 'Arabic is a language the prompts can name.' );
+
 // An unknown profile is the complete one, never an empty pipeline.
 msrwa_test_assert( MSRWA_Engine_Steps::names() === MSRWA_Profile::steps( 'inventé' ), 'An unknown profile falls back to the full pipeline.' );
 

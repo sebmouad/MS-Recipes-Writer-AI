@@ -49,6 +49,7 @@ if ( ! function_exists( 'esc_url' ) ) { function esc_url( $value ) { return (str
 if ( ! function_exists( 'esc_url_raw' ) ) { function esc_url_raw( $value ) { return (string) $value; } }
 if ( ! function_exists( 'esc_html__' ) ) { function esc_html__( $value, $domain = '' ) { return $value; } }
 if ( ! function_exists( 'esc_html_e' ) ) { function esc_html_e( $value, $domain = '' ) { echo $value; } }
+if ( ! function_exists( 'esc_attr_e' ) ) { function esc_attr_e( $value, $domain = '' ) { echo htmlspecialchars( (string) $value, ENT_QUOTES ); } }
 if ( ! function_exists( '__' ) ) { function __( $value, $domain = '' ) { return $value; } }
 if ( ! function_exists( '_n' ) ) { function _n( $single, $plural, $number, $domain = '' ) { return 1 === (int) $number ? $single : $plural; } }
 if ( ! function_exists( 'wp_kses_post' ) ) { function wp_kses_post( $value ) { return (string) $value; } }

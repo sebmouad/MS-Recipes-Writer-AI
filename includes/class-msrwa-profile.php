@@ -97,8 +97,47 @@ final class MSRWA_Profile {
 		return array_merge( self::language_config( $language ), $steps ? array( 'steps' => $steps ) : array() );
 	}
 
+	/** The heading that opens page two, in each shipped language. */
+	public static function page_two_headings() {
+		return array(
+			'fr' => 'Préparation de la recette étape par étape',
+			'en' => 'Step-by-step preparation',
+			'ar' => 'طريقة التحضير خطوة بخطوة',
+		);
+	}
+
+	public static function page_two_heading( $language ) {
+		$headings = self::page_two_headings();
+		return $headings[ (string) $language ] ?? $headings['fr'];
+	}
+
+	/**
+	 * The article language, where the engine's shared classes read it.
+	 *
+	 * The prompts take their language from `settings.site_language`; the
+	 * engine's top-level `language` key is recorded but read by nothing, so a
+	 * lot asked for in English or Arabic was written in French. And the article
+	 * and proofreading scorecards measure French accents, which an English or
+	 * Arabic text rightly has none of: for those the accent checks stand down
+	 * rather than fail a correct article.
+	 */
 	private static function language_config( $language ) {
-		return self::language_exists( $language ) ? array( 'language' => (string) $language ) : array();
+		if ( ! self::language_exists( $language ) ) { return array(); }
+		$config = array( 'language' => (string) $language, 'settings' => array( 'site_language' => (string) $language ) );
+		// The heading that opens page two is text in some language. A heading the
+		// site wrote itself is kept for lots in the site's language; a shipped
+		// one, or any heading on a lot in another language, becomes that
+		// language's own — or an English article turns its page in French.
+		$site = class_exists( 'MSRWA_Settings' ) ? (array) MSRWA_Settings::get() : array();
+		$heading = (string) ( $site['article_page2_heading'] ?? '' );
+		$shipped = in_array( $heading, self::page_two_headings(), true );
+		if ( (string) ( $site['site_language'] ?? 'fr' ) !== (string) $language || ( $shipped && self::page_two_heading( $language ) !== $heading ) ) {
+			$config['settings']['article_page2_heading'] = self::page_two_heading( $language );
+		}
+		if ( 'fr' !== $language ) {
+			$config['thresholds'] = array( 'article_accents_per_1000' => 0, 'proofread_accent_slack' => 1000 );
+		}
+		return $config;
 	}
 
 }

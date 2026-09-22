@@ -11,56 +11,32 @@ final class MSRWA_Settings {
 
 	public static function defaults() {
 		$defaults = array(
-			'mode'                => 'automatic',
 			'openai_key'          => '',
 			'gemini_key'          => '',
 			'claude_key'          => '',
-			'openai_model'        => 'gpt-5.6-luna',
-			'gemini_model'        => 'gemini-3.1-flash-image',
-			'claude_model'        => 'claude-sonnet-5',
-			'manual_models'       => array(
-				'text'   => 'openai:gpt-5.6-luna',
-				'review' => 'claude:claude-sonnet-5',
-				'image'  => 'gemini:gemini-3.1-flash-image',
-				'search' => 'openai:gpt-5.6-luna',
-			),
-			'max_batch'           => 50,
-			'max_concurrency'     => 4,
 			'max_corrections'     => 2,
-			'per_recipe_budget_usd' => 0.10,
-			'target_cost_usd'      => 0.10,
+			'per_recipe_budget_usd' => 0.50,
 			'daily_budget_usd'    => 0,
 			'monthly_budget_usd'  => 0,
-			'vision_reserve_usd'   => 0.005,
-			'text_reserve_margin_usd' => 0.002,
 			'web_search_tool_cost_usd' => 0.01,
 			'web_search_max_tool_calls' => 1,
-			'featured_image_estimate_usd' => 0.025,
-			'facebook_image_estimate_usd' => 0.035,
 			'max_reference_images' => 3,
-			'visual_reference_search' => 1,
-			'visual_reference_max' => 3,
 			'retention_events_days' => 90,
 			'retention_artifacts_days' => 365,
 			'retention_runs_days' => 0,
-			'log_days'            => 30,
-			'temp_days'           => 7,
-			'aggregate_months'    => 12,
 			'featured_ratio'      => '1:1',
 			'facebook_ratio'      => '2:3',
-			'facebook_image_fit'  => 'contain',
-			'image_padding_color' => '#ffffff',
 			'featured_image_quality' => 'medium',
 			'facebook_image_quality' => 'medium',
 			'image_quality'       => 'medium',
 			'image_format'        => 'webp',
-			'facebook_text'       => 0,
 			'internal_links_enabled' => 1,
 			'internal_links_max'     => 3,
 			'prompt_internal_links' => 'Intègre les liens naturellement sur plusieurs mots ou expressions pertinents dans les paragraphes de content_html. Chaque ancre doit décrire la recette cible et faire partie de la phrase. Répartis les liens dans le texte, sans répétition de cible, sans liste de liens ni section À découvrir, À lire aussi ou équivalente. Retourne dans internal_links les mêmes ancres exactes et URLs. Si aucun lien ne convient au contexte, omets-le plutôt que forcer une recommandation.',
 			'quality_min_score'        => 90,
 			'quality_min_words'   => 2800,
 			'site_language'       => 'fr',
+			'recipe_schema'       => 1,
 			'article_page2_heading' => 'Préparation de la recette étape par étape',
 			'facebook_collage_steps' => 6,
 			'required_sections'   => array(),
@@ -82,8 +58,6 @@ final class MSRWA_Settings {
 			'image_review_max_output_tokens' => 1000,
 			'approval_max_output_tokens' => 14000,
 			'article_pagination_enabled' => 1,
-			'generate_featured_image' => 1,
-			'generate_facebook_image' => 1,
 			'article_pagination_min_words' => 1000,
 			'article_pagination_split_percent' => 50,
 			'integration_mapping' => array( 'prep_minutes' => '_recipe_prep_time', 'cook_minutes' => '_recipe_cook_time', 'total_minutes' => '_recipe_total_time', 'recipe_category' => '_recipe_category', 'description' => '_recipe_description', 'servings' => '_recipe_servings', 'calories_estimate' => '_recipe_calories', 'cuisine' => '_recipe_cuisine', 'difficulty' => '_recipe_difficulty', 'equipment' => '_recipe_equipment', 'notes' => '_recipe_notes', 'faq' => '_recipe_faq', 'keywords' => '_recipe_keywords', 'ingredients' => '_recipe_ingredients', 'instructions' => '_recipe_instructions', 'seo_title' => '_seo_title', 'seo_description' => '_seo_description', 'facebook_meta' => 'fb_images_data' ),
@@ -544,16 +518,30 @@ SILENT FINAL CHECK BEFORE RETURNING — fix anything that fails:
 		return $keys;
 	}
 
+	/**
+	 * What the engine receives as its `settings` branch: the site's prompt and
+	 * quality settings, and the keys.
+	 *
+	 * The engine treats a non-empty `settings` as the caller's complete set and
+	 * stops reading the shipped defaults. Handing it the keys alone therefore
+	 * handed it no word count, no minimum, no page split and no language: every
+	 * threshold compared against zero and the site's own choices never reached a
+	 * prompt.
+	 */
+	public static function engine_settings() {
+		$values = self::get();
+		foreach ( self::key_fields() as $field ) { unset( $values[ $field ] ); }
+		$keys = self::engine_keys();
+		if ( $keys ) { $values['keys'] = $keys; }
+		return $values;
+	}
+
 	public static function sanitize( $raw ) {
 		$raw = is_array( $raw ) ? $raw : array();
 		$defaults = self::defaults();
 		$out = $defaults;
-		$out['mode'] = in_array( isset( $raw['mode'] ) ? $raw['mode'] : '', array( 'automatic', 'manual' ), true ) ? $raw['mode'] : $defaults['mode'];
 		foreach ( array( 'openai_key', 'gemini_key', 'claude_key' ) as $key ) {
 			$out[ $key ] = self::secret_for_save( $key, $raw[ $key ] ?? null );
-		}
-		foreach ( array( 'openai_model', 'gemini_model', 'claude_model' ) as $key ) {
-			if ( isset( $raw[ $key ] ) ) { $out[ $key ] = sanitize_text_field( $raw[ $key ] ); }
 		}
 		$out['featured_ratio'] = isset( $raw['featured_ratio'] ) && in_array( $raw['featured_ratio'], array( '1:1', '4:5', '3:2', '2:3' ), true ) ? $raw['featured_ratio'] : $defaults['featured_ratio'];
 		$out['facebook_ratio'] = isset( $raw['facebook_ratio'] ) && in_array( $raw['facebook_ratio'], array( '4:5', '1:1', '2:3', '3:2' ), true ) ? $raw['facebook_ratio'] : $defaults['facebook_ratio'];
@@ -561,17 +549,7 @@ SILENT FINAL CHECK BEFORE RETURNING — fix anything that fails:
 			$out[ $key ] = isset( $raw[ $key ] ) && in_array( $raw[ $key ], MSRWA_Images::qualities(), true ) ? $raw[ $key ] : $defaults[ $key ];
 		}
 		$out['image_format'] = isset( $raw['image_format'] ) && in_array( $raw['image_format'], array( 'webp', 'jpeg', 'png' ), true ) ? $raw['image_format'] : $defaults['image_format'];
-		$out['facebook_image_fit'] = isset( $raw['facebook_image_fit'] ) && in_array( $raw['facebook_image_fit'], array( 'contain', 'cover' ), true ) ? $raw['facebook_image_fit'] : $defaults['facebook_image_fit'];
-		$out['image_padding_color'] = isset( $raw['image_padding_color'] ) && preg_match( '/^#[a-f0-9]{6}$/i', $raw['image_padding_color'] ) ? strtolower( $raw['image_padding_color'] ) : $defaults['image_padding_color'];
-		$catalog = MSRWA_Catalog::models();
-		if ( isset( $raw['manual_models'] ) && is_array( $raw['manual_models'] ) ) {
-			foreach ( array( 'text', 'review', 'image', 'search' ) as $stage ) {
-				$value = isset( $raw['manual_models'][ $stage ] ) ? sanitize_text_field( $raw['manual_models'][ $stage ] ) : $defaults['manual_models'][ $stage ];
-				list( $provider, $model ) = array_pad( explode( ':', $value, 2 ), 2, '' );
-				if ( isset( $catalog[ $provider ][ $model ] ) && ! empty( $catalog[ $provider ][ $model ]['stable'] ) ) { $out['manual_models'][ $stage ] = $provider . ':' . $model; }
-			}
-		}
-		foreach ( array( 'max_batch' => array( 1, 50 ), 'max_concurrency' => array( 1, 4 ), 'max_corrections' => array( 0, 2 ), 'log_days' => array( 1, 365 ), 'temp_days' => array( 1, 90 ), 'aggregate_months' => array( 1, 60 ) ) as $key => $limits ) {
+		foreach ( array( 'max_corrections' => array( 0, 2 ) ) as $key => $limits ) {
 			$value = isset( $raw[ $key ] ) ? absint( $raw[ $key ] ) : $defaults[ $key ];
 			$out[ $key ] = min( $limits[1], max( $limits[0], $value ) );
 		}
@@ -581,21 +559,13 @@ SILENT FINAL CHECK BEFORE RETURNING — fix anything that fails:
 		foreach ( array( 'retention_events_days', 'retention_artifacts_days', 'retention_runs_days' ) as $key ) {
 			$out[ $key ] = isset( $raw[ $key ] ) ? min( 3650, max( 0, absint( $raw[ $key ] ) ) ) : $defaults[ $key ];
 		}
-		foreach ( array( 'per_recipe_budget_usd', 'target_cost_usd', 'daily_budget_usd', 'monthly_budget_usd' ) as $key ) { $out[ $key ] = isset( $raw[ $key ] ) ? min( 100000, max( 0, (float) $raw[ $key ] ) ) : $defaults[ $key ]; }
-		$out['vision_reserve_usd'] = isset( $raw['vision_reserve_usd'] ) ? min( 1000, max( 0.001, (float) $raw['vision_reserve_usd'] ) ) : $defaults['vision_reserve_usd'];
-		$out['text_reserve_margin_usd'] = isset( $raw['text_reserve_margin_usd'] ) ? min( 1000, max( 0, (float) $raw['text_reserve_margin_usd'] ) ) : $defaults['text_reserve_margin_usd'];
+		foreach ( array( 'per_recipe_budget_usd', 'daily_budget_usd', 'monthly_budget_usd' ) as $key ) { $out[ $key ] = isset( $raw[ $key ] ) ? min( 100000, max( 0, (float) $raw[ $key ] ) ) : $defaults[ $key ]; }
 		$out['web_search_tool_cost_usd'] = isset( $raw['web_search_tool_cost_usd'] ) ? min( 1000, max( 0, (float) $raw['web_search_tool_cost_usd'] ) ) : $defaults['web_search_tool_cost_usd'];
 		$out['web_search_max_tool_calls'] = isset( $raw['web_search_max_tool_calls'] ) ? min( 10, max( 1, absint( $raw['web_search_max_tool_calls'] ) ) ) : $defaults['web_search_max_tool_calls'];
-		$out['featured_image_estimate_usd'] = isset( $raw['featured_image_estimate_usd'] ) ? min( 1000, max( 0.001, (float) $raw['featured_image_estimate_usd'] ) ) : $defaults['featured_image_estimate_usd'];
-		$out['facebook_image_estimate_usd'] = isset( $raw['facebook_image_estimate_usd'] ) ? min( 1000, max( 0.001, (float) $raw['facebook_image_estimate_usd'] ) ) : $defaults['facebook_image_estimate_usd'];
 		$out['max_reference_images'] = isset( $raw['max_reference_images'] ) ? min( 10, max( 0, absint( $raw['max_reference_images'] ) ) ) : $defaults['max_reference_images'];
-		$out['visual_reference_search'] = empty( $raw['visual_reference_search'] ) ? 0 : 1;
-		$out['visual_reference_max'] = isset( $raw['visual_reference_max'] ) ? min( 10, max( 0, absint( $raw['visual_reference_max'] ) ) ) : $defaults['visual_reference_max'];
-		$out['facebook_text'] = empty( $raw['facebook_text'] ) ? 0 : 1;
 		$out['internal_links_enabled'] = empty( $raw['internal_links_enabled'] ) ? 0 : 1;
 		$out['article_pagination_enabled'] = empty( $raw['article_pagination_enabled'] ) ? 0 : 1;
-		$out['generate_featured_image'] = empty( $raw['generate_featured_image'] ) ? 0 : 1;
-		$out['generate_facebook_image'] = empty( $raw['generate_facebook_image'] ) ? 0 : 1;
+		$out['recipe_schema'] = empty( $raw['recipe_schema'] ) ? 0 : 1;
 		$out['article_pagination_min_words'] = isset( $raw['article_pagination_min_words'] ) ? min( 8000, max( 300, absint( $raw['article_pagination_min_words'] ) ) ) : $defaults['article_pagination_min_words'];
 		$out['article_pagination_split_percent'] = isset( $raw['article_pagination_split_percent'] ) ? min( 70, max( 30, absint( $raw['article_pagination_split_percent'] ) ) ) : $defaults['article_pagination_split_percent'];
 		$out['internal_links_max'] = isset( $raw['internal_links_max'] ) ? min( 10, max( 0, absint( $raw['internal_links_max'] ) ) ) : $defaults['internal_links_max'];
@@ -605,6 +575,15 @@ SILENT FINAL CHECK BEFORE RETURNING — fix anything that fails:
 			$out[ $key ] = min( $limits[1], max( $limits[0], $value ) );
 		}
 		if ( $out['quality_max_words'] < $out['quality_min_words'] ) { $out['quality_max_words'] = $out['quality_min_words']; }
+		// These were never read back from a submission, so every save reset them
+		// to what ships: the site language could not be chosen at all.
+		$out['site_language'] = isset( $raw['site_language'] ) && in_array( $raw['site_language'], array( 'fr', 'en', 'ar' ), true ) ? $raw['site_language'] : $defaults['site_language'];
+		$heading = isset( $raw['article_page2_heading'] ) ? trim( sanitize_text_field( (string) $raw['article_page2_heading'] ) ) : '';
+		$out['article_page2_heading'] = '' !== $heading ? mb_substr( $heading, 0, 120 ) : $defaults['article_page2_heading'];
+		$out['facebook_collage_steps'] = isset( $raw['facebook_collage_steps'] ) ? min( 9, max( 2, absint( $raw['facebook_collage_steps'] ) ) ) : $defaults['facebook_collage_steps'];
+		if ( isset( $raw['required_sections'] ) && is_array( $raw['required_sections'] ) ) {
+			$out['required_sections'] = array_values( array_filter( array_map( static function ( $line ) { return mb_substr( trim( sanitize_text_field( (string) $line ) ), 0, 160 ); }, $raw['required_sections'] ) ) );
+		}
 		if ( isset( $raw['integration_mapping_json'] ) ) {
 			$mapping = json_decode( (string) $raw['integration_mapping_json'], true );
 			if ( is_array( $mapping ) ) { foreach ( $defaults['integration_mapping'] as $key => $fallback ) { if ( isset( $mapping[ $key ] ) ) { $out['integration_mapping'][ $key ] = sanitize_key( $mapping[ $key ] ); } } }

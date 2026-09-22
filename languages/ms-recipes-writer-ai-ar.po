@@ -1019,3 +1019,186 @@ msgstr[2] "أطلق وصفتين"
 msgstr[3] "أطلق %d وصفات"
 msgstr[4] "أطلق %d وصفة"
 msgstr[5] "أطلق %d وصفة"
+
+msgid "Arrêtée à la demande. Elle peut être reprise là où elle s’était arrêtée."
+msgstr "أُوقفت بطلب. يمكن استئنافها من حيث توقفت."
+
+msgid "Attention : une recette est estimée à %1$s, au-dessus du plafond de %2$s. Elle s’arrêterait en route ; le lot sera refusé au lancement. Relevez le plafond ou choisissez une sortie plus légère."
+msgstr "تنبيه: تُقدَّر الوصفة الواحدة بـ %1$s، أي فوق السقف البالغ %2$s. ستتوقف في منتصف الطريق، لذا سيُرفض الدفعة عند الإطلاق. ارفع السقف أو اختر مخرجًا أخف."
+
+msgid "Avec le routage actuel, une recette complète est estimée à %s. Un plafond en dessous refuse le lot au lancement ; laissez de la marge pour les reprises."
+msgstr "بحسب التوجيه الحالي، تُقدَّر الوصفة الكاملة بـ %s. أي سقف أدنى يرفض الدفعة عند الإطلاق؛ اترك هامشًا لإعادة المحاولات."
+
+msgid "Ce lot dépasse le plafond par recette fixé pour le site : il s’arrêterait en route. Choisissez une sortie plus légère, ou demandez à un administrateur de relever le plafond."
+msgstr "تتجاوز هذه الدفعة سقف الوصفة المحدد للموقع وستتوقف في منتصف الطريق. اختر مخرجًا أخف، أو اطلب من المسؤول رفع السقف."
+
+msgid "Ce lot dépasse le plafond par recette fixé pour le site et sera refusé au lancement. Choisissez une sortie plus légère, ou demandez à un administrateur de relever le plafond."
+msgstr "تتجاوز هذه الدفعة سقف الوصفة المحدد للموقع وستُرفض عند الإطلاق. اختر مخرجًا أخف، أو اطلب من المسؤول رفع السقف."
+
+msgid "Ce que chaque article doit être. Ces réglages atteignent directement les prompts et les contrôles du moteur."
+msgstr "ما يجب أن تكون عليه كل مقالة. تصل هذه الإعدادات مباشرة إلى تعليمات المحرك وفحوصه."
+
+msgid "Chaque recette suit le même chemin. Plus il y a d’images, plus la recette demande de travail."
+msgstr "تسلك كل وصفة المسار نفسه. كلما زادت الصور زاد العمل الذي تتطلبه الوصفة."
+
+msgid "Collage Facebook"
+msgstr "مجموعة صور فيسبوك"
+
+msgid "Contrôle final"
+msgstr "الفحص النهائي"
+
+msgid "Correction de la langue"
+msgstr "تدقيق اللغة"
+
+msgid "Corrections"
+msgstr "التصحيحات"
+
+msgid "Couper l’article en deux pages"
+msgstr "تقسيم المقالة إلى صفحتين"
+
+msgid "Demande à chaque fournisseur la liste de ses modèles : gratuit, et la seule preuve qu’un vrai appel passera."
+msgstr "يطلب من كل مزوّد قائمة نماذجه: مجاني، وهو الدليل الوحيد على أن الاستدعاء الحقيقي سينجح."
+
+msgid "En attente : la file est suspendue par un administrateur. Elle repartira d’elle-même quand la file reprendra."
+msgstr "في الانتظار: علّق المسؤول قائمة الانتظار. ستنطلق تلقائيًا عند استئنافها."
+
+msgid "En attente de son tour. Elle partira d’elle-même ; rien à faire."
+msgstr "في انتظار دورها. ستنطلق تلقائيًا؛ لا شيء عليك فعله."
+
+msgid "En cours d’écriture : %1$d étape(s) sur %2$d. Vous pouvez quitter cette page, le travail continue."
+msgstr "قيد الكتابة: %1$d من %2$d خطوة. يمكنك مغادرة هذه الصفحة، فالعمل مستمر."
+
+msgid "Image à la une"
+msgstr "الصورة البارزة"
+
+msgid "La recette s’est arrêtée avant la fin. La reprendre relance seulement ce qui a échoué."
+msgstr "توقفت الوصفة قبل النهاية. استئنافها يعيد تشغيل ما فشل فقط."
+
+msgid "La recette s’est arrêtée à l’étape « %s ». La reprendre relance seulement ce qui a échoué."
+msgstr "توقفت الوصفة عند خطوة «%s». استئنافها يعيد تشغيل ما فشل فقط."
+
+msgid "Langue des articles"
+msgstr "لغة المقالات"
+
+msgid "Le brouillon est prêt à être relu. Rien n’est publié tant que vous ne le décidez pas."
+msgstr "المسودة جاهزة للمراجعة. لا يُنشر شيء حتى تقرر ذلك."
+
+msgid "Le brouillon est prêt, mais le contrôle final a relevé des points à vérifier. Lisez-les avant de publier."
+msgstr "المسودة جاهزة، لكن الفحص النهائي أشار إلى نقاط يجب التحقق منها. اقرأها قبل النشر."
+
+msgid "Le minimum est une exigence : un article plus court échoue à son contrôle. Plus de mots coûtent plus cher à écrire et à relire."
+msgstr "الحد الأدنى شرط: المقالة الأقصر ترسب في فحصها. الكلمات الإضافية تكلّف أكثر في الكتابة والمراجعة."
+
+msgid "Le plafond de dépense de cette recette a été atteint avant la fin. Ce qui est fait est gardé ; un administrateur peut relever le plafond et la reprendre."
+msgstr "بلغت هذه الوصفة سقف إنفاقها قبل النهاية. ما أُنجز محفوظ؛ ويمكن للمسؤول رفع السقف واستئنافها."
+
+msgid "Le service d’écriture a refusé la clé du site. Un administrateur doit la vérifier dans les réglages, puis reprendre la recette."
+msgstr "رفضت خدمة الكتابة مفتاح الموقع. على المسؤول التحقق منه في الإعدادات ثم استئناف الوصفة."
+
+msgid "Le service d’écriture n’a pas répondu à temps. Reprendre la recette suffit en général : rien de ce qui est fait n’est perdu."
+msgstr "لم تستجب خدمة الكتابة في الوقت المناسب. استئناف الوصفة يكفي عادة: لا يضيع شيء مما أُنجز."
+
+msgid "Le service d’écriture était saturé. Reprendre la recette un peu plus tard suffit en général."
+msgstr "كانت خدمة الكتابة مكتظة. استئناف الوصفة بعد قليل يكفي عادة."
+
+msgid "Le site n’est relié à aucun service d’écriture pour une étape de cette recette. Un administrateur doit enregistrer la clé, puis la reprendre."
+msgstr "الموقع غير مرتبط بأي خدمة كتابة لإحدى خطوات هذه الوصفة. على المسؤول حفظ المفتاح ثم استئنافها."
+
+msgid "Le travail est terminé, mais aucun brouillon n’a pu être créé. Un administrateur doit regarder le détail."
+msgstr "انتهى العمل، لكن تعذّر إنشاء مسودة. على المسؤول الاطلاع على التفاصيل."
+
+msgid "Les articles"
+msgstr "المقالات"
+
+msgid "Longueur"
+msgstr "الطول"
+
+msgid "Légende Facebook"
+msgstr "تعليق فيسبوك"
+
+msgid "Méta-description"
+msgstr "الوصف التعريفي"
+
+msgid "Nombre de mots maximal"
+msgstr "الحد الأقصى لعدد الكلمات"
+
+msgid "Proposée par défaut sur chaque nouveau lot. Un lot peut toujours en demander une autre."
+msgstr "مقترحة افتراضيًا لكل دفعة جديدة. يمكن لأي دفعة طلب لغة أخرى."
+
+msgid "Publier la recette en données structurées (Recipe JSON-LD)"
+msgstr "نشر الوصفة كبيانات منظَّمة (Recipe JSON-LD)"
+
+msgid "Recette de référence"
+msgstr "الوصفة المرجعية"
+
+msgid "Recherche"
+msgstr "البحث"
+
+msgid "Relecture éditoriale"
+msgstr "المراجعة التحريرية"
+
+msgid "Rédaction"
+msgstr "التحرير"
+
+msgid "Référencement et réseaux sociaux"
+msgstr "محركات البحث والشبكات الاجتماعية"
+
+msgid "Sur les articles publiés seulement. Ce que Google lit pour afficher une recette enrichie : temps, portions, ingrédients, étapes, calories."
+msgstr "على المقالات المنشورة فقط. ما يقرؤه Google لعرض نتيجة وصفة غنية: الأوقات، الحصص، المكونات، الخطوات، السعرات."
+
+msgid "Titre SEO"
+msgstr "عنوان SEO"
+
+msgid "Titre qui ouvre la seconde page"
+msgstr "العنوان الذي يفتتح الصفحة الثانية"
+
+msgid "Une extension de recettes active imprime déjà les siennes : rien n’est ajouté, pour ne pas décrire deux fois le même plat."
+msgstr "إضافة وصفات نشطة تطبع بياناتها بالفعل: لا يُضاف شيء، كي لا يوصف الطبق نفسه مرتين."
+
+msgid "Une recette de ce lot est estimée à %1$s, au-dessus de son plafond de %2$s : elle s’arrêterait en route après avoir dépensé. Relevez le plafond ou choisissez une sortie plus légère."
+msgstr "تُقدَّر وصفة في هذه الدفعة بـ %1$s، أي فوق سقفها البالغ %2$s: ستتوقف في منتصف الطريق بعد أن تنفق. ارفع السقف أو اختر مخرجًا أخف."
+
+msgid "Vos recettes passées par le moteur, avec leur état et leur brouillon."
+msgstr "وصفاتك التي مرّت عبر المحرك، مع حالتها ومسودتها."
+
+msgid "Vérification des faits"
+msgstr "التحقق من الحقائق"
+
+msgid "Vérification…"
+msgstr "جارٍ التحقق…"
+
+msgid "Vérifier les clés"
+msgstr "التحقق من المفاتيح"
+
+msgid "arrêtée"
+msgstr "متوقفة"
+
+msgid "aucune clé enregistrée"
+msgstr "لا يوجد مفتاح محفوظ"
+
+msgid "clé acceptée"
+msgstr "المفتاح مقبول"
+
+msgid "clé acceptée, mais le quota est atteint pour l’instant"
+msgstr "المفتاح مقبول، لكن الحصة مستنفدة حاليًا"
+
+msgid "clé refusée par le fournisseur : vérifiez-la ou remplacez-la"
+msgstr "رفض المزوّد المفتاح: تحقق منه أو استبدله"
+
+msgid "faite"
+msgstr "منجزة"
+
+msgid "injoignable depuis ce serveur : le pare-feu de l’hébergeur bloque peut-être la sortie"
+msgstr "يتعذر الوصول إليه من هذا الخادم: ربما يحجب جدار الحماية لدى المستضيف الاتصالات الصادرة"
+
+msgid "le fournisseur répond %d : réessayez plus tard"
+msgstr "يرد المزوّد بالرمز %d: أعد المحاولة لاحقًا"
+
+msgid "mots"
+msgstr "كلمة"
+
+msgid "à"
+msgstr "إلى"
+
+msgid "Le compte du service d’écriture n’a plus de crédit. Un administrateur doit le recharger, puis reprendre la recette : rien de ce qui est fait n’est perdu."
+msgstr "نفد رصيد حساب خدمة الكتابة. على المسؤول إعادة شحنه ثم استئناف الوصفة: لا يضيع شيء مما أُنجز."
