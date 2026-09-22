@@ -1,27 +1,47 @@
 # Build checklist — for the model doing the work
 
-## Verified on a real site — 0.8.0, 2026-09-22
+## Verified on a real site — 0.10.0, 2026-09-22
 
 WordPress 7.1.1 with the SQLite database integration (the only database the
 test sandbox could run; a MySQL pass is still owed), the plugin activated, lots
 driven over REST with an application password and carried to a draft by
-WP-Cron. Text steps routed to Claude Haiku through the Moteur screen: OpenAI and
-Gemini were unreachable from the sandbox's network, so **no image step has run
-live yet**.
+WP-Cron.
+
+**No provider can complete a lot from this sandbox any more**, and each is
+blocked for a different reason, all three established rather than guessed:
+`api.openai.com` is refused by the sandbox's network policy (`CONNECT` answers
+403); the Anthropic account has no credit (`HTTP 400`, "Your credit balance is
+too low"); the Gemini free-tier quota is spent (`HTTP 429`, "You exceeded your
+current quota"). So the steps below that need a model were verified on the last
+run that could reach one, and everything after the draft was verified by
+driving `MSRWA_Draft::create()` on the live site with the artifacts a finished
+run carries.
 
 - [x] `tests/real/test-site.php` green: schema, capabilities, cron, routes
   closed to the public, key check, and a lot over its ceiling refused for free.
 - [x] `tests/real/test-flow.php` green: one French article-only lot, 294 s,
-  $0.2570 billed against $0.2485 estimated, draft created. (Its last rerun
-  stopped at the recipe step because the Anthropic account ran out of credit —
-  now reported to writers as exactly that.)
+  $0.2570 billed against $0.2485 estimated, draft created.
 - [x] One English lot by hand: written in English, 5 988 words over two pages,
   $0.2422, recipe meta mapped, JSON-LD printed once published.
 - [x] Every screen opened in a real browser as administrator and as author, at
   1400 px and 390 px: no horizontal overflow, no script error, no amount shown
   to the author.
-- [ ] Image steps, the final judge and the matcher live — need an OpenAI or
-  Gemini key reachable from the test machine.
+- [x] The draft opened in the real block editor: 14 blocks, **0 invalid, 0
+  Classic blocks, no "unexpected or invalid content" warning**, accents and
+  ligatures intact, page break where the article put it.
+- [x] Attachments on a real draft: featured and Facebook images sideloaded,
+  both `post_parent` the draft, both with alternative text, both with their
+  sizes generated and their file on disk; the featured one set as the thumbnail.
+- [x] Slug, excerpt, tags, category and the SEO meta on a real draft, read back
+  through the block editor's own store.
+- [x] The published page's head: meta description, Open Graph, X card and the
+  Recipe JSON-LD, with the sharing image at 1200 × 630; nothing printed on a
+  post this plugin did not write, and nothing printed with the setting off.
+- [x] The key check and the Diagnostic screen naming a real provider refusal:
+  `claude` out of credit, `gemini` out of quota, read back from the failures
+  those accounts actually returned.
+- [ ] Image steps, the final judge and the matcher live — need a reachable and
+  funded OpenAI or Gemini key.
 - [ ] The same suite on MySQL.
 
 Executable version of the agreed specification, in the order the owner set:

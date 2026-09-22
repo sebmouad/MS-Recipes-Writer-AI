@@ -58,6 +58,12 @@ function msrwa_real_anonymous( $method, $path, $timeout = 60 ) {
 	return array( 'status' => (int) shell_exec( $command ) );
 }
 
+/** A page of the site as a visitor gets it, markup and all. */
+function msrwa_real_page( $url ) {
+	$command = 'curl -sS -L --max-time 60 ' . escapeshellarg( (string) $url ) . ' 2>/dev/null';
+	return (string) shell_exec( $command );
+}
+
 function wp_strip_all_tags_compat( $value ) { return trim( preg_replace( '/\s+/', ' ', strip_tags( (string) $value ) ) ); }
 
 function wp_json_encode_compat( $value ) { return json_encode( $value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ); }

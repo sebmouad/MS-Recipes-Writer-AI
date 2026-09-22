@@ -5,12 +5,13 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.9.0
+## État actuel — 0.10.0
 
-La version `0.9.0` est installable et vérifiée de bout en bout sur un vrai
+La version `0.10.0` est installable et vérifiée de bout en bout sur un vrai
 WordPress (7.1.1) : un lot part, le cron le fait avancer vague par vague, et un
-brouillon arrive avec son article, sa recette, son extrait, ses étiquettes, ses
-métadonnées SEO et ses données structurées Recipe.
+brouillon arrive **en blocs**, avec son article, sa recette, son extrait, son
+identifiant d’URL, ses étiquettes, ses images attachées et décrites, ses
+métadonnées SEO, ses données structurées Recipe et son aperçu de partage.
 
 | Rôle | Ce qu’il voit |
 | --- | --- |
@@ -23,7 +24,8 @@ langues d’article (français, anglais, arabe), estimation avant dépense et re
 gratuit d’un lot qui dépasserait son plafond, plafonds par recette, par jour et
 sur trente jours, file suspendable, reprise d’une recette arrêtée sans repayer
 ce qui a réussi, lots programmés, export CSV, rétention réglable, vérification
-gratuite des clés d’API, JSON-LD Recipe sur les articles publiés.
+gratuite des clés d’API, JSON-LD Recipe et aperçu de partage Open Graph sur les
+articles publiés.
 
 Les coûts affichés sont des estimations calculées avec les tarifs configurés,
 jamais une facture. `done` veut dire que le traitement est terminé, jamais qu’un
@@ -63,6 +65,51 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.10.0
+
+**L’article arrive en blocs, pas en un mur de HTML.** Le moteur rend une seule
+chaîne de HTML sémantique ; elle était écrite telle quelle dans le brouillon,
+et l’éditeur de blocs n’en faisait qu’une boîte classique : impossible de
+déplacer un paragraphe, d’ajouter une image au milieu, ou d’utiliser un seul
+des outils qu’un relecteur a sous la main. `MSRWA_Blocks` convertit les titres,
+les paragraphes, les listes — chaque élément de liste étant lui-même un bloc,
+comme WordPress l’exige depuis la 6.0 — et la coupure de page. Ce que le
+contrat n’avait pas promis est enveloppé dans un bloc HTML plutôt que perdu :
+perdre un paragraphe est bien pire que l’afficher dans un bloc plus simple.
+Vérifié dans le vrai éditeur : quatorze blocs, aucun invalide, aucune boîte
+classique, aucun avertissement de contenu inattendu.
+
+**La description SEO et l’aperçu de partage sont enfin publiés.** L’étape
+article écrivait un titre SEO, une description SEO et une légende Facebook, et
+le moteur dessinait une image de partage en 1200 × 630. Les quatre étaient
+rangés sur l’article et lus par personne : sans Yoast ni Rank Math installé, la
+description n’atteignait aucune balise et le lien partagé retombait sur ce que
+le thème voulait bien donner. `MSRWA_Head` les imprime — description, Open
+Graph, carte X, avec l’image de partage quand elle existe et l’image à la une
+sinon — et s’efface dès qu’une extension SEO est active, pour la même raison
+que le JSON-LD Recipe : deux descriptions d’une même page valent moins qu’une.
+Sur les articles publiés par cette extension seulement, jamais sur ceux du
+site.
+
+**« Clé acceptée » ne veut plus dire « le compte peut payer ».** La
+vérification des clés liste les modèles du fournisseur : c’est gratuit, cela
+prouve que la clé est bonne et que le serveur sort — et un compte à zéro liste
+ses modèles avec le même entrain. Elle annonçait donc vert un compte incapable
+de payer un seul mot, et l’exploitant l’apprenait quand un lot mourait à sa
+première étape. Chaque appel réel étant déjà consigné, le dernier refus est
+relu : crédit épuisé ou quota atteint, la nuance décidant s’il faut attendre ou
+recharger. L’écran Diagnostic le dit en rouge, avec le fournisseur nommé et le
+geste à faire, et la phrase que lit un rédacteur sur une recette arrêtée vient
+désormais de la même lecture — les deux ne peuvent plus se contredire.
+
+**Ce que vérifient les tests réels.** `tests/real/test-flow.php` ne s’arrête
+plus au fait qu’un brouillon existe : il exige des blocs appariés, l’image à la
+une attachée au bon article avec son texte alternatif et ses tailles générées,
+puis publie l’article le temps de lire sa page — description, Open Graph, carte
+X, JSON-LD Recipe — et le repasse aussitôt en brouillon. Un article non relu ne
+reste jamais publié : c’est précisément ce que cette extension existe pour
+empêcher.
 
 ## Version 0.9.0
 

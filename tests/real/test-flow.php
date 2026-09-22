@@ -98,4 +98,67 @@ msrwa_real_assert( ! empty( $draft['body']['tags'] ), 'The article’s tags must
 
 msrwa_real_note( 'excerpt ' . mb_strlen( (string) ( $draft['body']['excerpt']['raw'] ?? '' ) ) . ' chars, ' . count( (array) ( $draft['body']['tags'] ?? array() ) ) . ' tag(s)' );
 
+// --- The article as the editor will open it -------------------------------
+
+// Blocks, not one Classic block holding the whole article. Only a real site
+// can answer this: the conversion runs against the engine's own HTML, and the
+// version that dropped every element but the page break passed offline.
+$raw = (string) ( $draft['body']['content']['raw'] ?? '' );
+msrwa_real_assert( false !== strpos( $raw, '<!-- wp:' ), 'The article must be stored as blocks.' );
+msrwa_real_assert( false === strpos( $raw, '<!-- wp:freeform' ), 'It must not arrive as one Classic block.' );
+msrwa_real_assert( substr_count( $raw, '<!-- wp:paragraph' ) > 1, 'Its paragraphs must be paragraph blocks.' );
+msrwa_real_assert( false !== strpos( $raw, '<!-- wp:heading' ), 'Its headings must be heading blocks.' );
+// Delimiters that do not pair are what the editor reports as invalid content.
+foreach ( array( 'paragraph', 'heading', 'list', 'list-item' ) as $block ) {
+	$opened = preg_match_all( '~<!-- wp:' . preg_quote( $block, '~' ) . '( \{[^\n]*\})? -->~', $raw );
+	msrwa_real_assert( $opened === substr_count( $raw, '<!-- /wp:' . $block . ' -->' ), 'Every ' . $block . ' block must be closed.' );
+}
+msrwa_real_note( substr_count( $raw, '<!-- wp:' ) . ' block(s) in the article' );
+
+// The images the engine drew must be in the media library and on the post,
+// with something a screen reader can read.
+$featured = (int) ( $draft['body']['featured_media'] ?? 0 );
+if ( $featured ) {
+	$media = msrwa_real_request( 'GET', '/wp/v2/media/' . $featured );
+	msrwa_real_assert( 200 === $media['status'], 'The featured image must be in the media library.' );
+	msrwa_real_assert( (int) ( $media['body']['post'] ?? 0 ) === $post, 'It must be attached to the draft, not left loose.' );
+	msrwa_real_assert( '' !== trim( (string) ( $media['body']['alt_text'] ?? '' ) ), 'It must carry alternative text.' );
+	msrwa_real_assert( ! empty( $media['body']['media_details']['sizes'] ), 'WordPress must have generated its sizes.' );
+	msrwa_real_note( 'featured image #' . $featured . ', ' . count( (array) $media['body']['media_details']['sizes'] ) . ' size(s)' );
+} else {
+	msrwa_real_note( 'no featured image: this lot was run on the article-only profile' );
+}
+
+// --- What a published article tells search engines ------------------------
+
+// The head tags and the Recipe markup print on published posts only, so the
+// draft is published for the length of this check and put straight back. It is
+// never left published: an unreviewed article on a live site is exactly what
+// this plugin exists to prevent.
+$published = msrwa_real_request( 'POST', '/wp/v2/posts/' . $post, array( 'status' => 'publish' ) );
+if ( 200 === $published['status'] ) {
+	$html = msrwa_real_page( (string) ( $published['body']['link'] ?? '' ) );
+	msrwa_real_request( 'POST', '/wp/v2/posts/' . $post, array( 'status' => 'draft' ) );
+
+	msrwa_real_assert( '' !== $html, 'The published article must be reachable.' );
+	foreach ( array( 'og:title', 'og:description', 'og:url', 'twitter:card' ) as $tag ) {
+		msrwa_real_assert( false !== strpos( $html, '"' . $tag . '"' ), 'The page must carry its ' . $tag . '.' );
+	}
+	msrwa_real_assert( false !== strpos( $html, 'name="description"' ), 'The page must carry a meta description.' );
+	if ( preg_match( '~<script type="application/ld\+json">(.*?)</script>~s', $html, $found ) ) {
+		$data = json_decode( $found[1], true );
+		msrwa_real_assert( 'Recipe' === ( $data['@type'] ?? '' ), 'The structured data must describe a Recipe.' );
+		msrwa_real_assert( ! empty( $data['recipeIngredient'] ), 'It must list the ingredients.' );
+		msrwa_real_assert( ! empty( $data['recipeInstructions'] ), 'And the steps.' );
+		msrwa_real_note( 'Recipe JSON-LD with ' . count( (array) $data['recipeIngredient'] ) . ' ingredient(s)' );
+	} else {
+		msrwa_real_fail( 'The published article carried no Recipe JSON-LD.' );
+	}
+
+	$back = msrwa_real_request( 'GET', '/wp/v2/posts/' . $post . '?context=edit' );
+	msrwa_real_assert( 'draft' === (string) ( $back['body']['status'] ?? '' ), 'The article must be back to a draft.' );
+} else {
+	msrwa_real_note( 'could not publish the draft to check the page head (got ' . $published['status'] . ')' );
+}
+
 msrwa_real_done( 'one lot, end to end' );

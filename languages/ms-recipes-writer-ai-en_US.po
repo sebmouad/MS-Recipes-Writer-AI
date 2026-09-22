@@ -1453,3 +1453,30 @@ msgid "%d remarque bloquante à corriger avant publication."
 msgid_plural "%d remarques bloquantes à corriger avant publication."
 msgstr[0] "%d blocking finding to fix before publishing."
 msgstr[1] "%d blocking findings to fix before publishing."
+
+msgid "Publier la description SEO et l’aperçu de partage (Open Graph)"
+msgstr "Publish the SEO description and the share preview (Open Graph)"
+
+msgid "Sur les articles publiés par ce plugin seulement. Le titre et la description écrits par l’article, et l’image de partage, pour Google, Facebook et X."
+msgstr "On articles published by this plugin only. The title and description the article wrote, and the share image, for Google, Facebook and X."
+
+msgid "Une extension SEO active s’en charge déjà : rien n’est ajouté, pour ne pas décrire deux fois la même page."
+msgstr "An active SEO plugin already handles this: nothing is added, so the same page is not described twice."
+
+msgid "Attendre que le quota se réinitialise, ou relever la limite du compte chez le fournisseur."
+msgstr "Wait for the quota to reset, or raise the account limit at the provider."
+
+msgid "Le compte est à court de crédit chez : %s. La clé est bonne ; c’est le compte qui ne peut plus payer, et toute recette s’arrêtera à sa première étape."
+msgstr "The account is out of credit at: %s. The key is fine; it is the account that can no longer pay, and every recipe will stop at its first step."
+
+msgid "Le quota du compte a été atteint récemment chez : %s. La clé est bonne ; la limite est du côté du fournisseur."
+msgstr "The account quota was reached recently at: %s. The key is fine; the limit is on the provider’s side."
+
+msgid "Recharger le compte chez le fournisseur, puis reprendre les recettes arrêtées."
+msgstr "Top the account up at the provider, then resume the stopped recipes."
+
+msgid "clé valide, mais le compte du fournisseur n’a plus de crédit : le dernier appel réel a été refusé. Recharger le compte chez le fournisseur."
+msgstr "key valid, but the provider account is out of credit: the last real call was refused. Top the account up at the provider."
+
+msgid "clé valide, mais le quota du compte est épuisé : le dernier appel réel a été refusé. Attendre qu’il se réinitialise ou relever la limite chez le fournisseur."
+msgstr "key valid, but the account quota is exhausted: the last real call was refused. Wait for it to reset or raise the limit at the provider."

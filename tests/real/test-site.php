@@ -65,11 +65,20 @@ msrwa_real_note( 'one full recipe is estimated at $' . number_format( (float) $e
 
 $keys = msrwa_real_request( 'POST', '/msrwa/v1/keys/check' );
 msrwa_real_assert( 200 === $keys['status'], 'The key check must answer an administrator (got ' . $keys['status'] . ').' );
+$states = array( 'ok', 'blocked', 'refused', 'unreachable', 'missing' );
 foreach ( (array) $keys['body'] as $provider => $verdict ) {
 	msrwa_real_assert( false === strpos( wp_json_encode_compat( $verdict ), 'sk-' ), 'The key check must never echo a key.' );
-	msrwa_real_note( $provider . ': ' . ( $verdict['state'] ?? '?' ) );
-	if ( 'refused' === ( $verdict['state'] ?? '' ) ) { msrwa_real_fail( $provider . ' refuses the stored key.' ); }
+	$state = (string) ( $verdict['state'] ?? '' );
+	msrwa_real_assert( in_array( $state, $states, true ), $provider . ' must report a state the screen knows how to draw; got "' . $state . '".' );
+	msrwa_real_assert( '' !== trim( (string) ( $verdict['message'] ?? '' ) ), $provider . ' must say what it found.' );
+	msrwa_real_note( $provider . ': ' . $state . ' — ' . ( $verdict['message'] ?? '' ) );
+	if ( 'refused' === $state ) { msrwa_real_fail( $provider . ' refuses the stored key.' ); }
+	// A key that lists models but whose account cannot pay reads green from the
+	// probe alone; only the record of a real refusal catches it, and a green
+	// verdict here means nothing was found against the account.
+	if ( 'blocked' === $state ) { msrwa_real_note( $provider . ' cannot actually be used: its account was refused on a real call.' ); }
 }
+
 
 // --- A lot that cannot finish under its ceiling is refused, free -------------
 

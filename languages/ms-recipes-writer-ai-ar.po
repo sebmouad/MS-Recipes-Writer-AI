@@ -1469,3 +1469,30 @@ msgstr[2] "ملاحظتان حاجبتان يجب تصحيحهما قبل الن
 msgstr[3] "%d ملاحظات حاجبة يجب تصحيحها قبل النشر."
 msgstr[4] "%d ملاحظة حاجبة يجب تصحيحها قبل النشر."
 msgstr[5] "%d ملاحظة حاجبة يجب تصحيحها قبل النشر."
+
+msgid "Publier la description SEO et l’aperçu de partage (Open Graph)"
+msgstr "نشر وصف تحسين محركات البحث ومعاينة المشاركة (Open Graph)"
+
+msgid "Sur les articles publiés par ce plugin seulement. Le titre et la description écrits par l’article, et l’image de partage, pour Google, Facebook et X."
+msgstr "على المقالات التي ينشرها هذا الملحق فقط. العنوان والوصف اللذان كتبهما المقال، وصورة المشاركة، من أجل Google وFacebook وX."
+
+msgid "Une extension SEO active s’en charge déjà : rien n’est ajouté, pour ne pas décrire deux fois la même page."
+msgstr "يتكفّل بذلك ملحق تحسين محركات بحث مفعّل: لا يُضاف شيء، حتى لا توصف الصفحة ذاتها مرتين."
+
+msgid "Attendre que le quota se réinitialise, ou relever la limite du compte chez le fournisseur."
+msgstr "انتظر إعادة ضبط الحصة، أو ارفع حدّ الحساب لدى المزوّد."
+
+msgid "Le compte est à court de crédit chez : %s. La clé est bonne ; c’est le compte qui ne peut plus payer, et toute recette s’arrêtera à sa première étape."
+msgstr "نفد رصيد الحساب لدى: %s. المفتاح سليم؛ الحساب هو الذي لم يعد قادرًا على الدفع، وستتوقف كل وصفة عند خطوتها الأولى."
+
+msgid "Le quota du compte a été atteint récemment chez : %s. La clé est bonne ; la limite est du côté du fournisseur."
+msgstr "بلغ الحساب حصّته مؤخرًا لدى: %s. المفتاح سليم؛ الحدّ من جانب المزوّد."
+
+msgid "Recharger le compte chez le fournisseur, puis reprendre les recettes arrêtées."
+msgstr "اشحن الحساب لدى المزوّد، ثم استأنف الوصفات المتوقفة."
+
+msgid "clé valide, mais le compte du fournisseur n’a plus de crédit : le dernier appel réel a été refusé. Recharger le compte chez le fournisseur."
+msgstr "المفتاح صالح، لكن حساب المزوّد بلا رصيد: رُفض آخر طلب فعلي. اشحن الحساب لدى المزوّد."
+
+msgid "clé valide, mais le quota du compte est épuisé : le dernier appel réel a été refusé. Attendre qu’il se réinitialise ou relever la limite chez le fournisseur."
+msgstr "المفتاح صالح، لكن حصة الحساب استُنفدت: رُفض آخر طلب فعلي. انتظر إعادة ضبطها أو ارفع الحدّ لدى المزوّد."

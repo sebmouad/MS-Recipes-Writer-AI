@@ -15,7 +15,7 @@ msgstr ""
 msgid "%1$d en attente, %2$d en cours"
 msgstr ""
 
-#: class-msrwa-diagnostics.php:158
+#: class-msrwa-diagnostics.php:183
 msgid "%1$d en cours, %2$d en attente ; entretien piloté par %3$s."
 msgstr ""
 
@@ -23,7 +23,7 @@ msgstr ""
 msgid "%1$d min %2$d s"
 msgstr ""
 
-#: class-msrwa-diagnostics.php:142
+#: class-msrwa-diagnostics.php:167
 msgid "%1$d recette(s) attendent depuis %2$s sans que rien n’avance."
 msgstr ""
 
@@ -31,15 +31,15 @@ msgstr ""
 msgid "%1$d traitée(s), %2$d ignorée(s) : l’action ne s’appliquait pas, ou elles ne vous appartiennent pas."
 msgstr ""
 
-#: class-msrwa-ui.php:170
+#: class-msrwa-ui.php:167
 msgid "%1$d étapes sur %2$d"
 msgstr ""
 
-#: class-msrwa-screen-settings.php:255
+#: class-msrwa-screen-settings.php:263
 msgid "%1$s run(s), %2$s lignes de déroulé"
 msgstr ""
 
-#: class-msrwa-screen-settings.php:148
+#: class-msrwa-screen-settings.php:156
 msgid "%1$s sur %2$s"
 msgstr ""
 
@@ -73,9 +73,15 @@ msgstr ""
 msgid "%d recettes sélectionnées"
 msgstr ""
 
-#: class-msrwa-editor.php:75
+#: class-msrwa-editor.php:170
 msgid "%d remarque bloquante"
 msgid_plural "%d remarques bloquantes"
+msgstr[0] ""
+msgstr[1] ""
+
+#: class-msrwa-editor.php:108
+msgid "%d remarque bloquante à corriger avant publication."
+msgid_plural "%d remarques bloquantes à corriger avant publication."
 msgstr[0] ""
 msgstr[1] ""
 
@@ -135,7 +141,7 @@ msgstr ""
 msgid "Action inconnue."
 msgstr ""
 
-#: class-msrwa-diagnostics.php:123
+#: class-msrwa-diagnostics.php:148
 msgid "Ajoutez son tarif dans Moteur → models, ou routez l’étape vers un modèle tarifé."
 msgstr ""
 
@@ -219,6 +225,10 @@ msgstr ""
 msgid "Association sûre"
 msgstr ""
 
+#: class-msrwa-diagnostics.php:106
+msgid "Attendre que le quota se réinitialise, ou relever la limite du compte chez le fournisseur."
+msgstr ""
+
 #: class-msrwa-admin.php:125
 msgid "Attention : une recette est estimée à %1$s, au-dessus du plafond de %2$s. Elle s’arrêterait en route ; le lot sera refusé au lancement. Relevez le plafond ou choisissez une sortie plus légère."
 msgstr ""
@@ -227,15 +237,15 @@ msgstr ""
 msgid "Aucun contrôle en échec"
 msgstr ""
 
-#: class-msrwa-diagnostics.php:162
+#: class-msrwa-diagnostics.php:187
 msgid "Aucun entretien n’est planifié : réactivez l’extension pour le réarmer."
 msgstr ""
 
-#: class-msrwa-editor.php:61
+#: class-msrwa-editor.php:104 class-msrwa-editor.php:159
 msgid "Aucun jugement final n’a été rendu pour cet article — le profil choisi ne l’exécutait pas, ou la recette s’est arrêtée avant."
 msgstr ""
 
-#: class-msrwa-diagnostics.php:200
+#: class-msrwa-diagnostics.php:225
 msgid "Aucun plafond n’arrête de travail en ce moment."
 msgstr ""
 
@@ -279,7 +289,7 @@ msgstr ""
 msgid "Aucune remarque."
 msgstr ""
 
-#: class-msrwa-diagnostics.php:213
+#: class-msrwa-diagnostics.php:238
 msgid "Aucune table d’une version précédente."
 msgstr ""
 
@@ -287,11 +297,11 @@ msgstr ""
 msgid "Avec le routage actuel, une recette complète est estimée à %s. Un plafond en dessous refuse le lot au lancement ; laissez de la marge pour les reprises."
 msgstr ""
 
-#: class-msrwa-editor.php:89
+#: class-msrwa-editor.php:109 class-msrwa-editor.php:183
 msgid "Bloquant"
 msgstr ""
 
-#: class-msrwa-ui.php:213
+#: class-msrwa-ui.php:210
 msgid "Brouillon"
 msgstr ""
 
@@ -343,7 +353,7 @@ msgstr ""
 msgid "Ce qui doit être vrai pour qu’une recette aboutisse, vérifié maintenant. Aucun appel facturé."
 msgstr ""
 
-#: class-msrwa-screen-settings.php:218
+#: class-msrwa-screen-settings.php:226
 msgid "Ce qui est conservé"
 msgstr ""
 
@@ -367,7 +377,7 @@ msgstr ""
 msgid "Celle d’un lot qui n’en choisit pas."
 msgstr ""
 
-#: class-msrwa-editor.php:58
+#: class-msrwa-editor.php:103 class-msrwa-editor.php:156
 msgid "Cet article a été généré. Les contrôles ci-dessous portent sur ce que la machine a produit ; ils ne remplacent pas votre relecture, et rien ici ne vaut approbation."
 msgstr ""
 
@@ -391,11 +401,11 @@ msgstr ""
 msgid "Chaque recette suit le même chemin. Plus il y a d’images, plus la recette demande de travail."
 msgstr ""
 
-#: class-msrwa-diagnostics.php:191
+#: class-msrwa-diagnostics.php:216
 msgid "Chaque rôle porte les capacités que l’activation accorde."
 msgstr ""
 
-#: class-msrwa-diagnostics.php:125
+#: class-msrwa-diagnostics.php:150
 msgid "Chaque étape a une clé et un tarif publié."
 msgstr ""
 
@@ -411,7 +421,7 @@ msgstr ""
 msgid "Clé présente"
 msgstr ""
 
-#: class-msrwa-diagnostics.php:82 class-msrwa-diagnostics.php:84 class-msrwa-screen-settings.php:30
+#: class-msrwa-diagnostics.php:82 class-msrwa-diagnostics.php:95 class-msrwa-diagnostics.php:102 class-msrwa-diagnostics.php:109 class-msrwa-screen-settings.php:30
 msgid "Clés d’API"
 msgstr ""
 
@@ -463,7 +473,7 @@ msgstr ""
 msgid "Correction de la langue"
 msgstr ""
 
-#: class-msrwa-editor.php:92
+#: class-msrwa-editor.php:111 class-msrwa-editor.php:186
 msgid "Correction proposée :"
 msgstr ""
 
@@ -471,7 +481,7 @@ msgstr ""
 msgid "Corrections"
 msgstr ""
 
-#: class-msrwa-diagnostics.php:169
+#: class-msrwa-diagnostics.php:194
 msgid "Corrigez les droits du dossier wp-content/uploads ; sans lui, aucune image générée ne peut être enregistrée."
 msgstr ""
 
@@ -487,11 +497,11 @@ msgstr ""
 msgid "Coût moy."
 msgstr ""
 
-#: class-msrwa-diagnostics.php:146
+#: class-msrwa-diagnostics.php:171
 msgid "DISABLE_WP_CRON est actif : vérifiez que le cron du serveur appelle bien wp-cron.php."
 msgstr ""
 
-#: class-msrwa-screen-settings.php:176
+#: class-msrwa-screen-settings.php:184
 msgid "DISABLE_WP_CRON est actif. C’est la configuration recommandée, mais elle suppose qu’un cron serveur appelle wp-cron.php : sans lui, les recettes resteront en attente indéfiniment."
 msgstr ""
 
@@ -511,27 +521,27 @@ msgstr ""
 msgid "Demande à chaque fournisseur la liste de ses modèles : gratuit, et la seule preuve qu’un vrai appel passera."
 msgstr ""
 
-#: class-msrwa-screen-settings.php:266
+#: class-msrwa-screen-settings.php:274
 msgid "Dernier passage il y a %1$s : %2$s lignes de déroulé, %3$s productions, %4$s runs."
 msgstr ""
 
-#: class-msrwa-editor.php:80
+#: class-msrwa-editor.php:106 class-msrwa-editor.php:175
 msgid "Des remarques mineures, sans rien de bloquant."
 msgstr ""
 
-#: class-msrwa-diagnostics.php:187
+#: class-msrwa-diagnostics.php:212
 msgid "Des rôles ont perdu une capacité : %s."
 msgstr ""
 
-#: class-msrwa-diagnostics.php:209
+#: class-msrwa-diagnostics.php:234
 msgid "Des tables d’une version précédente occupent encore la base : %s."
 msgstr ""
 
-#: class-msrwa-diagnostics.php:114
+#: class-msrwa-diagnostics.php:139
 msgid "Des étapes sont routées vers un fournisseur sans clé : %s."
 msgstr ""
 
-#: class-msrwa-diagnostics.php:121
+#: class-msrwa-diagnostics.php:146
 msgid "Des étapes tournent sur un modèle sans tarif publié : %s. La dépense sera incomplète, jamais fausse."
 msgstr ""
 
@@ -547,7 +557,7 @@ msgstr ""
 msgid "Dimensions image indisponibles."
 msgstr ""
 
-#: class-msrwa-diagnostics.php:185 class-msrwa-diagnostics.php:191
+#: class-msrwa-diagnostics.php:210 class-msrwa-diagnostics.php:216
 msgid "Droits"
 msgstr ""
 
@@ -579,7 +589,7 @@ msgstr ""
 msgid "Déposez des recettes et des photographies pour lancer un premier lot."
 msgstr ""
 
-#: class-msrwa-screen-run.php:261 class-msrwa-screen-settings.php:213
+#: class-msrwa-screen-run.php:261 class-msrwa-screen-settings.php:221
 msgid "Déroulé"
 msgstr ""
 
@@ -611,11 +621,11 @@ msgstr ""
 msgid "Enregistrement…"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:90 class-msrwa-screen-settings.php:122
+#: class-msrwa-screen-engine.php:90 class-msrwa-screen-settings.php:130
 msgid "Enregistrer"
 msgstr ""
 
-#: class-msrwa-screen-settings.php:236
+#: class-msrwa-screen-settings.php:244
 msgid "Enregistrer les durées"
 msgstr ""
 
@@ -623,7 +633,7 @@ msgstr ""
 msgid "Enregistrer l’appariement"
 msgstr ""
 
-#: class-msrwa-diagnostics.php:116
+#: class-msrwa-diagnostics.php:141
 msgid "Enregistrez sa clé dans Réglages, ou changez la route dans Moteur → Modèle par étape."
 msgstr ""
 
@@ -631,7 +641,7 @@ msgstr ""
 msgid "Enregistré."
 msgstr ""
 
-#: class-msrwa-diagnostics.php:86
+#: class-msrwa-diagnostics.php:111
 msgid "Enregistrée(s) pour : %s. Une clé enregistrée n’est pas une clé valide — « Vérifier les clés » le dit gratuitement."
 msgstr ""
 
@@ -667,7 +677,7 @@ msgstr ""
 msgid "Fichier image introuvable pour le recadrage."
 msgstr ""
 
-#: class-msrwa-diagnostics.php:140 class-msrwa-diagnostics.php:150 class-msrwa-diagnostics.php:156
+#: class-msrwa-diagnostics.php:165 class-msrwa-diagnostics.php:175 class-msrwa-diagnostics.php:181
 msgid "File"
 msgstr ""
 
@@ -707,11 +717,11 @@ msgstr ""
 msgid "Il n’y a aucune recette dans ce texte."
 msgstr ""
 
-#: class-msrwa-draft.php:176
+#: class-msrwa-draft.php:178
 msgid "Image Facebook"
 msgstr ""
 
-#: class-msrwa-draft.php:176 class-msrwa-ui.php:83
+#: class-msrwa-draft.php:178 class-msrwa-ui.php:83
 msgid "Image à la une"
 msgstr ""
 
@@ -743,7 +753,7 @@ msgstr ""
 msgid "La couche appelante, telle quelle. Vide signifie que tout suit le moteur."
 msgstr ""
 
-#: class-msrwa-screen-settings.php:137
+#: class-msrwa-screen-settings.php:145
 msgid "La dépense du site entier, pas celle d’un rédacteur : un plafond appartient au site, et quelqu’un qui n’en verrait que sa part ne comprendrait jamais pourquoi son lot a été refusé."
 msgstr ""
 
@@ -755,7 +765,7 @@ msgstr ""
 msgid "La file"
 msgstr ""
 
-#: class-msrwa-diagnostics.php:152
+#: class-msrwa-diagnostics.php:177
 msgid "La file est suspendue ; %d recette(s) attendent."
 msgstr ""
 
@@ -787,15 +797,15 @@ msgstr ""
 msgid "La même période, en CSV, pour les questions qu’un tableur répond mieux qu’un écran. Un coût inconnu y est vide, jamais zéro : une colonne de zéros s’additionne en un total qui n’a jamais existé."
 msgstr ""
 
-#: class-msrwa-screen-settings.php:213
+#: class-msrwa-screen-settings.php:221
 msgid "La narration minute par minute. La table qui grossit le plus vite, et celle que personne ne relit."
 msgstr ""
 
-#: class-msrwa-ui.php:161
+#: class-msrwa-ui.php:158
 msgid "La recette s’est arrêtée avant la fin. La reprendre relance seulement ce qui a échoué."
 msgstr ""
 
-#: class-msrwa-ui.php:159
+#: class-msrwa-ui.php:156
 msgid "La recette s’est arrêtée à l’étape « %s ». La reprendre relance seulement ce qui a échoué."
 msgstr ""
 
@@ -837,27 +847,31 @@ msgstr ""
 msgid "Le brouillon est prêt, mais le contrôle final a relevé des points à vérifier. Lisez-les avant de publier."
 msgstr ""
 
-#: class-msrwa-ui.php:137
+#: class-msrwa-ui.php:134
 msgid "Le compte du service d’écriture n’a plus de crédit. Un administrateur doit le recharger, puis reprendre la recette : rien de ce qui est fait n’est perdu."
 msgstr ""
 
-#: class-msrwa-diagnostics.php:147
+#: class-msrwa-diagnostics.php:97
+msgid "Le compte est à court de crédit chez : %s. La clé est bonne ; c’est le compte qui ne peut plus payer, et toute recette s’arrêtera à sa première étape."
+msgstr ""
+
+#: class-msrwa-diagnostics.php:172
 msgid "Le cron de WordPress ne se déclenche qu’à une visite. Ajoutez un cron serveur sur wp-cron.php toutes les cinq minutes."
 msgstr ""
 
-#: class-msrwa-screen-settings.php:214
+#: class-msrwa-screen-settings.php:222
 msgid "Le dossier de recherche, l’article tel que la machine l’a écrit, les prompts d’image. Le verdict, la revue et la recette restent quoi qu’il arrive."
 msgstr ""
 
-#: class-msrwa-screen-settings.php:179
+#: class-msrwa-screen-settings.php:187
 msgid "Le dossier des téléversements n’est pas accessible en écriture : aucune image générée ne pourra être enregistrée."
 msgstr ""
 
-#: class-msrwa-diagnostics.php:169
+#: class-msrwa-diagnostics.php:194
 msgid "Le dossier des téléversements n’est pas accessible en écriture."
 msgstr ""
 
-#: class-msrwa-diagnostics.php:171
+#: class-msrwa-diagnostics.php:196
 msgid "Le dossier est accessible en écriture."
 msgstr ""
 
@@ -865,7 +879,7 @@ msgstr ""
 msgid "Le juge"
 msgstr ""
 
-#: class-msrwa-editor.php:82
+#: class-msrwa-editor.php:105 class-msrwa-editor.php:177
 msgid "Le juge n’a rien relevé. Votre relecture reste la seule validation."
 msgstr ""
 
@@ -881,7 +895,7 @@ msgstr ""
 msgid "Le média image généré est introuvable ou invalide."
 msgstr ""
 
-#: class-msrwa-screen-settings.php:273
+#: class-msrwa-screen-settings.php:281
 msgid "Le nettoyage n’a encore jamais tourné."
 msgstr ""
 
@@ -889,11 +903,11 @@ msgstr ""
 msgid "Le pass"
 msgstr ""
 
-#: class-msrwa-diagnostics.php:154
+#: class-msrwa-diagnostics.php:179
 msgid "Le pass → « Reprendre la file » quand vous voulez qu’elles repartent."
 msgstr ""
 
-#: class-msrwa-ui.php:146
+#: class-msrwa-ui.php:143
 msgid "Le plafond de dépense de cette recette a été atteint avant la fin. Ce qui est fait est gardé ; un administrateur peut relever le plafond et la reprendre."
 msgstr ""
 
@@ -905,23 +919,27 @@ msgstr ""
 msgid "Le plafond du jour est atteint : %1$s dépensés sur %2$s. Rien de plus ne sera lancé avant demain."
 msgstr ""
 
+#: class-msrwa-diagnostics.php:104
+msgid "Le quota du compte a été atteint récemment chez : %s. La clé est bonne ; la limite est du côté du fournisseur."
+msgstr ""
+
 #: class-msrwa-diagnostics.php:66
 msgid "Le schéma enregistré est %1$d ; cette version en attend %2$d."
 msgstr ""
 
-#: class-msrwa-ui.php:143
+#: class-msrwa-ui.php:140
 msgid "Le service d’écriture a refusé la clé du site. Un administrateur doit la vérifier dans les réglages, puis reprendre la recette."
 msgstr ""
 
-#: class-msrwa-ui.php:155
+#: class-msrwa-ui.php:152
 msgid "Le service d’écriture n’a pas répondu à temps. Reprendre la recette suffit en général : rien de ce qui est fait n’est perdu."
 msgstr ""
 
-#: class-msrwa-ui.php:152
+#: class-msrwa-ui.php:149
 msgid "Le service d’écriture refuse d’en traiter davantage pour le moment : c’est une limite de son côté, pas du site. Reprendre la recette plus tard suffit souvent ; si cela se répète, la limite du compte doit être relevée chez le fournisseur."
 msgstr ""
 
-#: class-msrwa-ui.php:140
+#: class-msrwa-ui.php:137
 msgid "Le site n’est relié à aucun service d’écriture pour une étape de cette recette. Un administrateur doit enregistrer la clé, puis la reprendre."
 msgstr ""
 
@@ -1001,7 +1019,7 @@ msgstr ""
 msgid "Lu sur ce que le moteur a rapporté, jamais recalculé. Un coût inconnu reste inconnu jusqu’ici."
 msgstr ""
 
-#: class-msrwa-editor.php:118
+#: class-msrwa-editor.php:210
 msgid "Légende Facebook"
 msgstr ""
 
@@ -1013,15 +1031,15 @@ msgstr ""
 msgid "L’ordre de la file est réservé aux administrateurs."
 msgstr ""
 
-#: class-msrwa-admin.php:26
+#: class-msrwa-admin.php:26 class-msrwa-editor.php:102
 msgid "MS Recipes Writer"
 msgstr ""
 
-#: class-msrwa-editor.php:41
+#: class-msrwa-editor.php:140
 msgid "MS Recipes Writer — à vérifier avant publication"
 msgstr ""
 
-#: class-msrwa-editor.php:89
+#: class-msrwa-editor.php:110 class-msrwa-editor.php:183
 msgid "Mineur"
 msgstr ""
 
@@ -1037,7 +1055,7 @@ msgstr ""
 msgid "Moteur"
 msgstr ""
 
-#: class-msrwa-editor.php:117
+#: class-msrwa-editor.php:209
 msgid "Méta-description"
 msgstr ""
 
@@ -1045,7 +1063,7 @@ msgstr ""
 msgid "Nettoyage…"
 msgstr ""
 
-#: class-msrwa-screen-settings.php:276
+#: class-msrwa-screen-settings.php:284
 msgid "Nettoyer maintenant"
 msgstr ""
 
@@ -1061,7 +1079,7 @@ msgstr ""
 msgid "Non décrite."
 msgstr ""
 
-#: class-msrwa-editor.php:100
+#: class-msrwa-editor.php:112 class-msrwa-editor.php:193
 msgid "Non vérifiable :"
 msgstr ""
 
@@ -1089,7 +1107,7 @@ msgstr ""
 msgid "Ouvrir les réglages"
 msgstr ""
 
-#: class-msrwa-screen-settings.php:136
+#: class-msrwa-screen-settings.php:144
 msgid "Où en sont les plafonds"
 msgstr ""
 
@@ -1137,7 +1155,7 @@ msgstr ""
 msgid "Plafond par recette"
 msgstr ""
 
-#: class-msrwa-diagnostics.php:198 class-msrwa-diagnostics.php:200
+#: class-msrwa-diagnostics.php:223 class-msrwa-diagnostics.php:225
 msgid "Plafonds"
 msgstr ""
 
@@ -1145,7 +1163,7 @@ msgstr ""
 msgid "Plafonds de dépense"
 msgstr ""
 
-#: class-msrwa-diagnostics.php:211
+#: class-msrwa-diagnostics.php:236
 msgid "Plus rien ne les lit. Elles ne sont jamais supprimées d’ici : c’est à vous, une fois la sauvegarde faite."
 msgstr ""
 
@@ -1165,7 +1183,7 @@ msgstr ""
 msgid "Productions"
 msgstr ""
 
-#: class-msrwa-screen-settings.php:214
+#: class-msrwa-screen-settings.php:222
 msgid "Productions lourdes"
 msgstr ""
 
@@ -1179,6 +1197,10 @@ msgstr ""
 
 #: class-msrwa-screen-engine.php:88
 msgid "Prévisualiser"
+msgstr ""
+
+#: class-msrwa-screen-settings.php:123
+msgid "Publier la description SEO et l’aperçu de partage (Open Graph)"
 msgstr ""
 
 #: class-msrwa-screen-settings.php:115
@@ -1221,6 +1243,10 @@ msgstr ""
 msgid "Recettes"
 msgstr ""
 
+#: class-msrwa-diagnostics.php:99
+msgid "Recharger le compte chez le fournisseur, puis reprendre les recettes arrêtées."
+msgstr ""
+
 #: class-msrwa-diagnostics.php:69
 msgid "Rechargez n’importe quel écran d’administration : la migration se déclenche au premier chargement après une mise à jour."
 msgstr ""
@@ -1253,7 +1279,7 @@ msgstr ""
 msgid "Reprise…"
 msgstr ""
 
-#: class-msrwa-diagnostics.php:207 class-msrwa-diagnostics.php:213
+#: class-msrwa-diagnostics.php:232 class-msrwa-diagnostics.php:238
 msgid "Restes"
 msgstr ""
 
@@ -1289,7 +1315,7 @@ msgstr ""
 msgid "Rien à analyser"
 msgstr ""
 
-#: class-msrwa-diagnostics.php:112 class-msrwa-diagnostics.php:119 class-msrwa-diagnostics.php:125
+#: class-msrwa-diagnostics.php:137 class-msrwa-diagnostics.php:144 class-msrwa-diagnostics.php:150
 msgid "Routage"
 msgstr ""
 
@@ -1301,11 +1327,11 @@ msgstr ""
 msgid "Run introuvable."
 msgstr ""
 
-#: class-msrwa-screen-settings.php:215
+#: class-msrwa-screen-settings.php:223
 msgid "Runs entiers"
 msgstr ""
 
-#: class-msrwa-diagnostics.php:189
+#: class-msrwa-diagnostics.php:214
 msgid "Réactivez l’extension : les capacités sont accordées depuis une seule liste, à l’activation comme à la mise à jour."
 msgstr ""
 
@@ -1317,7 +1343,7 @@ msgstr ""
 msgid "Rédaction"
 msgstr ""
 
-#: class-msrwa-editor.php:126
+#: class-msrwa-editor.php:113 class-msrwa-editor.php:222
 msgid "Référencement et réseaux sociaux"
 msgstr ""
 
@@ -1329,7 +1355,7 @@ msgstr ""
 msgid "Réglages → Clés d’API, puis « Vérifier les clés »."
 msgstr ""
 
-#: class-msrwa-diagnostics.php:198
+#: class-msrwa-diagnostics.php:223
 msgid "Réglages → Plafonds de dépense, ou attendez la fenêtre suivante."
 msgstr ""
 
@@ -1389,6 +1415,10 @@ msgstr ""
 msgid "Sur"
 msgstr ""
 
+#: class-msrwa-screen-settings.php:126
+msgid "Sur les articles publiés par ce plugin seulement. Le titre et la description écrits par l’article, et l’image de partage, pour Google, Facebook et X."
+msgstr ""
+
 #: class-msrwa-screen-settings.php:118
 msgid "Sur les articles publiés seulement. Ce que Google lit pour afficher une recette enrichie : temps, portions, ingrédients, étapes, calories."
 msgstr ""
@@ -1413,7 +1443,7 @@ msgstr ""
 msgid "Sélection"
 msgstr ""
 
-#: class-msrwa-ui.php:189
+#: class-msrwa-ui.php:186
 msgid "Sélectionner %s"
 msgstr ""
 
@@ -1457,7 +1487,7 @@ msgstr ""
 msgid "Titre"
 msgstr ""
 
-#: class-msrwa-editor.php:116
+#: class-msrwa-editor.php:208
 msgid "Titre SEO"
 msgstr ""
 
@@ -1485,7 +1515,7 @@ msgstr ""
 msgid "Toutes les étapes ont satisfait leurs contrôles sur cette période."
 msgstr ""
 
-#: class-msrwa-screen-settings.php:219
+#: class-msrwa-screen-settings.php:227
 msgid "Trois durées, parce que trois choses vieillissent différemment. À zéro, rien de cette sorte n’est jamais supprimé."
 msgstr ""
 
@@ -1493,7 +1523,7 @@ msgstr ""
 msgid "Trois plafonds, pour trois craintes différentes. Celui par recette arrête un article emballé ; celui du jour arrête un mauvais après-midi ; celui du mois arrête un mauvais mois que personne n’a vu venir. Ils sont vérifiés avant qu’un lot parte et avant chaque vague de chaque recette, parce qu’un lot qui tenait au départ peut cesser de tenir en cours de route. À zéro, aucun plafond."
 msgstr ""
 
-#: class-msrwa-diagnostics.php:169 class-msrwa-diagnostics.php:171
+#: class-msrwa-diagnostics.php:194 class-msrwa-diagnostics.php:196
 msgid "Téléversements"
 msgstr ""
 
@@ -1501,16 +1531,20 @@ msgstr ""
 msgid "Un contrôle qui échoue une fois sur six est du bruit ; six fois sur six, c’est un contrat que le prompt ne tient pas."
 msgstr ""
 
-#: class-msrwa-screen-settings.php:244
+#: class-msrwa-screen-settings.php:252
 msgid "Un filtre impose une autre durée pour : %s. C’est le filtre qui s’applique, pas ce qui est saisi ici."
 msgstr ""
 
-#: class-msrwa-screen-settings.php:279
+#: class-msrwa-screen-settings.php:287
 msgid "Un passage est borné : il retire ce qu’il peut sans faire tomber la requête, et reprend au suivant. Chaque durée est aussi un filtre — msrwa_retention_events_days, msrwa_retention_artifacts_days, msrwa_retention_runs_days."
 msgstr ""
 
 #: class-msrwa-admin.php:94
 msgid "Une erreur est survenue."
+msgstr ""
+
+#: class-msrwa-screen-settings.php:125
+msgid "Une extension SEO active s’en charge déjà : rien n’est ajouté, pour ne pas décrire deux fois la même page."
 msgstr ""
 
 #: class-msrwa-screen-settings.php:117
@@ -1545,7 +1579,7 @@ msgstr ""
 msgid "Verdicts"
 msgstr ""
 
-#: class-msrwa-editor.php:137
+#: class-msrwa-editor.php:115 class-msrwa-editor.php:233
 msgid "Voir le détail de la recette %d"
 msgstr ""
 
@@ -1573,15 +1607,15 @@ msgstr ""
 msgid "Vérifier les clés"
 msgstr ""
 
-#: class-msrwa-diagnostics.php:161 class-msrwa-screen-settings.php:186
+#: class-msrwa-diagnostics.php:186 class-msrwa-screen-settings.php:194
 msgid "WordPress"
 msgstr ""
 
-#: class-msrwa-screen-settings.php:215
+#: class-msrwa-screen-settings.php:223
 msgid "Y compris les chiffres. Laissé à zéro par défaut : une ligne d’étape est le seul témoignage de ce qu’un run a coûté. Un run qui a produit un brouillon n’est jamais supprimé."
 msgstr ""
 
-#: class-msrwa-screen-settings.php:191
+#: class-msrwa-screen-settings.php:199
 msgid "accessibles"
 msgstr ""
 
@@ -1605,7 +1639,7 @@ msgstr ""
 msgid "attend votre confirmation"
 msgstr ""
 
-#: class-msrwa-screen-settings.php:187
+#: class-msrwa-screen-settings.php:195
 msgid "aucun entretien planifié"
 msgstr ""
 
@@ -1613,7 +1647,7 @@ msgstr ""
 msgid "aucune clé"
 msgstr ""
 
-#: class-msrwa-keys.php:29
+#: class-msrwa-keys.php:38
 msgid "aucune clé enregistrée"
 msgstr ""
 
@@ -1621,7 +1655,7 @@ msgstr ""
 msgid "aucune photographie"
 msgstr ""
 
-#: class-msrwa-screen-pass.php:30 class-msrwa-screen-settings.php:139
+#: class-msrwa-screen-pass.php:30 class-msrwa-screen-settings.php:147
 msgid "aujourd’hui"
 msgstr ""
 
@@ -1633,7 +1667,7 @@ msgstr ""
 msgid "bloquantes"
 msgstr ""
 
-#: class-msrwa-screen-settings.php:191
+#: class-msrwa-screen-settings.php:199
 msgid "bloqués"
 msgstr ""
 
@@ -1645,11 +1679,11 @@ msgstr ""
 msgid "brouillons prêts"
 msgstr ""
 
-#: class-msrwa-keys.php:44
+#: class-msrwa-keys.php:104
 msgid "clé acceptée"
 msgstr ""
 
-#: class-msrwa-keys.php:48
+#: class-msrwa-keys.php:108
 msgid "clé acceptée, mais le quota est atteint pour l’instant"
 msgstr ""
 
@@ -1657,8 +1691,16 @@ msgstr ""
 msgid "clé enregistrée"
 msgstr ""
 
-#: class-msrwa-keys.php:46
+#: class-msrwa-keys.php:106
 msgid "clé refusée par le fournisseur : vérifiez-la ou remplacez-la"
+msgstr ""
+
+#: class-msrwa-keys.php:57
+msgid "clé valide, mais le compte du fournisseur n’a plus de crédit : le dernier appel réel a été refusé. Recharger le compte chez le fournisseur."
+msgstr ""
+
+#: class-msrwa-keys.php:58
+msgid "clé valide, mais le quota du compte est épuisé : le dernier appel réel a été refusé. Attendre qu’il se réinitialise ou relever la limite chez le fournisseur."
 msgstr ""
 
 #: class-msrwa-screen-run.php:141
@@ -1681,7 +1723,7 @@ msgstr ""
 msgid "coût moyen"
 msgstr ""
 
-#: class-msrwa-screen-settings.php:185
+#: class-msrwa-screen-settings.php:193
 msgid "cron"
 msgstr ""
 
@@ -1701,7 +1743,7 @@ msgstr ""
 msgid "dépense"
 msgstr ""
 
-#: class-msrwa-screen-settings.php:183 class-msrwa-ui.php:62
+#: class-msrwa-screen-settings.php:191 class-msrwa-ui.php:62
 msgid "en attente"
 msgstr ""
 
@@ -1717,7 +1759,7 @@ msgstr ""
 msgid "groupes modifiés"
 msgstr ""
 
-#: class-msrwa-editor.php:47
+#: class-msrwa-editor.php:146
 msgid "généré"
 msgstr ""
 
@@ -1733,11 +1775,11 @@ msgstr ""
 msgid "inchangée"
 msgstr ""
 
-#: class-msrwa-keys.php:41
+#: class-msrwa-keys.php:101
 msgid "injoignable depuis ce serveur : le pare-feu de l’hébergeur bloque peut-être la sortie"
 msgstr ""
 
-#: class-msrwa-screen-settings.php:232
+#: class-msrwa-screen-settings.php:240
 msgid "jours"
 msgstr ""
 
@@ -1749,7 +1791,7 @@ msgstr ""
 msgid "langue"
 msgstr ""
 
-#: class-msrwa-keys.php:50
+#: class-msrwa-keys.php:110
 msgid "le fournisseur répond %d : réessayez plus tard"
 msgstr ""
 
@@ -1757,7 +1799,7 @@ msgstr ""
 msgid "le reste"
 msgstr ""
 
-#: class-msrwa-diagnostics.php:161
+#: class-msrwa-diagnostics.php:186
 msgid "le serveur"
 msgstr ""
 
@@ -1797,7 +1839,7 @@ msgstr ""
 msgid "par recette, sur 30 jours"
 msgstr ""
 
-#: class-msrwa-ui.php:206
+#: class-msrwa-ui.php:203
 msgid "passe devant"
 msgstr ""
 
@@ -1813,7 +1855,7 @@ msgstr ""
 msgid "plafond %s"
 msgstr ""
 
-#: class-msrwa-screen-settings.php:251
+#: class-msrwa-screen-settings.php:259
 msgid "poids actuel"
 msgstr ""
 
@@ -1837,7 +1879,7 @@ msgstr ""
 msgid "résultats"
 msgstr ""
 
-#: class-msrwa-screen-settings.php:186
+#: class-msrwa-screen-settings.php:194
 msgid "serveur"
 msgstr ""
 
@@ -1853,11 +1895,11 @@ msgstr ""
 msgid "tout"
 msgstr ""
 
-#: class-msrwa-screen-settings.php:139
+#: class-msrwa-screen-settings.php:147
 msgid "trente jours"
 msgstr ""
 
-#: class-msrwa-screen-settings.php:190
+#: class-msrwa-screen-settings.php:198
 msgid "téléversements"
 msgstr ""
 
@@ -1881,7 +1923,7 @@ msgstr ""
 msgid "État"
 msgstr ""
 
-#: class-msrwa-screen-settings.php:173
+#: class-msrwa-screen-settings.php:181
 msgid "État de la machinerie"
 msgstr ""
 
@@ -1889,7 +1931,7 @@ msgstr ""
 msgid "à"
 msgstr ""
 
-#: class-msrwa-editor.php:78
+#: class-msrwa-editor.php:173
 msgid "à corriger avant publication."
 msgstr ""
 

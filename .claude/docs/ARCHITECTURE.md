@@ -27,8 +27,10 @@ MSRWA_Run::advance ──► MSRWA_Engine::run( only: this wave )
    │                      steps, calls, events, artifacts written down
    ▼
 MSRWA_Draft::create ──► WordPress draft + media library + post meta
-   │                     excerpt, slug, tags, SEO, recipe card meta
-   │                     (published later: MSRWA_Schema prints Recipe JSON-LD)
+   │                     article as blocks (MSRWA_Blocks), excerpt, slug,
+   │                     tags, SEO, recipe card meta
+   │                     (published later: MSRWA_Schema prints Recipe JSON-LD,
+   │                      MSRWA_Head the description and the share preview)
    │
    ▼
 MSRWA_Run::release_stored ──► the copies WordPress now holds are dropped
@@ -181,9 +183,21 @@ collapsed drawer — a sidebar panel and a pre-publish check for the block
 editor, the second opening by itself when something blocks publication. It also
 carries the SEO title, meta description and Facebook caption the article wrote.
 
+The article itself reaches the post as blocks. The engine returns one string of
+semantic HTML, and stored as-is the block editor makes a single Classic block
+of the whole article — unmovable, untouchable by any block-level tool, which is
+the one thing an editor came to work on. `MSRWA_Blocks` converts the tags the
+article contract allows (headings, paragraphs, lists with each item its own
+block, the page break) and wraps anything else in an HTML block rather than
+dropping it.
+
 On the public site, `MSRWA_Schema` prints the recipe as schema.org Recipe
 JSON-LD on published posts that carry `_msrwa_recipe`, unless a recipe plugin
-that prints its own is active.
+that prints its own is active. `MSRWA_Head` does the same for the meta
+description, the Open Graph tags and the X card, using the 1200 × 630 image the
+engine drew for sharing and falling back to the featured one; it steps aside
+when any of the usual SEO plugins is active, and speaks only for posts this
+plugin wrote.
 
 The interface ships in French, English and Arabic. `tools/i18n.php` extracts and
 compiles the catalogues, because there is no gettext toolchain and no build step.
