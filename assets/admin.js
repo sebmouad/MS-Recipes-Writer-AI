@@ -248,6 +248,22 @@
     });
   }
 
+  // --- Clearing what has outlived its usefulness --------------------------
+
+  var prune = document.getElementById('ms-prune');
+  if (prune) {
+    prune.addEventListener('click', function () {
+      prune.disabled = true;
+      say(document.getElementById('ms-prune-status'), t.pruning || '');
+      call('/retention', { method: 'POST' })
+        .then(function () { window.location.reload(); })
+        .catch(function (error) {
+          say(document.getElementById('ms-prune-status'), error.message);
+          prune.disabled = false;
+        });
+    });
+  }
+
   // --- One decision, several recipes -------------------------------------
 
   var bulk = document.getElementById('ms-bulk');

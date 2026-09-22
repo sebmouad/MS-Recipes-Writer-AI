@@ -40,6 +40,9 @@ final class MSRWA_Settings {
 			'max_reference_images' => 3,
 			'visual_reference_search' => 1,
 			'visual_reference_max' => 3,
+			'retention_events_days' => 90,
+			'retention_artifacts_days' => 365,
+			'retention_runs_days' => 0,
 			'log_days'            => 30,
 			'temp_days'           => 7,
 			'aggregate_months'    => 12,
@@ -564,6 +567,12 @@ SILENT FINAL CHECK BEFORE RETURNING — fix anything that fails:
 		foreach ( array( 'max_batch' => array( 1, 50 ), 'max_concurrency' => array( 1, 4 ), 'max_corrections' => array( 0, 2 ), 'log_days' => array( 1, 365 ), 'temp_days' => array( 1, 90 ), 'aggregate_months' => array( 1, 60 ) ) as $key => $limits ) {
 			$value = isset( $raw[ $key ] ) ? absint( $raw[ $key ] ) : $defaults[ $key ];
 			$out[ $key ] = min( $limits[1], max( $limits[0], $value ) );
+		}
+		// Zero means "never remove anything", so these cannot share the loop
+		// above: its floor of one would quietly turn a site that asked to keep
+		// everything into one that keeps a day.
+		foreach ( array( 'retention_events_days', 'retention_artifacts_days', 'retention_runs_days' ) as $key ) {
+			$out[ $key ] = isset( $raw[ $key ] ) ? min( 3650, max( 0, absint( $raw[ $key ] ) ) ) : $defaults[ $key ];
 		}
 		foreach ( array( 'per_recipe_budget_usd', 'target_cost_usd', 'daily_budget_usd', 'monthly_budget_usd' ) as $key ) { $out[ $key ] = isset( $raw[ $key ] ) ? min( 100000, max( 0, (float) $raw[ $key ] ) ) : $defaults[ $key ]; }
 		$out['vision_reserve_usd'] = isset( $raw['vision_reserve_usd'] ) ? min( 1000, max( 0.001, (float) $raw['vision_reserve_usd'] ) ) : $defaults['vision_reserve_usd'];

@@ -173,7 +173,8 @@ Namespace `msrwa/v1`, WordPress cookies and nonce, every response `no-store`
 
 `GET|POST /batches`, `DELETE /batches/{id}`, `POST /batches/{id}/{pairs|schedule|dispatch}`,
 `GET /batches/{id}/runs`, `POST /runs/bulk`, `POST /runs/{id}/{retry|cancel}`,
-`GET /estimate`, `GET /health`, `GET|POST /queue`, `POST /diagnostics/config`.
+`GET /estimate`, `GET /health`, `GET|POST /queue`, `POST /retention`,
+`POST /diagnostics/config`.
 
 ## Invariants
 

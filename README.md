@@ -2,6 +2,30 @@
 
 Plugin WordPress en construction pour la génération éditoriale culinaire orchestrée.
 
+## Version 0.7.4
+
+**Les durées de conservation se règlent depuis l'écran, et le ménage se
+déclenche à la main.**
+
+Les trois durées étaient des filtres PHP. Dire à un propriétaire de site
+d'écrire `add_filter( 'msrwa_retention_events_days', … )` dans un fichier,
+c'est ne pas lui donner le réglage. Ce sont maintenant des réglages, avec leur
+propre formulaire, et le filtre existe toujours et garde le dernier mot — quand
+un filtre impose autre chose que ce qui est saisi, l'écran le dit, au lieu de
+montrer un chiffre qui ne s'appliquera pas.
+
+Chaque passage est écrit noir sur blanc, même celui qui n'a rien trouvé à
+retirer : « passé il y a une heure, rien à faire » et « n'a pas tourné depuis
+mars » se ressemblaient beaucoup trop. Et on peut en déclencher un soi-même,
+borné comme celui du cron : un site avec un an de retard se nettoie en
+plusieurs fois, pas en une requête que l'hébergeur tue.
+
+Au passage, la désinstallation laissait derrière elle `msrwa_queue_held`, la
+capacité `msrwa_view_own` et tout ce qui avait été donné au rôle `writer`. Un
+nouveau test lit les options, les capacités et les rôles directement dans le
+code et vérifie que `uninstall.php` les rend tous — une liste tenue à la main
+finit toujours par prendre du retard sur la version suivante.
+
 ## Version 0.7.3
 
 **La priorité se voit, et se règle là où on la regarde.**
@@ -456,7 +480,7 @@ cron réel et validité distante des clés restent à vérifier sur un site de t
 
 ## État actuel
 
-La version `0.7.3` est un socle installable : file persistante, pipeline de
+La version `0.7.4` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.

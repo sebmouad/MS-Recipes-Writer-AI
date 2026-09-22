@@ -111,9 +111,6 @@ msgstr "ما يجري تنفيذه، وما ينتظر المراجعة، وما
 msgid "Ce qu’il faut produire"
 msgstr "ما المطلوب إنتاجه"
 
-msgid "Chaque recette suit le même chemin. Les montants sont des ordres de grandeur mesurés, jamais une facture."
-msgstr "كل وصفة تسلك المسار نفسه. المبالغ تقديرات مقيسة، وليست فاتورة."
-
 msgid "Choisir dans la médiathèque"
 msgstr "اختر من مكتبة الوسائط"
 
@@ -231,9 +228,6 @@ msgstr "حسب النموذج"
 msgid "Par étape"
 msgstr "حسب الخطوة"
 
-msgid "Pas de collage. Le jugement final ne s’exécute pas : il confronte le texte aux deux images, et il n’y en a qu’une."
-msgstr "بلا ملصق. الحكم النهائي لا يُنفَّذ: فهو يقارن النص بالصورتين، وليس هنا إلا واحدة."
-
 msgid "Photographies des recettes"
 msgstr "صور الوصفات"
 
@@ -257,9 +251,6 @@ msgstr "لا يُكتب شيء في هذه المرحلة: تُوصف الصور
 
 msgid "Rien à analyser"
 msgstr "لا شيء للتحليل"
-
-msgid "Run introuvable."
-msgstr "التنفيذ غير موجود."
 
 msgid "Rédacteur"
 msgstr "المحرِّر"
@@ -293,9 +284,6 @@ msgstr "النسبة"
 
 msgid "Terminés"
 msgstr "منتهية"
-
-msgid "Texte uniquement, relu et vérifié. Aucune image n’est générée."
-msgstr "نص فقط، مُدقَّق ومُتحقَّق منه. لا تُولَّد أي صورة."
 
 msgid "Titre"
 msgstr "العنوان"
@@ -666,9 +654,6 @@ msgstr "الصورة الرئيسية"
 msgid "inchangée"
 msgstr "دون تغيير"
 
-msgid "jours de déroulé conservés ; les chiffres restent"
-msgstr "أيام من المسار محفوظة؛ والأرقام تبقى"
-
 msgid "langue"
 msgstr "اللغة"
 
@@ -689,9 +674,6 @@ msgstr "السقف"
 
 msgid "réserves"
 msgstr "تحفّظات"
-
-msgid "rétention"
-msgstr "الاحتفاظ"
 
 msgid "serveur"
 msgstr "خادم"
@@ -822,38 +804,11 @@ msgstr "‏%1$s تنفيذ، %2$s سطر مسار"
 msgid "Ce qui est conservé"
 msgstr "ما يُحتفظ به"
 
-msgid "Chaque durée est un filtre : msrwa_retention_events_days, msrwa_retention_artifacts_days, msrwa_retention_runs_days. À zéro, rien n’est jamais supprimé."
-msgstr "كل مدة مرشِّح: msrwa_retention_events_days و msrwa_retention_artifacts_days و msrwa_retention_runs_days. وعند الصفر لا يُحذف شيء أبداً."
-
-msgid "Trois durées, parce que trois choses vieillissent différemment. Le déroulé est de la narration et personne ne relit celui d’un run du printemps dernier. Les productions lourdes — le dossier de recherche, l’article tel que la machine l’a écrit, les prompts d’image — valent des mois : c’est de là qu’on répond à une question sur la qualité. Les chiffres, eux, ne sont jamais supprimés par défaut : une ligne d’étape pèse quelques dizaines d’octets et c’est le seul témoignage de ce qu’un run a coûté."
-msgstr "ثلاث مدد، لأن ثلاثة أشياء تشيخ بمعدلات مختلفة. المسار سرد، ولا أحد يعيد قراءة مسار تنفيذ من الربيع الماضي. أما المُخرَجات الثقيلة — ملف البحث، والمقال كما كتبته الآلة، وموجّهات الصور — فتساوي شهوراً: منها يُجاب عن سؤال الجودة. والأرقام لا تُحذف افتراضياً: سطر الخطوة يزن عشرات البايتات وهو الشاهد الوحيد على كلفة التنفيذ."
-
-msgid "conservé indéfiniment"
-msgstr "محفوظ بلا أجل"
-
-msgid "déroulé"
-msgstr "المسار"
-
-msgid "jamais supprimés"
-msgstr "لا تُحذف أبداً"
-
 msgid "jours"
 msgstr "يوماً"
 
-msgid "jours ; verdict, revue et recette restent"
-msgstr "يوماً؛ ويبقى الحكم والمراجعة والوصفة"
-
-msgid "jours, sauf ceux qui ont produit un brouillon"
-msgstr "يوماً، عدا ما أنتج مسودة"
-
 msgid "poids actuel"
 msgstr "الوزن الحالي"
-
-msgid "productions lourdes"
-msgstr "مخرجات ثقيلة"
-
-msgid "runs entiers"
-msgstr "تنفيذات كاملة"
 
 msgid "%s $"
 msgstr "%s $"
@@ -965,6 +920,45 @@ msgstr "إعادته إلى ترتيبه"
 
 msgid "passe devant"
 msgstr "مقدَّمة في الصف"
+
+msgid "Dernier passage il y a %1$s : %2$s lignes de déroulé, %3$s productions, %4$s runs."
+msgstr "آخر تمريرة قبل %1$s: %2$s من سطور المسار، و%3$s من المخرجات، و%4$s من عمليات التشغيل."
+
+msgid "La narration minute par minute. La table qui grossit le plus vite, et celle que personne ne relit."
+msgstr "السرد دقيقة بدقيقة. أسرع الجداول نموًّا، وأقلّها قراءةً من جديد."
+
+msgid "Le dossier de recherche, l’article tel que la machine l’a écrit, les prompts d’image. Le verdict, la revue et la recette restent quoi qu’il arrive."
+msgstr "ملف البحث، والمقال كما كتبته الآلة، وموجّهات الصور. أمّا الحكم والمراجعة والوصفة فتبقى مهما حدث."
+
+msgid "Le nettoyage n’a encore jamais tourné."
+msgstr "لم يُشغَّل التنظيف بعد قطّ."
+
+msgid "Nettoyage…"
+msgstr "جارٍ التنظيف…"
+
+msgid "Nettoyer maintenant"
+msgstr "نظّف الآن"
+
+msgid "Productions lourdes"
+msgstr "المخرجات الثقيلة"
+
+msgid "Runs entiers"
+msgstr "عمليات التشغيل كاملةً"
+
+msgid "Trois durées, parce que trois choses vieillissent différemment. À zéro, rien de cette sorte n’est jamais supprimé."
+msgstr "ثلاث مدد، لأن ثلاثة أشياء تتقادم بوتائر مختلفة. عند الصفر، لا يُحذف شيء من هذا النوع أبدًا."
+
+msgid "Un filtre impose une autre durée pour : %s. C’est le filtre qui s’applique, pas ce qui est saisi ici."
+msgstr "يفرض فلتر مدةً أخرى لـ: %s. الفلتر هو ما يُطبَّق، لا ما يُدخَل هنا."
+
+msgid "Un passage est borné : il retire ce qu’il peut sans faire tomber la requête, et reprend au suivant. Chaque durée est aussi un filtre — msrwa_retention_events_days, msrwa_retention_artifacts_days, msrwa_retention_runs_days."
+msgstr "التمريرة محدودة: تزيل ما تستطيع دون إسقاط الطلب، وتستأنف من حيث توقّفت في التمريرة التالية. وكل مدة هي أيضًا فلتر — msrwa_retention_events_days و msrwa_retention_artifacts_days و msrwa_retention_runs_days."
+
+msgid "Y compris les chiffres. Laissé à zéro par défaut : une ligne d’étape est le seul témoignage de ce qu’un run a coûté. Un run qui a produit un brouillon n’est jamais supprimé."
+msgstr "بما في ذلك الأرقام. يُترك عند الصفر افتراضيًّا: سطر الخطوة هو السجل الوحيد لما كلّفته عملية التشغيل. وعملية أنتجت مسودة لا تُحذف أبدًا."
+
+msgid "Enregistrer les durées"
+msgstr "حفظ المدد"
 
 msgid "%d remarque bloquante"
 msgid_plural "%d remarques bloquantes"

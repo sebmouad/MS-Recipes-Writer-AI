@@ -21,6 +21,7 @@ final class MSRWA_REST {
 			array( 'methods' => 'GET', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'queue' ) ),
 			array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_manage' ), 'callback' => array( __CLASS__, 'queue_control' ) ),
 		) );
+		register_rest_route( 'msrwa/v1', '/retention', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_manage' ), 'callback' => array( __CLASS__, 'prune' ) ) );
 		register_rest_route( 'msrwa/v1', '/runs/bulk', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'bulk' ) ) );
 		register_rest_route( 'msrwa/v1', '/runs/(?P<id>\d+)/retry', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'retry' ) ) );
 		register_rest_route( 'msrwa/v1', '/runs/(?P<id>\d+)/cancel', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'cancel' ) ) );
@@ -144,6 +145,16 @@ final class MSRWA_REST {
 		if ( 'hold' === $action ) { MSRWA_Queue::hold(); return rest_ensure_response( array( 'held' => true ) ); }
 		if ( 'release' === $action ) { return rest_ensure_response( array( 'held' => false, 'rearmed' => MSRWA_Queue::release() ) ); }
 		return new WP_Error( 'msrwa_unknown_action', __( 'Action inconnue.', 'ms-recipes-writer-ai' ), array( 'status' => 400 ) );
+	}
+
+	/**
+	 * One bounded pass of the retention policy, asked for rather than waited on.
+	 *
+	 * Bounded like the scheduled one: a site with a year of backlog clears it
+	 * over several presses, not in one request the host kills.
+	 */
+	public static function prune() {
+		return rest_ensure_response( MSRWA_Retention::sweep() );
 	}
 
 	/**

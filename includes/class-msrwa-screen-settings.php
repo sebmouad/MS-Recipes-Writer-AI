@@ -145,28 +145,49 @@ final class MSRWA_Screen_Settings {
 	 * limit should at least say how big it has got.
 	 */
 	private static function retention() {
+		$settings = MSRWA_Settings::get();
 		$policy = MSRWA_Retention::policy();
 		$weight = MSRWA_Retention::weight();
+		$last = MSRWA_Retention::last();
+
+		$ages = array(
+			'events' => array( 'retention_events_days', __( 'Déroulé', 'ms-recipes-writer-ai' ), __( 'La narration minute par minute. La table qui grossit le plus vite, et celle que personne ne relit.', 'ms-recipes-writer-ai' ) ),
+			'artifacts' => array( 'retention_artifacts_days', __( 'Productions lourdes', 'ms-recipes-writer-ai' ), __( 'Le dossier de recherche, l’article tel que la machine l’a écrit, les prompts d’image. Le verdict, la revue et la recette restent quoi qu’il arrive.', 'ms-recipes-writer-ai' ) ),
+			'runs' => array( 'retention_runs_days', __( 'Runs entiers', 'ms-recipes-writer-ai' ), __( 'Y compris les chiffres. Laissé à zéro par défaut : une ligne d’étape est le seul témoignage de ce qu’un run a coûté. Un run qui a produit un brouillon n’est jamais supprimé.', 'ms-recipes-writer-ai' ) ),
+		);
 
 		echo '<section class="ms-card"><h2>' . esc_html__( 'Ce qui est conservé', 'ms-recipes-writer-ai' ) . '</h2>';
-		echo '<p>' . esc_html__( 'Trois durées, parce que trois choses vieillissent différemment. Le déroulé est de la narration et personne ne relit celui d’un run du printemps dernier. Les productions lourdes — le dossier de recherche, l’article tel que la machine l’a écrit, les prompts d’image — valent des mois : c’est de là qu’on répond à une question sur la qualité. Les chiffres, eux, ne sont jamais supprimés par défaut : une ligne d’étape pèse quelques dizaines d’octets et c’est le seul témoignage de ce qu’un run a coûté.', 'ms-recipes-writer-ai' ) . '</p>';
+		echo '<p>' . esc_html__( 'Trois durées, parce que trois choses vieillissent différemment. À zéro, rien de cette sorte n’est jamais supprimé.', 'ms-recipes-writer-ai' ) . '</p>';
+
+		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
+		echo '<input type="hidden" name="action" value="msrwa_save_settings">';
+		wp_nonce_field( 'msrwa_save_settings' );
+
+		$pinned = array();
+		foreach ( $ages as $name => $age ) {
+			list( $key, $label, $why ) = $age;
+			$set = (int) ( $settings[ $key ] ?? 0 );
+			if ( $set !== (int) $policy[ $name ] ) { $pinned[] = $label; }
+			echo '<p><label for="ms-' . esc_attr( $key ) . '"><strong>' . esc_html( $label ) . '</strong></label><br>'
+				. '<input type="number" id="ms-' . esc_attr( $key ) . '" name="msrwa_settings[' . esc_attr( $key ) . ']" value="' . esc_attr( $set ) . '" step="1" min="0" max="3650" class="small-text ms-num"> '
+				. esc_html__( 'jours', 'ms-recipes-writer-ai' )
+				. '<br><small class="ms-muted">' . esc_html( $why ) . '</small></p>';
+		}
+		echo '<p>';
+		submit_button( __( 'Enregistrer les durées', 'ms-recipes-writer-ai' ), 'secondary', 'submit', false );
+		echo '</p></form>';
+
+		// A filter beats the field, so a screen that showed only the field would
+		// be telling an operator something that is not going to happen.
+		if ( $pinned ) {
+			MSRWA_UI::note( esc_html( sprintf(
+				/* translators: %s is a list of names, e.g. "Déroulé, Runs entiers". */
+				__( 'Un filtre impose une autre durée pour : %s. C’est le filtre qui s’applique, pas ce qui est saisi ici.', 'ms-recipes-writer-ai' ),
+				implode( ', ', $pinned )
+			) ), 'warn' );
+		}
 
 		MSRWA_UI::figures( array(
-			array(
-				'label' => __( 'déroulé', 'ms-recipes-writer-ai' ),
-				'value' => $policy['events'] ? number_format_i18n( $policy['events'] ) : '∞',
-				'note' => $policy['events'] ? __( 'jours', 'ms-recipes-writer-ai' ) : __( 'conservé indéfiniment', 'ms-recipes-writer-ai' ),
-			),
-			array(
-				'label' => __( 'productions lourdes', 'ms-recipes-writer-ai' ),
-				'value' => $policy['artifacts'] ? number_format_i18n( $policy['artifacts'] ) : '∞',
-				'note' => $policy['artifacts'] ? __( 'jours ; verdict, revue et recette restent', 'ms-recipes-writer-ai' ) : __( 'conservé indéfiniment', 'ms-recipes-writer-ai' ),
-			),
-			array(
-				'label' => __( 'runs entiers', 'ms-recipes-writer-ai' ),
-				'value' => $policy['runs'] ? number_format_i18n( $policy['runs'] ) : '∞',
-				'note' => $policy['runs'] ? __( 'jours, sauf ceux qui ont produit un brouillon', 'ms-recipes-writer-ai' ) : __( 'jamais supprimés', 'ms-recipes-writer-ai' ),
-			),
 			array(
 				'label' => __( 'poids actuel', 'ms-recipes-writer-ai' ),
 				'value' => size_format( $weight['artifact_bytes'] ),
@@ -179,7 +200,24 @@ final class MSRWA_Screen_Settings {
 			),
 		) );
 
-		echo '<p class="ms-muted">' . esc_html__( 'Chaque durée est un filtre : msrwa_retention_events_days, msrwa_retention_artifacts_days, msrwa_retention_runs_days. À zéro, rien n’est jamais supprimé.', 'ms-recipes-writer-ai' ) . '</p>';
+		echo '<div class="ms-row">';
+		if ( $last['at'] ) {
+			echo '<span class="ms-muted">' . esc_html( sprintf(
+				/* translators: 1: how long ago, 2: timeline rows removed, 3: heavy outputs removed, 4: whole runs removed. */
+				__( 'Dernier passage il y a %1$s : %2$s lignes de déroulé, %3$s productions, %4$s runs.', 'ms-recipes-writer-ai' ),
+				human_time_diff( (int) strtotime( $last['at'] . ' UTC' ), time() ),
+				number_format_i18n( $last['events'] ),
+				number_format_i18n( $last['artifacts'] ),
+				number_format_i18n( $last['runs'] )
+			) ) . '</span>';
+		} else {
+			echo '<span class="ms-muted">' . esc_html__( 'Le nettoyage n’a encore jamais tourné.', 'ms-recipes-writer-ai' ) . '</span>';
+		}
+		echo '<span id="ms-prune-status" class="ms-muted" aria-live="polite"></span>';
+		echo '<button type="button" class="button" id="ms-prune">' . esc_html__( 'Nettoyer maintenant', 'ms-recipes-writer-ai' ) . '</button>';
+		echo '</div>';
+
+		echo '<p class="ms-muted">' . esc_html__( 'Un passage est borné : il retire ce qu’il peut sans faire tomber la requête, et reprend au suivant. Chaque durée est aussi un filtre — msrwa_retention_events_days, msrwa_retention_artifacts_days, msrwa_retention_runs_days.', 'ms-recipes-writer-ai' ) . '</p>';
 		echo '</section>';
 	}
 }

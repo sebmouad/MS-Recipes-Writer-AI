@@ -179,8 +179,10 @@ if ( ! function_exists( 'wp_nonce_field' ) ) {
 		return $field;
 	}
 }
+// A test that needs a filter to fire sets $GLOBALS['msrwa_test_filters'][hook].
+$GLOBALS['msrwa_test_filters'] = array();
 if ( ! function_exists( 'apply_filters' ) ) {
-	function apply_filters( $hook, $value ) { return $value; }
+	function apply_filters( $hook, $value ) { return array_key_exists( $hook, $GLOBALS['msrwa_test_filters'] ) ? $GLOBALS['msrwa_test_filters'][ $hook ] : $value; }
 }
 if ( ! function_exists( 'wp_date' ) ) {
 	function wp_date( $format, $timestamp = null ) { return gmdate( $format, $timestamp ?: time() ); }

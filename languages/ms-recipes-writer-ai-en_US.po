@@ -111,9 +111,6 @@ msgstr "What is running, what is waiting to be read, and what stopped."
 msgid "Ce qu’il faut produire"
 msgstr "What to produce"
 
-msgid "Chaque recette suit le même chemin. Les montants sont des ordres de grandeur mesurés, jamais une facture."
-msgstr "Every recipe takes the same path. The amounts are measured orders of magnitude, never an invoice."
-
 msgid "Choisir dans la médiathèque"
 msgstr "Choose from the media library"
 
@@ -231,9 +228,6 @@ msgstr "By model"
 msgid "Par étape"
 msgstr "By step"
 
-msgid "Pas de collage. Le jugement final ne s’exécute pas : il confronte le texte aux deux images, et il n’y en a qu’une."
-msgstr "No collage. The final judgement does not run: it checks the text against both images, and there is only one."
-
 msgid "Photographies des recettes"
 msgstr "Recipe photographs"
 
@@ -257,9 +251,6 @@ msgstr "Nothing is written at this stage: only the photographs are described. Yo
 
 msgid "Rien à analyser"
 msgstr "Nothing to analyse"
-
-msgid "Run introuvable."
-msgstr "Run not found."
 
 msgid "Rédacteur"
 msgstr "Writer"
@@ -293,9 +284,6 @@ msgstr "Rate"
 
 msgid "Terminés"
 msgstr "Finished"
-
-msgid "Texte uniquement, relu et vérifié. Aucune image n’est générée."
-msgstr "Text only, proofread and checked. No image is generated."
 
 msgid "Titre"
 msgstr "Title"
@@ -666,9 +654,6 @@ msgstr "featured image"
 msgid "inchangée"
 msgstr "unchanged"
 
-msgid "jours de déroulé conservés ; les chiffres restent"
-msgstr "days of timeline kept; the figures stay"
-
 msgid "langue"
 msgstr "language"
 
@@ -689,9 +674,6 @@ msgstr "ceiling"
 
 msgid "réserves"
 msgstr "reservations"
-
-msgid "rétention"
-msgstr "retention"
 
 msgid "serveur"
 msgstr "server"
@@ -822,38 +804,11 @@ msgstr "%1$s run(s), %2$s timeline entries"
 msgid "Ce qui est conservé"
 msgstr "What is kept"
 
-msgid "Chaque durée est un filtre : msrwa_retention_events_days, msrwa_retention_artifacts_days, msrwa_retention_runs_days. À zéro, rien n’est jamais supprimé."
-msgstr "Each age is a filter: msrwa_retention_events_days, msrwa_retention_artifacts_days, msrwa_retention_runs_days. At zero, nothing is ever removed."
-
-msgid "Trois durées, parce que trois choses vieillissent différemment. Le déroulé est de la narration et personne ne relit celui d’un run du printemps dernier. Les productions lourdes — le dossier de recherche, l’article tel que la machine l’a écrit, les prompts d’image — valent des mois : c’est de là qu’on répond à une question sur la qualité. Les chiffres, eux, ne sont jamais supprimés par défaut : une ligne d’étape pèse quelques dizaines d’octets et c’est le seul témoignage de ce qu’un run a coûté."
-msgstr "Three ages, because three things decay at different rates. The timeline is narration and nobody rereads one from last spring. The heavy output — the research package, the article as the machine wrote it, the image prompts — is worth months: that is what a question about quality is answered from. The figures are never removed by default: a step row weighs a few dozen bytes and is the only record of what a run cost."
-
-msgid "conservé indéfiniment"
-msgstr "kept indefinitely"
-
-msgid "déroulé"
-msgstr "timeline"
-
-msgid "jamais supprimés"
-msgstr "never removed"
-
 msgid "jours"
 msgstr "days"
 
-msgid "jours ; verdict, revue et recette restent"
-msgstr "days; verdict, review and recipe stay"
-
-msgid "jours, sauf ceux qui ont produit un brouillon"
-msgstr "days, except those that produced a draft"
-
 msgid "poids actuel"
 msgstr "current weight"
-
-msgid "productions lourdes"
-msgstr "heavy output"
-
-msgid "runs entiers"
-msgstr "whole runs"
 
 msgid "%s $"
 msgstr "$%s"
@@ -965,6 +920,45 @@ msgstr "Put back in order"
 
 msgid "passe devant"
 msgstr "moved to the front"
+
+msgid "Dernier passage il y a %1$s : %2$s lignes de déroulé, %3$s productions, %4$s runs."
+msgstr "Last pass %1$s ago: %2$s timeline rows, %3$s outputs, %4$s runs."
+
+msgid "La narration minute par minute. La table qui grossit le plus vite, et celle que personne ne relit."
+msgstr "The minute-by-minute narration. The fastest-growing table there is, and the one nobody rereads."
+
+msgid "Le dossier de recherche, l’article tel que la machine l’a écrit, les prompts d’image. Le verdict, la revue et la recette restent quoi qu’il arrive."
+msgstr "The research package, the article as the machine wrote it, the image prompts. The verdict, the review and the recipe stay whatever happens."
+
+msgid "Le nettoyage n’a encore jamais tourné."
+msgstr "The cleanup has never run yet."
+
+msgid "Nettoyage…"
+msgstr "Cleaning…"
+
+msgid "Nettoyer maintenant"
+msgstr "Clean now"
+
+msgid "Productions lourdes"
+msgstr "Heavy output"
+
+msgid "Runs entiers"
+msgstr "Whole runs"
+
+msgid "Trois durées, parce que trois choses vieillissent différemment. À zéro, rien de cette sorte n’est jamais supprimé."
+msgstr "Three ages, because three things decay at different rates. At zero, nothing of that kind is ever removed."
+
+msgid "Un filtre impose une autre durée pour : %s. C’est le filtre qui s’applique, pas ce qui est saisi ici."
+msgstr "A filter imposes a different age for: %s. The filter is what applies, not what is typed here."
+
+msgid "Un passage est borné : il retire ce qu’il peut sans faire tomber la requête, et reprend au suivant. Chaque durée est aussi un filtre — msrwa_retention_events_days, msrwa_retention_artifacts_days, msrwa_retention_runs_days."
+msgstr "A pass is bounded: it removes what it can without bringing the request down, and picks up where it left off on the next one. Each age is also a filter — msrwa_retention_events_days, msrwa_retention_artifacts_days, msrwa_retention_runs_days."
+
+msgid "Y compris les chiffres. Laissé à zéro par défaut : une ligne d’étape est le seul témoignage de ce qu’un run a coûté. Un run qui a produit un brouillon n’est jamais supprimé."
+msgstr "Including the figures. Left at zero by default: a step row is the only record of what a run cost. A run that produced a draft is never removed."
+
+msgid "Enregistrer les durées"
+msgstr "Save these ages"
 
 msgid "%d remarque bloquante"
 msgid_plural "%d remarques bloquantes"

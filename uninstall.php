@@ -22,7 +22,7 @@ foreach ( array( 'batches', 'runs', 'steps', 'calls', 'events', 'artifacts' ) as
 	$wpdb->query( 'DROP TABLE IF EXISTS ' . $msrwa_prefix . $msrwa_table ); // phpcs:ignore WordPress.DB
 }
 
-foreach ( array( 'msrwa_settings', 'msrwa_engine_config', 'msrwa_schema', 'msrwa_db_version', 'msrwa_superseded_dropped', 'msrwa_duplicates_reclaimed', 'msrwa_watchdog_at' ) as $msrwa_option ) {
+foreach ( array( 'msrwa_settings', 'msrwa_engine_config', 'msrwa_schema', 'msrwa_db_version', 'msrwa_superseded_dropped', 'msrwa_duplicates_reclaimed', 'msrwa_watchdog_at', 'msrwa_queue_held', 'msrwa_prune_last' ) as $msrwa_option ) {
 	delete_option( $msrwa_option );
 }
 
@@ -30,10 +30,10 @@ foreach ( array( 'msrwa_run_step', 'msrwa_cleanup' ) as $msrwa_hook ) {
 	wp_clear_scheduled_hook( $msrwa_hook );
 }
 
-foreach ( array( 'administrator', 'editor', 'author' ) as $msrwa_role_name ) {
+foreach ( array( 'administrator', 'editor', 'author', 'writer' ) as $msrwa_role_name ) {
 	$msrwa_role = get_role( $msrwa_role_name );
 	if ( ! $msrwa_role ) { continue; }
-	foreach ( array( 'msrwa_create', 'msrwa_view_all', 'msrwa_manage' ) as $msrwa_capability ) {
+	foreach ( array( 'msrwa_create', 'msrwa_view_all', 'msrwa_view_own', 'msrwa_manage' ) as $msrwa_capability ) {
 		$msrwa_role->remove_cap( $msrwa_capability );
 	}
 }

@@ -13,8 +13,9 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
  * quality is answered from. The figures are worth keeping indefinitely: a row
  * in `steps` is a few dozen bytes and is the only record of what a run cost.
  *
- * Every age is a filter, so a site that wants to keep everything sets them to
- * zero and nothing is ever removed.
+ * The three ages are settings, so an operator can change them without touching
+ * code, and each one is also a filter for a site that would rather pin it. At
+ * zero nothing of that kind is ever removed.
  */
 final class MSRWA_Retention {
 
@@ -23,11 +24,30 @@ final class MSRWA_Retention {
 		return array( 'brief', 'review', 'fact_check', 'approval', 'canonical' );
 	}
 
+	/**
+	 * The three ages, as the site set them.
+	 *
+	 * The settings are the answer; the filters still get the last word, so a
+	 * site that pinned an age in code keeps it and the screen shows what will
+	 * actually happen rather than what was typed.
+	 */
 	public static function policy() {
+		$settings = MSRWA_Settings::get();
 		return array(
-			'events' => (int) apply_filters( 'msrwa_retention_events_days', 90 ),
-			'artifacts' => (int) apply_filters( 'msrwa_retention_artifacts_days', 365 ),
-			'runs' => (int) apply_filters( 'msrwa_retention_runs_days', 0 ),
+			'events' => (int) apply_filters( 'msrwa_retention_events_days', (int) ( $settings['retention_events_days'] ?? 90 ) ),
+			'artifacts' => (int) apply_filters( 'msrwa_retention_artifacts_days', (int) ( $settings['retention_artifacts_days'] ?? 365 ) ),
+			'runs' => (int) apply_filters( 'msrwa_retention_runs_days', (int) ( $settings['retention_runs_days'] ?? 0 ) ),
+		);
+	}
+
+	/** When the last sweep ran, and what it took. */
+	public static function last() {
+		$last = (array) get_option( 'msrwa_prune_last', array() );
+		return array(
+			'at' => (string) ( $last['at'] ?? '' ),
+			'events' => (int) ( $last['events'] ?? 0 ),
+			'artifacts' => (int) ( $last['artifacts'] ?? 0 ),
+			'runs' => (int) ( $last['runs'] ?? 0 ),
 		);
 	}
 
@@ -40,11 +60,16 @@ final class MSRWA_Retention {
 	 */
 	public static function sweep() {
 		$policy = self::policy();
-		return array(
+		$removed = array(
 			'events' => self::events( $policy['events'] ),
 			'artifacts' => self::artifacts( $policy['artifacts'] ),
 			'runs' => self::runs( $policy['runs'] ),
 		);
+		// Written down every time, including when it took nothing: "ran an hour
+		// ago and found nothing to remove" and "has not run since March" look
+		// identical on screen otherwise.
+		update_option( 'msrwa_prune_last', array_merge( $removed, array( 'at' => current_time( 'mysql', true ) ) ), false );
+		return $removed;
 	}
 
 	/**
