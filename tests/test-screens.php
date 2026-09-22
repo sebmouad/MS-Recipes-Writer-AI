@@ -76,6 +76,25 @@ msrwa_test_missing( $engine['html'] ?? '', 'key_env', 'The engine screen does no
 
 msrwa_test_contains( ( msrwa_render( array( 'MSRWA_Screen_Pass', 'render' ) )['html'] ?? '' ), 'ms-empty', 'With nothing to show, the pass invites the reader to act.' );
 
+// --- A lot that has not left is still somebody's ------------------------
+
+msrwa_test_as_editor( 7 );
+$GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
+MSRWA_Batch::waiting();
+msrwa_test_contains( $GLOBALS['wpdb']->log(), 'owner_id = 7', 'A writer sees only their own lots waiting to leave.' );
+msrwa_test_contains( $GLOBALS['wpdb']->log(), "status = 'ready'", 'Only lots that have not started are listed.' );
+msrwa_test_contains( $GLOBALS['wpdb']->log(), 'ORDER BY (dispatch_at IS NULL), dispatch_at ASC', 'The one with an hour on it comes first.' );
+
+msrwa_test_as_admin();
+$GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
+MSRWA_Batch::waiting();
+msrwa_test_missing( $GLOBALS['wpdb']->log(), 'owner_id =', 'An administrator sees every lot waiting to leave.' );
+
+// The section is silent when there is nothing waiting, rather than printing an
+// empty table on the one screen meant to be read at a glance.
+$GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
+msrwa_test_missing( ( msrwa_render( array( 'MSRWA_Screen_Pass', 'render' ) )['html'] ?? '' ), 'Pas encore parti', 'Nothing waiting, nothing said.' );
+
 // --- Queue order is said where it is true, and only there ---------------
 
 $waiting = array( 'id' => 9, 'batch_id' => 1, 'owner_id' => 1, 'label' => 'Tarte', 'status' => 'queued', 'step' => '', 'steps_done' => 0, 'steps_total' => 10, 'approved' => null, 'priority' => 5, 'draft_post_id' => 0 );

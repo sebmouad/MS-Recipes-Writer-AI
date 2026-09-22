@@ -960,6 +960,18 @@ msgstr "بما في ذلك الأرقام. يُترك عند الصفر افتر
 msgid "Enregistrer les durées"
 msgstr "حفظ المدد"
 
+msgid "Départ"
+msgstr "الانطلاق"
+
+msgid "Ouvrir"
+msgstr "فتح"
+
+msgid "Pas encore parti"
+msgstr "لم ينطلق بعد"
+
+msgid "attend votre confirmation"
+msgstr "بانتظار تأكيدك"
+
 msgid "%d remarque bloquante"
 msgid_plural "%d remarques bloquantes"
 msgstr[0] "لا ملاحظات حاجبة"

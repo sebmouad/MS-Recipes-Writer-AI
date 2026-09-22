@@ -960,6 +960,18 @@ msgstr "Including the figures. Left at zero by default: a step row is the only r
 msgid "Enregistrer les durées"
 msgstr "Save these ages"
 
+msgid "Départ"
+msgstr "Leaves"
+
+msgid "Ouvrir"
+msgstr "Open"
+
+msgid "Pas encore parti"
+msgstr "Not gone yet"
+
+msgid "attend votre confirmation"
+msgstr "waiting for you"
+
 msgid "%d remarque bloquante"
 msgid_plural "%d remarques bloquantes"
 msgstr[0] "%d blocking finding"

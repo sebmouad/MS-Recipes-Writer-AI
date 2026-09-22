@@ -48,6 +48,7 @@ final class MSRWA_Screen_Pass {
 		) );
 
 		self::queue();
+		self::waiting();
 		self::rail( __( 'En cours', 'ms-recipes-writer-ai' ), $moving['runs'], __( 'Rien ne tourne.', 'ms-recipes-writer-ai' ), __( 'Déposez des recettes et des photographies pour lancer un lot.', 'ms-recipes-writer-ai' ), true );
 
 		if ( $attention['runs'] ) {
@@ -115,6 +116,40 @@ final class MSRWA_Screen_Pass {
 		if ( defined( 'DISABLE_WP_CRON' ) && DISABLE_WP_CRON && MSRWA_Rights::may_manage() ) {
 			MSRWA_UI::note( __( 'DISABLE_WP_CRON est actif. Les lots n’avanceront que si un cron serveur appelle wp-cron.php ; sans cela ils resteront en attente sans rien signaler.', 'ms-recipes-writer-ai' ), 'warn' );
 		}
+	}
+
+	/**
+	 * Lots that have not left yet.
+	 *
+	 * The rails below show work the engine is doing; this shows work it has not
+	 * been asked to do. A lot paired last Thursday and never sent used to leave
+	 * the screen with the person who made it, and there was nowhere at all to
+	 * see what was scheduled for tonight.
+	 */
+	private static function waiting() {
+		$batches = MSRWA_Batch::waiting( 10 );
+		if ( ! $batches ) { return; }
+
+		echo '<section class="ms-card ms-card-flush"><h2>' . esc_html__( 'Pas encore parti', 'ms-recipes-writer-ai' ) . '</h2>';
+		echo MSRWA_UI::scroll( __( 'Pas encore parti', 'ms-recipes-writer-ai' ) ) . '<table class="ms-table"><thead><tr>' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- scroll() escapes its own.
+			. '<th>' . esc_html__( 'Lot', 'ms-recipes-writer-ai' ) . '</th>'
+			. '<th class="ms-num">' . esc_html__( 'Recettes', 'ms-recipes-writer-ai' ) . '</th>'
+			. '<th>' . esc_html__( 'Départ', 'ms-recipes-writer-ai' ) . '</th>'
+			. '<th></th></tr></thead><tbody>';
+
+		foreach ( $batches as $batch ) {
+			$url = admin_url( 'admin.php?page=msrwa-batch&batch_id=' . (int) $batch['id'] );
+			echo '<tr><td><strong>#' . esc_html( $batch['id'] ) . '</strong>'
+				. ( '' !== (string) $batch['label'] ? ' ' . esc_html( $batch['label'] ) : '' )
+				. '<small>' . esc_html( (string) MSRWA_Profile::get( (string) $batch['profile'] )['label'] ) . '</small></td>'
+				. '<td class="ms-num">' . esc_html( number_format_i18n( (int) $batch['recipes'] ) ) . '</td>'
+				. '<td>' . ( empty( $batch['dispatch_at'] )
+					? '<span class="ms-state ms-state-warn">' . esc_html__( 'attend votre confirmation', 'ms-recipes-writer-ai' ) . '</span>'
+					: esc_html( MSRWA_I18N::when( (string) $batch['dispatch_at'] ) ) )
+				. '</td>'
+				. '<td class="ms-num"><a class="button" href="' . esc_url( $url ) . '">' . esc_html__( 'Ouvrir', 'ms-recipes-writer-ai' ) . '</a></td></tr>';
+		}
+		echo '</tbody></table></div></section>';
 	}
 
 	private static function rail( $title, array $runs, $empty_title, $empty_text, $live ) {

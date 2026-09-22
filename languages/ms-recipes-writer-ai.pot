@@ -7,7 +7,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: tools/i18n.php\n"
 
-#: class-msrwa-screen-pass.php:89
+#: class-msrwa-screen-pass.php:90
 msgid "%1$d en attente, %2$d en cours"
 msgstr ""
 
@@ -199,7 +199,7 @@ msgstr ""
 msgid "Aucun jugement final n’a été rendu pour cet article — le profil choisi ne l’exécutait pas, ou la recette s’est arrêtée avant."
 msgstr ""
 
-#: class-msrwa-screen-pass.php:107
+#: class-msrwa-screen-pass.php:108
 msgid "Aucune clé d’API n’est enregistrée, donc rien ne peut être généré. %s"
 msgstr ""
 
@@ -239,7 +239,7 @@ msgstr ""
 msgid "Cache"
 msgstr ""
 
-#: class-msrwa-batch.php:118
+#: class-msrwa-batch.php:140
 msgid "Ce lot a déjà été lancé."
 msgstr ""
 
@@ -359,7 +359,7 @@ msgstr ""
 msgid "DISABLE_WP_CRON est actif. C’est la configuration recommandée, mais elle suppose qu’un cron serveur appelle wp-cron.php : sans lui, les recettes resteront en attente indéfiniment."
 msgstr ""
 
-#: class-msrwa-screen-pass.php:116
+#: class-msrwa-screen-pass.php:117
 msgid "DISABLE_WP_CRON est actif. Les lots n’avanceront que si un cron serveur appelle wp-cron.php ; sans cela ils resteront en attente sans rien signaler."
 msgstr ""
 
@@ -367,7 +367,7 @@ msgstr ""
 msgid "Date illisible."
 msgstr ""
 
-#: class-msrwa-screen-articles.php:130 class-msrwa-screen-pass.php:54
+#: class-msrwa-screen-articles.php:130 class-msrwa-screen-pass.php:55
 msgid "Demande une décision"
 msgstr ""
 
@@ -395,11 +395,15 @@ msgstr ""
 msgid "Décrire et apparier"
 msgstr ""
 
+#: class-msrwa-screen-pass.php:137
+msgid "Départ"
+msgstr ""
+
 #: class-msrwa-screen-analysis.php:129 class-msrwa-screen-analysis.php:194 class-msrwa-screen-analysis.php:225
 msgid "Dépense"
 msgstr ""
 
-#: class-msrwa-screen-pass.php:51
+#: class-msrwa-screen-pass.php:52
 msgid "Déposez des recettes et des photographies pour lancer un lot."
 msgstr ""
 
@@ -411,7 +415,7 @@ msgstr ""
 msgid "Déroulé"
 msgstr ""
 
-#: class-msrwa-screen-articles.php:129 class-msrwa-screen-pass.php:51
+#: class-msrwa-screen-articles.php:129 class-msrwa-screen-pass.php:52
 msgid "En cours"
 msgstr ""
 
@@ -495,15 +499,15 @@ msgstr ""
 msgid "La dépense du site entier, pas celle d’un rédacteur : un plafond appartient au site, et quelqu’un qui n’en verrait que sa part ne comprendrait jamais pourquoi son lot a été refusé."
 msgstr ""
 
-#: class-msrwa-screen-pass.php:81
+#: class-msrwa-screen-pass.php:82
 msgid "La file"
 msgstr ""
 
-#: class-msrwa-screen-pass.php:83
+#: class-msrwa-screen-pass.php:84
 msgid "La file est suspendue. Rien de nouveau ne part ; ce qui est déjà commencé garde tout ce qui a été fait et reprendra à l’endroit exact."
 msgstr ""
 
-#: class-msrwa-screen-pass.php:76
+#: class-msrwa-screen-pass.php:77
 msgid "La file n’avance pas : la plus ancienne recette attend depuis %s et rien ne tourne. Sur un site peu visité, c’est le cron."
 msgstr ""
 
@@ -609,7 +613,7 @@ msgstr ""
 msgid "Les recettes seront générées sans photographie fournie : le moteur cherchera ses propres références."
 msgstr ""
 
-#: class-msrwa-admin.php:43
+#: class-msrwa-admin.php:43 class-msrwa-screen-pass.php:135
 msgid "Lot"
 msgstr ""
 
@@ -673,15 +677,19 @@ msgstr ""
 msgid "Non vérifiable :"
 msgstr ""
 
-#: class-msrwa-admin.php:28 class-msrwa-screen-articles.php:34 class-msrwa-screen-articles.php:73 class-msrwa-screen-compose.php:19 class-msrwa-screen-pass.php:30 class-msrwa-screen-pass.php:123
+#: class-msrwa-admin.php:28 class-msrwa-screen-articles.php:34 class-msrwa-screen-articles.php:73 class-msrwa-screen-compose.php:19 class-msrwa-screen-pass.php:30 class-msrwa-screen-pass.php:158
 msgid "Nouveau lot"
+msgstr ""
+
+#: class-msrwa-screen-pass.php:150
+msgid "Ouvrir"
 msgstr ""
 
 #: class-msrwa-screen-run.php:71
 msgid "Ouvrir le brouillon"
 msgstr ""
 
-#: class-msrwa-screen-pass.php:108
+#: class-msrwa-screen-pass.php:109
 msgid "Ouvrir les réglages"
 msgstr ""
 
@@ -711,6 +719,10 @@ msgstr ""
 
 #: class-msrwa-profile.php:36
 msgid "Pas de collage. Le jugement final s’exécute quand même et confronte le texte à l’image produite ; il n’a simplement pas de collage à comparer."
+msgstr ""
+
+#: class-msrwa-screen-pass.php:133 class-msrwa-screen-pass.php:134
+msgid "Pas encore parti"
 msgstr ""
 
 #: class-msrwa-screen-batch.php:128
@@ -769,7 +781,7 @@ msgstr ""
 msgid "Recette pour la photographie %s"
 msgstr ""
 
-#: class-msrwa-screen-batch.php:154
+#: class-msrwa-screen-batch.php:154 class-msrwa-screen-pass.php:136
 msgid "Recettes"
 msgstr ""
 
@@ -781,7 +793,7 @@ msgstr ""
 msgid "Reprendre"
 msgstr ""
 
-#: class-msrwa-screen-pass.php:96
+#: class-msrwa-screen-pass.php:97
 msgid "Reprendre la file"
 msgstr ""
 
@@ -805,7 +817,7 @@ msgstr ""
 msgid "Rien ne correspond"
 msgstr ""
 
-#: class-msrwa-screen-pass.php:51
+#: class-msrwa-screen-pass.php:52
 msgid "Rien ne tourne."
 msgstr ""
 
@@ -877,7 +889,7 @@ msgstr ""
 msgid "Sur trente jours"
 msgstr ""
 
-#: class-msrwa-screen-pass.php:96
+#: class-msrwa-screen-pass.php:97
 msgid "Suspendre la file"
 msgstr ""
 
@@ -1027,6 +1039,10 @@ msgstr ""
 
 #: class-msrwa-screen-run.php:134
 msgid "article"
+msgstr ""
+
+#: class-msrwa-screen-pass.php:147
+msgid "attend votre confirmation"
 msgstr ""
 
 #: class-msrwa-screen-settings.php:128

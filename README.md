@@ -2,6 +2,22 @@
 
 Plugin WordPress en construction pour la génération éditoriale culinaire orchestrée.
 
+## Version 0.7.5
+
+**Un lot qui n'est pas encore parti existe enfin quelque part.**
+
+Jusqu'ici, un lot quittait l'écran en même temps que la personne qui l'avait
+fait. Programmé pour neuf heures demain, ou apparié jeudi dernier et jamais
+envoyé, il n'existait que dans la base — c'est-à-dire nulle part, pour celui
+qui l'attendait. Aucun écran ne listait les lots : on n'y arrivait que depuis
+une recette déjà lancée.
+
+Le pass ouvre donc sur ce qui n'est pas encore parti : l'heure d'envoi quand il
+y en a une, « attend votre confirmation » quand il n'y en a pas, et le plus
+proche en premier, parce qu'un lot avec une heure dessus est un lot avec une
+échéance. La section se tait quand il n'y a rien — c'est le seul écran fait
+pour être lu d'un coup d'œil.
+
 ## Version 0.7.4
 
 **Les durées de conservation se règlent depuis l'écran, et le ménage se
@@ -480,7 +496,7 @@ cron réel et validité distante des clés restent à vérifier sur un site de t
 
 ## État actuel
 
-La version `0.7.4` est un socle installable : file persistante, pipeline de
+La version `0.7.5` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.

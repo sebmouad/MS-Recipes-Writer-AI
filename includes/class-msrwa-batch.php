@@ -75,6 +75,28 @@ final class MSRWA_Batch {
 		return (array) $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM ' . self::table() . ' WHERE owner_id = %d ORDER BY id DESC LIMIT %d', get_current_user_id(), $limit ), ARRAY_A );
 	}
 
+	/**
+	 * The lots that have not started: scheduled, or still waiting to be sent.
+	 *
+	 * Until now a lot left the screen the moment you did. One scheduled for
+	 * nine tomorrow, or paired and never dispatched, existed only in the
+	 * database — which is the same as not existing to the person who made it.
+	 *
+	 * Soonest departure first, then the most recently made, because a lot with
+	 * an hour on it is the one with a deadline.
+	 */
+	public static function waiting( $limit = 10 ) {
+		global $wpdb;
+		$limit = max( 1, min( 50, (int) $limit ) );
+		$columns = 'id, owner_id, label, recipes, images, profile, language, dispatch_at, created_at';
+		$order = 'ORDER BY (dispatch_at IS NULL), dispatch_at ASC, id DESC LIMIT %d';
+
+		if ( current_user_can( 'manage_options' ) ) {
+			return (array) $wpdb->get_results( $wpdb->prepare( "SELECT {$columns} FROM " . self::table() . " WHERE status = 'ready' {$order}", $limit ), ARRAY_A );
+		}
+		return (array) $wpdb->get_results( $wpdb->prepare( "SELECT {$columns} FROM " . self::table() . " WHERE status = 'ready' AND owner_id = %d {$order}", get_current_user_id(), $limit ), ARRAY_A );
+	}
+
 	public static function may_see( array $batch ) {
 		return (int) $batch['owner_id'] === get_current_user_id() || current_user_can( 'manage_options' );
 	}
