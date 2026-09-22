@@ -72,6 +72,22 @@ foreach ( array_keys( array_merge( MSRWA_Engine_Settings::simple(), MSRWA_Engine
 // A key must never reach a screen, whatever else is on it.
 msrwa_test_missing( $engine['html'] ?? '', 'key_env', 'The engine screen does not print where keys are kept.' );
 
+// The friendly routing picker must offer every route the engine's own
+// defaults name — a picker missing one would silently drop an admin's choice
+// for that step back to whatever `routing.article` resolves to.
+msrwa_test_contains( $engine['html'] ?? '', 'id="ms-engine-routing-picker"', 'The engine screen offers the friendly routing picker.' );
+if ( preg_match( '/id="ms-engine-routing-data">(.*?)<\/script>/s', $engine['html'] ?? '', $match ) ) {
+	$picker_data = json_decode( $match[1], true );
+	msrwa_test_assert( is_array( $picker_data ), 'The routing picker embeds valid JSON.' );
+	foreach ( array_keys( MSRWA_Engine_Settings::defaults()['routing'] ) as $key ) {
+		msrwa_test_assert( isset( $picker_data['keys'][ $key ], $picker_data['current'][ $key ] ), 'The routing picker names route ' . $key . '.' );
+	}
+	msrwa_test_assert( ! empty( $picker_data['imageModels'] ), 'The routing picker lists at least one image-capable model.' );
+	msrwa_test_missing( $match[1], 'key_env', 'The routing picker data embeds no provider header, key included.' );
+} else {
+	msrwa_test_assert( false, 'The routing picker data script must be present and well-formed.' );
+}
+
 // --- An empty site is not an error -------------------------------------
 
 msrwa_test_contains( ( msrwa_render( array( 'MSRWA_Screen_Pass', 'render' ) )['html'] ?? '' ), 'ms-empty', 'With nothing to show, the pass invites the reader to act.' );

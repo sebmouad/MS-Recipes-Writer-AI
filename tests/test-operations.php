@@ -31,4 +31,23 @@ msrwa_test_assert( isset( $GLOBALS['ops_options']['msrwa_watchdog_at'] ), 'Watch
 require_once MSRWA_DIR . 'tools/report.php';
 $html = report_render( array( 'artifacts' => array(), 'steps' => array(), 'events' => array(), 'totals' => array(), 'ok' => false ) );
 foreach ( array( 'Recette canonique', 'SEO, publication', 'Visuels générés', 'Appels aux fournisseurs', 'Configuration de ce passage' ) as $section ) { msrwa_test_contains( $html, $section, 'Shared lab report retains ' . $section ); }
+
+// Previewing an unsaved configuration must resolve every step that actually
+// calls a model, and none that does not: 'corrections' has no prompt file at
+// all, and asking for one read the prompts directory as if it were a file.
+require_once MSRWA_DIR . 'includes/engine/load.php';
+require_once MSRWA_DIR . 'includes/class-msrwa-engine-settings.php';
+if ( ! function_exists( 'rest_ensure_response' ) ) { function rest_ensure_response( $data ) { return $data; } }
+class MSRWA_Test_Preview_Request {
+	private $params;
+	public function __construct( array $params ) { $this->params = $params; }
+	public function get_param( $key ) { return $this->params[ $key ] ?? null; }
+}
+msrwa_test_as_admin();
+$preview = MSRWA_Operations::preview( new MSRWA_Test_Preview_Request( array( 'config' => array() ) ) );
+msrwa_test_assert( ! ( $preview instanceof WP_Error ), 'Previewing the defaults does not error.' );
+msrwa_test_assert( ! isset( $preview['routes']['corrections'] ), 'A step with no capability has no route to preview.' );
+msrwa_test_assert( isset( $preview['routes']['article'] ), 'A step that does call a model is still previewed.' );
+msrwa_test_assert( 'string' === gettype( $preview['routes']['article']['prompt_source'] ), 'A previewed step still resolves its prompt.' );
+
 msrwa_test_done( 'operations and report contracts' );

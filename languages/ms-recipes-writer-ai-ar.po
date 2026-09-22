@@ -1202,3 +1202,43 @@ msgstr "إلى"
 
 msgid "Le compte du service d’écriture n’a plus de crédit. Un administrateur doit le recharger, puis reprendre la recette : rien de ce qui est fait n’est perdu."
 msgstr "نفد رصيد حساب خدمة الكتابة. على المسؤول إعادة شحنه ثم استئناف الوصفة: لا يضيع شيء مما أُنجز."
+
+msgid "Anthropic Claude"
+msgstr "أنثروبيك كلود"
+
+msgid "Clé présente"
+msgstr "المفتاح موجود"
+
+msgid "Google Gemini"
+msgstr "جوجل جيميني"
+
+msgid "Génération d’image (à la une et collage Facebook)"
+msgstr "توليد الصور (الصورة البارزة ولوحة فيسبوك)"
+
+msgid "La façon courante de changer une route : un fournisseur, un niveau. Ceci réécrit le champ « routing » plus bas à chaque changement ; ce qui y est modifié à la main reste possible et prévaut en cas de désaccord entre les deux après un chargement de page."
+msgstr "الطريقة المعتادة لتغيير مسار: مزوّد واحد، ومستوى واحد. هذا يعيد كتابة حقل «routing» أدناه عند كل تغيير؛ تعديله يدويًا يبقى ممكنًا ويُرجَّح عند الاختلاف بين الاثنين بعد إعادة تحميل الصفحة."
+
+msgid "Lecture des photographies (appariement, observation avant génération)"
+msgstr "قراءة الصور (المطابقة، والملاحظة قبل التوليد)"
+
+msgid "Modèle par étape"
+msgstr "النموذج لكل خطوة"
+
+msgid "Nécessite JavaScript ; sans cela, utilisez directement le champ « routing » ci-dessous."
+msgstr "يتطلب JavaScript؛ بدونه، استخدم حقل «routing» أدناه مباشرة."
+
+msgid "OpenAI"
+msgstr "أوبن إيه آي"
+
+msgid "Prévisualiser"
+msgstr "معاينة"
+
+msgid "Route"
+msgstr "المسار"
+
+msgid "Résout ce qui est à l’écran sans l’enregistrer et sans appeler personne."
+msgstr "يحل ما هو معروض على الشاشة دون حفظه ودون استدعاء أي جهة."
+
+msgid "Tarif connu"
+msgstr "التعرفة معروفة"
+

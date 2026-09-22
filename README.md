@@ -5,9 +5,9 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.8.0
+## État actuel — 0.8.1
 
-La version `0.8.0` est installable et vérifiée de bout en bout sur un vrai
+La version `0.8.1` est installable et vérifiée de bout en bout sur un vrai
 WordPress (7.1.1) : un lot part, le cron le fait avancer vague par vague, et un
 brouillon arrive avec son article, sa recette, son extrait, ses étiquettes, ses
 métadonnées SEO et ses données structurées Recipe.
@@ -49,6 +49,31 @@ cron serveur doit appeler `wp-cron.php` toutes les cinq minutes.
 - [`docs/ENGINE.md`](docs/ENGINE.md) — le contrat du moteur, et les changements
   proposés qui attendent l’accord du propriétaire.
 - [`docs/TESTING.md`](docs/TESTING.md) — suite hors ligne et tests réels.
+
+## Version 0.8.1
+
+**Un modèle par étape, choisi plutôt qu’écrit.** L’écran *Moteur* offrait un
+seul moyen de changer quel fournisseur sert une étape : éditer à la main le
+groupe JSON `routing`. Il porte maintenant un sélecteur fournisseur et niveau
+pour chacune des neuf routes que le moteur consulte réellement — y compris les
+deux clés partagées par plusieurs étapes (`image` pour l’image à la une et le
+collage Facebook, `vision` pour la lecture des photographies) — et réécrit le
+même champ JSON à chaque changement ; ce qui y est modifié à la main reste
+possible et prévaut en cas de désaccord après un chargement de page. Vérifié en
+réel : changer la route de recherche vers Claude, à haute qualité, produit
+`"research": "claude:high"` dans le champ, sans rien enregistrer ni dépenser.
+
+**Prévisualiser sans enregistrer.** Un bouton résout tout le formulaire — y
+compris un champ JSON tout juste modifié — à travers l’API que l’écran
+possédait déjà sans jamais l’appeler (`/diagnostics/config`) : quelle route
+chaque étape prendrait, si une clé existe pour elle, si son tarif est publié.
+En l’appelant pour la première fois, la prévisualisation lisait le dossier des
+prompts comme si c’était un fichier pour l’étape « corrections », qui n’en a
+pas — elle applique les corrections factuelles en code, sans jamais appeler de
+modèle. Elle est maintenant exclue de ce que la prévisualisation résout, comme
+elle l’est déjà de l’estimation. Une route mal orthographiée se découvre ainsi
+avant l’enregistrement, jamais
+en pleine recette.
 
 ## Version 0.8.0
 

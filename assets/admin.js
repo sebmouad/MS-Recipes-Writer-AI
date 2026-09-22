@@ -329,6 +329,133 @@
     });
   }
 
+  // --- A friendly editor for one JSON group: which model serves each step -
+
+  var routingData = document.getElementById('ms-engine-routing-data');
+  if (routingData) {
+    var schema = JSON.parse(routingData.textContent);
+    var routingField = document.getElementById('ms-engine-routing');
+    var body = document.querySelector('.ms-routing-picker tbody');
+
+    function parseRoute(route) {
+      var parts = (route || '').split(':');
+      return { provider: parts[0] || '', named: parts.slice(1).join(':') || 'medium' };
+    }
+
+    function writeRouting() {
+      var value = {};
+      Object.keys(schema.keys).forEach(function (key) {
+        var row = body.querySelector('[data-route="' + key + '"]');
+        if (!row) return;
+        var model = row.querySelector('.ms-route-model');
+        if (model) { value[key] = model.value; return; }
+        var provider = row.querySelector('.ms-route-provider').value;
+        var tier = row.querySelector('.ms-route-tier').value;
+        value[key] = provider + ':' + tier;
+      });
+      routingField.value = JSON.stringify(value, null, 4);
+    }
+
+    function option(value, label, selected) {
+      var el = document.createElement('option');
+      el.value = value;
+      el.textContent = label;
+      if (selected) el.selected = true;
+      return el;
+    }
+
+    Object.keys(schema.keys).forEach(function (key) {
+      var row = document.createElement('tr');
+      row.dataset.route = key;
+
+      var labelCell = document.createElement('td');
+      labelCell.textContent = schema.keys[key];
+      row.appendChild(labelCell);
+
+      var current = parseRoute(schema.current[key]);
+      var controlCell = document.createElement('td');
+
+      if ('image' === key) {
+        var modelSelect = document.createElement('select');
+        modelSelect.className = 'ms-route-model';
+        schema.imageModels.forEach(function (entry) {
+          modelSelect.appendChild(option(entry.value, entry.label, entry.value === schema.current[key]));
+        });
+        modelSelect.addEventListener('change', writeRouting);
+        controlCell.appendChild(modelSelect);
+      } else {
+        var providerSelect = document.createElement('select');
+        providerSelect.className = 'ms-route-provider';
+        Object.keys(schema.providers).forEach(function (provider) {
+          providerSelect.appendChild(option(provider, schema.providers[provider], provider === current.provider));
+        });
+        var tierSelect = document.createElement('select');
+        tierSelect.className = 'ms-route-tier';
+        schema.tiers.forEach(function (tier) {
+          tierSelect.appendChild(option(tier, tier, tier === current.named));
+        });
+        // A route can already name a specific model rather than a tier — kept
+        // selectable so switching provider and back does not silently drop it.
+        if (schema.tiers.indexOf(current.named) === -1) {
+          tierSelect.insertBefore(option(current.named, current.named, true), tierSelect.firstChild);
+        }
+        providerSelect.addEventListener('change', writeRouting);
+        tierSelect.addEventListener('change', writeRouting);
+        controlCell.appendChild(providerSelect);
+        controlCell.appendChild(document.createTextNode(' '));
+        controlCell.appendChild(tierSelect);
+      }
+
+      row.appendChild(controlCell);
+      body.appendChild(row);
+    });
+  }
+
+  // --- Resolving the form as it stands, without saving or spending --------
+
+  var preview = document.getElementById('ms-engine-preview');
+  if (preview) {
+    var previewResult = document.getElementById('ms-engine-preview-result');
+    preview.addEventListener('click', function () {
+      var config = {};
+      document.querySelectorAll('textarea[id^="ms-engine-"]').forEach(function (area) {
+        config[area.id.replace('ms-engine-', '')] = area.value;
+      });
+      var languageField = document.querySelector('input[name="msrwa_engine[language]"]');
+      if (languageField) { config.language = languageField.value; }
+
+      preview.disabled = true;
+      previewResult.innerHTML = '';
+      call('/diagnostics/config', { method: 'POST', body: JSON.stringify({ config: config }) })
+        .then(function (data) {
+          var table = document.createElement('table');
+          table.className = 'ms-table';
+          var head = table.insertRow();
+          [t.previewStep || 'Étape', t.previewRoute || 'Route', t.previewKey || 'Clé', t.previewPrice || 'Tarif'].forEach(function (title) {
+            var cell = document.createElement('th');
+            cell.textContent = title;
+            head.appendChild(cell);
+          });
+          Object.keys(data.routes).forEach(function (step) {
+            var route = data.routes[step];
+            var row = table.insertRow();
+            row.insertCell().textContent = step;
+            row.insertCell().textContent = route.route.provider + ':' + route.route.model;
+            row.insertCell().textContent = route.provider_known ? '✓' : '✗';
+            row.insertCell().textContent = route.price_known ? '✓' : '✗';
+          });
+          previewResult.appendChild(table);
+        })
+        .catch(function (error) {
+          var p = document.createElement('p');
+          p.className = 'ms-muted';
+          p.textContent = error.message;
+          previewResult.appendChild(p);
+        })
+        .then(function () { preview.disabled = false; });
+    });
+  }
+
   // --- Clearing what has outlived its usefulness --------------------------
 
   var prune = document.getElementById('ms-prune');

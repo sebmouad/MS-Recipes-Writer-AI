@@ -131,6 +131,10 @@ msgstr ""
 msgid "Anglais"
 msgstr ""
 
+#: class-msrwa-screen-engine.php:118
+msgid "Anthropic Claude"
+msgstr ""
+
 #: class-msrwa-screen-batch.php:67
 msgid "Appariement"
 msgstr ""
@@ -299,7 +303,7 @@ msgstr ""
 msgid "Ce qui est en cours, ce qui attend une relecture, et ce qui s’est arrêté."
 msgstr ""
 
-#: class-msrwa-screen-engine.php:91
+#: class-msrwa-screen-engine.php:98
 msgid "Ce qui est réellement transmis au moteur"
 msgstr ""
 
@@ -345,6 +349,10 @@ msgstr ""
 
 #: class-msrwa-screen-compose.php:43
 msgid "Choisir dans la médiathèque"
+msgstr ""
+
+#: class-msrwa-admin.php:104
+msgid "Clé présente"
 msgstr ""
 
 #: class-msrwa-screen-settings.php:30
@@ -491,7 +499,7 @@ msgstr ""
 msgid "Enregistrement…"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:85 class-msrwa-screen-settings.php:122
+#: class-msrwa-screen-engine.php:90 class-msrwa-screen-settings.php:122
 msgid "Enregistrer"
 msgstr ""
 
@@ -543,8 +551,16 @@ msgstr ""
 msgid "Français"
 msgstr ""
 
+#: class-msrwa-screen-engine.php:117
+msgid "Google Gemini"
+msgstr ""
+
 #: class-msrwa-screen-run.php:153
 msgid "Gravité"
+msgstr ""
+
+#: class-msrwa-screen-engine.php:129
+msgid "Génération d’image (à la une et collage Facebook)"
 msgstr ""
 
 #: class-msrwa-admin.php:77
@@ -563,12 +579,16 @@ msgstr ""
 msgid "La chaîne complète, jugement final compris : c’est le seul moment où le texte et les deux images sont confrontés."
 msgstr ""
 
-#: class-msrwa-screen-engine.php:92
+#: class-msrwa-screen-engine.php:99
 msgid "La couche appelante, telle quelle. Vide signifie que tout suit le moteur."
 msgstr ""
 
 #: class-msrwa-screen-settings.php:137
 msgid "La dépense du site entier, pas celle d’un rédacteur : un plafond appartient au site, et quelqu’un qui n’en verrait que sa part ne comprendrait jamais pourquoi son lot a été refusé."
+msgstr ""
+
+#: class-msrwa-screen-engine.php:163
+msgid "La façon courante de changer une route : un fournisseur, un niveau. Ceci réécrit le champ « routing » plus bas à chaque changement ; ce qui y est modifié à la main reste possible et prévaut en cas de désaccord entre les deux après un chargement de page."
 msgstr ""
 
 #: class-msrwa-screen-pass.php:88
@@ -721,6 +741,10 @@ msgstr ""
 msgid "Le travail est terminé, mais aucun brouillon n’a pu être créé. Un administrateur doit regarder le détail."
 msgstr ""
 
+#: class-msrwa-screen-engine.php:127
+msgid "Lecture des photographies (appariement, observation avant génération)"
+msgstr ""
+
 #: class-msrwa-screen-settings.php:84
 msgid "Les articles"
 msgstr ""
@@ -801,6 +825,10 @@ msgstr ""
 msgid "Modèle"
 msgstr ""
 
+#: class-msrwa-screen-engine.php:162
+msgid "Modèle par étape"
+msgstr ""
+
 #: class-msrwa-admin.php:31 class-msrwa-screen-engine.php:25
 msgid "Moteur"
 msgstr ""
@@ -835,6 +863,14 @@ msgstr ""
 
 #: class-msrwa-admin.php:28 class-msrwa-screen-articles.php:34 class-msrwa-screen-articles.php:73 class-msrwa-screen-compose.php:19 class-msrwa-screen-pass.php:33 class-msrwa-screen-pass.php:164
 msgid "Nouveau lot"
+msgstr ""
+
+#: class-msrwa-screen-engine.php:166
+msgid "Nécessite JavaScript ; sans cela, utilisez directement le champ « routing » ci-dessous."
+msgstr ""
+
+#: class-msrwa-screen-engine.php:116
+msgid "OpenAI"
 msgstr ""
 
 #: class-msrwa-screen-pass.php:156
@@ -929,6 +965,10 @@ msgstr ""
 msgid "Proposée par défaut sur chaque nouveau lot. Un lot peut toujours en demander une autre."
 msgstr ""
 
+#: class-msrwa-screen-engine.php:88
+msgid "Prévisualiser"
+msgstr ""
+
 #: class-msrwa-screen-settings.php:115
 msgid "Publier la recette en données structurées (Recipe JSON-LD)"
 msgstr ""
@@ -1013,6 +1053,10 @@ msgstr ""
 msgid "Rien à analyser"
 msgstr ""
 
+#: class-msrwa-admin.php:103
+msgid "Route"
+msgstr ""
+
 #: class-msrwa-screen-settings.php:215
 msgid "Runs entiers"
 msgstr ""
@@ -1029,8 +1073,12 @@ msgstr ""
 msgid "Référencement et réseaux sociaux"
 msgstr ""
 
-#: class-msrwa-admin.php:32 class-msrwa-screen-engine.php:54 class-msrwa-screen-settings.php:20
+#: class-msrwa-admin.php:32 class-msrwa-screen-engine.php:56 class-msrwa-screen-settings.php:20
 msgid "Réglages"
+msgstr ""
+
+#: class-msrwa-screen-engine.php:89
+msgid "Résout ce qui est à l’écran sans l’enregistrer et sans appeler personne."
 msgstr ""
 
 #: class-msrwa-screen-compose.php:42
@@ -1053,7 +1101,7 @@ msgstr ""
 msgid "Sortie"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:55
+#: class-msrwa-screen-engine.php:57
 msgid "Structures"
 msgstr ""
 
@@ -1107,6 +1155,10 @@ msgstr ""
 
 #: class-msrwa-screen-run.php:252
 msgid "Taille"
+msgstr ""
+
+#: class-msrwa-admin.php:105
+msgid "Tarif connu"
 msgstr ""
 
 #: class-msrwa-screen-compose.php:36
@@ -1209,7 +1261,7 @@ msgstr ""
 msgid "Une recette de ce lot est estimée à %1$s, au-dessus de son plafond de %2$s : elle s’arrêterait en route après avoir dépensé. Relevez le plafond ou choisissez une sortie plus légère."
 msgstr ""
 
-#: class-msrwa-screen-engine.php:78
+#: class-msrwa-screen-engine.php:80
 msgid "Valeur par défaut du moteur"
 msgstr ""
 
@@ -1229,7 +1281,7 @@ msgstr ""
 msgid "Vous n’avez pas accès à cet export."
 msgstr ""
 
-#: class-msrwa-admin.php:107 class-msrwa-admin.php:115 class-msrwa-screen-analysis.php:16 class-msrwa-screen-articles.php:15 class-msrwa-screen-batch.php:16 class-msrwa-screen-compose.php:15 class-msrwa-screen-engine.php:16 class-msrwa-screen-pass.php:14 class-msrwa-screen-run.php:15 class-msrwa-screen-settings.php:15
+#: class-msrwa-admin.php:111 class-msrwa-admin.php:119 class-msrwa-screen-analysis.php:16 class-msrwa-screen-articles.php:15 class-msrwa-screen-batch.php:16 class-msrwa-screen-compose.php:15 class-msrwa-screen-engine.php:16 class-msrwa-screen-pass.php:14 class-msrwa-screen-run.php:15 class-msrwa-screen-settings.php:15
 msgid "Vous n’avez pas accès à cet écran."
 msgstr ""
 
@@ -1445,7 +1497,7 @@ msgstr ""
 msgid "mineure"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:68
+#: class-msrwa-screen-engine.php:70
 msgid "modifié"
 msgstr ""
 
@@ -1533,7 +1585,7 @@ msgstr ""
 msgid "Élargissez le filtre, ou repartez de la liste complète."
 msgstr ""
 
-#: class-msrwa-screen-analysis.php:190 class-msrwa-screen-analysis.php:247 class-msrwa-screen-run.php:199 class-msrwa-screen-run.php:232
+#: class-msrwa-admin.php:102 class-msrwa-screen-analysis.php:190 class-msrwa-screen-analysis.php:247 class-msrwa-screen-run.php:199 class-msrwa-screen-run.php:232
 msgid "Étape"
 msgstr ""
 

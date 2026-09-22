@@ -49,6 +49,8 @@ final class MSRWA_Screen_Engine {
 				</p>
 			</section>
 
+			<?php self::routing_picker( $stored, $defaults ); ?>
+
 			<?php
 			foreach ( array(
 				__( 'Réglages', 'ms-recipes-writer-ai' ) => MSRWA_Engine_Settings::simple(),
@@ -82,7 +84,12 @@ final class MSRWA_Screen_Engine {
 				<?php endforeach; ?>
 			<?php endforeach; ?>
 
-			<div class="ms-card ms-save"><?php submit_button( __( 'Enregistrer', 'ms-recipes-writer-ai' ), 'primary', 'submit', false ); ?></div>
+			<div class="ms-card ms-save">
+				<button type="button" class="button" id="ms-engine-preview"><?php esc_html_e( 'Prévisualiser', 'ms-recipes-writer-ai' ); ?></button>
+				<span class="ms-muted"><?php esc_html_e( 'Résout ce qui est à l’écran sans l’enregistrer et sans appeler personne.', 'ms-recipes-writer-ai' ); ?></span>
+				<?php submit_button( __( 'Enregistrer', 'ms-recipes-writer-ai' ), 'primary', 'submit', false ); ?>
+			</div>
+			<div id="ms-engine-preview-result"></div>
 		</form>
 
 		<?php MSRWA_Operations::diagnostics(); ?>
@@ -94,5 +101,70 @@ final class MSRWA_Screen_Engine {
 		</section>
 		<?php
 		echo '</div>';
+	}
+
+	/**
+	 * A friendly editor for the one JSON group people actually reach for:
+	 * which provider and tier serves each step. It only ever rewrites the
+	 * `routing` textarea below — that field stays the one thing the form
+	 * submits, so nothing about saving or validating `routing` changes.
+	 */
+	private static function routing_picker( $stored, $defaults ) {
+		$config = MSRWA_Engine_Config::create( $stored );
+		$catalog = MSRWA_Catalog::defaults();
+		$providers = array(
+			'openai' => __( 'OpenAI', 'ms-recipes-writer-ai' ),
+			'gemini' => __( 'Google Gemini', 'ms-recipes-writer-ai' ),
+			'claude' => __( 'Anthropic Claude', 'ms-recipes-writer-ai' ),
+		);
+		$steps = $config->steps();
+
+		$keys = array();
+		foreach ( array_keys( (array) $defaults['routing'] ) as $key ) {
+			if ( isset( $steps[ $key ]['label'] ) ) {
+				$keys[ $key ] = $steps[ $key ]['label'];
+			} elseif ( 'vision' === $key ) {
+				$keys[ $key ] = __( 'Lecture des photographies (appariement, observation avant génération)', 'ms-recipes-writer-ai' );
+			} elseif ( 'image' === $key ) {
+				$keys[ $key ] = __( 'Génération d’image (à la une et collage Facebook)', 'ms-recipes-writer-ai' );
+			} else {
+				$keys[ $key ] = $key;
+			}
+		}
+
+		// Every tier resolves to a text-and-vision-capable model on every
+		// provider, so the tier pickers offer all three unconditionally; only
+		// image generation is uneven across providers and models, so it lists
+		// exactly what can do it rather than pretending otherwise.
+		$image_models = array();
+		foreach ( $catalog as $provider => $models ) {
+			foreach ( $models as $model => $info ) {
+				if ( empty( $info['image_generation'] ) ) { continue; }
+				$image_models[] = array(
+					'value' => $provider . ':' . $model,
+					'label' => ( $providers[ $provider ] ?? $provider ) . ' — ' . $info['label'],
+				);
+			}
+		}
+
+		$current = array();
+		foreach ( array_keys( $keys ) as $key ) { $current[ $key ] = $config->model_for( $key )['route']; }
+
+		$data = array(
+			'providers' => $providers,
+			'tiers' => array_keys( (array) ( $defaults['tiers'] ?? array() ) ),
+			'imageModels' => $image_models,
+			'keys' => $keys,
+			'current' => $current,
+		);
+		?>
+		<section class="ms-card" id="ms-engine-routing-picker">
+			<h2><?php esc_html_e( 'Modèle par étape', 'ms-recipes-writer-ai' ); ?></h2>
+			<p><?php esc_html_e( 'La façon courante de changer une route : un fournisseur, un niveau. Ceci réécrit le champ « routing » plus bas à chaque changement ; ce qui y est modifié à la main reste possible et prévaut en cas de désaccord entre les deux après un chargement de page.', 'ms-recipes-writer-ai' ); ?></p>
+			<table class="ms-table ms-routing-picker"><tbody></tbody></table>
+			<script type="application/json" id="ms-engine-routing-data"><?php echo wp_json_encode( $data, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP ); ?></script>
+			<noscript><p class="ms-muted"><?php esc_html_e( 'Nécessite JavaScript ; sans cela, utilisez directement le champ « routing » ci-dessous.', 'ms-recipes-writer-ai' ); ?></p></noscript>
+		</section>
+		<?php
 	}
 }

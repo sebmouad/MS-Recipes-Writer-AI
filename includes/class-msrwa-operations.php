@@ -24,6 +24,10 @@ final class MSRWA_Operations {
 			$config = MSRWA_Engine_Config::create( $parsed['config'] );
 			$routes = array();
 			foreach ( $config->steps() as $name => $step ) {
+				// A step with no capability calls no model and has no prompt file
+				// — 'corrections' applies the fact-check verbatim, in code. Asking
+				// for its route or its prompt is asking a question with no answer.
+				if ( 'none' === ( $step['capability'] ?? '' ) ) { continue; }
 				$route = $config->model_for( $name );
 				$prompt = $config->prompt( $name );
 				$routes[ $name ] = array( 'route' => $route, 'provider_known' => (bool) $config->get( 'providers.' . $route['provider'] ), 'price_known' => null !== $config->price( $route['provider'], $route['model'], array() ), 'prompt_source' => $prompt['source'], 'prompt_bytes' => strlen( $prompt['text'] ), 'max_output' => $config->max_output( $name ), 'attempts' => $config->attempts( $name ) );

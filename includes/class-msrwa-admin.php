@@ -99,6 +99,10 @@ final class MSRWA_Admin {
 				'overCeilingWriter' => __( 'Ce lot dépasse le plafond par recette fixé pour le site et sera refusé au lancement. Choisissez une sortie plus légère, ou demandez à un administrateur de relever le plafond.', 'ms-recipes-writer-ai' ),
 				/* translators: 1: how many were done, 2: how many were not. */
 				'someSkipped' => __( '%1$d traitée(s), %2$d ignorée(s) : l’action ne s’appliquait pas, ou elles ne vous appartiennent pas.', 'ms-recipes-writer-ai' ),
+				'previewStep' => __( 'Étape', 'ms-recipes-writer-ai' ),
+				'previewRoute' => __( 'Route', 'ms-recipes-writer-ai' ),
+				'previewKey' => __( 'Clé présente', 'ms-recipes-writer-ai' ),
+				'previewPrice' => __( 'Tarif connu', 'ms-recipes-writer-ai' ),
 			),
 		) );
 	}

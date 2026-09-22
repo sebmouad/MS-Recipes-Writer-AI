@@ -475,8 +475,12 @@ Measured on the live site: 293s of provider work inside a 10-minute wall clock,
 
 ## B3 — Model policy and escalation
 
-- [ ] **T2.1 — Policy in settings.** Allowed models per step, target cost per
-  bucket, admin may pin a model per step.
+- [~] *(admin may pin a model per step, from a friendly picker over the same
+  routing an admin could already hand-edit as JSON; a live preview resolves
+  the unsaved form through `MSRWA_Operations::preview()` before anyone saves
+  or spends. Allowed-models restriction and target cost per bucket are not
+  built.)* **T2.1 — Policy in settings.** Allowed models per step, target cost
+  per bucket, admin may pin a model per step.
 - [ ] **T2.2 — Frozen plan per recipe.** Later settings changes cannot alter a
   running job.
 - [ ] **T2.3 — Escalation ladder.** A rejected step retries with the next model

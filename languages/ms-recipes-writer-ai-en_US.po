@@ -1190,3 +1190,43 @@ msgstr "to"
 
 msgid "Le compte du service d’écriture n’a plus de crédit. Un administrateur doit le recharger, puis reprendre la recette : rien de ce qui est fait n’est perdu."
 msgstr "The writing service’s account has run out of credit. An administrator must top it up, then resume the recipe: nothing already done is lost."
+
+msgid "Anthropic Claude"
+msgstr "Anthropic Claude"
+
+msgid "Clé présente"
+msgstr "Key present"
+
+msgid "Google Gemini"
+msgstr "Google Gemini"
+
+msgid "Génération d’image (à la une et collage Facebook)"
+msgstr "Image generation (featured image and Facebook collage)"
+
+msgid "La façon courante de changer une route : un fournisseur, un niveau. Ceci réécrit le champ « routing » plus bas à chaque changement ; ce qui y est modifié à la main reste possible et prévaut en cas de désaccord entre les deux après un chargement de page."
+msgstr "The usual way to change a route: a provider, a tier. This rewrites the “routing” field below on every change; editing it by hand remains possible, and wins if the two disagree after a page load."
+
+msgid "Lecture des photographies (appariement, observation avant génération)"
+msgstr "Reading photographs (pairing, observation before generation)"
+
+msgid "Modèle par étape"
+msgstr "Model per step"
+
+msgid "Nécessite JavaScript ; sans cela, utilisez directement le champ « routing » ci-dessous."
+msgstr "Requires JavaScript; without it, use the “routing” field below directly."
+
+msgid "OpenAI"
+msgstr "OpenAI"
+
+msgid "Prévisualiser"
+msgstr "Preview"
+
+msgid "Route"
+msgstr "Route"
+
+msgid "Résout ce qui est à l’écran sans l’enregistrer et sans appeler personne."
+msgstr "Resolves what is on screen without saving it and without calling anybody."
+
+msgid "Tarif connu"
+msgstr "Rate known"
+
