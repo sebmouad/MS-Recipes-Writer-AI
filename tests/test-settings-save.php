@@ -18,6 +18,17 @@ msrwa_test_assert( $stored === get_option( MSRWA_Settings::OPTION ), 'Blank and 
 MSRWA_Settings::save( array( 'openai_key' => 'test-openai-replacement' ) );
 $keys = MSRWA_Settings::engine_keys();
 msrwa_test_assert( 'test-openai-replacement' === $keys['openai'], 'Replacement key is saved.' );
-msrwa_test_assert( 'test-gemini-original' === $keys['gemini'] && 'test-claude-original' === $keys['anthropic'], 'Omitted providers are preserved.' );
+msrwa_test_assert( 'test-gemini-original' === $keys['gemini'] && 'test-claude-original' === $keys['claude'], 'Omitted providers are preserved.' );
 msrwa_test_assert( 3000 === MSRWA_Settings::get()['quality_min_words'], 'Credential-only save preserves unrelated settings.' );
+
+// A key handed to the engine under a name it does not configure is a key it
+// never reads: a stored Claude key once reached the engine as `anthropic` and
+// every Claude step failed with "No API key for claude".
+require_once dirname( __DIR__ ) . '/includes/engine/load.php';
+$engine_providers = array_keys( (array) MSRWA_Engine_Config::defaults()['providers'] );
+foreach ( array_keys( MSRWA_Settings::key_fields() ) as $provider ) {
+	msrwa_test_assert( in_array( $provider, $engine_providers, true ), 'The engine has no provider named ' . $provider . '; its key would never be read.' );
+}
+$config = MSRWA_Engine_Config::create( array(), array( 'settings' => array( 'keys' => MSRWA_Settings::engine_keys() ) ) );
+msrwa_test_assert( ! empty( $config->provider( 'claude' )['has_key'] ), 'The stored Claude key must be the one the engine resolves.' );
 msrwa_test_done( 'production settings save regression' );

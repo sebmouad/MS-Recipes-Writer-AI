@@ -510,11 +510,18 @@ SILENT FINAL CHECK BEFORE RETURNING — fix anything that fails:
 		return $value;
 	}
 
+	/**
+	 * Which setting holds each provider's key, under the provider's name as the
+	 * engine spells it. The engine looks a key up as `settings.keys.claude`; a
+	 * key handed over under any other name is a key it never sees.
+	 */
+	public static function key_fields() { return array( 'openai' => 'openai_key', 'gemini' => 'gemini_key', 'claude' => 'claude_key' ); }
+
 	/** Which providers have a key, for a screen that must not print one. */
 	public static function configured_providers() {
 		$values = self::get();
 		$out = array();
-		foreach ( array( 'openai' => 'openai_key', 'gemini' => 'gemini_key', 'anthropic' => 'claude_key' ) as $provider => $field ) {
+		foreach ( self::key_fields() as $provider => $field ) {
 			if ( '' !== trim( (string) ( $values[ $field ] ?? '' ) ) ) { $out[] = $provider; }
 		}
 		return $out;
@@ -530,7 +537,7 @@ SILENT FINAL CHECK BEFORE RETURNING — fix anything that fails:
 	public static function engine_keys() {
 		$values = self::get();
 		$keys = array();
-		foreach ( array( 'openai' => 'openai_key', 'gemini' => 'gemini_key', 'anthropic' => 'claude_key' ) as $provider => $field ) {
+		foreach ( self::key_fields() as $provider => $field ) {
 			$value = trim( (string) ( $values[ $field ] ?? '' ) );
 			if ( '' !== $value ) { $keys[ $provider ] = $value; }
 		}

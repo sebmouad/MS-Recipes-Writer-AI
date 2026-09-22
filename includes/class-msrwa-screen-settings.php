@@ -33,7 +33,7 @@ final class MSRWA_Screen_Settings {
 				foreach ( array(
 					'openai_key' => array( 'OpenAI', 'openai' ),
 					'gemini_key' => array( 'Gemini', 'gemini' ),
-					'claude_key' => array( 'Claude', 'anthropic' ),
+					'claude_key' => array( 'Claude', 'claude' ),
 				) as $field => $provider ) :
 					$stored = in_array( $provider[1], $configured, true );
 					?>
