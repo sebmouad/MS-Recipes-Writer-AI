@@ -1230,3 +1230,156 @@ msgstr "Resolves what is on screen without saving it and without calling anybody
 msgid "Tarif connu"
 msgstr "Rate known"
 
+msgid "%1$d en cours, %2$d en attente ; entretien piloté par %3$s."
+msgstr "%1$d running, %2$d waiting; maintenance driven by %3$s."
+
+msgid "%1$d recette(s) attendent depuis %2$s sans que rien n’avance."
+msgstr "%1$d recipe(s) have been waiting %2$s with nothing moving."
+
+msgid "Ajoutez son tarif dans Moteur → models, ou routez l’étape vers un modèle tarifé."
+msgstr "Add its rate under Engine → models, or route the step to a model that has one."
+
+msgid "Aucun entretien n’est planifié : réactivez l’extension pour le réarmer."
+msgstr "No maintenance is scheduled: reactivate the plugin to re-arm it."
+
+msgid "Aucun plafond n’arrête de travail en ce moment."
+msgstr "No ceiling is stopping work right now."
+
+msgid "Aucune clé enregistrée : aucune recette ne peut partir."
+msgstr "No key saved: no recipe can leave."
+
+msgid "Aucune table d’une version précédente."
+msgstr "No table from an earlier version."
+
+msgid "Ce qui doit être vrai pour qu’une recette aboutisse, vérifié maintenant. Aucun appel facturé."
+msgstr "What has to be true for a recipe to finish, checked now. Nothing billed."
+
+msgid "Chaque rôle porte les capacités que l’activation accorde."
+msgstr "Every role carries the capabilities activation grants."
+
+msgid "Chaque étape a une clé et un tarif publié."
+msgstr "Every step has a key and a published rate."
+
+msgid "Contrôles"
+msgstr "Checks"
+
+msgid "Copier le rapport"
+msgstr "Copy the report"
+
+msgid "Corrigez les droits du dossier wp-content/uploads ; sans lui, aucune image générée ne peut être enregistrée."
+msgstr "Fix the permissions on the wp-content/uploads directory; without it, no generated image can be saved."
+
+msgid "DISABLE_WP_CRON est actif : vérifiez que le cron du serveur appelle bien wp-cron.php."
+msgstr "DISABLE_WP_CRON is on: check that the server’s cron really does call wp-cron.php."
+
+msgid "Des rôles ont perdu une capacité : %s."
+msgstr "Roles have lost a capability: %s."
+
+msgid "Des tables d’une version précédente occupent encore la base : %s."
+msgstr "Tables from an earlier version are still sitting in the database: %s."
+
+msgid "Des étapes sont routées vers un fournisseur sans clé : %s."
+msgstr "Steps are routed to a provider with no key: %s."
+
+msgid "Des étapes tournent sur un modèle sans tarif publié : %s. La dépense sera incomplète, jamais fausse."
+msgstr "Steps run on a model with no published rate: %s. The spend will be incomplete, never wrong."
+
+msgid "Diagnostic"
+msgstr "Diagnostic"
+
+msgid "Droits"
+msgstr "Capabilities"
+
+msgid "Désactivez puis réactivez l’extension : l’installation des tables se rejoue à l’activation."
+msgstr "Deactivate the plugin and activate it again: the tables are installed on activation."
+
+msgid "Enregistrez sa clé dans Réglages, ou changez la route dans Moteur → Modèle par étape."
+msgstr "Save its key in Settings, or change the route under Engine → Model per step."
+
+msgid "Enregistrée(s) pour : %s. Une clé enregistrée n’est pas une clé valide — « Vérifier les clés » le dit gratuitement."
+msgstr "Saved for: %s. A saved key is not a valid key — “Check the keys” says which, and says it for free."
+
+msgid "File"
+msgstr "Queue"
+
+msgid "Il en manque : %s."
+msgstr "Missing: %s."
+
+msgid "La file est suspendue ; %d recette(s) attendent."
+msgstr "The queue is held; %d recipe(s) are waiting."
+
+msgid "Le cron de WordPress ne se déclenche qu’à une visite. Ajoutez un cron serveur sur wp-cron.php toutes les cinq minutes."
+msgstr "WordPress cron only fires on a visit. Add a server cron calling wp-cron.php every five minutes."
+
+msgid "Le dossier des téléversements n’est pas accessible en écriture."
+msgstr "The uploads directory is not writable."
+
+msgid "Le dossier est accessible en écriture."
+msgstr "The directory is writable."
+
+msgid "Le pass → « Reprendre la file » quand vous voulez qu’elles repartent."
+msgstr "The pass → “Release the queue” when you want them moving again."
+
+msgid "Le schéma enregistré est %1$d ; cette version en attend %2$d."
+msgstr "The stored schema is %1$d; this version expects %2$d."
+
+msgid "Les mêmes constats en un bloc, à coller dans une demande d’aide. Il ne porte ni clé, ni chemin, ni adresse du site."
+msgstr "The same findings as one block, to paste into a request for help. It carries no key, no path and no site address."
+
+msgid "Les six tables sont là, schéma %d."
+msgstr "All six tables are there, schema %d."
+
+msgid "Plafonds"
+msgstr "Ceilings"
+
+msgid "Plus rien ne les lit. Elles ne sont jamais supprimées d’ici : c’est à vous, une fois la sauvegarde faite."
+msgstr "Nothing reads them any more. They are never dropped from here: that is yours to do, once you have a backup."
+
+msgid "Quelque chose empêche une recette d’aboutir. Les lignes marquées en rouge disent quoi."
+msgstr "Something is stopping a recipe from finishing. The lines marked in red say what."
+
+msgid "Rapport"
+msgstr "Report"
+
+msgid "Rapport copié."
+msgstr "Report copied."
+
+msgid "Rechargez n’importe quel écran d’administration : la migration se déclenche au premier chargement après une mise à jour."
+msgstr "Load any admin screen: the migration runs on the first load after an update."
+
+msgid "Restes"
+msgstr "Leftovers"
+
+msgid "Rien n’est bloqué, mais quelque chose mérite un regard."
+msgstr "Nothing is blocked, but something is worth a look."
+
+msgid "Routage"
+msgstr "Routing"
+
+msgid "Réactivez l’extension : les capacités sont accordées depuis une seule liste, à l’activation comme à la mise à jour."
+msgstr "Reactivate the plugin: capabilities are granted from one list, on activation as on upgrade."
+
+msgid "Réglages → Clés d’API, puis « Vérifier les clés »."
+msgstr "Settings → API keys, then “Check the keys”."
+
+msgid "Réglages → Plafonds de dépense, ou attendez la fenêtre suivante."
+msgstr "Settings → Spending ceilings, or wait for the next window."
+
+msgid "Sélectionné : copiez avec votre raccourci habituel."
+msgstr "Selected: copy it with your usual shortcut."
+
+msgid "Tables"
+msgstr "Tables"
+
+msgid "Téléversements"
+msgstr "Uploads"
+
+msgid "contrôles"
+msgstr "checks"
+
+msgid "le serveur"
+msgstr "the server"
+
+msgid "à regarder"
+msgstr "to look at"
+

@@ -61,6 +61,8 @@ require_once MSRWA_DIR . 'includes/class-msrwa-screen-batch.php';
 require_once MSRWA_DIR . 'includes/class-msrwa-screen-run.php';
 require_once MSRWA_DIR . 'includes/class-msrwa-screen-settings.php';
 require_once MSRWA_DIR . 'includes/class-msrwa-screen-engine.php';
+require_once MSRWA_DIR . 'includes/class-msrwa-diagnostics.php';
+require_once MSRWA_DIR . 'includes/class-msrwa-screen-diagnostics.php';
 require_once MSRWA_DIR . 'includes/class-msrwa-admin.php';
 require_once MSRWA_DIR . 'includes/class-msrwa-operations.php';
 require_once MSRWA_DIR . 'includes/class-msrwa-plugin.php';

@@ -115,7 +115,26 @@ if ( ! class_exists( 'WP_Error' ) ) {
 }
 
 require_once __DIR__ . '/lib/class-fake-wpdb.php';
+require_once __DIR__ . '/lib/class-fake-role.php';
 $GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
+
+/**
+ * The roles this site has, and what each carries.
+ *
+ * Empty by default: a test that cares about capabilities says so, and one that
+ * does not is not quietly given a site where every role exists.
+ */
+function msrwa_test_roles( array $roles = array() ) {
+	$GLOBALS['msrwa_test_roles'] = $roles;
+}
+msrwa_test_roles();
+
+if ( ! function_exists( 'get_role' ) ) {
+	function get_role( $name ) {
+		$roles = (array) ( $GLOBALS['msrwa_test_roles'] ?? array() );
+		return isset( $roles[ $name ] ) ? new MSRWA_Fake_Role( (array) $roles[ $name ] ) : null;
+	}
+}
 
 /** Loads plugin classes by short name, in dependency order. */
 function msrwa_test_load( ...$classes ) {

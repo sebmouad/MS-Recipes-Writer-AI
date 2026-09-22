@@ -456,6 +456,26 @@
     });
   }
 
+  // --- Handing the diagnostic report to somebody who can help -------------
+
+  var copyReport = document.getElementById('ms-copy-report');
+  if (copyReport) {
+    var report = document.getElementById('ms-diagnostic-report');
+    var copyStatus = document.getElementById('ms-copy-status');
+    copyReport.addEventListener('click', function () {
+      // The clipboard API needs a secure context, which a local site is not.
+      // Selecting the text is the fallback that always works: the reader
+      // presses their own copy shortcut and nothing is lost.
+      var done = function () { say(copyStatus, t.copied || ''); };
+      var select = function () { report.focus(); report.select(); say(copyStatus, t.copyManually || ''); };
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(report.value).then(done).catch(select);
+        return;
+      }
+      select();
+    });
+  }
+
   // --- Clearing what has outlived its usefulness --------------------------
 
   var prune = document.getElementById('ms-prune');

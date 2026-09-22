@@ -29,6 +29,7 @@ final class MSRWA_Admin {
 		add_submenu_page( 'msrwa', __( 'Articles', 'ms-recipes-writer-ai' ), __( 'Articles', 'ms-recipes-writer-ai' ), $write, 'msrwa-articles', array( 'MSRWA_Screen_Articles', 'render' ) );
 		add_submenu_page( 'msrwa', __( 'Analyse', 'ms-recipes-writer-ai' ), __( 'Analyse', 'ms-recipes-writer-ai' ), $manage, 'msrwa-analysis', array( 'MSRWA_Screen_Analysis', 'render' ) );
 		add_submenu_page( 'msrwa', __( 'Moteur', 'ms-recipes-writer-ai' ), __( 'Moteur', 'ms-recipes-writer-ai' ), $manage, 'msrwa-engine', array( 'MSRWA_Screen_Engine', 'render' ) );
+		add_submenu_page( 'msrwa', __( 'Diagnostic', 'ms-recipes-writer-ai' ), __( 'Diagnostic', 'ms-recipes-writer-ai' ), $manage, 'msrwa-diagnostics', array( 'MSRWA_Screen_Diagnostics', 'render' ) );
 		add_submenu_page( 'msrwa', __( 'Réglages', 'ms-recipes-writer-ai' ), __( 'Réglages', 'ms-recipes-writer-ai' ), $manage, 'msrwa-settings', array( 'MSRWA_Screen_Settings', 'render' ) );
 
 		// Reached from a ticket, never from the menu. Registered under the real
@@ -99,6 +100,8 @@ final class MSRWA_Admin {
 				'overCeilingWriter' => __( 'Ce lot dépasse le plafond par recette fixé pour le site et sera refusé au lancement. Choisissez une sortie plus légère, ou demandez à un administrateur de relever le plafond.', 'ms-recipes-writer-ai' ),
 				/* translators: 1: how many were done, 2: how many were not. */
 				'someSkipped' => __( '%1$d traitée(s), %2$d ignorée(s) : l’action ne s’appliquait pas, ou elles ne vous appartiennent pas.', 'ms-recipes-writer-ai' ),
+				'copied' => __( 'Rapport copié.', 'ms-recipes-writer-ai' ),
+				'copyManually' => __( 'Sélectionné : copiez avec votre raccourci habituel.', 'ms-recipes-writer-ai' ),
 				'previewStep' => __( 'Étape', 'ms-recipes-writer-ai' ),
 				'previewRoute' => __( 'Route', 'ms-recipes-writer-ai' ),
 				'previewKey' => __( 'Clé présente', 'ms-recipes-writer-ai' ),

@@ -307,6 +307,26 @@
 .ms-timeline > div { display: grid; grid-template-columns: 78px 132px minmax(0, 1fr); gap: 14px; padding: 8px 0; border-block-end: 1px solid var(--ms-line-soft); }
 .ms-timeline time, .ms-timeline .ms-key { font-family: var(--ms-mono); font-size: 12px; color: var(--ms-ink-faint); font-variant-numeric: tabular-nums; }
 
+/* --- Checks ------------------------------------------------------------
+ * The diagnostic screen. The state chip is a fixed column so the eye runs
+ * down it and stops at the one that is not green, and the remedy sits under
+ * the measurement rather than beside it: it is the second thing read, never
+ * the first.
+ */
+
+.ms-checks { display: grid; }
+.ms-check {
+	display: grid;
+	grid-template-columns: minmax(120px, max-content) minmax(0, 1fr);
+	gap: 4px 16px;
+	align-items: start;
+	padding: 13px 20px;
+	border-block-end: 1px solid var(--ms-line-soft);
+}
+.ms-check:last-child { border-block-end: 0; }
+.ms-check p { margin: 0; max-width: 84ch; }
+.ms-check p + p { margin-block-start: 4px; font-size: 12px; }
+
 /* --- Empty and notes ---------------------------------------------------
  * An empty screen is an invitation to act, so it says what to do next.
  */

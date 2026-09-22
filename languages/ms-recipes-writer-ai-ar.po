@@ -1242,3 +1242,156 @@ msgstr "يحل ما هو معروض على الشاشة دون حفظه ودون
 msgid "Tarif connu"
 msgstr "التعرفة معروفة"
 
+msgid "%1$d en cours, %2$d en attente ; entretien piloté par %3$s."
+msgstr "%1$d قيد التنفيذ، %2$d في الانتظار؛ الصيانة يقودها %3$s."
+
+msgid "%1$d recette(s) attendent depuis %2$s sans que rien n’avance."
+msgstr "%1$d وصفة (وصفات) تنتظر منذ %2$s دون أن يتقدّم شيء."
+
+msgid "Ajoutez son tarif dans Moteur → models, ou routez l’étape vers un modèle tarifé."
+msgstr "أضف تعرفته في المحرّك ← models، أو وجّه الخطوة إلى نموذج له تعرفة."
+
+msgid "Aucun entretien n’est planifié : réactivez l’extension pour le réarmer."
+msgstr "لا صيانة مجدولة: أعد تفعيل الإضافة لإعادة ضبطها."
+
+msgid "Aucun plafond n’arrête de travail en ce moment."
+msgstr "لا سقف يوقف العمل في الوقت الحالي."
+
+msgid "Aucune clé enregistrée : aucune recette ne peut partir."
+msgstr "لا مفتاح محفوظ: لا يمكن لأي وصفة أن تنطلق."
+
+msgid "Aucune table d’une version précédente."
+msgstr "لا جداول من إصدار سابق."
+
+msgid "Ce qui doit être vrai pour qu’une recette aboutisse, vérifié maintenant. Aucun appel facturé."
+msgstr "ما يجب أن يكون صحيحًا حتى تكتمل وصفة، مفحوصًا الآن. دون أي استدعاء مدفوع."
+
+msgid "Chaque rôle porte les capacités que l’activation accorde."
+msgstr "كل دور يحمل الصلاحيات التي يمنحها التفعيل."
+
+msgid "Chaque étape a une clé et un tarif publié."
+msgstr "كل خطوة لها مفتاح وتعرفة منشورة."
+
+msgid "Contrôles"
+msgstr "الفحوص"
+
+msgid "Copier le rapport"
+msgstr "نسخ التقرير"
+
+msgid "Corrigez les droits du dossier wp-content/uploads ; sans lui, aucune image générée ne peut être enregistrée."
+msgstr "صحّح صلاحيات مجلد wp-content/uploads؛ بدونه لا يمكن حفظ أي صورة مولّدة."
+
+msgid "DISABLE_WP_CRON est actif : vérifiez que le cron du serveur appelle bien wp-cron.php."
+msgstr "DISABLE_WP_CRON مفعّل: تأكّد أن cron الخادم يستدعي wp-cron.php فعلًا."
+
+msgid "Des rôles ont perdu une capacité : %s."
+msgstr "أدوار فقدت صلاحية: %s."
+
+msgid "Des tables d’une version précédente occupent encore la base : %s."
+msgstr "جداول من إصدار سابق ما تزال تشغل قاعدة البيانات: %s."
+
+msgid "Des étapes sont routées vers un fournisseur sans clé : %s."
+msgstr "خطوات موجَّهة إلى مزوّد بلا مفتاح: %s."
+
+msgid "Des étapes tournent sur un modèle sans tarif publié : %s. La dépense sera incomplète, jamais fausse."
+msgstr "خطوات تعمل على نموذج بلا تعرفة منشورة: %s. ستكون النفقة ناقصة، لا خاطئة."
+
+msgid "Diagnostic"
+msgstr "تشخيص"
+
+msgid "Droits"
+msgstr "الصلاحيات"
+
+msgid "Désactivez puis réactivez l’extension : l’installation des tables se rejoue à l’activation."
+msgstr "عطّل الإضافة ثم أعد تفعيلها: تثبيت الجداول يُعاد عند التفعيل."
+
+msgid "Enregistrez sa clé dans Réglages, ou changez la route dans Moteur → Modèle par étape."
+msgstr "احفظ مفتاحه في الإعدادات، أو غيّر المسار في المحرّك ← النموذج لكل خطوة."
+
+msgid "Enregistrée(s) pour : %s. Une clé enregistrée n’est pas une clé valide — « Vérifier les clés » le dit gratuitement."
+msgstr "محفوظ لـ: %s. المفتاح المحفوظ ليس بالضرورة مفتاحًا صالحًا — «تحقّق من المفاتيح» يقول ذلك مجانًا."
+
+msgid "File"
+msgstr "الطابور"
+
+msgid "Il en manque : %s."
+msgstr "ينقص منها: %s."
+
+msgid "La file est suspendue ; %d recette(s) attendent."
+msgstr "الطابور موقوف؛ %d وصفة (وصفات) تنتظر."
+
+msgid "Le cron de WordPress ne se déclenche qu’à une visite. Ajoutez un cron serveur sur wp-cron.php toutes les cinq minutes."
+msgstr "cron الخاص بووردبريس لا ينطلق إلا عند زيارة. أضف cron على الخادم يستدعي wp-cron.php كل خمس دقائق."
+
+msgid "Le dossier des téléversements n’est pas accessible en écriture."
+msgstr "مجلد الرفع غير قابل للكتابة."
+
+msgid "Le dossier est accessible en écriture."
+msgstr "المجلد قابل للكتابة."
+
+msgid "Le pass → « Reprendre la file » quand vous voulez qu’elles repartent."
+msgstr "الممرّ ← «استئناف الطابور» عندما تريد لها أن تنطلق من جديد."
+
+msgid "Le schéma enregistré est %1$d ; cette version en attend %2$d."
+msgstr "المخطّط المحفوظ هو %1$d؛ هذا الإصدار ينتظر %2$d."
+
+msgid "Les mêmes constats en un bloc, à coller dans une demande d’aide. Il ne porte ni clé, ni chemin, ni adresse du site."
+msgstr "المعاينات نفسها في كتلة واحدة، لتلصقها في طلب مساعدة. لا يحمل مفتاحًا ولا مسارًا ولا عنوان الموقع."
+
+msgid "Les six tables sont là, schéma %d."
+msgstr "الجداول الستة موجودة، المخطّط %d."
+
+msgid "Plafonds"
+msgstr "السقوف"
+
+msgid "Plus rien ne les lit. Elles ne sont jamais supprimées d’ici : c’est à vous, une fois la sauvegarde faite."
+msgstr "لم يعد شيء يقرؤها. لا تُحذف من هنا أبدًا: ذلك لك، بعد أخذ نسخة احتياطية."
+
+msgid "Quelque chose empêche une recette d’aboutir. Les lignes marquées en rouge disent quoi."
+msgstr "شيء ما يمنع وصفة من الاكتمال. الأسطر المعلَّمة بالأحمر تقول ماذا."
+
+msgid "Rapport"
+msgstr "التقرير"
+
+msgid "Rapport copié."
+msgstr "نُسخ التقرير."
+
+msgid "Rechargez n’importe quel écran d’administration : la migration se déclenche au premier chargement après une mise à jour."
+msgstr "افتح أي شاشة إدارة: الترحيل ينطلق عند أول تحميل بعد التحديث."
+
+msgid "Restes"
+msgstr "بقايا"
+
+msgid "Rien n’est bloqué, mais quelque chose mérite un regard."
+msgstr "لا شيء متوقف، لكن شيئًا يستحق نظرة."
+
+msgid "Routage"
+msgstr "التوجيه"
+
+msgid "Réactivez l’extension : les capacités sont accordées depuis une seule liste, à l’activation comme à la mise à jour."
+msgstr "أعد تفعيل الإضافة: الصلاحيات تُمنح من قائمة واحدة، عند التفعيل كما عند التحديث."
+
+msgid "Réglages → Clés d’API, puis « Vérifier les clés »."
+msgstr "الإعدادات ← مفاتيح API، ثم «تحقّق من المفاتيح»."
+
+msgid "Réglages → Plafonds de dépense, ou attendez la fenêtre suivante."
+msgstr "الإعدادات ← سقوف الإنفاق، أو انتظر النافذة التالية."
+
+msgid "Sélectionné : copiez avec votre raccourci habituel."
+msgstr "محدَّد: انسخه باختصارك المعتاد."
+
+msgid "Tables"
+msgstr "الجداول"
+
+msgid "Téléversements"
+msgstr "الرفع"
+
+msgid "contrôles"
+msgstr "فحوص"
+
+msgid "le serveur"
+msgstr "الخادم"
+
+msgid "à regarder"
+msgstr "للمراجعة"
+

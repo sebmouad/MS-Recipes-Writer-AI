@@ -38,6 +38,7 @@ foreach ( array(
 foreach ( array(
 	'MSRWA_Screen_Analysis' => array( 'MSRWA_Screen_Analysis', 'render' ),
 	'MSRWA_Screen_Engine' => array( 'MSRWA_Screen_Engine', 'render' ),
+	'MSRWA_Screen_Diagnostics' => array( 'MSRWA_Screen_Diagnostics', 'render' ),
 	'MSRWA_Screen_Settings' => array( 'MSRWA_Screen_Settings', 'render' ),
 ) as $name => $callable ) {
 	$GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
@@ -53,6 +54,7 @@ foreach ( array(
 	'MSRWA_Screen_Pass' => array( 'MSRWA_Screen_Pass', 'render' ),
 	'MSRWA_Screen_Analysis' => array( 'MSRWA_Screen_Analysis', 'render' ),
 	'MSRWA_Screen_Engine' => array( 'MSRWA_Screen_Engine', 'render' ),
+	'MSRWA_Screen_Diagnostics' => array( 'MSRWA_Screen_Diagnostics', 'render' ),
 	'MSRWA_Screen_Settings' => array( 'MSRWA_Screen_Settings', 'render' ),
 ) as $name => $callable ) {
 	$GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
