@@ -921,6 +921,36 @@ msgstr "Three ceilings, for three different fears. The per-recipe one stops a ru
 msgid "trente jours"
 msgstr "thirty days"
 
+msgid "%1$s sur les %2$d jours précédents"
+msgstr "%1$s on the previous %2$d days"
+
+msgid "%1$s, %2$s du temps"
+msgstr "%1$s, %2$s of the time"
+
+msgid "Les quatre postes du moteur, dépense et temps passé. Le temps n’est pas la dépense : une image coûte cher et va vite, une relecture est l’inverse."
+msgstr "The engine’s four items, what each spent and how long it took. Time is not spend: an image is expensive and quick, a proofread is the other way round."
+
+msgid "Où part l’argent"
+msgstr "Where the money goes"
+
+msgid "le reste"
+msgstr "the rest"
+
+msgid "l’article"
+msgstr "the article"
+
+msgid "l’image Facebook"
+msgstr "the Facebook image"
+
+msgid "l’image à la une"
+msgstr "the featured image"
+
+msgid "plafond %s"
+msgstr "ceiling %s"
+
+msgid "stable sur %d jours"
+msgstr "steady over %d days"
+
 msgid "%d remarque bloquante"
 msgid_plural "%d remarques bloquantes"
 msgstr[0] "%d blocking finding"

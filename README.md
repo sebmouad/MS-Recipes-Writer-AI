@@ -2,6 +2,32 @@
 
 Plugin WordPress en construction pour la génération éditoriale culinaire orchestrée.
 
+## Version 0.7.1
+
+**Deux questions que le tableau par étape ne répondait pas.**
+
+*Où part l'argent* : les quatre postes du moteur — l'article, l'image à la une,
+l'image Facebook, le reste — avec la dépense et le temps passé côte à côte. Le
+tableau par étape est une longue liste ; ceci tient en quatre lignes, et c'est
+ce qu'on regarde en premier devant une facture. Le temps y est distinct de la
+dépense, parce qu'il l'est : une image coûte cher et va vite, une relecture est
+l'inverse.
+
+*Et est-ce que ça empire ?* Le coût par recette et la durée moyenne portent
+désormais leur écart avec la période précédente de même longueur. En dessous
+d'une poignée de recettes de chaque côté, aucun écart n'est affiché : deux
+contre trois n'est pas une tendance, et l'habiller en pourcentage serait du
+bruit présenté comme une direction.
+
+Les quatorze jours sont enfin quatorze jours. Les journées sans recette étaient
+simplement absentes du graphique, ce qui collait deux dates éloignées l'une à
+côté de l'autre et se lisait comme une activité continue qui n'a jamais eu
+lieu. Elles sont là, à zéro, en gris.
+
+Au passage : `_n()` n'existait pas dans le harnais de test, si bien qu'un écran
+qui l'appelait passait au vert hors ligne et tombait en fatale sur un vrai
+WordPress dès qu'il avait une ligne à compter.
+
 ## Version 0.7.0
 
 **Des plafonds de dépense, et une file qu'on peut tenir.**
@@ -392,7 +418,7 @@ cron réel et validité distante des clés restent à vérifier sur un site de t
 
 ## État actuel
 
-La version `0.7.0` est un socle installable : file persistante, pipeline de
+La version `0.7.1` est un socle installable : file persistante, pipeline de
 génération, contrôle qualité déterministe, budgets, images et écrans
 d’administration. Le détail des fonctionnalités livrées se trouve dans
 l’historique des versions ci-dessous.

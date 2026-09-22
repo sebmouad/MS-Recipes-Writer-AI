@@ -17,6 +17,7 @@ final class MSRWA_Screen_Analysis {
 
 		$days = isset( $_GET['days'] ) ? absint( $_GET['days'] ) : 30;
 		$spend = MSRWA_Ledger::spend( $days );
+		$before = MSRWA_Ledger::previously( $days );
 		$verdicts = MSRWA_Ledger::verdicts( $days );
 
 		echo '<div class="wrap msrwa">';
@@ -29,10 +30,20 @@ final class MSRWA_Screen_Analysis {
 
 		MSRWA_UI::figures( array(
 			array( 'label' => __( 'recettes', 'ms-recipes-writer-ai' ), 'value' => number_format_i18n( $spend['runs'] ) ),
-			array( 'label' => __( 'dépense', 'ms-recipes-writer-ai' ), 'value' => MSRWA_I18N::money( $spend['spend_usd'], 2 ) ),
-			array( 'label' => __( 'par recette', 'ms-recipes-writer-ai' ), 'value' => MSRWA_I18N::money( $spend['average_usd'] ) ),
-			array( 'label' => __( 'durée moyenne', 'ms-recipes-writer-ai' ), 'value' => MSRWA_I18N::seconds( $spend['seconds'] ) ),
+			array( 'label' => __( 'dépense', 'ms-recipes-writer-ai' ), 'value' => MSRWA_I18N::money( $spend['spend_usd'], 2 ), 'note' => self::ceiling_note( $days ) ),
+			array(
+				'label' => __( 'par recette', 'ms-recipes-writer-ai' ),
+				'value' => MSRWA_I18N::money( $spend['average_usd'] ),
+				'note' => self::against( $spend['average_usd'], $before['average_usd'], $spend['runs'], $before['runs'], $days ),
+			),
+			array(
+				'label' => __( 'durée moyenne', 'ms-recipes-writer-ai' ),
+				'value' => MSRWA_I18N::seconds( $spend['seconds'] ),
+				'note' => self::against( $spend['seconds'], $before['seconds'], $spend['runs'], $before['runs'], $days ),
+			),
 		) );
+
+		self::buckets( $days );
 
 		if ( $spend['unpriced_steps'] ) {
 			MSRWA_UI::note( sprintf(
@@ -54,6 +65,82 @@ final class MSRWA_Screen_Analysis {
 		echo '</section>';
 
 		echo '</div>';
+	}
+
+	/**
+	 * How this window compares with the one before it, when that is honest.
+	 *
+	 * Two runs against three is not a trend, so below a handful on either side
+	 * this says nothing at all rather than dressing noise as a direction. A
+	 * window of "everything" has nothing before it and is left alone too.
+	 */
+	private static function against( $now, $then, $runs_now, $runs_then, $days ) {
+		if ( $days <= 0 || $runs_now < 3 || $runs_then < 3 || $then <= 0 ) { return ''; }
+		$change = round( 100 * ( (float) $now - (float) $then ) / (float) $then );
+		if ( 0 === (int) $change ) {
+			/* translators: %d is a number of days. */
+			return sprintf( __( 'stable sur %d jours', 'ms-recipes-writer-ai' ), (int) $days );
+		}
+		return sprintf(
+			/* translators: 1: a signed percentage, e.g. "+12 %"; 2: a number of days. */
+			__( '%1$s sur les %2$d jours précédents', 'ms-recipes-writer-ai' ),
+			( $change > 0 ? '+' : '−' ) . abs( (int) $change ) . ' %',
+			(int) $days
+		);
+	}
+
+	/** What is left under the ceiling, when the site has set one. */
+	private static function ceiling_note( $days ) {
+		$state = MSRWA_Budget::state();
+		$budget = 30 === (int) $days ? $state['monthly'] : ( 1 === (int) $days ? $state['daily'] : null );
+		if ( ! $budget || ! $budget['ceiling'] ) { return ''; }
+		return sprintf(
+			/* translators: %s is an amount of money. */
+			__( 'plafond %s', 'ms-recipes-writer-ai' ),
+			MSRWA_I18N::money( $budget['ceiling'], 2 )
+		);
+	}
+
+	/**
+	 * Which part of the product the bill is for.
+	 *
+	 * The step table is a long list; this is four lines, and it is the first
+	 * thing somebody looking at a total wants to know — whether the money went
+	 * on the writing or on the pictures.
+	 */
+	private static function buckets( $days ) {
+		$rows = MSRWA_Ledger::by_bucket( $days );
+		if ( count( $rows ) < 2 ) { return; }
+
+		$labels = array(
+			'article' => __( 'l’article', 'ms-recipes-writer-ai' ),
+			'featured' => __( 'l’image à la une', 'ms-recipes-writer-ai' ),
+			'facebook' => __( 'l’image Facebook', 'ms-recipes-writer-ai' ),
+			'other' => __( 'le reste', 'ms-recipes-writer-ai' ),
+		);
+		$total = 0.0;
+		$minutes = 0.0;
+		foreach ( $rows as $row ) { $total += (float) $row['spend']; $minutes += (float) $row['seconds']; }
+
+		echo '<section class="ms-card"><h2>' . esc_html__( 'Où part l’argent', 'ms-recipes-writer-ai' ) . '</h2>';
+		echo '<p>' . esc_html__( 'Les quatre postes du moteur, dépense et temps passé. Le temps n’est pas la dépense : une image coûte cher et va vite, une relecture est l’inverse.', 'ms-recipes-writer-ai' ) . '</p>';
+		echo '<table class="ms-table"><tbody>';
+		foreach ( $rows as $row ) {
+			$bucket = (string) $row['bucket'];
+			$share = $total > 0 ? round( 100 * (float) $row['spend'] / $total ) : 0;
+			$time = $minutes > 0 ? round( 100 * (float) $row['seconds'] / $minutes ) : 0;
+			echo '<tr><td style="inline-size:180px">' . esc_html( $labels[ $bucket ] ?? $bucket ) . '</td>'
+				. '<td><span class="ms-progress" style="inline-size:100%"><i style="inline-size:' . (int) $share . '%"></i></span></td>'
+				. '<td class="ms-num" style="inline-size:110px">' . esc_html( MSRWA_I18N::money( $row['spend'], 2 ) ) . '</td>'
+				. '<td class="ms-num" style="inline-size:70px">' . esc_html( $share . ' %' ) . '</td>'
+				. '<td class="ms-num" style="inline-size:200px;white-space:nowrap"><small>' . esc_html( sprintf(
+					/* translators: 1: a duration; 2: that duration as a share of the total, e.g. "40 %". */
+					__( '%1$s, %2$s du temps', 'ms-recipes-writer-ai' ),
+					MSRWA_I18N::seconds( $row['seconds'] ),
+					$time . ' %'
+				) ) . '</small></td></tr>';
+		}
+		echo '</tbody></table></section>';
 	}
 
 	private static function windows( $days ) {
@@ -170,14 +257,25 @@ final class MSRWA_Screen_Analysis {
 	private static function days() {
 		$rows = MSRWA_Ledger::by_day( 14 );
 		if ( ! $rows ) { return; }
+
+		// Every day in the window, including the ones nothing ran on. Drawing
+		// only the days that have rows puts two distant days side by side and
+		// reads as a run of activity that never happened.
+		$seen = array();
+		foreach ( $rows as $row ) { $seen[ (string) $row['day'] ] = $row; }
+		$rows = array();
 		$peak = 0.0;
-		foreach ( $rows as $row ) { $peak = max( $peak, (float) $row['spend'] ); }
+		for ( $back = 13; $back >= 0; $back-- ) {
+			$day = gmdate( 'Y-m-d', time() - $back * DAY_IN_SECONDS );
+			$rows[] = $seen[ $day ] ?? array( 'day' => $day, 'runs' => 0, 'spend' => 0, 'seconds' => 0 );
+			$peak = max( $peak, (float) ( $seen[ $day ]['spend'] ?? 0 ) );
+		}
 
 		echo '<section class="ms-card"><h2>' . esc_html__( 'Sur quatorze jours', 'ms-recipes-writer-ai' ) . '</h2>';
 		echo '<table class="ms-table"><tbody>';
 		foreach ( $rows as $row ) {
 			$share = $peak > 0 ? round( 100 * (float) $row['spend'] / $peak ) : 0;
-			echo '<tr><td class="ms-key" style="inline-size:120px">' . esc_html( $row['day'] ) . '</td>'
+			echo '<tr' . ( $row['runs'] ? '' : ' class="ms-muted"' ) . '><td class="ms-key" style="inline-size:120px">' . esc_html( $row['day'] ) . '</td>'
 				. '<td><span class="ms-progress" style="inline-size:100%"><i style="inline-size:' . (int) $share . '%"></i></span></td>'
 				. '<td class="ms-num" style="inline-size:110px">' . esc_html( MSRWA_I18N::money( $row['spend'], 2 ) ) . '</td>'
 				. '<td class="ms-num" style="inline-size:90px">' . esc_html( sprintf( /* translators: %d is a count of recipes. */ _n( '%d recette', '%d recettes', (int) $row['runs'], 'ms-recipes-writer-ai' ), (int) $row['runs'] ) ) . '</td></tr>';

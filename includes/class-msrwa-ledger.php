@@ -86,6 +86,57 @@ final class MSRWA_Ledger {
 			GROUP BY s.step, s.bucket ORDER BY spend DESC", ARRAY_A );
 	}
 
+	/**
+	 * Where the money and the minutes actually go, by the engine's own buckets.
+	 *
+	 * The step table answers *which step*, which is a long list. This answers
+	 * *which part of the product* — the article, the featured image, the
+	 * Facebook image, the rest — and that is the question somebody looking at a
+	 * bill asks first.
+	 */
+	public static function by_bucket( $days = 0 ) {
+		global $wpdb;
+		$t = self::tables();
+		$scope = MSRWA_Rights::scope_sql( 'r.owner_id' );
+		$since = $days > 0 ? $wpdb->prepare( ' AND r.created_at >= DATE_SUB(UTC_TIMESTAMP(), INTERVAL %d DAY)', (int) $days ) : '';
+
+		return (array) $wpdb->get_results(
+			"SELECT s.bucket, COUNT(*) steps, SUM(s.cost_usd) spend, SUM(s.seconds) seconds,
+				SUM(CASE WHEN s.cost_usd IS NULL THEN 1 ELSE 0 END) unpriced
+			FROM {$t['steps']} s INNER JOIN {$t['runs']} r ON r.id = s.run_id
+			WHERE {$scope}{$since}
+			GROUP BY s.bucket ORDER BY spend DESC", ARRAY_A );
+	}
+
+	/**
+	 * The same window, one window earlier.
+	 *
+	 * A figure on its own says what a recipe costs; the same figure against the
+	 * fortnight before says whether it is getting worse. Nothing here decides
+	 * whether the difference means anything — the screen refuses to draw a
+	 * comparison from a handful of runs, which is where that judgement belongs.
+	 */
+	public static function previously( $days ) {
+		global $wpdb;
+		if ( $days <= 0 ) { return array( 'runs' => 0, 'average_usd' => 0.0, 'seconds' => 0.0 ); }
+		$t = self::tables();
+		$scope = MSRWA_Rights::scope_sql( 'r.owner_id' );
+
+		$row = $wpdb->get_row( $wpdb->prepare(
+			"SELECT COUNT(*) runs, AVG(r.cost_usd) average, AVG(r.seconds) seconds
+			FROM {$t['runs']} r
+			WHERE {$scope}
+				AND r.created_at >= DATE_SUB(UTC_TIMESTAMP(), INTERVAL %d DAY)
+				AND r.created_at < DATE_SUB(UTC_TIMESTAMP(), INTERVAL %d DAY)",
+			2 * (int) $days, (int) $days ), ARRAY_A );
+
+		return array(
+			'runs' => (int) ( $row['runs'] ?? 0 ),
+			'average_usd' => round( (float) ( $row['average'] ?? 0 ), 4 ),
+			'seconds' => round( (float) ( $row['seconds'] ?? 0 ), 1 ),
+		);
+	}
+
 	/** Which model actually answered, how much of its input was served from cache. */
 	public static function by_model( $days = 0 ) {
 		global $wpdb;
