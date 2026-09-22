@@ -1,6 +1,141 @@
 # MS Recipes Writer AI
 
-Plugin WordPress en construction pour la génération éditoriale culinaire orchestrée.
+Plugin WordPress de rédaction culinaire assistée. Un rédacteur dépose plusieurs
+recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
+recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
+par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
+
+## État actuel — 0.8.0
+
+La version `0.8.0` est installable et vérifiée de bout en bout sur un vrai
+WordPress (7.1.1) : un lot part, le cron le fait avancer vague par vague, et un
+brouillon arrive avec son article, sa recette, son extrait, ses étiquettes, ses
+métadonnées SEO et ses données structurées Recipe.
+
+| Rôle | Ce qu’il voit |
+| --- | --- |
+| Rédacteur (`msrwa_create`) | ses lots, l’état de chaque recette en une phrase, le brouillon, les remarques du contrôle final — **aucun montant, aucun modèle** |
+| Administrateur (`msrwa_manage`) | tout : coûts, plafonds, modèles, diagnostics, moteur, réglages |
+
+Ce qui fonctionne : lots multi-recettes avec appariement des photos, trois
+sorties (article seul, article et image à la une, chaîne complète), trois
+langues d’article (français, anglais, arabe), estimation avant dépense et refus
+gratuit d’un lot qui dépasserait son plafond, plafonds par recette, par jour et
+sur trente jours, file suspendable, reprise d’une recette arrêtée sans repayer
+ce qui a réussi, lots programmés, export CSV, rétention réglable, vérification
+gratuite des clés d’API, JSON-LD Recipe sur les articles publiés.
+
+Les coûts affichés sont des estimations calculées avec les tarifs configurés,
+jamais une facture. `done` veut dire que le traitement est terminé, jamais qu’un
+texte est validé éditorialement.
+
+### Installation
+
+1. Copier le dossier dans `wp-content/plugins/` et activer l’extension.
+2. *MS Recipes Writer → Réglages* : enregistrer au moins une clé d’API, puis
+   **Vérifier les clés**.
+3. *Moteur* : choisir quel fournisseur sert chaque étape (OpenAI par défaut).
+4. *Nouveau lot* : coller une ou plusieurs recettes, séparées par `---`.
+
+Le travail avance par le cron de WordPress. Si `DISABLE_WP_CRON` est actif, un
+cron serveur doit appeler `wp-cron.php` toutes les cinq minutes.
+
+### Documentation
+
+- [`docs/PLAN.md`](docs/PLAN.md) — les six jalons, en clair, et où ils en sont.
+- [`docs/BUILD-CHECKLIST.md`](docs/BUILD-CHECKLIST.md) — les tâches, leurs tests
+  et leur critère d’achèvement.
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — le code tel qu’il existe.
+- [`docs/ENGINE.md`](docs/ENGINE.md) — le contrat du moteur, et les changements
+  proposés qui attendent l’accord du propriétaire.
+- [`docs/TESTING.md`](docs/TESTING.md) — suite hors ligne et tests réels.
+
+## Version 0.8.0
+
+**Premier passage complet sur un vrai WordPress, et ce qu’il a montré.** Un
+WordPress 7.1.1 installé pour de vrai, l’extension activée, des lots lancés par
+l’API REST avec un mot de passe d’application et menés jusqu’au brouillon par le
+cron. Deux recettes réelles, une en français et une en anglais, chacune pour
+environ 0,25 $ et cinq minutes — l’estimation annonçait 0,2485 $.
+
+**Une clé Claude enregistrée n’atteignait jamais le moteur.** Le plugin la
+transmettait sous le nom `anthropic` ; le moteur appelle ce fournisseur
+`claude` et la cherchait sous ce nom. Toute étape routée vers Claude échouait
+sur « No API key for claude » pendant que l’écran affichait « clé
+enregistrée ».
+
+**Les réglages du site n’atteignaient pas le moteur non plus.** Le moteur prend
+une branche `settings` non vide pour l’ensemble complet des réglages de
+l’appelant ; le plugin ne lui donnait que les clés. Nombre de mots minimum,
+titres, ingrédients, étapes : chaque seuil se comparait à zéro. La coupure en
+deux pages ne partait jamais. Le moteur reçoit désormais tous les réglages du
+site avec les clés.
+
+**La langue d’un lot était ignorée.** Elle partait dans une clé du moteur que
+rien ne lit ; les prompts lisent `site_language`. Un lot demandé en anglais
+était écrit en français. Elle arrive désormais là où les prompts la lisent,
+l’arabe est une langue que les prompts savent nommer, le contrôle des accents
+français s’efface pour l’anglais et l’arabe, et le titre qui ouvre la seconde
+page est écrit dans la langue de l’article. Vérifié en réel : une shakshuka
+écrite en anglais, coupée en deux pages.
+
+**Un lot qui ne peut pas finir sous son plafond est refusé, gratuitement.** Le
+plafond par recette arrête un run avant l’étape qui le dépasserait : une
+recette estimée au-dessus s’arrêtait donc en route après avoir payé tout ce qui
+précédait. Elle est maintenant refusée au lancement, et l’écran de dépôt le dit
+avant qu’on appuie. Le plafond livré passe de 0,10 $ à 0,50 $ : l’ancien était
+inférieur au prix d’une recette complète, si bien qu’un rédacteur ne pouvait
+lancer aucun lot complet sur une installation neuve.
+
+**Le rédacteur ne voit plus aucun montant** (jalon 5). Le pass lui montrait la
+dépense du site et le coût moyen, le dépôt un prix par sortie, et l’API
+d’estimation lui renvoyait les chiffres. Il apprend maintenant seulement si le
+lot tient sous le plafond. La page d’une recette lui dit où elle en est en une
+phrase — « le brouillon est prêt », « le site n’est relié à aucun service
+d’écriture pour une étape » — au lieu d’un message technique, et liste les
+étapes par leur nom, sans score ni nom de contrôle.
+
+**Le brouillon porte ce que l’article a écrit sur lui-même.** La relecture ne
+rend que le corps du texte ; le brouillon prenait son artefact tel quel et
+perdait l’extrait, le slug, le titre et la description SEO, les étiquettes, la
+légende Facebook. Tout arrive maintenant sur l’article : les métadonnées SEO
+dans Yoast ou Rank Math quand l’un d’eux est installé, les champs de la recette
+sous les clés que lit la fiche recette du site, et une boîte « Référencement et
+réseaux sociaux » sur l’écran d’édition.
+
+**Données structurées Recipe.** Une fois l’article publié, sa recette est
+imprimée en JSON-LD schema.org — temps en ISO 8601, ingrédients, étapes,
+portions, calories — sans extension de recettes. Rien n’est ajouté quand une
+extension de recettes imprime déjà les siennes.
+
+**Réglages des articles.** Langue par défaut des articles, longueur minimale et
+maximale, coupure en deux pages et titre de la seconde page se règlent enfin à
+l’écran ; ces champs étaient remis à leur valeur livrée à chaque
+enregistrement.
+
+**Vérifier les clés.** Un bouton demande à chaque fournisseur la liste de ses
+modèles — gratuit — et dit pour chacun : acceptée, refusée, ou injoignable
+depuis ce serveur.
+
+**Un compte fournisseur à court de crédit est dit comme tel**, au lieu d’une
+recette « arrêtée à l’étape Recette de référence ».
+
+**Les droits sont accordés depuis une seule liste**, à l’activation comme à
+chaque mise à jour. La mise à jour appliquait une autre liste : un éditeur
+perdait `msrwa_view_all` à la mise à jour et le retrouvait à l’activation
+suivante.
+
+**Ménage.** Vingt réglages que plus rien ne lisait depuis la réécriture de la
+0.3.0, quatre méthodes mortes de `MSRWA_Recipe`, et `assets/operations.css`,
+chargée par personne, sont retirés.
+
+**Les tests réels passent sans permaliens jolis** (`?rest_route=`), vérifient
+qu’un lot au-dessus de son plafond est refusé sans rien dépenser, que les clés
+ouvrent leur fournisseur, et que le brouillon porte extrait, slug et
+étiquettes.
+
+**En attente de votre accord — le moteur n’a pas été modifié.** Quatre
+changements sont proposés dans [`docs/ENGINE.md`](docs/ENGINE.md), § 7.
 
 ## Version 0.7.8
 
@@ -545,27 +680,6 @@ minutes et réarmement des jobs en attente. Moteur inchangé.
 
 Validation hors ligne uniquement : installation WordPress, rendu navigateur,
 cron réel et validité distante des clés restent à vérifier sur un site de test.
-
-## État actuel
-
-La version `0.7.8` est un socle installable : file persistante, pipeline de
-génération, contrôle qualité déterministe, budgets, images et écrans
-d’administration. Le détail des fonctionnalités livrées se trouve dans
-l’historique des versions ci-dessous.
-
-Le plugin est en cours de refonte éditoriale et budgétaire :
-
-- [`docs/PLAN.md`](docs/PLAN.md) — ce qui est construit, en clair.
-- [`docs/BUILD-CHECKLIST.md`](docs/BUILD-CHECKLIST.md) — les tâches à réaliser,
-  leurs tests et leur critère d’achèvement.
-- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — le code tel qu’il existe.
-- [`docs/ENGINE.md`](docs/ENGINE.md) — le contrat du moteur : comment on
-  l’appelle, comment on le configure, ce qu’il rend.
-- [`docs/TESTING.md`](docs/TESTING.md) — suite hors ligne et tests réels.
-
-Les coûts affichés sont des estimations calculées avec le catalogue configuré,
-non une facture fournisseur. `completed` signifie que le traitement est terminé,
-jamais qu’un texte est validé éditorialement.
 
 ## Version 0.3.0
 

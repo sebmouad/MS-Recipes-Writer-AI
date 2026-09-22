@@ -45,6 +45,13 @@ final class MSRWA_Screen_Settings {
 							placeholder="<?php echo esc_attr( $stored ? __( 'inchangée', 'ms-recipes-writer-ai' ) : __( 'aucune clé', 'ms-recipes-writer-ai' ) ); ?>">
 					</p>
 				<?php endforeach; ?>
+				<?php if ( $configured ) : ?>
+					<p class="ms-keys-check">
+						<button type="button" class="button" id="ms-check-keys"><?php esc_html_e( 'Vérifier les clés', 'ms-recipes-writer-ai' ); ?></button>
+						<span class="ms-muted"><?php esc_html_e( 'Demande à chaque fournisseur la liste de ses modèles : gratuit, et la seule preuve qu’un vrai appel passera.', 'ms-recipes-writer-ai' ); ?></span>
+					</p>
+					<ul id="ms-keys-result" class="ms-keys-result" aria-live="polite"></ul>
+				<?php endif; ?>
 			</section>
 			<section class="ms-card">
 				<h2><?php esc_html_e( 'Plafonds de dépense', 'ms-recipes-writer-ai' ); ?></h2>
@@ -52,8 +59,16 @@ final class MSRWA_Screen_Settings {
 				<?php $settings = MSRWA_Settings::get(); ?>
 				<p>
 					<label for="ms-per-recipe"><strong><?php esc_html_e( 'Par recette', 'ms-recipes-writer-ai' ); ?></strong></label><br>
-					<input type="number" id="ms-per-recipe" name="msrwa_settings[per_recipe_budget_usd]" value="<?php echo esc_attr( (float) ( $settings['per_recipe_budget_usd'] ?? 0.20 ) ); ?>" step="0.01" min="0" class="small-text ms-num"> $
+					<input type="number" id="ms-per-recipe" name="msrwa_settings[per_recipe_budget_usd]" value="<?php echo esc_attr( (float) $settings['per_recipe_budget_usd'] ); ?>" step="0.01" min="0" class="small-text ms-num"> $
 					<br><small class="ms-muted"><?php esc_html_e( 'La valeur proposée sur un nouveau lot, et celle qui s’applique à un lot déposé par quelqu’un qui ne voit pas les montants.', 'ms-recipes-writer-ai' ); ?></small>
+					<?php $full = (float) MSRWA_Estimate::recipe( MSRWA_Profile::FULL )['cost_usd']; ?>
+					<br><small class="ms-muted<?php echo MSRWA_Estimate::fits( $full, (float) $settings['per_recipe_budget_usd'] ) ? '' : ' ms-warn'; ?>"><?php
+						echo esc_html( sprintf(
+							/* translators: %s is the estimated cost of one complete recipe. */
+							__( 'Avec le routage actuel, une recette complète est estimée à %s. Un plafond en dessous refuse le lot au lancement ; laissez de la marge pour les reprises.', 'ms-recipes-writer-ai' ),
+							MSRWA_I18N::money( $full, 4 )
+						) );
+					?></small>
 				</p>
 				<p>
 					<label for="ms-daily"><strong><?php esc_html_e( 'Par jour', 'ms-recipes-writer-ai' ); ?></strong></label><br>
@@ -62,6 +77,45 @@ final class MSRWA_Screen_Settings {
 				<p>
 					<label for="ms-monthly"><strong><?php esc_html_e( 'Sur trente jours', 'ms-recipes-writer-ai' ); ?></strong></label><br>
 					<input type="number" id="ms-monthly" name="msrwa_settings[monthly_budget_usd]" value="<?php echo esc_attr( (float) ( $settings['monthly_budget_usd'] ?? 0 ) ); ?>" step="1" min="0" class="small-text ms-num"> $
+				</p>
+			</section>
+
+			<section class="ms-card">
+				<h2><?php esc_html_e( 'Les articles', 'ms-recipes-writer-ai' ); ?></h2>
+				<p><?php esc_html_e( 'Ce que chaque article doit être. Ces réglages atteignent directement les prompts et les contrôles du moteur.', 'ms-recipes-writer-ai' ); ?></p>
+				<p>
+					<label for="ms-site-language"><strong><?php esc_html_e( 'Langue des articles', 'ms-recipes-writer-ai' ); ?></strong></label><br>
+					<select id="ms-site-language" name="msrwa_settings[site_language]">
+						<?php foreach ( MSRWA_Profile::languages() as $code => $name ) : ?>
+							<option value="<?php echo esc_attr( $code ); ?>" <?php selected( (string) $settings['site_language'], $code ); ?>><?php echo esc_html( $name ); ?></option>
+						<?php endforeach; ?>
+					</select>
+					<br><small class="ms-muted"><?php esc_html_e( 'Proposée par défaut sur chaque nouveau lot. Un lot peut toujours en demander une autre.', 'ms-recipes-writer-ai' ); ?></small>
+				</p>
+				<p>
+					<label for="ms-min-words"><strong><?php esc_html_e( 'Longueur', 'ms-recipes-writer-ai' ); ?></strong></label><br>
+					<input type="number" id="ms-min-words" name="msrwa_settings[quality_min_words]" value="<?php echo esc_attr( (int) $settings['quality_min_words'] ); ?>" step="100" min="300" max="8000" class="small-text ms-num">
+					<?php esc_html_e( 'à', 'ms-recipes-writer-ai' ); ?>
+					<input type="number" id="ms-max-words" name="msrwa_settings[quality_max_words]" value="<?php echo esc_attr( (int) $settings['quality_max_words'] ); ?>" step="100" min="500" max="10000" class="small-text ms-num" aria-label="<?php esc_attr_e( 'Nombre de mots maximal', 'ms-recipes-writer-ai' ); ?>">
+					<?php esc_html_e( 'mots', 'ms-recipes-writer-ai' ); ?>
+					<br><small class="ms-muted"><?php esc_html_e( 'Le minimum est une exigence : un article plus court échoue à son contrôle. Plus de mots coûtent plus cher à écrire et à relire.', 'ms-recipes-writer-ai' ); ?></small>
+				</p>
+				<p>
+					<input type="hidden" name="msrwa_settings[article_pagination_enabled]" value="0">
+					<label><input type="checkbox" name="msrwa_settings[article_pagination_enabled]" value="1" <?php checked( ! empty( $settings['article_pagination_enabled'] ) ); ?>>
+						<strong><?php esc_html_e( 'Couper l’article en deux pages', 'ms-recipes-writer-ai' ); ?></strong></label>
+				</p>
+				<p>
+					<label for="ms-page2"><strong><?php esc_html_e( 'Titre qui ouvre la seconde page', 'ms-recipes-writer-ai' ); ?></strong></label><br>
+					<input type="text" id="ms-page2" name="msrwa_settings[article_page2_heading]" value="<?php echo esc_attr( (string) $settings['article_page2_heading'] ); ?>" class="regular-text" maxlength="120">
+				</p>
+				<p>
+					<input type="hidden" name="msrwa_settings[recipe_schema]" value="0">
+					<label><input type="checkbox" name="msrwa_settings[recipe_schema]" value="1" <?php checked( ! empty( $settings['recipe_schema'] ) ); ?>>
+						<strong><?php esc_html_e( 'Publier la recette en données structurées (Recipe JSON-LD)', 'ms-recipes-writer-ai' ); ?></strong></label>
+					<br><small class="ms-muted"><?php echo esc_html( MSRWA_Schema::another_plugin_prints_it()
+						? __( 'Une extension de recettes active imprime déjà les siennes : rien n’est ajouté, pour ne pas décrire deux fois le même plat.', 'ms-recipes-writer-ai' )
+						: __( 'Sur les articles publiés seulement. Ce que Google lit pour afficher une recette enrichie : temps, portions, ingrédients, étapes, calories.', 'ms-recipes-writer-ai' ) ); ?></small>
 				</p>
 			</section>
 

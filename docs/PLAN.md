@@ -34,7 +34,7 @@ build task.
 
 ## The six milestones
 
-### ☐ 1. Know the cost before spending it
+### ◐ 1. Know the cost before spending it
 
 The plugin stops using fixed guesses and calculates real amounts: for each
 recipe, a **minimum** and a **maximum** cost, split into four parts — the
@@ -48,6 +48,12 @@ and new batches are refused until the next day or month.
 
 **Done when:** the settings screen shows min and max per bucket and per recipe,
 and they change as you edit settings.
+
+*Where it stands (0.8.0):* the new-lot screen estimates each lot live and warns
+before a lot that could not finish under its ceiling is sent; such a lot is
+refused for free. On a real run the estimate was $0.2485 and the bill $0.2570.
+Daily and thirty-day ceilings exist. Still missing: the min/max grid per bucket
+on the settings screen.
 
 ### ☐ 2. The right model for each step, without overpaying
 
@@ -71,7 +77,11 @@ by itself — you review and accept.
 **Done when:** you can answer four questions and get a working policy you only
 have to approve.
 
-### ☐ 4. Articles that are complete and correct
+*Where it stands:* not started. The Moteur screen already lets you pick the
+model for every step by hand, and *Vérifier les clés* tells you which providers
+answer.
+
+### ◐ 4. Articles that are complete and correct
 
 2800 words minimum, split over two pages (about 1500 then 1300, page two
 starting at the preparation). A fixed list of sections you can edit, which the
@@ -88,7 +98,14 @@ Google can show rich results, with no extra recipe plugin required.
 **Done when:** a generated article contains every required section, matches its
 sources, and reads without mistakes.
 
-### ☐ 5. A simple screen for editors
+*Where it stands (0.8.0):* verified on a real site — research, recipe, article
+over two pages, review, fact check with corrections applied, proofreading, and
+a draft carrying its excerpt, tags, SEO title and description. Recipe
+structured data is printed once the article is published. The section list is
+enforced but not yet editable: that needs an engine change you have to approve
+(see `ENGINE.md` §7).
+
+### ☑ 5. A simple screen for editors
 
 Editors see their articles, the quality verdict, the publication status, the
 draft, and a clear sentence when something needs their attention. No costs, no
@@ -97,7 +114,12 @@ model names, no technical detail. Administrators keep everything.
 **Done when:** an editor account sees no cost and no technical information
 anywhere.
 
-### ☐ 6. One language per site
+*Verified (0.8.0)* in a real browser with an author account: no amount on any
+screen, and each recipe says where it stands in one sentence — "the draft is
+ready", "the site is not connected to a writing service for one step" — instead
+of an error message.
+
+### ◐ 6. One language per site
 
 The administrator picks the site language; every article follows it. Three
 languages ship.
@@ -105,22 +127,21 @@ languages ship.
 **Done when:** changing the language setting changes the language of the next
 article.
 
+*Where it stands (0.8.0):* the language is chosen in *Réglages* and offered on
+every new lot; French, English and Arabic ship. An English article was written
+on a real site; Arabic has not been run live yet.
+
 ## What I need from you
 
-Real tests require real access. See *Credentials* in
-[`TESTING.md`](TESTING.md) for where to put each item safely — never in the
-repository.
+1. **An OpenAI or Gemini key usable from a test machine that can reach them.**
+   The keys you sent work for Claude; the sandbox used for 0.8.0 could not reach
+   OpenAI or Gemini at all, so images, the final judge and photograph matching
+   have not run live yet. Please also **rotate the three keys** you pasted into
+   the chat.
+2. **A staging copy of the real site** (MySQL), with an administrator's
+   application password — the 0.8.0 verification ran on a local SQLite site.
+3. **A decision on the four engine changes** proposed in
+   [`ENGINE.md`](ENGINE.md) §7. None is applied until you say so.
 
-1. **Provider API keys** for the models you intend to use: OpenAI (text,
-   images and web search), and Gemini and/or Anthropic if you want them in the
-   routing.
-2. **A WordPress test site** the plugin can run on, with either WP-CLI access
-   or admin credentials. A staging copy is ideal; a local site is fine.
-3. **A spending cap for tests** — the amount per day I may use on real
-   generation runs, so verification never surprises you.
-4. **The three languages** you want shipped. Assumed for now: French (default),
-   English, Spanish.
-
-Until those exist, work continues with offline tests only, and milestones stay
-`◐` rather than `☑`: a milestone is only *done* once it has been verified on a
-real site with real providers.
+See *Credentials* in [`TESTING.md`](TESTING.md) for where each item goes —
+never in the repository.

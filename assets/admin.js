@@ -76,11 +76,19 @@
       pending = window.setTimeout(function () {
         var profile = compose.querySelector('input[name=profile]:checked');
 
-        call('/estimate', {}, {
+        var query = {
           profile: profile ? profile.value : '',
           recipes: count,
           images: chosen.length
-        }).then(function (data) {
+        };
+        if (budgetField) { query.budget = ceiling(); }
+        call('/estimate', {}, query).then(function (data) {
+          compose.classList.toggle('ms-over-ceiling', data.fits === false);
+          // A writer is told whether the lot fits, never what it costs.
+          if (data.cost_usd === undefined) {
+            say(estimate, data.fits === false ? (t.overCeilingWriter || '') : '');
+            return;
+          }
           var cap = ceiling() * count;
           // Two numbers, and they are different things: what this is likely to
           // cost, and the most it is allowed to cost. Showing only the first is
@@ -92,6 +100,9 @@
           if (data.unpriced && data.unpriced.length) {
             line += ' ' + (t.unpriced || '').replace('%s', data.unpriced.join(', '));
           }
+          if (data.fits === false) {
+            line += ' ' + (t.overCeiling || '').replace('%1$s', money(data.per_recipe_usd)).replace('%2$s', money(data.ceiling_usd));
+          }
           say(estimate, line);
         }).catch(function () {
           say(estimate, '');
@@ -100,9 +111,9 @@
     }
 
     // A writer is never shown money, so the field is simply not there for
-    // them; the site's own ceiling, sent with the strings, stands in.
+    // them and the server applies the site's own ceiling.
     function ceiling() {
-      return budgetField ? (parseFloat(budgetField.value) || 0) : (parseFloat(t.perRecipeCeiling) || 0);
+      return budgetField ? (parseFloat(budgetField.value) || 0) : 0;
     }
 
     recipes.addEventListener('input', refreshEstimate);
@@ -286,6 +297,35 @@
           say(document.getElementById('ms-batch-head-status'), error.message);
           batchDelete.disabled = false;
         });
+    });
+  }
+
+  // --- Whether the stored keys actually open their providers ----------------
+
+  var checkKeys = document.getElementById('ms-check-keys');
+  if (checkKeys) {
+    var keysResult = document.getElementById('ms-keys-result');
+    checkKeys.addEventListener('click', function () {
+      checkKeys.disabled = true;
+      keysResult.innerHTML = '';
+      var waiting = document.createElement('li');
+      waiting.textContent = t.checkingKeys || '';
+      keysResult.appendChild(waiting);
+      call('/keys/check', { method: 'POST' })
+        .then(function (data) {
+          keysResult.innerHTML = '';
+          Object.keys(data).forEach(function (provider) {
+            var row = document.createElement('li');
+            var state = document.createElement('span');
+            state.className = 'ms-state ms-state-' + ({ ok: 'good', refused: 'stop', unreachable: 'warn', missing: 'idle' }[data[provider].state] || 'idle');
+            state.textContent = data[provider].label;
+            row.appendChild(state);
+            row.appendChild(document.createTextNode(' ' + data[provider].message));
+            keysResult.appendChild(row);
+          });
+        })
+        .catch(function (error) { keysResult.innerHTML = ''; var row = document.createElement('li'); row.textContent = error.message; keysResult.appendChild(row); })
+        .then(function () { checkKeys.disabled = false; });
     });
   }
 

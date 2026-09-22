@@ -89,11 +89,14 @@ final class MSRWA_Admin {
 				'holding' => __( 'Suspension…', 'ms-recipes-writer-ai' ),
 				'releasing' => __( 'Reprise de la file…', 'ms-recipes-writer-ai' ),
 				'pruning' => __( 'Nettoyage…', 'ms-recipes-writer-ai' ),
+				'checkingKeys' => __( 'Vérification…', 'ms-recipes-writer-ai' ),
 				/* translators: %d is a number of recipes. */
 				'confirmDelete' => __( 'Supprimer %d recette(s) et tout ce que le moteur en a rapporté ? C’est irréversible.', 'ms-recipes-writer-ai' ),
 				'confirmBatchDelete' => __( 'Supprimer ce lot et tout ce que le moteur en a rapporté ? Les brouillons déjà produits sont conservés. C’est irréversible.', 'ms-recipes-writer-ai' ),
 				'passUrl' => admin_url( 'admin.php?page=msrwa' ),
-				'perRecipeCeiling' => (float) ( MSRWA_Settings::get()['per_recipe_budget_usd'] ?? 0.20 ),
+				/* translators: 1: estimated cost per recipe, 2: the per-recipe ceiling. */
+				'overCeiling' => __( 'Attention : une recette est estimée à %1$s, au-dessus du plafond de %2$s. Elle s’arrêterait en route ; le lot sera refusé au lancement. Relevez le plafond ou choisissez une sortie plus légère.', 'ms-recipes-writer-ai' ),
+				'overCeilingWriter' => __( 'Ce lot dépasse le plafond par recette fixé pour le site et sera refusé au lancement. Choisissez une sortie plus légère, ou demandez à un administrateur de relever le plafond.', 'ms-recipes-writer-ai' ),
 				/* translators: 1: how many were done, 2: how many were not. */
 				'someSkipped' => __( '%1$d traitée(s), %2$d ignorée(s) : l’action ne s’appliquait pas, ou elles ne vous appartiennent pas.', 'ms-recipes-writer-ai' ),
 			),

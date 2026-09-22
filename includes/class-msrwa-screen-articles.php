@@ -29,7 +29,7 @@ final class MSRWA_Screen_Articles {
 			__( 'Articles', 'ms-recipes-writer-ai' ),
 			MSRWA_Rights::may_see_everything()
 				? __( 'Toutes les recettes passées par le moteur, avec leur état et ce qu’elles ont coûté.', 'ms-recipes-writer-ai' )
-				: __( 'Vos recettes passées par le moteur, avec leur état et ce qu’elles ont coûté.', 'ms-recipes-writer-ai' ),
+				: __( 'Vos recettes passées par le moteur, avec leur état et leur brouillon.', 'ms-recipes-writer-ai' ),
 			array( __( 'résultats', 'ms-recipes-writer-ai' ) => number_format_i18n( $found['total'] ) ),
 			'<a class="button button-primary" href="' . esc_url( admin_url( 'admin.php?page=msrwa-compose' ) ) . '">' . esc_html__( 'Nouveau lot', 'ms-recipes-writer-ai' ) . '</a>'
 		);

@@ -48,7 +48,9 @@ final class MSRWA_Screen_Compose {
 
 			<section class="ms-step">
 				<h3><?php esc_html_e( 'Ce qu’il faut produire', 'ms-recipes-writer-ai' ); ?></h3>
-				<p><?php esc_html_e( 'Chaque recette suit le même chemin. Les montants sont calculés depuis le routage et les tarifs réellement configurés — ce sont des estimations, jamais une facture.', 'ms-recipes-writer-ai' ); ?></p>
+				<p><?php echo esc_html( MSRWA_Rights::may_see_money()
+					? __( 'Chaque recette suit le même chemin. Les montants sont calculés depuis le routage et les tarifs réellement configurés — ce sont des estimations, jamais une facture.', 'ms-recipes-writer-ai' )
+					: __( 'Chaque recette suit le même chemin. Plus il y a d’images, plus la recette demande de travail.', 'ms-recipes-writer-ai' ) ); ?></p>
 				<div class="ms-choices">
 					<?php foreach ( MSRWA_Profile::all() as $key => $profile ) : ?>
 						<label class="ms-choice">
@@ -57,7 +59,9 @@ final class MSRWA_Screen_Compose {
 								<strong><?php echo esc_html( $profile['label'] ); ?></strong>
 								<small><?php echo esc_html( $profile['description'] ); ?></small>
 							</span>
-							<span class="ms-choice-cost" data-profile-cost="<?php echo esc_attr( $key ); ?>">~ <?php echo esc_html( MSRWA_I18N::money( MSRWA_Estimate::recipe( $key )['cost_usd'], 4 ) ); ?></span>
+							<?php if ( MSRWA_Rights::may_see_money() ) : ?>
+								<span class="ms-choice-cost" data-profile-cost="<?php echo esc_attr( $key ); ?>">~ <?php echo esc_html( MSRWA_I18N::money( MSRWA_Estimate::recipe( $key )['cost_usd'], 4 ) ); ?></span>
+							<?php endif; ?>
 						</label>
 					<?php endforeach; ?>
 				</div>
@@ -72,14 +76,14 @@ final class MSRWA_Screen_Compose {
 					<label for="ms-language"><strong><?php esc_html_e( 'Langue de l’article', 'ms-recipes-writer-ai' ); ?></strong></label><br>
 					<select id="ms-language" name="language">
 						<?php foreach ( MSRWA_Profile::languages() as $code => $name ) : ?>
-							<option value="<?php echo esc_attr( $code ); ?>" <?php selected( 'fr', $code ); ?>><?php echo esc_html( $name ); ?></option>
+							<option value="<?php echo esc_attr( $code ); ?>" <?php selected( (string) MSRWA_Settings::get()['site_language'], $code ); ?>><?php echo esc_html( $name ); ?></option>
 						<?php endforeach; ?>
 					</select>
 				</p>
 				<?php if ( MSRWA_Rights::may_see_money() ) : ?>
 					<p>
 						<label for="ms-budget"><strong><?php esc_html_e( 'Plafond par recette', 'ms-recipes-writer-ai' ); ?></strong></label><br>
-						<input type="number" id="ms-budget" name="budget" value="<?php echo esc_attr( (float) ( MSRWA_Settings::get()['per_recipe_budget_usd'] ?? 0.20 ) ); ?>" step="0.01" min="0.01" class="small-text ms-num"> $
+						<input type="number" id="ms-budget" name="budget" value="<?php echo esc_attr( (float) MSRWA_Settings::get()['per_recipe_budget_usd'] ); ?>" step="0.01" min="0.01" class="small-text ms-num"> $
 					</p>
 				<?php endif; ?>
 			</section>

@@ -14,8 +14,11 @@ final class MSRWA_Screen_Pass {
 		if ( ! MSRWA_Rights::may_write() ) { wp_die( esc_html__( 'Vous n’avez pas accès à cet écran.', 'ms-recipes-writer-ai' ) ); }
 
 		$now = MSRWA_Ledger::now();
-		$today = MSRWA_Ledger::spend( 1 );
-		$month = MSRWA_Ledger::spend( 30 );
+		// Money is an operator's concern: a writer's pass neither shows the
+		// spend nor asks the database for it.
+		$money = MSRWA_Rights::may_see_money();
+		$today = $money ? MSRWA_Ledger::spend( 1 ) : null;
+		$month = $money ? MSRWA_Ledger::spend( 30 ) : null;
 		$moving = MSRWA_Ledger::runs( array( 'status' => 'moving', 'per_page' => 12 ) );
 		$attention = MSRWA_Ledger::runs( array( 'status' => 'attention', 'per_page' => 8 ) );
 
@@ -23,29 +26,32 @@ final class MSRWA_Screen_Pass {
 		MSRWA_UI::head(
 			__( 'Le pass', 'ms-recipes-writer-ai' ),
 			__( 'Ce qui est en cours, ce qui attend une relecture, et ce qui s’est arrêté.', 'ms-recipes-writer-ai' ),
-			array(
+			$money ? array(
 				__( 'aujourd’hui', 'ms-recipes-writer-ai' ) => MSRWA_I18N::money( $today['spend_usd'], 2 ),
 				__( '30 jours', 'ms-recipes-writer-ai' ) => MSRWA_I18N::money( $month['spend_usd'], 2 ),
-			),
+			) : array(),
 			'<a class="button button-primary" href="' . esc_url( admin_url( 'admin.php?page=msrwa-compose' ) ) . '">' . esc_html__( 'Nouveau lot', 'ms-recipes-writer-ai' ) . '</a>'
 		);
 
 		self::warnings();
 
-		MSRWA_UI::figures( array(
+		$figures = array(
 			array( 'label' => __( 'en cours', 'ms-recipes-writer-ai' ), 'value' => number_format_i18n( $now['moving'] ) ),
 			array( 'label' => __( 'à relire', 'ms-recipes-writer-ai' ), 'value' => number_format_i18n( $now['to_read'] ), 'note' => __( 'brouillons prêts', 'ms-recipes-writer-ai' ) ),
 			array( 'label' => __( 'réserves du juge', 'ms-recipes-writer-ai' ), 'value' => number_format_i18n( $now['reserved'] ) ),
 			array( 'label' => __( 'échecs', 'ms-recipes-writer-ai' ), 'value' => number_format_i18n( $now['failed'] ) ),
-			array(
+		);
+		if ( $money ) {
+			$figures[] = array(
 				'label' => __( 'coût moyen', 'ms-recipes-writer-ai' ),
 				'value' => MSRWA_I18N::money( $month['average_usd'] ),
 				'note' => $month['unpriced_steps']
 					/* translators: %d is a number of steps. */
 					? sprintf( __( '%d étape(s) sans tarif publié', 'ms-recipes-writer-ai' ), $month['unpriced_steps'] )
 					: __( 'par recette, sur 30 jours', 'ms-recipes-writer-ai' ),
-			),
-		) );
+			);
+		}
+		MSRWA_UI::figures( $figures );
 
 		self::queue();
 		self::waiting();

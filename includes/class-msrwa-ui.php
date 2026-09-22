@@ -74,6 +74,84 @@ final class MSRWA_UI {
 		return '<span class="ms-state' . ( $state['tone'] ? ' ms-state-' . $state['tone'] : '' ) . '">' . esc_html( $state['label'] ) . '</span>';
 	}
 
+	/** What each step is called for somebody who does not read the engine's names. */
+	public static function step_name( $step ) {
+		$names = array(
+			'research' => __( 'Recherche', 'ms-recipes-writer-ai' ),
+			'canonical_recipe' => __( 'Recette de référence', 'ms-recipes-writer-ai' ),
+			'article' => __( 'Rédaction', 'ms-recipes-writer-ai' ),
+			'featured_image' => __( 'Image à la une', 'ms-recipes-writer-ai' ),
+			'facebook_image' => __( 'Collage Facebook', 'ms-recipes-writer-ai' ),
+			'review' => __( 'Relecture éditoriale', 'ms-recipes-writer-ai' ),
+			'fact_check' => __( 'Vérification des faits', 'ms-recipes-writer-ai' ),
+			'corrections' => __( 'Corrections', 'ms-recipes-writer-ai' ),
+			'proofread' => __( 'Correction de la langue', 'ms-recipes-writer-ai' ),
+			'final_approval' => __( 'Contrôle final', 'ms-recipes-writer-ai' ),
+		);
+		return $names[ (string) $step ] ?? (string) $step;
+	}
+
+	/**
+	 * One sentence that says where a recipe stands and what, if anything, the
+	 * reader should do — in words, never in the engine's vocabulary.
+	 *
+	 * An editor used to meet "No API key for claude." or a raw HTTP status. Those
+	 * stay on the diagnostics for whoever can act on them; everybody gets the
+	 * sentence. Returns array( tone, text ).
+	 */
+	public static function reason( array $run, array $steps = array() ) {
+		$status = (string) ( $run['status'] ?? '' );
+		if ( 'queued' === $status ) {
+			return class_exists( 'MSRWA_Queue' ) && MSRWA_Queue::held()
+				? array( 'warn', __( 'En attente : la file est suspendue par un administrateur. Elle repartira d’elle-même quand la file reprendra.', 'ms-recipes-writer-ai' ) )
+				: array( '', __( 'En attente de son tour. Elle partira d’elle-même ; rien à faire.', 'ms-recipes-writer-ai' ) );
+		}
+		if ( 'running' === $status ) {
+			/* translators: 1: steps finished, 2: steps in total. */
+			return array( 'live', sprintf( __( 'En cours d’écriture : %1$d étape(s) sur %2$d. Vous pouvez quitter cette page, le travail continue.', 'ms-recipes-writer-ai' ), (int) ( $run['steps_done'] ?? 0 ), (int) ( $run['steps_total'] ?? 0 ) ) );
+		}
+		if ( 'cancelled' === $status ) { return array( '', __( 'Arrêtée à la demande. Elle peut être reprise là où elle s’était arrêtée.', 'ms-recipes-writer-ai' ) ); }
+		if ( 'done' === $status ) {
+			if ( ! (int) ( $run['draft_post_id'] ?? 0 ) ) { return array( 'warn', __( 'Le travail est terminé, mais aucun brouillon n’a pu être créé. Un administrateur doit regarder le détail.', 'ms-recipes-writer-ai' ) ); }
+			$approved = $run['approved'] ?? null;
+			if ( null !== $approved && ! $approved ) {
+				return array( 'warn', __( 'Le brouillon est prêt, mais le contrôle final a relevé des points à vérifier. Lisez-les avant de publier.', 'ms-recipes-writer-ai' ) );
+			}
+			return array( 'good', __( 'Le brouillon est prêt à être relu. Rien n’est publié tant que vous ne le décidez pas.', 'ms-recipes-writer-ai' ) );
+		}
+
+		$said = (string) ( $run['error_message'] ?? '' );
+		$where = '';
+		foreach ( $steps as $step ) {
+			if ( '' !== (string) ( $step['error'] ?? '' ) ) { $said .= ' ' . $step['error']; $where = $where ? $where : (string) $step['step']; }
+		}
+		// Checked first: a provider out of credit answers 400 or 429 with a
+		// message about billing, and no amount of retrying fixes that.
+		if ( preg_match( '/credit balance|billing|insufficient_quota|exceeded your current quota/i', $said ) ) {
+			return array( 'stop', __( 'Le compte du service d’écriture n’a plus de crédit. Un administrateur doit le recharger, puis reprendre la recette : rien de ce qui est fait n’est perdu.', 'ms-recipes-writer-ai' ) );
+		}
+		if ( preg_match( '/no api key|api key|clé/i', $said ) && ! preg_match( '/HTTP 40[13]/', $said ) ) {
+			return array( 'stop', __( 'Le site n’est relié à aucun service d’écriture pour une étape de cette recette. Un administrateur doit enregistrer la clé, puis la reprendre.', 'ms-recipes-writer-ai' ) );
+		}
+		if ( preg_match( '/HTTP 40[13]/', $said ) ) {
+			return array( 'stop', __( 'Le service d’écriture a refusé la clé du site. Un administrateur doit la vérifier dans les réglages, puis reprendre la recette.', 'ms-recipes-writer-ai' ) );
+		}
+		if ( preg_match( '/plafond|budget|ceiling/i', $said ) ) {
+			return array( 'stop', __( 'Le plafond de dépense de cette recette a été atteint avant la fin. Ce qui est fait est gardé ; un administrateur peut relever le plafond et la reprendre.', 'ms-recipes-writer-ai' ) );
+		}
+		if ( preg_match( '/HTTP 429|rate|quota/i', $said ) ) {
+			return array( 'stop', __( 'Le service d’écriture était saturé. Reprendre la recette un peu plus tard suffit en général.', 'ms-recipes-writer-ai' ) );
+		}
+		if ( preg_match( '/timed? ?out|cURL|HTTP 5\d\d|resolve|connect/i', $said ) ) {
+			return array( 'stop', __( 'Le service d’écriture n’a pas répondu à temps. Reprendre la recette suffit en général : rien de ce qui est fait n’est perdu.', 'ms-recipes-writer-ai' ) );
+		}
+		if ( '' !== $where ) {
+			/* translators: %s is the name of a step, such as "Rédaction". */
+			return array( 'stop', sprintf( __( 'La recette s’est arrêtée à l’étape « %s ». La reprendre relance seulement ce qui a échoué.', 'ms-recipes-writer-ai' ), self::step_name( $where ) ) );
+		}
+		return array( 'stop', __( 'La recette s’est arrêtée avant la fin. La reprendre relance seulement ce qui a échoué.', 'ms-recipes-writer-ai' ) );
+	}
+
 	/** How far through its steps a run is. */
 	public static function progress( $done, $total ) {
 		$total = max( 1, (int) $total );

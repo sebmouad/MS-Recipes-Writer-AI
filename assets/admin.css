@@ -346,3 +346,39 @@
 	.ms-ticket-title, .ms-ticket-meta, .ms-ticket-side { grid-column: 1; grid-row: auto; }
 	.ms-ticket-side { justify-content: flex-start; }
 }
+
+/* --- Warnings that stop a lot before it spends --------------------------
+ * The estimate line turns into a warning when a recipe is expected to cost
+ * more than its ceiling: that lot would be refused, and saying so before the
+ * button is pressed is the whole point of showing an estimate.
+ */
+
+.msrwa .ms-warn { color: var(--ms-warn); font-weight: 600; }
+.ms-over-ceiling #ms-estimate {
+	color: var(--ms-warn);
+	background: var(--ms-warn-soft);
+	border-inline-start: var(--ms-rail) solid var(--ms-warn);
+	border-radius: 4px;
+	padding: 10px 12px;
+}
+
+.ms-state-idle { color: var(--ms-ink-soft); }
+.ms-keys-check { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.ms-keys-result { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+.ms-keys-result li { margin: 0; }
+
+.ms-note-good { border-inline-start-color: var(--ms-good); background: var(--ms-good-soft); }
+.ms-note-live { border-inline-start-color: var(--ms-live); background: var(--ms-live-soft); }
+
+/* The steps as a writer reads them: done or stopped, and nothing else. */
+.ms-steps-plain { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+.ms-steps-plain li { margin: 0; display: flex; align-items: center; gap: 10px; }
+.ms-steps-plain .ms-state { min-inline-size: 84px; justify-content: center; }
+
+/* The article's own SEO and social copy, on the post editor. */
+.ms-extras { margin-block: 12px; }
+.ms-extras summary { cursor: pointer; font-weight: 600; }
+.ms-extras dl { margin: 10px 0 0; display: grid; gap: 6px; }
+.ms-extras dt { font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: var(--ms-ink-faint); margin: 6px 0 0; }
+.ms-extras dd { margin: 0; }
+.ms-extras textarea { font-size: 13px; resize: vertical; }

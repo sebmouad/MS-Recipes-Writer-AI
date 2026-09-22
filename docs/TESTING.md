@@ -28,26 +28,42 @@ The offline runner exits non-zero on any lint or test failure; CI
 
 ## Credentials
 
-Real tests read everything from the environment. **Never commit a key, and
-never paste one into a chat message.** Set them where the runtime can read
-them: for Claude Code on the web, in the environment's variables; on a server,
-in the shell profile or the site's `wp-config.php`.
+Real tests read everything from the environment. **Never commit a key.** Set
+them where the runtime can read them: in the environment's variables for a
+hosted agent, in the shell profile on a server. The provider keys themselves are
+not read by the real tests: they are typed into the site's own *Réglages*
+screen, where the plugin encrypts them, and the tests drive that site.
 
 | Variable | What it is | Needed for |
 | --- | --- | --- |
-| `MSRWA_TEST_WP_PATH` | Absolute path to a WordPress installation with the plugin active | every real test |
-| `MSRWA_TEST_SITE_URL` | Public or local URL of that site | draft and JSON-LD checks |
-| `MSRWA_OPENAI_KEY` | OpenAI key with access to text, images and web search | writing, images, research |
-| `MSRWA_GEMINI_KEY` | Google Gemini key | only if Gemini is in the routing |
-| `MSRWA_CLAUDE_KEY` | Anthropic key | only if Claude is in the routing |
-| `MSRWA_TEST_BUDGET_USD` | Maximum a single real run may spend, for example `2.00` | every real test that calls a provider |
-| `OPENAI_API_KEY` | OpenAI key used by the lab only | `tools/lab.php` |
+| `MSRWA_TEST_SITE_URL` | URL of a WordPress site with the plugin active | every real test |
+| `MSRWA_WP_USER` | an administrator's login on that site | every real test |
+| `MSRWA_WP_APP_PASSWORD` | that user's application password (*Users → Profile*) | every real test |
+| `MSRWA_TEST_BUDGET_USD` | the most one real run may spend, for example `1.00` | every test that calls a provider |
+| `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GEMINI_API_KEY` | provider keys for the lab only | `tools/lab.php` |
 
-A real test that would exceed `MSRWA_TEST_BUDGET_USD` refuses to start. Each
-run prints what it spent.
+A real test that would exceed `MSRWA_TEST_BUDGET_USD` refuses to start, and
+each run prints what it spent. Application passwords need HTTPS unless the site
+declares `WP_ENVIRONMENT_TYPE` as `local`.
 
-Use a **staging site**, never production: real tests create posts, jobs and
-attachments.
+Use a **staging site**, never production: real tests create posts, lots and
+attachments. The real layer reaches the API through `?rest_route=`, so it works
+with plain permalinks as well as pretty ones.
+
+### A throwaway local site
+
+What the 0.8.0 verification ran on, when no staging site is at hand:
+
+1. WordPress from `git clone --branch <version> https://github.com/WordPress/WordPress`.
+2. A database: MySQL if the machine has one; otherwise the
+   [SQLite database integration](https://github.com/WordPress/sqlite-database-integration)
+   (its `db.copy` becomes `wp-content/db.php`).
+3. `wp-config.php` with `WP_ENVIRONMENT_TYPE` set to `local`, then
+   `wp_install()` from a PHP script, and `PHP_CLI_SERVER_WORKERS=4 php -S
+   127.0.0.1:8080` — several workers, because WP-Cron calls the site back while
+   a request is still open.
+4. Symlink this repository into `wp-content/plugins/`, activate it, create an
+   application password, and export the four variables above.
 
 ## Writing an offline test
 
@@ -57,13 +73,13 @@ touches, a recording `$wpdb`, capability helpers and assertions.
 ```php
 <?php
 require __DIR__ . '/bootstrap.php';
-msrwa_test_load( 'recipe', 'publisher', 'presentation', 'lists' );
+msrwa_test_load( 'rights', 'ledger' );
 
 msrwa_test_as_editor( 7 );                 // or msrwa_test_as_admin()
-$GLOBALS['wpdb']->on( 'FROM wp_msrwa_jobs', array( $row ) );
+$GLOBALS['wpdb']->on( 'FROM wp_msrwa_runs', array( $row ) );
 
-$args = MSRWA_Lists::sanitize_args( array( 'msrwa_author' => '99' ) );
-msrwa_test_assert( 7 === $args['author'], 'A scoped editor must not read another author.' );
+MSRWA_Ledger::runs( array() );
+msrwa_test_contains( $GLOBALS['wpdb']->log(), 'owner_id = 7', 'A writer reads only their own runs.' );
 
 msrwa_test_done( 'MSRWA my contract' );
 ```
@@ -82,28 +98,25 @@ Harness API:
 
 ## Writing a real test
 
-Put it in `tests/real/`, named `test-<subject>.php`. It runs inside a real
-WordPress through WP-CLI, so every WordPress and plugin function is available
-for real.
+Put it in `tests/real/`, named `test-<subject>.php`. It drives the live site
+over REST with the application password, so it needs no shell on the site.
 
 ```php
 <?php
-// tests/real/test-example.php — run by tests/real/run.php
-msrwa_real_require( 'openai' );            // skips cleanly if the key is absent
+require __DIR__ . '/lib.php';
 $budget = msrwa_real_budget();             // refuses to run past the cap
 
-$batch = msrwa_real_create_batch( 'Tarte aux pommes …' );
-msrwa_real_wait( $batch, 900 );            // drive the queue, bounded
+$created = msrwa_real_request( 'POST', '/msrwa/v1/batches', array( 'recipes' => "Tarte…", 'profile' => 'article', 'budget' => $budget ) );
+msrwa_real_request( 'POST', '/msrwa/v1/batches/' . $created['body']['id'] . '/dispatch' );
+msrwa_real_wait( function () { /* poll /batches/{id}/runs */ }, 900, 15 );   // bounded
 
-$job = msrwa_real_job( $batch );
-msrwa_real_assert( $job['draft_post_id'] > 0, 'A draft must exist.' );
-msrwa_real_report( $batch );               // prints cost, tokens, verdict
+msrwa_real_assert( $condition, 'What must be true.' );
+msrwa_real_done( 'label' );
 ```
 
 Rules for real tests:
 
-- **Clean up**: delete the posts, attachments, jobs and batches created, unless
-  the test is asked to keep them for inspection.
+- **Clean up** what you create, unless asked to keep it for inspection.
 - **Bounded**: never loop without a deadline; the queue is asynchronous.
 - **Honest**: report the real cost, and fail loudly rather than skipping a
   provider error.
@@ -111,25 +124,29 @@ Rules for real tests:
 
 ## What is covered today
 
-| File | Covers |
+Offline, `php tests/run.php` — lint plus one file per contract:
+
+| Area | Files |
 | --- | --- |
-| `test-contracts.php` | Catalogue eligibility, input normalization, stage transitions, router plan, quality gate |
-| `test-openai-contracts.php` | OpenAI transport request shape and response parsing, offline |
-| `test-inline-links.php` | Internal links stay inside paragraphs, no external target, no nested anchor |
-| `test-editorial-report.php` | A partial draft never gets a passing verdict; a score never hides a failed review |
-| `test-ai-quality.php` | Independent content and image verdicts |
-| `test-presentation.php` | Public state vocabulary, article quality, batch aggregation over articles |
-| `test-lists.php` | Filter sanitization, capability scoping, prepared parameters, quality filter mapping |
-| `test-admin-lists.php` | List rendering: scoping in SQL, filters, escaping, row actions, queue notice |
-| `test-stats.php` | Article-scoped quality statistics, delivery verdict versus structural gate |
-| `test-queue.php` | Batch draining past the concurrency limit, slot accounting, re-scheduling |
-| `test-version.php` | Plugin header, constant, README changelog and direct-access guards agree |
-| `test-draft-integration.php` | Draft creation on a real site; skipped offline |
+| Engine and its configuration | `test-engine*.php`, `test-json.php`, `test-resolves.php`, `test-audit-handoff.php` |
+| Prompts and scoring | `test-prompt*.php`, `test-ai-quality.php`, `test-approval*.php`, `test-image-*.php`, `test-visual-reference.php`, `test-recipe-structured-data.php` |
+| Money | `test-cost.php`, `test-estimate.php`, `test-budget-and-queue.php`, `test-export.php`, `test-analytics.php` |
+| The lot and its runs | `test-intake.php`, `test-match.php`, `test-profile.php`, `test-run-lifecycle.php`, `test-bulk-and-schedule.php`, `test-storage.php`, `test-retention.php` |
+| Screens and rights | `test-screens.php`, `test-admin-pages.php`, `test-operations.php` |
+| Settings and keys | `test-settings-save.php`, `test-keys.php` |
+| Publishing | `test-schema.php` |
+| Release | `test-version.php`, `test-i18n.php`, `test-uninstall.php` |
+
+Real, `php tests/real/run.php`:
+
+| File | Spends | Proves |
+| --- | --- | --- |
+| `test-site.php` | nothing | schema and migration, capabilities per role, cron armed, uploads writable, an estimate exists, every key opens its provider, a lot over its ceiling is refused, nothing answers anonymously |
+| `test-flow.php` | one article-only recipe | submit → dispatch → cron → draft, cost within the ceiling and near the estimate, the draft carries its excerpt, slug and tags |
 
 ## Gaps
 
-- No offline test executes SQL: schema and index changes are only proven by a
-  real migration.
-- The pipeline stage machine, image generation and the Gemini and Claude
-  adapters have no offline coverage.
-- `tests/real/` is scaffolding until the credentials above exist.
+- No offline test executes SQL; schema changes are proven by the real layer.
+- Image generation, the final judge and photograph matching have not run live
+  from the test machine used for 0.8.0 (no image provider reachable).
+- The real layer has run on SQLite, not yet on MySQL.

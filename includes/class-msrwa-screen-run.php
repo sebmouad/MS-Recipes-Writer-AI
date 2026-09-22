@@ -29,7 +29,11 @@ final class MSRWA_Screen_Run {
 			self::actions( $run )
 		);
 
-		if ( '' !== (string) $run['error_message'] ) { MSRWA_UI::note( esc_html( $run['error_message'] ), 'stop' ); }
+		// Where it stands, in a sentence, for everybody; the raw message only for
+		// whoever can act on it.
+		$reason = MSRWA_UI::reason( $run, $state['steps'] );
+		MSRWA_UI::note( esc_html( $reason[1] ), $reason[0] );
+		if ( '' !== (string) $run['error_message'] && MSRWA_Rights::may_read_diagnostics() ) { MSRWA_UI::note( esc_html( $run['error_message'] ), 'stop' ); }
 		if ( ! empty( $state['totals']['unpriced_steps'] ) && MSRWA_Rights::may_see_money() ) {
 			MSRWA_UI::note( sprintf(
 				/* translators: %d is a number of steps. */
@@ -40,7 +44,7 @@ final class MSRWA_Screen_Run {
 
 		self::edited( $state['artifacts'] );
 		self::verdict( $approval );
-		self::steps( $state['steps'] );
+		if ( MSRWA_Rights::may_read_diagnostics() ) { self::steps( $state['steps'] ); } else { self::progress( $state['steps'] ); }
 
 		if ( MSRWA_Rights::may_read_diagnostics() ) {
 			self::calls( $id );
@@ -172,6 +176,22 @@ final class MSRWA_Screen_Run {
 		return $words[ $verdict ] ?? $verdict;
 	}
 
+	/**
+	 * The steps as a writer needs them: what has been done and what went wrong,
+	 * without scores, check names or model names.
+	 */
+	private static function progress( array $steps ) {
+		if ( ! $steps ) { return; }
+		echo '<section class="ms-card"><h2>' . esc_html__( 'Étapes', 'ms-recipes-writer-ai' ) . '</h2><ol class="ms-steps-plain">';
+		foreach ( $steps as $step ) {
+			$failed = '' !== (string) $step['error'];
+			echo '<li class="' . ( $failed ? 'is-failed' : 'is-done' ) . '"><span class="ms-state ms-state-' . ( $failed ? 'stop' : 'good' ) . '">'
+				. esc_html( $failed ? __( 'arrêtée', 'ms-recipes-writer-ai' ) : __( 'faite', 'ms-recipes-writer-ai' ) ) . '</span> '
+				. esc_html( MSRWA_UI::step_name( $step['step'] ) ) . '</li>';
+		}
+		echo '</ol></section>';
+	}
+
 	private static function steps( array $steps ) {
 		if ( ! $steps ) { return; }
 		echo '<section class="ms-card ms-card-flush"><h2>' . esc_html__( 'Étapes', 'ms-recipes-writer-ai' ) . '</h2>'
@@ -184,7 +204,7 @@ final class MSRWA_Screen_Run {
 			. '<th>' . esc_html__( 'Contrôles non satisfaits', 'ms-recipes-writer-ai' ) . '</th></tr></thead><tbody>';
 
 		foreach ( $steps as $step ) {
-			echo '<tr><td><strong>' . esc_html( $step['step'] ) . '</strong>';
+			echo '<tr><td><strong>' . esc_html( MSRWA_UI::step_name( $step['step'] ) ) . '</strong> <span class="ms-key">' . esc_html( $step['step'] ) . '</span>';
 			if ( '' !== $step['error'] ) { echo '<small>' . esc_html( $step['error'] ) . '</small>'; }
 			echo '</td>';
 			if ( MSRWA_Rights::may_read_diagnostics() ) { echo '<td class="ms-key">' . esc_html( $step['model'] ) . '</td>'; }

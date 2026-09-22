@@ -27,6 +27,8 @@ MSRWA_Run::advance ──► MSRWA_Engine::run( only: this wave )
    │                      steps, calls, events, artifacts written down
    ▼
 MSRWA_Draft::create ──► WordPress draft + media library + post meta
+   │                     excerpt, slug, tags, SEO, recipe card meta
+   │                     (published later: MSRWA_Schema prints Recipe JSON-LD)
    │
    ▼
 MSRWA_Run::release_stored ──► the copies WordPress now holds are dropped
@@ -58,11 +60,17 @@ differently is expressed as the engine's own caller configuration:
 
 - **which steps run** — `MSRWA_Profile` turns "article only" into a step list
   plus the `needs` those dropped steps leave dangling;
-- **which language** — the engine's own `language` key;
+- **which language** — `settings.site_language`, which is what the prompts
+  read (the engine's top-level `language` key is recorded but read by nothing),
+  with the French accent checks relaxed for other languages;
+- **which site settings** — `settings` carries the site's complete prompt and
+  quality settings, from `MSRWA_Settings::engine_settings()`: a non-empty
+  `settings` replaces the engine's defaults wholesale;
 - **which models, ceilings, prices, prompts** — `MSRWA_Engine_Settings` stores
   only the difference from the engine's defaults and hands it over as the caller
   layer;
-- **the API keys** — under `settings.keys.<provider>`, the one branch of the
+- **the API keys** — under `settings.keys.<provider>`, with the provider named
+  the engine's way (`MSRWA_Settings::key_fields()`), the one branch of the
   engine's configuration that never reaches a stored record.
 
 Seven classes are the engine's own dependencies rather than application code and
@@ -145,7 +153,11 @@ to apply it. A query that forgets it has no `WHERE` at all and fails review,
 where one that forgets an inline check quietly shows another writer's work.
 
 Money is an operator's concern: a screen that may not show a figure does not
-fetch it either — `MSRWA_Ledger::runs()` changes its `SELECT` list by capability.
+fetch it either — `MSRWA_Ledger::runs()` changes its `SELECT` list by capability,
+the pass skips the spend query for a writer, and `GET /estimate` answers a writer
+with whether the lot fits and nothing else. What a writer reads instead is one
+sentence per recipe from `MSRWA_UI::reason()`: where it stands and who has to
+act, never a model name or an HTTP status.
 
 ## Screens
 
@@ -154,14 +166,19 @@ fetch it either — `MSRWA_Ledger::runs()` changes its `SELECT` list by capabili
 | Le pass | writer | what is running, what waits to be read, what stopped |
 | Nouveau lot | writer | recipes, photographs, profile, language, ceiling |
 | Lot | writer | the pairing to confirm, then its recipes |
-| Recette | writer | the verdict, the steps; diagnostics for managers only |
+| Recette | writer | where it stands in one sentence, the verdict, the steps by name; scores, models, calls and timeline for managers only |
 | Articles | writer | every run, filtered, with bulk actions |
 | Analyse | manager | cost by step, by model, by day; failing checks; CSV export |
 | Moteur | manager | every engine parameter, and where each step would route |
-| Réglages | manager | keys, and whether the machinery is actually running |
+| Réglages | manager | keys and a free check that each one works, ceilings, the article (language, length, pages, JSON-LD), retention, and whether the machinery is running |
 
 Plus a meta box on the post editor, because a writer opens the article, not this
-plugin, and a warning on a dashboard nobody opened has warned nobody.
+plugin, and a warning on a dashboard nobody opened has warned nobody. It also
+carries the SEO title, meta description and Facebook caption the article wrote.
+
+On the public site, `MSRWA_Schema` prints the recipe as schema.org Recipe
+JSON-LD on published posts that carry `_msrwa_recipe`, unless a recipe plugin
+that prints its own is active.
 
 The interface ships in French, English and Arabic. `tools/i18n.php` extracts and
 compiles the catalogues, because there is no gettext toolchain and no build step.
@@ -174,7 +191,7 @@ Namespace `msrwa/v1`, WordPress cookies and nonce, every response `no-store`
 `GET|POST /batches`, `DELETE /batches/{id}`, `POST /batches/{id}/{pairs|schedule|dispatch}`,
 `GET /batches/{id}/runs`, `POST /runs/bulk`, `POST /runs/{id}/{retry|cancel}`,
 `GET /estimate`, `GET /health`, `GET|POST /queue`, `POST /retention`,
-`POST /diagnostics/config`.
+`POST /keys/check`, `POST /diagnostics/config`.
 
 ## Invariants
 
@@ -205,3 +222,9 @@ Break these and the plugin misreports itself.
     figure that refused it.
 12. **A ceiling parks a run; it never fails one.** Nothing about the article
     went wrong, so nothing it produced is thrown away.
+13. **The engine gets the site's whole `settings`, not the keys alone**, and
+    every key under the provider name the engine configures —
+    `tests/test-settings-save.php`.
+14. **A lot whose recipe is estimated above its per-recipe ceiling is refused at
+    dispatch.** Stopping it part way would pay for everything before the stop
+    and deliver nothing.

@@ -94,6 +94,35 @@ msrwa_test_contains( $html, 'value="0.33"', 'The ceiling offered is the site’s
 
 unset( $GLOBALS['msrwa_test_options'][ MSRWA_Settings::OPTION ] );
 
+// The pass and the compose screen used to print the site's spend and a price per
+// profile to writers — milestone five says an editor sees no cost anywhere.
+msrwa_test_as_editor( 7 );
+$GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
+$pass = msrwa_render( array( 'MSRWA_Screen_Pass', 'render' ) )['html'] ?? '';
+msrwa_test_missing( $pass, ' $<', 'A writer’s pass shows no amount.' );
+msrwa_test_missing( $GLOBALS['wpdb']->log(), 'SUM(r.cost_usd)', 'A writer’s pass does not even ask for the spend.' );
+$GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
+msrwa_test_missing( msrwa_render( array( 'MSRWA_Screen_Compose', 'render' ) )['html'] ?? '', 'ms-choice-cost', 'A writer is not shown a price per profile.' );
+
+// A lot defaults to the site's article language, not always French.
+msrwa_test_as_admin();
+$GLOBALS['msrwa_test_options'][ MSRWA_Settings::OPTION ] = array( 'site_language' => 'en' );
+$GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
+msrwa_test_contains( msrwa_render( array( 'MSRWA_Screen_Compose', 'render' ) )['html'] ?? '', "value=\"en\"  selected='selected'", 'The site language is the one offered.' );
+unset( $GLOBALS['msrwa_test_options'][ MSRWA_Settings::OPTION ] );
+
+// --- A writer reads a sentence, not a stack trace ----------------------------
+
+msrwa_test_assert( 'stop' === MSRWA_UI::reason( array( 'status' => 'failed' ), array( array( 'step' => 'research', 'error' => 'No API key for claude.' ) ) )[0], 'A missing key stops.' );
+msrwa_test_contains( MSRWA_UI::reason( array( 'status' => 'failed' ), array( array( 'step' => 'research', 'error' => 'No API key for claude.' ) ) )[1], 'clé', 'A missing key is said as a missing key.' );
+msrwa_test_missing( MSRWA_UI::reason( array( 'status' => 'failed' ), array( array( 'step' => 'research', 'error' => 'No API key for claude.' ) ) )[1], 'claude', 'Without naming the provider to a writer.' );
+msrwa_test_contains( MSRWA_UI::reason( array( 'status' => 'failed', 'error_message' => 'Plafond de 0.1000 $ atteint avant review.' ) )[1], 'plafond', 'A ceiling is said as a ceiling.' );
+msrwa_test_contains( MSRWA_UI::reason( array( 'status' => 'failed' ), array( array( 'step' => 'article', 'error' => 'HTTP 503' ) ) )[1], 'répondu', 'An outage is said as one.' );
+// Seen live: Anthropic answers 400 when the account is out of credit.
+msrwa_test_contains( MSRWA_UI::reason( array( 'status' => 'failed' ), array( array( 'step' => 'canonical_recipe', 'error' => 'HTTP 400: {"error":{"message":"Your credit balance is too low to access the Anthropic API."}}' ) ) )[1], 'crédit', 'An empty provider account is said as one, not as a broken step.' );
+msrwa_test_contains( MSRWA_UI::reason( array( 'status' => 'failed' ), array( array( 'step' => 'article', 'error' => 'recipe schema' ) ) )[1], 'Rédaction', 'Anything else names the step in words.' );
+msrwa_test_contains( MSRWA_UI::reason( array( 'status' => 'done', 'draft_post_id' => 3, 'approved' => null ) )[1], 'Rien n’est publié', 'A finished recipe is never phrased as approved.' );
+
 // --- Throwing a lot away is an administrator's, and never mid-flight ----
 
 function msrwa_batch_html( $status, $owner ) {

@@ -1,32 +1,28 @@
 # Build checklist — for the model doing the work
 
-## Reference-inspired 0.3.3
+## Verified on a real site — 0.8.0, 2026-09-22
 
-- [~] Administrator-only global access; writers/editors scoped to own jobs even with legacy view-all capability. Editorial result cards omit costs and technical reports. Statistics explanatory text moved into collapsed help. Offline scope tests pass; live role/browser validation pending.
+WordPress 7.1.1 with the SQLite database integration (the only database the
+test sandbox could run; a MySQL pass is still owed), the plugin activated, lots
+driven over REST with an application password and carried to a draft by
+WP-Cron. Text steps routed to Claude Haiku through the Moteur screen: OpenAI and
+Gemini were unreachable from the sandbox's network, so **no image step has run
+live yet**.
 
-- [~] Multi-recipe title preview, live per-status batch counters, accessible per-recipe progress bars and French status badges. Offline summary-count regressions pass; real browser verification pending.
-
-- [~] Interface-only inspiration from MS Cook Writer AI revision 2c00d91: statistics summary cards. Preserve multiple-recipe batches, pairing and per-job tracking. Do not change engine, article or image prompts/generation. Visual validation pending.
-
-## Hotfix 0.3.2
-
-- [~] Restore credential sanitization, preserve partial settings saves, and handle the removed catalog table. Production settings class tested offline with OpenSSL; live WordPress save still requires deployment verification.
-
-## Plugin operations 0.3.1 — 2026-09-21
-
-- [~] Unified responsive design tokens, mobile navigation, 44px controls, keyboard focus, selected-photo thumbnails, overflow hints and unsaved-settings warning. Visual browser validation remains pending.
-
-- [~] Shared page navigation, searchable/paginated owner-scoped Jobs, dedicated scheduler diagnostic page and recipe-count feedback on Write.
-
-- [~] Job detail embeds the lab report, with authenticated full-page and HTML download views; image paths confined to the job upload directory.
-- [~] Analytics: bounded period, statuses, steps, quality counts, model/provider usage, cache, events, artifacts and recent-job drilldown.
-- [~] Local settings diagnostics, JSON syntax tests, atomic rejection of invalid saves.
-- [~] Admin-only unsaved configuration preview, shared parsing with save, whole-list overrides and engine-resolved effective values.
-- [~] Five-minute cron watchdog, guarded expired-lease recovery, missing queued-event recovery and heartbeat visibility.
-- [~] Responsive tables, visible keyboard focus, retrying non-overlapping status polling.
-- [ ] Verify on a real WordPress/MySQL installation: report/images, mobile viewport, provider authentication and cron execution. No WordPress installation is available in the current repository.
-
-Offline suite: 20 passed; JavaScript syntax and diff whitespace checks passed. Engine files unchanged.
+- [x] `tests/real/test-site.php` green: schema, capabilities, cron, routes
+  closed to the public, key check, and a lot over its ceiling refused for free.
+- [x] `tests/real/test-flow.php` green: one French article-only lot, 294 s,
+  $0.2570 billed against $0.2485 estimated, draft created. (Its last rerun
+  stopped at the recipe step because the Anthropic account ran out of credit —
+  now reported to writers as exactly that.)
+- [x] One English lot by hand: written in English, 5 988 words over two pages,
+  $0.2422, recipe meta mapped, JSON-LD printed once published.
+- [x] Every screen opened in a real browser as administrator and as author, at
+  1400 px and 390 px: no horizontal overflow, no script error, no amount shown
+  to the author.
+- [ ] Image steps, the final judge and the matcher live — need an OpenAI or
+  Gemini key reachable from the test machine.
+- [ ] The same suite on MySQL.
 
 Executable version of the agreed specification, in the order the owner set:
 **prove the prompts, then build everything, then deploy and improve on the
@@ -442,22 +438,22 @@ cost) in the task before changing anything.
 Measured on the live site: 293s of provider work inside a 10-minute wall clock,
 14 worker runs for one recipe, and the article generated four times.
 
-- [ ] **B1.1 — One-pass runner.** A worker runs a job from intake to draft in a
+- [x] *(superseded by the engine's waves, verified live: one recipe, one run, 294 s, no step generated twice)* **B1.1 — One-pass runner.** A worker runs a job from intake to draft in a
   single execution under a time budget, re-scheduling only when the budget runs
   out. Removes the per-stage cron ping-pong.
   *Offline test:* one invocation advances a job through every stage; a job that
   exceeds the budget re-schedules exactly once and resumes where it stopped.
-- [ ] **B1.2 — Patch, do not regenerate.** A correction rewrites only the
+- [x] *(superseded: the `corrections` step substitutes the fact check's quotes in code, verified live)* **B1.2 — Patch, do not regenerate.** A correction rewrites only the
   sections the review named. *Offline test:* untouched sections stay
   byte-identical; the corrected section changes.
-- [ ] **B1.3 — Deterministic routing by default.** The agentic router becomes
+- [x] *(superseded: routing is a setting, no router call exists)* **B1.3 — Deterministic routing by default.** The agentic router becomes
   opt-in, so no model call happens before real work.
   *Offline test:* with the setting off, no routing call is recorded.
-- [ ] **B1.4 — Parallel calls.** Independent provider calls run concurrently
+- [x] *(engine `limits.concurrency`, verified live: review and fact check ran as one wave)* **B1.4 — Parallel calls.** Independent provider calls run concurrently
   (`curl_multi`): featured and Facebook images together, image generation
   overlapping the review. *Offline test:* the transport issues one multi
   request for a batch of two, and a failure in one does not cancel the other.
-- [ ] **B1.5 — Target.** Article plus featured image in **90 seconds or less**
+- [ ] *(not met: an article-only recipe takes ~290 s on Claude Haiku; image steps not yet measured live)* **B1.5 — Target.** Article plus featured image in **90 seconds or less**
   for one recipe. *Real test:* `tests/real/test-generation.php` asserts it.
 
 ## B2 — Cost engine (started)
@@ -466,7 +462,7 @@ Measured on the live site: 293s of provider work inside a 10-minute wall clock,
   the catalogue rate; the catalogue carries editable generated-image token
   counts per size and quality; the estimate reports four buckets with min and
   max. Offline coverage in `tests/test-cost.php`.
-- [ ] **T1.4 — Live recompute in settings.** The eight numbers on screen,
+- [~] *(the compose screen recomputes live as the lot, profile and ceiling change, and warns before a lot over its ceiling is sent; the settings screen shows the full-recipe estimate beside the ceiling. The eight-number grid is not built.)* **T1.4 — Live recompute in settings.** The eight numbers on screen,
   updated without reloading through `POST /estimate`, refused to a user without
   `manage_options`.
 - [~] **T1.5 — Budgets reduced to daily and monthly.** `MSRWA_Budget` reads two
@@ -495,35 +491,35 @@ Measured on the live site: 293s of provider work inside a 10-minute wall clock,
 
 ## B5 — Article contract
 
-- [ ] **T4.1 — Editable enforced outline**, a missing section blocking delivery.
-- [ ] **T4.2 — Two-part writing with continuity**, 2800 words minimum.
-- [ ] **T4.3 — Post-write fact check** correcting only the failing parts.
-- [ ] **T4.4 — Proofreading pass**, always on, last text step.
-- [ ] **T4.5 — Recipe JSON-LD** behind an adapter.
+- [~] *(enforced by the engine's fixed section list; making it editable needs the engine change proposed in ENGINE.md §7)* **T4.1 — Editable enforced outline**, a missing section blocking delivery.
+- [x] *(verified live once the site's settings reached the engine in 0.8.0)* **T4.2 — Two-part writing with continuity**, 2800 words minimum.
+- [x] **T4.3 — Post-write fact check** correcting only the failing parts.
+- [x] **T4.4 — Proofreading pass**, always on, last text step.
+- [x] **T4.5 — Recipe JSON-LD** behind an adapter. `MSRWA_Schema`, silent when a recipe plugin prints its own; `tests/test-schema.php`, verified on a published post.
 
 ## B6 — Roles and surface
 
-- [ ] **T5.1 — Editor surface** with no cost, models, tokens, stages or
+- [x] **T5.1 — Editor surface** with no cost, models, tokens, stages or
   diagnostics, on every screen including statistics and job detail.
-- [ ] **T5.2 — Plain-language reasons** for every internal status and error.
+- [x] *(`MSRWA_UI::reason()`, verified on the recipe screen as an author)* **T5.2 — Plain-language reasons** for every internal status and error.
 
 ## B7 — Site language
 
-- [ ] **T6.1 — One language per site**, applied to prompts, the quality
+- [~] *(site language and per-lot language reach the prompts; English verified live, Arabic offline only)* **T6.1 — One language per site**, applied to prompts, the quality
   contract and proofreading. Three shipped.
 
 ## B8 — First complete version sweep
 
-- [ ] **B8.1 — Menus and pages.** Every screen reachable, titled, with an empty
+- [x] **B8.1 — Menus and pages.** Every screen reachable, titled, with an empty
   state and a back link; no orphan page.
-- [ ] **B8.2 — Security pass.** Capability check and nonce on every action,
+- [~] **B8.2 — Security pass.** Capability check and nonce on every action,
   escaping on every output, prepared statements everywhere, no secret in stored
   data, plugin API responses uncacheable. *Offline test per rule.*
-- [ ] **B8.3 — Access management.** Roles and capabilities documented and
+- [x] **B8.3 — Access management.** Roles and capabilities documented and
   enforced: who may create, read own, read all, manage.
-- [ ] **B8.4 — Uninstall and migration.** Activation, upgrade and uninstall
+- [~] *(activation and the 0.7.8 → 0.8.0 upgrade verified live; uninstall offline only)* **B8.4 — Uninstall and migration.** Activation, upgrade and uninstall
   verified on a site holding data.
-- [ ] **B8.5 — Release.** Version, README changelog, architecture and plan
+- [x] **B8.5 — Release.** Version, README changelog, architecture and plan
   updated; `php tests/run.php` green.
 
 ---
@@ -532,7 +528,7 @@ Measured on the live site: 293s of provider work inside a 10-minute wall clock,
 
 - [ ] **C1 — Deployment path.** SFTP, SSH or a server-side pull, so a build
   reaches the site without a manual ZIP upload.
-- [ ] **C2 — Real suite.** `php tests/real/run.php` green, including generation.
+- [~] *(green on a local site, not yet on the production host)* **C2 — Real suite.** `php tests/real/run.php` green, including generation.
 - [ ] **C3 — Performance verified live:** article plus featured image ≤ 90s.
 - [ ] **C4 — Quality verified live** against the benchmark: complete sections,
   faithful to sources, no writing mistakes, cost inside the estimate.
@@ -541,8 +537,12 @@ Measured on the live site: 293s of provider work inside a 10-minute wall clock,
 
 ## Awaiting real verification
 
-- **T1.1 / T1.2 / T1.3** — cost engine. Real verification needs T1.4 so the
-  numbers are visible on screen.
+- **T1.1 / T1.2 / T1.3** — cost engine. The article-only estimate landed within
+  4 % of the bill on a real run; the image buckets need an image provider
+  reachable from the test machine.
+- **T6.1** — an Arabic lot, live.
+- **B1.5 / C3** — timing with images.
+- Everything under *Verified on a real site* that is still unticked.
 
 ## Decisions this checklist encodes
 

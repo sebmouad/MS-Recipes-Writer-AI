@@ -31,4 +31,17 @@ foreach ( array_keys( MSRWA_Settings::key_fields() ) as $provider ) {
 }
 $config = MSRWA_Engine_Config::create( array(), array( 'settings' => array( 'keys' => MSRWA_Settings::engine_keys() ) ) );
 msrwa_test_assert( ! empty( $config->provider( 'claude' )['has_key'] ), 'The stored Claude key must be the one the engine resolves.' );
+
+// The engine treats a non-empty `settings` as complete. Keys alone once meant
+// every quality threshold compared against zero and the site's word count,
+// page split and language never reached a prompt.
+$handed = MSRWA_Settings::engine_settings();
+msrwa_test_assert( 3000 === (int) $handed['quality_min_words'], 'The site word count must reach the engine with the keys.' );
+foreach ( array( 'quality_min_headings', 'quality_min_ingredients', 'quality_min_steps', 'site_language' ) as $needed ) {
+	msrwa_test_assert( array_key_exists( $needed, $handed ), $needed . ' must reach the engine.' );
+}
+msrwa_test_assert( ! isset( $handed['openai_key'] ) && ! isset( $handed['claude_key'] ) && ! isset( $handed['gemini_key'] ), 'Encrypted key fields travel only once, decrypted, under keys.' );
+MSRWA_Engine_Input::use_settings( array() );
+$config = MSRWA_Engine_Config::create( array(), array( 'settings' => $handed ) );
+msrwa_test_assert( 3000 === (int) $config->settings()['quality_min_words'], 'The engine must read the site threshold, not zero.' );
 msrwa_test_done( 'production settings save regression' );

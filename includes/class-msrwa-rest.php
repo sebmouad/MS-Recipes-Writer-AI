@@ -21,6 +21,7 @@ final class MSRWA_REST {
 			array( 'methods' => 'GET', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'queue' ) ),
 			array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_manage' ), 'callback' => array( __CLASS__, 'queue_control' ) ),
 		) );
+		register_rest_route( 'msrwa/v1', '/keys/check', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_manage' ), 'callback' => array( __CLASS__, 'check_keys' ) ) );
 		register_rest_route( 'msrwa/v1', '/retention', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_manage' ), 'callback' => array( __CLASS__, 'prune' ) ) );
 		register_rest_route( 'msrwa/v1', '/runs/bulk', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'bulk' ) ) );
 		register_rest_route( 'msrwa/v1', '/runs/(?P<id>\d+)/retry', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'retry' ) ) );
@@ -57,6 +58,16 @@ final class MSRWA_REST {
 			(int) $request->get_param( 'recipes' ),
 			(int) $request->get_param( 'images' )
 		);
+		$site_ceiling = (float) MSRWA_Settings::get()['per_recipe_budget_usd'];
+		$ceiling = MSRWA_Rights::may_see_money() && null !== $request->get_param( 'budget' ) ? (float) $request->get_param( 'budget' ) : $site_ceiling;
+		$fits = MSRWA_Estimate::fits( (float) $estimate['per_recipe_usd'], $ceiling );
+		// Money is an operator's concern: a writer learns whether the lot fits,
+		// never what it costs or what the ceiling is.
+		if ( ! MSRWA_Rights::may_see_money() ) {
+			return rest_ensure_response( array( 'recipes' => (int) $estimate['recipes'], 'fits' => $fits ) );
+		}
+		$estimate['ceiling_usd'] = $ceiling;
+		$estimate['fits'] = $fits;
 		return rest_ensure_response( $estimate );
 	}
 
@@ -72,7 +83,7 @@ final class MSRWA_REST {
 		// The per-recipe ceiling is the site's unless the person may set it. It
 		// used to be worked out here and then not used, so anybody who could
 		// submit a lot could name their own ceiling by posting one.
-		$budget = MSRWA_Rights::may_see_money() ? (float) $request->get_param( 'budget' ) : (float) ( MSRWA_Settings::get()['per_recipe_budget_usd'] ?? 0.20 );
+		$budget = MSRWA_Rights::may_see_money() ? (float) $request->get_param( 'budget' ) : (float) MSRWA_Settings::get()['per_recipe_budget_usd'];
 		$id = MSRWA_Batch::create(
 			$recipes, $images, $budget,
 			sanitize_key( (string) $request->get_param( 'profile' ) ),
@@ -148,6 +159,11 @@ final class MSRWA_REST {
 		if ( 'hold' === $action ) { MSRWA_Queue::hold(); return rest_ensure_response( array( 'held' => true ) ); }
 		if ( 'release' === $action ) { return rest_ensure_response( array( 'held' => false, 'rearmed' => MSRWA_Queue::release() ) ); }
 		return new WP_Error( 'msrwa_unknown_action', __( 'Action inconnue.', 'ms-recipes-writer-ai' ), array( 'status' => 400 ) );
+	}
+
+	/** Whether each stored key opens its provider. Costs nothing: it lists models. */
+	public static function check_keys() {
+		return rest_ensure_response( MSRWA_Keys::check() );
 	}
 
 	/**

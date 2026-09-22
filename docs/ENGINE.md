@@ -272,8 +272,7 @@ stacks with its column names, and nothing runs off the side.
 
 ## 6 · What the plugin has to do
 
-The plugin is not written yet. When it is, it owns exactly four things the
-engine deliberately does not:
+The plugin owns exactly four things the engine deliberately does not:
 
 - **Access.** Capabilities, nonces, per-editor scoping. The engine has no idea
   who is asking.
@@ -281,9 +280,51 @@ engine deliberately does not:
   fed by the observer.
 - **Configuration.** Every engine parameter exposed to an administrator, and
   translated from the plugin's own vocabulary into the engine's before the call.
+  Two details the plugin must get right, both found on a live site in 0.8.0:
+  keys go under `settings.keys.<provider>` with the provider named the engine's
+  way (`claude`, never `anthropic`), and `settings` carries the site's
+  **complete** prompt and quality settings — a non-empty `settings` replaces
+  the shipped defaults wholesale, so handing over the keys alone once made
+  every threshold zero. The article language travels as
+  `settings.site_language`, which is what the prompts read.
 - **Storage.** Artifacts, steps, events and costs into the database, through
   `MSRWA_DB::sanitize_persisted_data()`. Quality belongs to the article, never
   to the job that ran; `completed` is never editorial approval; costs are
   estimates, never an invoice.
 
 The engine changes for none of this.
+
+---
+
+## 7 · Proposed changes, awaiting the owner's approval
+
+Found while running the plugin on a real site. None of these has been applied:
+the engine changes only on the owner's decision. Each is small and each has a
+workaround already in the plugin.
+
+1. **The article prompt demands French accents in every language.**
+   `prompts/article.tpl.txt` line 8 lists `é, è, ê, à…` and says "text without
+   accents is rejected" whatever `{{language}}` is. An English or Arabic
+   article is asked to carry French typography. *Proposal:* wrap that line in
+   `{{#if french}}`, with `french` set by `MSRWA_Prompt::variables()`. *Today:*
+   the plugin lowers `article_accents_per_1000` to 0 for non-French lots, so the
+   check no longer fails, but the instruction still reaches the model.
+2. **The required-sections check only knows French headings.**
+   `MSRWA_Engine_Score::required_sections()` matches French synonyms (choix,
+   matériel, erreurs, conservation…). A correct English article fails it every
+   time (seen live: 9/10, "missing: choix, matériel, erreurs, conservation").
+   *Proposal:* read the list from `settings.required_sections` when set, and ship
+   synonyms per language. This is also what milestone T4.1 (an editable
+   outline) needs.
+3. **The top-level `language` key is read by nothing.** It is recorded on every
+   run and shown on the Moteur screen, but prompts read
+   `settings.site_language`. *Proposal:* when `language` is set and
+   `settings.site_language` is not, copy it across in `configure()`; or remove
+   the key. *Today:* the plugin sets both.
+4. **Nothing checks the maximum length.** The words check compares against
+   `quality_min_words` only; a live English article came back at 5 988 words for
+   a 2 800–3 600 target, which is paid for twice more (review and proofread
+   read it whole). *Proposal:* a `words` check that also fails above
+   `quality_max_words` by more than a tolerance, so the step is asked again
+   rather than billed on.
+
