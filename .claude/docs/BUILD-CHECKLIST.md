@@ -1,6 +1,6 @@
 # Build checklist — for the model doing the work
 
-## Verified on a real site — 0.10.0, 2026-09-22
+## Verified on a real site — 0.11.0, 2026-09-22
 
 WordPress 7.1.1 with the SQLite database integration (the only database the
 test sandbox could run; a MySQL pass is still owed), the plugin activated, lots
@@ -40,6 +40,11 @@ run carries.
 - [x] The key check and the Diagnostic screen naming a real provider refusal:
   `claude` out of credit, `gemini` out of quota, read back from the failures
   those accounts actually returned.
+- [x] The model list each provider actually serves, fetched live and read back:
+  Gemini returned 59 identifiers and Anthropic 12, and comparing them to the
+  engine's `tiers` map found `claude:low` naming `claude-haiku-4-5`, which
+  Anthropic does not serve. Proposed in ENGINE.md §7; the Diagnostic screen
+  turns the routing red for it.
 - [ ] Image steps, the final judge and the matcher live — need a reachable and
   funded OpenAI or Gemini key.
 - [ ] The same suite on MySQL.

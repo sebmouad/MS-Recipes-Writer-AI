@@ -328,3 +328,36 @@ workaround already in the plugin.
    `quality_max_words` by more than a tolerance, so the step is asked again
    rather than billed on.
 
+5. **Five of the nine tier routes name a model that cannot be priced, and one
+   names a model its provider does not serve.** `tiers` in
+   `MSRWA_Engine_Config::defaults()` maps each `provider:low|medium|high` to an
+   identifier. Checked on 2026-09-22 against the catalogue, and against the
+   lists Gemini and Anthropic returned for the real keys on the test site:
+
+   | Tier | Provider | Model named | Priced | Served |
+   | --- | --- | --- | --- | --- |
+   | low | openai | `gpt-5-nano` | no | not checked |
+   | low | gemini | `gemini-3.1-flash-lite` | no | yes |
+   | low | claude | `claude-haiku-4-5` | no | **no** |
+   | medium | openai | `gpt-5.6-luna` | yes | not checked |
+   | medium | gemini | `gemini-3.5-flash` | yes | yes |
+   | medium | claude | `claude-sonnet-5` | yes | yes |
+   | high | openai | `gpt-5.6-sol` | yes | not checked |
+   | high | gemini | `gemini-3.1-pro-preview` | no | yes |
+   | high | claude | `claude-opus-5` | no | yes |
+
+   `claude:low` is the one that fails outright: Anthropic lists
+   `claude-haiku-4-5-20251001`, not `claude-haiku-4-5`, so any step routed
+   there dies with a model-not-found after every step before it has been paid
+   for. The rest run but cannot be estimated, which makes the ceiling that is
+   supposed to refuse an over-budget lot unable to see them.
+
+   *Proposal:* correct `claude-haiku-4-5` to `claude-haiku-4-5-20251001`, and
+   either point the remaining four at models the catalogue prices or accept
+   that `low` and `high` are unpriced by design and say so in the contract.
+   *Today:* nothing is changed in the engine. The plugin now shows the
+   resolved model, its price and whether the provider serves it beside every
+   route on the Moteur screen, and the Diagnostic screen refuses to call the
+   routing green when a step names a model its provider does not list — so the
+   failure is visible before a lot is dispatched rather than after it has paid
+   its way to that step.

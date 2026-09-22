@@ -1480,3 +1480,84 @@ msgstr "key valid, but the provider account is out of credit: the last real call
 
 msgid "clé valide, mais le quota du compte est épuisé : le dernier appel réel a été refusé. Attendre qu’il se réinitialise ou relever la limite chez le fournisseur."
 msgstr "key valid, but the account quota is exhausted: the last real call was refused. Wait for it to reset or raise the limit at the provider."
+
+msgid "$%1$s entrée / $%2$s sortie par million de jetons"
+msgstr "$%1$s in / $%2$s out per million tokens"
+
+msgid "%1$d modèle(s) servis d’après le fournisseur, relevés le %2$s."
+msgstr "%1$d model(s) served according to the provider, listed on %2$s."
+
+msgid "Le profil complet en compte %s. Une étape part dès que tout ce dont elle dépend est prêt : c’est ce qui découpe une recette en vagues, et ce qui fait qu’une reprise ne repaie pas ce qui a réussi."
+msgstr "The full profile has %s of them. A step starts as soon as everything it depends on is ready: that is what cuts a recipe into waves, and what makes a resume avoid paying again for what succeeded."
+
+msgid "Attend"
+msgstr "Waits for"
+
+msgid "Ce que fait le moteur, étape par étape"
+msgstr "What the engine does, step by step"
+
+msgid "Entrée / sortie par million"
+msgstr "In / out per million"
+
+msgid "Fournisseur et niveau"
+msgstr "Provider and level"
+
+msgid "Jamais interrogé. « Vérifier les clés », dans les réglages, relève la liste sans rien dépenser."
+msgstr "Never asked. \"Check the keys\", in the settings, fetches the list without spending anything."
+
+msgid "Le fournisseur ne sert pas ces modèles : %s. L’étape concernée échouera, après avoir payé celles d’avant."
+msgstr "The provider does not serve these models: %s. The step concerned will fail, after paying for the ones before it."
+
+msgid "Les tarifs sont saisis à la main d’après la page de chaque fournisseur : aucune API ne les donne, et une estimation ne vaut que ce qu’ils valent. La liste des identifiants, elle, vient du fournisseur lui-même et se met à jour à chaque « Vérifier les clés »."
+msgstr "Prices are entered by hand from each provider’s own page: no API gives them, and an estimate is only worth what they are worth. The list of identifiers, on the other hand, comes from the provider itself and is refreshed by every \"Check the keys\"."
+
+msgid "Modèle qui tournera"
+msgstr "The model that will run"
+
+msgid "Modèles et tarifs"
+msgstr "Models and prices"
+
+msgid "Produit"
+msgstr "Produces"
+
+msgid "Routez ces étapes vers un modèle listé dans Moteur → Modèles et tarifs."
+msgstr "Route these steps to a model listed under Engine → Models and prices."
+
+msgid "Sait faire"
+msgstr "Can do"
+
+msgid "Servi"
+msgstr "Served"
+
+msgid "Tout ce que le fournisseur sert"
+msgstr "Everything the provider serves"
+
+msgid "aucun tarif connu — le coût de cette étape ne peut pas être estimé"
+msgstr "no known price — the cost of this step cannot be estimated"
+
+msgid "génération d’image"
+msgstr "image generation"
+
+msgid "jamais vérifié auprès du fournisseur"
+msgstr "never checked against the provider"
+
+msgid "le fournisseur ne sert pas ce nom : l’étape échouera"
+msgstr "the provider does not serve this name: the step will fail"
+
+msgid "non"
+msgstr "no"
+
+msgid "non vérifié"
+msgstr "not checked"
+
+msgid "oui"
+msgstr "yes"
+
+msgid "recherche web"
+msgstr "web search"
+
+msgid "texte"
+msgstr "text"
+
+msgid "vision"
+msgstr "vision"

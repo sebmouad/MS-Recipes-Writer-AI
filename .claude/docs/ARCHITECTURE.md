@@ -199,7 +199,19 @@ engine drew for sharing and falling back to the featured one; it steps aside
 when any of the usual SEO plugins is active, and speaks only for posts this
 plugin wrote.
 
-The interface ships in French, English and Arabic. `tools/i18n.php` extracts and
+`MSRWA_Catalog` holds two different kinds of knowledge, deliberately kept
+apart. What a model costs and what it can do is shipped: no API tells you a
+price, so it is written down and corrected by hand against the source each
+entry names. Which identifiers a provider still answers to is the opposite —
+only the provider knows, and it changes when a model is renamed or retired, so
+the key check keeps the list it downloads (it used to read the status code and
+throw the body away) and the Moteur screen and the Diagnostic screen both read
+it back. A route naming a model the provider does not list is a stop, because
+that step cannot run; a provider never asked says nothing about its models, so
+silence is reported as unknown rather than as absence.
+
+The interface is light only, by the owner's decision, and ships in French,
+English and Arabic. `tools/i18n.php` extracts and
 compiles the catalogues, because there is no gettext toolchain and no build step.
 
 ## REST

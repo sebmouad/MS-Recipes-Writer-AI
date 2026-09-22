@@ -5,9 +5,9 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.10.0
+## État actuel — 0.11.0
 
-La version `0.10.0` est installable et vérifiée de bout en bout sur un vrai
+La version `0.11.0` est installable et vérifiée de bout en bout sur un vrai
 WordPress (7.1.1) : un lot part, le cron le fait avancer vague par vague, et un
 brouillon arrive **en blocs**, avec son article, sa recette, son extrait, son
 identifiant d’URL, ses étiquettes, ses images attachées et décrites, ses
@@ -65,6 +65,56 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.11.0
+
+**L’écran Moteur dit enfin quel modèle va tourner.** « Modèle par étape »
+proposait un fournisseur et un niveau — *low*, *medium*, *high* — et s’arrêtait
+là. Or ce n’est pas une réponse à « qu’est-ce qui va tourner et combien cela
+coûtera » : c’est la table `tiers` du moteur qui transforme ce couple en un
+identifiant de modèle, et cet identifiant n’apparaissait nulle part. Une
+troisième colonne le montre désormais, avec son tarif, et prévient quand il
+n’en a pas.
+
+**Ce que cela a immédiatement révélé.** Cinq des neuf combinaisons
+fournisseur × niveau désignent un modèle dont ce plugin ne connaît pas le
+tarif — l’estimation qui doit refuser un lot trop cher ne peut donc pas les
+voir. Et `claude:low` nomme `claude-haiku-4-5`, alors qu’Anthropic sert
+`claude-haiku-4-5-20251001` : toute étape routée là échoue, après avoir payé
+toutes celles d’avant. La table `tiers` appartient au moteur, donc rien n’y a
+été touché ; la correction est proposée dans
+[`.claude/docs/ENGINE.md`](.claude/docs/ENGINE.md) §7, avec le relevé complet.
+
+**La liste des modèles du fournisseur ne part plus à la poubelle.** La
+vérification des clés interroge `/models` chez chacun — c’est gratuit et c’est
+ce qui prouve que la clé ouvre la porte — puis ne lisait que le code HTTP et
+jetait la réponse. C’est pourtant la seule chose que le fournisseur sait et que
+ce plugin ne peut pas deviner : quels identifiants répondent encore, ce qui
+change sans prévenir quand un modèle est renommé ou retiré. La liste est
+maintenant conservée, datée, affichée sous « Modèles et tarifs », et le
+Diagnostic refuse de dire le routage vert quand une étape nomme un modèle que
+son fournisseur ne sert pas.
+
+**Deux sections de référence sur l’écran Moteur.** Ce que fait le moteur étape
+par étape — ce que chaque étape attend, ce qu’elle produit, sur quel modèle
+elle tourne — et le catalogue des modèles avec leurs tarifs, leurs capacités et
+leur état chez le fournisseur. Le registre n’était lisible que sous forme de
+JSON brut dans une case vide sur un site qui n’a rien modifié : le seul écran
+consacré au moteur ne disait rien de ce que le moteur fait.
+
+**Du code mort en moins.** `MSRWA_Catalog` gardait un installateur, un filtre
+d’éligibilité et un magasin d’état qui interrogeaient les tables
+`msrwa_providers` et `msrwa_models` — supersédées et plus jamais créées. La
+classe passe de 207 à un peu plus de 100 lignes et ne contient plus que ce qui
+s’exécute.
+
+**Plus de thème sombre.** L’interface est claire, par décision du propriétaire.
+Les couleurs restent des jetons, donc un thème pourrait revenir en un bloc,
+mais plus rien ne suit la préférence système du lecteur. Une nouvelle suite
+(`tests/test-styles.php`) tient les trois promesses que l’en-tête de la feuille
+de style énonçait sans que rien ne les vérifie : clair uniquement, aucune
+propriété physique gauche/droite — l’interface est aussi arabe — et aucun appel
+à un autre serveur depuis l’administration de quelqu’un d’autre.
 
 ## Version 0.10.0
 

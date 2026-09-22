@@ -1496,3 +1496,84 @@ msgstr "المفتاح صالح، لكن حساب المزوّد بلا رصيد
 
 msgid "clé valide, mais le quota du compte est épuisé : le dernier appel réel a été refusé. Attendre qu’il se réinitialise ou relever la limite chez le fournisseur."
 msgstr "المفتاح صالح، لكن حصة الحساب استُنفدت: رُفض آخر طلب فعلي. انتظر إعادة ضبطها أو ارفع الحدّ لدى المزوّد."
+
+msgid "$%1$s entrée / $%2$s sortie par million de jetons"
+msgstr "%1$s دولار للإدخال / %2$s دولار للإخراج لكل مليون رمز"
+
+msgid "%1$d modèle(s) servis d’après le fournisseur, relevés le %2$s."
+msgstr "%1$d نموذج/نماذج يخدمها المزوّد، حسب قائمة %2$s."
+
+msgid "Le profil complet en compte %s. Une étape part dès que tout ce dont elle dépend est prêt : c’est ce qui découpe une recette en vagues, et ce qui fait qu’une reprise ne repaie pas ce qui a réussi."
+msgstr "يضم الملف الكامل %s منها. تنطلق الخطوة فور جهوز كل ما تعتمد عليه: هذا ما يقسّم الوصفة إلى موجات، وما يجعل الاستئناف لا يدفع ثانيةً ثمن ما نجح."
+
+msgid "Attend"
+msgstr "ينتظر"
+
+msgid "Ce que fait le moteur, étape par étape"
+msgstr "ما يفعله المحرّك، خطوة بخطوة"
+
+msgid "Entrée / sortie par million"
+msgstr "إدخال / إخراج لكل مليون"
+
+msgid "Fournisseur et niveau"
+msgstr "المزوّد والمستوى"
+
+msgid "Jamais interrogé. « Vérifier les clés », dans les réglages, relève la liste sans rien dépenser."
+msgstr "لم يُسأل قط. «تحقّق من المفاتيح» في الإعدادات يجلب القائمة دون أي إنفاق."
+
+msgid "Le fournisseur ne sert pas ces modèles : %s. L’étape concernée échouera, après avoir payé celles d’avant."
+msgstr "لا يخدم المزوّد هذه النماذج: %s. ستفشل الخطوة المعنية بعد دفع ثمن ما سبقها."
+
+msgid "Les tarifs sont saisis à la main d’après la page de chaque fournisseur : aucune API ne les donne, et une estimation ne vaut que ce qu’ils valent. La liste des identifiants, elle, vient du fournisseur lui-même et se met à jour à chaque « Vérifier les clés »."
+msgstr "تُدخَل الأسعار يدويًا من صفحة كل مزوّد: لا تتيحها أي واجهة برمجية، ولا يساوي التقدير إلا ما تساويه. أما قائمة المعرّفات فتأتي من المزوّد نفسه وتُحدَّث مع كل «تحقّق من المفاتيح»."
+
+msgid "Modèle qui tournera"
+msgstr "النموذج الذي سيعمل"
+
+msgid "Modèles et tarifs"
+msgstr "النماذج والأسعار"
+
+msgid "Produit"
+msgstr "يُنتج"
+
+msgid "Routez ces étapes vers un modèle listé dans Moteur → Modèles et tarifs."
+msgstr "وجّه هذه الخطوات إلى نموذج مدرج في المحرّك ← النماذج والأسعار."
+
+msgid "Sait faire"
+msgstr "يستطيع"
+
+msgid "Servi"
+msgstr "مخدوم"
+
+msgid "Tout ce que le fournisseur sert"
+msgstr "كل ما يخدمه المزوّد"
+
+msgid "aucun tarif connu — le coût de cette étape ne peut pas être estimé"
+msgstr "لا سعر معروف — يتعذّر تقدير تكلفة هذه الخطوة"
+
+msgid "génération d’image"
+msgstr "توليد الصور"
+
+msgid "jamais vérifié auprès du fournisseur"
+msgstr "لم يُتحقَّق منه لدى المزوّد"
+
+msgid "le fournisseur ne sert pas ce nom : l’étape échouera"
+msgstr "لا يخدم المزوّد هذا الاسم: ستفشل الخطوة"
+
+msgid "non"
+msgstr "لا"
+
+msgid "non vérifié"
+msgstr "غير مُتحقَّق"
+
+msgid "oui"
+msgstr "نعم"
+
+msgid "recherche web"
+msgstr "البحث على الويب"
+
+msgid "texte"
+msgstr "نص"
+
+msgid "vision"
+msgstr "الرؤية"
