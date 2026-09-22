@@ -4,9 +4,9 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
 final class MSRWA_Images {
 	public static function validate( $image ) {
 		$id = isset( $image['attachment_id'] ) ? absint( $image['attachment_id'] ) : 0;
-		if ( ! $id || ! get_attached_file( $id ) || ! wp_attachment_is_image( $id ) ) { return new WP_Error( 'image_invalid', 'Le média image généré est introuvable ou invalide.' ); }
+		if ( ! $id || ! get_attached_file( $id ) || ! wp_attachment_is_image( $id ) ) { return new WP_Error( 'image_invalid', __( 'Le média image généré est introuvable ou invalide.', 'ms-recipes-writer-ai' ) ); }
 		$meta = wp_get_attachment_metadata( $id );
-		if ( empty( $meta['width'] ) || empty( $meta['height'] ) ) { return new WP_Error( 'image_dimensions_missing', 'Les dimensions de l’image générée sont absentes.' ); }
+		if ( empty( $meta['width'] ) || empty( $meta['height'] ) ) { return new WP_Error( 'image_dimensions_missing', __( 'Les dimensions de l’image générée sont absentes.', 'ms-recipes-writer-ai' ) ); }
 		return true;
 	}
 
@@ -65,14 +65,14 @@ final class MSRWA_Images {
 
 	private static function crop_ratio( $attachment_id, $ratio, $format = 'webp', $fit = 'cover', $padding_color = '#ffffff' ) {
 		$file = get_attached_file( $attachment_id );
-		if ( ! $file || ! file_exists( $file ) ) { return new WP_Error( 'image_file_missing', 'Fichier image introuvable pour le recadrage.' ); }
+		if ( ! $file || ! file_exists( $file ) ) { return new WP_Error( 'image_file_missing', __( 'Fichier image introuvable pour le recadrage.', 'ms-recipes-writer-ai' ) ); }
 		$parts = array_map( 'absint', explode( ':', (string) $ratio ) );
 		if ( count( $parts ) !== 2 || ! $parts[0] || ! $parts[1] ) { return $attachment_id; }
 		require_once ABSPATH . 'wp-admin/includes/image.php';
 		$editor = wp_get_image_editor( $file );
 		if ( is_wp_error( $editor ) ) { return $editor; }
 		$size = $editor->get_size();
-		if ( empty( $size['width'] ) || empty( $size['height'] ) ) { return new WP_Error( 'image_size_missing', 'Dimensions image indisponibles.' ); }
+		if ( empty( $size['width'] ) || empty( $size['height'] ) ) { return new WP_Error( 'image_size_missing', __( 'Dimensions image indisponibles.', 'ms-recipes-writer-ai' ) ); }
 		$target_ratio = $parts[0] / $parts[1];
 		$source_ratio = $size['width'] / $size['height'];
 		$width = $size['width'];
@@ -102,11 +102,11 @@ final class MSRWA_Images {
 
 	/** Preserve every collage panel when the delivery ratio differs from the API ratio. */
 	private static function pad_image( $file, $target, $width, $height, $color, $format ) {
-		if ( ! function_exists( 'imagecreatefromstring' ) ) { return new WP_Error( 'image_padding_unavailable', 'GD est nécessaire pour conserver le collage entier au ratio demandé.' ); }
+		if ( ! function_exists( 'imagecreatefromstring' ) ) { return new WP_Error( 'image_padding_unavailable', __( 'GD est nécessaire pour conserver le collage entier au ratio demandé.', 'ms-recipes-writer-ai' ) ); }
 		$source = imagecreatefromstring( file_get_contents( $file ) );
-		if ( ! $source ) { return new WP_Error( 'image_decode_failed', 'Impossible de lire le collage généré.' ); }
+		if ( ! $source ) { return new WP_Error( 'image_decode_failed', __( 'Impossible de lire le collage généré.', 'ms-recipes-writer-ai' ) ); }
 		$canvas = imagecreatetruecolor( $width, $height );
-		if ( ! $canvas ) { imagedestroy( $source ); return new WP_Error( 'image_canvas_failed', 'Impossible de préparer le format image.' ); }
+		if ( ! $canvas ) { imagedestroy( $source ); return new WP_Error( 'image_canvas_failed', __( 'Impossible de préparer le format image.', 'ms-recipes-writer-ai' ) ); }
 		$hex = ltrim( $color, '#' );
 		$background = imagecolorallocate( $canvas, hexdec( substr( $hex, 0, 2 ) ), hexdec( substr( $hex, 2, 2 ) ), hexdec( substr( $hex, 4, 2 ) ) );
 		imagefill( $canvas, 0, 0, $background );
@@ -115,6 +115,6 @@ final class MSRWA_Images {
 		$ok = function_exists( $writer ) && $writer( $canvas, $target );
 		imagedestroy( $source );
 		imagedestroy( $canvas );
-		return $ok ? array( 'path' => $target ) : new WP_Error( 'image_padding_save_failed', 'Impossible de sauvegarder le collage au format demandé.' );
+		return $ok ? array( 'path' => $target ) : new WP_Error( 'image_padding_save_failed', __( 'Impossible de sauvegarder le collage au format demandé.', 'ms-recipes-writer-ai' ) );
 	}
 }

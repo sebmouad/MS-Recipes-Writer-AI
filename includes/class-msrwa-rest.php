@@ -74,7 +74,7 @@ final class MSRWA_REST {
 	/** Splits the submission, describes the photographs, pairs them. */
 	public static function create( WP_REST_Request $request ) {
 		$recipes = MSRWA_Intake::recipes( (string) $request->get_param( 'recipes' ) );
-		if ( ! $recipes ) { return new WP_Error( 'msrwa_no_recipes', 'Aucune recette lisible dans ce texte.', array( 'status' => 400 ) ); }
+		if ( ! $recipes ) { return new WP_Error( 'msrwa_no_recipes', __( 'Aucune recette lisible dans ce texte.', 'ms-recipes-writer-ai' ), array( 'status' => 400 ) ); }
 
 		$ids = $request->get_param( 'images' );
 		$ids = is_string( $ids ) ? array_filter( array_map( 'absint', explode( ',', $ids ) ) ) : (array) $ids;
@@ -101,8 +101,8 @@ final class MSRWA_REST {
 
 	public static function pairs( WP_REST_Request $request ) {
 		$batch = self::batch( $request['id'] );
-		if ( ! $batch ) { return new WP_Error( 'msrwa_not_found', 'Lot introuvable.', array( 'status' => 404 ) ); }
-		if ( 'ready' !== $batch['status'] ) { return new WP_Error( 'msrwa_locked', 'Ce lot est déjà lancé ; son appariement ne change plus.', array( 'status' => 409 ) ); }
+		if ( ! $batch ) { return new WP_Error( 'msrwa_not_found', __( 'Lot introuvable.', 'ms-recipes-writer-ai' ), array( 'status' => 404 ) ); }
+		if ( 'ready' !== $batch['status'] ) { return new WP_Error( 'msrwa_locked', __( 'Ce lot est déjà lancé ; son appariement ne change plus.', 'ms-recipes-writer-ai' ), array( 'status' => 409 ) ); }
 		MSRWA_Batch::repair( (int) $batch['id'], (array) $request->get_param( 'pairs' ) );
 		return rest_ensure_response( array( 'saved' => true ) );
 	}
@@ -118,7 +118,7 @@ final class MSRWA_REST {
 
 	public static function dispatch( WP_REST_Request $request ) {
 		$batch = self::batch( $request['id'] );
-		if ( ! $batch ) { return new WP_Error( 'msrwa_not_found', 'Lot introuvable.', array( 'status' => 404 ) ); }
+		if ( ! $batch ) { return new WP_Error( 'msrwa_not_found', __( 'Lot introuvable.', 'ms-recipes-writer-ai' ), array( 'status' => 404 ) ); }
 		$started = MSRWA_Batch::dispatch( (int) $batch['id'] );
 		if ( is_wp_error( $started ) ) { return $started; }
 		return rest_ensure_response( array( 'started' => (int) $started ) );
@@ -127,7 +127,7 @@ final class MSRWA_REST {
 	/** What the batch screen polls while its runs advance. */
 	public static function runs( WP_REST_Request $request ) {
 		$batch = self::batch( $request['id'] );
-		if ( ! $batch ) { return new WP_Error( 'msrwa_not_found', 'Lot introuvable.', array( 'status' => 404 ) ); }
+		if ( ! $batch ) { return new WP_Error( 'msrwa_not_found', __( 'Lot introuvable.', 'ms-recipes-writer-ai' ), array( 'status' => 404 ) ); }
 		$out = array();
 		foreach ( MSRWA_Run::for_batch( (int) $batch['id'] ) as $run ) {
 			$out[] = array(
@@ -238,7 +238,7 @@ final class MSRWA_REST {
 
 	public static function cancel( WP_REST_Request $request ) {
 		$run = MSRWA_Run::get( absint( $request['id'] ) );
-		if ( ! $run || ! MSRWA_Run::may_see( $run ) ) { return new WP_Error( 'msrwa_not_found', 'Run introuvable.', array( 'status' => 404 ) ); }
+		if ( ! $run || ! MSRWA_Run::may_see( $run ) ) { return new WP_Error( 'msrwa_not_found', __( 'Run introuvable.', 'ms-recipes-writer-ai' ), array( 'status' => 404 ) ); }
 		return rest_ensure_response( array( 'cancelled' => MSRWA_Run::cancel( (int) $run['id'] ) ) );
 	}
 

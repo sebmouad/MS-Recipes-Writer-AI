@@ -1383,3 +1383,69 @@ msgstr "the server"
 msgid "à regarder"
 msgstr "to look at"
 
+msgid " et %d autres"
+msgstr " and %d others"
+
+msgid "Aucune recette dans ce qui a été fourni."
+msgstr "No recipe in what was provided."
+
+msgid "Aucune recette lisible dans ce texte."
+msgstr "No readable recipe in this text."
+
+msgid "Ce lot est déjà lancé ; son appariement ne change plus."
+msgstr "This lot has already left; its pairing no longer changes."
+
+msgid "Configuration attendue."
+msgstr "A configuration was expected."
+
+msgid "Dimensions image indisponibles."
+msgstr "Image dimensions unavailable."
+
+msgid "En attente de : %s, qui n’est jamais arrivé."
+msgstr "Waiting for: %s, which never arrived."
+
+msgid "Fichier image introuvable pour le recadrage."
+msgstr "Image file not found for cropping."
+
+msgid "Fixez un plafond de dépense par recette."
+msgstr "Set a spending ceiling per recipe."
+
+msgid "GD est nécessaire pour conserver le collage entier au ratio demandé."
+msgstr "GD is required to keep the whole collage at the requested ratio."
+
+msgid "Image Facebook"
+msgstr "Facebook image"
+
+msgid "Impossible de lire le collage généré."
+msgstr "The generated collage could not be read."
+
+msgid "Impossible de préparer le format image."
+msgstr "The image format could not be prepared."
+
+msgid "Impossible de sauvegarder le collage au format demandé."
+msgstr "The collage could not be saved in the requested format."
+
+msgid "JSON invalide : %s."
+msgstr "Invalid JSON: %s."
+
+msgid "Le lot n’a pas pu être enregistré."
+msgstr "The lot could not be saved."
+
+msgid "Le média image généré est introuvable ou invalide."
+msgstr "The generated image media is missing or invalid."
+
+msgid "Le service d’écriture refuse d’en traiter davantage pour le moment : c’est une limite de son côté, pas du site. Reprendre la recette plus tard suffit souvent ; si cela se répète, la limite du compte doit être relevée chez le fournisseur."
+msgstr "The writing service will not take any more for now: that is a limit on its side, not the site’s. Resuming the recipe later is usually enough; if it keeps happening, the account’s limit has to be raised with the provider."
+
+msgid "Les dimensions de l’image générée sont absentes."
+msgstr "The generated image has no dimensions."
+
+msgid "Run introuvable."
+msgstr "Run not found."
+
+msgid "Simulation locale : aucune sauvegarde, aucun appel API. Vérifiez les routes et les valeurs effectives ci-dessous."
+msgstr "Local simulation: nothing saved, no API call. Check the routes and the effective values below."
+
+msgid "Structure incompatible avec le moteur. Vérifiez les types et les champs des groupes JSON."
+msgstr "A structure the engine cannot use. Check the types and the fields of the JSON groups."
+

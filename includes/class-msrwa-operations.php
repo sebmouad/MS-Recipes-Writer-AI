@@ -15,11 +15,15 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
 final class MSRWA_Operations {
 	/** Resolve unsaved settings without saving, calling providers or spending. */
 	public static function preview( $request ) {
-		if ( ! current_user_can( 'manage_options' ) ) { return new WP_Error( 'forbidden', 'Accès refusé.', array( 'status' => 403 ) ); }
+		if ( ! current_user_can( 'manage_options' ) ) { return new WP_Error( 'forbidden', __( 'Accès refusé.', 'ms-recipes-writer-ai' ), array( 'status' => 403 ) ); }
 		$raw = $request->get_param( 'config' );
-		if ( ! is_array( $raw ) ) { return new WP_Error( 'invalid_config', 'Configuration attendue.', array( 'status' => 400 ) ); }
+		if ( ! is_array( $raw ) ) { return new WP_Error( 'invalid_config', __( 'Configuration attendue.', 'ms-recipes-writer-ai' ), array( 'status' => 400 ) ); }
 		$parsed = MSRWA_Engine_Settings::parse( $raw );
-		if ( $parsed['invalid'] ) { return new WP_Error( 'invalid_json', 'JSON invalide : ' . implode( ', ', $parsed['invalid'] ), array( 'status' => 400 ) ); }
+		if ( $parsed['invalid'] ) { return new WP_Error( 'invalid_json', sprintf(
+				/* translators: %s is a comma-separated list of group names. */
+				__( 'JSON invalide : %s.', 'ms-recipes-writer-ai' ),
+				implode( ', ', $parsed['invalid'] )
+			), array( 'status' => 400 ) ); }
 		try {
 			$config = MSRWA_Engine_Config::create( $parsed['config'] );
 			$routes = array();
@@ -32,9 +36,9 @@ final class MSRWA_Operations {
 				$prompt = $config->prompt( $name );
 				$routes[ $name ] = array( 'route' => $route, 'provider_known' => (bool) $config->get( 'providers.' . $route['provider'] ), 'price_known' => null !== $config->price( $route['provider'], $route['model'], array() ), 'prompt_source' => $prompt['source'], 'prompt_bytes' => strlen( $prompt['text'] ), 'max_output' => $config->max_output( $name ), 'attempts' => $config->attempts( $name ) );
 			}
-			return rest_ensure_response( array( 'notice' => 'Simulation locale : aucune sauvegarde, aucun appel API. Vérifiez les routes et les valeurs effectives ci-dessous.', 'routes' => $routes, 'effective' => $config->to_array() ) );
+			return rest_ensure_response( array( 'notice' => __( 'Simulation locale : aucune sauvegarde, aucun appel API. Vérifiez les routes et les valeurs effectives ci-dessous.', 'ms-recipes-writer-ai' ), 'routes' => $routes, 'effective' => $config->to_array() ) );
 		} catch ( Throwable $error ) {
-			return new WP_Error( 'invalid_config', 'Structure incompatible avec le moteur. Vérifiez les types et les champs des groupes JSON.', array( 'status' => 400 ) );
+			return new WP_Error( 'invalid_config', __( 'Structure incompatible avec le moteur. Vérifiez les types et les champs des groupes JSON.', 'ms-recipes-writer-ai' ), array( 'status' => 400 ) );
 		}
 	}
 
@@ -91,8 +95,8 @@ final class MSRWA_Operations {
 		$id = absint( $_GET['run_id'] ?? 0 );
 		check_admin_referer( 'msrwa_job_report_' . $id );
 		$run = MSRWA_Run::get( $id );
-		if ( ! current_user_can( 'manage_options' ) ) { wp_die( 'Accès refusé.' ); }
-		if ( ! $run || ! MSRWA_Run::may_see( $run ) || ( ! current_user_can( 'msrwa_create' ) && ! current_user_can( 'manage_options' ) ) ) { wp_die( 'Accès refusé.' ); }
+		if ( ! current_user_can( 'manage_options' ) ) { wp_die( esc_html__( 'Accès refusé.', 'ms-recipes-writer-ai' ) ); }
+		if ( ! $run || ! MSRWA_Run::may_see( $run ) || ( ! current_user_can( 'msrwa_create' ) && ! current_user_can( 'manage_options' ) ) ) { wp_die( esc_html__( 'Accès refusé.', 'ms-recipes-writer-ai' ) ); }
 		$state = MSRWA_Run::state( $id );
 		$state['artifacts']['brief'] = (array) json_decode( (string) $run['brief_json'], true );
 		$state['ok'] = 'done' === $run['status'] && ! empty( $state['ok'] );

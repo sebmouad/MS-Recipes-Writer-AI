@@ -127,7 +127,13 @@ final class MSRWA_UI {
 		}
 		// Checked first: a provider out of credit answers 400 or 429 with a
 		// message about billing, and no amount of retrying fixes that.
-		if ( preg_match( '/credit balance|billing|insufficient_quota|exceeded your current quota/i', $said ) ) {
+		//
+		// Only the unmistakable wordings count. Google's rate limit reads "You
+		// exceeded your current quota, please check your plan and billing
+		// details" — it carries the word billing and the word quota while the
+		// account is perfectly well funded, and matching either sent an
+		// administrator off to top up a wallet that was already full.
+		if ( preg_match( '/credit balance|insufficient_quota|billing_not_active|account is not active/i', $said ) ) {
 			return array( 'stop', __( 'Le compte du service d’écriture n’a plus de crédit. Un administrateur doit le recharger, puis reprendre la recette : rien de ce qui est fait n’est perdu.', 'ms-recipes-writer-ai' ) );
 		}
 		if ( preg_match( '/no api key|api key|clé/i', $said ) && ! preg_match( '/HTTP 40[13]/', $said ) ) {
@@ -139,8 +145,11 @@ final class MSRWA_UI {
 		if ( preg_match( '/plafond|budget|ceiling/i', $said ) ) {
 			return array( 'stop', __( 'Le plafond de dépense de cette recette a été atteint avant la fin. Ce qui est fait est gardé ; un administrateur peut relever le plafond et la reprendre.', 'ms-recipes-writer-ai' ) );
 		}
-		if ( preg_match( '/HTTP 429|rate|quota/i', $said ) ) {
-			return array( 'stop', __( 'Le service d’écriture était saturé. Reprendre la recette un peu plus tard suffit en général.', 'ms-recipes-writer-ai' ) );
+		// A burst limit clears in minutes; a daily or free-tier quota does not,
+		// and the difference is invisible from here — so the sentence covers
+		// both and names the one thing an administrator can actually do.
+		if ( preg_match( '/HTTP 429|RESOURCE_EXHAUSTED|rate.?limit|rate|quota/i', $said ) ) {
+			return array( 'stop', __( 'Le service d’écriture refuse d’en traiter davantage pour le moment : c’est une limite de son côté, pas du site. Reprendre la recette plus tard suffit souvent ; si cela se répète, la limite du compte doit être relevée chez le fournisseur.', 'ms-recipes-writer-ai' ) );
 		}
 		if ( preg_match( '/timed? ?out|cURL|HTTP 5\d\d|resolve|connect/i', $said ) ) {
 			return array( 'stop', __( 'Le service d’écriture n’a pas répondu à temps. Reprendre la recette suffit en général : rien de ce qui est fait n’est perdu.', 'ms-recipes-writer-ai' ) );

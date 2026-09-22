@@ -140,7 +140,14 @@ final class MSRWA_Run {
 		if ( ! $remaining ) { self::complete( $id, $state ); return; }
 
 		$wave = MSRWA_Engine_Steps::ready( $artifacts, $remaining, $registry );
-		if ( ! $wave ) { self::finish( $id, 'failed', 'En attente de : ' . implode( ', ', MSRWA_Engine_Steps::missing( $remaining[0], $artifacts, $registry ) ) . ', qui n’est jamais arrivé.' ); return; }
+		if ( ! $wave ) {
+			self::finish( $id, 'failed', sprintf(
+				/* translators: %s is a comma-separated list of step names. */
+				__( 'En attente de : %s, qui n’est jamais arrivé.', 'ms-recipes-writer-ai' ),
+				implode( ', ', MSRWA_Engine_Steps::missing( $remaining[0], $artifacts, $registry ) )
+			) );
+			return;
+		}
 
 		$spent = (float) $run['cost_usd'];
 		$budget = (float) ( $config['limits']['budget_usd'] ?? 0 );

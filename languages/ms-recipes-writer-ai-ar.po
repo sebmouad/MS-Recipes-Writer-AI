@@ -1395,3 +1395,69 @@ msgstr "الخادم"
 msgid "à regarder"
 msgstr "للمراجعة"
 
+msgid " et %d autres"
+msgstr " و%d أخرى"
+
+msgid "Aucune recette dans ce qui a été fourni."
+msgstr "لا وصفة فيما قُدِّم."
+
+msgid "Aucune recette lisible dans ce texte."
+msgstr "لا وصفة مقروءة في هذا النص."
+
+msgid "Ce lot est déjà lancé ; son appariement ne change plus."
+msgstr "هذه الدفعة انطلقت بالفعل؛ لم تعد مطابقتها تتغيّر."
+
+msgid "Configuration attendue."
+msgstr "كان من المتوقّع وجود إعداد."
+
+msgid "Dimensions image indisponibles."
+msgstr "أبعاد الصورة غير متاحة."
+
+msgid "En attente de : %s, qui n’est jamais arrivé."
+msgstr "في انتظار: %s، وهو ما لم يصل قط."
+
+msgid "Fichier image introuvable pour le recadrage."
+msgstr "ملف الصورة غير موجود للاقتصاص."
+
+msgid "Fixez un plafond de dépense par recette."
+msgstr "حدّد سقف إنفاق لكل وصفة."
+
+msgid "GD est nécessaire pour conserver le collage entier au ratio demandé."
+msgstr "GD ضروري للحفاظ على اللوحة كاملة بالنسبة المطلوبة."
+
+msgid "Image Facebook"
+msgstr "صورة فيسبوك"
+
+msgid "Impossible de lire le collage généré."
+msgstr "تعذّرت قراءة اللوحة المولّدة."
+
+msgid "Impossible de préparer le format image."
+msgstr "تعذّر تحضير صيغة الصورة."
+
+msgid "Impossible de sauvegarder le collage au format demandé."
+msgstr "تعذّر حفظ اللوحة بالصيغة المطلوبة."
+
+msgid "JSON invalide : %s."
+msgstr "JSON غير صالح: %s."
+
+msgid "Le lot n’a pas pu être enregistré."
+msgstr "تعذّر حفظ الدفعة."
+
+msgid "Le média image généré est introuvable ou invalide."
+msgstr "وسيط الصورة المولّد غير موجود أو غير صالح."
+
+msgid "Le service d’écriture refuse d’en traiter davantage pour le moment : c’est une limite de son côté, pas du site. Reprendre la recette plus tard suffit souvent ; si cela se répète, la limite du compte doit être relevée chez le fournisseur."
+msgstr "خدمة الكتابة لا تقبل المزيد في الوقت الحالي: هذا حدّ من جهتها، لا من جهة الموقع. استئناف الوصفة لاحقًا يكفي غالبًا؛ وإن تكرّر ذلك فلا بدّ من رفع حدّ الحساب لدى المزوّد."
+
+msgid "Les dimensions de l’image générée sont absentes."
+msgstr "الصورة المولّدة بلا أبعاد."
+
+msgid "Run introuvable."
+msgstr "التنفيذ غير موجود."
+
+msgid "Simulation locale : aucune sauvegarde, aucun appel API. Vérifiez les routes et les valeurs effectives ci-dessous."
+msgstr "محاكاة محلية: لا حفظ ولا استدعاء API. تحقّق من المسارات والقيم الفعلية أدناه."
+
+msgid "Structure incompatible avec le moteur. Vérifiez les types et les champs des groupes JSON."
+msgstr "بنية لا يستطيع المحرّك استخدامها. تحقّق من أنواع حقول مجموعات JSON."
+

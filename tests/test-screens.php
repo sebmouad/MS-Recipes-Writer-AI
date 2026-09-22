@@ -138,6 +138,16 @@ msrwa_test_contains( MSRWA_UI::reason( array( 'status' => 'failed', 'error_messa
 msrwa_test_contains( MSRWA_UI::reason( array( 'status' => 'failed' ), array( array( 'step' => 'article', 'error' => 'HTTP 503' ) ) )[1], 'répondu', 'An outage is said as one.' );
 // Seen live: Anthropic answers 400 when the account is out of credit.
 msrwa_test_contains( MSRWA_UI::reason( array( 'status' => 'failed' ), array( array( 'step' => 'canonical_recipe', 'error' => 'HTTP 400: {"error":{"message":"Your credit balance is too low to access the Anthropic API."}}' ) ) )[1], 'crédit', 'An empty provider account is said as one, not as a broken step.' );
+// Google answers a rate limit with "You exceeded your current quota, please
+// check your plan and billing details" on an account that is funded and fine.
+// Reading that as an empty wallet sent an administrator to a billing page to
+// fix something that was never broken; it is a limit, and it says to wait.
+$google_429 = array( array( 'step' => 'research', 'error' => 'HTTP 429: { "error": { "code": 429, "message": "You exceeded your current quota, please check your plan and billing details.", "status": "RESOURCE_EXHAUSTED" } }' ) );
+msrwa_test_missing( MSRWA_UI::reason( array( 'status' => 'failed' ), $google_429 )[1], 'crédit', 'A rate limit is not reported as an empty account.' );
+msrwa_test_contains( MSRWA_UI::reason( array( 'status' => 'failed' ), $google_429 )[1], 'limite', 'A rate limit is reported as a limit.' );
+// OpenAI's own out-of-credit code must still read as out of credit.
+msrwa_test_contains( MSRWA_UI::reason( array( 'status' => 'failed' ), array( array( 'step' => 'article', 'error' => 'HTTP 429: {"error":{"code":"insufficient_quota"}}' ) ) )[1], 'crédit', 'An account genuinely out of credit is still said as one.' );
+
 msrwa_test_contains( MSRWA_UI::reason( array( 'status' => 'failed' ), array( array( 'step' => 'article', 'error' => 'recipe schema' ) ) )[1], 'Rédaction', 'Anything else names the step in words.' );
 msrwa_test_contains( MSRWA_UI::reason( array( 'status' => 'done', 'draft_post_id' => 3, 'approved' => null ) )[1], 'Rien n’est publié', 'A finished recipe is never phrased as approved.' );
 

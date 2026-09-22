@@ -28,14 +28,14 @@ final class MSRWA_Batch {
 	 */
 	public static function create( array $recipes, array $images, $budget_per_recipe, $profile = MSRWA_Profile::FULL, $language = 'fr', array $config_overrides = array() ) {
 		global $wpdb;
-		if ( ! $recipes ) { return new WP_Error( 'msrwa_no_recipes', 'Aucune recette dans ce qui a été fourni.' ); }
+		if ( ! $recipes ) { return new WP_Error( 'msrwa_no_recipes', __( 'Aucune recette dans ce qui a été fourni.', 'ms-recipes-writer-ai' ) ); }
 		$budget = round( (float) $budget_per_recipe, 4 );
-		if ( $budget <= 0 ) { return new WP_Error( 'msrwa_no_budget', 'Fixez un plafond de dépense par recette.' ); }
+		if ( $budget <= 0 ) { return new WP_Error( 'msrwa_no_budget', __( 'Fixez un plafond de dépense par recette.', 'ms-recipes-writer-ai' ) ); }
 
 		$now = current_time( 'mysql', true );
 		$wpdb->insert( self::table(), array(
 			'owner_id' => get_current_user_id(),
-			'label' => mb_substr( (string) $recipes[0]['title'], 0, 190 ) . ( count( $recipes ) > 1 ? sprintf( ' et %d autres', count( $recipes ) - 1 ) : '' ),
+			'label' => mb_substr( (string) $recipes[0]['title'], 0, 190 ) . ( count( $recipes ) > 1 ? sprintf( /* translators: %d is how many further recipes the lot carries. */ __( ' et %d autres', 'ms-recipes-writer-ai' ), count( $recipes ) - 1 ) : '' ),
 			'status' => 'matching', 'recipes' => count( $recipes ), 'images' => count( $images ),
 			'budget_usd' => $budget,
 			'profile' => MSRWA_Profile::exists( $profile ) ? $profile : MSRWA_Profile::FULL,
@@ -45,7 +45,7 @@ final class MSRWA_Batch {
 			'created_at' => $now, 'updated_at' => $now,
 		) );
 		$id = (int) $wpdb->insert_id;
-		if ( ! $id ) { return new WP_Error( 'msrwa_not_created', 'Le lot n’a pas pu être enregistré.' ); }
+		if ( ! $id ) { return new WP_Error( 'msrwa_not_created', __( 'Le lot n’a pas pu être enregistré.', 'ms-recipes-writer-ai' ) ); }
 
 		$match = MSRWA_Match::run( $recipes, $images, self::engine_config( self::config_overrides( $id ) ) );
 		$wpdb->update( self::table(), array(
@@ -136,7 +136,7 @@ final class MSRWA_Batch {
 	public static function dispatch( $id ) {
 		global $wpdb;
 		$batch = self::get( $id );
-		if ( ! $batch ) { return new WP_Error( 'msrwa_no_batch', 'Lot introuvable.' ); }
+		if ( ! $batch ) { return new WP_Error( 'msrwa_no_batch', __( 'Lot introuvable.', 'ms-recipes-writer-ai' ) ); }
 		if ( 'ready' !== $batch['status'] ) { return new WP_Error( 'msrwa_not_ready', __( 'Ce lot a déjà été lancé.', 'ms-recipes-writer-ai' ) ); }
 
 		// Refusing to start is free; stopping halfway is not. The estimate is

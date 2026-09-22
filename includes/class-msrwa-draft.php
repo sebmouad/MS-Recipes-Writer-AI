@@ -173,7 +173,7 @@ final class MSRWA_Draft {
 	 * an attachment cannot be set.
 	 */
 	private static function attach_images( $post_id, $run_id, array $artifacts, $title ) {
-		foreach ( array( 'featured' => 'Image à la une', 'facebook' => 'Image Facebook' ) as $kind => $label ) {
+		foreach ( array( 'featured' => __( 'Image à la une', 'ms-recipes-writer-ai' ), 'facebook' => __( 'Image Facebook', 'ms-recipes-writer-ai' ) ) as $kind => $label ) {
 			$image = (array) ( $artifacts[ $kind ] ?? array() );
 			$path = (string) ( $image['path'] ?? '' );
 			if ( '' === $path || ! is_readable( $path ) ) { continue; }

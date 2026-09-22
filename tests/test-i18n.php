@@ -104,4 +104,17 @@ foreach ( array( 'en_US' => 2, 'ar' => 6 ) as $locale => $forms ) {
 	}
 }
 
+// Screens were translated from the start; the messages the same people read
+// when something goes wrong were not. Every WP_Error the REST layer returns is
+// printed verbatim by assets/admin.js, so a raw French literal here is a French
+// sentence on an English site — and nothing in the catalogues would ever show
+// it as missing, because the extractor only ever sees what __() wraps.
+$raw = array();
+foreach ( (array) glob( dirname( __DIR__ ) . '/includes/*.php' ) as $file ) {
+	$source = (string) file_get_contents( $file );
+	if ( ! preg_match_all( "/new WP_Error\(\s*'[^']*'\s*,\s*('(?:[^'\\\\]|\\\\.)*')/", $source, $found ) ) { continue; }
+	foreach ( $found[1] as $literal ) { $raw[] = basename( $file ) . ': ' . $literal; }
+}
+msrwa_test_assert( ! $raw, count( $raw ) . ' error message(s) reach a reader untranslated: ' . implode( ', ', array_slice( $raw, 0, 5 ) ) );
+
 msrwa_test_done( 'translation catalogues OK' );
