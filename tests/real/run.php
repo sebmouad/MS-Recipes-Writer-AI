@@ -27,14 +27,14 @@ foreach ( array_merge( $required, $optional ) as $name => $why ) {
 echo "\n";
 if ( $missing ) {
 	echo 'Not ready: ' . implode( ', ', $missing ) . " missing.\n";
-	echo "Set them in the environment, never in the repository. See docs/TESTING.md.\n";
+	echo "Set them in the environment, never in the repository. See .claude/docs/TESTING.md.\n";
 	exit( 2 );
 }
 
 $filter = isset( $argv[1] ) ? (string) $argv[1] : '';
 $files = glob( __DIR__ . '/test-*.php' );
 sort( $files );
-if ( ! $files ) { echo "No real tests yet. Add tests/real/test-<subject>.php — see docs/TESTING.md.\n"; exit( 0 ); }
+if ( ! $files ) { echo "No real tests yet. Add tests/real/test-<subject>.php — see .claude/docs/TESTING.md.\n"; exit( 0 ); }
 
 $passed = 0; $failed = 0; $skipped = 0;
 foreach ( $files as $file ) {

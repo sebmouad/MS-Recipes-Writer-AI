@@ -42,13 +42,27 @@ cron serveur doit appeler `wp-cron.php` toutes les cinq minutes.
 
 ### Documentation
 
-- [`docs/PLAN.md`](docs/PLAN.md) — les six jalons, en clair, et où ils en sont.
-- [`docs/BUILD-CHECKLIST.md`](docs/BUILD-CHECKLIST.md) — les tâches, leurs tests
-  et leur critère d’achèvement.
-- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — le code tel qu’il existe.
-- [`docs/ENGINE.md`](docs/ENGINE.md) — le contrat du moteur, et les changements
-  proposés qui attendent l’accord du propriétaire.
-- [`docs/TESTING.md`](docs/TESTING.md) — suite hors ligne et tests réels.
+Ce fichier est le seul document à la racine : il s’adresse au propriétaire du
+site. Tout le reste vit dans [`.claude/`](.claude/), avec
+[`CLAUDE.md`](CLAUDE.md) comme porte d’entrée pour qui reprend le
+développement, humain ou agent.
+
+- [`CLAUDE.md`](CLAUDE.md) — style de code, invariants, et la procédure à
+  suivre pour livrer un changement. À lire en premier.
+- [`.claude/docs/PLAN.md`](.claude/docs/PLAN.md) — les six jalons, en clair, et
+  où ils en sont.
+- [`.claude/docs/BUILD-CHECKLIST.md`](.claude/docs/BUILD-CHECKLIST.md) — les
+  tâches, leurs tests et leur critère d’achèvement.
+- [`.claude/docs/ARCHITECTURE.md`](.claude/docs/ARCHITECTURE.md) — le code tel
+  qu’il existe, et les invariants au complet.
+- [`.claude/docs/ENGINE.md`](.claude/docs/ENGINE.md) — le contrat du moteur, et
+  les changements proposés qui attendent l’accord du propriétaire.
+- [`.claude/docs/TESTING.md`](.claude/docs/TESTING.md) — suite hors ligne, tests
+  réels, et comment monter un WordPress jetable.
+- [`.claude/docs/LAB.md`](.claude/docs/LAB.md) — le laboratoire de prompts
+  (`tools/`), ses commandes et ses règles de provenance d’images.
+- [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
+  mesures du laboratoire ont établi, pour ne pas les refaire.
 
 ## Version 0.8.2
 
@@ -83,7 +97,7 @@ OpenAI reste injoignable au niveau réseau ; la clé Claude répond désormais
 problème mais son outil de recherche web — que l’étape recherche exige —
 répond `429` ou `503` à chaque tentative, ce qui ressemble à un palier gratuit
 trop bas pour la recherche web plutôt qu’à une clé invalide. Détaillé dans
-[`PLAN.md`](docs/PLAN.md), « Ce dont j’ai besoin de vous ».
+[`PLAN.md`](.claude/docs/PLAN.md), « Ce dont j’ai besoin de vous ».
 
 ## Version 0.8.1
 
@@ -195,7 +209,7 @@ ouvrent leur fournisseur, et que le brouillon porte extrait, slug et
 étiquettes.
 
 **En attente de votre accord — le moteur n’a pas été modifié.** Quatre
-changements sont proposés dans [`docs/ENGINE.md`](docs/ENGINE.md), § 7.
+changements sont proposés dans [`.claude/docs/ENGINE.md`](.claude/docs/ENGINE.md), § 7.
 
 ## Version 0.7.8
 
@@ -1192,7 +1206,7 @@ Les deux régénérations sont enregistrées comme leurs propres étapes, chacun
 avec son coût dans son propre poste de budget, et chaque image conserve les
 corrections dont elle est née.
 
-Mesures reportées dans [`docs/LAB-RESULTS.md`](docs/LAB-RESULTS.md).
+Mesures reportées dans [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md).
 
 ## Version 0.2.74
 
@@ -1817,7 +1831,7 @@ observations. Le `medium` passe de 0/3 à 1/3 approuvé : un progrès, pas une
 solution.
 
 Les huit tirages, leurs coûts et leurs verdicts sont consignés dans
-[`docs/LAB-RESULTS.md`](docs/LAB-RESULTS.md), avec les deux routes chiffrées
+[`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md), avec les deux routes chiffrées
 pour la suite — réessayer jusqu'à approbation (~0,077 $ le collage accepté) ou
 générer six panneaux séparés et composer la grille nous-mêmes (0,062 $ en `low`,
 0,106 $ en `medium`, composition gratuite et ordre garanti par construction).
@@ -2066,17 +2080,3 @@ Corrige deux pertes de résultat mesurées sur de vraies réponses de modèles, 
 - Conservation du collage Facebook complet avec ajustement configurable et mesure des durées des appels images.
 
 Les coûts affichés sont des estimations calculées avec le catalogue configuré, non une facture fournisseur. Un appel interrompu peut avoir été facturé. La validation éditoriale et les tests complets des fournisseurs restent nécessaires avant utilisation en production.
-
-## Installation locale
-
-1. Installer le dossier dans `wp-content/plugins/ms-recipes-writer-ai/`.
-2. Activer **MS Recipes Writer AI**.
-3. Ouvrir **MS Recipes Writer → Configuration**.
-4. Configurer prompts, modèles, tarifs, budgets opérationnels et clés serveur. Une clé seule ne déclenche aucun job.
-5. Utiliser **Créer des Articles/Images** avec une recette ou un brief, puis ajouter des références visuelles si nécessaire.
-
-Les tables sont préfixées par la base WordPress et sont créées à l’activation. La désactivation retire uniquement la planification du plugin ; elle ne supprime pas les données ni les médias.
-
-## Documentation de conception
-
-Le plan complet et les critères d’acceptation se trouvent dans [`../MS-Recipes-Writer-AI-PLAN-FINAL.md`](../MS-Recipes-Writer-AI-PLAN-FINAL.md).

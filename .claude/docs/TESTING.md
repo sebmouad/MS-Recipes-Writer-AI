@@ -19,7 +19,7 @@ php tests/real/run.php           # real: preflight, then run what it can
 The prompt lab needs no WordPress and no database. It starts from a title-,
 article- or image-led editor brief, creates one sourced research package, and
 passes that same package to the canonical recipe, single-call article, images,
-review, fact-check and proofreading. See `tools/README.md` for the commands and
+review, fact-check and proofreading. See [`LAB.md`](LAB.md) for the commands and
 real-image provenance rules. Maintained lab prompts can be compared with the
 plugin defaults before promotion.
 

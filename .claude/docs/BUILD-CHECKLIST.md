@@ -29,7 +29,7 @@ Executable version of the agreed specification, in the order the owner set:
 live site.**
 
 Read [`ARCHITECTURE.md`](ARCHITECTURE.md) for the existing code and
-[`../CLAUDE.md`](../CLAUDE.md) for house style and the invariants.
+[`../../CLAUDE.md`](../../CLAUDE.md) for house style and the invariants.
 
 ## How to use this file
 
