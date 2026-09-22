@@ -1449,3 +1449,7 @@ msgstr "Local simulation: nothing saved, no API call. Check the routes and the e
 msgid "Structure incompatible avec le moteur. Vérifiez les types et les champs des groupes JSON."
 msgstr "A structure the engine cannot use. Check the types and the fields of the JSON groups."
 
+msgid "%d remarque bloquante à corriger avant publication."
+msgid_plural "%d remarques bloquantes à corriger avant publication."
+msgstr[0] "%d blocking finding to fix before publishing."
+msgstr[1] "%d blocking findings to fix before publishing."

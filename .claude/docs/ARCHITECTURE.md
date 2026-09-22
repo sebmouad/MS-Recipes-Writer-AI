@@ -173,8 +173,12 @@ act, never a model name or an HTTP status.
 | Diagnostic | manager | the eight things that must be true for a recipe to finish, each with its remedy, and a report to paste into a request for help |
 | Réglages | manager | keys and a free check that each one works, ceilings, the article (language, length, pages, JSON-LD), retention, and whether the machinery is running |
 
-Plus a meta box on the post editor, because a writer opens the article, not this
-plugin, and a warning on a dashboard nobody opened has warned nobody. It also
+Plus the verdict on the post editor, because a writer opens the article, not
+this plugin, and a warning on a dashboard nobody opened has warned nobody. It
+reaches both editors from one `MSRWA_Editor::verdict()`: a meta box for the
+classic editor, and — since the block editor folds meta boxes away behind a
+collapsed drawer — a sidebar panel and a pre-publish check for the block
+editor, the second opening by itself when something blocks publication. It also
 carries the SEO title, meta description and Facebook caption the article wrote.
 
 On the public site, `MSRWA_Schema` prints the recipe as schema.org Recipe
