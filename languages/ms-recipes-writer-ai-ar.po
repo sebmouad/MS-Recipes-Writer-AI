@@ -1577,3 +1577,6 @@ msgstr "نص"
 
 msgid "vision"
 msgstr "الرؤية"
+
+msgid "La couche appelante, telle quelle : ce qui a été saisi ici, plus les modèles et les niveaux que la page Modèles engendre. Vide signifie que tout suit le moteur."
+msgstr "الطبقة المُستدعية كما هي: ما أُدخل هنا، إضافةً إلى النماذج والمستويات التي تولّدها صفحة النماذج. الفراغ يعني أن كل شيء يتبع المحرّك."

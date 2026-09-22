@@ -46,43 +46,15 @@ final class MSRWA_Keys {
 			// this plugin cannot — which model identifiers still answer — so it
 			// is kept, and a route to a name the provider no longer serves can
 			// be caught before a lot pays its way to that step.
-			$listed = self::model_ids( $provider, wp_remote_retrieve_body( $response ) );
+			$listed = self::models( $provider, wp_remote_retrieve_body( $response ) );
 			if ( $listed && class_exists( 'MSRWA_Catalog' ) ) {
-				MSRWA_Catalog::remember_models( $provider, $listed );
+				MSRWA_Catalog::remember_listing( $provider, $listed );
 				$verdict['models'] = count( $listed );
 			}
 
 			$out[ $provider ] = array( 'label' => $probe['label'] ) + $verdict;
 		}
 		return $out;
-	}
-
-	/**
-	 * The model identifiers in one provider's listing.
-	 *
-	 * Three providers, three shapes, and Google prefixes every name with
-	 * `models/` — which is not the identifier the engine routes to. Pure, so
-	 * each shape is held by a test rather than by a live call nobody can make
-	 * from a laptop with no key.
-	 */
-	public static function model_ids( $provider, $body ) {
-		$data = json_decode( (string) $body, true );
-		if ( ! is_array( $data ) ) { return array(); }
-		$rows = array();
-		if ( 'gemini' === $provider ) {
-			$rows = (array) ( $data['models'] ?? array() );
-		} else {
-			$rows = (array) ( $data['data'] ?? array() );
-		}
-		$ids = array();
-		foreach ( $rows as $row ) {
-			if ( ! is_array( $row ) ) { continue; }
-			$id = (string) ( $row['id'] ?? $row['name'] ?? '' );
-			if ( 'gemini' === $provider && 0 === strpos( $id, 'models/' ) ) { $id = substr( $id, 7 ); }
-			$id = trim( $id );
-			if ( '' !== $id ) { $ids[] = $id; }
-		}
-		return array_values( array_unique( $ids ) );
 	}
 
 	/**
@@ -134,6 +106,68 @@ final class MSRWA_Keys {
 		if ( preg_match( '/credit balance|insufficient_quota|billing_not_active|account is not active/i', $error ) ) { return 'credit'; }
 		if ( preg_match( '/HTTP 429|RESOURCE_EXHAUSTED|rate.?limit|quota/i', $error ) ) { return 'quota'; }
 		return '';
+	}
+
+	/** Just the identifiers, for anything that does not care about the rest. */
+	public static function model_ids( $provider, $body ) {
+		return array_values( array_unique( array_column( self::models( $provider, $body ), 'id' ) ) );
+	}
+
+	/**
+	 * Every model in one provider's listing, with whatever it says about them.
+	 *
+	 * Three providers, three shapes, and what each volunteers differs wildly:
+	 * Anthropic states its capabilities outright, Gemini gives token limits and
+	 * the methods a model supports, OpenAI gives an identifier and little else.
+	 * None of them gives a price — checked against the live responses of all
+	 * three — which is why a rate is never fetched here.
+	 *
+	 * Google prefixes every name with `models/`, which is not the identifier
+	 * the engine routes to. Getting that wrong marks every Gemini model
+	 * unserved.
+	 *
+	 * Pure, so each shape is held by a test rather than by a live call nobody
+	 * can make from a machine with no key.
+	 */
+	public static function models( $provider, $body ) {
+		$data = json_decode( (string) $body, true );
+		if ( ! is_array( $data ) ) { return array(); }
+		$rows = 'gemini' === $provider ? (array) ( $data['models'] ?? array() ) : (array) ( $data['data'] ?? array() );
+
+		$out = array();
+		$seen = array();
+		foreach ( $rows as $row ) {
+			if ( ! is_array( $row ) ) { continue; }
+			$id = trim( (string) ( $row['id'] ?? $row['name'] ?? '' ) );
+			if ( 'gemini' === $provider && 0 === strpos( $id, 'models/' ) ) { $id = substr( $id, 7 ); }
+			if ( '' === $id || isset( $seen[ $id ] ) ) { continue; }
+			$seen[ $id ] = true;
+
+			$model = array( 'id' => $id, 'label' => trim( (string) ( $row['display_name'] ?? $row['displayName'] ?? '' ) ) );
+
+			// Only what the provider actually stated. A capability left out
+			// here is left alone in the catalogue rather than set to false:
+			// silence is not a denial, and overwriting a correct flag with a
+			// guess would take a working model out of service.
+			$capabilities = array();
+			$limits = array();
+			if ( 'gemini' === $provider ) {
+				$methods = (array) ( $row['supportedGenerationMethods'] ?? array() );
+				if ( $methods ) { $capabilities['text'] = in_array( 'generateContent', $methods, true ); }
+				if ( isset( $row['inputTokenLimit'] ) ) { $limits['input_tokens'] = (int) $row['inputTokenLimit']; }
+				if ( isset( $row['outputTokenLimit'] ) ) { $limits['output_tokens'] = (int) $row['outputTokenLimit']; }
+			} elseif ( 'claude' === $provider ) {
+				$stated = (array) ( $row['capabilities'] ?? array() );
+				if ( isset( $stated['image_input']['supported'] ) ) { $capabilities['vision'] = (bool) $stated['image_input']['supported']; }
+				if ( $stated ) { $capabilities['text'] = true; }
+				if ( isset( $row['max_input_tokens'] ) ) { $limits['input_tokens'] = (int) $row['max_input_tokens']; }
+				if ( isset( $row['max_tokens'] ) ) { $limits['output_tokens'] = (int) $row['max_tokens']; }
+			}
+			if ( $capabilities ) { $model['capabilities'] = $capabilities; }
+			if ( $limits ) { $model['limits'] = $limits; }
+			$out[] = $model;
+		}
+		return $out;
 	}
 
 	/** Pure, so the reading of a response can be tested without a network. */

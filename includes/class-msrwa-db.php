@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
 final class MSRWA_DB {
 
 	/** Bumped whenever the schema below changes. */
-	const SCHEMA = 8;
+	const SCHEMA = 9;
 
 	public static function tables() {
 		global $wpdb;
@@ -29,6 +29,7 @@ final class MSRWA_DB {
 			'calls'     => $prefix . 'calls',
 			'events'    => $prefix . 'events',
 			'artifacts' => $prefix . 'artifacts',
+			'catalog'   => $prefix . 'catalog',
 		);
 	}
 
@@ -69,6 +70,14 @@ final class MSRWA_DB {
 			"CREATE TABLE {$t['events']} (\n id bigint(20) unsigned NOT NULL AUTO_INCREMENT,\n run_id bigint(20) unsigned NOT NULL,\n at_seconds decimal(10,1) NOT NULL DEFAULT 0,\n kind varchar(32) NOT NULL DEFAULT '',\n step varchar(64) NOT NULL DEFAULT '',\n message text NULL,\n data_json longtext NULL,\n created_at datetime NOT NULL,\n PRIMARY KEY (id),\n KEY run_order (run_id,id),\n KEY run_kind (run_id,kind)\n) $charset;",
 
 			"CREATE TABLE {$t['artifacts']} (\n id bigint(20) unsigned NOT NULL AUTO_INCREMENT,\n run_id bigint(20) unsigned NOT NULL,\n artifact_key varchar(64) NOT NULL,\n content_json longtext NULL,\n bytes int unsigned NOT NULL DEFAULT 0,\n created_at datetime NOT NULL,\n updated_at datetime NOT NULL,\n PRIMARY KEY (id),\n UNIQUE KEY run_artifact (run_id,artifact_key)\n) $charset;",
+			// The models this site may use, and everything variable about them.
+			// Kept by the plugin rather than the engine so that a renamed model
+			// or a changed rate is an edit here, never a change to the editorial
+			// process. `steps_json` is the compatibility grid: which steps a
+			// model is allowed to serve. `price_method` records where a rate
+			// came from — shipped, typed by a person, or looked up by a model —
+			// because a rate nobody can trace is a rate nobody should bill on.
+			"CREATE TABLE {$t['catalog']} (\n id bigint(20) unsigned NOT NULL AUTO_INCREMENT,\n provider varchar(32) NOT NULL,\n model_id varchar(191) NOT NULL,\n label varchar(191) NOT NULL DEFAULT '',\n content_type varchar(32) NOT NULL DEFAULT 'recipe',\n enabled tinyint(1) NOT NULL DEFAULT 1,\n input_usd decimal(12,6) NULL,\n output_usd decimal(12,6) NULL,\n price_method varchar(16) NOT NULL DEFAULT '',\n price_source text NULL,\n price_checked_at datetime NULL,\n capabilities_json longtext NULL,\n limits_json longtext NULL,\n steps_json longtext NULL,\n served tinyint(1) NULL,\n listed_at datetime NULL,\n notes text NULL,\n created_at datetime NOT NULL,\n updated_at datetime NOT NULL,\n PRIMARY KEY (id),\n UNIQUE KEY provider_model (provider,model_id),\n KEY enabled_provider (enabled,provider)\n) $charset;",
 		) as $statement ) { dbDelta( $statement ); }
 
 		foreach ( array(
@@ -92,6 +101,9 @@ final class MSRWA_DB {
 		}
 
 		self::reclaim_duplicates();
+		// Seeded once, then the owner's. A site that has already corrected a
+		// rate must not have it overwritten by the shipped one on every update.
+		MSRWA_Catalog::seed();
 		update_option( 'msrwa_schema', self::SCHEMA, false );
 		update_option( 'msrwa_db_version', MSRWA_VERSION, false );
 	}

@@ -66,16 +66,23 @@ msrwa_test_assert( 'warn' === msrwa_tone( MSRWA_Diagnostics::checks(), 'Tables' 
 // exists, and the identifier is simply no longer one the provider answers to.
 // It was found for real — the engine's `claude:low` tier names
 // `claude-haiku-4-5`, and Anthropic serves `claude-haiku-4-5-20251001`.
-$routed = MSRWA_Diagnostics::checks();
-$before = msrwa_tone( $routed, 'Routage' );
-MSRWA_Catalog::remember_models( 'openai', array( 'a-model-this-site-does-not-route-to' ) );
-$after = msrwa_tone( MSRWA_Diagnostics::checks(), 'Routage' );
-msrwa_test_assert( 'stop' === $after, 'A step naming a model its provider does not list is a stop, not a warning: that step cannot run at all.' );
+// The catalogue is a table, which the fake database does not hold, so what is
+// asserted here is the rule rather than the round trip: the table itself is
+// exercised in tests/real/. Silence must not be read as absence — a provider
+// never asked says nothing about its models, and the routing check must not
+// turn red merely for want of a list.
+msrwa_test_assert( 'unknown' === MSRWA_Catalog::served( 'openai', 'gpt-5.6-luna' ), 'With no catalogue table, nothing is claimed about any model.' );
 
-// And silence must not be read as absence: a provider never asked says nothing
-// about its models, so the check must not turn red merely for want of a list.
-$GLOBALS['msrwa_test_options']['msrwa_provider_models'] = array();
-msrwa_test_assert( $before === msrwa_tone( MSRWA_Diagnostics::checks(), 'Routage' ), 'With no listing at all, the routing check reads exactly as it did before one was ever taken.' );
+/** One check's detail, by title. */
+$detail = static function ( array $checks, $title ) {
+	foreach ( $checks as $check ) {
+		if ( $title === $check['title'] ) { return (string) $check['detail']; }
+	}
+	return '';
+};
+// Whatever else the routing check says on this site, it must not be the
+// unserved-model sentence: nothing has been asked, so nothing is known.
+msrwa_test_missing( $detail( MSRWA_Diagnostics::checks(), 'Routage' ), 'ne sert pas', 'The routing check invents no unserved model from a silence.' );
 
 // --- worst() ------------------------------------------------------------
 

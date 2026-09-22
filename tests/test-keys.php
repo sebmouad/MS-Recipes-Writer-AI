@@ -70,8 +70,30 @@ msrwa_test_assert( array( 'gpt-5.6-luna', 'gpt-image-2.5-flare' ) === MSRWA_Keys
 $claude = '{"data":[{"type":"model","id":"claude-sonnet-5"},{"type":"model","id":"claude-opus-5"}],"has_more":false}';
 msrwa_test_assert( array( 'claude-sonnet-5', 'claude-opus-5' ) === MSRWA_Keys::model_ids( 'claude', $claude ), 'Claude uses the same shape.' );
 
-$gemini = '{"models":[{"name":"models/gemini-3.5-flash","displayName":"Gemini"},{"name":"models/gemini-2.5-pro"}]}';
+$gemini = '{"models":[{"name":"models/gemini-3.5-flash","displayName":"Gemini","inputTokenLimit":1048576,"outputTokenLimit":65536,"supportedGenerationMethods":["generateContent","countTokens"]},{"name":"models/gemini-2.5-pro"}]}';
 msrwa_test_assert( array( 'gemini-3.5-flash', 'gemini-2.5-pro' ) === MSRWA_Keys::model_ids( 'gemini', $gemini ), 'Gemini lists under models[].name, and the models/ prefix is not part of the identifier.' );
+
+// --- What each provider volunteers besides the name ----------------------
+
+// None of the three gives a price — checked against all three live responses
+// — which is why a rate is never fetched. What they do give is worth keeping.
+$rows = MSRWA_Keys::models( 'gemini', $gemini );
+msrwa_test_assert( 'Gemini' === $rows[0]['label'], 'Gemini names its models.' );
+msrwa_test_assert( true === $rows[0]['capabilities']['text'], 'A model that supports generateContent can write.' );
+msrwa_test_assert( 1048576 === $rows[0]['limits']['input_tokens'], 'And states how much it will read.' );
+msrwa_test_assert( ! isset( $rows[1]['capabilities'] ), 'A model that states nothing carries nothing: silence must not be recorded as a denial.' );
+
+$rich = '{"data":[{"type":"model","id":"claude-opus-5-5","display_name":"Claude Opus 5.5","max_input_tokens":1000000,"max_tokens":128000,"capabilities":{"image_input":{"supported":true},"thinking":{"supported":true}}}]}';
+$rows = MSRWA_Keys::models( 'claude', $rich );
+msrwa_test_assert( 'Claude Opus 5.5' === $rows[0]['label'], 'Anthropic names its models.' );
+msrwa_test_assert( true === $rows[0]['capabilities']['vision'], 'And states outright whether one reads images.' );
+msrwa_test_assert( 128000 === $rows[0]['limits']['output_tokens'], 'And how much it will write.' );
+
+// OpenAI gives an identifier and little else, which must not be mistaken for
+// a model that can do nothing.
+$rows = MSRWA_Keys::models( 'openai', $openai );
+msrwa_test_assert( ! isset( $rows[0]['capabilities'] ), 'A provider that states no capabilities leaves the catalogue’s own untouched.' );
+msrwa_test_assert( 'gpt-5.6-luna' === $rows[0]['id'], 'But the identifier still comes through.' );
 
 // Nothing usable must produce nothing, never a half-list: an empty answer is
 // what stops the catalogue from forgetting everything it knew.

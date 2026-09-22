@@ -41,7 +41,29 @@ final class MSRWA_Engine_Settings {
 		);
 	}
 
+	/**
+	 * The caller layer the engine is handed.
+	 *
+	 * What the owner typed on the Moteur screen, over the models and tiers the
+	 * catalogue generates. The catalogue comes first so an explicit override
+	 * still wins — somebody who edits `tiers` by hand means it — but on every
+	 * site that has not, the model map is data in a table rather than a
+	 * constant in the engine. That is what lets a provider rename a model
+	 * without anybody touching the process that writes an article.
+	 */
 	public static function stored() {
+		$stored = get_option( self::OPTION, array() );
+		$stored = is_array( $stored ) ? $stored : array();
+		if ( ! class_exists( 'MSRWA_Catalog' ) ) { return $stored; }
+
+		foreach ( MSRWA_Catalog::for_engine() as $group => $value ) {
+			if ( $value && ! isset( $stored[ $group ] ) ) { $stored[ $group ] = $value; }
+		}
+		return $stored;
+	}
+
+	/** Only what a person actually saved, for the screen that edits it. */
+	public static function typed() {
 		$stored = get_option( self::OPTION, array() );
 		return is_array( $stored ) ? $stored : array();
 	}

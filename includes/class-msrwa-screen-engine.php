@@ -16,7 +16,11 @@ final class MSRWA_Screen_Engine {
 		if ( ! MSRWA_Rights::may_manage() ) { wp_die( esc_html__( 'Vous n’avez pas accès à cet écran.', 'ms-recipes-writer-ai' ) ); }
 
 		$defaults = MSRWA_Engine_Settings::defaults();
-		$stored = MSRWA_Engine_Settings::stored();
+		// What a person actually typed, which is what "modified" means here.
+		// The models and tiers the catalogue generates are also part of the
+		// caller layer, but nobody edited them on this screen and badging them
+		// as changed would send the owner looking for an edit they never made.
+		$stored = MSRWA_Engine_Settings::typed();
 		$invalid = isset( $_GET['invalid'] ) ? array_filter( explode( ',', sanitize_text_field( wp_unslash( $_GET['invalid'] ) ) ) ) : array();
 		$encode = static function ( $value ) { return (string) wp_json_encode( $value, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ); };
 
@@ -99,8 +103,8 @@ final class MSRWA_Screen_Engine {
 
 		<section class="ms-card">
 			<h2><?php esc_html_e( 'Ce qui est réellement transmis au moteur', 'ms-recipes-writer-ai' ); ?></h2>
-			<p><?php esc_html_e( 'La couche appelante, telle quelle. Vide signifie que tout suit le moteur.', 'ms-recipes-writer-ai' ); ?></p>
-			<pre class="ms-code"><?php echo esc_html( $encode( $stored ) ); ?></pre>
+			<p><?php esc_html_e( 'La couche appelante, telle quelle : ce qui a été saisi ici, plus les modèles et les niveaux que la page Modèles engendre. Vide signifie que tout suit le moteur.', 'ms-recipes-writer-ai' ); ?></p>
+			<pre class="ms-code"><?php echo esc_html( $encode( MSRWA_Engine_Settings::stored() ) ); ?></pre>
 		</section>
 		<?php
 		echo '</div>';
