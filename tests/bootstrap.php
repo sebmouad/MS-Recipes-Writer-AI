@@ -238,6 +238,28 @@ if ( ! function_exists( 'update_post_meta' ) ) {
 if ( ! function_exists( 'get_attached_file' ) ) {
 	function get_attached_file( $id ) { return '/uploads/attachment-' . (int) $id . '.webp'; }
 }
+// The post and its images as a published site would hand them over. A test
+// that cares sets the globals; everything else reads an empty site.
+$GLOBALS['msrwa_test_thumbnails'] = array();
+$GLOBALS['msrwa_test_attachments'] = array();
+if ( ! function_exists( 'get_the_title' ) ) {
+	function get_the_title( $post = 0 ) { $id = is_object( $post ) ? (int) $post->ID : (int) $post; return (string) ( $GLOBALS['msrwa_test_posts'][ $id ]->post_title ?? '' ); }
+}
+if ( ! function_exists( 'get_post_field' ) ) {
+	function get_post_field( $field, $post = 0 ) { $id = is_object( $post ) ? (int) $post->ID : (int) $post; return (string) ( $GLOBALS['msrwa_test_posts'][ $id ]->$field ?? '' ); }
+}
+if ( ! function_exists( 'get_bloginfo' ) ) {
+	function get_bloginfo( $show = '' ) { return 'name' === $show ? 'Le Site' : ''; }
+}
+if ( ! function_exists( 'get_post_thumbnail_id' ) ) {
+	function get_post_thumbnail_id( $post = 0 ) { return (int) ( $GLOBALS['msrwa_test_thumbnails'][ (int) $post ] ?? 0 ); }
+}
+if ( ! function_exists( 'wp_get_attachment_image_url' ) ) {
+	function wp_get_attachment_image_url( $id, $size = 'thumbnail' ) { return isset( $GLOBALS['msrwa_test_attachments'][ (int) $id ] ) ? 'https://example.test/uploads/' . (int) $id . '.webp' : false; }
+}
+if ( ! function_exists( 'wp_get_attachment_metadata' ) ) {
+	function wp_get_attachment_metadata( $id ) { return $GLOBALS['msrwa_test_attachments'][ (int) $id ] ?? false; }
+}
 if ( ! function_exists( 'wp_delete_file' ) ) {
 	function wp_delete_file( $path ) { $GLOBALS['msrwa_test_deleted'][] = $path; }
 }

@@ -37,6 +37,7 @@ final class MSRWA_Settings {
 			'quality_min_words'   => 2800,
 			'site_language'       => 'fr',
 			'recipe_schema'       => 1,
+			'seo_meta'            => 1,
 			'article_page2_heading' => 'Préparation de la recette étape par étape',
 			'facebook_collage_steps' => 6,
 			'required_sections'   => array(),
@@ -566,6 +567,7 @@ SILENT FINAL CHECK BEFORE RETURNING — fix anything that fails:
 		$out['internal_links_enabled'] = empty( $raw['internal_links_enabled'] ) ? 0 : 1;
 		$out['article_pagination_enabled'] = empty( $raw['article_pagination_enabled'] ) ? 0 : 1;
 		$out['recipe_schema'] = empty( $raw['recipe_schema'] ) ? 0 : 1;
+		$out['seo_meta'] = empty( $raw['seo_meta'] ) ? 0 : 1;
 		$out['article_pagination_min_words'] = isset( $raw['article_pagination_min_words'] ) ? min( 8000, max( 300, absint( $raw['article_pagination_min_words'] ) ) ) : $defaults['article_pagination_min_words'];
 		$out['article_pagination_split_percent'] = isset( $raw['article_pagination_split_percent'] ) ? min( 70, max( 30, absint( $raw['article_pagination_split_percent'] ) ) ) : $defaults['article_pagination_split_percent'];
 		$out['internal_links_max'] = isset( $raw['internal_links_max'] ) ? min( 10, max( 0, absint( $raw['internal_links_max'] ) ) ) : $defaults['internal_links_max'];

@@ -44,4 +44,22 @@ msrwa_test_assert( ! isset( $handed['openai_key'] ) && ! isset( $handed['claude_
 MSRWA_Engine_Input::use_settings( array() );
 $config = MSRWA_Engine_Config::create( array(), array( 'settings' => $handed ) );
 msrwa_test_assert( 3000 === (int) $config->settings()['quality_min_words'], 'The engine must read the site threshold, not zero.' );
+// A save is a merge, so that the credentials form can post three fields and
+// leave the rest alone. That makes a cleared checkbox — which posts nothing at
+// all — indistinguishable from a field the form never carried, and the setting
+// would be impossible to turn off. Each one is paired with a hidden zero in the
+// screen; this holds both halves of that arrangement together.
+foreach ( array( 'recipe_schema', 'seo_meta' ) as $toggle ) {
+	MSRWA_Settings::save( array( $toggle => '1' ) );
+	msrwa_test_assert( 1 === MSRWA_Settings::get()[ $toggle ], $toggle . ' can be turned on.' );
+	// What the screen posts for a box the user cleared.
+	MSRWA_Settings::save( array( $toggle => '0' ) );
+	msrwa_test_assert( 0 === MSRWA_Settings::get()[ $toggle ], $toggle . ' turns off when the hidden zero is all that is posted.' );
+	// And what a form that does not carry the field at all must not do to it.
+	MSRWA_Settings::save( array( 'quality_min_words' => 3000 ) );
+	msrwa_test_assert( 0 === MSRWA_Settings::get()[ $toggle ], $toggle . ' is left alone by a form that does not carry it.' );
+	MSRWA_Settings::save( array( $toggle => '1' ) );
+	msrwa_test_assert( 1 === MSRWA_Settings::get()[ $toggle ], $toggle . ' can be turned back on.' );
+}
+
 msrwa_test_done( 'production settings save regression' );
