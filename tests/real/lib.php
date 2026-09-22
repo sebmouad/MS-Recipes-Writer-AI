@@ -24,9 +24,21 @@ function msrwa_real_skip( $reason ) {
 
 function msrwa_real_site() { return rtrim( msrwa_real_env( 'MSRWA_TEST_SITE_URL' ), '/' ); }
 
+/**
+ * The URL of a REST path. `?rest_route=` answers under every permalink
+ * setting, where `/wp-json` exists only once pretty permalinks are on — and a
+ * staging copy is exactly where somebody leaves them off.
+ */
+function msrwa_real_rest_url( $path ) {
+	if ( 0 === strpos( $path, 'http' ) ) { return $path; }
+	$parts = explode( '?', (string) $path, 2 );
+	$route = '' === $parts[0] ? '/' : $parts[0];
+	return msrwa_real_site() . '/?rest_route=' . rawurlencode( $route ) . ( isset( $parts[1] ) ? '&' . $parts[1] : '' );
+}
+
 /** One authenticated REST call. Returns array( status, body, headers ). */
 function msrwa_real_request( $method, $path, $body = null, $timeout = 90 ) {
-	$url = 0 === strpos( $path, 'http' ) ? $path : msrwa_real_site() . '/wp-json' . $path;
+	$url = msrwa_real_rest_url( $path );
 	$auth = msrwa_real_env( 'MSRWA_WP_USER' ) . ':' . msrwa_real_env( 'MSRWA_WP_APP_PASSWORD' );
 	$command = 'curl -sS --max-time ' . (int) $timeout . ' -o /dev/stdout -w "\n%{http_code}" -X ' . escapeshellarg( strtoupper( $method ) );
 	$command .= ' -u ' . escapeshellarg( $auth ) . ' -H ' . escapeshellarg( 'Accept: application/json' );
@@ -39,11 +51,11 @@ function msrwa_real_request( $method, $path, $body = null, $timeout = 90 ) {
 	return array( 'status' => $status, 'body' => $payload, 'raw' => substr( $raw, 0, max( 0, $split ) ) );
 }
 
-/** An unauthenticated call, to prove a route is not public. */
+/** An unauthenticated call, to prove a route is not public. Returns array( status ). */
 function msrwa_real_anonymous( $method, $path, $timeout = 60 ) {
-	$url = msrwa_real_site() . '/wp-json' . $path;
+	$url = msrwa_real_rest_url( $path );
 	$command = 'curl -sS --max-time ' . (int) $timeout . ' -o /dev/null -w "%{http_code}" -X ' . escapeshellarg( strtoupper( $method ) ) . ' ' . escapeshellarg( $url ) . ' 2>/dev/null';
-	return (int) shell_exec( $command );
+	return array( 'status' => (int) shell_exec( $command ) );
 }
 
 function wp_strip_all_tags_compat( $value ) { return trim( preg_replace( '/\s+/', ' ', strip_tags( (string) $value ) ) ); }
