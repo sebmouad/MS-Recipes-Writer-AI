@@ -42,7 +42,9 @@ final class MSRWA_Draft {
 		$post = array(
 			'post_type' => 'post', 'post_status' => 'draft',
 			'post_title' => wp_strip_all_tags( $title ),
-			'post_content' => $html,
+			// Blocks, not one Classic block: the article is what an editor came
+			// here to work on, and they cannot work on a wall of HTML.
+			'post_content' => MSRWA_Blocks::from_html( $html ),
 			'post_excerpt' => wp_strip_all_tags( (string) ( $article['excerpt'] ?? '' ) ),
 			'post_author' => (int) $run['owner_id'],
 		);
@@ -180,6 +182,10 @@ final class MSRWA_Draft {
 
 			$attachment = self::sideload( $path, $post_id, $title . ' — ' . $label, (string) ( $image['mime'] ?? 'image/webp' ) );
 			if ( ! $attachment ) { continue; }
+			// What the photograph is of, which is what a screen reader needs. The
+			// generation prompt is art direction, not a description, so the dish
+			// is the honest answer.
+			update_post_meta( $attachment, '_wp_attachment_image_alt', wp_strip_all_tags( $title ) );
 			if ( 'featured' === $kind ) { set_post_thumbnail( $post_id, $attachment ); }
 			update_post_meta( $post_id, '_msrwa_' . $kind . '_image_id', (int) $attachment );
 		}
