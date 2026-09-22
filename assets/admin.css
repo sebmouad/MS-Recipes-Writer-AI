@@ -10,8 +10,9 @@
  *
  * - The interface ships in Arabic as well as French and English, so nothing is
  *   left or right. Logical properties only; the rail mirrors for free.
- * - WordPress admin has a dark scheme, so every colour is a token and every
- *   token is redefined under it.
+ * - Light only, by the owner's decision. Every colour is still a token, so a
+ *   scheme could be reinstated in one block, but nothing here follows the
+ *   reader's system preference.
  * - No webfont. A plugin that calls Google on every admin page is a privacy
  *   and performance problem on someone else's site, so the personality comes
  *   from treatment — weight, tracking, and a monospace given a real voice —
@@ -56,32 +57,6 @@
 
 	color: var(--ms-ink);
 	max-width: 1360px;
-}
-
-@media (prefers-color-scheme: dark) {
-	.msrwa {
-		--ms-ground: #121d22;
-		--ms-sunk: #0d171b;
-		--ms-raised: #17252b;
-		--ms-line: #2a3c44;
-		--ms-line-soft: #213137;
-
-		--ms-ink: #e7eef0;
-		--ms-ink-soft: #9db1ba;
-		--ms-ink-faint: #748b95;
-
-		--ms-lamp: #e8a33d;
-		--ms-lamp-soft: #2c2113;
-
-		--ms-live: #45c9b8;
-		--ms-live-soft: #0f2e2b;
-		--ms-good: #4cc07d;
-		--ms-good-soft: #102c1d;
-		--ms-warn: #d9a33f;
-		--ms-warn-soft: #2e2411;
-		--ms-stop: #e2726c;
-		--ms-stop-soft: #321a19;
-	}
 }
 
 .msrwa * { box-sizing: border-box; }
