@@ -123,6 +123,7 @@ final class MSRWA_Diagnostics {
 		$config = MSRWA_Engine_Config::create( MSRWA_Engine_Settings::stored(), array( 'settings' => MSRWA_Settings::engine_settings() ) );
 		$keyless = array();
 		$unpriced = array();
+		$unserved = array();
 
 		foreach ( $config->steps() as $step => $definition ) {
 			$capability = (string) ( $definition['capability'] ?? '' );
@@ -131,8 +132,20 @@ final class MSRWA_Diagnostics {
 			$provider = $config->provider( $route['provider'], $route['model'] );
 			if ( empty( $provider['has_key'] ) ) { $keyless[ $route['provider'] ] = $route['provider']; }
 			if ( null === $config->price( $route['provider'], $route['model'], array() ) ) { $unpriced[ $route['model'] ] = $route['model']; }
+			// The provider's own list, when this site has one. A route naming a
+			// model that was renamed or retired fails at that step, having paid
+			// for every step before it, and nothing else here can see it: a key
+			// works, a price exists, and the name is simply no longer served.
+			if ( 'no' === MSRWA_Catalog::served( $route['provider'], $route['model'] ) ) { $unserved[ $route['model'] ] = $route['provider'] . ':' . $route['model']; }
 		}
 
+		if ( $unserved ) {
+			return self::check( 'stop', __( 'Routage', 'ms-recipes-writer-ai' ), sprintf(
+				/* translators: %s is a comma-separated list of provider:model names. */
+				__( 'Le fournisseur ne sert pas ces modèles : %s. L’étape concernée échouera, après avoir payé celles d’avant.', 'ms-recipes-writer-ai' ),
+				implode( ', ', $unserved )
+			), __( 'Routez ces étapes vers un modèle listé dans Moteur → Modèles et tarifs.', 'ms-recipes-writer-ai' ) );
+		}
 		if ( $keyless ) {
 			return self::check( 'stop', __( 'Routage', 'ms-recipes-writer-ai' ), sprintf(
 				/* translators: %s is a comma-separated list of provider names. */
@@ -147,6 +160,8 @@ final class MSRWA_Diagnostics {
 				implode( ', ', $unpriced )
 			), __( 'Ajoutez son tarif dans Moteur → models, ou routez l’étape vers un modèle tarifé.', 'ms-recipes-writer-ai' ) );
 		}
+		// Nothing is said about models never checked against their provider:
+		// silence from a provider is not evidence against a model.
 		return self::check( 'good', __( 'Routage', 'ms-recipes-writer-ai' ), __( 'Chaque étape a une clé et un tarif publié.', 'ms-recipes-writer-ai' ) );
 	}
 

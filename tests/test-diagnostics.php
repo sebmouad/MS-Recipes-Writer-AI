@@ -60,6 +60,23 @@ msrwa_test_assert( 'warn' === msrwa_tone( $installed, 'Droits' ), 'A role that l
 update_option( 'msrwa_schema', MSRWA_DB::SCHEMA - 1 );
 msrwa_test_assert( 'warn' === msrwa_tone( MSRWA_Diagnostics::checks(), 'Tables' ), 'A schema behind this release warns rather than stops.' );
 
+// --- A route to a model the provider does not serve ----------------------
+
+// The failure nothing else on this screen can see: the key works, the price
+// exists, and the identifier is simply no longer one the provider answers to.
+// It was found for real — the engine's `claude:low` tier names
+// `claude-haiku-4-5`, and Anthropic serves `claude-haiku-4-5-20251001`.
+$routed = MSRWA_Diagnostics::checks();
+$before = msrwa_tone( $routed, 'Routage' );
+MSRWA_Catalog::remember_models( 'openai', array( 'a-model-this-site-does-not-route-to' ) );
+$after = msrwa_tone( MSRWA_Diagnostics::checks(), 'Routage' );
+msrwa_test_assert( 'stop' === $after, 'A step naming a model its provider does not list is a stop, not a warning: that step cannot run at all.' );
+
+// And silence must not be read as absence: a provider never asked says nothing
+// about its models, so the check must not turn red merely for want of a list.
+$GLOBALS['msrwa_test_options']['msrwa_provider_models'] = array();
+msrwa_test_assert( $before === msrwa_tone( MSRWA_Diagnostics::checks(), 'Routage' ), 'With no listing at all, the routing check reads exactly as it did before one was ever taken.' );
+
 // --- worst() ------------------------------------------------------------
 
 $tone = static function ( $value ) { return array( 'tone' => $value, 'title' => 'x', 'detail' => 'x', 'remedy' => '' ); };

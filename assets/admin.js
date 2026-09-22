@@ -407,6 +407,62 @@
       }
 
       row.appendChild(controlCell);
+
+      // Which model this actually is. A provider and a quality name are not an
+      // answer: the tier map turns them into an identifier, and that is the
+      // thing that runs, costs money, and can fail to exist.
+      var resolvedCell = document.createElement('td');
+      resolvedCell.className = 'ms-route-resolved';
+      row.appendChild(resolvedCell);
+
+      function describe() {
+        var route = (function () {
+          var model = row.querySelector('.ms-route-model');
+          if (model) return model.value;
+          return row.querySelector('.ms-route-provider').value + ':' + row.querySelector('.ms-route-tier').value;
+        })();
+        var info = schema.resolved[route];
+        resolvedCell.textContent = '';
+        if (!info) {
+          resolvedCell.appendChild(muted(schema.labels.unknown));
+          return;
+        }
+        var name = document.createElement('code');
+        name.className = 'ms-key';
+        name.textContent = info.id;
+        resolvedCell.appendChild(name);
+
+        if (info.priced) {
+          resolvedCell.appendChild(muted(schema.labels.perMillion
+            .replace('%1$s', info.input.toFixed(2))
+            .replace('%2$s', info.output.toFixed(2))));
+        } else {
+          resolvedCell.appendChild(flag('warn', schema.labels.unpriced));
+        }
+        if (info.served === 'no') resolvedCell.appendChild(flag('stop', schema.labels.unserved));
+      }
+
+      function muted(text) {
+        var el = document.createElement('small');
+        el.className = 'ms-muted';
+        el.style.display = 'block';
+        el.textContent = text;
+        return el;
+      }
+
+      function flag(tone, text) {
+        var el = document.createElement('small');
+        el.className = 'ms-muted ms-' + tone;
+        el.style.display = 'block';
+        el.textContent = text;
+        return el;
+      }
+
+      Array.prototype.forEach.call(controlCell.querySelectorAll('select'), function (select) {
+        select.addEventListener('change', describe);
+      });
+      describe();
+
       body.appendChild(row);
     });
   }
