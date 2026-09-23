@@ -170,7 +170,7 @@ final class MSRWA_Engine_Config {
 					'gemini-3-pro-image' => array( 2.00, 12.00 ),
 				),
 				'claude' => array(
-					'claude-haiku-4-5' => array( 1.00, 5.00 ),
+					'claude-haiku-4-5-20251001' => array( 1.00, 5.00 ),
 					'claude-sonnet-5' => array( 2.00, 10.00 ),
 					'claude-opus-5' => array( 5.00, 25.00 ),
 				),
@@ -178,7 +178,7 @@ final class MSRWA_Engine_Config {
 
 			/** What `provider:low|medium|high` resolves to. */
 			'tiers' => array(
-				'low'    => array( 'openai' => 'gpt-5-nano', 'gemini' => 'gemini-3.1-flash-lite', 'claude' => 'claude-haiku-4-5' ),
+				'low'    => array( 'openai' => 'gpt-5-nano', 'gemini' => 'gemini-3.1-flash-lite', 'claude' => 'claude-haiku-4-5-20251001' ),
 				'medium' => array( 'openai' => 'gpt-5.6-luna', 'gemini' => 'gemini-3.5-flash', 'claude' => 'claude-sonnet-5' ),
 				'high'   => array( 'openai' => 'gpt-5.6-sol', 'gemini' => 'gemini-3.1-pro-preview', 'claude' => 'claude-opus-5' ),
 			),
@@ -238,6 +238,16 @@ final class MSRWA_Engine_Config {
 				$provenance[ $key ] = isset( $provenance[ $key ] ) && 'engine' !== $provenance[ $key ] ? $provenance[ $key ] . '+' . $layer : $layer;
 			}
 		}
+
+		// The top-level `language` was recorded on every run, shown on the
+		// Moteur screen, and read by nothing: every prompt reads
+		// `settings.site_language`. A caller that set one and not the other got
+		// an article in the wrong language with no indication why.
+		if ( ! empty( $values['language'] ) && empty( $values['settings']['site_language'] ) ) {
+			$values['settings'] = (array) ( $values['settings'] ?? array() );
+			$values['settings']['site_language'] = (string) $values['language'];
+		}
+
 		return new self( self::clamp( $values ), $provenance );
 	}
 

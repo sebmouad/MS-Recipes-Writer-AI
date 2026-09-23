@@ -5,8 +5,8 @@ TASK: write the complete article in one call from the canonical recipe and the s
 OUTPUT LANGUAGE: {{language}}. Everything you write — headings, body, metadata — is in {{language}}.
 
 LANGUAGE AND TYPOGRAPHY — mandatory:
-- Correct, fully accented {{language}}: é, è, ê, à, â, ù, û, ô, ç, œ. Text without accents is rejected.
-- Typographic apostrophes ’. No spelling, agreement or conjugation errors.
+{{#if french}}- Correct, fully accented {{language}}: é, è, ê, à, â, ù, û, ô, ç, œ. Text without accents is rejected.
+- Typographic apostrophes ’. {{/if}}No spelling, agreement or conjugation errors.
 
 LENGTH: {{words_total}} words minimum in total, {{words_maximum}} maximum.{{#if two_pages}} At least {{words_page1}} words before the page break and at least {{words_page2}} after.{{/if}} No padding: if you run short of material, go deeper on a useful technique rather than paraphrasing.
 

@@ -26,6 +26,11 @@ final class MSRWA_Prompt {
 		$sections = self::sections( $s );
 		return array(
 			'language'             => self::language_name( $s ),
+			// The typography rule below it is French orthography, not a
+			// universal one. Asked of an English or Arabic article it demands
+			// accents that language does not have, and the article then fails
+			// a check it could never pass.
+			'french'               => 'fr' === (string) ( $s['site_language'] ?? 'fr' ),
 			'words_total'          => $total,
 			'words_maximum'        => max( $total, (int) ( $s['quality_max_words'] ?? $total + 1400 ) ),
 			'two_pages'            => $two_pages,

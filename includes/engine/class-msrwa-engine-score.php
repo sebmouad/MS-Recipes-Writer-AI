@@ -87,19 +87,32 @@ final class MSRWA_Engine_Score {
 			$quality = MSRWA_Quality::evaluate( $json, $canonical, $settings );
 			$checks['quality gate'] = array( 'pass' => ! empty( $quality['pass'] ), 'detail' => 'score ' . (int) $quality['score'] . '/100' . ( empty( $quality['blockers'] ) ? '' : ', blocked on ' . implode( ', ', $quality['blockers'] ) ) );
 			$words = (int) ( $quality['metrics']['words'] ?? 0 );
-			$checks['words'] = array( 'pass' => $words >= (int) $settings['quality_min_words'], 'detail' => $words . ' / ' . (int) $settings['quality_min_words'] );
+			// Both ends. Comparing against the minimum alone let a live English
+			// article come back at 5 988 words against a 2 800–3 600 target,
+			// and an over-long article is paid for twice more: review and
+			// proofread each read it whole.
+			$maximum = (int) ( $settings['quality_max_words'] ?? 0 );
+			$ceiling = $maximum > 0 ? (int) round( $maximum * 1.15 ) : 0;
+			$too_long = $ceiling > 0 && $words > $ceiling;
+			$checks['words'] = array(
+				'pass' => $words >= (int) $settings['quality_min_words'] && ! $too_long,
+				'detail' => $too_long
+					? $words . ' / ' . $maximum . ' maximum'
+					: $words . ' / ' . (int) $settings['quality_min_words'],
+			);
 			$checks['headings'] = array( 'pass' => (int) ( $quality['metrics']['headings'] ?? 0 ) >= (int) $settings['quality_min_headings'], 'detail' => (int) ( $quality['metrics']['headings'] ?? 0 ) . ' / ' . (int) $settings['quality_min_headings'] );
 			$content = (string) ( $json['content_html'] ?? '' );
 			$headings = MSRWA_Engine_Input::headings( $content );
 			$missing = array();
-			foreach ( self::required_sections() as $section => $synonyms ) {
+			foreach ( self::required_sections( $settings ) as $section => $synonyms ) {
 				$found = false;
 				foreach ( $synonyms as $synonym ) {
 					foreach ( $headings as $heading ) { if ( false !== strpos( self::fold( $heading ), $synonym ) ) { $found = true; break 2; } }
 				}
 				if ( ! $found ) { $missing[] = $section; }
 			}
-			$checks['required sections'] = array( 'pass' => empty( $missing ), 'detail' => $missing ? 'missing: ' . implode( ', ', $missing ) : count( self::required_sections() ) . '/' . count( self::required_sections() ) . ' present' );
+			$required = self::required_sections( $settings );
+			$checks['required sections'] = array( 'pass' => empty( $missing ), 'detail' => $missing ? 'missing: ' . implode( ', ', $missing ) : count( $required ) . '/' . count( $required ) . ' present' );
 			$closing = self::closing_section( $content );
 			$checks['closing section'] = array( 'pass' => $closing['words'] >= (int) $limits['article_closing_words'] && ! $closing['is_question'], 'detail' => $closing['words'] . ' words under "' . mb_substr( $closing['heading'], 0, 40 ) . '"' );
 			$accents = self::accent_density( $content );
@@ -306,18 +319,71 @@ final class MSRWA_Engine_Score {
 	 * The outline the specification requires, each with the wordings that satisfy
 	 * it. Matching ignores accents and case so typography is measured separately.
 	 */
-	public static function required_sections() {
+	public static function required_sections( $settings = array() ) {
+		// A caller that ships its own outline decides it entirely: this is also
+		// what an editable outline needs, and the shape is section => synonyms.
+		$supplied = (array) ( $settings['required_sections'] ?? array() );
+		if ( $supplied ) {
+			$out = array();
+			foreach ( $supplied as $section => $synonyms ) {
+				$out[ (string) $section ] = array_values( array_filter( array_map( 'strval', (array) $synonyms ) ) );
+			}
+			if ( $out ) { return $out; }
+		}
+
+		// Otherwise the shipped outline, in the language the article is being
+		// written in. Matching only French wordings failed every correct
+		// English article — seen live at 9/10, "missing: choix, matériel,
+		// erreurs, conservation" — which then paid for a correction round that
+		// could not fix anything.
+		$language = (string) ( $settings['site_language'] ?? 'fr' );
+		$shipped = self::outlines();
+		return $shipped[ $language ] ?? $shipped['fr'];
+	}
+
+	/**
+	 * The required outline per language, each section with the wordings that
+	 * satisfy it. Matching ignores accents and case, so typography is measured
+	 * separately and a missing accent never reads as a missing section.
+	 */
+	public static function outlines() {
 		return array(
-			'ingrédients'  => array( 'ingredient' ),
-			'choix'        => array( 'choisir', 'choix', 'selection' ),
-			'substitutions'=> array( 'substitut', 'remplacer', 'alternative' ),
-			'matériel'     => array( 'materiel', 'equipement', 'ustensile' ),
-			'préparation'  => array( 'preparation', 'etape', 'pas a pas' ),
-			'erreurs'      => array( 'erreur', 'piege', 'eviter' ),
-			'conservation' => array( 'conservation', 'conserver', 'rechauff' ),
-			'variantes'    => array( 'variante', 'version', 'adaptation' ),
-			'service'      => array( 'service', 'servir', 'accompagn', 'decoupe' ),
-			'faq'          => array( 'faq', 'questions frequentes', 'question' ),
+			'fr' => array(
+				'ingrédients'  => array( 'ingredient' ),
+				'choix'        => array( 'choisir', 'choix', 'selection' ),
+				'substitutions'=> array( 'substitut', 'remplacer', 'alternative' ),
+				'matériel'     => array( 'materiel', 'equipement', 'ustensile' ),
+				'préparation'  => array( 'preparation', 'etape', 'pas a pas' ),
+				'erreurs'      => array( 'erreur', 'piege', 'eviter' ),
+				'conservation' => array( 'conservation', 'conserver', 'rechauff' ),
+				'variantes'    => array( 'variante', 'version', 'adaptation' ),
+				'service'      => array( 'service', 'servir', 'accompagn', 'decoupe' ),
+				'faq'          => array( 'faq', 'questions frequentes', 'question' ),
+			),
+			'en' => array(
+				'ingredients'  => array( 'ingredient' ),
+				'choosing'     => array( 'choos', 'select', 'pick', 'buying', 'which' ),
+				'substitutions'=> array( 'substitut', 'swap', 'replace', 'alternative' ),
+				'equipment'    => array( 'equipment', 'tool', 'utensil', 'pan', 'kit' ),
+				'method'       => array( 'method', 'step', 'how to make', 'instructions' ),
+				'mistakes'     => array( 'mistake', 'wrong', 'avoid', 'pitfall', 'trouble' ),
+				'storage'      => array( 'stor', 'keep', 'leftover', 'reheat', 'freez' ),
+				'variations'   => array( 'variation', 'version', 'adapt', 'twist' ),
+				'serving'      => array( 'serv', 'accompan', 'side', 'pair' ),
+				'faq'          => array( 'faq', 'frequently asked', 'question' ),
+			),
+			'ar' => array(
+				'المكونات'     => array( 'مكون', 'مكونات' ),
+				'الاختيار'     => array( 'اختيار', 'اختر', 'انتقاء' ),
+				'البدائل'      => array( 'بديل', 'بدائل', 'استبدال' ),
+				'الأدوات'      => array( 'أدوات', 'معدات', 'أواني' ),
+				'الطريقة'      => array( 'طريقة', 'خطوات', 'تحضير' ),
+				'الأخطاء'      => array( 'أخطاء', 'خطأ', 'تجنب' ),
+				'الحفظ'        => array( 'حفظ', 'تخزين', 'تسخين' ),
+				'التنويعات'    => array( 'تنويع', 'نسخة', 'تعديل' ),
+				'التقديم'      => array( 'تقديم', 'يقدم', 'مرافق' ),
+				'الأسئلة'      => array( 'أسئلة', 'الشائعة', 'سؤال' ),
+			),
 		);
 	}
 

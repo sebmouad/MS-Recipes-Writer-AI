@@ -296,75 +296,60 @@ The engine changes for none of this.
 
 ---
 
-## 7 · Proposed changes, awaiting the owner's approval
+## 7 · Changes the owner approved, and what is still open
 
-Found while running the plugin on a real site. None of these has been applied:
-the engine changes only on the owner's decision. Each is small and each has a
-workaround already in the plugin.
+### Applied on 2026-09-23, with the owner's approval
 
-1. **The article prompt demands French accents in every language.**
-   `prompts/article.tpl.txt` line 8 lists `é, è, ê, à…` and says "text without
-   accents is rejected" whatever `{{language}}` is. An English or Arabic
-   article is asked to carry French typography. *Proposal:* wrap that line in
-   `{{#if french}}`, with `french` set by `MSRWA_Prompt::variables()`. *Today:*
-   the plugin lowers `article_accents_per_1000` to 0 for non-French lots, so the
-   check no longer fails, but the instruction still reaches the model.
-2. **The required-sections check only knows French headings.**
-   `MSRWA_Engine_Score::required_sections()` matches French synonyms (choix,
-   matériel, erreurs, conservation…). A correct English article fails it every
-   time (seen live: 9/10, "missing: choix, matériel, erreurs, conservation").
-   *Proposal:* read the list from `settings.required_sections` when set, and ship
-   synonyms per language. This is also what milestone T4.1 (an editable
-   outline) needs.
-3. **The top-level `language` key is read by nothing.** It is recorded on every
-   run and shown on the Moteur screen, but prompts read
-   `settings.site_language`. *Proposal:* when `language` is set and
-   `settings.site_language` is not, copy it across in `configure()`; or remove
-   the key. *Today:* the plugin sets both.
-4. **Nothing checks the maximum length.** The words check compares against
-   `quality_min_words` only; a live English article came back at 5 988 words for
-   a 2 800–3 600 target, which is paid for twice more (review and proofread
-   read it whole). *Proposal:* a `words` check that also fails above
-   `quality_max_words` by more than a tolerance, so the step is asked again
-   rather than billed on.
+The engine changes only on the owner's decision. These five were proposed
+here, approved, and are in. `tests/test-engine-language.php` holds them.
 
-5. **`claude:low` names a model Anthropic does not serve.** `tiers` in
-   `MSRWA_Engine_Config::defaults()` maps each `provider:low|medium|high` to an
-   identifier. Checked on 2026-09-22 against the engine's own `models` price
-   list and against the listings Gemini and Anthropic returned for the real
-   keys on the test site:
+1. **The article prompt demanded French accents in every language.**
+   `prompts/article.tpl.txt` listed `é, è, ê, à…` and said "text without
+   accents is rejected" whatever `{{language}}` was, so an English or Arabic
+   article was asked for typography its language does not have. That line is
+   now inside `{{#if french}}`, with `french` set by
+   `MSRWA_Prompt::variables()` from the site's language.
 
-   | Tier | Provider | Model named | Priced by the engine | Served |
-   | --- | --- | --- | --- | --- |
-   | low | openai | `gpt-5-nano` | yes | not checked (host blocks OpenAI) |
-   | low | gemini | `gemini-3.1-flash-lite` | yes | yes |
-   | low | claude | `claude-haiku-4-5` | yes | **no** |
-   | medium | openai | `gpt-5.6-luna` | yes | not checked |
-   | medium | gemini | `gemini-3.5-flash` | yes | yes |
-   | medium | claude | `claude-sonnet-5` | yes | yes |
-   | high | openai | `gpt-5.6-sol` | yes | not checked |
-   | high | gemini | `gemini-3.1-pro-preview` | yes | yes |
-   | high | claude | `claude-opus-5` | yes | yes |
+2. **The required-sections check knew only French headings.**
+   `MSRWA_Engine_Score::required_sections()` matched French synonyms, so a
+   correct English article failed every time — seen live at 9/10, "missing:
+   choix, matériel, erreurs, conservation" — and paid for a correction round
+   that could not fix anything. It now takes the settings, reads
+   `settings.required_sections` when a caller supplies one, and otherwise uses
+   the shipped outline for the site's language. French, English and Arabic
+   ship, each requiring the same ten sections. Supplying an outline is also
+   what milestone T4.1 needs.
 
-   Anthropic lists `claude-haiku-4-5-20251001`, not `claude-haiku-4-5`, so any
-   step routed to `claude:low` dies with a model-not-found after every step
-   before it has been paid for.
+3. **The top-level `language` key was read by nothing.** It was recorded on
+   every run and shown on the Moteur screen while every prompt read
+   `settings.site_language`. `create()` now copies it across when the caller
+   set one and not the other; a stated `site_language` still wins.
 
-   *Proposal:* correct `claude-haiku-4-5` to `claude-haiku-4-5-20251001`.
-   *Today:* nothing is changed in the engine. The Moteur screen shows the
-   resolved model, its rate and whether the provider serves it beside every
-   route, and the Diagnostic screen refuses to call the routing green when a
-   step names a model its provider does not list — so the failure is visible
-   before a lot is dispatched.
+4. **Nothing checked the maximum length.** The words check compared against
+   `quality_min_words` only, so a live English article came back at 5 988
+   words for a 2 800–3 600 target and passed — and an over-long article is
+   paid for twice more, because review and proofread each read it whole. It
+   now fails above `quality_max_words` with 15% of tolerance, and the detail
+   names which end it failed so a correction knows what to do.
 
-6. **The engine's `models` price list and the plugin's `MSRWA_Catalog` are two
-   different lists that disagree.** The engine prices 19 models; the plugin
-   documents 9, with different identifiers for the same model
-   (`claude-haiku-4-5` against `claude-haiku-4-5-20251001`). Only the engine's
-   list is billed against. Two sources of truth for a price is how an estimate
-   silently stops matching an invoice. *Proposal:* the owner has asked for the
-   plugin to own all variable data — models, rates and per-step compatibility
-   — in a table of its own, handing the engine a generated `models` and
-   `tiers` through the caller layer it already accepts. That needs no engine
-   change: both groups are already overridable. Awaiting approval of the
-   design.
+5. **`claude:low` named a model Anthropic does not serve.** The `tiers` map
+   said `claude-haiku-4-5`; Anthropic lists `claude-haiku-4-5-20251001`. Any
+   step routed there died with a model-not-found after every step before it
+   had been paid for. Both the tier and its entry in `models` now use the
+   identifier that exists. All nine tier routes are priced and served.
+
+### Still open
+
+6. **The engine's `models` list is a second source of truth for prices.** The
+   plugin now owns the catalogue — models, rates and per-step compatibility in
+   a table of its own — and hands the engine generated `models` and `tiers`
+   through the caller layer. The engine's own list stays as the fallback for
+   running it without WordPress, which is what it is for; but on a site, two
+   lists still exist and only the generated one is authoritative. *Proposal:*
+   leave it, and treat the engine's list as documentation of what the engine
+   would do alone. Nothing to decide unless the owner wants it removed.
+
+7. **The step registry is one editorial process.** Multiple content types,
+   each with their own chain of steps, would be a second registry — `steps` is
+   already overridable through the caller layer, so the engine would not have
+   to change. *Proposal:* awaiting a written design before anything is built.
