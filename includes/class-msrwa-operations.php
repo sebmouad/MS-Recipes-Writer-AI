@@ -25,18 +25,34 @@ final class MSRWA_Operations {
 				implode( ', ', $parsed['invalid'] )
 			), array( 'status' => 400 ) ); }
 		try {
-			$config = MSRWA_Engine_Config::create( $parsed['config'] );
+			// What is on screen, over the catalogue, as a save would resolve it.
+			// Resolved against the engine alone, every model the catalogue
+			// priced read as unpriced and the table said nothing about money.
+			$config = MSRWA_Engine_Config::create( MSRWA_Engine_Settings::merge( array_filter( MSRWA_Catalog::for_engine() ), $parsed['config'] ), array( 'settings' => MSRWA_Settings::engine_settings() ) );
+			$estimate = MSRWA_Estimate::recipe_on( $config, MSRWA_Profile::FULL );
 			$routes = array();
 			foreach ( $config->steps() as $name => $step ) {
 				// A step with no capability calls no model and has no prompt file
 				// — 'corrections' applies the fact-check verbatim, in code. Asking
 				// for its route or its prompt is asking a question with no answer.
 				if ( 'none' === ( $step['capability'] ?? '' ) ) { continue; }
-				$route = $config->model_for( $name );
 				$prompt = $config->prompt( $name );
-				$routes[ $name ] = array( 'route' => $route, 'provider_known' => (bool) $config->get( 'providers.' . $route['provider'] ), 'price_known' => null !== $config->price( $route['provider'], $route['model'], array() ), 'prompt_source' => $prompt['source'], 'prompt_bytes' => strlen( $prompt['text'] ), 'max_output' => $config->max_output( $name ), 'attempts' => $config->attempts( $name ) );
+				$route = $config->model_for( MSRWA_Estimate::route_for( $name, (string) ( $step['capability'] ?? '' ) ) );
+				$wire = $config->provider( $route['provider'], $route['model'] );
+				$routes[ $name ] = array(
+					'route' => $route, 'provider_known' => (bool) $wire, 'has_key' => ! empty( $wire['has_key'] ),
+					'price_known' => null !== $config->price( $route['provider'], $route['model'], array() ),
+					'cost_usd' => $estimate['steps'][ $name ]['cost_usd'] ?? null,
+					'prompt_source' => $prompt['source'], 'prompt_bytes' => strlen( $prompt['text'] ), 'max_output' => $config->max_output( $name ), 'attempts' => $config->attempts( $name ),
+				);
 			}
-			return rest_ensure_response( array( 'notice' => __( 'Simulation locale : aucune sauvegarde, aucun appel API. Vérifiez les routes et les valeurs effectives ci-dessous.', 'ms-recipes-writer-ai' ), 'routes' => $routes, 'effective' => $config->to_array() ) );
+			return rest_ensure_response( array(
+				'notice' => __( 'Simulation locale : aucune sauvegarde, aucun appel API. Vérifiez les routes et les valeurs effectives ci-dessous.', 'ms-recipes-writer-ai' ),
+				'routes' => $routes,
+				'cost_usd' => $estimate['cost_usd'],
+				'unpriced' => $estimate['unpriced'],
+				'effective' => $config->to_array(),
+			) );
 		} catch ( Throwable $error ) {
 			return new WP_Error( 'invalid_config', __( 'Structure incompatible avec le moteur. Vérifiez les types et les champs des groupes JSON.', 'ms-recipes-writer-ai' ), array( 'status' => 400 ) );
 		}

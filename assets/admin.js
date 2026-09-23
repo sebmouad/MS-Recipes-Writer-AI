@@ -480,28 +480,57 @@
     catalogResult.appendChild(p);
   }
 
+  // What a provider or a model wrote is text, never markup.
+  function esc(value) {
+    var span = document.createElement('span');
+    span.textContent = String(value);
+    return span.innerHTML;
+  }
+
+  function priceLines(data) {
+    if (data.error) return [esc(data.error)];
+    if (!data.asked) return [esc(MSRWA.text.nothingToPrice)];
+    var lines = [esc(MSRWA.text.pricesFound.replace('%1$d', data.found).replace('%2$d', data.asked))];
+    Object.keys(data.results || {}).forEach(function (key) {
+      var row = data.results[key];
+      if (row.state === 'found') lines.push(esc(key + ' : $' + row.input + ' / $' + row.output));
+      else lines.push(esc(key + ' : ' + row.why));
+    });
+    lines.push('<em>' + esc(MSRWA.text.pricesAreIndicative) + '</em>');
+    return lines;
+  }
+
   function catalogRun(button, route, working, done) {
     if (!button) return;
     button.addEventListener('click', function () {
       button.disabled = true;
-      catalogSay(working);
+      catalogSay(esc(working));
       call(route, { method: 'POST' })
-        .then(function (data) { catalogSay(done(data)); })
-        .catch(function (error) { catalogSay(String(error && error.message ? error.message : error), 'stop'); })
+        .then(function (data) { return done(data); })
+        .catch(function (error) { catalogSay(esc(error && error.message ? error.message : error), 'stop'); })
         .then(function () { button.disabled = false; });
     });
   }
 
+  // A fetch adds models nobody has priced, and a model with no rate stops
+  // every estimate that routes to it. So the lookup follows the fetch at once,
+  // for those models only; when every served model already has a rate it
+  // asks nothing and costs nothing.
   catalogRun(
     document.getElementById('ms-fetch-models'),
     '/catalog/models',
     MSRWA.text.askingProviders,
     function (data) {
-      var lines = Object.keys(data).map(function (provider) {
+      var listed = Object.keys(data).map(function (provider) {
         var row = data[provider];
-        return row.label + ' : ' + (row.models ? MSRWA.text.modelsListed.replace('%d', row.models) : row.message);
+        return esc(row.label + ' : ' + (row.models ? MSRWA.text.modelsListed.replace('%d', row.models) : row.message));
       });
-      return lines.join('<br>') + '<br><em>' + MSRWA.text.reloadToSee + '</em>';
+      catalogSay(listed.join('<br>') + '<br>' + esc(MSRWA.text.readingPrices));
+      return call('/catalog/prices', { method: 'POST' }).then(function (prices) {
+        catalogSay(listed.concat(priceLines(prices)).join('<br>') + '<br><em>' + esc(MSRWA.text.reloadToSee) + '</em>');
+      }, function (error) {
+        catalogSay(listed.join('<br>') + '<br>' + esc(error && error.message ? error.message : error), 'stop');
+      });
     }
   );
 
@@ -509,18 +538,7 @@
     document.getElementById('ms-fetch-prices'),
     '/catalog/prices',
     MSRWA.text.readingPrices,
-    function (data) {
-      if (data.error) return data.error;
-      if (!data.asked) return MSRWA.text.nothingToPrice;
-      var lines = [MSRWA.text.pricesFound.replace('%1$d', data.found).replace('%2$d', data.asked)];
-      Object.keys(data.results || {}).forEach(function (key) {
-        var row = data.results[key];
-        if (row.state === 'found') lines.push(key + ' : $' + row.input + ' / $' + row.output);
-        else lines.push(key + ' : ' + row.why);
-      });
-      lines.push('<em>' + MSRWA.text.pricesAreIndicative + '</em>');
-      return lines.join('<br>');
-    }
+    function (data) { catalogSay(priceLines(data).join('<br>')); }
   );
 
   // --- Resolving the form as it stands, without saving or spending --------
@@ -543,20 +561,31 @@
           var table = document.createElement('table');
           table.className = 'ms-table';
           var head = table.insertRow();
-          [t.previewStep || 'Étape', t.previewRoute || 'Route', t.previewKey || 'Clé', t.previewPrice || 'Tarif'].forEach(function (title) {
+          [t.previewStep || 'Étape', t.previewRoute || 'Route', t.previewKey || 'Clé', t.previewPrice || 'Tarif', t.previewCost || 'Coût'].forEach(function (title) {
             var cell = document.createElement('th');
             cell.textContent = title;
             head.appendChild(cell);
           });
+          var money = function (value) { return '$' + Number(value).toFixed(4); };
           Object.keys(data.routes).forEach(function (step) {
             var route = data.routes[step];
             var row = table.insertRow();
             row.insertCell().textContent = step;
             row.insertCell().textContent = route.route.provider + ':' + route.route.model;
-            row.insertCell().textContent = route.provider_known ? '✓' : '✗';
+            row.insertCell().textContent = route.has_key ? '✓' : '✗';
             row.insertCell().textContent = route.price_known ? '✓' : '✗';
+            var cost = row.insertCell();
+            cost.className = 'ms-num';
+            cost.textContent = null === route.cost_usd || undefined === route.cost_usd ? '—' : money(route.cost_usd);
           });
           previewResult.appendChild(table);
+          var total = document.createElement('p');
+          total.textContent = (t.previewTotal || '%s').replace('%s', money(data.cost_usd || 0));
+          if (data.unpriced && data.unpriced.length) {
+            total.className = 'ms-warn';
+            total.textContent += ' ' + (t.previewUnpriced || '') + ' ' + data.unpriced.join(', ');
+          }
+          previewResult.appendChild(total);
         })
         .catch(function (error) {
           var p = document.createElement('p');

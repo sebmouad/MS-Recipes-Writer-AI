@@ -159,6 +159,7 @@ if ( ! class_exists( 'MSRWA_Settings' ) ) {
 	class MSRWA_Settings {
 		const FORM_FIELD = 'msrwa_settings';
 		public static function get() { return $GLOBALS['msrwa_test_settings']; }
+		public static function engine_settings() { return array(); }
 	}
 }
 

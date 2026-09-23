@@ -58,6 +58,16 @@ msrwa_test_assert( 'gpt-5.6-sol' === $handed['tiers']['high']['openai'], 'high i
 $handed = MSRWA_Catalog::for_engine( array( $openai[0], msrwa_row( 'openai', 'gpt-5.6-luna', 0.2, 1.2, false ), $openai[3], $openai[4] ) );
 msrwa_test_assert( 'gpt-5.6-luna' !== $handed['tiers']['medium']['openai'], 'An engine choice the provider no longer serves is replaced, never kept.' );
 
+// Switched off means "not a tier", not "has no price": a route may still name
+// the model outright, and an unpriced route stops the run.
+$off = msrwa_row( 'gemini', 'gemini-3.6-flash', 0.75, 3.75, true );
+$off['enabled'] = false;
+$handed = MSRWA_Catalog::for_engine( array( msrwa_row( 'gemini', 'gemini-3.5-flash', 1.5, 9.0, true ), $off ) );
+msrwa_test_assert( array( 0.75, 3.75 ) === $handed['models']['gemini']['gemini-3.6-flash'], 'A model switched off still hands its rate to the engine.' );
+foreach ( $handed['tiers'] as $tier => $byprovider ) {
+	msrwa_test_assert( 'gemini-3.6-flash' !== $byprovider['gemini'], 'But is never a ' . $tier . ' tier.' );
+}
+
 // --- What must never reach the engine ------------------------------------
 
 $mixed = array(

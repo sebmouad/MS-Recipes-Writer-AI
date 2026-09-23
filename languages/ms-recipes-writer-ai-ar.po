@@ -1653,6 +1653,19 @@ msgstr "لم يتمكن أي نموذج متاح من قراءة صفحة الم
 msgid "la page citée n’est pas celle du fournisseur"
 msgstr "الصفحة المذكورة ليست صفحة المزوّد نفسه"
 
+msgid "Demande à chaque fournisseur la liste de ce qu’il sert, gratuitement, puis cherche aussitôt le tarif des nouveaux modèles qui n’en ont pas : quelques centimes, et seulement s’il en manque. Aucun fournisseur ne publie ses tarifs par API."
+msgstr "يطلب من كل مزوّد قائمة ما يقدّمه مجانًا، ثم يبحث فورًا عن تسعيرة النماذج الجديدة التي لا تسعيرة لها: بضعة سنتات، وفقط عند وجود نقص. لا يوجد مزوّد ينشر تسعيراته عبر واجهة برمجية."
+
+msgid "Coût estimé"
+msgstr "التكلفة التقديرية"
+
+msgid "Sans tarif, donc absentes du total :"
+msgstr "بلا تسعيرة، لذا لم تُحتسب في المجموع:"
+
+#, php-format
+msgid "Une recette complète est estimée à %s — une estimation, jamais une facture."
+msgstr "تُقدَّر الوصفة الكاملة بـ %s — تقدير، وليست فاتورة أبدًا."
+
 msgid "aucune page citée"
 msgstr "لم تُذكر أي صفحة"
 

@@ -1637,6 +1637,19 @@ msgstr "no available model could read the provider’s page"
 msgid "la page citée n’est pas celle du fournisseur"
 msgstr "the page cited is not the provider’s own"
 
+msgid "Demande à chaque fournisseur la liste de ce qu’il sert, gratuitement, puis cherche aussitôt le tarif des nouveaux modèles qui n’en ont pas : quelques centimes, et seulement s’il en manque. Aucun fournisseur ne publie ses tarifs par API."
+msgstr "Asks each provider for the list of what it serves, free of charge, then immediately looks up the rate of any new model that has none: a few cents, and only when one is missing. No provider publishes its rates through an API."
+
+msgid "Coût estimé"
+msgstr "Estimated cost"
+
+msgid "Sans tarif, donc absentes du total :"
+msgstr "Unpriced, so left out of the total:"
+
+#, php-format
+msgid "Une recette complète est estimée à %s — une estimation, jamais une facture."
+msgstr "A full recipe is estimated at %s — an estimate, never an invoice."
+
 msgid "aucune page citée"
 msgstr "no page cited"
 

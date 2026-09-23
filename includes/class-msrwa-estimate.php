@@ -41,7 +41,11 @@ final class MSRWA_Estimate {
 	 * cannot be completed says so instead of reading low.
 	 */
 	public static function recipe( $profile, array $overrides = array() ) {
-		$config = MSRWA_Engine_Config::create( MSRWA_Engine_Settings::merge( MSRWA_Engine_Settings::stored(), $overrides ) );
+		return self::recipe_on( MSRWA_Engine_Config::create( MSRWA_Engine_Settings::merge( MSRWA_Engine_Settings::stored(), $overrides ) ), $profile );
+	}
+
+	/** The same, on a configuration already resolved — the Moteur preview's, say. */
+	public static function recipe_on( MSRWA_Engine_Config $config, $profile ) {
 		$registry = (array) $config->get( 'steps', array() );
 		$shape = self::shape();
 

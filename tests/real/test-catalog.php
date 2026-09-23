@@ -50,6 +50,18 @@ $estimate = msrwa_real_request( 'GET', '/msrwa/v1/estimate?profile=full&recipes=
 msrwa_real_assert( 200 === $estimate['status'], 'The estimate must still answer after the catalogue changed.' );
 msrwa_real_assert( empty( $estimate['body']['unpriced'] ), 'Every configured route must still be priced; unpriced: ' . implode( ', ', (array) ( $estimate['body']['unpriced'] ?? array() ) ) );
 
+// The Moteur simulation resolves what is on screen over the catalogue, and
+// prices it. A model that ships priced but switched off, named by a route,
+// must still read as priced: an unpriced route stops the run.
+$simulation = msrwa_real_request( 'POST', '/msrwa/v1/diagnostics/config', array( 'config' => array( 'routing' => wp_json_encode_compat( array( 'article' => 'gemini:gemini-3.6-flash', 'research' => 'gemini:medium' ) ) ) ) );
+msrwa_real_assert( 200 === $simulation['status'], 'The simulation must answer (got ' . $simulation['status'] . ').' );
+$routes = (array) ( $simulation['body']['routes'] ?? array() );
+msrwa_real_assert( 'gemini-3.6-flash' === ( $routes['article']['route']['model'] ?? '' ), 'The simulation resolves the route typed on screen, not the saved one.' );
+msrwa_real_assert( ! empty( $routes['article']['price_known'] ) && (float) ( $routes['article']['cost_usd'] ?? 0 ) > 0, 'A shipped rate reaches the simulation even for a model not switched on.' );
+msrwa_real_assert( 0 === strpos( (string) ( $routes['featured_image']['route']['model'] ?? '' ), 'gpt-image' ), 'An image step is simulated on the image route.' );
+msrwa_real_assert( (float) ( $simulation['body']['cost_usd'] ?? 0 ) > 0 && empty( $simulation['body']['unpriced'] ), 'The simulation totals a full recipe with nothing unpriced.' );
+msrwa_real_note( 'simulated full recipe: $' . number_format( (float) ( $simulation['body']['cost_usd'] ?? 0 ), 4 ) );
+
 msrwa_real_done( 'the catalogue keeps what it can use and prices it from the providers’ pages' );
 
 function wp_parse_url_compat( $url ) { return parse_url( (string) $url, PHP_URL_HOST ); }

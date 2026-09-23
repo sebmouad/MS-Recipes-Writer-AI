@@ -37,6 +37,7 @@ foreach ( array( 'Recette canonique', 'SEO, publication', 'Visuels générés', 
 // all, and asking for one read the prompts directory as if it were a file.
 require_once MSRWA_DIR . 'includes/engine/load.php';
 require_once MSRWA_DIR . 'includes/class-msrwa-engine-settings.php';
+foreach ( array( 'db', 'catalog', 'estimate' ) as $class ) { require_once MSRWA_DIR . 'includes/class-msrwa-' . $class . '.php'; }
 if ( ! function_exists( 'rest_ensure_response' ) ) { function rest_ensure_response( $data ) { return $data; } }
 class MSRWA_Test_Preview_Request {
 	private $params;
@@ -49,5 +50,13 @@ msrwa_test_assert( ! ( $preview instanceof WP_Error ), 'Previewing the defaults 
 msrwa_test_assert( ! isset( $preview['routes']['corrections'] ), 'A step with no capability has no route to preview.' );
 msrwa_test_assert( isset( $preview['routes']['article'] ), 'A step that does call a model is still previewed.' );
 msrwa_test_assert( 'string' === gettype( $preview['routes']['article']['prompt_source'] ), 'A previewed step still resolves its prompt.' );
+// The simulation says what the configuration on screen would cost, and routes
+// each image step the way the engine does — through `routing.image`, not
+// through the step's own name, which showed a text model drawing the photo.
+msrwa_test_assert( $preview['cost_usd'] > 0, 'The simulation prices a full recipe.' );
+msrwa_test_assert( $preview['routes']['article']['cost_usd'] > 0, 'And each step.' );
+msrwa_test_assert( 0 === strpos( $preview['routes']['featured_image']['route']['model'], 'gpt-image' ), 'An image step is shown on the image route; got ' . $preview['routes']['featured_image']['route']['model'] );
+$cheaper = MSRWA_Operations::preview( new MSRWA_Test_Preview_Request( array( 'config' => array( 'routing' => '{"article":"openai:low"}' ) ) ) );
+msrwa_test_assert( $cheaper['routes']['article']['cost_usd'] < $preview['routes']['article']['cost_usd'], 'Changing a route on screen changes the simulated cost before anything is saved.' );
 
 msrwa_test_done( 'operations and report contracts' );

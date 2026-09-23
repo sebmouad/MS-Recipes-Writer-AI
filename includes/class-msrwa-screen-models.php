@@ -69,7 +69,7 @@ final class MSRWA_Screen_Models {
 			<h2><?php esc_html_e( 'Mettre le catalogue à jour', 'ms-recipes-writer-ai' ); ?></h2>
 			<p>
 				<button type="button" class="button button-primary" id="ms-fetch-models"><?php esc_html_e( 'Relever les modèles chez les fournisseurs', 'ms-recipes-writer-ai' ); ?></button>
-				<span class="ms-muted"><?php esc_html_e( 'Gratuit. Demande à chaque fournisseur la liste de ce qu’il sert, et ce qu’il en dit : capacités, limites. Aucun fournisseur ne publie ses tarifs par API, donc aucun tarif n’est touché ici.', 'ms-recipes-writer-ai' ); ?></span>
+				<span class="ms-muted"><?php esc_html_e( 'Demande à chaque fournisseur la liste de ce qu’il sert, gratuitement, puis cherche aussitôt le tarif des nouveaux modèles qui n’en ont pas : quelques centimes, et seulement s’il en manque. Aucun fournisseur ne publie ses tarifs par API.', 'ms-recipes-writer-ai' ); ?></span>
 			</p>
 			<p>
 				<button type="button" class="button" id="ms-fetch-prices"><?php esc_html_e( 'Chercher les tarifs manquants', 'ms-recipes-writer-ai' ); ?></button>

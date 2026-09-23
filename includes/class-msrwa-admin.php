@@ -143,6 +143,10 @@ final class MSRWA_Admin {
 				'previewRoute' => __( 'Route', 'ms-recipes-writer-ai' ),
 				'previewKey' => __( 'Clé présente', 'ms-recipes-writer-ai' ),
 				'previewPrice' => __( 'Tarif connu', 'ms-recipes-writer-ai' ),
+				'previewCost' => __( 'Coût estimé', 'ms-recipes-writer-ai' ),
+				/* translators: %s is an amount in US dollars. */
+				'previewTotal' => __( 'Une recette complète est estimée à %s — une estimation, jamais une facture.', 'ms-recipes-writer-ai' ),
+				'previewUnpriced' => __( 'Sans tarif, donc absentes du total :', 'ms-recipes-writer-ai' ),
 			),
 		) );
 	}

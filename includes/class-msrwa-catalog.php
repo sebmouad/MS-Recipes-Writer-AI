@@ -34,6 +34,9 @@ final class MSRWA_Catalog {
 				'gpt-5.6-luna' => array( 'label' => 'GPT-5.6 Luna', 'stable' => true, 'text' => true, 'vision' => true, 'web_search' => true, 'image_generation' => false, 'input' => 0.20, 'output' => 1.20, 'source' => 'https://developers.openai.com/api/docs/models/gpt-5.6-luna' ),
 				'gpt-5.6-terra' => array( 'label' => 'GPT-5.6 Terra', 'stable' => true, 'text' => true, 'vision' => true, 'web_search' => true, 'image_generation' => false, 'input' => 2.00, 'output' => 12.00, 'source' => 'https://developers.openai.com/api/docs/models/gpt-5.6-terra' ),
 				'gpt-5.6-sol' => array( 'label' => 'GPT-5.6 Sol', 'stable' => true, 'text' => true, 'vision' => true, 'web_search' => true, 'image_generation' => false, 'input' => 4.00, 'output' => 20.00, 'source' => 'https://developers.openai.com/api/docs/models/gpt-5.6-sol' ),
+				'gpt-5' => array( 'label' => 'GPT-5', 'stable' => true, 'text' => true, 'vision' => true, 'web_search' => true, 'image_generation' => false, 'input' => 1.25, 'output' => 10.00, 'source' => 'https://developers.openai.com/api/docs/pricing', 'enabled' => false ),
+				'gpt-5-mini' => array( 'label' => 'GPT-5 mini', 'stable' => true, 'text' => true, 'vision' => true, 'web_search' => true, 'image_generation' => false, 'input' => 0.25, 'output' => 2.00, 'source' => 'https://developers.openai.com/api/docs/pricing', 'enabled' => false ),
+				'gpt-image-1' => array( 'label' => 'GPT Image 1', 'stable' => true, 'text' => false, 'vision' => true, 'web_search' => false, 'image_generation' => true, 'input' => 5.00, 'image_input' => 10.00, 'output' => 40.00, 'source' => 'https://developers.openai.com/api/docs/pricing', 'enabled' => false ),
 				'gpt-image-2.5-flare' => array( 'label' => 'GPT Image 2.5 Flare', 'stable' => true, 'text' => false, 'vision' => true, 'web_search' => false, 'image_generation' => true, 'image_tokens' => array( '1024x1024' => array( 'low' => 272, 'medium' => 1056, 'high' => 4160 ), '1024x1536' => array( 'low' => 408, 'medium' => 1584, 'high' => 6240 ), '1536x1024' => array( 'low' => 400, 'medium' => 1568, 'high' => 6208 ) ), 'input' => 5.00, 'image_input' => 8.00, 'output' => 30.00, 'source' => 'https://developers.openai.com/api/docs/models/gpt-image-2.5-flare' ),
 				'gpt-image-2.5-sunburst' => array( 'label' => 'GPT Image 2.5 Sunburst', 'stable' => true, 'text' => false, 'vision' => true, 'web_search' => false, 'image_generation' => true, 'image_tokens' => array( '1024x1024' => array( 'low' => 272, 'medium' => 1056, 'high' => 4160 ), '1024x1536' => array( 'low' => 408, 'medium' => 1584, 'high' => 6240 ), '1536x1024' => array( 'low' => 400, 'medium' => 1568, 'high' => 6208 ) ), 'input' => 5.00, 'image_input' => 8.00, 'output' => 30.00, 'source' => 'https://developers.openai.com/api/docs/models/gpt-image-2.5-sunburst' ),
 			),
@@ -44,6 +47,7 @@ final class MSRWA_Catalog {
 			'gemini' => array(
 				'gemini-3.5-flash' => array( 'label' => 'Gemini 3.5 Flash', 'stable' => true, 'text' => true, 'vision' => true, 'web_search' => true, 'image_generation' => false, 'input' => 1.50, 'output' => 9.00, 'source' => 'https://ai.google.dev/gemini-api/docs/pricing' ),
 				'gemini-3.1-flash-lite' => array( 'label' => 'Gemini 3.1 Flash-Lite', 'stable' => true, 'text' => true, 'vision' => true, 'web_search' => true, 'image_generation' => false, 'input' => 0.25, 'output' => 1.50, 'source' => 'https://ai.google.dev/gemini-api/docs/pricing' ),
+				'gemini-3-flash-preview' => array( 'label' => 'Gemini 3 Flash Preview', 'stable' => true, 'text' => true, 'vision' => true, 'web_search' => true, 'image_generation' => false, 'input' => 0.50, 'output' => 3.00, 'source' => 'https://ai.google.dev/gemini-api/docs/pricing', 'enabled' => false ),
 				'gemini-3.5-flash-lite' => array( 'label' => 'Gemini 3.5 Flash-Lite', 'stable' => true, 'text' => true, 'vision' => true, 'web_search' => true, 'image_generation' => false, 'input' => 0.30, 'output' => 2.50, 'source' => 'https://ai.google.dev/gemini-api/docs/pricing', 'enabled' => false ),
 				'gemini-3.6-flash' => array( 'label' => 'Gemini 3.6 Flash', 'stable' => true, 'text' => true, 'vision' => true, 'web_search' => true, 'image_generation' => false, 'input' => 0.75, 'output' => 3.75, 'source' => 'https://ai.google.dev/gemini-api/docs/pricing', 'enabled' => false ),
 				'gemini-3.7-flash' => array( 'label' => 'Gemini 3.7 Flash', 'stable' => true, 'text' => true, 'vision' => true, 'web_search' => true, 'image_generation' => false, 'input' => 0.75, 'output' => 3.75, 'source' => 'https://ai.google.dev/gemini-api/docs/pricing', 'enabled' => false ),
@@ -287,7 +291,8 @@ final class MSRWA_Catalog {
 	 * now. Seeding never overwrote, which was right for a rate a person typed
 	 * and wrong for one that only ever came in the box: a provider that moved
 	 * a price left every site billing on the old one for ever. Only `shipped`
-	 * rows move; a typed or looked-up rate is somebody's decision.
+	 * rows move; a typed or looked-up rate is somebody's decision. A row a
+	 * fetch added with no rate at all is filled too, once one ships.
 	 */
 	public static function reprice() {
 		global $wpdb;
@@ -297,9 +302,9 @@ final class MSRWA_Catalog {
 		foreach ( self::defaults() as $provider => $models ) {
 			foreach ( $models as $model_id => $model ) {
 				$moved += (int) $wpdb->query( $wpdb->prepare(
-					'UPDATE ' . $t['catalog'] . ' SET input_usd = %f, output_usd = %f, price_source = %s, price_checked_at = %s, updated_at = %s WHERE provider = %s AND model_id = %s AND price_method = %s AND ( input_usd IS NULL OR output_usd IS NULL OR input_usd <> %f OR output_usd <> %f )',
+					'UPDATE ' . $t['catalog'] . ' SET input_usd = %f, output_usd = %f, price_method = \'' . self::SHIPPED . '\', price_source = %s, price_checked_at = %s, updated_at = %s WHERE provider = %s AND model_id = %s AND ( ( price_method = %s AND ( input_usd IS NULL OR output_usd IS NULL OR input_usd <> %f OR output_usd <> %f ) ) OR ( price_method = %s AND input_usd IS NULL AND output_usd IS NULL ) )',
 					(float) $model['input'], (float) $model['output'], (string) ( $model['source'] ?? '' ), $now, $now,
-					$provider, (string) $model_id, self::SHIPPED, (float) $model['input'], (float) $model['output']
+					$provider, (string) $model_id, self::SHIPPED, (float) $model['input'], (float) $model['output'], ''
 				) );
 			}
 		}
@@ -443,17 +448,20 @@ final class MSRWA_Catalog {
 	 * no engine change is needed: a renamed model or a moved rate is an edit
 	 * in this table, and the chain that writes an article never moves.
 	 *
-	 * Only enabled, priced models are handed over. A model with no rate makes
-	 * the run unverifiable against its ceiling, and the plugin's promise is an
-	 * estimate before it spends.
+	 * Every priced model's rate is handed over; only enabled ones can become a
+	 * tier. A model with no rate makes the run unverifiable against its ceiling,
+	 * and the plugin's promise is an estimate before it spends. Withholding the
+	 * rate of a model merely not enabled did the same to a route that names it
+	 * outright: gemini-3.6-flash ships priced, and routed by name it read as
+	 * unpriced and stopped the run.
 	 */
 	public static function for_engine( array $rows = null ) {
 		$models = array();
 		$priced = array();
-		foreach ( null === $rows ? self::rows( true ) : $rows as $row ) {
+		foreach ( null === $rows ? self::rows() : $rows as $row ) {
 			if ( null === $row['input_usd'] || null === $row['output_usd'] ) { continue; }
 			$models[ $row['provider'] ][ $row['model_id'] ] = array( (float) $row['input_usd'], (float) $row['output_usd'] );
-			$priced[ $row['provider'] ][ $row['model_id'] ] = $row;
+			if ( ! isset( $row['enabled'] ) || $row['enabled'] ) { $priced[ $row['provider'] ][ $row['model_id'] ] = $row; }
 		}
 		return array( 'models' => $models, 'tiers' => self::tiers( $priced ) );
 	}
