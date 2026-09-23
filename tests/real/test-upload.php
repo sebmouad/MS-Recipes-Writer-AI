@@ -41,9 +41,12 @@ $me = msrwa_real_request( 'GET', '/wp/v2/users/me' );
 msrwa_real_assert( (int) ( $added['author'] ?? 0 ) === (int) ( $me['body']['id'] ?? -1 ), 'It belongs to the writer who sent it.' );
 msrwa_real_note( 'lot #' . (int) $sent['body']['id'] . ', attachment #' . (int) $added['id'] );
 
-// Nothing was dispatched; leave the site as it was.
+// A lot deleted before any draft took its photograph takes the photograph
+// with it: nothing else points at it.
 msrwa_real_request( 'DELETE', '/msrwa/v1/batches/' . (int) $sent['body']['id'] );
-msrwa_real_request( 'DELETE', '/wp/v2/media/' . (int) $added['id'] . '?force=true' );
+$gone = msrwa_real_request( 'GET', '/wp/v2/media/' . (int) $added['id'] . '?context=edit' );
+msrwa_real_assert( 404 === $gone['status'], 'Deleting the lot removed the photograph no draft took (got ' . $gone['status'] . ').' );
+if ( 404 !== $gone['status'] ) { msrwa_real_request( 'DELETE', '/wp/v2/media/' . (int) $added['id'] . '?force=true' ); }
 array_map( 'unlink', glob( $dir . '/*' ) );
 @rmdir( $dir );
 msrwa_real_done( 'photographs are sent from the computer, checked, and owned by their writer' );

@@ -77,6 +77,9 @@ final class MSRWA_Intake {
 	/** How many photographs one lot may carry. Each is described by a paid call. */
 	const MAX_PHOTOS = 30;
 
+	/** Marks a library photograph as one a writer sent with a lot. */
+	const SENT = '_msrwa_sent_by_writer';
+
 	/** What a photograph may be: the types every provider's vision reads. */
 	const PHOTO_TYPES = array( 'jpg|jpeg|jpe' => 'image/jpeg', 'png' => 'image/png', 'webp' => 'image/webp' );
 
@@ -157,6 +160,9 @@ final class MSRWA_Intake {
 				self::discard( $ids );
 				return array( 'ids' => array(), 'error' => sprintf( '%s : %s', sanitize_file_name( (string) $file['name'] ), $id->get_error_message() ) );
 			}
+			// Marked, so the plugin knows which library photographs it added and
+			// may attach to a draft or remove with their lot — and no other.
+			update_post_meta( (int) $id, self::SENT, 1 );
 			$ids[] = (int) $id;
 		}
 		return array( 'ids' => $ids, 'error' => '' );
@@ -165,6 +171,26 @@ final class MSRWA_Intake {
 	/** Removes photographs a submission added and then could not use. */
 	public static function discard( array $ids ) {
 		foreach ( $ids as $id ) { wp_delete_attachment( absint( $id ), true ); }
+	}
+
+	/** Whether a library item is a photograph a writer sent with a lot and nothing has taken yet. */
+	public static function loose( $id ) {
+		$post = get_post( absint( $id ) );
+		return $post && 'attachment' === $post->post_type && ! (int) $post->post_parent && get_post_meta( $post->ID, self::SENT, true );
+	}
+
+	/** Hands a recipe's photographs to its draft, where the editor will look for them. */
+	public static function adopt( $post_id, array $ids ) {
+		foreach ( $ids as $id ) {
+			if ( self::loose( $id ) ) { wp_update_post( array( 'ID' => absint( $id ), 'post_parent' => absint( $post_id ) ) ); }
+		}
+	}
+
+	/** Removes a deleted lot's photographs that no draft took. */
+	public static function forget( array $ids ) {
+		foreach ( $ids as $id ) {
+			if ( self::loose( $id ) ) { wp_delete_attachment( absint( $id ), true ); }
+		}
 	}
 
 	/** One image as the engine's vision call wants it: a media type and base64 bytes. */

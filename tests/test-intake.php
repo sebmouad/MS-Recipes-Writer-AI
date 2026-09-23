@@ -81,6 +81,26 @@ msrwa_test_assert( '' !== $half['error'] && array( 101 ) === $GLOBALS['deleted']
 
 $many = array_fill( 0, MSRWA_Intake::MAX_PHOTOS + 1, $photo( 'tarte.png', $dir . '/tarte.png' ) );
 msrwa_test_contains( MSRWA_Intake::upload( $many )['error'], (string) MSRWA_Intake::MAX_PHOTOS, 'A lot carries a bounded number of photographs: each is a paid description.' );
+msrwa_test_assert( ! empty( $GLOBALS['msrwa_test_meta'][101][ MSRWA_Intake::SENT ] ), 'A photograph the plugin added is marked as sent by a writer.' );
+
+// A sent photograph goes to its recipe's draft; one no draft took leaves with
+// its lot. Anything else in the library is never touched, whoever sent it.
+$GLOBALS['updated'] = array();
+function wp_update_post( $post ) { $GLOBALS['updated'][] = $post; $GLOBALS['msrwa_test_posts'][ $post['ID'] ]->post_parent = $post['post_parent']; return $post['ID']; }
+$attachment = static function ( $id, $parent ) { return (object) array( 'ID' => $id, 'post_type' => 'attachment', 'post_parent' => $parent ); };
+$GLOBALS['msrwa_test_posts'][201] = $attachment( 201, 0 );
+$GLOBALS['msrwa_test_posts'][202] = $attachment( 202, 0 );
+$GLOBALS['msrwa_test_posts'][203] = $attachment( 203, 0 );
+$GLOBALS['msrwa_test_posts'][204] = $attachment( 204, 7 );
+foreach ( array( 201, 202, 204 ) as $id ) { update_post_meta( $id, MSRWA_Intake::SENT, 1 ); }
+MSRWA_Intake::adopt( 90, array( 201, 203, 204 ) );
+msrwa_test_assert( 90 === $GLOBALS['msrwa_test_posts'][201]->post_parent, 'The draft takes its recipe\'s photograph.' );
+msrwa_test_assert( 0 === $GLOBALS['msrwa_test_posts'][203]->post_parent, 'A photograph the plugin did not add is not moved.' );
+msrwa_test_assert( 7 === $GLOBALS['msrwa_test_posts'][204]->post_parent, 'A photograph already attached elsewhere is not moved.' );
+$GLOBALS['deleted'] = array();
+MSRWA_Intake::forget( array( 201, 202, 203, 204 ) );
+msrwa_test_assert( array( 202 ) === $GLOBALS['deleted'], 'A deleted lot removes only its own photographs that no draft took; removed: ' . implode( ',', $GLOBALS['deleted'] ) );
+
 array_map( 'unlink', glob( $dir . '/*' ) );
 @rmdir( $dir );
 

@@ -109,6 +109,9 @@ run carries.
 - [x] A lot does not wait for a visitor between waves, live: three recipes in
   8 min 06 s with one visit a minute (14 min 18 s before, with one every
   20 s), 3/3 approved at $0.125 per recipe, one collage redraw in three.
+- [x] A writer's photographs follow their draft, live: sent with the lot by
+  `tests/real/test-flow.php`, attached to the draft it produced; removed with a
+  lot deleted before any draft (`tests/real/test-upload.php`).
 - [ ] A complete lot on Claude — the account has no credit. — the Gemini key's
   grounding quota is exhausted, OpenAI is unreachable from the test
   environment and the Claude account has no credit.

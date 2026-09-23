@@ -60,6 +60,7 @@ final class MSRWA_Draft {
 		$batch = MSRWA_Batch::get( (int) $run['batch_id'] );
 		if ( $batch && '' !== (string) $batch['language'] ) { update_post_meta( $post_id, '_msrwa_language', sanitize_key( (string) $batch['language'] ) ); }
 		self::attach_images( $post_id, $run_id, $artifacts, $title );
+		MSRWA_Intake::adopt( $post_id, array_column( (array) ( $brief['images'] ?? array() ), 'id' ) );
 
 		global $wpdb;
 		$t = MSRWA_DB::tables();

@@ -24,18 +24,31 @@ msrwa_real_note( 'estimated $' . number_format( $expected, 4 ) . ', at most $' .
 
 // --- Submit ---------------------------------------------------------------
 
-$created = msrwa_real_request( 'POST', '/msrwa/v1/batches', array(
+// Sent the way the compose screen sends it: a form, with a photograph from
+// disk when PHP can draw one, so the upload, the pairing and the draft taking
+// the photograph are all on the path this test walks.
+$fields = array(
 	'recipes' => "Tarte aux pommes normande\nPâte brisée, pommes, crème, œufs, calvados. Cuire 45 minutes à 180 °C.",
-	'images' => '',
-	'budget' => round( $budget, 4 ),
+	'budget' => (string) round( $budget, 4 ),
 	'profile' => $profile,
 	'language' => 'fr',
-), 180 );
+);
+$photo = '';
+if ( function_exists( 'imagecreatetruecolor' ) ) {
+	$photo = sys_get_temp_dir() . '/msrwa-flow-tarte-' . getmypid() . '.jpg';
+	$image = imagecreatetruecolor( 640, 480 );
+	imagefill( $image, 0, 0, imagecolorallocate( $image, 222, 196, 150 ) );
+	imagefilledellipse( $image, 320, 240, 440, 440, imagecolorallocate( $image, 200, 140, 60 ) );
+	imagejpeg( $image, $photo, 85 );
+}
+$created = msrwa_real_upload( '/msrwa/v1/batches', $fields, $photo ? array( $photo ) : array() );
+if ( $photo ) { @unlink( $photo ); }
 
 msrwa_real_assert( 200 === $created['status'], 'A lot must be accepted (got ' . $created['status'] . ': ' . wp_json_encode_compat( $created['body'] ) . ').' );
 $batch = (int) ( $created['body']['id'] ?? 0 );
 msrwa_real_assert( $batch > 0, 'The lot must come back with a number.' );
 msrwa_real_assert( 1 === (int) ( $created['body']['recipes'] ?? 0 ), 'One recipe must have been read out of the text.' );
+msrwa_real_assert( ( $photo ? 1 : 0 ) === (int) ( $created['body']['images'] ?? -1 ), 'The photograph sent is the lot\'s photograph.' );
 msrwa_real_note( 'lot #' . $batch );
 
 // --- Dispatch and wait ----------------------------------------------------
@@ -99,6 +112,15 @@ msrwa_real_assert( 200 === $draft['status'], 'The draft must be readable (got ' 
 msrwa_real_assert( 'draft' === (string) ( $draft['body']['status'] ?? '' ), 'It must be a draft, never published.' );
 msrwa_real_assert( '' !== trim( (string) ( $draft['body']['content']['raw'] ?? '' ) ), 'A draft with no article in it is worse than no draft.' );
 msrwa_real_note( 'draft #' . $post . ': ' . wp_strip_all_tags_compat( (string) ( $draft['body']['title']['raw'] ?? '' ) ) );
+
+// The photograph the writer sent is attached to the draft that came of it,
+// where the editor will look for it — unless the pairing set it aside.
+if ( $photo ) {
+	$media = msrwa_real_request( 'GET', '/wp/v2/media?parent=' . $post . '&per_page=20&context=edit' );
+	$sent = array_filter( (array) $media['body'], static function ( $item ) { return false !== strpos( (string) ( $item['source_url'] ?? '' ), 'msrwa-flow-tarte' ); } );
+	msrwa_real_note( count( (array) $media['body'] ) . ' attachment(s) on the draft, ' . count( $sent ) . ' of them the photograph sent' );
+	msrwa_real_assert( 1 === count( $sent ), 'The writer\'s photograph is attached to the draft.' );
+}
 
 // What the article wrote about itself must reach the post: proofreading returns
 // the body alone, and taking its artifact whole once left every draft without

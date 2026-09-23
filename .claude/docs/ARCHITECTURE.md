@@ -330,4 +330,7 @@ Break these and the plugin misreports itself.
     every file from its bytes (JPEG, PNG or WebP, under
     `MSRWA_Admin::photo_bytes()`, at most `MSRWA_Intake::MAX_PHOTOS`) before
     adding any, refuses the whole lot on one bad file, and removes what it
-    added when the lot cannot be created.
+    added when the lot cannot be created. Each is marked
+    `_msrwa_sent_by_writer`; the draft adopts its recipe's photographs
+    (`MSRWA_Intake::adopt()`), and deleting a lot removes those no draft took
+    (`forget()`). Nothing without that mark is ever moved or removed.

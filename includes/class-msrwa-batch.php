@@ -207,6 +207,9 @@ final class MSRWA_Batch {
 	public static function delete( $id ) {
 		global $wpdb;
 		$t = MSRWA_DB::tables();
+		// The photographs this lot uploaded and no draft took would otherwise
+		// stay in the media library with nothing pointing at them.
+		MSRWA_Intake::forget( array_column( (array) ( self::matching( $id )['images'] ?? array() ), 'id' ) );
 		foreach ( MSRWA_Run::for_batch( $id ) as $run ) {
 			foreach ( array( 'steps', 'calls', 'events', 'artifacts' ) as $table ) {
 				$wpdb->query( $wpdb->prepare( 'DELETE FROM ' . $t[ $table ] . ' WHERE run_id = %d', (int) $run['id'] ) );

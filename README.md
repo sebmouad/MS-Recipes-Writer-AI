@@ -5,9 +5,9 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.18.5
+## État actuel — 0.18.6
 
-La version `0.18.5` fait passer un lot de trois recettes en 8 minutes pour 0,125 $ la recette, toutes approuvées ; la `0.18.4` faisait envoyer les photographies d’un lot depuis l’ordinateur du rédacteur ; la `0.18.3` faisait approuver les trois recettes d’un lot réel aux réglages par défaut — image à la une en `low`, collage en `medium` — pour 0,132 $ en moyenne ; la `0.18.2` permettait de choisir le modèle et la qualité de chaque image
+La version `0.18.6` range les photographies envoyées avec le brouillon qu’elles ont servi à écrire ; la `0.18.5` faisait passer un lot de trois recettes en 8 minutes pour 0,125 $ la recette, toutes approuvées ; la `0.18.4` faisait envoyer les photographies d’un lot depuis l’ordinateur du rédacteur ; la `0.18.3` faisait approuver les trois recettes d’un lot réel aux réglages par défaut — image à la une en `low`, collage en `medium` — pour 0,132 $ en moyenne ; la `0.18.2` permettait de choisir le modèle et la qualité de chaque image
 séparément ; la `0.18.1` fait tenir le plafond par recette jusque dans les reprises
 de l’approbation finale ; la `0.18.0` ramène une recette complète à environ 0,11 $ réels —
 recherche web comprise — sans perte de qualité mesurée ; la `0.17.0` faisait
@@ -74,6 +74,21 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.18.6
+
+**Les photographies envoyées vont avec leur brouillon.** Une photographie
+envoyée avec un lot sert de référence à la recherche ; elle restait ensuite
+dans la médiathèque sans rien qui la relie à l’article. Elle est désormais
+attachée au brouillon de sa recette, là où l’éditeur la cherchera. Si le lot
+est supprimé avant qu’un brouillon ne la prenne, elle part avec lui. Seules
+les photographies ajoutées par l’extension sont concernées : rien d’autre de
+la médiathèque n’est jamais déplacé ni supprimé.
+
+Vérifié en réel : la suite complète passe (4 sur 4). Une recette complète
+envoyée avec une photographie, comme le fait le formulaire, a pris 226 s pour
+0,104 $, et la photographie est attachée au brouillon avec l’image à la une et
+le collage. Un lot supprimé sans avoir tourné a emporté sa photographie.
 
 ## Version 0.18.5
 
