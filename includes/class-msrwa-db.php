@@ -104,6 +104,7 @@ final class MSRWA_DB {
 		// Seeded once, then the owner's. A site that has already corrected a
 		// rate must not have it overwritten by the shipped one on every update.
 		MSRWA_Catalog::seed();
+		if ( class_exists( 'MSRWA_Engine_Settings' ) ) { MSRWA_Engine_Settings::forget_copies(); }
 		update_option( 'msrwa_schema', self::SCHEMA, false );
 		update_option( 'msrwa_db_version', MSRWA_VERSION, false );
 	}

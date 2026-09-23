@@ -50,16 +50,51 @@ final class MSRWA_Engine_Settings {
 	 * site that has not, the model map is data in a table rather than a
 	 * constant in the engine. That is what lets a provider rename a model
 	 * without anybody touching the process that writes an article.
+	 *
+	 * Merged model by model, not group by group. One typed rate used to hide
+	 * the whole catalogue: every price fetched, looked up or corrected on the
+	 * Modèles screen afterwards stopped reaching the engine.
 	 */
 	public static function stored() {
-		$stored = get_option( self::OPTION, array() );
-		$stored = is_array( $stored ) ? $stored : array();
-		if ( ! class_exists( 'MSRWA_Catalog' ) ) { return $stored; }
-
-		foreach ( MSRWA_Catalog::for_engine() as $group => $value ) {
-			if ( $value && ! isset( $stored[ $group ] ) ) { $stored[ $group ] = $value; }
+		$stored = self::typed();
+		foreach ( self::catalogue() as $group => $value ) {
+			if ( $value ) { $stored[ $group ] = isset( $stored[ $group ] ) && is_array( $stored[ $group ] ) ? self::merge( $value, $stored[ $group ] ) : $value; }
 		}
 		return $stored;
+	}
+
+	/** The groups the catalogue generates, or none when it is not loaded. */
+	private static function catalogue() { return class_exists( 'MSRWA_Catalog' ) ? MSRWA_Catalog::for_engine() : array(); }
+
+	/**
+	 * What an untouched form resolves to: the engine's defaults with the
+	 * catalogue applied. Saving is compared against this, not against the
+	 * engine alone, or the catalogue's rates shown in the form are stored back
+	 * as if a person had typed them.
+	 */
+	public static function baseline() {
+		$catalogue = array_filter( self::catalogue() );
+		return MSRWA_Engine_Config::create( $catalogue )->to_array();
+	}
+
+	/**
+	 * Drops what an earlier save stored only because the form showed it: every
+	 * value equal to what the engine and the catalogue would give anyway. What
+	 * a person really changed differs from that and stays. Idempotent; runs on
+	 * each version change.
+	 */
+	public static function forget_copies() {
+		$typed = self::typed();
+		if ( ! $typed ) { return false; }
+		$baseline = self::baseline();
+		$kept = array();
+		foreach ( $typed as $group => $value ) {
+			if ( ! is_array( $value ) || ! is_array( $baseline[ $group ] ?? null ) ) { $kept[ $group ] = $value; continue; }
+			$difference = self::difference( $value, $baseline[ $group ] );
+			if ( $difference ) { $kept[ $group ] = $difference; }
+		}
+		if ( $kept === $typed ) { return false; }
+		return update_option( self::OPTION, $kept, false );
 	}
 
 	/** Only what a person actually saved, for the screen that edits it. */
@@ -92,7 +127,7 @@ final class MSRWA_Engine_Settings {
 
 	/** Shared by saving and the non-mutating diagnostic preview. */
 	public static function parse( array $raw ) {
-		$defaults = self::defaults();
+		$defaults = self::baseline();
 		$config = array();
 		$invalid = array();
 
@@ -119,16 +154,30 @@ final class MSRWA_Engine_Settings {
 			if ( ! array_key_exists( $key, $default ) ) { $out[ $key ] = $item; continue; }
 			if ( is_array( $item ) && is_array( $default[ $key ] ) ) {
 				if ( array() === $item || array_keys( $item ) === range( 0, count( $item ) - 1 ) ) {
-					if ( $item !== $default[ $key ] ) { $out[ $key ] = $item; }
+					if ( ! self::same( $item, $default[ $key ] ) ) { $out[ $key ] = $item; }
 					continue;
 				}
 				$nested = self::difference( $item, $default[ $key ] );
 				if ( $nested ) { $out[ $key ] = $nested; }
 				continue;
 			}
-			if ( $item !== $default[ $key ] ) { $out[ $key ] = $item; }
+			if ( ! self::same( $item, $default[ $key ] ) ) { $out[ $key ] = $item; }
 		}
 		return $out;
+	}
+
+	/**
+	 * Equal as values. JSON writes 4.0 as 4 and reads it back as an integer, so
+	 * a strict comparison found every rate in an untouched form "changed".
+	 */
+	private static function same( $a, $b ) {
+		if ( is_array( $a ) || is_array( $b ) ) {
+			if ( ! is_array( $a ) || ! is_array( $b ) || array_keys( $a ) !== array_keys( $b ) ) { return false; }
+			foreach ( $a as $key => $value ) { if ( ! self::same( $value, $b[ $key ] ) ) { return false; } }
+			return true;
+		}
+		if ( ( is_int( $a ) || is_float( $a ) ) && ( is_int( $b ) || is_float( $b ) ) ) { return (float) $a === (float) $b; }
+		return $a === $b;
 	}
 
 	/**

@@ -25,6 +25,12 @@ msrwa_test_assert( array( 'concurrency' => 8 ) === $diff( array_merge( $defaults
 msrwa_test_assert( array( 'nested' => array( 'b' => 99 ) ) === $diff( array( 'nested' => array( 'a' => 1, 'b' => 99 ) ) ), 'A nested change keeps its path and drops its siblings.' );
 msrwa_test_assert( isset( $diff( array( 'ma_propre_etape' => array() ) )['ma_propre_etape'] ), 'A key the engine does not ship is still stored.' );
 msrwa_test_assert( array( 'concurrency' => '4' ) === $diff( array( 'concurrency' => '4' ) ), 'A value that changed type has changed.' );
+// JSON writes 4.0 as 4. Comparing strictly found every rate in an untouched
+// form "changed", stored the catalogue's prices as typed overrides, and froze
+// them: nothing fetched or corrected afterwards reached the engine.
+msrwa_test_assert( array() === $diff( array( 'budget_usd' => 0 ) ), 'Zero written as 0 is the default 0.0.' );
+msrwa_test_assert( array() === MSRWA_Engine_Settings::difference( array( 'openai' => array( 'gpt-5.6-sol' => array( 4, 20 ) ) ), array( 'openai' => array( 'gpt-5.6-sol' => array( 4.0, 20.0 ) ) ) ), 'A rate read back from JSON is the same rate.' );
+msrwa_test_assert( array( 'openai' => array( 'gpt-5.6-sol' => array( 4, 21 ) ) ) === MSRWA_Engine_Settings::difference( array( 'openai' => array( 'gpt-5.6-sol' => array( 4, 21 ) ) ), array( 'openai' => array( 'gpt-5.6-sol' => array( 4.0, 20.0 ) ) ) ), 'A rate that did move is still stored.' );
 
 // Every configuration group the engine carries must have a field. Without this
 // the promise that nothing is hardcoded quietly stops being true.
