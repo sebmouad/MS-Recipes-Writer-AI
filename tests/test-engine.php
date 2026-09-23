@@ -245,4 +245,14 @@ foreach ( $mixed as $name => $answer ) {
 	msrwa_test_assert( isset( $answer['status'] ) && isset( $answer['seconds'] ), $name . ' must come back in the shape of a call, however it went.' );
 }
 
+// A later version of the article replaces only what it filled. A live
+// proofread answered with an empty body; merged whole, it replaced a 21 505-
+// character article with nothing, the approval judged a blank page and the
+// run ended without a draft.
+$merged = array_merge( array( 'content_html' => '<p>Article</p>', 'excerpt' => 'Résumé', 'slug' => 'tarte' ), MSRWA_Engine::filled( array( 'content_html' => '', 'excerpt' => '  ', 'notes' => array(), 'title' => 'Tarte normande' ) ) );
+msrwa_test_assert( '<p>Article</p>' === $merged['content_html'], 'An empty body never replaces the article before it.' );
+msrwa_test_assert( 'Résumé' === $merged['excerpt'], 'Nor does a blank excerpt.' );
+msrwa_test_assert( 'Tarte normande' === $merged['title'], 'What the later version did fill still wins.' );
+msrwa_test_assert( ! isset( $merged['notes'] ), 'An empty list is not a value.' );
+
 msrwa_test_done( 'engine' );

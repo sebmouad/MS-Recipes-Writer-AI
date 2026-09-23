@@ -27,11 +27,13 @@ final class MSRWA_Draft {
 		// otherwise the draft as first written — over the article's own
 		// metadata. Proofreading returns the body alone; taking its artifact
 		// whole once left every draft without an excerpt, a slug or an SEO title.
-		$article = array_merge(
-			(array) ( $artifacts['article'] ?? array() ),
-			(array) ( $artifacts['corrected'] ?? array() ),
-			(array) ( $artifacts['proofread'] ?? array() )
-		);
+		// Only what a later version actually filled replaces the earlier one: a
+		// proofread that came back with an empty body once replaced a 21 505-
+		// character article with nothing, and the run ended without a draft.
+		$article = (array) ( $artifacts['article'] ?? array() );
+		foreach ( array( 'corrected', 'proofread' ) as $later ) {
+			$article = array_merge( $article, MSRWA_Engine::filled( (array) ( $artifacts[ $later ] ?? array() ) ) );
+		}
 		$html = (string) ( $article['content_html'] ?? '' );
 		if ( '' === trim( $html ) ) { return 0; }
 

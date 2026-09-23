@@ -550,6 +550,15 @@ final class MSRWA_Engine {
 		} );
 	}
 
+	/**
+	 * What a later version of the article actually filled in. A field it left
+	 * empty keeps the earlier version's: a proofread that answered without its
+	 * body had the final approval judge a blank article and left no draft.
+	 */
+	public static function filled( array $version ) {
+		return array_filter( $version, static function ( $value ) { return is_array( $value ) ? (bool) $value : '' !== trim( (string) $value ); } );
+	}
+
 	/** The artifacts one step reads, under the names its input builder expects. */
 	private static function working_set( $name, MSRWA_Result $result ) {
 		$brief = (array) ( $result->artifacts['brief'] ?? array() );
@@ -561,7 +570,7 @@ final class MSRWA_Engine {
 		// Oldest first, so the newest version is the one that ends up on top.
 		foreach ( array( 'corrected' => array( 'proofread', 'final_approval' ), 'proofread' => array( 'final_approval' ) ) as $source => $steps ) {
 			if ( in_array( $name, $steps, true ) && ! empty( $result->artifacts[ $source ] ) ) {
-				$article = array_merge( $article, (array) $result->artifacts[ $source ] );
+				$article = array_merge( $article, self::filled( (array) $result->artifacts[ $source ] ) );
 			}
 		}
 
