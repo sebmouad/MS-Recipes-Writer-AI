@@ -69,7 +69,9 @@ final class MSRWA_Engine_Config {
 			// saving is taken out of what catches a defect.
 			// Proofreading returns the whole article, and once at `low` answered
 			// without it; it keeps medium too.
-			'thinking' => array( 'default' => '', 'fact_check' => 'medium', 'proofread' => 'medium', 'final_approval' => 'medium' ),
+			// Research too: at low it once came back without a single photograph
+			// of the dish (9/14); at medium it scored 14/14 every time measured.
+			'thinking' => array( 'default' => '', 'research' => 'medium', 'fact_check' => 'medium', 'proofread' => 'medium', 'final_approval' => 'medium' ),
 
 			// Output ceilings. Every one of these has been too low at least once,
 			// and a truncated answer is billed in full and scores nothing.

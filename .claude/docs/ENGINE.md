@@ -395,8 +395,9 @@ here, approved, and are in. `tests/test-engine-language.php` holds them.
     paid searches expected and Claude's cap; `limits.web_tool_calls` (10) is
     OpenAI's `max_tool_calls`. The research prompt says a search is billed and
     a page read is not, and asks for at most three. OpenAI thinks at `low`
-    (`providers.openai.thinking_level`), except `fact_check`, `proofread` and
-    `final_approval`, which stay at `medium`. The collage prompt requires each
+    (`providers.openai.thinking_level`), except `research`, `fact_check`,
+    `proofread` and `final_approval`, which stay at `medium` — research at low
+    once returned no photograph of the dish. The collage prompt requires each
     panel to show the state every earlier step left, and each ingredient only
     from its own step; the article prompt keeps storage, reheating and safety
     advice to what a source states. `MSRWA_Engine::filled()` stops an empty

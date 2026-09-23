@@ -89,8 +89,8 @@ gardant son score maximal (recherche 14/14, article 10/10, approbation 10/10).
 | Seule une *recherche* est facturée ; ouvrir une page est gratuit | le coût réel comptait 13 « recherches » là où 4 étaient facturées |
 | `search_context_size: low` | recherche 0,055 $ au lieu de 0,071 $, 14/14 |
 | La consigne de recherche : trois requêtes au plus, puis lire les pages | 1 recherche payante le plus souvent, 0,020–0,027 $ |
-| Réflexion `low` pour la recherche, la rédaction et la revue | 0,1030 $ au lieu de 0,1822 $ la recette, scores intacts |
-| Réflexion `medium` gardée pour la vérification des faits, la correction et l’approbation | aucune économie prise sur ce qui détecte un défaut |
+| Réflexion `low` pour la recette canonique, la rédaction et la revue | 0,1030 $ au lieu de 0,1822 $ la recette, scores intacts |
+| Réflexion `medium` gardée pour la recherche, la vérification des faits, la correction et l’approbation | la recherche à `low` est revenue une fois sans aucune photographie (9/14) ; à `medium`, 14/14 sur quatre plats pour 0,022–0,032 $ |
 
 **Deux défauts de qualité corrigés, qui coûtaient aussi.** Le collage Facebook
 sautait une étape de cuisson (la précuisson de la tarte) ou montrait un
@@ -105,6 +105,10 @@ limite ces conseils à ce que disent les sources.
 remplaçait l’article de 21 505 caractères par rien : pas de brouillon, et
 l’approbation jugeait une page blanche. Une version plus récente ne remplace
 plus que ce qu’elle remplit.
+
+Vérifié ensuite sur le WordPress de test : une recette complète estimée
+0,126 $, facturée 0,1318 $ avec un collage redessiné une fois, brouillon complet
+(image à la une, blocs, données structurées Recipe).
 
 **L’estimation suit.** Recherche mesurée (45 000 jetons, 2 recherches), économie
 mesurée de la réflexion `low`, plafond de dix appels d’outil pour le maximum :
