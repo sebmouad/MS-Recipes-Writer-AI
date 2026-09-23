@@ -151,6 +151,8 @@ final class MSRWA_Prices {
 	public static function wire( array $route ) {
 		$wire = $route['wire'];
 		if ( 'gemini' === $route['provider'] ) { $wire['web_search_tool'] = array( 'url_context' => array() ); }
+		// Copying a number off a table needs no deliberation.
+		$wire['thinking_level'] = 'low';
 		return $wire;
 	}
 

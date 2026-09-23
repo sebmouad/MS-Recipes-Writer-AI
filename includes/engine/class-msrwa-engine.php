@@ -321,7 +321,7 @@ final class MSRWA_Engine {
 			$attached ? implode( ' + ', $attached ) : 'nothing', $web_search ? ', web search on' : ''
 		), array( 'prompt_source' => $prompt['source'], 'prompt_chars' => strlen( $prompt['text'] ), 'input_chars' => strlen( $input ), 'attached' => $attached, 'ceiling' => $ceiling, 'web_search' => $web_search, 'route' => $route ) );
 
-		$wire = $config->provider( $route['provider'], $route['model'] );
+		$wire = $config->provider( $route['provider'], $route['model'], $name );
 		$plan = MSRWA_Engine_Call::plan_text( $route['provider'], $route['model'], $input, $ceiling, true, $web_search, $wire );
 		if ( isset( $plan['error'] ) ) { return self::failed( $plan['error'], 0, $route ); }
 
@@ -378,7 +378,7 @@ final class MSRWA_Engine {
 		$route = $config->model_for( 'vision' );
 		if ( '' === $route['model'] ) { return $package; }
 		$limit = (int) $config->get( 'limits.images_inspected', 3 );
-		$observed = MSRWA_Engine_Call::observe_images( $route['provider'], $route['model'], $package, $limit, $config->provider( $route['provider'], $route['model'] ), (int) $config->get( 'limits.max_image_bytes', 10000000 ), (string) $config->get( 'vision_instruction', '' ) );
+		$observed = MSRWA_Engine_Call::observe_images( $route['provider'], $route['model'], $package, $limit, $config->provider( $route['provider'], $route['model'], 'vision' ), (int) $config->get( 'limits.max_image_bytes', 10000000 ), (string) $config->get( 'vision_instruction', '' ) );
 		$usage['input_tokens'] = (int) ( $usage['input_tokens'] ?? 0 ) + (int) ( $observed['usage']['input_tokens'] ?? 0 );
 		$usage['output_tokens'] = (int) ( $usage['output_tokens'] ?? 0 ) + (int) ( $observed['usage']['output_tokens'] ?? 0 );
 		$count = count( (array) ( $observed['package']['visual_observations'] ?? array() ) );
@@ -401,7 +401,7 @@ final class MSRWA_Engine {
 			$url = is_array( $candidate ) ? (string) ( $candidate['image_url'] ?? '' ) : (string) $candidate;
 			$image = MSRWA_Engine_Call::fetch_image( $url, (int) $config->get( 'limits.max_image_bytes', 10000000 ) );
 			if ( isset( $image['error'] ) ) { $observed[] = array( 'image_url' => $url, 'uncertainties' => $image['error'] ); continue; }
-			$vision = MSRWA_Engine_Call::vision( $route['provider'], $route['model'], $image, 'Image fournie par l’éditeur', (int) $config->max_output( 'vision' ), $config->provider( $route['provider'], $route['model'] ), (string) $config->get( 'vision_instruction', '' ) );
+			$vision = MSRWA_Engine_Call::vision( $route['provider'], $route['model'], $image, 'Image fournie par l’éditeur', (int) $config->max_output( 'vision' ), $config->provider( $route['provider'], $route['model'], 'vision' ), (string) $config->get( 'vision_instruction', '' ) );
 			$decoded = MSRWA_Json::decode( (string) ( $vision['text'] ?? '' ) );
 			$observed[] = is_array( $decoded ) ? array_merge( array( 'image_url' => $url ), $decoded ) : array( 'image_url' => $url, 'uncertainties' => 'Analyse visuelle non structurée.' );
 		}
@@ -506,7 +506,7 @@ final class MSRWA_Engine {
 		foreach ( $images as $image ) { $bytes += (int) $image['bytes']; }
 		$result->event( 'input', $name, sprintf( 'Prompt from %s, %s characters and %d image(s) totalling %s KB.', $prompt['source'], number_format( strlen( $input ) ), count( $images ), number_format( $bytes / 1024, 1 ) ), array( 'prompt_source' => $prompt['source'], 'input_chars' => strlen( $input ), 'images' => count( $images ), 'image_bytes' => $bytes, 'attached' => self::attached( $brief ), 'route' => $route ) );
 
-		$wire = $config->provider( $route['provider'], $route['model'] );
+		$wire = $config->provider( $route['provider'], $route['model'], $name );
 		$plan = MSRWA_Engine_Call::plan_judge( $route['provider'], $route['model'], $input, $images, $config->max_output( $name ), $wire );
 		if ( isset( $plan['error'] ) ) { return self::failed( $plan['error'], 0, $route ); }
 
@@ -595,10 +595,11 @@ final class MSRWA_Engine {
 		$cached = (int) ( $usage['cached_input_tokens'] ?? 0 );
 		$cost = $config->price( $route['provider'], $route['model'], $usage );
 		$result->event( 'call', $name, sprintf(
-			'%s answered in %ss: %s in%s, %s out, %s.',
+			'%s answered in %ss: %s in%s, %s out%s, %s.',
 			$route['model'], $call['seconds'],
 			number_format( $in ), $cached ? ' (' . number_format( $cached ) . ' cached, ' . round( 100 * $cached / max( 1, $in ) ) . '%)' : '',
-			number_format( $out ), null === $cost ? 'no published rate' : sprintf( '$%.4f', $cost )
+			number_format( $out ), empty( $usage['thinking_tokens'] ) ? '' : ' (' . number_format( (int) $usage['thinking_tokens'] ) . ' thinking)',
+			null === $cost ? 'no published rate' : sprintf( '$%.4f', $cost )
 		), array(
 			'provider' => $route['provider'], 'model' => $route['model'], 'tier' => $route['tier'],
 			// The endpoint is recorded so a run through a gateway says so. It never
@@ -606,6 +607,7 @@ final class MSRWA_Engine {
 			'endpoint' => MSRWA_Engine_Config::redact_url( $endpoint ), 'seconds' => $call['seconds'], 'usage' => $usage,
 			'cached_ratio' => $in ? round( $cached / $in, 4 ) : 0.0,
 			'cost_usd' => $cost, 'priced' => null !== $cost, 'status' => (string) ( $call['status'] ?? '' ),
+			'thinking' => $config->thinking( $name, $route['provider'] ),
 		) );
 	}
 

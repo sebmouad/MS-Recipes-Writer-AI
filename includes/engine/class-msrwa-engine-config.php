@@ -56,6 +56,14 @@ final class MSRWA_Engine_Config {
 				'image'            => 'openai:gpt-image-2.5-flare',
 			),
 
+			/*
+			 * How hard a model may think before it answers, per step: minimal, low,
+			 * medium or high; '' leaves it to the provider (`providers.<name>.
+			 * thinking_level`, else the provider's own default). Thinking is billed
+			 * as output and, on Gemini and Claude, spent out of the output ceiling.
+			 */
+			'thinking' => array( 'default' => '' ),
+
 			// Output ceilings. Every one of these has been too low at least once,
 			// and a truncated answer is billed in full and scores nothing.
 			'max_output' => array(
@@ -135,7 +143,7 @@ final class MSRWA_Engine_Config {
 					'key_env'         => array( 'GEMINI_API_KEY', 'MSRWA_GEMINI_KEY' ),
 					'web_search_tool' => array( 'google_search' => array() ),
 					'web_search_usd'  => 0.014,
-					'thinking'        => array( 'thinkingLevel' => 'low' ),
+					'thinking_level'  => 'low',
 				),
 				'claude' => array(
 					'text_endpoint'   => 'https://api.anthropic.com/v1/messages',
@@ -309,8 +317,35 @@ final class MSRWA_Engine_Config {
 		return array( 'provider' => $provider, 'model' => $model, 'route' => $route, 'tier' => isset( $tiers[ $named ] ) ? $named : '' );
 	}
 
-	/** How one provider is reached, with {{model}} and {{key}} resolved. */
-	public function provider( $name, $model = '' ) {
+	/** The thinking levels the engine knows how to ask for. */
+	public static function thinking_levels() { return array( 'minimal', 'low', 'medium', 'high' ); }
+
+	/**
+	 * How hard a step may think on a provider: the step's own level, else the
+	 * `default`, else the provider's. '' means the provider decides.
+	 */
+	public function thinking( $step, $provider ) {
+		$levels = (array) $this->get( 'thinking', array() );
+		$level = (string) ( $levels[ $step ] ?? '' );
+		if ( '' === $level ) { $level = (string) ( $levels['default'] ?? '' ); }
+		if ( '' === $level ) { $level = (string) $this->get( 'providers.' . $provider . '.thinking_level', '' ); }
+		return in_array( $level, self::thinking_levels(), true ) ? $level : '';
+	}
+
+	/**
+	 * Output tokens a level adds to a call, over what the step's measured shape
+	 * already holds. The shapes were measured at the providers' default
+	 * reasoning, which is `medium`, so only a higher level adds anything; a
+	 * lower one is not subtracted, because an estimate that reads low lets a lot
+	 * past a ceiling it will break.
+	 */
+	public static function thinking_allowance( $level ) {
+		$tokens = array( 'minimal' => 0, 'low' => 1000, 'medium' => 3000, 'high' => 6000 );
+		return max( 0, ( $tokens[ $level ] ?? $tokens['medium'] ) - $tokens['medium'] );
+	}
+
+	/** How one provider is reached, with {{model}} and {{key}} resolved, and how hard `$step` may think on it. */
+	public function provider( $name, $model = '', $step = '' ) {
 		$provider = (array) $this->get( 'providers.' . $name, array() );
 		if ( ! $provider ) { return array(); }
 		$key = $this->key_for( $name, $provider );
@@ -320,6 +355,7 @@ final class MSRWA_Engine_Config {
 		$provider['headers'] = array_map( $replace, (array) ( $provider['headers'] ?? array() ) );
 		$provider['timeout'] = (int) $this->get( 'limits.http_timeout', 600 );
 		$provider['has_key'] = '' !== $key;
+		$provider['thinking_level'] = $this->thinking( '' === (string) $step ? 'default' : (string) $step, $name );
 		return $provider;
 	}
 

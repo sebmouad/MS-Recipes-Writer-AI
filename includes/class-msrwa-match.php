@@ -45,7 +45,7 @@ final class MSRWA_Match {
 		// route happened to resolve to the same model today and would have
 		// quietly stopped doing so the moment somebody changed one of them.
 		$route = $config->model_for( 'vision' );
-		$wire = $config->provider( $route['provider'], $route['model'] );
+		$wire = $config->provider( $route['provider'], $route['model'], 'vision' );
 		$started = microtime( true );
 		$out = array( 'images' => array(), 'cost_usd' => 0.0, 'seconds' => 0.0, 'errors' => array() );
 
@@ -90,7 +90,7 @@ final class MSRWA_Match {
 	/** One cheap text call that reads the descriptions against the recipe titles. */
 	private static function pair( array $recipes, array $images, MSRWA_Engine_Config $config ) {
 		$route = $config->model_for( 'canonical_recipe' );
-		$wire = $config->provider( $route['provider'], $route['model'] );
+		$wire = $config->provider( $route['provider'], $route['model'], 'canonical_recipe' );
 		$started = microtime( true );
 
 		$answer = MSRWA_Engine_Call::text( $route['provider'], $route['model'], self::prompt( $recipes, $images ), 1500, true, false, $wire );

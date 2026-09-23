@@ -72,21 +72,50 @@ $free = MSRWA_Engine_Config::create( array( 'providers' => array( 'gemini' => ar
 msrwa_test_assert( 0.0 === (float) $free->price( 'gemini', 'x', array( 'web_searches' => 5 ) ), 'A caller on a plan with free searches can set the fee to zero.' );
 msrwa_test_assert( null === $config->price( 'gemini', 'unpriced', array( 'web_searches' => 5 ) ), 'An unpriced model stays unknown, never the search fee alone.' );
 
-// --- How hard Gemini may think -----------------------------------------------
+// --- How hard a model may think ---------------------------------------------
 
 // Gemini counts thinking inside its output ceiling. Left unbounded, a live
 // canonical recipe thought its way through the whole ceiling, stopped on
 // MAX_TOKENS with its JSON cut in half, and was billed in full.
-$wire = MSRWA_Engine_Config::create( array( 'settings' => array( 'keys' => array( 'gemini' => 'k' ) ) ) )->provider( 'gemini', 'gemini-3.5-flash' );
+$keys = array( 'settings' => array( 'keys' => array( 'gemini' => 'k', 'openai' => 'k', 'claude' => 'k' ) ) );
+$config = MSRWA_Engine_Config::create( $keys );
+$wire = $config->provider( 'gemini', 'gemini-3.5-flash', 'canonical_recipe' );
 $plan = MSRWA_Engine_Call::plan_text( 'gemini', 'gemini-3.5-flash', 'x', 4500, true, false, $wire );
-msrwa_test_assert( array( 'thinkingLevel' => 'low' ) === ( $plan['request']['payload']['generationConfig']['thinkingConfig'] ?? null ), 'Gemini is asked to think at the shipped level.' );
+msrwa_test_assert( array( 'thinkingLevel' => 'low' ) === ( $plan['request']['payload']['generationConfig']['thinkingConfig'] ?? null ), 'Gemini thinks at the level its provider ships.' );
 msrwa_test_assert( 4500 === $plan['request']['payload']['generationConfig']['maxOutputTokens'], 'The ceiling is unchanged.' );
-$vision = MSRWA_Engine_Call::plan_vision( 'gemini', 'gemini-3.5-flash', array( 'mime' => 'image/jpeg', 'data' => 'AAAA' ), 'x', 900, $wire );
+$vision = MSRWA_Engine_Call::plan_vision( 'gemini', 'gemini-3.5-flash', array( 'mime' => 'image/jpeg', 'data' => 'AAAA' ), 'x', 900, $config->provider( 'gemini', 'gemini-3.5-flash', 'vision' ) );
 msrwa_test_assert( isset( $vision['request']['payload']['generationConfig']['thinkingConfig'] ), 'A vision pass is bounded the same way.' );
-$unbounded = $wire;
-unset( $unbounded['thinking'] );
-$plan = MSRWA_Engine_Call::plan_text( 'gemini', 'gemini-3.5-flash', 'x', 4500, true, false, $unbounded );
-msrwa_test_assert( ! isset( $plan['request']['payload']['generationConfig']['thinkingConfig'] ), 'A caller that removes the setting gets Google’s default.' );
+$judge = MSRWA_Engine_Call::plan_judge( 'gemini', 'gemini-3.5-flash', 'x', array(), 900, $wire );
+msrwa_test_assert( isset( $judge['request']['payload']['generationConfig']['thinkingConfig'] ), 'And the judge.' );
+
+// OpenAI and Claude think at their own default unless a level is set.
+$plan = MSRWA_Engine_Call::plan_text( 'openai', 'gpt-5.6-luna', 'x', 4500, true, false, $config->provider( 'openai', 'gpt-5.6-luna', 'article' ) );
+msrwa_test_assert( ! isset( $plan['request']['payload']['reasoning'] ), 'OpenAI keeps its own default when nothing is set.' );
+
+// One level per step, spelled the way each provider spells it.
+$tuned = MSRWA_Engine_Config::create( $keys + array( 'thinking' => array( 'default' => 'medium', 'research' => 'high', 'review' => 'minimal' ) ) );
+msrwa_test_assert( 'high' === $tuned->thinking( 'research', 'openai' ), 'A step’s own level wins.' );
+msrwa_test_assert( 'medium' === $tuned->thinking( 'article', 'gemini' ), 'Otherwise the default, over the provider’s.' );
+msrwa_test_assert( '' === MSRWA_Engine_Config::create( array( 'thinking' => array( 'article' => 'enormous' ) ) )->thinking( 'article', 'openai' ), 'A level the engine does not know is not sent.' );
+$plan = MSRWA_Engine_Call::plan_text( 'openai', 'gpt-5.6-luna', 'x', 4500, true, false, $tuned->provider( 'openai', 'gpt-5.6-luna', 'research' ) );
+msrwa_test_assert( array( 'effort' => 'high' ) === ( $plan['request']['payload']['reasoning'] ?? null ), 'OpenAI takes it as reasoning.effort.' );
+$plan = MSRWA_Engine_Call::plan_text( 'claude', 'claude-sonnet-5', 'x', 4500, true, false, $tuned->provider( 'claude', 'claude-sonnet-5', 'review' ) );
+msrwa_test_assert( array( 'effort' => 'low' ) === ( $plan['request']['payload']['output_config'] ?? null ), 'Claude takes it as effort, and has no minimal: low is the least.' );
+$plan = MSRWA_Engine_Call::plan_text( 'claude', 'claude-haiku-4-5-20251001', 'x', 4500, true, false, $tuned->provider( 'claude', 'claude-haiku-4-5-20251001', 'review' ) );
+msrwa_test_assert( ! isset( $plan['request']['payload']['output_config'] ), 'Haiku 4.5 refuses effort, so it is never sent one.' );
+$plan = MSRWA_Engine_Call::plan_text( 'openai', 'gpt-4.1', 'x', 4500, true, false, $tuned->provider( 'openai', 'gpt-4.1', 'research' ) );
+msrwa_test_assert( ! isset( $plan['request']['payload']['reasoning'] ), 'Nor is a model that does not reason.' );
+$plan = MSRWA_Engine_Call::plan_text( 'gemini', 'gemini-3.5-flash', 'x', 4500, true, false, $tuned->provider( 'gemini', 'gemini-3.5-flash', 'review' ) );
+msrwa_test_assert( array( 'thinkingLevel' => 'minimal' ) === $plan['request']['payload']['generationConfig']['thinkingConfig'], 'Gemini takes it as thinkingLevel.' );
+foreach ( array( 'claude-opus-5-5', 'claude-opus-4-5-20251101', 'claude-sonnet-4-6', 'claude-fable-5-1' ) as $model ) { msrwa_test_assert( MSRWA_Engine_Call::thinks( 'claude', $model ), $model . ' takes effort.' ); }
+foreach ( array( 'claude-sonnet-4-5-20250929', 'claude-haiku-4-5-20251001' ) as $model ) { msrwa_test_assert( ! MSRWA_Engine_Call::thinks( 'claude', $model ), $model . ' does not.' ); }
+
+// What thinking costs, in the estimate: the shapes were measured at the
+// providers' default, medium, so only a higher level adds output.
+msrwa_test_assert( 3000 === MSRWA_Engine_Config::thinking_allowance( 'high' ), 'high adds tokens to every call.' );
+msrwa_test_assert( 0 === MSRWA_Engine_Config::thinking_allowance( 'low' ), 'low subtracts nothing: an estimate must not read low.' );
+msrwa_test_assert( 0 === MSRWA_Engine_Config::thinking_allowance( '' ), 'The provider’s default is what was measured.' );
+
 $cut = msrwa_usage_read( 'gemini', array( 'candidates' => array( array( 'content' => array( 'parts' => array( array( 'text' => '{"title":' ) ) ), 'finishReason' => 'MAX_TOKENS' ) ), 'usageMetadata' => array( 'promptTokenCount' => 3759, 'candidatesTokenCount' => 1050, 'thoughtsTokenCount' => 3435 ) ) );
 msrwa_test_assert( 'MAX_TOKENS' === $cut['status'], 'A cut answer says so, so the run can warn that it was billed in full.' );
 

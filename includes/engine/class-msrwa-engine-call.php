@@ -214,26 +214,58 @@ final class MSRWA_Engine_Call {
 			return array( 'error' => 'unknown provider ' . $provider );
 		}
 
+		$payload = self::think( $provider, $model, $payload, $wire );
 		return array(
 			'kind' => 'text', 'provider' => $provider, 'model' => $model,
 			'request' => array( 'url' => $wire['text_endpoint'], 'headers' => $wire['headers'], 'payload' => $payload, 'timeout' => (int) ( $wire['timeout'] ?? 600 ) ),
 		);
 	}
 
+	private static function gemini_generation( array $wire, $max_tokens ) { return array( 'maxOutputTokens' => (int) $max_tokens ); }
+
 	/**
-	 * Gemini's generation settings: the ceiling, and how hard it may think.
+	 * How hard the model may think, in each provider's own words.
 	 *
-	 * Gemini counts thinking inside maxOutputTokens and, left to itself,
-	 * thinks hard. A live canonical recipe on gemini-3.5-flash spent the whole
-	 * 4 500-token ceiling — about 3 400 of it thinking — stopped on
-	 * MAX_TOKENS, returned JSON cut in half and was billed $0.046 for it.
-	 * `providers.gemini.thinking` is passed as thinkingConfig; `low` took the
-	 * same question from 2 717 thinking tokens to 731.
+	 * Thinking is billed as output everywhere, and on Gemini and Claude it is
+	 * spent out of the output ceiling. Left to itself, Gemini thinks hard: a
+	 * live canonical recipe on gemini-3.5-flash spent its whole 4 500-token
+	 * ceiling, stopped on MAX_TOKENS with its JSON cut in half and was billed
+	 * $0.046; at `low` the same step passed for $0.0227. The level comes from
+	 * the wire (`thinking_level`, set per step by the configuration). A model
+	 * that takes no such setting is sent none, because the provider refuses the
+	 * whole request rather than ignore it.
 	 */
-	private static function gemini_generation( array $wire, $max_tokens ) {
-		$config = array( 'maxOutputTokens' => (int) $max_tokens );
-		if ( ! empty( $wire['thinking'] ) && is_array( $wire['thinking'] ) ) { $config['thinkingConfig'] = $wire['thinking']; }
-		return $config;
+	public static function think( $provider, $model, array $payload, array $wire ) {
+		$level = (string) ( $wire['thinking_level'] ?? '' );
+		if ( 'gemini' === $provider ) {
+			if ( in_array( $level, MSRWA_Engine_Config::thinking_levels(), true ) ) { $payload['generationConfig']['thinkingConfig'] = array( 'thinkingLevel' => $level ); }
+			// A caller's own thinkingConfig, as 0.15.0 shipped it, still wins.
+			elseif ( ! empty( $wire['thinking'] ) && is_array( $wire['thinking'] ) ) { $payload['generationConfig']['thinkingConfig'] = $wire['thinking']; }
+			return $payload;
+		}
+		if ( '' === $level || ! self::thinks( $provider, $model ) ) { return $payload; }
+		if ( 'openai' === $provider ) { $payload['reasoning'] = array( 'effort' => $level ); }
+		// Anthropic's effort has no `minimal`; `low` is the least it takes.
+		if ( 'claude' === $provider ) { $payload['output_config'] = array( 'effort' => 'minimal' === $level ? 'low' : $level ); }
+		return $payload;
+	}
+
+	/**
+	 * Whether a model accepts a thinking level. OpenAI's GPT-5 family and o-series
+	 * take `reasoning.effort`; Claude takes `effort` from Opus 4.5 and the 4.6
+	 * generation on, and refuses it on Haiku 4.5 and Sonnet 4.5. Gemini 3 takes
+	 * `thinkingLevel` and is handled apart.
+	 */
+	public static function thinks( $provider, $model ) {
+		$model = strtolower( (string) $model );
+		if ( 'openai' === $provider ) { return (bool) preg_match( '/^(gpt-(\d+)(\.\d+)?(-[a-z]+)?|o\d(-mini)?)$/', $model, $m ) && ( ! isset( $m[2] ) || '' === $m[2] || (int) $m[2] >= 5 ); }
+		if ( 'claude' === $provider ) {
+			if ( ! preg_match( '/^claude-(opus|sonnet|haiku|fable|mythos)-(\d+)(?:-(\d{1,2}))?(?:-\d{8})?$/', $model, $m ) ) { return false; }
+			$version = (int) $m[2] * 10 + ( isset( $m[3] ) ? (int) $m[3] : 0 );
+			if ( 'haiku' === $m[1] ) { return $version >= 50; }
+			return 'opus' === $m[1] ? $version >= 45 : $version >= 46;
+		}
+		return 'gemini' === $provider;
 	}
 
 	/** Reads one answer back, whatever provider and kind of call produced it. */
@@ -264,6 +296,8 @@ final class MSRWA_Engine_Call {
 			// cached_tokens is what the provider reused from an identical prompt; it is
 			// billed at a discount, so it is the number that says whether caching works.
 			$usage = array( 'input_tokens' => (int) ( $body['usage']['input_tokens'] ?? 0 ), 'output_tokens' => (int) ( $body['usage']['output_tokens'] ?? 0 ), 'cached_input_tokens' => (int) ( $body['usage']['input_tokens_details']['cached_tokens'] ?? 0 ) );
+			$reasoning = (int) ( $body['usage']['output_tokens_details']['reasoning_tokens'] ?? 0 );
+			if ( $reasoning ) { $usage['thinking_tokens'] = $reasoning; }
 			$searches = 0;
 			foreach ( (array) ( $body['output'] ?? array() ) as $item ) { if ( 'web_search_call' === ( $item['type'] ?? '' ) ) { $searches++; } }
 			if ( $searches ) { $usage['web_searches'] = $searches; }
@@ -282,6 +316,7 @@ final class MSRWA_Engine_Call {
 				'output_tokens' => (int) ( $meta['candidatesTokenCount'] ?? 0 ) + (int) ( $meta['thoughtsTokenCount'] ?? 0 ),
 			);
 			if ( ! empty( $meta['cachedContentTokenCount'] ) ) { $usage['cached_input_tokens'] = (int) $meta['cachedContentTokenCount']; }
+			if ( ! empty( $meta['thoughtsTokenCount'] ) ) { $usage['thinking_tokens'] = (int) $meta['thoughtsTokenCount']; }
 			$searches = count( (array) ( $body['candidates'][0]['groundingMetadata']['webSearchQueries'] ?? array() ) );
 			if ( $searches ) { $usage['web_searches'] = $searches; }
 			$status = $body['candidates'][0]['finishReason'] ?? '';
@@ -467,6 +502,7 @@ final class MSRWA_Engine_Call {
 			$payload = array( 'model' => $model, 'max_tokens' => $max_tokens, 'messages' => array( array( 'role' => 'user', 'content' => array( array( 'type' => 'image', 'source' => array( 'type' => 'base64', 'media_type' => $image['mime'], 'data' => $image['data'] ) ), array( 'type' => 'text', 'text' => $instruction ) ) ) ) );
 		}
 
+		$payload = self::think( $provider, $model, $payload, $wire );
 		return array(
 			'kind' => 'vision', 'provider' => $provider, 'model' => $model,
 			'request' => array( 'url' => $wire['text_endpoint'], 'headers' => $wire['headers'], 'payload' => $payload, 'timeout' => (int) ( $wire['timeout'] ?? 600 ) ),
@@ -519,6 +555,7 @@ final class MSRWA_Engine_Call {
 			$payload = array( 'model' => $model, 'max_tokens' => $max_tokens, 'messages' => array( array( 'role' => 'user', 'content' => $content ) ) );
 		}
 
+		$payload = self::think( $provider, $model, $payload, $wire );
 		return array(
 			'kind' => 'judge', 'provider' => $provider, 'model' => $model,
 			'request' => array( 'url' => $wire['text_endpoint'], 'headers' => $wire['headers'], 'payload' => $payload, 'timeout' => (int) ( $wire['timeout'] ?? 600 ) ),
