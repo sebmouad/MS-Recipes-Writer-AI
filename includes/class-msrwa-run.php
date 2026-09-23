@@ -235,11 +235,14 @@ final class MSRWA_Run {
 
 		$ok = ! empty( $state['ok'] ) && ! empty( $tick['ok'] );
 		$errors = array_merge( (array) ( $state['errors'] ?? array() ), (array) ( $tick['errors'] ?? array() ) );
-		$totals = self::totals( self::steps( $id ) );
+		$recorded = self::steps( $id );
+		$totals = self::totals( $recorded );
 
 		$wpdb->update( self::table(), array(
 			'result_json' => wp_json_encode( array( 'ok' => (bool) $ok, 'errors' => MSRWA_DB::sanitize( $errors ) ) ),
-			'steps_done' => (int) $totals['steps'],
+			// Distinct steps: an image the final approval had redrawn twice read
+			// as 12 steps done out of 10.
+			'steps_done' => count( array_unique( array_column( $recorded, 'step' ) ) ),
 			'cost_usd' => (float) $totals['cost_usd'],
 			'seconds' => (float) $totals['seconds'],
 			'updated_at' => $now,
@@ -462,8 +465,10 @@ final class MSRWA_Run {
 		$approval = (array) ( $state['artifacts']['approval'] ?? array() );
 		$approved = array_key_exists( 'approved', $approval ) ? (int) ! empty( $approval['approved'] ) : null;
 		self::touch( $id, array( 'approved' => $approved ) );
-		self::finish( $id, empty( $state['ok'] ) ? 'failed' : 'done', '' );
+		// The draft first: a run read as done while its draft did not exist yet
+		// sent a watcher away with draft #0.
 		MSRWA_Draft::create( (int) $id );
+		self::finish( $id, empty( $state['ok'] ) ? 'failed' : 'done', '' );
 		MSRWA_Batch::settle( (int) ( self::get( $id )['batch_id'] ?? 0 ) );
 	}
 
