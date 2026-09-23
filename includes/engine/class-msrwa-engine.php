@@ -155,6 +155,19 @@ final class MSRWA_Engine {
 			$outcome['attempts'] = $attempt;
 
 			if ( '' === $outcome['retry'] || $attempt >= $attempts ) { break; }
+			// The budget was only checked between waves, so a refused approval
+			// could redraw and ask again past a ceiling the run had nearly
+			// reached. The next round is priced from what this one cost — the
+			// last attempt plus the images it would redraw — and not begun when
+			// it would cross the budget: the verdict so far goes to the editor.
+			$budget = (float) $config->get( 'limits.budget_usd', 0 );
+			if ( $budget > 0 ) {
+				$next = (float) $outcome['cost_usd'] / max( 1, $attempt ) + self::redraw_cost( $outcome, $result );
+				if ( $result->totals()['cost_usd'] + $spent + $next > $budget ) {
+					$result->event( 'decision', $name, sprintf( 'Not retried: another round would cost about $%.4f and cross the $%.4f budget. The verdict so far goes to the editor.', $next, $budget ) );
+					break;
+				}
+			}
 			$result->event( 'retry', $name, $outcome['retry'] );
 			// Recorded as its own step inside before_retry(); not this step's cost.
 			self::before_retry( $name, $outcome, $config, $result, $options );
@@ -172,6 +185,18 @@ final class MSRWA_Engine {
 	 * drawn again with its findings as corrections, so the next verdict is passed
 	 * different images rather than the same ones. Returns what that cost.
 	 */
+	/** What redrawing the images a refusal names cost last time they were drawn. */
+	private static function redraw_cost( array $outcome, MSRWA_Result $result ) {
+		if ( ! is_array( $outcome['artifact'] ?? null ) ) { return 0.0; }
+		$cost = 0.0;
+		foreach ( MSRWA_Engine_Score::images_to_retry( $outcome['artifact'] ) as $kind ) {
+			foreach ( array_reverse( $result->steps ) as $step ) {
+				if ( $kind . '_image' === $step['step'] ) { $cost += (float) $step['cost_usd']; break; }
+			}
+		}
+		return $cost;
+	}
+
 	private static function before_retry( $name, array $outcome, MSRWA_Engine_Config $config, MSRWA_Result $result, array $options ) {
 		if ( 'final_approval' !== $name || ! is_array( $outcome['artifact'] ?? null ) ) { return 0.0; }
 		$verdict = $outcome['artifact'];

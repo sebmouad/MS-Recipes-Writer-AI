@@ -88,7 +88,17 @@ final class MSRWA_Engine_Call {
 		return $names;
 	}
 
+	/**
+	 * Replaces the network for the offline tests: a callable taking the URL
+	 * and the payload and returning array( status, raw ). Null in production.
+	 */
+	public static $transport = null;
+
 	public static function http( $url, $headers, $payload, $timeout = 600 ) {
+		if ( is_callable( self::$transport ) ) {
+			$answer = (array) call_user_func( self::$transport, $url, $payload );
+			return array( 'status' => (int) ( $answer['status'] ?? 200 ), 'raw' => (string) ( $answer['raw'] ?? '' ), 'error' => '', 'seconds' => 0.0 );
+		}
 		$started = microtime( true );
 		$ch = curl_init( $url );
 		curl_setopt_array( $ch, array(
@@ -117,7 +127,7 @@ final class MSRWA_Engine_Call {
 	 */
 	public static function http_many( array $requests, $limit = 4 ) {
 		if ( ! $requests ) { return array(); }
-		if ( 1 === count( $requests ) || $limit < 2 ) {
+		if ( 1 === count( $requests ) || $limit < 2 || is_callable( self::$transport ) ) {
 			$out = array();
 			foreach ( $requests as $key => $request ) {
 				$out[ $key ] = self::http( $request['url'], $request['headers'], $request['payload'], (int) ( $request['timeout'] ?? 600 ) );
