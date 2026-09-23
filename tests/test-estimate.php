@@ -9,6 +9,14 @@ msrwa_test_load( 'rights', 'i18n', 'profile', 'engine-settings' );
 require_once dirname( __DIR__ ) . '/includes/engine/load.php';
 require_once dirname( __DIR__ ) . '/includes/class-msrwa-estimate.php';
 
+/** The shipped default, read from the real settings file without loading the class the harness doubles. */
+final class MSRWA_Settings_Defaults_For_Test {
+	public static function ceiling() {
+		preg_match( "/'per_recipe_budget_usd'\s*=>\s*([0-9.]+)/", (string) file_get_contents( dirname( __DIR__ ) . '/includes/class-msrwa-settings.php' ), $m );
+		return (float) ( $m[1] ?? 0 );
+	}
+}
+
 $full = MSRWA_Estimate::recipe( MSRWA_Profile::FULL );
 
 // Real runs on the shipped configuration, 2026-09-23, OpenAI, after the search
@@ -26,6 +34,12 @@ msrwa_test_assert( $article_only['cost_usd'] >= 0.050 && $article_only['cost_usd
 // The maximum is what the engine can spend when every approval refuses, and
 // the run that was refused twice must fall inside it.
 msrwa_test_assert( $full['max_usd'] >= 0.1839, 'The maximum covers the real run refused twice ($0.1839); got ' . $full['max_usd'] );
+// The shipped per-recipe ceiling lets a full recipe through with room for a
+// redrawn collage; the engine stops retrying before crossing it.
+$ceiling = (float) MSRWA_Settings_Defaults_For_Test::ceiling();
+msrwa_test_assert( 0.30 === $ceiling, 'The shipped per-recipe ceiling is $0.30.' );
+msrwa_test_assert( MSRWA_Estimate::fits( $full['cost_usd'], $ceiling ), 'A full recipe fits under the shipped ceiling; estimated ' . $full['cost_usd'] );
+msrwa_test_assert( $full['cost_usd'] + 0.035 < $ceiling, 'With room for one redrawn collage and approval.' );
 msrwa_test_assert( $full['max_usd'] > $full['cost_usd'], 'A recipe that can be refused has a maximum above its expected cost.' );
 // Without a final approval nothing is redrawn; what remains between the two
 // figures is research spending every tool call it is allowed on paid searches.

@@ -15,7 +15,7 @@ final class MSRWA_Settings {
 			'gemini_key'          => '',
 			'claude_key'          => '',
 			'max_corrections'     => 2,
-			'per_recipe_budget_usd' => 0.50,
+			'per_recipe_budget_usd' => 0.30,
 			'daily_budget_usd'    => 0,
 			'monthly_budget_usd'  => 0,
 			'web_search_tool_cost_usd' => 0.01,

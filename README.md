@@ -76,6 +76,12 @@ développement, humain ou agent.
 
 ## Version 0.18.1
 
+**Plafond par recette par défaut : 0,30 $** (au lieu de 0,50 $). Une recette
+complète est estimée à 0,126 $ et coûte 0,105–0,132 $ en réel : le plafond
+laisse la place d’un collage redessiné ; au-delà, le moteur s’arrête et laisse
+le verdict à l’éditeur plutôt que de dépasser. Un site qui a déjà enregistré
+son plafond le garde.
+
 **Le plafond tient jusque dans les reprises.** Le budget d’une recette n’était
 vérifié qu’entre deux vagues ; une approbation finale refusée pouvait
 redessiner ses images et redemander, dans la même vague, au-delà d’un plafond
