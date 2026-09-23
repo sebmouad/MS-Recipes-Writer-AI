@@ -414,21 +414,12 @@
     var routingField = document.getElementById('ms-engine-routing');
     var body = document.querySelector('.ms-routing-picker tbody');
 
-    function parseRoute(route) {
-      var parts = (route || '').split(':');
-      return { provider: parts[0] || '', named: parts.slice(1).join(':') || 'medium' };
-    }
-
     function writeRouting() {
       var value = {};
       Object.keys(schema.keys).forEach(function (key) {
         var row = body.querySelector('[data-route="' + key + '"]');
         if (!row) return;
-        var model = row.querySelector('.ms-route-model');
-        if (model) { value[key] = model.value; return; }
-        var provider = row.querySelector('.ms-route-provider').value;
-        var tier = row.querySelector('.ms-route-tier').value;
-        value[key] = provider + ':' + tier;
+        value[key] = row.querySelector('.ms-route-tier').value;
       });
       routingField.value = JSON.stringify(value, null, 4);
     }
@@ -505,7 +496,6 @@
       labelCell.textContent = schema.keys[key];
       row.appendChild(labelCell);
 
-      var current = parseRoute(schema.current[key]);
       var modelCell = document.createElement('td');
       modelCell.dataset.label = schema.labels.model;
       var controls = document.createElement('div');
@@ -513,56 +503,48 @@
       modelCell.appendChild(controls);
 
       var isImage = 'featured_image' === key || 'facebook_image' === key;
-      if (isImage) {
-        var modelSelect = document.createElement('select');
-        modelSelect.className = 'ms-route-model';
-        schema.imageModels.forEach(function (entry) {
-          modelSelect.appendChild(option(entry.value, entry.label, entry.value === schema.current[key]));
-        });
-        markBlocked(modelSelect, key, function (value) { return value; });
-        modelSelect.addEventListener('change', writeRouting);
-        controls.appendChild(field(schema.labels.model, modelSelect));
-        controls.classList.add('ms-route-controls-one');
-      } else {
-        var providerSelect = document.createElement('select');
-        providerSelect.className = 'ms-route-provider';
-        Object.keys(schema.providers).forEach(function (provider) {
-          providerSelect.appendChild(option(provider, schema.providers[provider], provider === current.provider));
-        });
-        var tierSelect = document.createElement('select');
-        tierSelect.className = 'ms-route-tier';
-        schema.tiers.forEach(function (tier) {
-          tierSelect.appendChild(option(tier, tier, tier === current.named));
-        });
-        // A route can already name a specific model rather than a tier — kept
-        // selectable so switching provider and back does not silently drop it.
-        if (schema.tiers.indexOf(current.named) === -1) {
-          tierSelect.insertBefore(option(current.named, current.named, true), tierSelect.firstChild);
+      // One path for every step, text or image: a provider, then the models
+      // the Modèles screen keeps for this step on that provider. A level's
+      // pick is offered as the level, named by its model.
+      var offered = (schema.choices || {})[key] || {};
+      var currentRoute = schema.current[key] || '';
+      var currentProvider = currentRoute.split(':')[0];
+      var providerSelect = document.createElement('select');
+      providerSelect.className = 'ms-route-provider';
+      Object.keys(schema.providers).forEach(function (provider) {
+        if (!offered[provider] && provider !== currentProvider) return;
+        providerSelect.appendChild(option(provider, schema.providers[provider], provider === currentProvider));
+      });
+      var tierSelect = document.createElement('select');
+      tierSelect.className = 'ms-route-tier';
+      var modelLabel = function (value) {
+        var info = schema.resolved[value];
+        var name = info ? (info.label || info.id) : value.split(':').slice(1).join(':');
+        var choice = (offered[value.split(':')[0]] || []).filter(function (c) { return c.value === value; })[0];
+        var tier = choice && choice.tier ? (schema.tierNames || {})[choice.tier] : '';
+        return tier ? name + ' · ' + tier : name;
+      };
+      function fillModels(keepValue) {
+        tierSelect.innerHTML = '';
+        var list = offered[providerSelect.value] || [];
+        list.forEach(function (choice) { tierSelect.appendChild(option(choice.value, '', choice.value === keepValue)); });
+        // A route naming something no longer offered stays visible, flagged.
+        if (keepValue && keepValue.split(':')[0] === providerSelect.value && !list.some(function (c) { return c.value === keepValue; })) {
+          tierSelect.insertBefore(option(keepValue, '', true), tierSelect.firstChild);
         }
-        var tierRoute = function (tier) { return providerSelect.value + ':' + tier; };
-        // The level is named by the model it picks, then by what it is for.
-        var tierLabel = function (tier) {
-          var info = schema.resolved[tierRoute(tier)];
-          var name = (schema.tierNames || {})[tier];
-          if (!name) return tier;
-          return info ? (info.label || info.id) + ' · ' + name : name;
-        };
-        markBlocked(tierSelect, key, tierRoute, tierLabel);
-        // A provider change can land on a level that cannot serve this step:
-        // the first one that can is chosen instead of leaving a refused route.
-        providerSelect.addEventListener('change', function () {
-          markBlocked(tierSelect, key, tierRoute, tierLabel);
-          if (tierSelect.selectedOptions[0] && tierSelect.selectedOptions[0].disabled) {
-            var usable = Array.prototype.find.call(tierSelect.options, function (opt) { return !opt.disabled; });
-            if (usable) { tierSelect.value = usable.value; markBlocked(tierSelect, key, tierRoute, tierLabel); }
-          }
-        });
-        tierSelect.addEventListener('change', function () { markBlocked(tierSelect, key, tierRoute, tierLabel); });
-        providerSelect.addEventListener('change', writeRouting);
-        tierSelect.addEventListener('change', writeRouting);
-        controls.appendChild(field(schema.labels.provider, providerSelect));
-        controls.appendChild(field(schema.labels.model, tierSelect));
+        markBlocked(tierSelect, key, function (value) { return value; }, modelLabel);
+        if (tierSelect.selectedOptions[0] && tierSelect.selectedOptions[0].disabled || !tierSelect.value) {
+          var usable = Array.prototype.find.call(tierSelect.options, function (opt) { return !opt.disabled; });
+          if (usable) { tierSelect.value = usable.value; markBlocked(tierSelect, key, function (value) { return value; }, modelLabel); }
+        }
       }
+      fillModels(currentRoute);
+      providerSelect.addEventListener('change', function () { fillModels(''); });
+      tierSelect.addEventListener('change', function () { markBlocked(tierSelect, key, function (value) { return value; }, modelLabel); });
+      providerSelect.addEventListener('change', writeRouting);
+      tierSelect.addEventListener('change', writeRouting);
+      controls.appendChild(field(schema.labels.provider, providerSelect));
+      controls.appendChild(field(schema.labels.model, tierSelect));
 
       // Which model this actually is, what it costs, and whether it can run:
       // that is the thing that is billed and that can fail to exist.
@@ -572,8 +554,7 @@
       row.appendChild(modelCell);
 
       function describe() {
-        var model = row.querySelector('.ms-route-model');
-        var route = model ? model.value : row.querySelector('.ms-route-provider').value + ':' + row.querySelector('.ms-route-tier').value;
+        var route = row.querySelector('.ms-route-tier').value;
         var resolved = schema.resolved[route];
         info.textContent = '';
         if (!resolved) { info.appendChild(small('', schema.labels.unknown)); return; }

@@ -35,6 +35,24 @@ final class MSRWA_UI {
 	 * A region that scrolls with the mouse and not with the keyboard is a table
 	 * some readers simply cannot see the end of, so it is focusable and named.
 	 */
+	/**
+	 * A level as both model screens name it. `low`, `medium` and `high` are
+	 * also thinking efforts and image qualities; a level picks a model.
+	 */
+	public static function tier_name( $tier ) {
+		$names = array(
+			'low' => __( 'économique', 'ms-recipes-writer-ai' ),
+			'medium' => __( 'standard', 'ms-recipes-writer-ai' ),
+			'high' => __( 'avancé', 'ms-recipes-writer-ai' ),
+		);
+		return $names[ (string) $tier ] ?? (string) $tier;
+	}
+
+	public static function provider_name( $provider ) {
+		$names = array( 'openai' => 'OpenAI', 'gemini' => 'Google Gemini', 'claude' => 'Anthropic Claude' );
+		return $names[ (string) $provider ] ?? (string) $provider;
+	}
+
 	public static function scroll( $label ) {
 		return '<div class="ms-scroll" tabindex="0" role="region" aria-label="' . esc_attr( $label ) . '">';
 	}

@@ -116,7 +116,11 @@ final class MSRWA_Screen_Engine {
 		</form>
 
 		<?php self::step_registry(); ?>
-		<?php self::model_catalogue(); ?>
+		<section class="ms-card">
+			<h2><?php esc_html_e( 'Modèles et tarifs', 'ms-recipes-writer-ai' ); ?></h2>
+			<p><?php esc_html_e( 'Les modèles proposés ci-dessus sont ceux de l’écran Modèles : ceux qui y sont activés, avec leurs tarifs et les étapes qu’ils ont le droit de servir. Un modèle désactivé ou retiré d’une étape là-bas est grisé ici, avec la raison.', 'ms-recipes-writer-ai' ); ?></p>
+			<p><a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=msrwa-models' ) ); ?>"><?php esc_html_e( 'Ouvrir l’écran Modèles', 'ms-recipes-writer-ai' ); ?></a></p>
+		</section>
 
 
 		<details class="ms-advanced">
@@ -143,122 +147,47 @@ final class MSRWA_Screen_Engine {
 		// the typed settings alone, the picker named the engine's own tiers and
 		// called every model the catalogue priced unpriced.
 		$config = MSRWA_Engine_Config::create( MSRWA_Engine_Settings::stored() );
-		$catalog = MSRWA_Catalog::defaults();
-		$providers = array(
-			'openai' => __( 'OpenAI', 'ms-recipes-writer-ai' ),
-			'gemini' => __( 'Google Gemini', 'ms-recipes-writer-ai' ),
-			'claude' => __( 'Anthropic Claude', 'ms-recipes-writer-ai' ),
-		);
-		$steps = $config->steps();
+		$providers = array();
+		foreach ( array( 'openai', 'gemini', 'claude' ) as $provider ) { $providers[ $provider ] = MSRWA_UI::provider_name( $provider ); }
 
-		// The two images are chosen apart: each is judged on its own, and a
-		// collage can need a stronger model than a single photograph.
-		$routing_keys = array();
-		foreach ( array_keys( (array) $defaults['routing'] ) as $key ) {
-			if ( 'image' === $key ) { $routing_keys[] = 'featured_image'; $routing_keys[] = 'facebook_image'; continue; }
-			$routing_keys[] = $key;
-		}
+		// The same steps, the same candidates and the same refusals as the
+		// Modèles screen: both read MSRWA_Compat, so a model switched off or
+		// taken off a step there is greyed here with that reason, and nothing
+		// is offered here that the Modèles screen does not list.
 		$keys = array();
-		foreach ( $routing_keys as $key ) {
-			if ( isset( $steps[ $key ] ) ) {
-				// The screen's own words, translated, rather than the engine's
-				// registry labels, which are French whatever the admin speaks.
-				$keys[ $key ] = MSRWA_UI::step_name( $key ) !== $key ? MSRWA_UI::step_name( $key ) : (string) ( $steps[ $key ]['label'] ?? $key );
-			} elseif ( 'vision' === $key ) {
-				$keys[ $key ] = __( 'Lecture des photographies (appariement, observation avant génération)', 'ms-recipes-writer-ai' );
-			} elseif ( 'image' === $key ) {
-				$keys[ $key ] = __( 'Génération d’image (à la une et collage Facebook)', 'ms-recipes-writer-ai' );
-			} else {
-				$keys[ $key ] = $key;
-			}
-		}
-
-		// Every tier resolves to a text-and-vision-capable model on every
-		// provider, so the tier pickers offer all three unconditionally; only
-		// image generation is uneven across providers and models, so it lists
-		// exactly what can do it rather than pretending otherwise.
-		// Every image model the catalogue knows, fetched or shipped, and only
-		// those the engine can draw with: OpenAI's images endpoint.
-		$image_models = array();
-		$labels = array();
-		foreach ( MSRWA_Catalog::rows() as $row ) {
-			if ( 'openai' !== $row['provider'] || 'image' !== MSRWA_Catalog::role( $row['provider'], $row['model_id'] ) || false === $row['served'] ) { continue; }
-			$labels[ $row['provider'] . ':' . $row['model_id'] ] = (string) $row['label'];
-		}
-		foreach ( $catalog as $provider => $models ) {
-			foreach ( $models as $model => $info ) {
-				if ( ! empty( $info['image_generation'] ) && ! isset( $labels[ $provider . ':' . $model ] ) ) { $labels[ $provider . ':' . $model ] = (string) $info['label']; }
-			}
-		}
-		foreach ( $labels as $value => $label ) {
-			list( $provider ) = explode( ':', $value, 2 );
-			$image_models[] = array( 'value' => $value, 'label' => ( $providers[ $provider ] ?? $provider ) . ' — ' . $label );
-		}
-
+		$choices = array();
 		$current = array();
-		foreach ( array_keys( $keys ) as $key ) {
-			$current[ $key ] = $config->model_for( in_array( $key, array( 'featured_image', 'facebook_image' ), true ) ? $config->image_route( $key ) : $key )['route'];
+		$resolved = array();
+		$blocked = array();
+		// The engine's own price list, which is the one it bills against.
+		$prices = (array) $config->get( 'models', array() );
+		foreach ( MSRWA_Compat::steps() as $key => $step ) {
+			$keys[ $key ] = $step['label'];
+			$route = $config->model_for( $step['image'] ? $config->image_route( $key ) : $key );
+			$current[ $key ] = (string) $route['route'];
+			foreach ( MSRWA_Compat::choices( $key, $config ) as $provider => $list ) {
+				foreach ( $list as $choice ) {
+					$choices[ $key ][ $provider ][] = array( 'value' => $choice['value'], 'tier' => $choice['tier'] );
+					$resolved[ $choice['value'] ] = self::describe_model( $provider, $choice['model'], $prices );
+					if ( '' !== $choice['blocked'] ) { $blocked[ $key ][ $choice['value'] ] = $choice['blocked']; }
+				}
+			}
+			// A route naming something no longer offered stays on screen, with
+			// why it cannot run, rather than silently turning into another choice.
+			if ( ! isset( $resolved[ $current[ $key ] ] ) && '' !== (string) $route['model'] ) {
+				$resolved[ $current[ $key ] ] = self::describe_model( (string) $route['provider'], (string) $route['model'], $prices );
+			}
+			$why = MSRWA_Compat::refusal( (string) $route['provider'], (string) $route['model'], $key );
+			if ( '' !== $why ) { $blocked[ $key ][ $current[ $key ] ] = $why; }
 		}
 		$quality = array(
 			'featured_image' => (string) $config->get( 'images.featured_quality', 'medium' ),
 			'facebook_image' => (string) $config->get( 'images.facebook_quality', 'medium' ),
 		);
 
-		// What each choice actually resolves to. A provider and a quality name
-		// are not an answer to "which model will run and what will it cost" —
-		// the tier map turns them into a model identifier, and until this was
-		// shown, choosing "low" picked a model nobody on this screen could
-		// name, two of which this plugin has no price for and one of which its
-		// provider does not serve at all.
-		$resolved = array();
-		// The engine's own price list, which is the one it bills against. The
-		// plugin ships a second, shorter list in MSRWA_Catalog for the models
-		// it documents; reading that one here reported four perfectly priced
-		// models as unpriced.
-		$prices = (array) $config->get( 'models', array() );
-		$tiers = (array) $config->get( 'tiers', array() );
-		foreach ( $tiers as $tier => $by_provider ) {
-			foreach ( (array) $by_provider as $provider => $model ) {
-				$resolved[ $provider . ':' . $tier ] = self::describe_model( $provider, (string) $model, $prices );
-			}
-		}
-		foreach ( $image_models as $entry ) {
-			list( $provider, $model ) = array_pad( explode( ':', $entry['value'], 2 ), 2, '' );
-			$resolved[ $entry['value'] ] = self::describe_model( $provider, $model, $prices );
-		}
-
-		// Each step's choices that resolve to a model unable to serve it, with
-		// the reason. The picker disables them; saving refuses them anyway.
-		$blocked = array();
-		foreach ( array_keys( $keys ) as $key ) {
-			if ( in_array( $key, array( 'featured_image', 'facebook_image' ), true ) ) {
-				foreach ( $image_models as $entry ) {
-					list( $provider, $model ) = array_pad( explode( ':', $entry['value'], 2 ), 2, '' );
-					$why = MSRWA_Compat::refusal( $provider, $model, $key );
-					if ( '' !== $why ) { $blocked[ $key ][ $entry['value'] ] = $why; }
-				}
-				continue;
-			}
-			foreach ( $tiers as $tier => $by_provider ) {
-				foreach ( (array) $by_provider as $provider => $model ) {
-					$why = MSRWA_Compat::refusal( $provider, (string) $model, $key );
-					if ( '' !== $why ) { $blocked[ $key ][ $provider . ':' . $tier ] = $why; }
-				}
-			}
-		}
-
-		$listed = array();
-		foreach ( array_keys( $providers ) as $provider ) {
-			$listed[ $provider ] = array(
-				'count' => count( MSRWA_Catalog::available( $provider ) ),
-				'at' => MSRWA_Catalog::listed_at( $provider ),
-			);
-		}
-
 		$data = array(
 			'providers' => $providers,
-			'tiers' => array_keys( (array) ( $defaults['tiers'] ?? array() ) ),
-			'imageModels' => $image_models,
+			'choices' => $choices,
 			'keys' => $keys,
 			'current' => $current,
 			'resolved' => $resolved,
@@ -271,9 +200,9 @@ final class MSRWA_Screen_Engine {
 			// words low, medium and high; shown raw side by side they read as
 			// the same setting twice. Each is named for what it decides.
 			'tierNames' => array(
-				'low' => __( 'économique', 'ms-recipes-writer-ai' ),
-				'medium' => __( 'standard', 'ms-recipes-writer-ai' ),
-				'high' => __( 'avancé', 'ms-recipes-writer-ai' ),
+				'low' => MSRWA_UI::tier_name( 'low' ),
+				'medium' => MSRWA_UI::tier_name( 'medium' ),
+				'high' => MSRWA_UI::tier_name( 'high' ),
 			),
 			'thinkingNames' => array(
 				'minimal' => __( 'minimale', 'ms-recipes-writer-ai' ),
@@ -407,82 +336,6 @@ final class MSRWA_Screen_Engine {
 				<?php endforeach; ?>
 				</tbody>
 			</table>
-		</section>
-		<?php
-	}
-
-	/**
-	 * The models this plugin knows, beside the ones the provider still serves.
-	 *
-	 * Two different kinds of knowledge, and confusing them is how a route ends
-	 * up naming a model that cannot run: what a model costs is written down
-	 * here by hand, and which identifiers answer is only ever known by asking.
-	 */
-	private static function model_catalogue() {
-		$catalog = MSRWA_Catalog::defaults();
-		$providers = array( 'openai' => 'OpenAI', 'gemini' => 'Google Gemini', 'claude' => 'Anthropic Claude' );
-		?>
-		<section class="ms-card">
-			<h2><?php esc_html_e( 'Modèles et tarifs', 'ms-recipes-writer-ai' ); ?></h2>
-			<p><?php esc_html_e( 'Les tarifs sont saisis à la main d’après la page de chaque fournisseur : aucune API ne les donne, et une estimation ne vaut que ce qu’ils valent. La liste des identifiants, elle, vient du fournisseur lui-même et se met à jour à chaque « Vérifier les clés ».', 'ms-recipes-writer-ai' ); ?></p>
-			<?php foreach ( $providers as $provider => $label ) : ?>
-				<?php
-				$available = MSRWA_Catalog::available( $provider );
-				$at = MSRWA_Catalog::listed_at( $provider );
-				?>
-				<h3><?php echo esc_html( $label ); ?></h3>
-				<p class="ms-muted"><?php echo esc_html( $available
-					? sprintf(
-						/* translators: 1: number of models, 2: a date and time. */
-						__( '%1$d modèle(s) servis d’après le fournisseur, relevés le %2$s.', 'ms-recipes-writer-ai' ),
-						count( $available ),
-						$at
-					)
-					: __( 'Jamais interrogé. « Vérifier les clés », dans les réglages, relève la liste sans rien dépenser.', 'ms-recipes-writer-ai' )
-				); ?></p>
-				<table class="ms-table ms-stack">
-					<thead><tr>
-						<th scope="col"><?php esc_html_e( 'Modèle', 'ms-recipes-writer-ai' ); ?></th>
-						<th scope="col"><?php esc_html_e( 'Sait faire', 'ms-recipes-writer-ai' ); ?></th>
-						<th scope="col"><?php esc_html_e( 'Entrée / sortie par million', 'ms-recipes-writer-ai' ); ?></th>
-						<th scope="col"><?php esc_html_e( 'Servi', 'ms-recipes-writer-ai' ); ?></th>
-					</tr></thead>
-					<tbody>
-					<?php foreach ( (array) ( $catalog[ $provider ] ?? array() ) as $id => $model ) : ?>
-						<?php
-						$can = array();
-						foreach ( array( 'text' => __( 'texte', 'ms-recipes-writer-ai' ), 'vision' => __( 'vision', 'ms-recipes-writer-ai' ), 'web_search' => __( 'recherche web', 'ms-recipes-writer-ai' ), 'image_generation' => __( 'génération d’image', 'ms-recipes-writer-ai' ) ) as $capability => $name ) {
-							if ( ! empty( $model[ $capability ] ) ) { $can[] = $name; }
-						}
-						$served = MSRWA_Catalog::served( $provider, (string) $id );
-						?>
-						<tr>
-							<th scope="row">
-								<code class="ms-key"><?php echo esc_html( $id ); ?></code>
-								<br><small class="ms-muted"><?php echo esc_html( (string) $model['label'] ); ?></small>
-							</th>
-							<td data-label="<?php esc_attr_e( 'Sait faire', 'ms-recipes-writer-ai' ); ?>"><?php echo esc_html( implode( ', ', $can ) ); ?></td>
-							<td data-label="<?php esc_attr_e( 'Entrée / sortie par million', 'ms-recipes-writer-ai' ); ?>" class="ms-num-cell"><?php echo esc_html( sprintf( '$%s / $%s', number_format_i18n( (float) ( $model['input'] ?? 0 ), 2 ), number_format_i18n( (float) ( $model['output'] ?? 0 ), 2 ) ) ); ?></td>
-							<td data-label="<?php esc_attr_e( 'Servi', 'ms-recipes-writer-ai' ); ?>"><?php
-							if ( 'yes' === $served ) {
-								echo '<span class="ms-state ms-state-good">' . esc_html__( 'oui', 'ms-recipes-writer-ai' ) . '</span>';
-							} elseif ( 'no' === $served ) {
-								echo '<span class="ms-state ms-state-stop">' . esc_html__( 'non', 'ms-recipes-writer-ai' ) . '</span>';
-							} else {
-								echo '<span class="ms-muted">' . esc_html__( 'non vérifié', 'ms-recipes-writer-ai' ) . '</span>';
-							}
-							?></td>
-						</tr>
-					<?php endforeach; ?>
-					</tbody>
-				</table>
-				<?php if ( $available ) : ?>
-					<details>
-						<summary><?php esc_html_e( 'Tout ce que le fournisseur sert', 'ms-recipes-writer-ai' ); ?></summary>
-						<pre class="ms-code"><?php echo esc_html( implode( "\n", $available ) ); ?></pre>
-					</details>
-				<?php endif; ?>
-			<?php endforeach; ?>
 		</section>
 		<?php
 	}

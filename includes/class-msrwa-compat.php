@@ -83,6 +83,7 @@ final class MSRWA_Compat {
 
 		if ( ! $with_owner ) { return ''; }
 		$row = class_exists( 'MSRWA_Catalog' ) ? MSRWA_Catalog::row( $provider, $model ) : null;
+		if ( $row && empty( $row['enabled'] ) ) { return __( 'désactivé sur l’écran Modèles', 'ms-recipes-writer-ai' ); }
 		// The image steps are listed on the Modèles screen as the two images; the
 		// shared `image` route answers to either.
 		$owner_step = 'image' === $step ? 'featured_image' : (string) $step;
@@ -135,6 +136,93 @@ final class MSRWA_Compat {
 		}
 		$steps[] = 'vision';
 		return array_values( array_unique( $steps ) );
+	}
+
+	/**
+	 * The steps a model is chosen for, in the order they run, as both the
+	 * Modèles and the Moteur screens show them. The shared `image` route is
+	 * two rows: each image is judged, priced and routed on its own.
+	 */
+	public static function steps() {
+		$config = MSRWA_Engine_Config::create( class_exists( 'MSRWA_Engine_Settings' ) ? MSRWA_Engine_Settings::stored() : array() );
+		$registry = (array) $config->steps();
+		$out = array();
+		foreach ( self::routed_steps( $config ) as $key ) {
+			$name = MSRWA_UI::step_name( $key );
+			$out[ $key ] = array(
+				'label' => $name !== $key ? $name : (string) ( $registry[ $key ]['label'] ?? $key ),
+				'image' => self::draws( $key ),
+			);
+		}
+		return $out;
+	}
+
+	/** Whether a step is served by a model that draws rather than one that writes. */
+	public static function draws( $step ) { return in_array( 'image_generation', self::needs( $step ), true ); }
+
+	/** Whether a model draws: the family it is offered for, on both screens. */
+	public static function is_image_model( $provider, $model ) {
+		return ! empty( self::capabilities( $provider, $model )['image_generation'] );
+	}
+
+	/**
+	 * What a step may be given, per provider: every model of the right family
+	 * that the Modèles screen keeps switched on and the provider still serves.
+	 * A model that is a level's pick is offered as that level, so the route
+	 * keeps following the level when the catalogue moves it. Each choice
+	 * carries the reason it is refused, if it is.
+	 */
+	public static function choices( $step, MSRWA_Engine_Config $config ) {
+		$image = self::draws( $step );
+		$tiers = (array) $config->get( 'tiers', array() );
+		$out = array();
+		foreach ( self::catalogue() as $row ) {
+			if ( empty( $row['enabled'] ) || false === $row['served'] ) { continue; }
+			$provider = (string) $row['provider'];
+			$model = (string) $row['model_id'];
+			if ( self::is_image_model( $provider, $model ) !== $image ) { continue; }
+			$tier = '';
+			foreach ( array( 'low', 'medium', 'high' ) as $name ) {
+				if ( $model === (string) ( $tiers[ $name ][ $provider ] ?? '' ) ) { $tier = $name; break; }
+			}
+			$out[ $provider ][] = array(
+				'value' => $provider . ':' . ( '' !== $tier && ! $image ? $tier : $model ),
+				'model' => $model,
+				'tier' => $image ? '' : $tier,
+				'price' => null === $row['input_usd'] ? null : (float) $row['input_usd'],
+				'blocked' => self::refusal( $provider, $model, $step ),
+			);
+		}
+		// Levels first, cheapest first; then the rest by price.
+		$rank = array( 'low' => 0, 'medium' => 1, 'high' => 2, '' => 3 );
+		foreach ( $out as $provider => $list ) {
+			usort( $list, static function ( $a, $b ) use ( $rank ) {
+				return array( $rank[ $a['tier'] ], (float) $a['price'] ) <=> array( $rank[ $b['tier'] ], (float) $b['price'] );
+			} );
+			$out[ $provider ] = $list;
+		}
+		return $out;
+	}
+
+	/**
+	 * The catalogue's rows, or what the plugin ships when the table is empty —
+	 * the same fallback MSRWA_Catalog::models() makes, so a site that never
+	 * seeded its catalogue is still offered the models it will run.
+	 */
+	private static function catalogue() {
+		$rows = MSRWA_Catalog::rows();
+		if ( $rows ) { return $rows; }
+		foreach ( MSRWA_Catalog::defaults() as $provider => $models ) {
+			foreach ( $models as $model => $info ) {
+				$rows[] = array(
+					'provider' => $provider, 'model_id' => $model,
+					'enabled' => ! array_key_exists( 'enabled', $info ) || ! empty( $info['enabled'] ),
+					'served' => null,
+					'input_usd' => isset( $info['input'] ) ? (float) $info['input'] : null,
+				);
+			}
+		}
+		return $rows;
 	}
 
 	/** Problems as one sentence, for a notice or an error. */

@@ -1954,6 +1954,48 @@ msgstr "عالية جدًا"
 msgid "économique"
 msgstr "اقتصادي"
 
+msgid "Aucun plat n’a été reconnu sur ces photographies. Ajoutez le nom de chaque recette dans le texte, avec ou sans les photographies."
+msgstr "لم يُتعرَّف على أي طبق في هذه الصور. أضف اسم كل وصفة في النص، مع الصور أو بدونها."
+
+msgid "Aucun texte : chaque plat reconnu sur les photographies deviendra une recette (%d au plus)."
+msgstr "لا نص: كل طبق يُتعرَّف عليه في الصور سيصبح وصفة (%d على الأكثر)."
+
+msgid "Aucun texte fourni : ces recettes ont été nommées d’après les photographies — %s. Chacune sera établie d’après les sources ; vérifiez-les avant de lancer."
+msgstr "لم يُقدَّم نص: سُمّيت هذه الوصفات انطلاقًا من الصور — %s. ستُعدّ كل واحدة منها اعتمادًا على المصادر؛ تحقق منها قبل الإطلاق."
+
+msgid "Collez au moins une recette ou ajoutez au moins une photographie."
+msgstr "الصق وصفة واحدة على الأقل أو أضف صورة واحدة على الأقل."
+
+msgid "Des recettes, des photographies, ou les deux. Les photographies sont décrites puis associées ; sans texte, chaque plat qu’elles montrent devient une recette. Vous confirmez avant que quoi que ce soit ne soit généré."
+msgstr "وصفات أو صور أو كلاهما. تُوصف الصور ثم تُقرن بالوصفات؛ وبدون نص يصبح كل طبق تظهره وصفة. تؤكد قبل توليد أي شيء."
+
+msgid "Les modèles proposés ci-dessus sont ceux de l’écran Modèles : ceux qui y sont activés, avec leurs tarifs et les étapes qu’ils ont le droit de servir. Un modèle désactivé ou retiré d’une étape là-bas est grisé ici, avec la raison."
+msgstr "النماذج المقترحة أعلاه هي نماذج شاشة النماذج: المفعّلة هناك، بأسعارها والمراحل المسموح لها بخدمتها. النموذج المعطّل أو المُزال من مرحلة هناك يظهر هنا باهتًا مع السبب."
+
+msgid "Ouvrir l’écran Modèles"
+msgstr "فتح شاشة النماذج"
+
+msgid "Photographies à reconnaître"
+msgstr "صور بانتظار التعرّف عليها"
+
+msgid "Rien n’est écrit à cette étape : seules les photographies sont décrites. Vous verrez les recettes et l’appariement avant de lancer quoi que ce soit."
+msgstr "لا يُكتب شيء في هذه المرحلة: تُوصف الصور فقط. سترى الوصفات والاقتران قبل إطلاق أي شيء."
+
+msgid "Sans dire lesquelles vont avec quoi : chacune sera décrite depuis ses propres pixels, puis associée à une recette — ou, sans texte, regroupée avec les autres photographies du même plat. Une photographie est facturée une fois, même si vous corrigez ensuite l’association."
+msgstr "دون تحديد أيّها يذهب مع أيّ وصفة: تُوصف كل صورة من بكسلاتها، ثم تُقرن بوصفة — أو، بدون نص، تُجمع مع صور الطبق نفسه. تُحتسب الصورة مرة واحدة حتى لو صحّحت الاقتران لاحقًا."
+
+msgid "Une ligne de trois tirets ou plus sépare deux recettes. La première ligne de chaque bloc en devient le titre. Le nom du plat suffit : le reste est établi d’après les sources."
+msgstr "سطر من ثلاث شرطات أو أكثر يفصل بين وصفتين. يصبح السطر الأول من كل كتلة عنوانها. يكفي اسم الطبق: يُعدّ الباقي اعتمادًا على المصادر."
+
+msgid "désactivé sur l’écran Modèles"
+msgstr "معطّل في شاشة النماذج"
+
+msgid "facultatif avec des photographies"
+msgstr "اختياري مع الصور"
+
+msgid "facultatif avec du texte"
+msgstr "اختياري مع النص"
+
 msgid "aucune page citée"
 msgstr "لم تُذكر أي صفحة"
 

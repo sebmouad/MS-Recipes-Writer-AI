@@ -53,19 +53,12 @@ final class MSRWA_Screen_Models {
 		echo '</div>';
 	}
 
-	/** The steps a model can be given, straight from the engine's registry. */
-	private static function steps() {
-		$config = MSRWA_Engine_Config::create( MSRWA_Engine_Settings::stored(), array( 'settings' => MSRWA_Settings::engine_settings() ) );
-		$out = array();
-		foreach ( (array) $config->steps() as $key => $step ) {
-			$capability = (string) ( $step['capability'] ?? 'text' );
-			// A step that calls no model cannot be given one.
-			if ( 'none' === $capability ) { continue; }
-			$name = MSRWA_UI::step_name( $key );
-			$out[ $key ] = array( 'label' => $name !== $key ? $name : (string) ( $step['label'] ?? $key ), 'image' => 'image_generation' === $capability );
-		}
-		return $out;
-	}
+	/**
+	 * The steps a model can be given: the Moteur screen's own list, from the
+	 * same place, so the two screens never disagree on what a step is called,
+	 * which ones exist — the photograph reading included — or who may serve it.
+	 */
+	private static function steps() { return MSRWA_Compat::steps(); }
 
 	private static function actions() {
 		?>
@@ -122,8 +115,8 @@ final class MSRWA_Screen_Models {
 							<td class="ms-grid-cell">
 								<?php
 								// An image model draws and a text model writes: each is offered
-								// only the steps it could actually serve.
-								$draws = ! empty( $row['capabilities']['image_generation'] );
+								// only the steps of its family, as on the Moteur screen.
+								$draws = MSRWA_Compat::is_image_model( $row['provider'], $row['model_id'] );
 								?>
 								<?php foreach ( $steps as $key => $step ) : ?>
 									<?php if ( $step['image'] !== $draws ) { continue; } ?>
@@ -189,14 +182,14 @@ final class MSRWA_Screen_Models {
 					<thead><tr>
 						<th scope="col"><?php esc_html_e( 'Niveau', 'ms-recipes-writer-ai' ); ?></th>
 						<?php foreach ( array_keys( $handed['models'] ) as $provider ) : ?>
-							<th scope="col"><?php echo esc_html( $provider ); ?></th>
+							<th scope="col"><?php echo esc_html( MSRWA_UI::provider_name( $provider ) ); ?></th>
 						<?php endforeach; ?>
 					</tr></thead>
 					<tbody>
 					<?php foreach ( array( 'low', 'medium', 'high' ) as $tier ) : ?>
 						<?php if ( empty( $handed['tiers'][ $tier ] ) ) { continue; } ?>
 						<tr>
-							<th scope="row"><?php echo esc_html( $tier ); ?></th>
+							<th scope="row"><?php echo esc_html( MSRWA_UI::tier_name( $tier ) ); ?></th>
 							<?php foreach ( array_keys( $handed['models'] ) as $provider ) : ?>
 								<td><code class="ms-key"><?php echo esc_html( (string) ( $handed['tiers'][ $tier ][ $provider ] ?? '—' ) ); ?></code></td>
 							<?php endforeach; ?>

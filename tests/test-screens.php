@@ -93,7 +93,15 @@ if ( preg_match( '/id="ms-engine-routing-data">(.*?)<\/script>/s', $engine['html
 	foreach ( $expected as $key ) {
 		msrwa_test_assert( isset( $picker_data['keys'][ $key ], $picker_data['current'][ $key ] ), 'The routing picker names route ' . $key . '.' );
 	}
-	msrwa_test_assert( ! empty( $picker_data['imageModels'] ), 'The routing picker lists at least one image-capable model.' );
+	msrwa_test_assert( ! empty( $picker_data['choices']['featured_image'] ), 'The routing picker lists at least one image-capable model.' );
+	// Each step is offered its own family only, the rule the Modèles screen applies.
+	foreach ( (array) $picker_data['choices']['featured_image'] as $provider => $list ) {
+		foreach ( $list as $choice ) { msrwa_test_assert( '' === $choice['tier'], 'An image choice is a model, never a text level: ' . $choice['value'] ); }
+	}
+	foreach ( (array) $picker_data['choices']['article'] as $provider => $list ) {
+		foreach ( $list as $choice ) { msrwa_test_assert( false === strpos( $choice['value'], 'image' ), 'The article is never offered an image model: ' . $choice['value'] ); }
+	}
+	msrwa_test_assert( array_keys( $picker_data['keys'] ) === array_keys( MSRWA_Compat::steps() ), 'The Moteur picker and the Modèles grid list the same steps, in the same order.' );
 	msrwa_test_missing( $match[1], 'key_env', 'The routing picker data embeds no provider header, key included.' );
 	// Level, thinking and image quality all say low/medium/high; each is named
 	// for what it decides, or they read as one setting given twice.

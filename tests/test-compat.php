@@ -33,6 +33,10 @@ $GLOBALS['wpdb']->on( 'SHOW TABLES', array( 'wp_msrwa_catalog' ) );
 $GLOBALS['wpdb']->on( "model_id = 'gpt-5.6-luna'", array( array( 'provider' => 'openai', 'model_id' => 'gpt-5.6-luna', 'enabled' => 1, 'capabilities_json' => '{}', 'input_usd' => 0.2, 'output_usd' => 1.2, 'served' => null, 'limits_json' => '{}', 'steps_json' => '["article"]' ) ) );
 msrwa_test_contains( MSRWA_Compat::refusal( 'openai', 'gpt-5.6-luna', 'research' ), 'Modèles', 'A step the owner took the model off is refused.' );
 $GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
+$GLOBALS['wpdb']->on( 'SHOW TABLES', array( 'wp_msrwa_catalog' ) );
+$GLOBALS['wpdb']->on( "model_id = 'gpt-5.6-luna'", array( array( 'provider' => 'openai', 'model_id' => 'gpt-5.6-luna', 'enabled' => 0, 'input_usd' => 0.2, 'output_usd' => 1.2, 'served' => null, 'capabilities_json' => '{}', 'limits_json' => '{}', 'steps_json' => '[]' ) ) );
+msrwa_test_contains( MSRWA_Compat::refusal( 'openai', 'gpt-5.6-luna', 'article' ), 'désactivé', 'A model switched off on the Modèles screen serves no step.' );
+$GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
 
 // Measured unfit, whatever the capability says.
 msrwa_test_contains( MSRWA_Compat::refusal( 'openai', 'gpt-5-nano', 'research' ), 'Mesuré', 'gpt-5-nano is refused the research, with what was measured.' );
@@ -65,5 +69,18 @@ $refused = MSRWA_Batch::dispatch( 9 );
 msrwa_test_assert( is_wp_error( $refused ) && 'msrwa_incompatible_route' === $refused->get_error_code(), 'A lot whose research would run on nano is refused at dispatch; got ' . ( is_wp_error( $refused ) ? $refused->get_error_code() : 'a dispatch' ) );
 msrwa_test_contains( $refused->get_error_message(), 'Recherche', 'The refusal names the step.' );
 msrwa_test_missing( $GLOBALS['wpdb']->log(), 'INSERT wp_msrwa_runs', 'Nothing is started.' );
+
+// Both model screens read one list of steps and one family rule.
+$GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
+$steps = MSRWA_Compat::steps();
+msrwa_test_assert( isset( $steps['vision'], $steps['featured_image'], $steps['facebook_image'], $steps['research'] ), 'The shared list names every routed step, the photograph reading included.' );
+msrwa_test_assert( ! isset( $steps['image'], $steps['corrections'] ), 'Neither the shared image route nor a step that calls no model is listed.' );
+msrwa_test_assert( $steps['featured_image']['image'] && ! $steps['vision']['image'], 'An image step is served by a model that draws, the photograph reading by one that writes.' );
+$offer = MSRWA_Compat::choices( 'research', MSRWA_Engine_Config::create( array() ) );
+$values = array();
+foreach ( $offer as $list ) { foreach ( $list as $choice ) { $values[ $choice['value'] ] = $choice['blocked']; } }
+msrwa_test_assert( isset( $values['openai:medium'] ) && '' === $values['openai:medium'], 'The research is offered the standard level, usable.' );
+msrwa_test_assert( ! isset( $values['openai:gpt-image-2.5-flare'] ), 'The research is never offered an image model.' );
+foreach ( $values as $value => $why ) { msrwa_test_assert( '' === $why || '' !== trim( $why ), 'A refused choice always says why: ' . $value ); }
 
 msrwa_test_done( 'only a model able to serve a step is given it' );
