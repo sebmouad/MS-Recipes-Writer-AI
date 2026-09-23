@@ -233,7 +233,10 @@ step's ceiling, so a lower level never makes an estimate read low.
 An estimate is two numbers: `cost_usd`, one pass through the profile, and
 `max_usd`, every final-approval attempt refused with both images redrawn. The
 per-recipe ceiling is checked against the first; screens show both and warn
-when the second is above the ceiling. Research is priced at its search cap.
+when the second is above the ceiling. Research is priced at its measured two
+paid searches; the maximum prices every allowed tool call as one. A later
+version of the article replaces only the fields it filled
+(`MSRWA_Engine::filled()`), in the engine and in the draft alike.
 
 What the catalogue keeps is decided by `MSRWA_Catalog::keep()`: the two newest
 generations of each role per provider, and anything shipped, named by the

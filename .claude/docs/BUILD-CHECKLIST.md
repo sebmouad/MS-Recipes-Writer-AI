@@ -93,6 +93,9 @@ run carries.
   and billed $0.1870; a full recipe refused twice billed $0.2804.
 - [x] OpenAI's listing trimmed to 12 models and priced from each model's own
   page, live (`tests/real/test-catalog.php`): four rates asked, four found.
+- [x] A complete recipe near $0.10, search included, without losing a point:
+  $0.1055, $0.109 and $0.115 per pass on three dishes in the lab, every step
+  at its maximum score (README 0.18.0 has each lever and what it saved).
 - [ ] A complete lot on Claude — the account has no credit. — the Gemini key's
   grounding quota is exhausted, OpenAI is unreachable from the test
   environment and the Claude account has no credit.

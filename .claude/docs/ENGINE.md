@@ -388,6 +388,21 @@ here, approved, and are in. `tests/test-engine-language.php` holds them.
     page; 1.0, full price, wherever no ratio is published). OpenAI can overrun
     the cap by one call; seen once, 11 under a cap of 10.
 
+12. **Search and thinking economies, measured before shipping.** Only a
+    `search` action is billed by OpenAI; `open_page` and `find_in_page` are
+    now recorded as `usage.page_reads` and not priced. The OpenAI search tool
+    ships with `search_context_size: low`. `limits.web_searches` (3) is the
+    paid searches expected and Claude's cap; `limits.web_tool_calls` (10) is
+    OpenAI's `max_tool_calls`. The research prompt says a search is billed and
+    a page read is not, and asks for at most three. OpenAI thinks at `low`
+    (`providers.openai.thinking_level`), except `fact_check`, `proofread` and
+    `final_approval`, which stay at `medium`. The collage prompt requires each
+    panel to show the state every earlier step left, and each ingredient only
+    from its own step; the article prompt keeps storage, reheating and safety
+    advice to what a source states. `MSRWA_Engine::filled()` stops an empty
+    later version of the article from replacing the one before it. Every
+    change was measured on live runs; see README 0.18.0.
+
 ### Still open
 
 6. **The engine's `models` list is a second source of truth for prices.** The

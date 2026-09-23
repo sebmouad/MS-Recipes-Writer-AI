@@ -5,10 +5,11 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.17.0
+## État actuel — 0.18.0
 
-La version `0.17.0` fait tenir l’estimation face à la facture, vérifiée sur de
-vraies recettes complètes chez OpenAI ; la `0.16.0` permettait de régler la
+La version `0.18.0` ramène une recette complète à environ 0,11 $ réels —
+recherche web comprise — sans perte de qualité mesurée ; la `0.17.0` faisait
+tenir l’estimation face à la facture ; la `0.16.0` permettait de régler la
 réflexion de chaque étape et d’en tenir compte dans les estimations ; la `0.15.0` faisait
 arriver jusqu’au moteur chaque tarif relevé ou corrigé et chiffrait la
 simulation ; la `0.14.0` corrigeait ce que coûte réellement un appel et ce que
@@ -71,6 +72,43 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.18.0
+
+**Environ 0,11 $ la recette complète, frais de recherche compris.** Les
+0,10–0,13 $ mesurés pendant le développement du moteur ne comptaient pas les
+frais de recherche web, que le moteur ignorait alors : la facture réelle
+tournait autour de 0,18 $. Mesuré en réel chez OpenAI, un passage complet
+coûte désormais 0,1055 $, 0,109 $ et 0,115 $ sur trois plats, chaque étape
+gardant son score maximal (recherche 14/14, article 10/10, approbation 10/10).
+
+**Ce qui a changé, et ce que chaque levier a rapporté :**
+
+| Levier | Effet mesuré |
+| --- | --- |
+| Seule une *recherche* est facturée ; ouvrir une page est gratuit | le coût réel comptait 13 « recherches » là où 4 étaient facturées |
+| `search_context_size: low` | recherche 0,055 $ au lieu de 0,071 $, 14/14 |
+| La consigne de recherche : trois requêtes au plus, puis lire les pages | 1 recherche payante le plus souvent, 0,020–0,027 $ |
+| Réflexion `low` pour la recherche, la rédaction et la revue | 0,1030 $ au lieu de 0,1822 $ la recette, scores intacts |
+| Réflexion `medium` gardée pour la vérification des faits, la correction et l’approbation | aucune économie prise sur ce qui détecte un défaut |
+
+**Deux défauts de qualité corrigés, qui coûtaient aussi.** Le collage Facebook
+sautait une étape de cuisson (la précuisson de la tarte) ou montrait un
+ingrédient trop tôt (des olives dans la marinade) ; l’approbation le refusait à
+raison, et chaque nouveau dessin coûtait 0,03 $ de plus. L’article ajoutait des
+conseils de conservation et de réchauffage non sourcés. Le prompt du collage
+exige maintenant que chaque panneau montre l’état laissé par toutes les étapes
+précédentes et qu’un ingrédient n’apparaisse qu’à son étape ; celui de l’article
+limite ces conseils à ce que disent les sources.
+
+**Une relecture vide effaçait l’article.** Une correction revenue sans texte
+remplaçait l’article de 21 505 caractères par rien : pas de brouillon, et
+l’approbation jugeait une page blanche. Une version plus récente ne remplace
+plus que ce qu’elle remplit.
+
+**L’estimation suit.** Recherche mesurée (45 000 jetons, 2 recherches), économie
+mesurée de la réflexion `low`, plafond de dix appels d’outil pour le maximum :
+une recette complète est estimée à 0,126 $, au plus 0,319 $.
 
 ## Version 0.17.0
 
