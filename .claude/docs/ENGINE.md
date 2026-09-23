@@ -364,6 +364,20 @@ here, approved, and are in. `tests/test-engine-language.php` holds them.
    reason (`MAX_TOKENS`, `max_tokens`, `incomplete`), since Gemini stops a few
    tokens short of the ceiling and the count alone missed it.
 
+10. **One thinking level per step, on every provider.** Item 9 bounded
+    Gemini alone, through a raw `thinkingConfig`. The engine now has a
+    `thinking` group — a level per step or `default`, from `minimal`, `low`,
+    `medium`, `high` — resolved by `MSRWA_Engine_Config::thinking()` as step,
+    then default, then `providers.<name>.thinking_level` (Gemini ships `low`),
+    then nothing. `provider( $name, $model, $step )` carries the level in the
+    wire and `MSRWA_Engine_Call::think()` spells it per provider in text,
+    vision and judge requests: `thinkingLevel`, `reasoning.effort`, or Claude's
+    `output_config.effort` (`minimal` sent as `low`), never to a model that
+    refuses it. OpenAI's `reasoning_tokens` and Gemini's `thoughtsTokenCount`
+    are reported as `usage.thinking_tokens`, and each call event records its
+    level. A caller's raw `providers.gemini.thinking` from 0.15.0 is still
+    honoured when no level is set.
+
 ### Still open
 
 6. **The engine's `models` list is a second source of truth for prices.** The

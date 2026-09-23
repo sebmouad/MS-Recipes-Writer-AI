@@ -80,6 +80,12 @@ run carries.
 - [x] Gemini steps finish under their ceiling, live: canonical recipe 4/4 for
   $0.0227 and article 8/10 for $0.0556 (estimated $0.0698) on
   `gemini-3.5-flash`, where the unbounded canonical stopped on MAX_TOKENS.
+- [x] A thinking level per step, on every provider, live on Gemini: the same
+  canonical recipe at `minimal` ($0.0209), `low` ($0.0227) and `high`
+  ($0.0649, 4 420 thinking tokens), each 4/4; the Moteur simulation shows the
+  level and prices `high` above the default (`tests/real/test-catalog.php`).
+  OpenAI's `reasoning.effort` and Claude's `effort` are held offline only
+  (`tests/test-engine-usage.php`) until those providers can be reached.
 - [ ] A complete lot on a funded provider with web search — the Gemini key's
   grounding quota is exhausted, OpenAI is unreachable from the test
   environment and the Claude account has no credit.

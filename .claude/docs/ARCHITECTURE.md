@@ -225,6 +225,11 @@ what the Moteur screen stores is merged over the catalogue model by model, and
 compared against it by value, so saving that form never freezes the
 catalogue's rates in place.
 
+How hard each step may think is engine configuration (`thinking`), edited on
+the Moteur screen like routing. `MSRWA_Estimate` adds to a step's estimated
+output only what a level above the measured `medium` would add, capped by the
+step's ceiling, so a lower level never makes an estimate read low.
+
 It holds three kinds of knowledge, deliberately kept apart. which identifiers exist, which only the provider knows and which is
 fetched; what they cost, which no provider API states — checked against all
 three live responses — so a rate is typed by a person or looked up by a model

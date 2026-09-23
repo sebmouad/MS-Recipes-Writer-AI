@@ -5,11 +5,13 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.15.0
+## État actuel — 0.16.0
 
-La version `0.15.0` fait arriver jusqu’au moteur chaque tarif relevé ou corrigé,
-borne la réflexion de Gemini et chiffre la simulation ; la `0.14.0` corrigeait ce
-que coûte réellement un appel et ce que le catalogue garde. Voir ci-dessous ce
+La version `0.16.0` permet de régler la réflexion de chaque étape, chez les
+trois fournisseurs, et en tient compte dans les estimations ; la `0.15.0` faisait
+arriver jusqu’au moteur chaque tarif relevé ou corrigé et chiffrait la
+simulation ; la `0.14.0` corrigeait ce que coûte réellement un appel et ce que
+le catalogue garde. Voir ci-dessous ce
 qui a été vérifié en conditions réelles et ce qui ne l’a pas été. La `0.13.0` était installable et vérifiée de bout en bout sur un vrai
 WordPress (7.1.1) : un lot part, le cron le fait avancer vague par vague, et un
 brouillon arrive **en blocs**, avec son article, sa recette, son extrait, son
@@ -68,6 +70,36 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.16.0
+
+**La réflexion se règle par étape, chez les trois fournisseurs.** Un nouveau
+groupe `thinking` du moteur donne un niveau — `minimal`, `low`, `medium` ou
+`high` — par étape ou par défaut ; vide, le fournisseur décide. Chaque appel le
+traduit dans la langue de son fournisseur : `thinkingLevel` chez Gemini,
+`reasoning.effort` chez OpenAI, `effort` chez Claude (qui n’a pas de `minimal` :
+`low` est le moins). Un modèle qui refuse ce réglage — Haiku 4.5, Sonnet 4.5, un
+modèle OpenAI qui ne raisonne pas — n’en reçoit aucun, plutôt qu’une erreur.
+Gemini reste à `low` par défaut (`providers.gemini.thinking_level`). Mesuré en
+réel sur la même recette canonique : `minimal` 0,0209 $ en 12 s, `low` 0,0227 $
+en 9 s, `high` 0,0649 $ en 82 s dont 4 420 jetons de réflexion — les trois 4/4.
+
+**Partout où l’on choisit un modèle.** Le sélecteur « Modèle par étape » de
+l’écran Moteur a une colonne *Réflexion*, qui écrit le champ `thinking` ; la
+simulation affiche le niveau de chaque étape ; le laboratoire prend
+`--thinking=`. Le sélecteur résout désormais les modèles et leurs tarifs
+par-dessus le catalogue, comme le moteur, au lieu de la seule liste du moteur.
+
+**Et dans les calculs.** Les formes d’estimation ont été mesurées à la
+réflexion par défaut des fournisseurs (`medium`) : un niveau supérieur ajoute sa
+réflexion à la sortie estimée de chaque étape, toujours plafonnée par le
+plafond de sortie, et un niveau inférieur ne retire rien — une estimation qui lit
+bas laisse passer un lot au-delà de son plafond. La réflexion est comptée à part
+dans le journal de chaque appel (« 6 579 out (4 420 thinking) »).
+
+**Toujours non vérifié** : un lot complet (recherche web épuisée sur la clé
+Gemini, OpenAI bloqué par la politique réseau de l’environnement de test, compte
+Claude sans crédit).
 
 ## Version 0.15.0
 
