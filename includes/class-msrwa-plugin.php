@@ -52,7 +52,7 @@ final class MSRWA_Plugin {
 	public static function intervals( $schedules ) {
 		$schedules['msrwa_five_minutes'] = array(
 			'interval' => 300,
-			'display' => did_action( 'init' ) ? __( 'Toutes les cinq minutes (MS Recipes Writer)', 'ms-recipes-writer-ai' ) : 'Toutes les cinq minutes (MS Recipes Writer)',
+			'display' => did_action( 'init' ) ? __( 'Toutes les cinq minutes (MS Recipes AI)', 'ms-recipes-writer-ai' ) : 'Toutes les cinq minutes (MS Recipes AI)',
 		);
 		return $schedules;
 	}

@@ -81,7 +81,7 @@ final class MSRWA_Editor {
 	public static function block_editor() {
 		$post_id = (int) get_the_ID();
 		if ( ! $post_id || ! get_post_meta( $post_id, '_msrwa_run_id', true ) ) { return; }
-		if ( ! current_user_can( 'edit_post', $post_id ) ) { return; }
+		if ( ! current_user_can( 'edit_post', $post_id ) || ! MSRWA_Rights::may_write() ) { return; }
 
 		$file = MSRWA_DIR . 'assets/editor.js';
 		wp_enqueue_script(
@@ -99,7 +99,7 @@ final class MSRWA_Editor {
 			? admin_url( 'admin.php?page=msrwa-run&run_id=' . $verdict['run_id'] )
 			: '';
 		$verdict['text'] = array(
-			'title' => __( 'MS Recipes Writer', 'ms-recipes-writer-ai' ),
+			'title' => __( 'MS Recipes AI', 'ms-recipes-writer-ai' ),
 			'lead' => __( 'Cet article a été généré. Les contrôles ci-dessous portent sur ce que la machine a produit ; ils ne remplacent pas votre relecture, et rien ici ne vaut approbation.', 'ms-recipes-writer-ai' ),
 			'unjudged' => __( 'Aucun jugement final n’a été rendu pour cet article — le profil choisi ne l’exécutait pas, ou la recette s’est arrêtée avant.', 'ms-recipes-writer-ai' ),
 			'clean' => __( 'Le juge n’a rien relevé. Votre relecture reste la seule validation.', 'ms-recipes-writer-ai' ),
@@ -136,8 +136,8 @@ final class MSRWA_Editor {
 
 	public static function register( $post ) {
 		if ( ! get_post_meta( $post->ID, '_msrwa_run_id', true ) ) { return; }
-		if ( ! current_user_can( 'edit_post', $post->ID ) ) { return; }
-		add_meta_box( 'msrwa-verdict', __( 'MS Recipes Writer — à vérifier avant publication', 'ms-recipes-writer-ai' ), array( __CLASS__, 'render' ), 'post', 'normal', 'high' );
+		if ( ! current_user_can( 'edit_post', $post->ID ) || ! MSRWA_Rights::may_write() ) { return; }
+		add_meta_box( 'msrwa-verdict', __( 'MS Recipes AI — à vérifier avant publication', 'ms-recipes-writer-ai' ), array( __CLASS__, 'render' ), 'post', 'normal', 'high' );
 	}
 
 	/** A quiet marker in the posts list, so a generated draft is never a surprise. */

@@ -86,4 +86,20 @@ msrwa_test_contains( $GLOBALS['wpdb']->log(), 'owner_id = 7', 'The count is scop
 // leave a red number in the sidebar that nobody can act on.
 msrwa_test_missing( $title, 'count-5', 'The badge counts drafts to read, not everything that happened.' );
 
+// The plugin is for those WordPress trusts with uploads: authors, editors and
+// administrators. A contributor holding `msrwa_create` — granted by an earlier
+// version, or by a role editor — still opens nothing.
+require_once dirname( __DIR__ ) . '/includes/class-msrwa-rest.php';
+$GLOBALS['msrwa_test_caps'] = array( 'edit_posts', 'msrwa_create' );
+msrwa_test_assert( ! MSRWA_Rights::may_write(), 'Without upload_files the plugin is closed, whatever else the user holds.' );
+msrwa_test_assert( ! MSRWA_Rest::can_create(), 'Its routes refuse a user without upload_files.' );
+try { MSRWA_Screen_Articles::render(); msrwa_test_assert( false, 'A contributor must not reach a screen by URL.' ); }
+catch ( RuntimeException $error ) { msrwa_test_assert( true, 'A contributor is turned away from a screen opened by URL.' ); }
+$GLOBALS['msrwa_test_caps'] = array( 'edit_posts', 'upload_files' );
+msrwa_test_assert( ! MSRWA_Rights::may_write(), 'Upload rights alone are not the plugin\'s grant either.' );
+msrwa_test_as_editor( 7 );
+msrwa_test_assert( MSRWA_Rights::may_write() && MSRWA_Rest::can_create(), 'An author or editor, who can upload, uses the plugin.' );
+$GLOBALS['msrwa_test_caps'] = array( 'manage_options' );
+msrwa_test_assert( MSRWA_Rights::may_write(), 'An administrator always does.' );
+
 msrwa_test_done( 'screens and permissions' );

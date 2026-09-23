@@ -207,8 +207,8 @@ msgstr "الدفعة غير موجودة."
 msgid "Lu sur ce que le moteur a rapporté, jamais recalculé. Un coût inconnu reste inconnu jusqu’ici."
 msgstr "مقروء مما أبلغ عنه المحرك، دون إعادة حساب. والكلفة المجهولة تبقى مجهولة إلى هنا."
 
-msgid "MS Recipes Writer"
-msgstr "MS Recipes Writer"
+msgid "MS Recipes AI"
+msgstr "MS Recipes AI"
 
 msgid "Modèle"
 msgstr "النموذج"
@@ -522,8 +522,8 @@ msgstr "دفعة %d"
 msgid "L’avis du moteur sur sa propre production. Ce n’est pas une validation éditoriale : c’est à vous de décider si l’article part."
 msgstr "رأي المحرك في إنتاجه هو. وليس إجازة تحريرية: القرار بنشر المقال لك."
 
-msgid "MS Recipes Writer — à vérifier avant publication"
-msgstr "MS Recipes Writer — للتحقق قبل النشر"
+msgid "MS Recipes AI — à vérifier avant publication"
+msgstr "MS Recipes AI — للتحقق قبل النشر"
 
 msgid "Mineur"
 msgstr "طفيف"
@@ -768,8 +768,8 @@ msgstr "التحديد"
 msgid "Sélectionner %s"
 msgstr "تحديد %s"
 
-msgid "Toutes les cinq minutes (MS Recipes Writer)"
-msgstr "كل خمس دقائق (MS Recipes Writer)"
+msgid "Toutes les cinq minutes (MS Recipes AI)"
+msgstr "كل خمس دقائق (MS Recipes AI)"
 
 msgid "Une ligne par appel"
 msgstr "سطر لكل استدعاء"

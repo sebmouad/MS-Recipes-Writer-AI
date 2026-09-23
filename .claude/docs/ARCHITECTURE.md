@@ -154,9 +154,15 @@ checks are how a list ends up scoped on one screen and not the next.
 
 | capability | may |
 |---|---|
-| `msrwa_create` | submit work, see and act on their own |
+| `msrwa_create` + `upload_files` | submit work, see and act on their own |
 | `msrwa_view_all` | see everyone's work |
 | `msrwa_manage` | settings, the engine, analysis, deletion, the whole ledger |
+
+The plugin is for users WordPress already trusts with uploads, since a lot's
+photographs enter the media library: `MSRWA_Rights::may_write()` requires
+`upload_files` beside `msrwa_create` — authors, editors and administrators by
+default, never a contributor. Without it there is no menu, no screen, no route
+and no box in the post editor, whatever else the user holds.
 
 `manage_options` is honoured everywhere as a superset. `msrwa_view_all` alone
 does **not** widen a writer's view: sites carry that capability from an earlier

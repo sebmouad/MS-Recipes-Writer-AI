@@ -12,6 +12,8 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
  *   msrwa_view_all   see everyone's work
  *   msrwa_manage     settings, the engine, deletion, the whole ledger
  *
+ * Creating also takes WordPress's `upload_files`: see may_write().
+ *
  * An administrator holds all three. `manage_options` is honoured everywhere as
  * a superset, so a site that never assigned the roles still works.
  */
@@ -20,6 +22,9 @@ final class MSRWA_Rights {
 	const CREATE = 'msrwa_create';
 	const VIEW_ALL = 'msrwa_view_all';
 	const MANAGE = 'msrwa_manage';
+
+	/** WordPress's own upload capability, which the plugin also requires. */
+	const UPLOAD = 'upload_files';
 
 	/**
 	 * The roles this plugin grants, on activation and on every upgrade, and
@@ -49,7 +54,18 @@ final class MSRWA_Rights {
 		return current_user_can( $capability ) || current_user_can( 'manage_options' );
 	}
 
-	public static function may_write() { return self::can( self::CREATE ); }
+	/**
+	 * Whether this user may use the plugin at all.
+	 *
+	 * A lot carries photographs that enter the media library, so the plugin is
+	 * for those WordPress already trusts with uploads — authors, editors and
+	 * administrators out of the box, never a contributor. Holding
+	 * `msrwa_create` without `upload_files` opens nothing: no menu, no screen,
+	 * no route.
+	 */
+	public static function may_write() {
+		return current_user_can( 'manage_options' ) || ( current_user_can( self::CREATE ) && current_user_can( self::UPLOAD ) );
+	}
 	public static function may_manage() { return self::can( self::MANAGE ); }
 	/**
 	 * Whether this reader sees other people's work.

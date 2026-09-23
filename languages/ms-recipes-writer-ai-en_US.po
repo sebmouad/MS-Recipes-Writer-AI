@@ -207,8 +207,8 @@ msgstr "Lot not found."
 msgid "Lu sur ce que le moteur a rapporté, jamais recalculé. Un coût inconnu reste inconnu jusqu’ici."
 msgstr "Read from what the engine reported, never recalculated. An unknown cost stays unknown all the way here."
 
-msgid "MS Recipes Writer"
-msgstr "MS Recipes Writer"
+msgid "MS Recipes AI"
+msgstr "MS Recipes AI"
 
 msgid "Modèle"
 msgstr "Model"
@@ -522,8 +522,8 @@ msgstr "Lot %d"
 msgid "L’avis du moteur sur sa propre production. Ce n’est pas une validation éditoriale : c’est à vous de décider si l’article part."
 msgstr "The engine's opinion of its own output. It is not an editorial approval: whether the article goes out is your call."
 
-msgid "MS Recipes Writer — à vérifier avant publication"
-msgstr "MS Recipes Writer — check before publishing"
+msgid "MS Recipes AI — à vérifier avant publication"
+msgstr "MS Recipes AI — check before publishing"
 
 msgid "Mineur"
 msgstr "Minor"
@@ -768,8 +768,8 @@ msgstr "Selection"
 msgid "Sélectionner %s"
 msgstr "Select %s"
 
-msgid "Toutes les cinq minutes (MS Recipes Writer)"
-msgstr "Every five minutes (MS Recipes Writer)"
+msgid "Toutes les cinq minutes (MS Recipes AI)"
+msgstr "Every five minutes (MS Recipes AI)"
 
 msgid "Une ligne par appel"
 msgstr "One row per call"

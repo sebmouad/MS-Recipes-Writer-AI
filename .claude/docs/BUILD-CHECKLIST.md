@@ -112,6 +112,10 @@ run carries.
 - [x] A writer's photographs follow their draft, live: sent with the lot by
   `tests/real/test-flow.php`, attached to the draft it produced; removed with a
   lot deleted before any draft (`tests/real/test-upload.php`).
+- [x] Only users who can upload use the plugin, live: a contributor holding
+  `msrwa_create` gets no menu, a 403 on the compose page and on the REST
+  routes; an author sees "MS Recipes AI" and creates a lot
+  (`tests/test-admin-pages.php` offline).
 - [ ] A complete lot on Claude — the account has no credit. — the Gemini key's
   grounding quota is exhausted, OpenAI is unreachable from the test
   environment and the Claude account has no credit.

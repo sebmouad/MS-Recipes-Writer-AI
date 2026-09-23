@@ -5,9 +5,9 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.18.7
+## État actuel — 0.18.8
 
-La version `0.18.7` dit juste ce que fait le plafond par recette ; la `0.18.6` rangeait les photographies envoyées avec le brouillon qu’elles ont servi à écrire ; la `0.18.5` faisait passer un lot de trois recettes en 8 minutes pour 0,125 $ la recette, toutes approuvées ; la `0.18.4` faisait envoyer les photographies d’un lot depuis l’ordinateur du rédacteur ; la `0.18.3` faisait approuver les trois recettes d’un lot réel aux réglages par défaut — image à la une en `low`, collage en `medium` — pour 0,132 $ en moyenne ; la `0.18.2` permettait de choisir le modèle et la qualité de chaque image
+La version `0.18.8` réserve l’extension, renommée « MS Recipes AI » dans le menu, à ceux qui peuvent téléverser des fichiers ; la `0.18.7` disait juste ce que fait le plafond par recette ; la `0.18.6` rangeait les photographies envoyées avec le brouillon qu’elles ont servi à écrire ; la `0.18.5` faisait passer un lot de trois recettes en 8 minutes pour 0,125 $ la recette, toutes approuvées ; la `0.18.4` faisait envoyer les photographies d’un lot depuis l’ordinateur du rédacteur ; la `0.18.3` faisait approuver les trois recettes d’un lot réel aux réglages par défaut — image à la une en `low`, collage en `medium` — pour 0,132 $ en moyenne ; la `0.18.2` permettait de choisir le modèle et la qualité de chaque image
 séparément ; la `0.18.1` fait tenir le plafond par recette jusque dans les reprises
 de l’approbation finale ; la `0.18.0` ramène une recette complète à environ 0,11 $ réels —
 recherche web comprise — sans perte de qualité mesurée ; la `0.17.0` faisait
@@ -24,7 +24,7 @@ métadonnées SEO, ses données structurées Recipe et son aperçu de partage.
 
 | Rôle | Ce qu’il voit |
 | --- | --- |
-| Rédacteur (`msrwa_create`) | ses lots, l’état de chaque recette en une phrase, le brouillon, les remarques du contrôle final — **aucun montant, aucun modèle** |
+| Rédacteur (`msrwa_create` et `upload_files` : auteur, éditeur) | ses lots, l’état de chaque recette en une phrase, le brouillon, les remarques du contrôle final — **aucun montant, aucun modèle** |
 | Administrateur (`msrwa_manage`) | tout : coûts, plafonds, modèles, diagnostics, moteur, réglages |
 
 Ce qui fonctionne : lots multi-recettes avec appariement des photos, trois
@@ -74,6 +74,24 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.18.8
+
+**L’extension est réservée à ceux qui peuvent téléverser.** Un lot fait entrer
+des photographies dans la médiathèque ; l’extension exige donc désormais la
+capacité WordPress `upload_files` en plus de la sienne. Par défaut : auteurs,
+éditeurs et administrateurs. Un contributeur ne voit ni le menu, ni les
+écrans (refusés même par leur adresse), ni l’encadré dans l’éditeur
+d’articles, et l’API REST lui répond 403 — même s’il détenait la capacité
+`msrwa_create` d’une version précédente.
+
+**Le menu s’appelle « MS Recipes AI »**, de même que l’encadré de l’éditeur
+d’articles et l’intervalle de cron. Le nom de l’extension dans la liste des
+extensions reste « MS Recipes Writer AI ».
+
+Vérifié en réel : un contributeur portant `msrwa_create` n’a pas de menu, la
+page *Nouveau lot* lui répond 403, la file et la création de lot aussi par
+l’API ; un auteur voit « MS Recipes AI » et crée un lot.
 
 ## Version 0.18.7
 

@@ -21,10 +21,13 @@ final class MSRWA_Admin {
 
 	/** In the order the work happens: the pass, submitting, the record, the levers. */
 	public static function menu() {
+		// No upload rights, no plugin: a contributor does not see the menu at
+		// all, and a page that was never registered cannot be opened by URL.
+		if ( ! MSRWA_Rights::may_write() ) { return; }
 		$write = MSRWA_Rights::CREATE;
 		$manage = MSRWA_Rights::MANAGE;
 
-		$title = __( 'MS Recipes Writer', 'ms-recipes-writer-ai' );
+		$title = __( 'MS Recipes AI', 'ms-recipes-writer-ai' );
 		add_menu_page( $title, self::title_with_waiting( $title ), $write, 'msrwa', array( 'MSRWA_Screen_Pass', 'render' ), 'dashicons-food', 58 );
 		add_submenu_page( 'msrwa', __( 'Le pass', 'ms-recipes-writer-ai' ), __( 'Le pass', 'ms-recipes-writer-ai' ), $write, 'msrwa', array( 'MSRWA_Screen_Pass', 'render' ) );
 		add_submenu_page( 'msrwa', __( 'Nouveau lot', 'ms-recipes-writer-ai' ), __( 'Nouveau lot', 'ms-recipes-writer-ai' ), $write, 'msrwa-compose', array( 'MSRWA_Screen_Compose', 'render' ) );

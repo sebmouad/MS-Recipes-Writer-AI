@@ -43,7 +43,7 @@ final class MSRWA_REST {
 		return $response;
 	}
 
-	public static function can_create() { return current_user_can( 'msrwa_create' ) || current_user_can( 'manage_options' ); }
+	public static function can_create() { return MSRWA_Rights::may_write(); }
 	public static function can_manage() { return current_user_can( 'manage_options' ); }
 
 	/**

@@ -23,8 +23,8 @@ $GLOBALS['msrwa_test_caps'] = array( 'edit_posts' );
 $GLOBALS['msrwa_test_user'] = 7;
 $GLOBALS['msrwa_test_failures'] = array();
 
-function msrwa_test_as_editor( $user_id = 7 ) { $GLOBALS['msrwa_test_caps'] = array( 'edit_posts', 'msrwa_create', 'msrwa_view_own' ); $GLOBALS['msrwa_test_user'] = $user_id; }
-function msrwa_test_as_admin( $user_id = 1 ) { $GLOBALS['msrwa_test_caps'] = array( 'edit_posts', 'msrwa_create', 'msrwa_manage', 'msrwa_view_all', 'manage_options' ); $GLOBALS['msrwa_test_user'] = $user_id; }
+function msrwa_test_as_editor( $user_id = 7 ) { $GLOBALS['msrwa_test_caps'] = array( 'edit_posts', 'upload_files', 'msrwa_create', 'msrwa_view_own' ); $GLOBALS['msrwa_test_user'] = $user_id; }
+function msrwa_test_as_admin( $user_id = 1 ) { $GLOBALS['msrwa_test_caps'] = array( 'edit_posts', 'upload_files', 'msrwa_create', 'msrwa_manage', 'msrwa_view_all', 'manage_options' ); $GLOBALS['msrwa_test_user'] = $user_id; }
 
 /** Records a failed expectation instead of stopping, so one run reports everything. */
 function msrwa_test_assert( $condition, $message ) {
