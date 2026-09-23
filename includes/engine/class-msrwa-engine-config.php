@@ -342,6 +342,15 @@ final class MSRWA_Engine_Config {
 	}
 
 	/**
+	 * Which routing key an image step draws on: its own (`featured_image`,
+	 * `facebook_image`) when the caller set one, otherwise the shared `image`.
+	 * The two images are judged apart and can be worth different models.
+	 */
+	public function image_route( $step ) {
+		return '' !== (string) $this->get( 'routing.' . $step, '' ) ? (string) $step : 'image';
+	}
+
+	/**
 	 * How many web searches one call may run on a provider: `limits.web_searches`,
 	 * or the provider's own tool cap when that is lower — Claude's tool ships
 	 * with `max_uses` 3, and the lower of two ceilings is the one that binds.

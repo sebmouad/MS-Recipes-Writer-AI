@@ -129,8 +129,15 @@ final class MSRWA_Screen_Engine {
 		);
 		$steps = $config->steps();
 
-		$keys = array();
+		// The two images are chosen apart: each is judged on its own, and a
+		// collage can need a stronger model than a single photograph.
+		$routing_keys = array();
 		foreach ( array_keys( (array) $defaults['routing'] ) as $key ) {
+			if ( 'image' === $key ) { $routing_keys[] = 'featured_image'; $routing_keys[] = 'facebook_image'; continue; }
+			$routing_keys[] = $key;
+		}
+		$keys = array();
+		foreach ( $routing_keys as $key ) {
 			if ( isset( $steps[ $key ]['label'] ) ) {
 				$keys[ $key ] = $steps[ $key ]['label'];
 			} elseif ( 'vision' === $key ) {
@@ -146,19 +153,32 @@ final class MSRWA_Screen_Engine {
 		// provider, so the tier pickers offer all three unconditionally; only
 		// image generation is uneven across providers and models, so it lists
 		// exactly what can do it rather than pretending otherwise.
+		// Every image model the catalogue knows, fetched or shipped, and only
+		// those the engine can draw with: OpenAI's images endpoint.
 		$image_models = array();
+		$labels = array();
+		foreach ( MSRWA_Catalog::rows() as $row ) {
+			if ( 'openai' !== $row['provider'] || 'image' !== MSRWA_Catalog::role( $row['provider'], $row['model_id'] ) || false === $row['served'] ) { continue; }
+			$labels[ $row['provider'] . ':' . $row['model_id'] ] = (string) $row['label'];
+		}
 		foreach ( $catalog as $provider => $models ) {
 			foreach ( $models as $model => $info ) {
-				if ( empty( $info['image_generation'] ) ) { continue; }
-				$image_models[] = array(
-					'value' => $provider . ':' . $model,
-					'label' => ( $providers[ $provider ] ?? $provider ) . ' — ' . $info['label'],
-				);
+				if ( ! empty( $info['image_generation'] ) && ! isset( $labels[ $provider . ':' . $model ] ) ) { $labels[ $provider . ':' . $model ] = (string) $info['label']; }
 			}
+		}
+		foreach ( $labels as $value => $label ) {
+			list( $provider ) = explode( ':', $value, 2 );
+			$image_models[] = array( 'value' => $value, 'label' => ( $providers[ $provider ] ?? $provider ) . ' — ' . $label );
 		}
 
 		$current = array();
-		foreach ( array_keys( $keys ) as $key ) { $current[ $key ] = $config->model_for( $key )['route']; }
+		foreach ( array_keys( $keys ) as $key ) {
+			$current[ $key ] = $config->model_for( in_array( $key, array( 'featured_image', 'facebook_image' ), true ) ? $config->image_route( $key ) : $key )['route'];
+		}
+		$quality = array(
+			'featured_image' => (string) $config->get( 'images.featured_quality', 'medium' ),
+			'facebook_image' => (string) $config->get( 'images.facebook_quality', 'medium' ),
+		);
 
 		// What each choice actually resolves to. A provider and a quality name
 		// are not an answer to "which model will run and what will it cost" —
@@ -199,6 +219,8 @@ final class MSRWA_Screen_Engine {
 			'current' => $current,
 			'resolved' => $resolved,
 			'thinking' => array_map( 'strval', (array) $config->get( 'thinking', array() ) ),
+			'imageQuality' => $quality,
+			'qualities' => array_values( array_diff( MSRWA_Images::qualities(), array( 'auto' ) ) ),
 			'thinkingLevels' => MSRWA_Engine_Config::thinking_levels(),
 			'labels' => array(
 				'thinkingDefault' => __( 'par défaut', 'ms-recipes-writer-ai' ),
@@ -217,7 +239,7 @@ final class MSRWA_Screen_Engine {
 					<th scope="col"><?php esc_html_e( 'Étape', 'ms-recipes-writer-ai' ); ?></th>
 					<th scope="col"><?php esc_html_e( 'Fournisseur et niveau', 'ms-recipes-writer-ai' ); ?></th>
 					<th scope="col"><?php esc_html_e( 'Modèle qui tournera', 'ms-recipes-writer-ai' ); ?></th>
-					<th scope="col"><?php esc_html_e( 'Réflexion', 'ms-recipes-writer-ai' ); ?></th>
+					<th scope="col"><?php esc_html_e( 'Réflexion ou qualité', 'ms-recipes-writer-ai' ); ?></th>
 				</tr></thead>
 				<tbody></tbody>
 			</table>

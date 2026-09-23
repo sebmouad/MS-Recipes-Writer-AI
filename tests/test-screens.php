@@ -81,7 +81,12 @@ msrwa_test_contains( $engine['html'] ?? '', 'id="ms-engine-routing-picker"', 'Th
 if ( preg_match( '/id="ms-engine-routing-data">(.*?)<\/script>/s', $engine['html'] ?? '', $match ) ) {
 	$picker_data = json_decode( $match[1], true );
 	msrwa_test_assert( is_array( $picker_data ), 'The routing picker embeds valid JSON.' );
-	foreach ( array_keys( MSRWA_Engine_Settings::defaults()['routing'] ) as $key ) {
+	// The shared image route is offered as two rows, one per image, each with
+	// its own model and quality.
+	$expected = array_merge( array_diff( array_keys( MSRWA_Engine_Settings::defaults()['routing'] ), array( 'image' ) ), array( 'featured_image', 'facebook_image' ) );
+	msrwa_test_assert( ! isset( $picker_data['keys']['image'] ), 'The images are not chosen together any more.' );
+	msrwa_test_assert( isset( $picker_data['imageQuality']['featured_image'], $picker_data['imageQuality']['facebook_image'] ), 'Each image has its own quality in the picker.' );
+	foreach ( $expected as $key ) {
 		msrwa_test_assert( isset( $picker_data['keys'][ $key ], $picker_data['current'][ $key ] ), 'The routing picker names route ' . $key . '.' );
 	}
 	msrwa_test_assert( ! empty( $picker_data['imageModels'] ), 'The routing picker lists at least one image-capable model.' );

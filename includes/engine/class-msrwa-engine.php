@@ -444,7 +444,7 @@ final class MSRWA_Engine {
 	 */
 	private static function draw( $name, MSRWA_Engine_Config $config, MSRWA_Result $result, array $options, array $findings = array() ) {
 		$kind = 'facebook_image' === $name ? 'facebook' : 'featured';
-		$route = $config->model_for( 'image' );
+		$route = $config->model_for( $config->image_route( $name ) );
 		$settings = MSRWA_Engine_Input::settings();
 		$brief = self::working_set( $name, $result );
 

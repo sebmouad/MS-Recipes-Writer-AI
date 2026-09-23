@@ -74,6 +74,17 @@ $capped = MSRWA_Estimate::recipe( MSRWA_Profile::ARTICLE, array( 'thinking' => a
 $route = MSRWA_Engine_Config::create()->model_for( 'article' );
 msrwa_test_assert( abs( $capped['steps']['article']['cost_usd'] - round( MSRWA_Engine_Config::create()->price( $route['provider'], $route['model'], array( 'input_tokens' => 6900, 'output_tokens' => 256 ) ), 6 ) ) < 1e-9, 'Never past the ceiling, whatever the level.' );
 
+// Each image has its own model and quality, and the estimate follows both.
+$split = MSRWA_Estimate::recipe( MSRWA_Profile::FULL, array( 'images' => array( 'featured_quality' => 'high', 'facebook_quality' => 'low' ) ) );
+msrwa_test_assert( 'high' === $split['steps']['featured_image']['quality'] && 'low' === $split['steps']['facebook_image']['quality'], 'Each image is estimated at its own quality.' );
+msrwa_test_assert( $split['steps']['featured_image']['cost_usd'] > $full['steps']['featured_image']['cost_usd'] * 2, 'High quality is priced well above medium (measured: $0.061 against $0.021).' );
+msrwa_test_assert( $split['steps']['facebook_image']['cost_usd'] < $full['steps']['facebook_image']['cost_usd'], 'Low is priced below medium.' );
+$routed = MSRWA_Estimate::recipe( MSRWA_Profile::FULL, array( 'routing' => array( 'facebook_image' => 'openai:gpt-image-2' ) ) );
+msrwa_test_assert( 'openai:gpt-image-2' === ( $routed['steps']['facebook_image']['model'] ?? '' ), 'The collage can be drawn by its own model.' );
+msrwa_test_assert( 'openai:gpt-image-2.5-flare' === $routed['steps']['featured_image']['model'], 'While the featured image keeps the shared one.' );
+msrwa_test_assert( 'facebook_image' === MSRWA_Engine_Config::create( array( 'routing' => array( 'facebook_image' => 'openai:gpt-image-2' ) ) )->image_route( 'facebook_image' ), 'A step with its own route uses it.' );
+msrwa_test_assert( 'image' === MSRWA_Engine_Config::create()->image_route( 'featured_image' ), 'Otherwise the shared image route.' );
+
 // Asking for less must cost less, in the bucket it was removed from.
 $featured = MSRWA_Estimate::recipe( MSRWA_Profile::FEATURED );
 $article = MSRWA_Estimate::recipe( MSRWA_Profile::ARTICLE );

@@ -1687,6 +1687,9 @@ msgstr "إذا رفضت الموافقة النهائية في كل محاولة
 msgid "lu sur la page du fournisseur"
 msgstr "مقروء من صفحة المزوّد"
 
+msgid "Réflexion ou qualité"
+msgstr "التفكير أو الجودة"
+
 msgid "aucune page citée"
 msgstr "لم تُذكر أي صفحة"
 

@@ -129,7 +129,7 @@ final class MSRWA_Diagnostics {
 		foreach ( $config->steps() as $step => $definition ) {
 			$capability = (string) ( $definition['capability'] ?? '' );
 			if ( 'none' === $capability ) { continue; }
-			$route = $config->model_for( MSRWA_Estimate::route_for( $step, $capability ) );
+			$route = $config->model_for( MSRWA_Estimate::route_for( $step, $capability, $config ) );
 			$provider = $config->provider( $route['provider'], $route['model'] );
 			if ( empty( $provider['has_key'] ) ) { $keyless[ $route['provider'] ] = $route['provider']; }
 			if ( null === $config->price( $route['provider'], $route['model'], array() ) ) { $unpriced[ $route['model'] ] = $route['model']; }

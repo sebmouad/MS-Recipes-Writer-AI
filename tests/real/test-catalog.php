@@ -72,6 +72,16 @@ msrwa_real_assert( 'high' === ( $harder['body']['routes']['article']['thinking']
 msrwa_real_assert( (float) ( $harder['body']['cost_usd'] ?? 0 ) > (float) ( $simulation['body']['cost_usd'] ?? 0 ), 'Thinking harder is simulated as costing more.' );
 msrwa_real_note( 'the same recipe at high thinking: $' . number_format( (float) ( $harder['body']['cost_usd'] ?? 0 ), 4 ) );
 
+// Each image has its own model and quality, and the simulation prices each.
+$images = msrwa_real_request( 'POST', '/msrwa/v1/diagnostics/config', array( 'config' => array(
+	'routing' => wp_json_encode_compat( array( 'featured_image' => 'openai:gpt-image-2.5-flare', 'facebook_image' => 'openai:gpt-image-2' ) ),
+	'images' => wp_json_encode_compat( array( 'featured_quality' => 'high', 'facebook_quality' => 'low' ) ),
+) ) );
+$by_step = (array) ( $images['body']['routes'] ?? array() );
+msrwa_real_assert( 'gpt-image-2.5-flare' === ( $by_step['featured_image']['route']['model'] ?? '' ) && 'gpt-image-2' === ( $by_step['facebook_image']['route']['model'] ?? '' ), 'Each image is simulated on its own model.' );
+msrwa_real_assert( (float) ( $by_step['featured_image']['cost_usd'] ?? 0 ) > (float) ( $by_step['facebook_image']['cost_usd'] ?? 0 ), 'A high-quality featured image is priced above a low-quality collage.' );
+msrwa_real_note( 'featured at high $' . number_format( (float) ( $by_step['featured_image']['cost_usd'] ?? 0 ), 4 ) . ', collage at low $' . number_format( (float) ( $by_step['facebook_image']['cost_usd'] ?? 0 ), 4 ) );
+
 msrwa_real_done( 'the catalogue keeps what it can use and prices it from the providers’ pages' );
 
 function wp_parse_url_compat( $url ) { return parse_url( (string) $url, PHP_URL_HOST ); }

@@ -37,11 +37,11 @@ final class MSRWA_Operations {
 				// for its route or its prompt is asking a question with no answer.
 				if ( 'none' === ( $step['capability'] ?? '' ) ) { continue; }
 				$prompt = $config->prompt( $name );
-				$route = $config->model_for( MSRWA_Estimate::route_for( $name, (string) ( $step['capability'] ?? '' ) ) );
+				$route = $config->model_for( MSRWA_Estimate::route_for( $name, (string) ( $step['capability'] ?? '' ), $config ) );
 				$wire = $config->provider( $route['provider'], $route['model'], $name );
 				$routes[ $name ] = array(
 					'route' => $route, 'provider_known' => (bool) $wire, 'has_key' => ! empty( $wire['has_key'] ),
-					'thinking' => 'image' === MSRWA_Estimate::route_for( $name, (string) ( $step['capability'] ?? '' ) ) ? '' : (string) ( $wire['thinking_level'] ?? '' ),
+					'thinking' => 'image_generation' === ( $step['capability'] ?? '' ) ? '' : (string) ( $wire['thinking_level'] ?? '' ),
 					'price_known' => null !== $config->price( $route['provider'], $route['model'], array() ),
 					'cost_usd' => $estimate['steps'][ $name ]['cost_usd'] ?? null,
 					'prompt_source' => $prompt['source'], 'prompt_bytes' => strlen( $prompt['text'] ), 'max_output' => $config->max_output( $name ), 'attempts' => $config->attempts( $name ),

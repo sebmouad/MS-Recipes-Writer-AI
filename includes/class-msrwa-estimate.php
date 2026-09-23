@@ -62,7 +62,7 @@ final class MSRWA_Estimate {
 			// one of them to `routing.image`. Asking for the step's route gave
 			// the text model and priced a collage at a twenty-fifth of what it
 			// really costs.
-			$route = $config->model_for( self::route_for( $name, $capability ) );
+			$route = $config->model_for( self::route_for( $name, $capability, $config ) );
 			$usage = $shape[ $name ] ?? array( 'input' => 5000, 'output' => 2000 );
 			// The ceiling is what the caller will be billed for if the model
 			// runs long, so an estimate uses the smaller of the two rather than
@@ -70,6 +70,11 @@ final class MSRWA_Estimate {
 			// Thinking above the level the shapes were measured at is extra output;
 			// the ceiling still caps the lot, because nothing is billed past it.
 			$thinking = 'image_generation' === $capability ? '' : $config->thinking( $name, $route['provider'] );
+			// An image is billed by the tokens it is drawn with, and its quality
+			// decides how many: the shapes are the `medium` drawing.
+			if ( 'image_generation' === $capability ) {
+				$usage['output'] = (int) round( $usage['output'] * self::quality_factor( (string) $config->get( 'images.' . ( 'facebook_image' === $name ? 'facebook' : 'featured' ) . '_quality', 'medium' ) ) );
+			}
 			$usage['output'] = min( max( (int) ( $usage['output'] / 2 ), (int) $usage['output'] + MSRWA_Engine_Config::thinking_allowance( $thinking ) ), $config->max_output( $name ) );
 
 			$searches = 'web_search' === $capability ? min( (int) ( $usage['searches'] ?? 2 ), $config->web_searches( $route['provider'] ) ) : 0;
@@ -88,6 +93,7 @@ final class MSRWA_Estimate {
 			$steps[ $name ] = array(
 				'model' => $route['provider'] . ':' . $route['model'],
 				'thinking' => $thinking,
+				'quality' => 'image_generation' === $capability ? (string) $config->get( 'images.' . ( 'facebook_image' === $name ? 'facebook' : 'featured' ) . '_quality', 'medium' ) : '',
 				'searches' => $searches,
 				'bucket' => MSRWA_Engine_Steps::bucket( $name, $registry ),
 				'cost_usd' => round( (float) $cost, 6 ),
@@ -124,6 +130,17 @@ final class MSRWA_Estimate {
 			'buckets' => array_map( static function ( $value ) { return round( $value, 6 ); }, $buckets ),
 			'unpriced' => $unknown,
 		);
+	}
+
+	/**
+	 * Output tokens an image quality draws, against `medium`. Measured on
+	 * gpt-image-2.5-flare, 2026-09-23: a 1024×1024 featured image drew 196,
+	 * 439, 1 756, 3 122 and 7 024 tokens from low to max ($0.014 to $0.219);
+	 * the 1024×1536 collage followed the same ratios (158, 343, 1 372).
+	 */
+	public static function quality_factor( $quality ) {
+		$factors = array( 'low' => 0.45, 'medium' => 1.0, 'high' => 4.0, 'xhigh' => 7.2, 'max' => 16.0 );
+		return $factors[ $quality ] ?? 1.0;
 	}
 
 	/** One look at one photograph: the shape the matcher and research both pay. */
@@ -170,8 +187,8 @@ final class MSRWA_Estimate {
 	}
 
 	/** Which routing key the engine will actually use for a step. */
-	public static function route_for( $name, $capability ) {
-		if ( 'image_generation' === $capability ) { return 'image'; }
+	public static function route_for( $name, $capability, $config = null ) {
+		if ( 'image_generation' === $capability ) { return $config instanceof MSRWA_Engine_Config ? $config->image_route( $name ) : 'image'; }
 		if ( 'vision' === $capability ) { return 'vision'; }
 		return $name;
 	}

@@ -1671,6 +1671,9 @@ msgstr "If the final approval refuses at every attempt and has the images redraw
 msgid "lu sur la page du fournisseur"
 msgstr "read from the provider’s page"
 
+msgid "Réflexion ou qualité"
+msgstr "Thinking or quality"
+
 msgid "aucune page citée"
 msgstr "no page cited"
 

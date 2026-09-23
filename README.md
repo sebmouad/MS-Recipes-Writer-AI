@@ -5,9 +5,10 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.18.1
+## État actuel — 0.18.2
 
-La version `0.18.1` fait tenir le plafond par recette jusque dans les reprises
+La version `0.18.2` permet de choisir le modèle et la qualité de chaque image
+séparément ; la `0.18.1` fait tenir le plafond par recette jusque dans les reprises
 de l’approbation finale ; la `0.18.0` ramène une recette complète à environ 0,11 $ réels —
 recherche web comprise — sans perte de qualité mesurée ; la `0.17.0` faisait
 tenir l’estimation face à la facture ; la `0.16.0` permettait de régler la
@@ -73,6 +74,34 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.18.2
+
+**Chaque image a son modèle et sa qualité.** Le sélecteur « Modèle par étape »
+de l’écran Moteur propose deux lignes au lieu d’une : *Image à la une* et
+*Collage Facebook*, chacune avec son modèle (tous les modèles d’image du
+catalogue, relevés ou livrés) et sa qualité — pour un modèle d’image, la
+qualité *est* l’effort : il n’a pas de niveau de réflexion. Le moteur lit
+`routing.featured_image` et `routing.facebook_image`, et à défaut
+`routing.image` ; les qualités restent `images.featured_quality` et
+`images.facebook_quality`.
+
+**L’estimation suit la qualité.** Elle comptait chaque image en `medium` quelle
+que soit la qualité choisie. Mesuré en réel sur gpt-image-2.5-flare, une image
+à la une 1024×1024 :
+
+| Qualité | Jetons dessinés | Coût |
+| --- | ---: | ---: |
+| low | 196 | 0,0142 $ |
+| medium | 439 | ≈ 0,021 $ |
+| high | 1 756 | 0,0610 $ |
+| xhigh | 3 122 | 0,1020 $ |
+| max | 7 024 | 0,2191 $ |
+
+Le collage suit les mêmes rapports (158, 343, 1 372 jetons). La simulation
+chiffre désormais une image à la une en `high` à 0,0618 $ et un collage en
+`low` à 0,0227 $ — 0,0610 $ et 0,0215 $ en réel. Vérifié en réel : image à la une
+par gpt-image-2.5-flare, collage par gpt-image-2, chacun à sa qualité.
 
 ## Version 0.18.1
 

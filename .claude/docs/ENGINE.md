@@ -411,6 +411,12 @@ here, approved, and are in. `tests/test-engine-language.php` holds them.
     drives the loop through `MSRWA_Engine_Call::$transport`, a test seam that
     is null in production.
 
+14. **A model per image.** `draw()` routes through
+    `MSRWA_Engine_Config::image_route()`: `routing.featured_image` or
+    `routing.facebook_image` when set, otherwise `routing.image`. Quality was
+    already per image (`images.<kind>_quality`); the estimate now prices it,
+    from real token counts per quality (`MSRWA_Estimate::quality_factor()`).
+
 ### Still open
 
 6. **The engine's `models` list is a second source of truth for prices.** The

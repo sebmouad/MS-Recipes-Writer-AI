@@ -372,6 +372,15 @@
       thinkingField.value = JSON.stringify(value, null, 4);
     }
 
+    var imagesField = document.getElementById('ms-engine-images');
+    function writeImageQuality(key, quality) {
+      if (!imagesField) return;
+      var value;
+      try { value = JSON.parse(imagesField.value || '{}') || {}; } catch (error) { return; }
+      value[('featured_image' === key ? 'featured' : 'facebook') + '_quality'] = quality;
+      imagesField.value = JSON.stringify(value, null, 4);
+    }
+
     function option(value, label, selected) {
       var el = document.createElement('option');
       el.value = value;
@@ -391,7 +400,8 @@
       var current = parseRoute(schema.current[key]);
       var controlCell = document.createElement('td');
 
-      if ('image' === key) {
+      var isImage = 'featured_image' === key || 'facebook_image' === key;
+      if (isImage) {
         var modelSelect = document.createElement('select');
         modelSelect.className = 'ms-route-model';
         schema.imageModels.forEach(function (entry) {
@@ -479,9 +489,17 @@
       });
       describe();
 
-      // An image model does not think; every other route may be told how hard to.
+      // An image model does not think: its effort is its quality, one per image,
+      // written into the `images` group. Every other route may be told how hard to think.
       var thinkingCell = document.createElement('td');
-      if ('image' !== key) {
+      if (isImage) {
+        var qualitySelect = document.createElement('select');
+        qualitySelect.className = 'ms-route-quality';
+        var current = (schema.imageQuality || {})[key] || 'medium';
+        (schema.qualities || []).forEach(function (name) { qualitySelect.appendChild(option(name, name, name === current)); });
+        qualitySelect.addEventListener('change', function () { writeImageQuality(key, qualitySelect.value); });
+        thinkingCell.appendChild(qualitySelect);
+      } else {
         var thinkingSelect = document.createElement('select');
         thinkingSelect.className = 'ms-route-thinking';
         var level = (schema.thinking || {})[key] || '';
