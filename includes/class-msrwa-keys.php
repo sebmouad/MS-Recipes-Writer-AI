@@ -48,8 +48,7 @@ final class MSRWA_Keys {
 			// be caught before a lot pays its way to that step.
 			$listed = self::models( $provider, wp_remote_retrieve_body( $response ) );
 			if ( $listed && class_exists( 'MSRWA_Catalog' ) ) {
-				MSRWA_Catalog::remember_listing( $provider, $listed );
-				$verdict['models'] = count( $listed );
+				$verdict['models'] = MSRWA_Catalog::remember_listing( $provider, $listed );
 			}
 
 			$out[ $provider ] = array( 'label' => $probe['label'] ) + $verdict;
