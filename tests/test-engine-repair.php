@@ -59,6 +59,16 @@ msrwa_test_assert( 1 === count( $result->artifacts['proofread']['approval_repair
 msrwa_test_assert( false === strpos( $seen[1], 'renforce le go' ), 'The second verdict is asked about the repaired article.' );
 msrwa_test_assert( ! empty( $result->artifacts['approval']['approved'] ), 'The repaired article is approved.' );
 
+// The proofread's own log of what it changed quotes sentences that are gone.
+// Sent as part of the article, the judge refused one of them.
+$calls = array();
+$seen = array();
+$logged = $input;
+$logged['artifacts']['proofread']['changes'] = array( array( 'type' => 'grammar', 'before' => 'Une phrase disparue du texte.', 'after' => 'Mouillez au bouillon.' ) );
+$answers = array( $verdict( true, array() ) );
+MSRWA_Engine::run_step( 'final_approval', $logged, $config );
+msrwa_test_assert( false === strpos( $seen[0], 'disparue' ), 'The judge is not shown the proofread change log.' );
+
 // A finding without a usable quote needs a person: nothing is patched and the
 // judge is not asked again.
 $calls = array();

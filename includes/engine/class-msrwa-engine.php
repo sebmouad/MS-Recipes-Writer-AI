@@ -636,8 +636,9 @@ final class MSRWA_Engine {
 			}
 		}
 		// What was corrected is the editor's record, not the article: sent along, it
-		// put every sentence already removed back in front of the judge.
-		$article = array_diff_key( $article, array_flip( array( 'corrections_applied', 'corrections_for_the_editor', 'approval_repairs' ) ) );
+		// put every sentence already removed back in front of the judge, who then
+		// refused an article over a sentence the proofread had already fixed.
+		$article = array_diff_key( $article, array_flip( array( 'corrections_applied', 'corrections_for_the_editor', 'approval_repairs', 'changes', 'clean' ) ) );
 
 		// A rewrite carries what the reviews found; a first draft carries nothing.
 		$feedback = array();

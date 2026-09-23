@@ -106,6 +106,9 @@ run carries.
   the media library, live (`tests/real/test-upload.php`, 1/1): a fake photo
   refuses the lot and adds nothing; a real one becomes the writer's
   attachment. Offline: `tests/test-intake.php`.
+- [x] A lot does not wait for a visitor between waves, live: three recipes in
+  8 min 06 s with one visit a minute (14 min 18 s before, with one every
+  20 s), 3/3 approved at $0.125 per recipe, one collage redraw in three.
 - [ ] A complete lot on Claude — the account has no credit. — the Gemini key's
   grounding quota is exhausted, OpenAI is unreachable from the test
   environment and the Claude account has no credit.

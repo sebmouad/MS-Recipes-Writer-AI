@@ -433,6 +433,13 @@ here, approved, and are in. `tests/test-engine-language.php` holds them.
     correction logs to later steps, which put removed sentences back in front
     of the judge.
 
+16. **The judge sees the article, not its history.** `working_set()` also
+    drops the proofread's `changes` and `clean`: the change log quotes the
+    sentences it replaced, and the final approval refused an article over one
+    of them. The final-approval prompt now says a count is minor in the
+    collage too, even where the visual brief states one; collage redraws fell
+    from six to one on the same three recipes.
+
 ### Still open
 
 6. **The engine's `models` list is a second source of truth for prices.** The

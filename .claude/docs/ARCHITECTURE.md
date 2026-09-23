@@ -43,6 +43,11 @@ next. Nothing is held between ticks: a request the host kills costs at most the
 wave it was in, `MSRWA_Run::recover_expired()` returns the lease, and the run
 resumes from the last step that finished.
 
+A tick keeps starting waves for up to `MSRWA_Run::TICK_SECONDS` (150 s),
+renewing its lease before each: WordPress's cron fires only on a visit, and a
+recipe that handed every wave back waited for a visitor seven times. Each wave
+is still written down before the next begins.
+
 Between two ticks a run is `running` with no lease, and only its cron event
 carries it on. WordPress keeps every event in one option, so workers finishing
 together can overwrite each other's next event — two of three recipes in a

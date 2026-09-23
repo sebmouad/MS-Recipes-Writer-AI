@@ -5,9 +5,9 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.18.4
+## État actuel — 0.18.5
 
-La version `0.18.4` fait envoyer les photographies d’un lot depuis l’ordinateur du rédacteur ; la `0.18.3` faisait approuver les trois recettes d’un lot réel aux réglages par défaut — image à la une en `low`, collage en `medium` — pour 0,132 $ en moyenne ; la `0.18.2` permettait de choisir le modèle et la qualité de chaque image
+La version `0.18.5` fait passer un lot de trois recettes en 8 minutes pour 0,125 $ la recette, toutes approuvées ; la `0.18.4` faisait envoyer les photographies d’un lot depuis l’ordinateur du rédacteur ; la `0.18.3` faisait approuver les trois recettes d’un lot réel aux réglages par défaut — image à la une en `low`, collage en `medium` — pour 0,132 $ en moyenne ; la `0.18.2` permettait de choisir le modèle et la qualité de chaque image
 séparément ; la `0.18.1` fait tenir le plafond par recette jusque dans les reprises
 de l’approbation finale ; la `0.18.0` ramène une recette complète à environ 0,11 $ réels —
 recherche web comprise — sans perte de qualité mesurée ; la `0.17.0` faisait
@@ -74,6 +74,48 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.18.5
+
+**Mesuré en réel, aux réglages par défaut**, le même lot de trois recettes
+qu’en 0.18.3, le site n’étant visité qu’une fois par minute (l’équivalent d’un
+cron serveur) : **3 recettes sur 3 approuvées**, **0,125 $ la recette** en
+moyenne (0,132 $, 0,126 $, 0,118 $ ; estimé 0,121 $), **8 min 06 s** pour le
+lot entier, contre 14 min 18 s en 0.18.3 avec une visite toutes les 20 s.
+
+| Étape | Durée moyenne | Coût moyen | Estimé |
+| --- | ---: | ---: | ---: |
+| Recherche (web, ≤ 3 recherches) | 47 s | 0,0291 $ | 0,0369 $ |
+| Recette canonique | 19 s | 0,0033 $ | 0,0040 $ |
+| Article | 49 s | 0,0085 $ | 0,0087 $ |
+| Image à la une (`low`) | 10 s | 0,0149 $ | 0,0149 $ |
+| Collage Facebook (`medium`) | 15 s | 0,0293 $ | 0,0284 $ |
+| Revue | 18 s | 0,0037 $ | 0,0043 $ |
+| Vérification des faits | 43 s | 0,0073 $ | 0,0075 $ |
+| Correction de la langue | 49 s | 0,0096 $ | 0,0105 $ |
+| Approbation finale (1 ou 2 passages) | 43 s | 0,0103 $ | 0,0061 $ |
+| Collage redessiné (1 recette sur 3) | 16 s | 0,028 $ | — |
+| **Recette complète** | **282–334 s** | **0,125 $** | 0,121 $ |
+
+**Un lot n’attend plus un visiteur entre deux étapes.** Le cron de WordPress
+ne se déclenche qu’à une visite ; chaque recette rendait la main après chaque
+vague — sept par recette — et attendait la visite suivante. Un passage de
+cron enchaîne désormais les vagues d’une recette pendant 150 s au plus, en
+enregistrant chacune avant la suivante : une requête interrompue ne coûte
+toujours qu’une vague.
+
+**L’approbation finale ne juge plus une phrase déjà corrigée.** Le journal
+des modifications de la correction (« avant », « après ») partait avec
+l’article ; le juge y lisait l’ancienne phrase et refusait l’article pour un
+défaut qui n’existait plus.
+
+**Un nombre dans le collage n’est plus bloquant.** Trois carottes sur la
+planche au lieu de deux, un bol qui semble contenir plus de pommes de terre :
+le prompt de l’approbation disait déjà qu’un nombre est mineur, mais le juge
+l’appliquait à la liste des ingrédients et pas au collage, ni quand le brief
+visuel donne un nombre. Les redessins du collage — 0,03 $ chacun — passent de
+six à un sur trois recettes. Un ingrédient ajouté ou une étape dans le
+désordre restent bloquants.
 
 ## Version 0.18.4
 

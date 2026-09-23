@@ -20,6 +20,16 @@ final class MSRWA_Run {
 	/** How long one wave may hold a run before another worker may take it over. */
 	const LEASE_MINUTES = 15;
 
+	/**
+	 * How long one tick keeps starting waves. WordPress's cron fires only on a
+	 * visit, so a recipe that handed every wave back to cron waited for a
+	 * visitor between each of its seven waves; on a quiet site a lot stalled
+	 * whenever nobody was looking. A wave already running is always finished,
+	 * and the longest takes some 100 s, so a tick ends inside the 300 s many
+	 * hosts allow a request.
+	 */
+	const TICK_SECONDS = 150;
+
 	private static function table() {
 		$t = MSRWA_DB::tables();
 		return $t['runs'];
@@ -98,8 +108,21 @@ final class MSRWA_Run {
 
 		$run = self::get( $id );
 		if ( ! $run ) { return; }
+		$started = microtime( true );
 		try {
-			self::advance( $run, $token );
+			// Each wave is written down before the next starts, so a request the
+			// host kills still costs at most the wave it was in.
+			while ( self::advance( $run, $token ) ) {
+				$run = self::get( $id );
+				$carry_on = $run && 'running' === $run['status']
+					&& microtime( true ) - $started < self::TICK_SECONDS
+					&& ! MSRWA_Queue::held() && '' === MSRWA_Budget::refusal()
+					&& self::renew( $id, $token );
+				if ( ! $carry_on ) {
+					if ( $run && 'running' === $run['status'] ) { self::release( $id, $token ); self::queue( $id, 2 ); }
+					return;
+				}
+			}
 		} catch ( Throwable $error ) {
 			// The engine does not throw; WordPress, the database and PHP still can.
 			self::finish( $id, 'failed', $error->getMessage() );
@@ -120,6 +143,7 @@ final class MSRWA_Run {
 	 * The engine is asked for one wave with `only`, and handed every artifact
 	 * produced so far, so it resumes where the last tick stopped. The budget
 	 * passed is what is left of it, not the figure the batch started with.
+	 * Returns whether the run has more to do.
 	 */
 	private static function advance( array $run, $token ) {
 		$id = (int) $run['id'];
@@ -137,7 +161,7 @@ final class MSRWA_Run {
 		$batch = MSRWA_Batch::get( (int) $run['batch_id'] );
 		$wanted = MSRWA_Profile::steps( $batch ? $batch['profile'] : MSRWA_Profile::FULL, $registry );
 		$remaining = array_values( array_diff( $wanted, $done ) );
-		if ( ! $remaining ) { self::complete( $id, $state ); return; }
+		if ( ! $remaining ) { self::complete( $id, $state ); return false; }
 
 		$wave = MSRWA_Engine_Steps::ready( $artifacts, $remaining, $registry );
 		if ( ! $wave ) {
@@ -146,12 +170,12 @@ final class MSRWA_Run {
 				__( 'En attente de : %s, qui n’est jamais arrivé.', 'ms-recipes-writer-ai' ),
 				implode( ', ', MSRWA_Engine_Steps::missing( $remaining[0], $artifacts, $registry ) )
 			) );
-			return;
+			return false;
 		}
 
 		$spent = (float) $run['cost_usd'];
 		$budget = (float) ( $config['limits']['budget_usd'] ?? 0 );
-		if ( $budget > 0 && $spent >= $budget ) { self::finish( $id, 'failed', sprintf( 'Plafond de %.4f $ atteint avant %s.', $budget, implode( ', ', $wave ) ) ); return; }
+		if ( $budget > 0 && $spent >= $budget ) { self::finish( $id, 'failed', sprintf( 'Plafond de %.4f $ atteint avant %s.', $budget, implode( ', ', $wave ) ) ); return false; }
 		if ( $budget > 0 ) { $config['limits']['budget_usd'] = max( 0.000001, $budget - $spent ); }
 
 		$workspace = self::workspace( $id );
@@ -165,9 +189,7 @@ final class MSRWA_Run {
 		self::absorb( $id, $state, $result->to_array() );
 
 		$run = self::get( $id );
-		if ( ! $run || 'running' !== $run['status'] ) { return; }
-		self::release( $id, $token );
-		self::queue( $id, 2 );
+		return $run && 'running' === $run['status'];
 	}
 
 	/**
@@ -476,6 +498,12 @@ final class MSRWA_Run {
 		global $wpdb;
 		$fields['updated_at'] = current_time( 'mysql', true );
 		$wpdb->update( self::table(), $fields, array( 'id' => absint( $id ) ) );
+	}
+
+	/** Extends the lease this tick holds; false when it is no longer this tick's. */
+	private static function renew( $id, $token ) {
+		global $wpdb;
+		return (bool) $wpdb->query( $wpdb->prepare( 'UPDATE ' . self::table() . ' SET lock_until = DATE_ADD(UTC_TIMESTAMP(), INTERVAL ' . (int) self::LEASE_MINUTES . ' MINUTE) WHERE id = %d AND lock_token = %s', absint( $id ), $token ) );
 	}
 
 	private static function release( $id, $token ) {
