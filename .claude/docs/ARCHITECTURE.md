@@ -207,11 +207,19 @@ is handed generated `models` and `tiers` through the caller layer it already
 accepts. No engine change was needed: both groups were already overridable, and
 a group typed by hand still wins over the generated one.
 
-Tiers are derived rather than stored: the cheapest, middle and dearest of what
-the site actually has, among models that are priced and known to write. That is
-what stops a tier naming a model nobody priced or the provider retired. They
-are the text routes only — image generation names its model outright — which is
-why "known to write" is required and not assumed.
+Tiers are derived rather than stored: the engine's own choice for each tier
+when the site has that model enabled, priced, served and known to write, and
+otherwise the cheapest, middle and dearest of what the site actually has. That
+is what stops a tier naming a model nobody priced or the provider retired,
+without letting a model's place in a price list decide what every step runs
+on. They are the text routes only — image generation names its model outright —
+which is why "known to write" is required and not assumed.
+
+What a provider lists is filtered before it is stored: `MSRWA_Catalog::role()`
+keeps the chat and image families the engine can call and nothing else, so
+speech, music, video, embeddings, dated snapshots and retired generations never
+become rows. Rates that shipped are brought up to date on each version; a rate a
+person typed or a model looked up never is.
 
 It holds three kinds of knowledge, deliberately kept apart. which identifiers exist, which only the provider knows and which is
 fetched; what they cost, which no provider API states — checked against all

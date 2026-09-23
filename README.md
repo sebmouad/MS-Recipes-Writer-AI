@@ -5,9 +5,11 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.13.0
+## État actuel — 0.14.0
 
-La version `0.13.0` est installable et vérifiée de bout en bout sur un vrai
+La version `0.14.0` corrige ce que coûte réellement un appel et ce que le
+catalogue garde ; voir ci-dessous ce qui a été vérifié en conditions réelles et
+ce qui ne l’a pas été. La `0.13.0` était installable et vérifiée de bout en bout sur un vrai
 WordPress (7.1.1) : un lot part, le cron le fait avancer vague par vague, et un
 brouillon arrive **en blocs**, avec son article, sa recette, son extrait, son
 identifiant d’URL, ses étiquettes, ses images attachées et décrites, ses
@@ -65,6 +67,60 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.14.0
+
+**Les jetons de réflexion de Gemini n’étaient pas comptés.** Google facture la
+réflexion comme de la sortie mais la déclare à part (`thoughtsTokenCount`), et
+le moteur ne lisait que `candidatesTokenCount`. Mesuré en réel sur
+`gemini-3.6-flash` : 5 jetons visibles, 2 717 de réflexion — l’appel était
+compté à 1/500ᵉ de son prix. Même oubli pour ce qu’un outil lit
+(`toolUsePromptTokenCount`, 8 973 jetons pour une page de tarifs), pour les
+lectures et écritures de cache de Claude, et pour les recherches web, facturées
+à la requête par les trois fournisseurs (0,01 $ ; 0,014 $ chez Google). Le
+moteur les compte désormais ; l’estimation de la recherche inclut ses trois
+recherches. Changement du moteur fait à la demande du propriétaire, consigné
+dans [`.claude/docs/ENGINE.md`](.claude/docs/ENGINE.md) §7.
+
+**`medium` coûtait dix fois trop cher sur un site neuf.** Les paliers étaient
+reconstruits en triant par prix les modèles « capables d’écrire », mais les
+modèles venus de la liste du moteur (`gpt-5-nano`, `gpt-5.4-mini`) n’étaient
+marqués capables de rien : le milieu de la liste OpenAI devenait Terra
+(2 $/12 $) au lieu de Luna (0,20 $/1,20 $), et une recette complète était
+estimée — et dépensée — à 0,69 $ au lieu de 0,11 $. Le choix du moteur
+s’applique maintenant dès que le site peut l’utiliser ; le tri par prix ne sert
+plus que de repli. Les lignes sans capacité déclarée sont classées à la
+migration.
+
+**Le catalogue ne garde que les modèles utiles.** Gemini liste 59 modèles,
+dont la synthèse vocale, la musique, la vidéo, les embeddings, la robotique et
+l’audio en direct, tous annoncés comme capables de « générer du contenu ». Il en
+reste 8 : les modèles de conversation 3.x. Chez OpenAI, la famille GPT-5 et les
+modèles d’image ; chez Anthropic, les douze modèles actuels. Les instantanés
+datés, les alias `-latest`, les préversions doublées d’une version stable et la
+génération 2.5 (refusée aux nouveaux comptes par un 404) sont écartés. Les
+lignes parasites déjà enregistrées sont supprimées à la migration — jamais un
+tarif saisi à la main, jamais un modèle affecté à une étape. Les modèles
+d’image Gemini sont écartés : le moteur ne dessine qu’avec OpenAI.
+
+**Les tarifs livrés sont à jour, et le restent.** Gemini 3.5 Flash-Lite,
+3.6, 3.7 et 3.8 Flash, et tous les modèles Claude actuels sont livrés avec leur
+tarif et leur page source, désactivés pour ne pas déplacer les paliers. Un tarif
+livré par une version précédente est désormais mis à jour par la suivante ; un
+tarif saisi ou recherché ne l’est jamais.
+
+**La recherche de tarifs aboutit.** Une question par fournisseur, qui nomme sa
+page de tarifs ; Gemini l’ouvre avec `url_context` au lieu de chercher (la
+recherche Google était épuisée sur la clé de test, la lecture de page non).
+Quand un modèle refuse — quota, crédit, « forte demande », les trois vus en
+réel — le suivant est essayé. Une source qui n’est pas la page du fournisseur
+est refusée.
+
+**Vérifié en réel** sur un WordPress 6.8.3 (SQLite) : liste des modèles, tri,
+nettoyage et reprise des tarifs à la migration, recherche de tarifs sur Gemini
+(quatre tarifs trouvés, conformes à la page de Google). **Non vérifié** : une
+génération complète — OpenAI est injoignable depuis l’environnement de test et
+le compte Claude n’a plus de crédit.
 
 ## Version 0.13.0
 

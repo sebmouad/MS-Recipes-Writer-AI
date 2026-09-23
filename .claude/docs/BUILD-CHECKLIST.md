@@ -53,11 +53,27 @@ run carries.
 - [x] The model × step grid saved and enforced: restricting `claude-sonnet-5`
   to article and proofread, then routing research at it, turns the Diagnostic
   routing check amber with the step named.
-- [~] The AI price lookup: the request is well-formed and reaches the provider
-  — Gemini answers with the account's quota error, not a malformed request —
-  but no provider on this sandbox can complete it, so no rate has been looked
-  up for real. The validation half (which is where a hallucinated rate would
-  get in) is covered offline in `tests/test-prices.php`.
+- [x] The AI price lookup, live (2026-09-23, `tests/real/test-catalog.php`):
+  one question per provider naming its own pricing page, Gemini reading it
+  with `url_context`, falling through refusals (OpenAI unreachable, Claude out
+  of credit, Gemini "high demand") to the next route. Asked about four models,
+  it returned three rates from Google's and Anthropic's own pages, each equal
+  to the shipped figure, and left the fourth missing rather than guessing. A
+  source that is not the provider's own page is refused
+  (`tests/test-prices.php`).
+- [x] The fetched list trimmed to the models a recipe can use, live: Gemini's
+  59 identifiers keep 8, Anthropic's 12 keep 12. On migration, noise rows an
+  earlier fetch stored were removed while a hand-priced row and a row assigned
+  to a step were kept; a stale shipped rate was brought up to date and a typed
+  one left alone.
+- [x] Every billed token counted, live: `gemini-3.6-flash` answered five
+  visible tokens after 2 717 of thinking and a `url_context` read billed 8 973
+  tokens of page, none of which the engine counted. Thinking, tool input,
+  Claude's cache tokens and each web search are now priced
+  (`tests/test-engine-usage.php`).
+- [x] The tiers the engine chose are the ones a site gets: a fresh site's
+  `openai:medium` resolved to Terra instead of Luna and estimated a full recipe
+  at $0.69; after the fix the same site estimates $0.14.
 - [x] Both roles over all eight screens at 1400px and 390px: the writer is
   refused from every administrative screen, no amount, model name or token
   count appears on any screen they reach, and page-level overflow is 0

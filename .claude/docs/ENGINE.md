@@ -338,6 +338,22 @@ here, approved, and are in. `tests/test-engine-language.php` holds them.
    had been paid for. Both the tier and its entry in `models` now use the
    identifier that exists. All nine tier routes are priced and served.
 
+### Applied on 2026-09-23, at the owner's request to fix the pricing
+
+8. **Billed tokens the engine never counted.** `MSRWA_Engine_Call::read()`
+   took Gemini's `candidatesTokenCount` as the whole output, but Google bills
+   thinking as output and reports it apart: a live `gemini-3.6-flash` call
+   answered five visible tokens after 2 717 of thinking and was priced at a
+   five-hundredth of its cost. It now adds `thoughtsTokenCount` to output and
+   `toolUsePromptTokenCount` (what `url_context` or grounding read — 8 973
+   tokens for one pricing page) to input. Claude's cache writes and reads are
+   added to input. Each web search is counted as `usage.web_searches`, from
+   OpenAI's `web_search_call` items, Anthropic's
+   `server_tool_use.web_search_requests` and Gemini's `webSearchQueries`, and
+   `price()` adds `providers.<name>.web_search_usd` per search — 0.01 for
+   OpenAI and Anthropic, 0.014 for Google, each overridable through the caller
+   layer. `tests/test-engine-usage.php` holds the live shapes.
+
 ### Still open
 
 6. **The engine's `models` list is a second source of truth for prices.** The
