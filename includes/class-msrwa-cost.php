@@ -35,10 +35,6 @@ final class MSRWA_Cost {
 	 * 2800-word target cost $0.086 on Sonnet 5 and $0.164 on a proofreading call,
 	 * both stopped at max_tokens.
 	 */
-	public static function output_budget( $words_max ) {
-		return (int) ceil( max( 1, (int) $words_max ) * self::WRITTEN_TOKENS_PER_WORD_MAX / 500 ) * 500;
-	}
-
 	public static function buckets() { return array( 'article', 'featured', 'facebook', 'other' ); }
 
 	/**

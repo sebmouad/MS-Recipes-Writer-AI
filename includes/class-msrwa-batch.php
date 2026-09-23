@@ -17,8 +17,6 @@ final class MSRWA_Batch {
 		return $t['batches'];
 	}
 
-	public static function may_submit() { return current_user_can( 'msrwa_create' ) || current_user_can( 'manage_options' ); }
-
 	/**
 	 * Records a submission and has its photographs matched.
 	 *
@@ -64,15 +62,6 @@ final class MSRWA_Batch {
 		global $wpdb;
 		$row = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM ' . self::table() . ' WHERE id = %d', absint( $id ) ), ARRAY_A );
 		return $row ? $row : null;
-	}
-
-	public static function recent( $limit = 30 ) {
-		global $wpdb;
-		$limit = max( 1, min( 200, (int) $limit ) );
-		if ( current_user_can( 'manage_options' ) ) {
-			return (array) $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM ' . self::table() . ' ORDER BY id DESC LIMIT %d', $limit ), ARRAY_A );
-		}
-		return (array) $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM ' . self::table() . ' WHERE owner_id = %d ORDER BY id DESC LIMIT %d', get_current_user_id(), $limit ), ARRAY_A );
 	}
 
 	/**

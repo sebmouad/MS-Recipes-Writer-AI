@@ -43,14 +43,6 @@ final class MSRWA_Rights {
 		}
 	}
 
-	public static function revoke() {
-		foreach ( array_keys( self::roles() ) as $name ) {
-			$role = get_role( $name );
-			if ( ! $role ) { continue; }
-			foreach ( array( self::CREATE, self::VIEW_ALL, self::MANAGE ) as $capability ) { $role->remove_cap( $capability ); }
-		}
-	}
-
 	public static function can( $capability, $user_id = 0 ) {
 		$user_id = absint( $user_id );
 		if ( $user_id ) { return user_can( $user_id, $capability ) || user_can( $user_id, 'manage_options' ); }

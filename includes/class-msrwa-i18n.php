@@ -14,14 +14,6 @@ final class MSRWA_I18N {
 	const DOMAIN = 'ms-recipes-writer-ai';
 
 	/** The interface languages shipped with the plugin. */
-	public static function interface_languages() {
-		return array(
-			'fr_FR' => 'Français',
-			'en_US' => 'English',
-			'ar'    => 'العربية',
-		);
-	}
-
 	public static function load() {
 		load_plugin_textdomain( self::DOMAIN, false, dirname( plugin_basename( MSRWA_FILE ) ) . '/languages' );
 	}
@@ -54,13 +46,6 @@ final class MSRWA_I18N {
 	}
 
 	/** "il y a 4 minutes", in the reader's language. */
-	public static function ago( $mysql_utc ) {
-		$timestamp = strtotime( (string) $mysql_utc . ' UTC' );
-		if ( ! $timestamp ) { return ''; }
-		/* translators: %s is a human-readable duration, e.g. "4 minutes". */
-		return sprintf( __( 'il y a %s', 'ms-recipes-writer-ai' ), human_time_diff( $timestamp, time() ) );
-	}
-
 	/**
 	 * An amount in dollars, written the way the reader's language writes it.
 	 *

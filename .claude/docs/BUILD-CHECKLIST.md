@@ -240,7 +240,7 @@ cost) in the task before changing anything.
 - [x] **A9 — Prompt templates (closed 2026-09-21).** All nine prompts are
   templates compiled from the settings; none hardcodes what a setting controls.
   The output language came from five prompts saying "French" and now comes from
-  `site_language`. `tools/promote-prompts.php` compiles them into the shipped
+  `site_language`. `tools/promote.php` compiles them into the shipped
   defaults and `tests/test-prompt-templates.php` asserts the defaults equal the
   compiled templates, so the plugin cannot run a prompt the lab never measured.
 - [ ] *(superseded)* **A20 — The fixtures carry invented observations.** `tarte-pommes` and

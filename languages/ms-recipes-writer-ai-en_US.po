@@ -312,9 +312,6 @@ msgstr "A line of three or more dashes separates two recipes. The first line of 
 msgid "Verdicts"
 msgstr "Verdicts"
 
-msgid "Vos recettes passées par le moteur, avec leur état et ce qu’elles ont coûté."
-msgstr "Your recipes that went through the engine, with their state and what they cost."
-
 msgid "Vous n’avez pas accès à cet écran."
 msgstr "You do not have access to this screen."
 
@@ -350,9 +347,6 @@ msgstr "waiting"
 
 msgid "en cours"
 msgstr "running"
-
-msgid "il y a %s"
-msgstr "%s ago"
 
 msgid "jugés"
 msgstr "judged"
@@ -500,9 +494,6 @@ msgstr "Severity"
 
 msgid "JSON invalide, donc ignoré pour : %s. Le reste a bien été enregistré, et ces groupes gardent leur valeur précédente."
 msgstr "Invalid JSON, so ignored for: %s. The rest was saved, and those groups keep their previous value."
-
-msgid "La couche appelante, telle quelle. Vide signifie que tout suit le moteur."
-msgstr "The caller layer, as it stands. Empty means everything follows the engine."
 
 msgid "Langue par défaut"
 msgstr "Default language"
@@ -1085,9 +1076,6 @@ msgstr "The writing service refused the site’s key. An administrator must chec
 
 msgid "Le service d’écriture n’a pas répondu à temps. Reprendre la recette suffit en général : rien de ce qui est fait n’est perdu."
 msgstr "The writing service did not answer in time. Resuming the recipe is usually enough: nothing already done is lost."
-
-msgid "Le service d’écriture était saturé. Reprendre la recette un peu plus tard suffit en général."
-msgstr "The writing service was overloaded. Resuming the recipe a little later is usually enough."
 
 msgid "Le site n’est relié à aucun service d’écriture pour une étape de cette recette. Un administrateur doit enregistrer la clé, puis la reprendre."
 msgstr "The site is not connected to a writing service for one of this recipe’s steps. An administrator must save the key, then resume it."

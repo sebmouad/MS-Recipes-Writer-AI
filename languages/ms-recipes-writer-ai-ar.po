@@ -312,9 +312,6 @@ msgstr "سطر من ثلاث شرطات أو أكثر يفصل وصفتين. و�
 msgid "Verdicts"
 msgstr "الأحكام"
 
-msgid "Vos recettes passées par le moteur, avec leur état et ce qu’elles ont coûté."
-msgstr "وصفاتك التي مرّت بالمحرك، بحالتها وكلفتها."
-
 msgid "Vous n’avez pas accès à cet écran."
 msgstr "لا تملك صلاحية هذه الشاشة."
 
@@ -350,9 +347,6 @@ msgstr "في الانتظار"
 
 msgid "en cours"
 msgstr "قيد التنفيذ"
-
-msgid "il y a %s"
-msgstr "قبل %s"
 
 msgid "jugés"
 msgstr "محكوم فيها"
@@ -500,9 +494,6 @@ msgstr "الخطورة"
 
 msgid "JSON invalide, donc ignoré pour : %s. Le reste a bien été enregistré, et ces groupes gardent leur valeur précédente."
 msgstr "‏JSON غير صالح، فتُجوهل لـ: %s. أما الباقي فحُفظ، وتحتفظ هذه المجموعات بقيمها السابقة."
-
-msgid "La couche appelante, telle quelle. Vide signifie que tout suit le moteur."
-msgstr "طبقة المُستدعي كما هي. والفراغ يعني أن كل شيء يتبع المحرك."
 
 msgid "Langue par défaut"
 msgstr "اللغة الافتراضية"
@@ -1097,9 +1088,6 @@ msgstr "رفضت خدمة الكتابة مفتاح الموقع. على الم�
 
 msgid "Le service d’écriture n’a pas répondu à temps. Reprendre la recette suffit en général : rien de ce qui est fait n’est perdu."
 msgstr "لم تستجب خدمة الكتابة في الوقت المناسب. استئناف الوصفة يكفي عادة: لا يضيع شيء مما أُنجز."
-
-msgid "Le service d’écriture était saturé. Reprendre la recette un peu plus tard suffit en général."
-msgstr "كانت خدمة الكتابة مكتظة. استئناف الوصفة بعد قليل يكفي عادة."
 
 msgid "Le site n’est relié à aucun service d’écriture pour une étape de cette recette. Un administrateur doit enregistrer la clé, puis la reprendre."
 msgstr "الموقع غير مرتبط بأي خدمة كتابة لإحدى خطوات هذه الوصفة. على المسؤول حفظ المفتاح ثم استئنافها."

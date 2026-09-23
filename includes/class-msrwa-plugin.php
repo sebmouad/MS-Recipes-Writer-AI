@@ -64,6 +64,11 @@ final class MSRWA_Plugin {
 			wp_clear_scheduled_hook( 'msrwa_cleanup' );
 			wp_schedule_event( time() + 300, 'msrwa_five_minutes', 'msrwa_cleanup' );
 		}
+		// Nothing loaded the catalogues. Translations appeared anyway because
+		// WordPress 6.7 began loading a plugin's own /languages just in time,
+		// so the gap was invisible on a current site and total on an older
+		// one: every screen in French, whatever the reader had chosen.
+		add_action( 'init', array( 'MSRWA_I18N', 'load' ) );
 		add_action( 'rest_api_init', array( 'MSRWA_REST', 'register' ) );
 		add_action( 'msrwa_run_step', array( 'MSRWA_Run', 'tick' ) );
 		add_action( 'msrwa_cleanup', array( 'MSRWA_Run', 'recover_expired' ) );

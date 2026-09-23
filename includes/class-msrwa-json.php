@@ -27,12 +27,6 @@ final class MSRWA_Json {
 	}
 
 	/** Same contract as decode(), raising the pipeline's error when it fails. */
-	public static function decode_or_fail( $text, $label ) {
-		$json = self::decode( $text );
-		if ( null === $json ) { throw new Exception( 'Sortie JSON invalide pour ' . $label . '.' ); }
-		return $json;
-	}
-
 	/**
 	 * Drops byte sequences that are not valid UTF-8. An answer stopped at
 	 * max_tokens is cut mid-character, and that single broken character makes
