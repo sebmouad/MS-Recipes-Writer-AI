@@ -83,7 +83,10 @@ final class MSRWA_Engine_Config {
 				// is cut mid-object, parses as nothing and is billed in full. That is
 				// the sixth ceiling in this list to have been found that way.
 				'review'           => 6000,
-				'fact_check'       => 4000,
+				// Reasoning counts against it on OpenAI: at 4000 a fact check with a
+				// dozen corrections was cut mid-object and stopped the run. A ceiling
+				// costs nothing until it is used.
+				'fact_check'       => 12000,
 				'proofread'        => 14500,
 				'final_approval'   => 14000,
 				'vision'           => 1200,
@@ -91,12 +94,18 @@ final class MSRWA_Engine_Config {
 
 			// How many times a step may be asked again before the run gives up.
 			'attempts' => array(
-				'final_approval' => 3,
+				// A sentence the approval quotes is now corrected in code between two
+				// verdicts, so a round can go to the article rather than the images.
+				// The budget still stops any round that would cross the ceiling.
+				'final_approval' => 4,
 				'default'        => 1,
 			),
 
 			'images' => array(
-				'featured_quality' => 'medium',
+				// The lowest quality the final approval passes: a featured image is
+				// judged good at every tier, and `low` costs $0.014 against $0.021.
+				// The collage needs `medium` to keep six panels legible.
+				'featured_quality' => 'low',
 				'facebook_quality' => 'medium',
 				'format'           => 'webp',
 				'featured_ratio'   => '1:1',

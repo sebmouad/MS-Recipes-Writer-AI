@@ -580,6 +580,13 @@ final class MSRWA_Run {
 		// queue should not wait behind everything that happened to arrive first.
 		$queued = (array) $wpdb->get_col( 'SELECT id FROM ' . self::table() . " WHERE status = 'queued' ORDER BY priority DESC, updated_at ASC LIMIT 100" );
 		foreach ( $queued as $id ) { self::queue( (int) $id, 5 ); }
+		// Between two waves a run is `running` with no lease, and only its cron
+		// event carries it on. WordPress keeps every event in one option, so
+		// workers finishing together overwrite each other's next event, and a
+		// run left that way waited forever. queue() skips a run already armed,
+		// and the claim keeps a duplicate from spending anything.
+		$between = (array) $wpdb->get_col( 'SELECT id FROM ' . self::table() . " WHERE status = 'running' AND lock_until IS NULL ORDER BY priority DESC, updated_at ASC LIMIT 100" );
+		foreach ( $between as $id ) { self::queue( (int) $id, 5 ); }
 	}
 
 	/** Where a run's generated images are written, under the uploads directory. */

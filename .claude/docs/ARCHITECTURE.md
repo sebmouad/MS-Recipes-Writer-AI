@@ -43,6 +43,13 @@ next. Nothing is held between ticks: a request the host kills costs at most the
 wave it was in, `MSRWA_Run::recover_expired()` returns the lease, and the run
 resumes from the last step that finished.
 
+Between two ticks a run is `running` with no lease, and only its cron event
+carries it on. WordPress keeps every event in one option, so workers finishing
+together can overwrite each other's next event — two of three recipes in a
+live lot sat forever that way. The watchdog therefore re-arms every leaseless
+`running` run as well as every `queued` one; `queue()` skips a run already
+armed and the claim stops a duplicate from spending anything.
+
 Two things can stop a tick before it claims anything: an operator hold
 (`MSRWA_Queue`) and a spending ceiling the site has reached (`MSRWA_Budget`).
 Either one parks the run — back to `queued`, lease released, `updated_at`

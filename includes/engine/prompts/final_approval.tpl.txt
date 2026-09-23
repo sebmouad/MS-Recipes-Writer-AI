@@ -63,7 +63,7 @@ SEVERITY:
 RULES:
 - Judge only what is present. Never infer an ingredient you cannot see, and never mark an image down for something outside the frame.
 - Every finding names where it is, what is wrong, and the smallest change that fixes it.
-- Do not rewrite the article and do not propose a new image prompt. You decide; someone else repairs.
+- Do not rewrite the article and do not propose a new image prompt. For an article finding, give only the quoted sentence as it should read: the same words with the fault removed or corrected from the canonical recipe or the research, or an empty string when the whole sentence should go. It is substituted word for word and the article is judged again.
 - `approved` is true only when nothing is blocking. Reservations without blockers still approve, and say why.
 - Write every human-readable value in {{language}}.
 
@@ -74,5 +74,5 @@ OUTPUT — a valid JSON object only, no Markdown, with exactly these keys. Every
 - "featured_image": {"verdict": "good|reservations|bad", "realism": "good|reservations|bad", "summary": one sentence} — null if you were not sent it
 - "facebook_image": {"verdict": "good|reservations|bad", "realism": "good|reservations|bad", "panels_counted": integer, "summary": one sentence} — null if you were not sent it
 - "consistency": {"verdict": "good|reservations|bad", "summary": one sentence on whether they show one dish} — null unless you were sent both images
-- "findings": array of {"target": "article|featured_image|facebook_image|consistency", "severity": "blocking|minor", "quote": the exact sentence at fault or "" for an image, "reason": what is wrong, "fix": the smallest change that repairs it}
+- "findings": array of {"target": "article|featured_image|facebook_image|consistency", "severity": "blocking|minor", "quote": the exact sentence at fault, copied verbatim from the article, or "" for an image, "replacement": for an article finding the sentence that replaces the quote, or "" to remove it; "" for an image, "reason": what is wrong, "fix": the smallest change that repairs it}
 - "uncertainties": array of strings naming what you could not verify from what you were given

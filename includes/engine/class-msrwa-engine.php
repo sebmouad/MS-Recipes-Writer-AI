@@ -201,6 +201,16 @@ final class MSRWA_Engine {
 		if ( 'final_approval' !== $name || ! is_array( $outcome['artifact'] ?? null ) ) { return 0.0; }
 		$verdict = $outcome['artifact'];
 		$spent = 0.0;
+		$judged = self::judged( $result );
+		$repairs = MSRWA_Engine_Score::article_repairs( $verdict, (string) ( $judged['content_html'] ?? '' ) );
+		if ( $repairs ) {
+			$html = (string) $judged['content_html'];
+			foreach ( $repairs as $repair ) { $html = self::substitute( $html, $repair['before'], $repair['after'] ); }
+			$earlier = (array) ( $judged['approval_repairs'] ?? array() );
+			// Written as the proofread article, which is the one the draft is made from.
+			$result->artifact( 'proofread', array_merge( $judged, array( 'content_html' => $html, 'approval_repairs' => array_merge( $earlier, $repairs ) ) ) );
+			$result->event( 'decision', $name, sprintf( 'Corrected %d sentence(s) the approval quoted, in code, before judging again.', count( $repairs ) ), array( 'repairs' => $repairs ) );
+		}
 		foreach ( MSRWA_Engine_Score::images_to_retry( $verdict ) as $kind ) {
 			$findings = MSRWA_Engine_Score::findings_for( $verdict, $kind . '_image' );
 			if ( 'facebook' === $kind ) { $findings = array_merge( $findings, MSRWA_Engine_Score::findings_for( $verdict, 'consistency' ) ); }
@@ -303,12 +313,11 @@ final class MSRWA_Engine {
 		foreach ( (array) ( ( (array) ( $result->artifacts['fact_check'] ?? array() ) )['corrections'] ?? array() ) as $correction ) {
 			if ( ! is_array( $correction ) ) { continue; }
 			$before = trim( (string) ( $correction['before'] ?? '' ) );
-			$after = trim( (string) ( $correction['after'] ?? '' ) );
-			if ( '' === $before || $before === $after ) { continue; }
+			if ( '' === $before || trim( (string) ( $correction['after'] ?? '' ) ) === $before ) { continue; }
 			// The fact check answers in plain sentences while the article is HTML, so a
 			// sentence broken by a tag cannot be substituted. Say so rather than guess.
 			if ( false === mb_strpos( $html, $before ) ) { $unapplied[] = $correction; continue; }
-			$html = str_replace( $before, $after, $html );
+			$html = self::substitute( $html, $before, (string) ( $correction['after'] ?? '' ) );
 			$applied[] = $correction;
 		}
 
@@ -323,6 +332,18 @@ final class MSRWA_Engine {
 			'checks' => $checks, 'error' => '', 'retry' => '',
 			'artifact' => array_merge( $article, array( 'corrections_applied' => $applied, 'corrections_for_the_editor' => $unapplied ) ),
 		);
+	}
+
+	/**
+	 * One quoted sentence replaced in the article. An empty replacement removes
+	 * it: the space before it goes too, and the paragraph if nothing else was in it.
+	 */
+	private static function substitute( $html, $before, $after ) {
+		$before = trim( (string) $before );
+		$after = trim( strip_tags( (string) $after ) );
+		if ( '' === $after && false !== mb_strpos( $html, ' ' . $before ) ) { $before = ' ' . $before; }
+		$html = str_replace( $before, $after, (string) $html );
+		return '' === $after ? (string) preg_replace( '#<p>\s*</p>\s*#u', '', $html ) : $html;
 	}
 
 	/** A step that returns JSON: research, the recipe, the article and the reviews. */
@@ -553,11 +574,18 @@ final class MSRWA_Engine {
 			$sound = $gate['sound'];
 			$approved = $gate['approved'];
 			$redraw = $sound && ! $approved ? MSRWA_Engine_Score::images_to_retry( $verdict ) : array();
+			$repairs = $sound && ! $approved ? MSRWA_Engine_Score::article_repairs( $verdict, (string) ( self::judged( $result )['content_html'] ?? '' ) ) : array();
+			$article_blocked = (bool) MSRWA_Engine_Score::findings_for( $verdict, 'article' );
 			$retry = '';
 			if ( ! $sound ) {
 				$retry = sprintf( 'The verdict is malformed (%d/%d contracts); asking again without touching the images.', $passed, count( $checks ) );
-			} elseif ( $redraw ) {
-				$retry = 'Refused; regenerating ' . implode( ', ', $redraw ) . '.';
+			} elseif ( $article_blocked && ! $repairs ) {
+				// Redrawing images cannot approve an article that stays refused.
+				$result->event( 'decision', $name, 'Refused on the article, which no retry here can change. The findings go to the editor.' );
+			} elseif ( $redraw || $repairs ) {
+				$work = $redraw ? array( 'regenerating ' . implode( ', ', $redraw ) ) : array();
+				if ( $repairs ) { $work[] = sprintf( 'correcting %d sentence(s) of the article', count( $repairs ) ); }
+				$retry = 'Refused; ' . implode( ' and ', $work ) . '.';
 			} elseif ( ! $approved ) {
 				// A refusal the engine cannot act on is a decision, not a failed attempt.
 				// Asking the same judge the same question about the same artifacts is a
@@ -584,6 +612,15 @@ final class MSRWA_Engine {
 		return array_filter( $version, static function ( $value ) { return is_array( $value ) ? (bool) $value : '' !== trim( (string) $value ); } );
 	}
 
+	/** The article the final approval judges: the latest version of each field. */
+	private static function judged( MSRWA_Result $result ) {
+		$article = (array) ( $result->artifacts['article'] ?? array() );
+		foreach ( array( 'corrected', 'proofread' ) as $source ) {
+			if ( ! empty( $result->artifacts[ $source ] ) ) { $article = array_merge( $article, self::filled( (array) $result->artifacts[ $source ] ) ); }
+		}
+		return $article;
+	}
+
 	/** The artifacts one step reads, under the names its input builder expects. */
 	private static function working_set( $name, MSRWA_Result $result ) {
 		$brief = (array) ( $result->artifacts['brief'] ?? array() );
@@ -598,6 +635,9 @@ final class MSRWA_Engine {
 				$article = array_merge( $article, self::filled( (array) $result->artifacts[ $source ] ) );
 			}
 		}
+		// What was corrected is the editor's record, not the article: sent along, it
+		// put every sentence already removed back in front of the judge.
+		$article = array_diff_key( $article, array_flip( array( 'corrections_applied', 'corrections_for_the_editor', 'approval_repairs' ) ) );
 
 		// A rewrite carries what the reviews found; a first draft carries nothing.
 		$feedback = array();

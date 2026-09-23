@@ -28,6 +28,9 @@ msrwa_test_contains( $GLOBALS['wpdb']->log(), "WHERE id = 17 AND status = 'runni
 // not wait behind everything that merely arrived earlier.
 msrwa_test_contains( $GLOBALS['wpdb']->log(), "WHERE status = 'queued' ORDER BY priority DESC, updated_at ASC LIMIT 100", 'The watchdog re-arms waiting jobs in priority order.' );
 msrwa_test_assert( isset( $GLOBALS['ops_options']['msrwa_watchdog_at'] ), 'Watchdog records heartbeat.' );
+// A run between two waves holds no lease; if its cron event was lost to
+// another worker rewriting the cron option, only the watchdog brings it back.
+msrwa_test_contains( $GLOBALS['wpdb']->log(), "WHERE status = 'running' AND lock_until IS NULL", 'The watchdog re-arms a run whose next wave was never scheduled.' );
 require_once MSRWA_DIR . 'tools/report.php';
 $html = report_render( array( 'artifacts' => array(), 'steps' => array(), 'events' => array(), 'totals' => array(), 'ok' => false ) );
 foreach ( array( 'Recette canonique', 'SEO, publication', 'Visuels générés', 'Appels aux fournisseurs', 'Configuration de ce passage' ) as $section ) { msrwa_test_contains( $html, $section, 'Shared lab report retains ' . $section ); }

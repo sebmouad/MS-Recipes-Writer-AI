@@ -5,9 +5,9 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.18.2
+## État actuel — 0.18.3
 
-La version `0.18.2` permet de choisir le modèle et la qualité de chaque image
+La version `0.18.3` fait approuver les trois recettes d’un lot réel aux réglages par défaut — image à la une en `low`, collage en `medium` — pour 0,132 $ en moyenne ; la `0.18.2` permettait de choisir le modèle et la qualité de chaque image
 séparément ; la `0.18.1` fait tenir le plafond par recette jusque dans les reprises
 de l’approbation finale ; la `0.18.0` ramène une recette complète à environ 0,11 $ réels —
 recherche web comprise — sans perte de qualité mesurée ; la `0.17.0` faisait
@@ -74,6 +74,58 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.18.3
+
+**Mesuré en réel, réglages par défaut.** Un lot de trois recettes (tarte aux
+pommes normande, poulet yassa, souris d’agneau au four) sur le WordPress de
+test, OpenAI gpt-5.6-luna pour le texte, gpt-image-2.5-flare pour les images,
+image à la une en `low`, collage en `medium`, plafond 0,30 $ par recette.
+Quatre lots ont été lancés ; les trois premiers ont révélé les défauts
+corrigés ci-dessous, le quatrième est celui-ci : **3 recettes sur 3
+approuvées**, article, image à la une et collage jugés *good* à chaque fois.
+
+| Étape | Durée moyenne | Coût moyen | Estimé |
+| --- | ---: | ---: | ---: |
+| Recherche (web, ≤ 3 recherches) | 56 s | 0,0242 $ | 0,0369 $ |
+| Recette canonique | 17 s | 0,0032 $ | 0,0040 $ |
+| Article | 50 s | 0,0081 $ | 0,0087 $ |
+| Image à la une (`low`) | 11 s | 0,0149 $ | 0,0149 $ |
+| Collage Facebook (`medium`) | 16 s | 0,0289 $ | 0,0284 $ |
+| Revue | 16 s | 0,0034 $ | 0,0043 $ |
+| Vérification des faits | 32 s | 0,0060 $ | 0,0075 $ |
+| Corrections (en code) | 0 s | 0 $ | 0 $ |
+| Correction de la langue | 46 s | 0,0094 $ | 0,0105 $ |
+| Approbation finale (1 à 4 passages) | 61 s | 0,0140 $ | 0,0061 $ |
+| Collage redessiné (2 recettes sur 3) | 16 s par dessin | 0,030 $ par dessin, 0,020 $ par recette en moyenne | — |
+| **Recette complète** | **244–378 s** | **0,132 $** (0,095 – 0,162) | 0,121 $, au plus 0,349 $ |
+
+Le lot de trois a pris 14 min 18 s de bout en bout sur ce serveur, cron compris.
+
+**Corrigé en chemin :**
+
+- *Des recettes restaient « en cours » pour toujours.* WordPress garde tous
+  ses événements cron dans une seule option ; trois recettes finissant une
+  vague ensemble s’écrasaient mutuellement l’événement suivant, et deux
+  recettes sur trois ne repartaient jamais. La surveillance (toutes les cinq
+  minutes) relance désormais toute recette en cours qui n’est tenue par
+  aucun travailleur.
+- *La vérification des faits était coupée.* Son plafond de 4 000 jetons
+  compte aussi la réflexion : deux vérifications sur trois s’arrêtaient au
+  milieu du JSON et la recette échouait. Plafond porté à 12 000 — un
+  plafond ne coûte rien tant qu’il n’est pas atteint.
+- *Un article refusé pour une phrase restait refusé.* L’approbation finale
+  cite la phrase fautive et donne désormais sa version corrigée (ou vide pour
+  la retirer) ; le moteur l’applique en code et redemande un verdict, pour
+  environ 0,005 $, au lieu de rendre un article refusé. Un refus qu’il ne
+  peut pas réparer ainsi n’entraîne plus de redessiner des images inutilement.
+  Les phrases corrigées restent listées pour le rédacteur. Quatre passages
+  d’approbation au plus, toujours sous le plafond par recette.
+- *Des explications inventées.* L’article n’attribue plus de goût, d’effet
+  ou de raison qu’aucune source ne donne ; la vérification des faits retire
+  celles qui passent encore.
+- *L’image à la une passe par défaut en `low`* (0,015 $ au lieu de 0,021 $) :
+  jugée *good* et réaliste sur les six images mesurées.
 
 ## Version 0.18.2
 

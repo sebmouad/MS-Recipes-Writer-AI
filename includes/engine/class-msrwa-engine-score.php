@@ -288,6 +288,28 @@ final class MSRWA_Engine_Score {
 	}
 
 	/**
+	 * The sentence-level repairs that would clear every blocking article finding.
+	 *
+	 * The judge quotes the sentence at fault and gives its replacement, so the
+	 * repair needs no model: it is applied in code and judged again. All or
+	 * nothing — one finding without a usable quote means the article needs a
+	 * person, and patching the others would only hide that.
+	 */
+	public static function article_repairs( $verdict, $html ) {
+		if ( ! is_array( $verdict ) || ! empty( $verdict['approved'] ) ) { return array(); }
+		$repairs = array();
+		foreach ( self::findings_for( $verdict, 'article' ) as $finding ) {
+			$quote = trim( (string) ( $finding['quote'] ?? '' ) );
+			if ( '' === $quote || ! array_key_exists( 'replacement', $finding ) || ! is_string( $finding['replacement'] ) ) { return array(); }
+			if ( false === mb_strpos( (string) $html, $quote ) ) { return array(); }
+			$replacement = trim( strip_tags( $finding['replacement'] ) );
+			if ( $replacement === $quote ) { return array(); }
+			$repairs[] = array( 'before' => $quote, 'after' => $replacement, 'reason' => (string) ( $finding['reason'] ?? '' ) );
+		}
+		return $repairs;
+	}
+
+	/**
 	 * Which images a refusal asks us to regenerate. A consistency finding names no
 	 * single image, so it is charged to the collage: the featured image is one
 	 * photograph of the finished dish and the collage is the piece that has to agree

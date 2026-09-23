@@ -26,7 +26,9 @@ final class MSRWA_Estimate {
 			'canonical_recipe' => array( 'input' => 4200, 'output' => 3100 ),
 			'article' => array( 'input' => 6900, 'output' => 6600 ),
 			'review' => array( 'input' => 11200, 'output' => 2200 ),
-			'fact_check' => array( 'input' => 10400, 'output' => 2900 ),
+			// Three live fact checks on 0.18.3 answered 3 990 tokens and twice more
+			// than the old 4 000 ceiling, reasoning included.
+			'fact_check' => array( 'input' => 10400, 'output' => 4500 ),
 			'proofread' => array( 'input' => 11800, 'output' => 6800 ),
 			'final_approval' => array( 'input' => 18000, 'output' => 2100 ),
 			'featured_image' => array( 'input' => 1800, 'output' => 440 ),

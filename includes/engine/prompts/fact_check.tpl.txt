@@ -6,6 +6,7 @@ RULES:
 - Work passage by passage. For each problem return the original sentence verbatim in "before", and its corrected form in "after". Change nothing else.
 - Correct: wrong quantities, wrong temperatures, wrong durations, wrong resting times, false claims about ingredients, unsafe advice, invented figures.
 - A statement the sources do not cover is not automatically wrong: flag it as "unsupported" only when it is a checkable claim the reader would act on.
+- An explanation no source gives — a flavour, an effect, a purpose, a consequence or a comparison attributed to an ingredient, a substitution or a step — is a correction, not only an unsupported claim: its "after" is the same sentence without the unsupported part, or an empty string when nothing documented remains. Descriptions of appearance and presentation are not explanations; leave them to "unsupported".
 - Keep the author's voice, the {{language}} typography and the surrounding HTML intact. Return plain sentences, not HTML fragments.
 - If the article is faithful to the sources, return an empty corrections array and pass true. Do not invent work.
 - Never introduce a fact that no source supports.

@@ -26,7 +26,7 @@ final class MSRWA_Settings {
 			'retention_runs_days' => 0,
 			'featured_ratio'      => '1:1',
 			'facebook_ratio'      => '2:3',
-			'featured_image_quality' => 'medium',
+			'featured_image_quality' => 'low',
 			'facebook_image_quality' => 'medium',
 			'image_quality'       => 'medium',
 			'image_format'        => 'webp',
@@ -168,9 +168,10 @@ CONSISTENCY: same ingredients, same quantities, same promise throughout. The dis
 RULES:
 - Paragraphs of 2 to 4 sentences; lists reserved for ingredients, equipment and steps.
 - Respect the canonical recipe\'s quantities, times and temperatures exactly. Invent no figure.
-- SOURCING. You may state only what the canonical recipe contains or the research package documents. This binds the substitutions and the serving suggestions hardest, because that is where invention is easiest: offer a replacement ingredient only when a research fact names it, and an accompaniment only when a fact names that. Where the research documents none, write that plainly — "les sources consultées ne documentent pas de remplacement pour cet ingrédient" — and explain instead what the ingredient does in the dish, which is useful and true. A section is never padded with a plausible swap.
+- SOURCING. You may state only what the canonical recipe contains or the research package documents. This binds the substitutions and the serving suggestions hardest, because that is where invention is easiest: offer a replacement ingredient only when a research fact names it, and an accompaniment only when a fact names that. Where the research documents none, write that plainly — "les sources consultées ne documentent pas de remplacement pour cet ingrédient" — and explain instead what the research says the ingredient does in the dish. A section is never padded with a plausible swap.
 - The same holds for storage, reheating and food safety, which invite the most generic advice. Say how long the dish keeps, how to reheat it and what is unsafe only as the canonical recipe or a research fact says it; where they say nothing, write that the sources do not document it. No precaution is added because it sounds prudent.
 - The same holds for method. Do not add a step, a technique, a placement, a resting time or a separate operation that neither the canonical recipe nor the research contains, however sensible it sounds — no reducing the juices separately, no arranging by size or by hot spot, unless a source says so.
+- The same holds for explanation. Do not attribute to an ingredient, a substitution or a step an effect, a flavour, a purpose or a consequence that no source states — "plus neutre", "renforce le goût", "afin que le vin ne domine pas", "colorera moins bien". State the documented fact and stop; a reason is written only when a source gives it.
 - Use the research package for ingredient choice, technique, success cues, failures, safety, storage and visual description. When it conflicts with the canonical recipe, keep the canonical figures and avoid repeating the disputed claim.
 - Treat visual observations as appearance evidence only. Never infer hidden ingredients, quantities or preparation steps from an image.
 - Never mention the generation process, a canonical recipe, a schema, JSON or validation.
@@ -327,7 +328,7 @@ SEVERITY:
 RULES:
 - Judge only what is present. Never infer an ingredient you cannot see, and never mark an image down for something outside the frame.
 - Every finding names where it is, what is wrong, and the smallest change that fixes it.
-- Do not rewrite the article and do not propose a new image prompt. You decide; someone else repairs.
+- Do not rewrite the article and do not propose a new image prompt. For an article finding, give only the quoted sentence as it should read: the same words with the fault removed or corrected from the canonical recipe or the research, or an empty string when the whole sentence should go. It is substituted word for word and the article is judged again.
 - `approved` is true only when nothing is blocking. Reservations without blockers still approve, and say why.
 - Write every human-readable value in French.
 
@@ -338,7 +339,7 @@ OUTPUT — a valid JSON object only, no Markdown, with exactly these keys. Every
 - "featured_image": {"verdict": "good|reservations|bad", "realism": "good|reservations|bad", "summary": one sentence} — null if you were not sent it
 - "facebook_image": {"verdict": "good|reservations|bad", "realism": "good|reservations|bad", "panels_counted": integer, "summary": one sentence} — null if you were not sent it
 - "consistency": {"verdict": "good|reservations|bad", "summary": one sentence on whether they show one dish} — null unless you were sent both images
-- "findings": array of {"target": "article|featured_image|facebook_image|consistency", "severity": "blocking|minor", "quote": the exact sentence at fault or "" for an image, "reason": what is wrong, "fix": the smallest change that repairs it}
+- "findings": array of {"target": "article|featured_image|facebook_image|consistency", "severity": "blocking|minor", "quote": the exact sentence at fault, copied verbatim from the article, or "" for an image, "replacement": for an article finding the sentence that replaces the quote, or "" to remove it; "" for an image, "reason": what is wrong, "fix": the smallest change that repairs it}
 - "uncertainties": array of strings naming what you could not verify from what you were given',
 			'prompt_image_review' => 'Tu es un directeur artistique culinaire indépendant. Évalue réellement le réalisme photographique et la fidélité de cette image à la recette validée. Retourne uniquement un JSON avec pass (boolean), verdict (good|needs_review|bad), realism (good|needs_review|bad), quality_summary (phrase courte), findings (severity, reason, fix), subject_match et uncertainties. pass ne vaut true que si verdict et realism sont good. Vérifie plat, ingrédients visibles, textures, proportions, éclairage, ombres, anatomie des aliments, cadrage, ratio, artefacts, texte, logo et filigrane. Ne déduis pas de détails invisibles.',
 			'prompt_image_correction' => 'Corrige uniquement les défauts visuels signalés ci-dessous tout en conservant la recette validée, le ratio demandé, une photographie culinaire réaliste, et l’absence de texte, logo ou filigrane. Ne copie ni ne reproduis une image de référence.',

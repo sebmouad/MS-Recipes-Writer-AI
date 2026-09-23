@@ -89,6 +89,18 @@ msrwa_test_assert( 1 === count( $corrected['corrections_applied'] ), 'What was a
 msrwa_test_assert( 1 === count( $corrected['corrections_for_the_editor'] ), 'A correction that cannot be located is handed to a person, never dropped.' );
 msrwa_test_assert( 0.0 === $reviewed->totals()['cost_usd'], 'Applying a verbatim substitution calls no model and costs nothing.' );
 
+// An explanation no source gives is removed, not rewritten: an empty
+// replacement takes the sentence, its space, and a paragraph left empty.
+$trimmed = MSRWA_Engine::run_step( 'corrections', array( 'title' => 'Souris', 'artifacts' => array(
+	'article' => array( 'content_html' => '<p>Utilisez un bouillon. Le premier est plus neutre.</p><p>Il renforce le goût.</p><p>Servez chaud.</p>' ),
+	'review' => array( 'pass' => true, 'findings' => array() ),
+	'fact_check' => array( 'pass' => false, 'corrections' => array(
+		array( 'before' => 'Le premier est plus neutre.', 'after' => '' ),
+		array( 'before' => 'Il renforce le goût.', 'after' => '' ),
+	) ),
+) ) );
+msrwa_test_assert( '<p>Utilisez un bouillon.</p><p>Servez chaud.</p>' === $trimmed->artifacts['corrected']['content_html'], 'An unsupported sentence is removed cleanly (got ' . $trimmed->artifacts['corrected']['content_html'] . ').' );
+
 // Configuration speaks the engine's vocabulary, and the caller overrides it in that
 // vocabulary — never the other way round.
 $config = MSRWA_Engine_Config::create(

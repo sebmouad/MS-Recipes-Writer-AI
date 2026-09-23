@@ -96,6 +96,12 @@ run carries.
 - [x] A complete recipe near $0.10, search included, without losing a point:
   $0.1055, $0.109 and $0.115 per pass on three dishes in the lab, every step
   at its maximum score (README 0.18.0 has each lever and what it saved).
+- [x] Default settings approve a whole lot, live: three recipes on OpenAI,
+  featured `low`, collage `medium`, 3/3 approved at $0.095, $0.162 and $0.140
+  (estimate $0.121). On the way: a leaseless `running` run whose cron event was
+  lost is re-armed by the watchdog; the fact check's ceiling rose to 12000; a
+  refused sentence is repaired in code and judged again
+  (`tests/test-engine-repair.php`, `tests/test-operations.php`).
 - [ ] A complete lot on Claude — the account has no credit. — the Gemini key's
   grounding quota is exhausted, OpenAI is unreachable from the test
   environment and the Claude account has no credit.

@@ -417,6 +417,22 @@ here, approved, and are in. `tests/test-engine-language.php` holds them.
     already per image (`images.<kind>_quality`); the estimate now prices it,
     from real token counts per quality (`MSRWA_Estimate::quality_factor()`).
 
+15. **A refused sentence is repaired, not the whole article.** The final
+    approval's findings carry a `replacement` for the quoted sentence
+    (`""` removes it). When every blocking article finding has a quote found
+    verbatim and a replacement, `MSRWA_Engine_Score::article_repairs()` lists
+    them, `before_retry()` applies them in code to the `proofread` artifact
+    (recorded under `approval_repairs`) and the judge is asked again; an
+    article finding it cannot repair ends the loop without redrawing images,
+    which could not change the verdict. `attempts.final_approval` is 4, the
+    budget guard of item 13 still bounding every round. The fact check turns
+    an explanation no source gives into a correction (`after` may be empty,
+    removing the sentence), the article prompt forbids inventing one, and
+    `max_output.fact_check` is 12000: at 4000 two live fact checks of three
+    were cut and stopped their run. `working_set()` no longer sends the
+    correction logs to later steps, which put removed sentences back in front
+    of the judge.
+
 ### Still open
 
 6. **The engine's `models` list is a second source of truth for prices.** The
