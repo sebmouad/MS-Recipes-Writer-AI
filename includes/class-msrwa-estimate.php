@@ -29,10 +29,14 @@ final class MSRWA_Estimate {
 			// Three live fact checks on 0.18.3 answered 3 990 tokens and twice more
 			// than the old 4 000 ceiling, reasoning included.
 			'fact_check' => array( 'input' => 10400, 'output' => 4500 ),
-			'proofread' => array( 'input' => 11800, 'output' => 6800 ),
+			// Measured on 0.19.0, three live recipes: the proofread returns only the
+			// sentences it changes (3 050–3 320 out, reasoning included, against
+			// 6 000 when it returned the article), and the image prompts lost their
+			// repetitions (1 450 and 2 530 tokens in, against 1 800 and 3 750).
+			'proofread' => array( 'input' => 11000, 'output' => 3300 ),
 			'final_approval' => array( 'input' => 18000, 'output' => 2100 ),
-			'featured_image' => array( 'input' => 1800, 'output' => 440 ),
-			'facebook_image' => array( 'input' => 3600, 'output' => 345 ),
+			'featured_image' => array( 'input' => 1450, 'output' => 440 ),
+			'facebook_image' => array( 'input' => 2550, 'output' => 345 ),
 			'corrections' => array( 'input' => 0, 'output' => 0 ),
 		);
 	}

@@ -440,6 +440,24 @@ here, approved, and are in. `tests/test-engine-language.php` holds them.
     collage too, even where the visual brief states one; collage redraws fell
     from six to one on the same three recipes.
 
+17. **The proofread returns its changes, not the article.** It answers
+    `{changes: [{type, before, after}], clean}`; `MSRWA_Engine::proofread()`
+    substitutes each `before` found verbatim into the corrected article, refuses
+    any change that alters a figure, treats an already-present `after` as applied
+    (overlapping passages), and keeps the rest as `changes_not_applied` for the
+    editor. The step's checks run on the rebuilt article; an answer in the old
+    shape, with `content_html`, is still taken. Live: 3 050–3 320 tokens out
+    instead of 6 000, 32 s instead of 49 s, $0.006 instead of $0.0096.
+
+18. **Image prompts say each rule once.** The collage template states the six
+    moments, the order rules, continuity, realism and photography once each
+    (9 828 → 4 470 characters); the featured template drops the reference to a
+    research package it is no longer sent. The visual brief no longer re-lists
+    the ingredients or quotes the observations a second time, and the closing
+    rule 3 points at the list instead of repeating it. Live, three recipes:
+    collage input 3 750 → 2 530 tokens, featured 1 800 → 1 450, every image
+    approved as good and realistic.
+
 ### Still open
 
 6. **The engine's `models` list is a second source of truth for prices.** The

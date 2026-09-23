@@ -5,9 +5,9 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.18.9
+## État actuel — 0.19.0
 
-La version `0.18.9` reprend chaque écran après une revue complète dans le navigateur ; la `0.18.8` réservait l’extension, renommée « MS Recipes AI » dans le menu, à ceux qui peuvent téléverser des fichiers ; la `0.18.7` disait juste ce que fait le plafond par recette ; la `0.18.6` rangeait les photographies envoyées avec le brouillon qu’elles ont servi à écrire ; la `0.18.5` faisait passer un lot de trois recettes en 8 minutes pour 0,125 $ la recette, toutes approuvées ; la `0.18.4` faisait envoyer les photographies d’un lot depuis l’ordinateur du rédacteur ; la `0.18.3` faisait approuver les trois recettes d’un lot réel aux réglages par défaut — image à la une en `low`, collage en `medium` — pour 0,132 $ en moyenne ; la `0.18.2` permettait de choisir le modèle et la qualité de chaque image
+La version `0.19.0` ramène une recette approuvée du premier coup à 0,09–0,10 $ sans perte mesurée ; la `0.18.9` reprenait chaque écran après une revue complète dans le navigateur ; la `0.18.8` réservait l’extension, renommée « MS Recipes AI » dans le menu, à ceux qui peuvent téléverser des fichiers ; la `0.18.7` disait juste ce que fait le plafond par recette ; la `0.18.6` rangeait les photographies envoyées avec le brouillon qu’elles ont servi à écrire ; la `0.18.5` faisait passer un lot de trois recettes en 8 minutes pour 0,125 $ la recette, toutes approuvées ; la `0.18.4` faisait envoyer les photographies d’un lot depuis l’ordinateur du rédacteur ; la `0.18.3` faisait approuver les trois recettes d’un lot réel aux réglages par défaut — image à la une en `low`, collage en `medium` — pour 0,132 $ en moyenne ; la `0.18.2` permettait de choisir le modèle et la qualité de chaque image
 séparément ; la `0.18.1` fait tenir le plafond par recette jusque dans les reprises
 de l’approbation finale ; la `0.18.0` ramène une recette complète à environ 0,11 $ réels —
 recherche web comprise — sans perte de qualité mesurée ; la `0.17.0` faisait
@@ -74,6 +74,42 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.19.0
+
+**Moins cher, sans perte mesurée.** Deux leviers, mesurés en réel sur six
+recettes (tarte normande, poulet yassa, souris d’agneau, daube provençale,
+lasagnes courgettes-jambon, clafoutis), réglages par défaut, OpenAI :
+**6 recettes sur 6 approuvées**, article, image à la une et collage jugés
+*good* à chaque fois.
+
+- *La correction de la langue ne réécrit plus l’article.* Elle renvoie
+  seulement les phrases qu’elle corrige, citées telles quelles, et le moteur
+  les remplace dans le texte. Une correction qui toucherait un chiffre est
+  refusée ; une citation introuvable reste signalée à l’éditeur. 3 200 jetons
+  au lieu de 6 200, 32 s au lieu de 49 s, 0,006 $ au lieu de 0,0096 $.
+- *Les prompts d’image disent chaque règle une fois.* Une image est facturée
+  surtout sur le texte qu’on lui envoie : le prompt du collage répétait trois
+  fois la liste des ingrédients, trois fois l’interdiction de garniture et deux
+  fois les observations. Toutes les règles sont gardées, chacune une fois :
+  16 500 → 9 700 caractères pour le collage, 0,029 $ → 0,023 $ ; 7 500 → 5 600
+  pour l’image à la une, 0,015 $ → 0,013 $.
+
+| Recette | Passages d’approbation | Coût |
+| --- | ---: | ---: |
+| Tarte aux pommes normande | 1 | 0,090 $ |
+| Souris d’agneau au four | 1 | 0,091 $ |
+| Daube de bœuf provençale | 1 | 0,099 $ |
+| Lasagnes courgettes et jambon | 2 (une phrase corrigée) | 0,102 $ |
+| Poulet yassa | 2 (collage redessiné) | 0,131 $ |
+| Clafoutis aux cerises | 4 (images redessinées) | 0,177 $ |
+| **Moyenne** | | **0,115 $** (0,125 $ en 0.18.5) |
+
+Une recette approuvée du premier coup coûte désormais 0,09 à 0,10 $ ; ce qui
+fait monter la moyenne, ce sont les images redessinées. Le collage du clafoutis
+montrait deux fois la même étape : la règle « chaque panneau fait avancer la
+recette » avait disparu à la réécriture et a été rétablie. L’estimation suit
+ces mesures : 0,110 $ la recette, au plus 0,317 $.
 
 ## Version 0.18.9
 

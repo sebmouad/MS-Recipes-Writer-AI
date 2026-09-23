@@ -175,8 +175,10 @@ final class MSRWA_Engine_Input {
 		if ( $counts ) {
 			$lines[] = '• Countable ingredients, exact numbers: ' . implode( '; ', $counts ) . '. Where a panel lays the ingredients out — the mise en place — show exactly these numbers, not one more pack, roll, fruit or egg "for composition". This binds the ingredient display only. A later panel showing the dish being made or served need not have them all in shot, and a few of the same fruit resting in the background of a finished shot is styling, not a miscount.';
 		}
+		// The list itself is already in the prompt; restating it here and again in
+		// the closing rules was three copies of the same forty words per image.
 		if ( $measured ) {
-			$lines[] = '• Measured ingredients, no count to respect, show a believable amount: ' . implode( '; ', $measured ) . '.';
+			$lines[] = '• Every other ingredient is measured, not counted: show a believable amount.';
 		}
 		$equipment = array_values( array_filter( array_map( 'trim', array_map( 'strval', (array) ( $canonical['equipment'] ?? array() ) ) ) ) );
 		if ( $equipment ) {
@@ -219,7 +221,9 @@ final class MSRWA_Engine_Input {
 		// Every image is generated in its own call, so nothing makes them agree unless
 		// the same decision is written into both. Three refusals in four came from the
 		// featured photograph and the collage's last panel serving the dish differently.
-		$lines[] = '• ONE SERVING PRESENTATION, shared by every image of this recipe: ' . self::serving_presentation( $canonical, $research ) . ' The featured photograph and the last panel of the collage must show the finished dish presented that same way, in the same vessel and at the same degree of colour. They are two photographs of one dish, taken minutes apart.';
+		$lines[] = '• ONE SERVING PRESENTATION, shared by every image of this recipe: ' . self::serving_presentation( $canonical, $research, true )
+			. ( $observed ? ' At the colour the observations above record.' : '' )
+			. ' The featured photograph and the last panel of the collage show it that same way — same vessel, same colour: two photographs of one dish, minutes apart.';
 
 		return implode( "\n", $lines ) . "\n";
 	}
@@ -440,7 +444,7 @@ final class MSRWA_Engine_Input {
 		$prompt .= "\nBEFORE YOU DRAW — the six rules a previous attempt at this brief broke:\n"
 			. "1. No text anywhere in the image: no caption, signature, watermark, logo, sticker, border or coloured frame. Nothing written, in any corner.\n"
 			. "2. No hands, no arms, no people. Nobody holds, carries or presents the dish.\n"
-			. '3. Nothing on the plate that is not in this list: ' . implode( ', ', $ingredients ) . ". No herb sprig, no citrus wedge, no dusting, no drizzle, no scattered seeds, however usual that looks."
+			. "3. Nothing on the plate that is not in the exact ingredient list above. No herb sprig, no citrus wedge, no dusting, no drizzle, no scattered seeds, however usual that looks."
 			// The observations name only what the vision pass could identify, so an
 			// unrecognised garnish arrives as "red and green strips" or "a yellow
 			// fruit half". Drawn literally those became peppers and a lemon slice,

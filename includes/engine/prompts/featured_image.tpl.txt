@@ -1,31 +1,9 @@
-Create a highly realistic premium food photograph of the finished, ready-to-serve dish, in strict {{featured_ratio}} format at {{featured_size}}.
+Create a highly realistic premium food photograph of the finished, ready-to-serve dish, in strict {{featured_ratio}} format at {{featured_size}}: a real professional photograph for a recipe website, never an illustration, a render or a generated-looking picture.
 
-The image must look like a real professional photograph made for a recipe website: not an illustration, not a render, not a generated-looking picture.
+The visual brief below comes from real photographs of this dish: follow it for form, doneness, texture, colour, vessel and angle, without copying any reference composition. The canonical recipe controls the dish and its ingredients; never add a hidden ingredient, quantity or step.
 
-Use the supplied RESEARCH PACKAGE as the visual source of truth. Its visual observations come from real, unedited source photographs and may guide dish form, doneness cues, texture, colour, plating, vessel, light and camera angle. Do not copy any reference image or reproduce its distinctive composition.
+Quality: photorealistic, soft natural side-window light, realistic colours never oversaturated, detailed surface texture — crumb, glaze, juices, crust, grain — appetising natural plating as a good home cook would serve it, clean table styling, subtle depth of field, realistic shadows and reflections.
 
-The canonical recipe controls the dish identity and ingredients. Never infer or add a hidden ingredient, quantity or preparation step from a photograph.
+Composition: one plated dish or serving arrangement, naturally centred; background props subtle. Camera: full-frame look, 85 mm, f/2.8, three-quarter angle at about 30 degrees.
 
-Required visual quality:
-- photorealistic food photography;
-- natural soft window light from the side;
-- believable, edible ingredients that match the recipe exactly;
-- realistic colours, never oversaturated;
-- detailed surface textures: crumb, glaze, juices, crust, grain;
-- appetising but natural plating, as a good home cook would serve it;
-- clean table styling suitable for a recipe blog;
-- subtle depth of field, realistic shadows and reflections;
-- no plastic or waxy food, no fantasy garnish.
-
-Composition rules:
-- one single plated dish or serving arrangement, naturally centred;
-- no hands, no people, no cooking process, no preparation steps;
-- no collage, no split screen, no before and after;
-- no packaging, no label, no text, no watermark, no logo;
-- keep every branded container, product tub and package completely outside the frame;
-- no garnish at all unless it is one of the recipe's own ingredients: no herb sprig laid on the dish, no scattered leaves, no citrus wedge, no dusting, no drizzle. A bare plate of exactly what the recipe makes is correct; the usual food-photography garnish is a defect here;
-- background props stay subtle and never compete with the dish.
-
-Camera direction: full-frame camera look, 85 mm lens, f/2.8, three-quarter angle at about 30 degrees, soft side light, clean editorial composition.
-
-Avoid: cartoon, illustration, 3D render, painting, plastic food, unrealistic shine, duplicated utensils, distorted plates, floating ingredients, impossible physics, excessive steam, messy composition, text, labels, watermarks, logos, packaging, collage, split screen.
+Never: hands or people, cooking steps, collage or split screen, text, label, watermark, logo, packaging or branded container; garnish that is not one of the recipe's own ingredients — no herb sprig, scattered leaves, citrus wedge, dusting or drizzle: a bare plate of exactly what the recipe makes is correct. No cartoon, 3D render, plastic or waxy food, unrealistic shine, duplicated utensils, distorted plates, floating ingredients, impossible physics or excessive steam.

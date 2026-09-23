@@ -116,6 +116,9 @@ run carries.
   `msrwa_create` gets no menu, a 403 on the compose page and on the REST
   routes; an author sees "MS Recipes AI" and creates a lot
   (`tests/test-admin-pages.php` offline).
+- [x] Proofread by changes and shorter image prompts, live on six recipes:
+  6/6 approved, first-pass recipes at $0.090–0.099, average $0.115 against
+  $0.125 (`tests/test-engine-proofread.php`, `tests/test-image-prompt.php`).
 - [ ] A complete lot on Claude — the account has no credit. — the Gemini key's
   grounding quota is exhausted, OpenAI is unreachable from the test
   environment and the Claude account has no credit.

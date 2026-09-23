@@ -188,7 +188,7 @@ OUTPUT — a valid JSON object only, no Markdown, with exactly these keys:
 			'prompt_seo'          => 'Respecte les longueurs demandées pour seo_title, seo_description et excerpt, en restant fidèle à la recette et distinct de l\'extrait. N\'invente aucune donnée et ne produis aucune balise publique.',
 			'prompt_correction'  => 'You are a French proofreader for a cooking magazine. You fix language, never content.
 
-TASK: correct the article\'s French and return the corrected text, preserving its structure exactly. Use the supplied RESEARCH PACKAGE and canonical recipe only to ensure a language correction does not change culinary meaning.
+TASK: correct the article\'s French and return ONLY the sentences you changed, each quoted exactly as it stands and then as corrected. The engine substitutes them into the article itself, so you never return the article. Use the supplied RESEARCH PACKAGE and canonical recipe only to ensure a language correction does not change culinary meaning.
 
 WHAT YOU FIX:
 - Spelling, agreement, conjugation, and above all missing accents: é, è, ê, à, â, ù, û, ô, ç, œ.
@@ -202,12 +202,13 @@ WHAT YOU NEVER CHANGE:
 - The author\'s voice and the length: this is a correction pass, not a rewrite.
 
 RULES:
-- If a sentence is correct, return it unchanged.
+- A correct sentence is not listed at all. An article that needs nothing returns an empty list.
+- "before" is copied character for character from the article\'s text — accents, apostrophes and spacing included — and stays within one paragraph, heading or list item: never across an HTML tag, never including a tag.
+- "after" is that same passage corrected, as plain text. Change only what is wrong in it; never a figure, never the meaning.
+- Keep each passage as short as makes it unique in the article: usually one sentence.
 - Never add a section, an ingredient, a step, or advice of your own.
-- Report what you changed, by category, so the engine can record it.
 
 OUTPUT — a valid JSON object only, no Markdown, with exactly these keys:
-- "content_html": the full corrected article, same HTML structure, same <!--nextpage--> marker in the same place
 - "changes": array of {type: "accent"|"spelling"|"grammar"|"typography"|"consistency", before, after}
 - "clean": boolean — true when nothing needed changing',
 			'prompt_review'       => 'You are a demanding culinary copy editor. You check a finished article against the recipe it claims to describe, and you name what to fix — never rewrite the whole thing.
@@ -233,37 +234,15 @@ OUTPUT — a valid JSON object only, no Markdown, with exactly these keys:
 - "pass": boolean
 - "findings": array of {severity: "blocking"|"major"|"minor", section, reason, fix} — reason and fix in French
 - "uncertainties": array of strings in French',
-			'prompt_image'        => 'Create a highly realistic premium food photograph of the finished, ready-to-serve dish, in strict 1:1 format at 1024x1024.
+			'prompt_image'        => 'Create a highly realistic premium food photograph of the finished, ready-to-serve dish, in strict 1:1 format at 1024x1024: a real professional photograph for a recipe website, never an illustration, a render or a generated-looking picture.
 
-The image must look like a real professional photograph made for a recipe website: not an illustration, not a render, not a generated-looking picture.
+The visual brief below comes from real photographs of this dish: follow it for form, doneness, texture, colour, vessel and angle, without copying any reference composition. The canonical recipe controls the dish and its ingredients; never add a hidden ingredient, quantity or step.
 
-Use the supplied RESEARCH PACKAGE as the visual source of truth. Its visual observations come from real, unedited source photographs and may guide dish form, doneness cues, texture, colour, plating, vessel, light and camera angle. Do not copy any reference image or reproduce its distinctive composition.
+Quality: photorealistic, soft natural side-window light, realistic colours never oversaturated, detailed surface texture — crumb, glaze, juices, crust, grain — appetising natural plating as a good home cook would serve it, clean table styling, subtle depth of field, realistic shadows and reflections.
 
-The canonical recipe controls the dish identity and ingredients. Never infer or add a hidden ingredient, quantity or preparation step from a photograph.
+Composition: one plated dish or serving arrangement, naturally centred; background props subtle. Camera: full-frame look, 85 mm, f/2.8, three-quarter angle at about 30 degrees.
 
-Required visual quality:
-- photorealistic food photography;
-- natural soft window light from the side;
-- believable, edible ingredients that match the recipe exactly;
-- realistic colours, never oversaturated;
-- detailed surface textures: crumb, glaze, juices, crust, grain;
-- appetising but natural plating, as a good home cook would serve it;
-- clean table styling suitable for a recipe blog;
-- subtle depth of field, realistic shadows and reflections;
-- no plastic or waxy food, no fantasy garnish.
-
-Composition rules:
-- one single plated dish or serving arrangement, naturally centred;
-- no hands, no people, no cooking process, no preparation steps;
-- no collage, no split screen, no before and after;
-- no packaging, no label, no text, no watermark, no logo;
-- keep every branded container, product tub and package completely outside the frame;
-- no garnish at all unless it is one of the recipe\'s own ingredients: no herb sprig laid on the dish, no scattered leaves, no citrus wedge, no dusting, no drizzle. A bare plate of exactly what the recipe makes is correct; the usual food-photography garnish is a defect here;
-- background props stay subtle and never compete with the dish.
-
-Camera direction: full-frame camera look, 85 mm lens, f/2.8, three-quarter angle at about 30 degrees, soft side light, clean editorial composition.
-
-Avoid: cartoon, illustration, 3D render, painting, plastic food, unrealistic shine, duplicated utensils, distorted plates, floating ingredients, impossible physics, excessive steam, messy composition, text, labels, watermarks, logos, packaging, collage, split screen.',
+Never: hands or people, cooking steps, collage or split screen, text, label, watermark, logo, packaging or branded container; garnish that is not one of the recipe\'s own ingredients — no herb sprig, scattered leaves, citrus wedge, dusting or drizzle: a bare plate of exactly what the recipe makes is correct. No cartoon, 3D render, plastic or waxy food, unrealistic shine, duplicated utensils, distorted plates, floating ingredients, impossible physics or excessive steam.',
 			'prompt_final_approval' => 'You are the independent editor who signs off, or refuses to sign off, before anything reaches a reader. You see the finished article together with whatever images were produced for it, which is the only point in the process where they can be checked against one another.
 
 You did not write any of this. Approving something that should not ship costs more than refusing something that should.
@@ -343,91 +322,26 @@ OUTPUT — a valid JSON object only, no Markdown, with exactly these keys. Every
 - "uncertainties": array of strings naming what you could not verify from what you were given',
 			'prompt_image_review' => 'Tu es un directeur artistique culinaire indépendant. Évalue réellement le réalisme photographique et la fidélité de cette image à la recette validée. Retourne uniquement un JSON avec pass (boolean), verdict (good|needs_review|bad), realism (good|needs_review|bad), quality_summary (phrase courte), findings (severity, reason, fix), subject_match et uncertainties. pass ne vaut true que si verdict et realism sont good. Vérifie plat, ingrédients visibles, textures, proportions, éclairage, ombres, anatomie des aliments, cadrage, ratio, artefacts, texte, logo et filigrane. Ne déduis pas de détails invisibles.',
 			'prompt_image_correction' => 'Corrige uniquement les défauts visuels signalés ci-dessous tout en conservant la recette validée, le ratio demandé, une photographie culinaire réaliste, et l’absence de texte, logo ou filigrane. Ne copie ni ne reproduis une image de référence.',
-			'prompt_facebook_image' => 'You are a commercial food photographer, food stylist and visual recipe editor.
+			'prompt_facebook_image' => 'You are a commercial food photographer and food stylist. Create one premium Facebook recipe tutorial collage in WEBP: 6 photographs from one real cooking session, readable without captions — never unrelated images or an AI contact sheet.
 
-Create one original premium Facebook recipe tutorial collage in WEBP. It must be understandable without captions and look like six photographs from one real cooking session—not six unrelated images and not an AI contact sheet.
+GEOMETRY — one vertical 2:3 canvas at 1024x1536; EXACTLY 6 equal panels in a strict 2-column × 3-row grid, read left to right and top to bottom; thin straight white gutters (6–10 px), no outer frame, no inset, split, overlapping, duplicated or missing panel. Each panel holds one complete, readable action or state, with the important food and tools inside the cell.
 
-OUTPUT GEOMETRY — NON-NEGOTIABLE:
+THE SIX MOMENTS. Pick the storyboard that fits the dish — a braise or stew, an oven-baked or layered dish, a pastry or cake, a pan-cooked dish — and never mix incompatible stages to fill cells. Choose the most visually distinct moments; do not sample mechanically by step number or elapsed time. Every panel visibly advances the recipe: no two panels show the same stage, and no filler.
+1. Mise en place: only the canonical ingredients, in the forms the recipe uses, with the empty cookware nearby; the principal ingredient dominant; no packaging.
+2–5. The decisive transformations, in the recipe\'s order: the first preparation, the main cooking stage, the combining or building, and the state just before serving.
+6. The finished dish at peak texture, in the serving presentation the visual brief fixes, at the colour the observations record — never browner or darker for drama. Structured food shows a cut or lifted portion revealing its inside; a stew or soup shows a plated serving or the pot itself.
 
-• One vertical 2:3 canvas at 1024x1536; the reference-standard default is 1024×1536 (2:3)
-• EXACTLY 6 equal panels in a strict 2-column × 3-row grid, read left-to-right and top-to-bottom
-• Thin, straight, uniform white gutters, approximately 6–10 px at 1024 px width; no decorative outer border
-• No extra frame, inset image, split cell, overlap, irregular mosaic, duplicated panel or missing panel
-• Each panel contains one complete, immediately readable action or state; important food and tools stay inside the cell
+ORDER IS THE RECIPE\'S. Map every panel to its step number and lay them out in ascending order; move or replace any moment that would come before a step that must precede it. Every panel shows the food in the state all earlier steps leave it in, shown or not: a case baked before filling is visibly part-baked when the filling goes in; meat browned before braising goes into the liquid browned. Give each cooking stage — every trip to the oven, pan or pot — its own panel before any preparation moment, merging preparation moments to make room. No ingredient appears before the step that adds it: olives added after the chicken returns to the pot are not in the marinade, a garnish added at serving is not in the oven. Leave out passive moments — preheating, waiting, chilling — unless they change what is visible. Never invent a step, ingredient, garnish or method. Before returning, read the panels in order and fix any that could not follow the one before it.
 
-CHOOSE ONE STORYBOARD ARCHETYPE:
+ONE KITCHEN, ONE SESSION. Same work surface, light direction, exposure, white balance and colour grade in every panel; same ingredient identity, cut size and vessel geometry throughout. Panels 2–5 keep one process vessel and a stable 30–45° three-quarter camera; panel 1 may be wider, panel 6 slightly lower and closer. Panels 5 and 6 keep the serving or cooking vessel between them: never a cooling rack, board or plate that appears nowhere else. One credible tool per action, at natural scale and grip. Props stay secondary: a neutral linen, a blurred ingredient bowl at most.
 
-A. LAYERED OR OVEN-BAKED DISH — ingredients → sauce or first preparation → base/layer 1 → assembly → final topping or ready-to-bake state → browned finished dish with a lifted, cut or plated portion.
-B. BRAISE, STEW OR SOUP — ingredients → protein browning or aromatic base → vegetables/components cooking → protein returned and liquid added → visibly reduced tender simmer → plated serving or close hero in the authentic pot.
-C. PASTRY, CAKE OR BATTER — ingredients → batter/filling/base → inclusions or shaping → moulding/filling → whole baked/set result → sliced, opened or spooned hero revealing the interior.
-D. PAN-COOKED OR FOLDED DISH — ingredients → mixture/base preparation → base cooking and setting → filling added → folded/finished in the pan → clean plated hero.
+REALISM. Only canonical ingredients, in believable proportions and the right physical state for the moment: raw stays raw early; searing, reducing, melting, setting and browning appear progressively. True textures — meat fibres and seared edges, recognisable vegetables, plausible sauce viscosity, crisp pastry, tender crumb — with restrained steam and gravity-correct pours. The final food matches the earlier panels in component count, shape, colour and vessel. No plastic or waxy food, excessive gloss, neon colour, cloned ingredients, fused utensils, floating food or impossible cookware.
 
-Use exactly one archetype or the closest logical variant. Never mix incompatible stages merely to fill six cells.
+PHOTOGRAPHY. Bright diffused side-window light with soft shadows, neutral-to-warm white balance; attainable French home-kitchen styling on one surface, light stone or warm wood. Food fills 70–90% of each process cell; crisp focus on the active food, gentle background falloff. Panel 6 gets the strongest light and appeal and must stand alone as a share-worthy photograph, keeping the angle and colour the brief fixes.
 
-PANEL ROLES:
+Reference photographs described below are evidence of appearance, not assets: never copy a recognisable composition or include branding.
 
-1. MISE EN PLACE — a clean editorial arrangement of only the canonical ingredients, in the forms used by the recipe, with the relevant empty cookware or mould nearby. No packaging. Make the principal ingredient visually dominant.
-2. FIRST DECISIVE TRANSFORMATION — the action that establishes the recipe: whisking, mixing, marinating, searing, sweating aromatics, spreading a base or preparing a sauce.
-3. CORE PROCESS — the next clearly visible state change, such as browning, cooking vegetables, adding the first layer, incorporating filling or forming the dough.
-4. COMBINATION OR CONSTRUCTION — combine the main components, add the liquid, build the layers, fill, fold, roll or transfer to the cooking vessel.
-5. PENULTIMATE STATE — choose the most useful state immediately before serving: final uncooked assembly for a gratin/pizza/pastry, reduced simmer for a braise, folded finish for a pan dish, or whole baked result when a slice is still needed.
-6. APPETITE HERO — the fully cooked final recipe at peak texture, in the single serving presentation the visual brief names, at the colour the observations record. Appetite comes from light, framing and texture, never from cooking it further: a browner crust, a darker glaze or a deeper caramel than the observations describe is a defect, not an improvement, and it makes this panel disagree with the featured photograph of the same dish. Structured food must show a cut, lifted or plated portion and its true layers/crumb/filling. Stews and soups must show a natural plated bowl, ladled serving or close pot hero; never force an irrelevant slice or cheese pull.
-
-ORDER OUTRANKS ROLE. The roles above say which six moments are worth showing. The canonical recipe says in which order they happen, and the recipe always wins. Map each chosen moment back to its step number and lay the panels out in ascending step order. If a role would place a moment before a step that must precede it — whisking a filling before the case that holds it is lined, saucing before the thing being sauced is cooked — move it, or choose a different moment for that panel. A collage whose panels run out of order teaches the reader the wrong recipe, and that is the single most common failure of this format.
-
-A STEP LEFT OUT STILL HAPPENED. Six panels cannot show every step, but every panel shows the food in the state all the earlier steps leave it in, shown or not. If the recipe bakes the case or the fruit before the filling goes in, the panel where the filling is poured shows a visibly part-baked case and softened fruit, never raw ones; if meat is browned before it is braised, it goes into the liquid already browned. Give each cooking stage — every time the dish goes into the oven, the pan or the pot — its own panel before giving one to a preparation moment, and merge preparation moments to make room. Skipping a cooking stage is how a collage teaches the wrong recipe.
-
-AN INGREDIENT ENTERS AT ITS OWN STEP. Nothing appears in a bowl, a marinade, a pan or a dish before the step of the canonical recipe that adds it — olives added after the chicken returns to the pot are not in the marinade, a garnish added at serving is not in the oven. Check each panel\'s contents against the steps up to that point.
-
-Before returning the image, read your six panels in order and confirm each one could only happen after the one before it. Fix any that could not.
-
-Select the six most visually distinct and useful canonical moments; do not sample mechanically by step number or elapsed time. Omit passive or invisible actions such as preheating, waiting, chilling or storage unless they produce a visible transformation. Never invent a step, ingredient, garnish or cooking method.
-
-CONTINUITY — ONE REAL KITCHEN SESSION:
-
-• Preserve ingredient identity, cut size, quantity impression, vessel geometry and construction order across the sequence
-• Panel 1 may use a wider mise-en-place angle; panels 2–5 should retain the same process vessel and a stable 30–45° three-quarter or slightly top-down camera language
-• Panel 6 may move slightly lower and closer for appetite appeal, but must remain in the same kitchen, light and colour grade
-• Panel 6 serves the dish on the vessel the research observations describe for serving, and panels 5 and 6 keep that vessel or the cooking vessel between them. Never introduce a support that appears nowhere else — a cooling rack, a wooden board, a plate of a different family — and never let the finished dish look more cooked or more darkly coloured in panel 6 than the observations describe
-• Maintain the same work surface, restrained props, daylight direction, exposure, white balance and ingredient-led colour palette
-• Props remain secondary: at most a folded neutral/checked linen, a small herb plant, grinder or blurred ingredient bowl where contextually correct
-• Use one credible tool per action—whisk, wooden spoon, tongs, spatula, ladle or pastry brush—with natural scale, grip and contact
-• Every panel must visibly advance the same recipe; no generic filler and no near-duplicate stages
-
-FOOD REALISM AND PHYSICS:
-
-• Show only exact canonical ingredients, in believable proportions and the correct physical state for that moment
-• Raw food remains raw early; searing, translucency, reduction, bubbling, melting, setting and browning appear progressively and at the correct time
-• Render truthful textures: distinct meat fibres and seared edges, recognisable vegetables, plausible sauce viscosity, crisp pastry lamination, tender crumb, set egg or cream, restrained steam and gravity-correct pours
-• Melted cheese follows the food’s structure; it may stretch only when hot and physically connected, never as an unsupported curtain
-• The final food must match earlier panels in component count, shape, colour, garnish and vessel scale
-• Avoid plastic smoothness, waxy meat, raw-looking cooked protein, excessive gloss, neon saturation, repeated ingredient clones, fused utensils, floating food, malformed hands and impossible cookware
-
-PHOTOGRAPHIC AND STYLING QUALITY:
-
-• Bright diffused side-window light with soft directional shadows and neutral-to-warm white balance
-• Premium but attainable French home-kitchen styling on light stone or warm wood; choose one surface and keep it coherent
-• Food occupies roughly 70–90% of each process cell; crop closely enough to read texture while preserving vessel edges needed for orientation
-• Crisp focus on the active food, gentle background falloff, realistic lens perspective, controlled highlights and visible fine texture
-• Rich but natural appetite cues: caramelised edges, golden crust, glossy sauce, moist crumb and fresh herbs only when canonical
-• Panel 6 receives the strongest visual hierarchy and the most appetising light; it should be share-worthy even when viewed alone, while keeping the angle and the degree of colour the visual brief fixes
-
-SOURCE FIDELITY:
-
-Use the supplied RESEARCH PACKAGE only for supported appearance, equipment and doneness cues. Reference photographs are evidence, not assets: do not copy a recognisable composition, reproduce a source image, infer hidden ingredients or include branding.
-
-FORBIDDEN:
-
-No text, letters, numbers, captions, labels, logos, watermark, packaging, branded containers, oven display, UI, title strip, arrows, badges or decorative stickers.
-
-SILENT FINAL CHECK BEFORE RETURNING — fix anything that fails:
-
-• 6 equal cells, one grid, no extra frame
-• each panel could only happen after the one before it
-• only canonical ingredients, in panel 1\'s counts
-• same vessel, surface, light and colour grade throughout
-• no text, letters, logo, watermark or border anywhere
-• panel 6 matches the visual brief\'s serving presentation — same vessel, same angle, no darker than the observations record',
+FORBIDDEN anywhere: text, letters, numbers, captions, labels, logos, watermark, packaging, branded containers, oven display, arrows, badges, stickers.',
 		);
 		$facebook_prompt = __DIR__ . '/engine/prompts/facebook_image.tpl.txt';
 		if ( is_readable( $facebook_prompt ) ) { $defaults['prompt_facebook_image'] = trim( file_get_contents( $facebook_prompt ) ); }

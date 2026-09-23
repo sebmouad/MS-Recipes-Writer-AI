@@ -335,6 +335,41 @@ final class MSRWA_Engine {
 	}
 
 	/**
+	 * The proofread article, built in code from the sentences the proofreader
+	 * changed.
+	 *
+	 * Rewriting a whole article to correct a few sentences was the single most
+	 * expensive answer after the research — 6 000 tokens out and fifty seconds —
+	 * and twice it came back with the body missing. The proofreader now returns
+	 * only what it changed, quoted verbatim, and each change is substituted here.
+	 * A change that touches a figure is refused, since the proofread may never
+	 * alter one, and a quote that cannot be found is left for the editor.
+	 */
+	private static function proofread( array $answer, array $brief, MSRWA_Result $result ) {
+		$html = (string) ( MSRWA_Engine_Input::article( $brief )['content_html'] ?? '' );
+		$applied = array();
+		$skipped = array();
+		foreach ( (array) ( $answer['changes'] ?? array() ) as $change ) {
+			if ( ! is_array( $change ) ) { continue; }
+			$before = trim( (string) ( $change['before'] ?? '' ) );
+			$after = trim( (string) ( $change['after'] ?? '' ) );
+			if ( '' === $before || '' === $after || $before === $after ) { continue; }
+			preg_match_all( '/\d+(?:[.,]\d+)?/', $before, $was );
+			preg_match_all( '/\d+(?:[.,]\d+)?/', $after, $is );
+			// Proofreaders list overlapping passages: once the first is applied the
+			// second's wording is gone, and its correction is already in the text.
+			if ( false === mb_strpos( $html, $before ) && false !== mb_strpos( $html, $after ) ) { continue; }
+			if ( $was[0] !== $is[0] || false === mb_strpos( $html, $before ) ) { $skipped[] = $change; continue; }
+			$html = self::substitute( $html, $before, $after );
+			$applied[] = $change;
+		}
+		if ( $skipped ) {
+			$result->event( 'warning', 'proofread', sprintf( '%d change(s) not applied: quoted text not found verbatim, or a figure would have changed.', count( $skipped ) ), array( 'skipped' => $skipped ) );
+		}
+		return array( 'content_html' => $html, 'changes' => $applied, 'clean' => ! $applied, 'changes_not_applied' => $skipped );
+	}
+
+	/**
 	 * One quoted sentence replaced in the article. An empty replacement removes
 	 * it: the space before it goes too, and the paragraph if nothing else was in it.
 	 */
@@ -395,6 +430,10 @@ final class MSRWA_Engine {
 
 			if ( 'research' === $name && $answer ) {
 				$answer = self::observe( $answer, $config, $result, $call['usage'] );
+				$call['text'] = (string) json_encode( $answer, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+			}
+			if ( 'proofread' === $name && $answer && ! isset( $answer['content_html'] ) ) {
+				$answer = self::proofread( $answer, $brief, $result );
 				$call['text'] = (string) json_encode( $answer, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
 			}
 
@@ -638,7 +677,7 @@ final class MSRWA_Engine {
 		// What was corrected is the editor's record, not the article: sent along, it
 		// put every sentence already removed back in front of the judge, who then
 		// refused an article over a sentence the proofread had already fixed.
-		$article = array_diff_key( $article, array_flip( array( 'corrections_applied', 'corrections_for_the_editor', 'approval_repairs', 'changes', 'clean' ) ) );
+		$article = array_diff_key( $article, array_flip( array( 'corrections_applied', 'corrections_for_the_editor', 'approval_repairs', 'changes', 'clean', 'changes_not_applied' ) ) );
 
 		// A rewrite carries what the reviews found; a first draft carries nothing.
 		$feedback = array();

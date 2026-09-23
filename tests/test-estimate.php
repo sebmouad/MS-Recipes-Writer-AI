@@ -21,10 +21,12 @@ $full = MSRWA_Estimate::recipe( MSRWA_Profile::FULL );
 
 // Real runs on the shipped configuration, 2026-09-23, OpenAI, after the search
 // and thinking economies: one pass of a full recipe cost $0.1055, $0.109 and
-// $0.115 on three dishes, the article profile about $0.050. The estimate must
+// $0.115 on three dishes, the article profile about $0.050. On 0.19.0, with
+// the proofread returning its changes only and shorter image prompts, a
+// recipe approved at the first pass billed $0.0896 and $0.0912. The estimate must
 // never read below what was billed — that is how a lot passes a ceiling it
 // then breaks — and not so far above it that it stops meaning anything.
-$measured = 0.110;
+$measured = 0.091;
 msrwa_test_assert(
 	$full['cost_usd'] >= $measured && $full['cost_usd'] <= $measured * 1.4,
 	'The full estimate must sit at or just above what one real pass cost; got ' . $full['cost_usd'] . ' against ' . $measured
