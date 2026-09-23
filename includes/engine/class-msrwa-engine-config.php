@@ -109,6 +109,12 @@ final class MSRWA_Engine_Config {
 				'concurrency'        => 4,
 				'max_image_bytes'    => 10000000,
 				'observation_phrases'=> 8,
+				// Web searches one call may run, each billed on top of the tokens.
+				// Uncapped, a live OpenAI research call ran 13 and cost $0.1525
+				// against an estimate of $0.0504 that had assumed three. The
+				// estimate prices exactly this many, so it is a ceiling and not a
+				// guess. Gemini offers no cap; its grounding is priced the same way.
+				'web_searches'       => 10,
 			),
 
 			'language' => 'fr',
@@ -135,6 +141,9 @@ final class MSRWA_Engine_Config {
 					'key_env'         => array( 'OPENAI_API_KEY', 'MSRWA_OPENAI_KEY' ),
 					'web_search_tool' => array( 'type' => 'web_search' ),
 					'web_search_usd'  => 0.01,
+					// Cached input is billed at a tenth of the input rate on every
+					// current model on OpenAI's pricing page.
+					'cached_input_ratio' => 0.1,
 				),
 				'gemini' => array(
 					'text_endpoint'   => 'https://generativelanguage.googleapis.com/v1beta/models/{{model}}:generateContent',
@@ -317,6 +326,17 @@ final class MSRWA_Engine_Config {
 		return array( 'provider' => $provider, 'model' => $model, 'route' => $route, 'tier' => isset( $tiers[ $named ] ) ? $named : '' );
 	}
 
+	/**
+	 * How many web searches one call may run on a provider: `limits.web_searches`,
+	 * or the provider's own tool cap when that is lower — Claude's tool ships
+	 * with `max_uses` 3, and the lower of two ceilings is the one that binds.
+	 */
+	public function web_searches( $provider = '' ) {
+		$limit = max( 1, (int) $this->get( 'limits.web_searches', 10 ) );
+		$own = (int) ( ( (array) $this->get( 'providers.' . $provider . '.web_search_tool', array() ) )['max_uses'] ?? 0 );
+		return $own > 0 ? min( $limit, $own ) : $limit;
+	}
+
 	/** The thinking levels the engine knows how to ask for. */
 	public static function thinking_levels() { return array( 'minimal', 'low', 'medium', 'high' ); }
 
@@ -356,6 +376,7 @@ final class MSRWA_Engine_Config {
 		$provider['timeout'] = (int) $this->get( 'limits.http_timeout', 600 );
 		$provider['has_key'] = '' !== $key;
 		$provider['thinking_level'] = $this->thinking( '' === (string) $step ? 'default' : (string) $step, $name );
+		$provider['web_searches'] = $this->web_searches( $name );
 		return $provider;
 	}
 
@@ -391,7 +412,13 @@ final class MSRWA_Engine_Config {
 		// Every provider charges each web search on top of the tokens, and the
 		// research step makes several.
 		$searches = (int) ( $usage['web_searches'] ?? 0 ) * (float) ( $this->get( 'providers.' . $provider . '.web_search_usd', 0 ) );
-		return ( (int) ( $usage['input_tokens'] ?? 0 ) * (float) $rate[0] + (int) ( $usage['output_tokens'] ?? 0 ) * (float) $rate[1] ) / 1000000 + $searches;
+		// Input read from the provider's cache is billed at a fraction of the
+		// rate. Without a published ratio it is billed in full, which overstates
+		// and never understates.
+		$input = (int) ( $usage['input_tokens'] ?? 0 );
+		$cached = min( $input, (int) ( $usage['cached_input_tokens'] ?? 0 ) );
+		$ratio = min( 1.0, max( 0.0, (float) $this->get( 'providers.' . $provider . '.cached_input_ratio', 1.0 ) ) );
+		return ( ( $input - $cached + $cached * $ratio ) * (float) $rate[0] + (int) ( $usage['output_tokens'] ?? 0 ) * (float) $rate[1] ) / 1000000 + $searches;
 	}
 
 	public function max_output( $step ) { return (int) $this->get( 'max_output.' . $step, 4000 ); }

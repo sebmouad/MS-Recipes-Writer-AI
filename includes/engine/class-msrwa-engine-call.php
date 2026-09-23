@@ -194,6 +194,8 @@ final class MSRWA_Engine_Call {
 		if ( 'openai' === $provider ) {
 			$payload = array( 'model' => $model, 'input' => (string) $input, 'store' => false, 'max_output_tokens' => max( 16, (int) $max_tokens ) );
 			if ( $tools ) { $payload['tools'] = array( $tools ); }
+			// The only built-in tool given is search, so this caps the searches.
+			if ( $tools && ! empty( $wire['web_searches'] ) ) { $payload['max_tool_calls'] = (int) $wire['web_searches']; }
 			if ( $json_output && ! $tools ) { $payload['text'] = array( 'format' => array( 'type' => 'json_object' ) ); }
 		} elseif ( 'gemini' === $provider ) {
 			$payload = array(
@@ -209,6 +211,7 @@ final class MSRWA_Engine_Call {
 				'model' => $model, 'max_tokens' => max( 16, (int) $max_tokens ),
 				'messages' => array( array( 'role' => 'user', 'content' => (string) $input . $instruction ) ),
 			);
+			if ( $tools && ! empty( $wire['web_searches'] ) ) { $tools['max_uses'] = (int) $wire['web_searches']; }
 			if ( $tools ) { $payload['tools'] = array( $tools ); }
 		} else {
 			return array( 'error' => 'unknown provider ' . $provider );
