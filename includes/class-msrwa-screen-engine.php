@@ -31,7 +31,15 @@ final class MSRWA_Screen_Engine {
 			array( __( 'groupes modifiés', 'ms-recipes-writer-ai' ) => number_format_i18n( count( $stored ) ) )
 		);
 
-		if ( isset( $_GET['saved'] ) && ! $invalid ) { MSRWA_UI::note( esc_html__( 'Enregistré.', 'ms-recipes-writer-ai' ) ); }
+		$refused = get_transient( 'msrwa_engine_refused_' . get_current_user_id() );
+		if ( is_array( $refused ) && $refused ) {
+			delete_transient( 'msrwa_engine_refused_' . get_current_user_id() );
+			MSRWA_UI::note( esc_html( sprintf(
+				/* translators: %s lists each refused step, its route and the reason. */
+				__( 'Rien n’a été enregistré : une étape était confiée à un modèle qui ne peut pas la faire. %s', 'ms-recipes-writer-ai' ),
+				MSRWA_Compat::describe( $refused )
+			) ), 'stop' );
+		} elseif ( ! empty( $_GET['saved'] ) && ! $invalid ) { MSRWA_UI::note( esc_html__( 'Enregistré.', 'ms-recipes-writer-ai' ) ); }
 		if ( $invalid ) {
 			MSRWA_UI::note( esc_html( sprintf(
 				/* translators: %s is a comma-separated list of group names. */
@@ -216,6 +224,26 @@ final class MSRWA_Screen_Engine {
 			$resolved[ $entry['value'] ] = self::describe_model( $provider, $model, $prices );
 		}
 
+		// Each step's choices that resolve to a model unable to serve it, with
+		// the reason. The picker disables them; saving refuses them anyway.
+		$blocked = array();
+		foreach ( array_keys( $keys ) as $key ) {
+			if ( in_array( $key, array( 'featured_image', 'facebook_image' ), true ) ) {
+				foreach ( $image_models as $entry ) {
+					list( $provider, $model ) = array_pad( explode( ':', $entry['value'], 2 ), 2, '' );
+					$why = MSRWA_Compat::refusal( $provider, $model, $key );
+					if ( '' !== $why ) { $blocked[ $key ][ $entry['value'] ] = $why; }
+				}
+				continue;
+			}
+			foreach ( $tiers as $tier => $by_provider ) {
+				foreach ( (array) $by_provider as $provider => $model ) {
+					$why = MSRWA_Compat::refusal( $provider, (string) $model, $key );
+					if ( '' !== $why ) { $blocked[ $key ][ $provider . ':' . $tier ] = $why; }
+				}
+			}
+		}
+
 		$listed = array();
 		foreach ( array_keys( $providers ) as $provider ) {
 			$listed[ $provider ] = array(
@@ -231,12 +259,15 @@ final class MSRWA_Screen_Engine {
 			'keys' => $keys,
 			'current' => $current,
 			'resolved' => $resolved,
+			'blocked' => $blocked,
 			'thinking' => array_map( 'strval', (array) $config->get( 'thinking', array() ) ),
 			'imageQuality' => $quality,
 			'qualities' => array_values( array_diff( MSRWA_Images::qualities(), array( 'auto' ) ) ),
 			'thinkingLevels' => MSRWA_Engine_Config::thinking_levels(),
 			'labels' => array(
 				'thinkingDefault' => __( 'par défaut', 'ms-recipes-writer-ai' ),
+				/* translators: %s is a level or model name. */
+				'blockedOption' => __( '%s — ne convient pas à cette étape', 'ms-recipes-writer-ai' ),
 				'unpriced' => __( 'aucun tarif connu — le coût de cette étape ne peut pas être estimé', 'ms-recipes-writer-ai' ),
 				'unserved' => __( 'le fournisseur ne sert pas ce nom : l’étape échouera', 'ms-recipes-writer-ai' ),
 				'unknown' => __( 'jamais vérifié auprès du fournisseur', 'ms-recipes-writer-ai' ),

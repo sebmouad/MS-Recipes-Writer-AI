@@ -131,6 +131,15 @@ final class MSRWA_Batch {
 		// Refusing to start is free; stopping halfway is not. The estimate is
 		// what the site is about to commit, so the ceiling is checked against
 		// it rather than only against what has already been spent.
+		// A route the catalogue says cannot serve its step would fail on the
+		// first recipe, after paying for everything before it: refused here.
+		$problems = class_exists( 'MSRWA_Compat' ) ? MSRWA_Compat::problems( self::config_overrides( $id ) ) : array();
+		if ( $problems ) {
+			return new WP_Error( 'msrwa_incompatible_route', MSRWA_Rights::may_manage()
+				/* translators: %s lists each refused step, its route and the reason. */
+				? sprintf( __( 'Ce lot ne peut pas partir : une étape est confiée à un modèle qui ne peut pas la faire. %s Changez-le sur l’écran Moteur.', 'ms-recipes-writer-ai' ), MSRWA_Compat::describe( $problems ) )
+				: __( 'Ce lot ne peut pas partir : le réglage des modèles du site doit être corrigé par un administrateur.', 'ms-recipes-writer-ai' ) );
+		}
 		$estimate = MSRWA_Estimate::lot( $batch['profile'], (int) $batch['recipes'], 0, self::config_overrides( $id ) );
 		$refusal = MSRWA_Budget::refusal( (float) $estimate['cost_usd'] );
 		if ( '' !== $refusal ) { return new WP_Error( 'msrwa_over_budget', $refusal ); }

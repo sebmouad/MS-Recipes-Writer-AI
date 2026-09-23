@@ -89,6 +89,7 @@ final class MSRWA_UI {
 			'corrections' => __( 'Corrections', 'ms-recipes-writer-ai' ),
 			'proofread' => __( 'Correction de la langue', 'ms-recipes-writer-ai' ),
 			'final_approval' => __( 'Contrôle final', 'ms-recipes-writer-ai' ),
+			'vision' => __( 'Lecture des photographies', 'ms-recipes-writer-ai' ),
 		);
 		return $names[ (string) $step ] ?? (string) $step;
 	}

@@ -212,7 +212,11 @@ final class MSRWA_Admin {
 		if ( ! MSRWA_Rights::may_manage() ) { wp_die( esc_html__( 'Vous n’avez pas accès à cet écran.', 'ms-recipes-writer-ai' ) ); }
 		check_admin_referer( 'msrwa_save_engine' );
 		$invalid = MSRWA_Engine_Settings::save( isset( $_POST['msrwa_engine'] ) ? (array) wp_unslash( $_POST['msrwa_engine'] ) : array() );
-		wp_safe_redirect( add_query_arg( array( 'page' => 'msrwa-engine', 'saved' => 1, 'invalid' => implode( ',', $invalid ) ), admin_url( 'admin.php' ) ) );
+		if ( MSRWA_Engine_Settings::$refused ) {
+			// Kept a minute for the redirected page to say which route and why.
+			set_transient( 'msrwa_engine_refused_' . get_current_user_id(), MSRWA_Engine_Settings::$refused, MINUTE_IN_SECONDS );
+		}
+		wp_safe_redirect( add_query_arg( array( 'page' => 'msrwa-engine', 'saved' => MSRWA_Engine_Settings::$refused ? 0 : 1, 'invalid' => implode( ',', $invalid ) ), admin_url( 'admin.php' ) ) );
 		exit;
 	}
 

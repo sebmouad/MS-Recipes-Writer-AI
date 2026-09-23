@@ -350,3 +350,14 @@ Break these and the plugin misreports itself.
     `MSRWA_Schema` print nothing and `MSRWA_Stack::enrich()` adds to their
     Recipe graph instead. A lot's language and ceiling are the site settings;
     `POST /batches` reads neither from the request.
+
+18. **Only a model able to serve a step is given it.** `MSRWA_Compat` decides:
+    the model must be known to have what the step needs (research searches the
+    web, the final approval and the photograph reading read images, the images
+    are drawn), must not be in the measured-unfit table
+    (`MSRWA_Compat::unfit()` — gpt-5-nano and gpt-5.4-mini on research), and
+    must not be taken off the step on the Modèles screen. A capability nobody
+    established counts as missing. Tiers are resolved as the engine resolves
+    them, so `openai:low` is judged as gpt-5-nano. Saving the Moteur screen,
+    dispatching a lot and the routing diagnostic all refuse on the same rule;
+    the pickers disable what it refuses.

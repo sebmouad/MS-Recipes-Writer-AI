@@ -285,3 +285,8 @@ if ( ! function_exists( 'paginate_links' ) ) {
 }
 
 if ( ! class_exists( 'MSRWA_DB' ) ) { require_once dirname( __DIR__ ) . '/includes/class-msrwa-db.php'; }
+
+if ( ! function_exists( 'get_transient' ) ) { function get_transient( $key ) { return $GLOBALS['msrwa_test_transients'][ $key ] ?? false; } }
+if ( ! function_exists( 'set_transient' ) ) { function set_transient( $key, $value, $expiry = 0 ) { $GLOBALS['msrwa_test_transients'][ $key ] = $value; return true; } }
+if ( ! function_exists( 'delete_transient' ) ) { function delete_transient( $key ) { unset( $GLOBALS['msrwa_test_transients'][ $key ] ); return true; } }
+if ( ! function_exists( 'disabled' ) ) { function disabled( $disabled, $current = true, $echo = true ) { $out = (string) $disabled === (string) $current ? " disabled='disabled'" : ''; if ( $echo ) { echo $out; } return $out; } }

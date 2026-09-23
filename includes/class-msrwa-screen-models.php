@@ -127,9 +127,14 @@ final class MSRWA_Screen_Models {
 								?>
 								<?php foreach ( $steps as $key => $step ) : ?>
 									<?php if ( $step['image'] !== $draws ) { continue; } ?>
-									<label class="ms-grid-step">
+									<?php
+									// A step the model cannot do is shown, locked: the reason
+									// is part of what the owner needs to know about it.
+									$cannot = MSRWA_Compat::refusal( $row['provider'], $row['model_id'], $key, false );
+									?>
+									<label class="ms-grid-step<?php echo '' !== $cannot ? ' ms-grid-step-off' : ''; ?>"<?php echo '' !== $cannot ? ' title="' . esc_attr( $cannot ) . '"' : ''; ?>>
 										<input type="checkbox" name="model[<?php echo esc_attr( $name ); ?>][steps][]" value="<?php echo esc_attr( $key ); ?>"
-											<?php checked( $row['steps'] && in_array( $key, $row['steps'], true ) ); ?>>
+											<?php checked( '' === $cannot && $row['steps'] && in_array( $key, $row['steps'], true ) ); ?><?php disabled( '' !== $cannot ); ?>>
 										<?php echo esc_html( $step['label'] ); ?>
 									</label>
 								<?php endforeach; ?>

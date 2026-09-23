@@ -5,9 +5,9 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.20.0
+## État actuel — 0.20.1
 
-La version `0.20.0` remplit chaque brouillon comme le lisent le thème MS Recipes, MS SEO Plus, MS FB Posts et MS Image Optimizer ; la `0.19.0` ramenait une recette approuvée du premier coup à 0,09–0,10 $ sans perte mesurée ; la `0.18.9` reprenait chaque écran après une revue complète dans le navigateur ; la `0.18.8` réservait l’extension, renommée « MS Recipes AI » dans le menu, à ceux qui peuvent téléverser des fichiers ; la `0.18.7` disait juste ce que fait le plafond par recette ; la `0.18.6` rangeait les photographies envoyées avec le brouillon qu’elles ont servi à écrire ; la `0.18.5` faisait passer un lot de trois recettes en 8 minutes pour 0,125 $ la recette, toutes approuvées ; la `0.18.4` faisait envoyer les photographies d’un lot depuis l’ordinateur du rédacteur ; la `0.18.3` faisait approuver les trois recettes d’un lot réel aux réglages par défaut — image à la une en `low`, collage en `medium` — pour 0,132 $ en moyenne ; la `0.18.2` permettait de choisir le modèle et la qualité de chaque image
+La version `0.20.1` ne laisse confier une étape qu’à un modèle capable de la faire ; la `0.20.0` remplissait chaque brouillon comme le lisent le thème MS Recipes, MS SEO Plus, MS FB Posts et MS Image Optimizer ; la `0.19.0` ramenait une recette approuvée du premier coup à 0,09–0,10 $ sans perte mesurée ; la `0.18.9` reprenait chaque écran après une revue complète dans le navigateur ; la `0.18.8` réservait l’extension, renommée « MS Recipes AI » dans le menu, à ceux qui peuvent téléverser des fichiers ; la `0.18.7` disait juste ce que fait le plafond par recette ; la `0.18.6` rangeait les photographies envoyées avec le brouillon qu’elles ont servi à écrire ; la `0.18.5` faisait passer un lot de trois recettes en 8 minutes pour 0,125 $ la recette, toutes approuvées ; la `0.18.4` faisait envoyer les photographies d’un lot depuis l’ordinateur du rédacteur ; la `0.18.3` faisait approuver les trois recettes d’un lot réel aux réglages par défaut — image à la une en `low`, collage en `medium` — pour 0,132 $ en moyenne ; la `0.18.2` permettait de choisir le modèle et la qualité de chaque image
 séparément ; la `0.18.1` fait tenir le plafond par recette jusque dans les reprises
 de l’approbation finale ; la `0.18.0` ramène une recette complète à environ 0,11 $ réels —
 recherche web comprise — sans perte de qualité mesurée ; la `0.17.0` faisait
@@ -74,6 +74,34 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.20.1
+
+**Une étape ne peut être confiée qu’à un modèle capable de la faire.** La
+recherche confiée à OpenAI · `low` échouait : ce niveau désigne gpt-5-nano, qui
+sait chercher sur le web sur le papier mais, mesuré sur la brochure de test,
+consacre toute sa réponse à réfléchir entre deux recherches et s’arrête au
+plafond de 12 000 jetons sans rien rendre (0/14 champs, même en réflexion
+`low`). Avec un plafond de 32 000 jetons il rend 9/14 champs, sans aucune
+photographie de référence, pour 0,068 $ et 130 s — 2,7 fois le coût de
+GPT-5.6 Luna, qui rend 14/14 pour environ 0,025 $. gpt-5.4-mini est coupé de
+même (0/14, 0,11 $).
+
+- Chaque étape exige ce dont elle a besoin : la recherche un modèle de texte qui
+  cherche sur le web, l’approbation finale et la lecture des photographies un
+  modèle de texte qui lit les images, les images un modèle qui dessine. Une
+  capacité que rien n’établit compte comme absente.
+- Les modèles mesurés inaptes à une étape y sont refusés, avec la mesure en
+  motif ; un modèle retiré d’une étape sur l’écran Modèles l’est aussi.
+- Sur l’écran Moteur, les choix refusés sont grisés avec leur motif, et changer
+  de fournisseur passe au premier niveau qui convient. Un enregistrement qui
+  confierait une étape à un modèle incapable est refusé en entier.
+- Sur l’écran Modèles, les étapes qu’un modèle ne sait pas faire ne peuvent
+  pas être cochées.
+- Un lot dont une étape tomberait sur un modèle incapable est refusé avant
+  toute dépense ; le diagnostic le signale.
+- Un modèle récupéré depuis le fournisseur garde les capacités que l’extension
+  connaît déjà quand la liste du fournisseur ne les mentionne pas.
 
 ## Version 0.20.0
 

@@ -1805,6 +1805,54 @@ msgstr "Remove %s"
 msgid "ou"
 msgstr "or"
 
+msgid "%s — ne convient pas à cette étape"
+msgstr "%s — not suited to this step"
+
+msgid "Aucun lot ne partira tant que ces étapes ne seront pas confiées à un modèle compatible, sur l’écran Moteur."
+msgstr "No lot will start until these steps are given to a compatible model, on the Engine screen."
+
+msgid "Ce lot ne peut pas partir : le réglage des modèles du site doit être corrigé par un administrateur."
+msgstr "This lot cannot start: the site’s model settings must be corrected by an administrator."
+
+msgid "Ce lot ne peut pas partir : une étape est confiée à un modèle qui ne peut pas la faire. %s Changez-le sur l’écran Moteur."
+msgstr "This lot cannot start: a step is given to a model that cannot do it. %s Change it on the Engine screen."
+
+msgid "Lecture des photographies"
+msgstr "Reading the photographs"
+
+msgid "Mesuré le 23/09/2026 : coupé au plafond sans réponse (0/14), pour 0,11 $."
+msgstr "Measured on 23/09/2026: cut at the ceiling with no answer (0/14), for $0.11."
+
+msgid "Mesuré le 23/09/2026 : il consacre toute sa réponse à réfléchir entre deux recherches et s’arrête au plafond (0/14). Avec un plafond de 32 000 jetons, 9/14 sans aucune photographie, pour 2,7 fois le coût de GPT-5.6 Luna."
+msgstr "Measured on 23/09/2026: it spends its whole answer reasoning between searches and stops at the ceiling (0/14). With a 32,000-token ceiling, 9/14 without a single photograph, at 2.7 times the cost of GPT-5.6 Luna."
+
+msgid "Rien n’a été enregistré : une étape était confiée à un modèle qui ne peut pas la faire. %s"
+msgstr "Nothing was saved: a step was given to a model that cannot do it. %s"
+
+msgid "aucun modèle ne répond à ce choix"
+msgstr "no model answers to this choice"
+
+msgid "ce modèle ne sait pas %s, ce que cette étape demande"
+msgstr "this model cannot %s, which this step requires"
+
+msgid "chercher sur le web"
+msgstr "search the web"
+
+msgid "dessiner des images"
+msgstr "draw images"
+
+msgid "lire des images"
+msgstr "read images"
+
+msgid "retiré de cette étape sur l’écran Modèles"
+msgstr "removed from this step on the Models screen"
+
+msgid "rien n’établit que ce modèle sait %s, ce que cette étape demande"
+msgstr "nothing establishes that this model can %s, which this step requires"
+
+msgid "rédiger du texte"
+msgstr "write text"
+
 msgid "aucune page citée"
 msgstr "no page cited"
 

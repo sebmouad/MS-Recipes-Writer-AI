@@ -453,6 +453,19 @@
       imagesField.value = JSON.stringify(value, null, 4);
     }
 
+    // Options that resolve to a model unable to serve the step stay visible,
+    // greyed and named as such, so the reason for the absence is on screen.
+    function markBlocked(select, key, routeOf) {
+      var blocked = (schema.blocked || {})[key] || {};
+      Array.prototype.forEach.call(select.options, function (opt) {
+        if (!opt.dataset.label) { opt.dataset.label = opt.textContent; }
+        var why = blocked[routeOf(opt.value)];
+        opt.disabled = !!why && !opt.selected;
+        opt.textContent = why ? (schema.labels.blockedOption || '%s').replace('%s', opt.dataset.label) : opt.dataset.label;
+        opt.title = why || '';
+      });
+    }
+
     function option(value, label, selected) {
       var el = document.createElement('option');
       el.value = value;
@@ -479,6 +492,7 @@
         schema.imageModels.forEach(function (entry) {
           modelSelect.appendChild(option(entry.value, entry.label, entry.value === schema.current[key]));
         });
+        markBlocked(modelSelect, key, function (value) { return value; });
         modelSelect.addEventListener('change', writeRouting);
         controlCell.appendChild(modelSelect);
       } else {
@@ -497,6 +511,17 @@
         if (schema.tiers.indexOf(current.named) === -1) {
           tierSelect.insertBefore(option(current.named, current.named, true), tierSelect.firstChild);
         }
+        var tierRoute = function (tier) { return providerSelect.value + ':' + tier; };
+        markBlocked(tierSelect, key, tierRoute);
+        // A provider change can land on a level that cannot serve this step:
+        // the first one that can is chosen instead of leaving a refused route.
+        providerSelect.addEventListener('change', function () {
+          markBlocked(tierSelect, key, tierRoute);
+          if (tierSelect.selectedOptions[0] && tierSelect.selectedOptions[0].disabled) {
+            var usable = Array.prototype.find.call(tierSelect.options, function (opt) { return !opt.disabled; });
+            if (usable) { tierSelect.value = usable.value; }
+          }
+        });
         providerSelect.addEventListener('change', writeRouting);
         tierSelect.addEventListener('change', writeRouting);
         controlCell.appendChild(providerSelect);
@@ -538,6 +563,8 @@
           resolvedCell.appendChild(flag('warn', schema.labels.unpriced));
         }
         if (info.served === 'no') resolvedCell.appendChild(flag('stop', schema.labels.unserved));
+        var why = ((schema.blocked || {})[key] || {})[route];
+        if (why) resolvedCell.appendChild(flag('stop', why));
       }
 
       function muted(text) {

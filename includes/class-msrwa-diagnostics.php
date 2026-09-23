@@ -146,6 +146,13 @@ final class MSRWA_Diagnostics {
 			}
 		}
 
+		// A step routed to a model that cannot serve it: dispatch refuses the lot,
+		// so this is a stop, and it says which step, which model and why.
+		$incompatible = class_exists( 'MSRWA_Compat' ) ? MSRWA_Compat::problems( MSRWA_Engine_Settings::stored() ) : array();
+		if ( $incompatible ) {
+			return self::check( 'stop', __( 'Routage', 'ms-recipes-writer-ai' ), MSRWA_Compat::describe( $incompatible ), __( 'Aucun lot ne partira tant que ces étapes ne seront pas confiées à un modèle compatible, sur l’écran Moteur.', 'ms-recipes-writer-ai' ) );
+		}
+
 		if ( $forbidden ) {
 			return self::check( 'warn', __( 'Routage', 'ms-recipes-writer-ai' ), sprintf(
 				/* translators: %s is a comma-separated list of step names. */

@@ -56,8 +56,8 @@ final class MSRWA_Engine_Settings {
 	 * the whole catalogue: every price fetched, looked up or corrected on the
 	 * Modèles screen afterwards stopped reaching the engine.
 	 */
-	public static function stored() {
-		$stored = self::typed();
+	public static function stored( ?array $typed = null ) {
+		$stored = null === $typed ? self::typed() : $typed;
 		foreach ( self::catalogue() as $group => $value ) {
 			if ( $value ) { $stored[ $group ] = isset( $stored[ $group ] ) && is_array( $stored[ $group ] ) ? self::merge( $value, $stored[ $group ] ) : $value; }
 		}
@@ -122,9 +122,16 @@ final class MSRWA_Engine_Settings {
 	 */
 	public static function save( array $raw ) {
 		$parsed = self::parse( $raw );
-		if ( ! $parsed['invalid'] ) { update_option( self::OPTION, $parsed['config'], false ); }
-		return $parsed['invalid'];
+		if ( $parsed['invalid'] ) { return $parsed['invalid']; }
+		// A route to a model that cannot serve its step is refused here, with
+		// the reason, instead of being saved and failing on the first recipe.
+		self::$refused = class_exists( 'MSRWA_Compat' ) ? MSRWA_Compat::problems( self::stored( $parsed['config'] ) ) : array();
+		if ( ! self::$refused ) { update_option( self::OPTION, $parsed['config'], false ); }
+		return array();
 	}
+
+	/** The routes the last save refused, step => {route, reason}. */
+	public static $refused = array();
 
 	/** Shared by saving and the non-mutating diagnostic preview. */
 	public static function parse( array $raw ) {

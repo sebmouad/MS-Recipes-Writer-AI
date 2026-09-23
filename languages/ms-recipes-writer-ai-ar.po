@@ -1825,6 +1825,54 @@ msgstr "إزالة %s"
 msgid "ou"
 msgstr "أو"
 
+msgid "%s — ne convient pas à cette étape"
+msgstr "%s — لا يناسب هذه المرحلة"
+
+msgid "Aucun lot ne partira tant que ces étapes ne seront pas confiées à un modèle compatible, sur l’écran Moteur."
+msgstr "لن تنطلق أي دفعة ما لم تُسنَد هذه المراحل إلى نموذج متوافق، في شاشة المحرك."
+
+msgid "Ce lot ne peut pas partir : le réglage des modèles du site doit être corrigé par un administrateur."
+msgstr "لا يمكن لهذه الدفعة أن تنطلق: يجب أن يصحّح مسؤول إعدادات نماذج الموقع."
+
+msgid "Ce lot ne peut pas partir : une étape est confiée à un modèle qui ne peut pas la faire. %s Changez-le sur l’écran Moteur."
+msgstr "لا يمكن لهذه الدفعة أن تنطلق: أُسندت مرحلة إلى نموذج لا يستطيع إنجازها. %s غيّره في شاشة المحرك."
+
+msgid "Lecture des photographies"
+msgstr "قراءة الصور الفوتوغرافية"
+
+msgid "Mesuré le 23/09/2026 : coupé au plafond sans réponse (0/14), pour 0,11 $."
+msgstr "قيس في 23/09/2026: توقف عند السقف دون إجابة (0/14)، مقابل 0,11 $."
+
+msgid "Mesuré le 23/09/2026 : il consacre toute sa réponse à réfléchir entre deux recherches et s’arrête au plafond (0/14). Avec un plafond de 32 000 jetons, 9/14 sans aucune photographie, pour 2,7 fois le coût de GPT-5.6 Luna."
+msgstr "قيس في 23/09/2026: يستهلك إجابته كلها في التفكير بين عمليتي بحث ويتوقف عند السقف (0/14). مع سقف 32 000 وحدة، 9/14 دون أي صورة، بتكلفة تبلغ 2,7 ضعف GPT-5.6 Luna."
+
+msgid "Rien n’a été enregistré : une étape était confiée à un modèle qui ne peut pas la faire. %s"
+msgstr "لم يُحفظ شيء: أُسندت مرحلة إلى نموذج لا يستطيع إنجازها. %s"
+
+msgid "aucun modèle ne répond à ce choix"
+msgstr "لا يوجد نموذج يطابق هذا الاختيار"
+
+msgid "ce modèle ne sait pas %s, ce que cette étape demande"
+msgstr "هذا النموذج لا يستطيع %s، وهو ما تتطلبه هذه المرحلة"
+
+msgid "chercher sur le web"
+msgstr "البحث في الويب"
+
+msgid "dessiner des images"
+msgstr "رسم الصور"
+
+msgid "lire des images"
+msgstr "قراءة الصور"
+
+msgid "retiré de cette étape sur l’écran Modèles"
+msgstr "أُزيل من هذه المرحلة في شاشة النماذج"
+
+msgid "rien n’établit que ce modèle sait %s, ce que cette étape demande"
+msgstr "لا شيء يثبت أن هذا النموذج يستطيع %s، وهو ما تتطلبه هذه المرحلة"
+
+msgid "rédiger du texte"
+msgstr "كتابة النصوص"
+
 msgid "aucune page citée"
 msgstr "لم تُذكر أي صفحة"
 

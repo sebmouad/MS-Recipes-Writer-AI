@@ -465,3 +465,6 @@
 .ms-welcome-steps li::before { content: counter(ms-step); position: absolute; inset-inline-start: 16px; inset-block-start: 14px; inline-size: 28px; block-size: 28px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; color: var(--ms-lamp); background: var(--ms-lamp-soft); border: 1px solid var(--ms-lamp); }
 .ms-welcome-steps strong { display: block; margin-block-end: 4px; color: var(--ms-ink); }
 .ms-welcome-steps span { color: var(--ms-ink-soft); line-height: 1.5; }
+
+/* A step a model cannot serve: shown, locked, the reason on hover. */
+.ms-grid-step-off { color: var(--ms-ink-faint); text-decoration: line-through; cursor: help; }

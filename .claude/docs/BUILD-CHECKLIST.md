@@ -126,6 +126,10 @@ run carries.
 - [x] Language and ceiling come from the settings only
   (`tests/test-screens.php`, `tests/test-dispatch-ceiling.php`,
   `tests/real/test-site.php`).
+- [x] Only a model able to serve a step can be given it, live: the Moteur
+  picker greys OpenAI · low (gpt-5-nano) on Research with the measured reason,
+  a save routing it there is refused and stores nothing, the Modèles screen
+  locks the steps a model cannot do (`tests/test-compat.php`).
 - [ ] A complete lot on Claude — the account has no credit. — the Gemini key's
   grounding quota is exhausted, OpenAI is unreachable from the test
   environment and the Claude account has no credit.
