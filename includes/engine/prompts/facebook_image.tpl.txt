@@ -30,6 +30,10 @@ PANEL ROLES:
 
 ORDER OUTRANKS ROLE. The roles above say which six moments are worth showing. The canonical recipe says in which order they happen, and the recipe always wins. Map each chosen moment back to its step number and lay the panels out in ascending step order. If a role would place a moment before a step that must precede it — whisking a filling before the case that holds it is lined, saucing before the thing being sauced is cooked — move it, or choose a different moment for that panel. A collage whose panels run out of order teaches the reader the wrong recipe, and that is the single most common failure of this format.
 
+A STEP LEFT OUT STILL HAPPENED. Six panels cannot show every step, but every panel shows the food in the state all the earlier steps leave it in, shown or not. If the recipe bakes the case or the fruit before the filling goes in, the panel where the filling is poured shows a visibly part-baked case and softened fruit, never raw ones; if meat is browned before it is braised, it goes into the liquid already browned. Give each cooking stage — every time the dish goes into the oven, the pan or the pot — its own panel before giving one to a preparation moment, and merge preparation moments to make room. Skipping a cooking stage is how a collage teaches the wrong recipe.
+
+AN INGREDIENT ENTERS AT ITS OWN STEP. Nothing appears in a bowl, a marinade, a pan or a dish before the step of the canonical recipe that adds it — olives added after the chicken returns to the pot are not in the marinade, a garnish added at serving is not in the oven. Check each panel's contents against the steps up to that point.
+
 Before returning the image, read your six panels in order and confirm each one could only happen after the one before it. Fix any that could not.
 
 Select the six most visually distinct and useful canonical moments; do not sample mechanically by step number or elapsed time. Omit passive or invisible actions such as preheating, waiting, chilling or storage unless they produce a visible transformation. Never invent a step, ingredient, garnish or cooking method.
