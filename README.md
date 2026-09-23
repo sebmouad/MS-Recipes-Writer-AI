@@ -5,9 +5,10 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.18.0
+## État actuel — 0.18.1
 
-La version `0.18.0` ramène une recette complète à environ 0,11 $ réels —
+La version `0.18.1` fait tenir le plafond par recette jusque dans les reprises
+de l’approbation finale ; la `0.18.0` ramène une recette complète à environ 0,11 $ réels —
 recherche web comprise — sans perte de qualité mesurée ; la `0.17.0` faisait
 tenir l’estimation face à la facture ; la `0.16.0` permettait de régler la
 réflexion de chaque étape et d’en tenir compte dans les estimations ; la `0.15.0` faisait
@@ -72,6 +73,17 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.18.1
+
+**Le plafond tient jusque dans les reprises.** Le budget d’une recette n’était
+vérifié qu’entre deux vagues ; une approbation finale refusée pouvait
+redessiner ses images et redemander, dans la même vague, au-delà d’un plafond
+presque atteint. Avant chaque nouveau tour, le moteur en estime désormais le
+coût — la dernière approbation plus les images à redessiner — et, s’il
+franchirait le plafond, s’arrête et laisse le verdict à l’éditeur. Un test hors
+ligne rejoue la boucle sans réseau : sans cette garde, cinq appels là où le
+budget n’en permettait qu’un.
 
 ## Version 0.18.0
 

@@ -404,6 +404,13 @@ here, approved, and are in. `tests/test-engine-language.php` holds them.
     later version of the article from replacing the one before it. Every
     change was measured on live runs; see README 0.18.0.
 
+13. **The budget holds inside the approval loop.** `perform()` prices the
+    next round — the last attempt plus the images `images_to_retry()` would
+    redraw, at what they last cost — and does not start it when it would
+    cross `limits.budget_usd`; a `decision` event says so. The offline suite
+    drives the loop through `MSRWA_Engine_Call::$transport`, a test seam that
+    is null in production.
+
 ### Still open
 
 6. **The engine's `models` list is a second source of truth for prices.** The
