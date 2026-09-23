@@ -246,6 +246,7 @@ final class MSRWA_Screen_Engine {
 				__( 'Le profil complet en compte %s. Une étape part dès que tout ce dont elle dépend est prêt : c’est ce qui découpe une recette en vagues, et ce qui fait qu’une reprise ne repaie pas ce qui a réussi.', 'ms-recipes-writer-ai' ),
 				number_format_i18n( count( $steps ) )
 			) ); ?></p>
+			<?php echo MSRWA_UI::scroll( esc_attr__( 'Ce que fait le moteur, étape par étape', 'ms-recipes-writer-ai' ) ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
 			<table class="ms-table">
 				<thead><tr>
 					<th scope="col"><?php esc_html_e( 'Étape', 'ms-recipes-writer-ai' ); ?></th>
@@ -271,6 +272,7 @@ final class MSRWA_Screen_Engine {
 				<?php endforeach; ?>
 				</tbody>
 			</table>
+			</div>
 		</section>
 		<?php
 	}
@@ -304,6 +306,7 @@ final class MSRWA_Screen_Engine {
 					)
 					: __( 'Jamais interrogé. « Vérifier les clés », dans les réglages, relève la liste sans rien dépenser.', 'ms-recipes-writer-ai' )
 				); ?></p>
+				<?php echo MSRWA_UI::scroll( esc_attr( $label ) ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
 				<table class="ms-table">
 					<thead><tr>
 						<th scope="col"><?php esc_html_e( 'Modèle', 'ms-recipes-writer-ai' ); ?></th>
@@ -340,6 +343,7 @@ final class MSRWA_Screen_Engine {
 					<?php endforeach; ?>
 					</tbody>
 				</table>
+				</div>
 				<?php if ( $available ) : ?>
 					<details>
 						<summary><?php esc_html_e( 'Tout ce que le fournisseur sert', 'ms-recipes-writer-ai' ); ?></summary>

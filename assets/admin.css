@@ -392,7 +392,33 @@
 
 .ms-catalog .ms-num { inline-size: 6.5rem; }
 
-@media (max-inline-size: 900px) {
+@media (max-width: 900px) {
 	.ms-catalog .ms-grid-cell { min-inline-size: 0; }
 	.ms-grid-step { inline-size: 100%; }
+}
+
+/* --- Tables that stop being tables on a phone -------------------------
+   Three columns of selects and a model identifier do not fit 390px, and a
+   sideways scrollbar inside a table inside an admin page is where people
+   lose things. Each row becomes a block instead, its headers carried by
+   data-label, which is what the report template already does. */
+
+@media (max-width: 782px) {
+	.ms-routing-picker thead { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); }
+	.ms-routing-picker,
+	.ms-routing-picker tbody,
+	.ms-routing-picker tr,
+	.ms-routing-picker td,
+	.ms-routing-picker th { display: block; inline-size: auto; }
+
+	.ms-routing-picker tr {
+		padding-block: 12px;
+		border-block-end: 1px solid var(--ms-line-soft);
+	}
+
+	.ms-routing-picker td,
+	.ms-routing-picker th { border-block-end: 0; padding-block: 4px; }
+
+	.ms-routing-picker select { inline-size: 100%; max-inline-size: 100%; }
+	.ms-routing-picker .ms-route-resolved { padding-block-start: 6px; }
 }

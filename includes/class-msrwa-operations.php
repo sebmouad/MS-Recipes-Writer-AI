@@ -95,8 +95,12 @@ final class MSRWA_Operations {
 		$id = absint( $_GET['run_id'] ?? 0 );
 		check_admin_referer( 'msrwa_job_report_' . $id );
 		$run = MSRWA_Run::get( $id );
+		// Administrators only, and deliberately: the report names models,
+		// tokens and amounts, none of which a writer may be shown. The scope
+		// check stands beside it because an administrator without
+		// `msrwa_view_all` still only sees their own lots.
 		if ( ! current_user_can( 'manage_options' ) ) { wp_die( esc_html__( 'Accès refusé.', 'ms-recipes-writer-ai' ) ); }
-		if ( ! $run || ! MSRWA_Run::may_see( $run ) || ( ! current_user_can( 'msrwa_create' ) && ! current_user_can( 'manage_options' ) ) ) { wp_die( esc_html__( 'Accès refusé.', 'ms-recipes-writer-ai' ) ); }
+		if ( ! $run || ! MSRWA_Run::may_see( $run ) ) { wp_die( esc_html__( 'Accès refusé.', 'ms-recipes-writer-ai' ) ); }
 		$state = MSRWA_Run::state( $id );
 		$state['artifacts']['brief'] = (array) json_decode( (string) $run['brief_json'], true );
 		$state['ok'] = 'done' === $run['status'] && ! empty( $state['ok'] );

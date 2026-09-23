@@ -61,6 +61,23 @@ msrwa_test_contains( $blocks, 'c’est', 'And so do typographic apostrophes.' );
 msrwa_test_contains( $blocks, '<strong>pâte brisée</strong>', 'Inline emphasis stays inline.' );
 msrwa_test_missing( $blocks, '<!-- wp:html -->', 'Nothing the contract promises falls back to an HTML block.' );
 
+// --- A list inside a list -------------------------------------------------
+
+// Written as a plain <ul> inside the item it survives and renders, and the
+// editor raises nothing — but it is not a block, so it cannot be indented,
+// reordered or added to. Core nests a whole list block inside the item.
+$nested = MSRWA_Blocks::from_html( '<ul><li>outer<ul><li>inner</li></ul></li><li>second</li></ul>' );
+msrwa_test_assert( 2 === substr_count( $nested, '<!-- wp:list -->' ), 'A list inside a list is a list block of its own.' );
+msrwa_test_assert( 3 === substr_count( $nested, '<!-- wp:list-item -->' ), 'And each item of both is an item block.' );
+msrwa_test_assert( substr_count( $nested, '<!-- wp:list' ) === substr_count( $nested, '<!-- /wp:list' ), 'Opened and closed in pairs, nesting included.' );
+msrwa_test_contains( $nested, 'inner', 'Nothing of the inner list is lost.' );
+msrwa_test_contains( $nested, 'second', 'Nor of what follows it.' );
+
+// An ordered list nested in an unordered one keeps each its own kind.
+$mixed = MSRWA_Blocks::from_html( '<ul><li>steps<ol><li>first</li></ol></li></ul>' );
+msrwa_test_contains( $mixed, '<!-- wp:list {"ordered":true} -->', 'A numbered list inside a bulleted one is still numbered.' );
+msrwa_test_contains( $mixed, '<ol class="wp-block-list">', 'And carries the tag that says so.' );
+
 // --- Converting twice ----------------------------------------------------
 
 msrwa_test_assert( $blocks === MSRWA_Blocks::from_html( $blocks ), 'Markup that already carries blocks is returned untouched.' );

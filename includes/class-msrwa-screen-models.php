@@ -87,6 +87,7 @@ final class MSRWA_Screen_Models {
 			<?php wp_nonce_field( 'msrwa_save_models' ); ?>
 			<section class="ms-card ms-card-flush">
 				<h2><?php esc_html_e( 'Le catalogue', 'ms-recipes-writer-ai' ); ?></h2>
+				<?php echo MSRWA_UI::scroll( esc_attr__( 'Le catalogue', 'ms-recipes-writer-ai' ) ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
 				<table class="ms-table ms-catalog">
 					<thead><tr>
 						<th scope="col"><?php esc_html_e( 'Modèle', 'ms-recipes-writer-ai' ); ?></th>
@@ -130,6 +131,7 @@ final class MSRWA_Screen_Models {
 					<?php endforeach; ?>
 					</tbody>
 				</table>
+				</div>
 			</section>
 			<div class="ms-card ms-save"><?php submit_button( __( 'Enregistrer', 'ms-recipes-writer-ai' ), 'primary', 'submit', false ); ?></div>
 		</form>

@@ -71,4 +71,33 @@ $GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
 $GLOBALS['wpdb']->default_var( wp_json_encode( array( 'path' => __FILE__ ) ) );
 msrwa_test_assert( '' === $path->invoke( null, 4, 'featured' ), 'A path outside the run’s directory is refused.' );
 
+// --- A credential inside somebody else's prose --------------------------
+
+// Masking by key name catches a payload this plugin built. It does not catch
+// what a provider says back: OpenAI answers a bad key with "Incorrect API key
+// provided: sk-proj-…", and that sentence used to be stored whole as a step's
+// error and shown on two screens.
+$said = 'HTTP 401: {"error":{"message":"Incorrect API key provided: sk-proj-AbCdEf123456789. You can find your API key at https://platform.openai.com/account/api-keys"}}';
+$clean = MSRWA_DB::sanitize( $said );
+msrwa_test_missing( $clean, 'sk-proj-AbCdEf123456789', 'An OpenAI key quoted back at us is not stored.' );
+msrwa_test_contains( $clean, 'Incorrect API key provided', 'But the sentence that explains the failure is kept.' );
+msrwa_test_contains( $clean, 'HTTP 401', 'And so is the status, which is what an operator acts on.' );
+
+foreach ( array(
+	'sk-ant-api03-ZZZZZZZZZZZZZZZZZZZZ' => 'an Anthropic key',
+	'AIzaSyB1234567890abcdefghijk' => 'a Google key',
+) as $secret => $what ) {
+	msrwa_test_missing( MSRWA_DB::sanitize( 'error: ' . $secret . ' rejected' ), $secret, $what . ' is not stored either.' );
+}
+msrwa_test_missing( MSRWA_DB::sanitize( 'Authorization: Bearer abcdef0123456789xyz' ), 'abcdef0123456789xyz', 'Nor a bearer token, whoever minted it.' );
+
+// It is applied everywhere sanitize() already was, so a nested string is
+// covered too — an error inside a run's result JSON, for instance.
+$nested = MSRWA_DB::sanitize( array( 'errors' => array( array( 'message' => 'bad key sk-proj-AbCdEf123456789' ) ) ) );
+msrwa_test_missing( wp_json_encode( $nested ), 'sk-proj-AbCdEf1234', 'A key nested inside an array is masked as well.' );
+
+// Ordinary prose must survive intact: over-redacting an error makes it useless.
+$innocent = 'HTTP 429: You exceeded your current quota, please check your plan and billing details.';
+msrwa_test_assert( $innocent === MSRWA_DB::sanitize( $innocent ), 'An error with no credential in it is stored word for word.' );
+
 msrwa_test_done( 'nothing is stored twice' );

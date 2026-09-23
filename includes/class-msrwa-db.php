@@ -220,7 +220,10 @@ final class MSRWA_DB {
 	 * be handed either.
 	 */
 	public static function sanitize( $value ) {
-		if ( is_string( $value ) && strlen( $value ) > 262144 ) { return substr( $value, 0, 262144 ) . "\n[tronqué]"; }
+		if ( is_string( $value ) ) {
+			if ( strlen( $value ) > 262144 ) { $value = substr( $value, 0, 262144 ) . "\n[tronqué]"; }
+			return self::redact( $value );
+		}
 		if ( ! is_array( $value ) ) { return $value; }
 		$out = array();
 		foreach ( $value as $key => $item ) {
@@ -232,5 +235,28 @@ final class MSRWA_DB {
 			$out[ $key ] = self::sanitize( $item );
 		}
 		return $out;
+	}
+
+	/**
+	 * Credentials that appear inside a string rather than under a named key.
+	 *
+	 * Masking by key name catches a payload this plugin built. It does not
+	 * catch what a provider says back: OpenAI answers a bad key with
+	 * "Incorrect API key provided: sk-proj-…", and that sentence is stored
+	 * whole as a step's error and shown on two screens. A key is a secret
+	 * wherever it turns up, including in somebody else's prose.
+	 */
+	public static function redact( $text ) {
+		return (string) preg_replace(
+			array(
+				// OpenAI and Anthropic both prefix `sk-`; Google uses `AIza`.
+				'/\bsk-[A-Za-z0-9_\-]{6,}/',
+				'/\bAIza[A-Za-z0-9_\-]{10,}/',
+				// And anything handed over as a bearer token, whoever minted it.
+				'/\bBearer\s+[A-Za-z0-9._\-]{12,}/i',
+			),
+			array( '[masqué]', '[masqué]', 'Bearer [masqué]' ),
+			(string) $text
+		);
 	}
 }

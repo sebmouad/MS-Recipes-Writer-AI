@@ -119,7 +119,7 @@ final class MSRWA_Blocks {
 		$items = array();
 		foreach ( $node->childNodes as $child ) {
 			if ( XML_ELEMENT_NODE !== $child->nodeType || 'li' !== strtolower( $child->nodeName ) ) { continue; }
-			$items[] = "<!-- wp:list-item -->\n<li>" . self::inner_html( $document, $child ) . "</li>\n<!-- /wp:list-item -->";
+			$items[] = "<!-- wp:list-item -->\n<li>" . self::item_html( $document, $child ) . "</li>\n<!-- /wp:list-item -->";
 		}
 		if ( ! $items ) { return ''; }
 
@@ -134,6 +134,27 @@ final class MSRWA_Blocks {
 	private static function html_block( $html ) {
 		$html = trim( (string) $html );
 		return '' === $html ? '' : "<!-- wp:html -->\n" . $html . "\n<!-- /wp:html -->";
+	}
+
+	/**
+	 * One list item, with any list inside it made a block of its own.
+	 *
+	 * A nested list written as plain `<ul>` inside the item survives and
+	 * renders, but the editor cannot see it: it is not a block, so it cannot
+	 * be indented, reordered or added to. Core nests a whole list block inside
+	 * the item, and so does this.
+	 */
+	private static function item_html( DOMDocument $document, DOMNode $node ) {
+		$inner = '';
+		foreach ( $node->childNodes as $child ) {
+			$tag = XML_ELEMENT_NODE === $child->nodeType ? strtolower( $child->nodeName ) : '';
+			if ( 'ul' === $tag || 'ol' === $tag ) {
+				$inner .= self::list_block( $document, $child, 'ol' === $tag );
+				continue;
+			}
+			$inner .= $document->saveHTML( $child );
+		}
+		return trim( $inner );
 	}
 
 	private static function inner_html( DOMDocument $document, DOMNode $node ) {

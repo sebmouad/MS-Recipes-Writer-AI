@@ -208,7 +208,8 @@ final class MSRWA_Run {
 				// Counted here so that asking which check keeps failing reads a
 				// number instead of parsing every blob ever stored.
 				'checks_failed' => $failed,
-				'error_message' => (string) $step['error'], 'created_at' => $now,
+				// A provider's own words, which may carry a partial key.
+				'error_message' => MSRWA_DB::sanitize( (string) $step['error'] ), 'created_at' => $now,
 			);
 		}
 		MSRWA_DB::insert_many( $t['steps'], $steps );
