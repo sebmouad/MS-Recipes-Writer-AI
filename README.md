@@ -5,10 +5,11 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.16.0
+## État actuel — 0.17.0
 
-La version `0.16.0` permet de régler la réflexion de chaque étape, chez les
-trois fournisseurs, et en tient compte dans les estimations ; la `0.15.0` faisait
+La version `0.17.0` fait tenir l’estimation face à la facture, vérifiée sur de
+vraies recettes complètes chez OpenAI ; la `0.16.0` permettait de régler la
+réflexion de chaque étape et d’en tenir compte dans les estimations ; la `0.15.0` faisait
 arriver jusqu’au moteur chaque tarif relevé ou corrigé et chiffrait la
 simulation ; la `0.14.0` corrigeait ce que coûte réellement un appel et ce que
 le catalogue garde. Voir ci-dessous ce
@@ -70,6 +71,50 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.17.0
+
+**L’estimation avant, la facture après — mesurées l’une contre l’autre.**
+Premières recettes complètes réelles chez OpenAI, sur un WordPress de test :
+
+| Lot | Estimé | Facturé |
+| --- | --- | --- |
+| Article seul, avant | 0,0853 $ | 0,1870 $ |
+| Article seul, après | 0,1553 $ | 0,1627 $ |
+| Recette complète, refusée deux fois | 0,2119 $ (un passage) | 0,2804 $ |
+| Recette complète, après | 0,2132 $, au plus 0,3266 $ | 0,1860 $ |
+
+**La recherche n’avait pas de limite chez OpenAI.** Elle a lancé 13 recherches,
+facturées 0,01 $ pièce, là où l’estimation en supposait 3. Un plafond
+`limits.web_searches` (10) est désormais envoyé au fournisseur —
+`max_tool_calls` chez OpenAI, `max_uses` chez Claude, dont l’outil livré reste
+à 3 — et l’estimation facture exactement ce plafond. Elle compte aussi la
+lecture des photographies citées par la recherche.
+
+**Deux chiffres : attendu et maximum.** L’approbation finale peut refuser et
+faire redessiner les images, jusqu’à trois fois : la recette refusée deux fois
+a dessiné trois collages. L’estimation donne désormais le coût d’un passage et
+le maximum si chaque tentative refuse ; l’écran de lot, les réglages et la
+simulation affichent les deux, et préviennent quand le maximum dépasse le
+plafond par recette.
+
+**Le coût réel compte le cache.** OpenAI facture l’entrée déjà en cache au
+dixième du tarif ; elle était facturée pleine.
+
+**Le catalogue ne garde que l’essentiel.** Par fournisseur, les deux
+générations les plus récentes de chaque rôle, plus ce que le moteur utilise ou
+qu’une route nomme : OpenAI passe de 132 identifiants à 12, Gemini de 59 à 5,
+Anthropic de 12 à 5 — tous tarifés. GPT-6 Luna, Sol et Astra sont livrés avec
+leur tarif officiel. Chez OpenAI, le tarif d’un modèle est lu directement sur
+sa page — gratuit, sans IA, marqué « lu sur la page du fournisseur » — puisque
+la page des tarifs ne montre que les modèles phares sans JavaScript.
+
+**Deux défauts vus en réel.** Une recette était marquée « terminée » avant que
+son brouillon existe, et un suivi lisait « brouillon #0 » ; l’avancement
+comptait chaque image redessinée comme une étape (12 sur 10).
+
+**Non vérifié** : Claude (compte sans crédit) ; la recherche web Gemini (quota
+épuisé).
 
 ## Version 0.16.0
 

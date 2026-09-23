@@ -378,6 +378,16 @@ here, approved, and are in. `tests/test-engine-language.php` holds them.
     level. A caller's raw `providers.gemini.thinking` from 0.15.0 is still
     honoured when no level is set.
 
+11. **Searches had no ceiling on OpenAI, and cached input was billed in
+    full.** A live research call ran 13 searches at $0.01 each against an
+    estimate that assumed 3. `limits.web_searches` (10) now caps every call —
+    `max_tool_calls` on OpenAI, the tool's `max_uses` on Claude, never above a
+    tool's own lower cap — and `web_searches( $provider )` is the number the
+    estimate prices. `price()` bills cached input at
+    `providers.<name>.cached_input_ratio` (0.1 for OpenAI, from its pricing
+    page; 1.0, full price, wherever no ratio is published). OpenAI can overrun
+    the cap by one call; seen once, 11 under a cap of 10.
+
 ### Still open
 
 6. **The engine's `models` list is a second source of truth for prices.** The

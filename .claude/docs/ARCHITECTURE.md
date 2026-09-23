@@ -230,6 +230,17 @@ the Moteur screen like routing. `MSRWA_Estimate` adds to a step's estimated
 output only what a level above the measured `medium` would add, capped by the
 step's ceiling, so a lower level never makes an estimate read low.
 
+An estimate is two numbers: `cost_usd`, one pass through the profile, and
+`max_usd`, every final-approval attempt refused with both images redrawn. The
+per-recipe ceiling is checked against the first; screens show both and warn
+when the second is above the ceiling. Research is priced at its search cap.
+
+What the catalogue keeps is decided by `MSRWA_Catalog::keep()`: the two newest
+generations of each role per provider, and anything shipped, named by the
+engine, or named by a typed route. OpenAI rates are read straight off each
+model's page (`READ`, "page"), a fourth provenance beside shipped, typed and
+looked up.
+
 It holds three kinds of knowledge, deliberately kept apart. which identifiers exist, which only the provider knows and which is
 fetched; what they cost, which no provider API states — checked against all
 three live responses — so a rate is typed by a person or looked up by a model

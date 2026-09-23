@@ -86,7 +86,14 @@ run carries.
   level and prices `high` above the default (`tests/real/test-catalog.php`).
   OpenAI's `reasoning.effort` and Claude's `effort` are held offline only
   (`tests/test-engine-usage.php`) until those providers can be reached.
-- [ ] A complete lot on a funded provider with web search — the Gemini key's
+- [x] A complete lot on OpenAI, estimate against bill, live
+  (`tests/real/test-flow.php`, `MSRWA_TEST_PROFILE=full`): estimated $0.2132
+  at most $0.3266, billed $0.1860, draft with featured image, blocks and
+  Recipe JSON-LD. Before the search cap an article lot was estimated $0.0853
+  and billed $0.1870; a full recipe refused twice billed $0.2804.
+- [x] OpenAI's listing trimmed to 12 models and priced from each model's own
+  page, live (`tests/real/test-catalog.php`): four rates asked, four found.
+- [ ] A complete lot on Claude — the account has no credit. — the Gemini key's
   grounding quota is exhausted, OpenAI is unreachable from the test
   environment and the Claude account has no credit.
 - [x] The tiers the engine chose are the ones a site gets: a fresh site's
