@@ -25,9 +25,15 @@ msrwa_test_assert( array() === $full['unpriced'], 'Every shipped route must be p
 // as a twenty-fifth of its real cost.
 msrwa_test_assert( $full['buckets']['featured'] > 0.01, 'The featured image is priced as an image; got ' . $full['buckets']['featured'] );
 msrwa_test_assert( $full['buckets']['facebook'] > 0.01, 'The collage is priced as an image; got ' . $full['buckets']['facebook'] );
-msrwa_test_assert( 'image', MSRWA_Estimate::route_for( 'featured_image', 'image_generation' ), 'Image steps resolve through the image route.' );
+msrwa_test_assert( 'image' === MSRWA_Estimate::route_for( 'featured_image', 'image_generation' ), 'Image steps resolve through the image route.' );
 msrwa_test_assert( 'vision' === MSRWA_Estimate::route_for( 'reference_vision', 'vision' ), 'Vision steps resolve through the vision route.' );
 msrwa_test_assert( 'article' === MSRWA_Estimate::route_for( 'article', 'text' ), 'Text steps resolve through their own name.' );
+
+// Research is billed per search on top of its tokens: three searches at the
+// provider's per-search fee are part of what the step costs.
+$route = MSRWA_Engine_Config::create()->model_for( 'research' );
+$tokens_only = MSRWA_Engine_Config::create()->price( $route['provider'], $route['model'], array( 'input_tokens' => 65000, 'output_tokens' => min( 6200, MSRWA_Engine_Config::create()->max_output( 'research' ) ) ) );
+msrwa_test_assert( $full['steps']['research']['cost_usd'] > $tokens_only, 'The research estimate includes its searches.' );
 
 // Asking for less must cost less, in the bucket it was removed from.
 $featured = MSRWA_Estimate::recipe( MSRWA_Profile::FEATURED );

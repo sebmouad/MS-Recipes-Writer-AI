@@ -126,6 +126,7 @@ final class MSRWA_Engine_Config {
 					'headers'         => array( 'Content-Type: application/json', 'Authorization: Bearer {{key}}' ),
 					'key_env'         => array( 'OPENAI_API_KEY', 'MSRWA_OPENAI_KEY' ),
 					'web_search_tool' => array( 'type' => 'web_search' ),
+					'web_search_usd'  => 0.01,
 				),
 				'gemini' => array(
 					'text_endpoint'   => 'https://generativelanguage.googleapis.com/v1beta/models/{{model}}:generateContent',
@@ -133,6 +134,7 @@ final class MSRWA_Engine_Config {
 					'headers'         => array( 'Content-Type: application/json', 'x-goog-api-key: {{key}}' ),
 					'key_env'         => array( 'GEMINI_API_KEY', 'MSRWA_GEMINI_KEY' ),
 					'web_search_tool' => array( 'google_search' => array() ),
+					'web_search_usd'  => 0.014,
 				),
 				'claude' => array(
 					'text_endpoint'   => 'https://api.anthropic.com/v1/messages',
@@ -140,6 +142,7 @@ final class MSRWA_Engine_Config {
 					'headers'         => array( 'Content-Type: application/json', 'x-api-key: {{key}}', 'anthropic-version: 2023-06-01' ),
 					'key_env'         => array( 'ANTHROPIC_API_KEY', 'MSRWA_CLAUDE_KEY' ),
 					'web_search_tool' => array( 'type' => 'web_search_20250305', 'name' => 'web_search', 'max_uses' => 3 ),
+					'web_search_usd'  => 0.01,
 				),
 			),
 
@@ -348,7 +351,10 @@ final class MSRWA_Engine_Config {
 		$models = (array) $this->get( 'models', array() );
 		$rate = $models[ $provider ][ $model ] ?? null;
 		if ( ! is_array( $rate ) || 2 > count( $rate ) ) { return null; }
-		return ( (int) ( $usage['input_tokens'] ?? 0 ) * (float) $rate[0] + (int) ( $usage['output_tokens'] ?? 0 ) * (float) $rate[1] ) / 1000000;
+		// Every provider charges each web search on top of the tokens, and the
+		// research step makes several.
+		$searches = (int) ( $usage['web_searches'] ?? 0 ) * (float) ( $this->get( 'providers.' . $provider . '.web_search_usd', 0 ) );
+		return ( (int) ( $usage['input_tokens'] ?? 0 ) * (float) $rate[0] + (int) ( $usage['output_tokens'] ?? 0 ) * (float) $rate[1] ) / 1000000 + $searches;
 	}
 
 	public function max_output( $step ) { return (int) $this->get( 'max_output.' . $step, 4000 ); }

@@ -18,7 +18,9 @@ final class MSRWA_Estimate {
 	/** Rough output tokens per step, from what real runs actually produced. */
 	private static function shape() {
 		return array(
-			'research' => array( 'input' => 65000, 'output' => 6200 ),
+			// Search is billed per query on top of the tokens; three is the
+			// ceiling the research step is given.
+			'research' => array( 'input' => 65000, 'output' => 6200, 'searches' => 3 ),
 			'canonical_recipe' => array( 'input' => 4200, 'output' => 3100 ),
 			'article' => array( 'input' => 6900, 'output' => 6600 ),
 			'review' => array( 'input' => 11200, 'output' => 2200 ),
@@ -61,7 +63,7 @@ final class MSRWA_Estimate {
 			// promising an output nobody guaranteed.
 			$usage['output'] = min( (int) $usage['output'], $config->max_output( $name ) );
 
-			$cost = $config->price( $route['provider'], $route['model'], array( 'input_tokens' => $usage['input'], 'output_tokens' => $usage['output'] ) );
+			$cost = $config->price( $route['provider'], $route['model'], array( 'input_tokens' => $usage['input'], 'output_tokens' => $usage['output'], 'web_searches' => (int) ( $usage['searches'] ?? 0 ) ) );
 			if ( null === $cost ) { $unknown[] = $name; continue; }
 
 			$total += (float) $cost;

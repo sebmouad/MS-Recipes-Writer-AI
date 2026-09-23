@@ -248,17 +248,39 @@ final class MSRWA_Engine_Call {
 			// cached_tokens is what the provider reused from an identical prompt; it is
 			// billed at a discount, so it is the number that says whether caching works.
 			$usage = array( 'input_tokens' => (int) ( $body['usage']['input_tokens'] ?? 0 ), 'output_tokens' => (int) ( $body['usage']['output_tokens'] ?? 0 ), 'cached_input_tokens' => (int) ( $body['usage']['input_tokens_details']['cached_tokens'] ?? 0 ) );
+			$searches = 0;
+			foreach ( (array) ( $body['output'] ?? array() ) as $item ) { if ( 'web_search_call' === ( $item['type'] ?? '' ) ) { $searches++; } }
+			if ( $searches ) { $usage['web_searches'] = $searches; }
 			$status = $body['status'] ?? '';
 			$model = $body['model'] ?? $model;
 		} elseif ( 'gemini' === $provider ) {
 			foreach ( (array) ( $body['candidates'][0]['content']['parts'] ?? array() ) as $part ) { if ( isset( $part['text'] ) ) { $text .= $part['text']; } }
 			$meta = $body['usageMetadata'] ?? array();
-			$usage = array( 'input_tokens' => (int) ( $meta['promptTokenCount'] ?? 0 ), 'output_tokens' => (int) ( $meta['candidatesTokenCount'] ?? 0 ) );
+			// Google bills thinking as output and whatever a tool fetched as input,
+			// and reports neither inside the two headline counts: gemini-3.6-flash
+			// answered five visible tokens after 2 717 of thinking, and a url_context
+			// call read 8 973 tokens of page. Leaving them out priced both at almost
+			// nothing.
+			$usage = array(
+				'input_tokens' => (int) ( $meta['promptTokenCount'] ?? 0 ) + (int) ( $meta['toolUsePromptTokenCount'] ?? 0 ),
+				'output_tokens' => (int) ( $meta['candidatesTokenCount'] ?? 0 ) + (int) ( $meta['thoughtsTokenCount'] ?? 0 ),
+			);
+			if ( ! empty( $meta['cachedContentTokenCount'] ) ) { $usage['cached_input_tokens'] = (int) $meta['cachedContentTokenCount']; }
+			$searches = count( (array) ( $body['candidates'][0]['groundingMetadata']['webSearchQueries'] ?? array() ) );
+			if ( $searches ) { $usage['web_searches'] = $searches; }
 			$status = $body['candidates'][0]['finishReason'] ?? '';
 		} else {
 			foreach ( (array) ( $body['content'] ?? array() ) as $block ) { if ( 'text' === ( $block['type'] ?? '' ) ) { $text .= $block['text']; } }
 			if ( 'text' === $plan['kind'] ) { $text = preg_replace( '/^```(?:json)?\s*|\s*```$/m', '', trim( $text ) ); }
-			$usage = array( 'input_tokens' => (int) ( $body['usage']['input_tokens'] ?? 0 ), 'output_tokens' => (int) ( $body['usage']['output_tokens'] ?? 0 ) );
+			// Cache writes and reads are input too; Anthropic reports them apart.
+			$cached = (int) ( $body['usage']['cache_read_input_tokens'] ?? 0 );
+			$usage = array(
+				'input_tokens' => (int) ( $body['usage']['input_tokens'] ?? 0 ) + (int) ( $body['usage']['cache_creation_input_tokens'] ?? 0 ) + $cached,
+				'output_tokens' => (int) ( $body['usage']['output_tokens'] ?? 0 ),
+			);
+			if ( $cached ) { $usage['cached_input_tokens'] = $cached; }
+			$searches = (int) ( $body['usage']['server_tool_use']['web_search_requests'] ?? 0 );
+			if ( $searches ) { $usage['web_searches'] = $searches; }
 			$status = $body['stop_reason'] ?? '';
 			$model = $body['model'] ?? $model;
 		}
