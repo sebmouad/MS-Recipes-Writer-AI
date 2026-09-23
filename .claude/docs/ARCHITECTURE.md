@@ -318,3 +318,11 @@ Break these and the plugin misreports itself.
 15. **Model output written to a meta key a third-party plugin reads is stripped
     of markup first**, in `MSRWA_Draft::map_recipe()` as everywhere else in that
     file. A card plugin's own template is not this plugin's to trust.
+
+16. **A lot's photographs are the files its writer sent**, uploaded from their
+    computer with the lot (`photos[]`), never picked from the media library:
+    `POST /batches` reads no attachment id. `MSRWA_Intake::upload()` checks
+    every file from its bytes (JPEG, PNG or WebP, under
+    `MSRWA_Admin::photo_bytes()`, at most `MSRWA_Intake::MAX_PHOTOS`) before
+    adding any, refuses the whole lot on one bad file, and removes what it
+    added when the lot cannot be created.

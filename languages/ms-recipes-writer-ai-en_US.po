@@ -1674,6 +1674,30 @@ msgstr "read from the provider’s page"
 msgid "Réflexion ou qualité"
 msgstr "Thinking or quality"
 
+msgid "%1$s dépasse %2$s Mo."
+msgstr "%1$s is larger than %2$s MB."
+
+msgid "%s n’a pas été reçu en entier."
+msgstr "%s was not received in full."
+
+msgid "%s n’est pas une photographie JPEG, PNG ou WebP."
+msgstr "%s is not a JPEG, PNG or WebP photograph."
+
+msgid "Choisir sur mon ordinateur"
+msgstr "Choose from my computer"
+
+msgid "Ensemble, ces photographies dépassent les %s Mo que ce serveur accepte en un envoi."
+msgstr "Together, these photographs exceed the %s MB this server accepts in one upload."
+
+msgid "Envoi des photographies…"
+msgstr "Uploading the photographs…"
+
+msgid "JPEG, PNG ou WebP, %1$d au plus, %2$s Mo chacune. Elles sont ajoutées à la médiathèque quand le lot est créé."
+msgstr "JPEG, PNG or WebP, at most %1$d, %2$s MB each. They are added to the media library when the lot is created."
+
+msgid "Un lot accepte au plus %d photographies."
+msgstr "A lot accepts at most %d photographs."
+
 msgid "aucune page citée"
 msgstr "no page cited"
 

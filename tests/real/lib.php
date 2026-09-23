@@ -51,6 +51,21 @@ function msrwa_real_request( $method, $path, $body = null, $timeout = 90 ) {
 	return array( 'status' => $status, 'body' => $payload, 'raw' => substr( $raw, 0, max( 0, $split ) ) );
 }
 
+/**
+ * A form post with files, the way the compose screen sends a lot: fields as
+ * form values, each file under `photos[]`. Returns array( status, body ).
+ */
+function msrwa_real_upload( $path, array $fields, array $files, $timeout = 180 ) {
+	$url = msrwa_real_rest_url( $path );
+	$auth = msrwa_real_env( 'MSRWA_WP_USER' ) . ':' . msrwa_real_env( 'MSRWA_WP_APP_PASSWORD' );
+	$command = 'curl -sS --max-time ' . (int) $timeout . ' -o /dev/stdout -w "\n%{http_code}" -X POST -u ' . escapeshellarg( $auth ) . ' -H ' . escapeshellarg( 'Accept: application/json' );
+	foreach ( $fields as $name => $value ) { $command .= ' --form-string ' . escapeshellarg( $name . '=' . $value ); }
+	foreach ( $files as $file ) { $command .= ' -F ' . escapeshellarg( 'photos[]=@' . $file ); }
+	$raw = (string) shell_exec( $command . ' ' . escapeshellarg( $url ) . ' 2>/dev/null' );
+	$split = strrpos( $raw, "\n" );
+	return array( 'status' => (int) substr( $raw, $split + 1 ), 'body' => json_decode( substr( $raw, 0, max( 0, $split ) ), true ) );
+}
+
 /** An unauthenticated call, to prove a route is not public. Returns array( status ). */
 function msrwa_real_anonymous( $method, $path, $timeout = 60 ) {
 	$url = msrwa_real_rest_url( $path );

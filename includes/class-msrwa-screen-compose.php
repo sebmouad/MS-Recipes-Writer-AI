@@ -40,9 +40,15 @@ final class MSRWA_Screen_Compose {
 			<section class="ms-step">
 				<h3><?php esc_html_e( 'Les photographies', 'ms-recipes-writer-ai' ); ?></h3>
 				<p><?php esc_html_e( 'Sans dire lesquelles vont avec quoi : chacune sera décrite depuis ses propres pixels, puis associée à une recette. Une photographie est facturée une fois, même si vous corrigez ensuite l’association.', 'ms-recipes-writer-ai' ); ?></p>
-				<button type="button" class="button" id="ms-pick"><?php esc_html_e( 'Choisir dans la médiathèque', 'ms-recipes-writer-ai' ); ?></button>
-				<span class="ms-muted" id="ms-image-count"><?php esc_html_e( 'aucune photographie', 'ms-recipes-writer-ai' ); ?></span>
-				<input type="hidden" id="ms-images" name="images" value="">
+				<label class="button" for="ms-photos"><?php esc_html_e( 'Choisir sur mon ordinateur', 'ms-recipes-writer-ai' ); ?></label>
+				<input type="file" id="ms-photos" name="photos[]" class="screen-reader-text" multiple accept="image/jpeg,image/png,image/webp">
+				<span class="ms-muted" id="ms-image-count" aria-live="polite"><?php esc_html_e( 'aucune photographie', 'ms-recipes-writer-ai' ); ?></span>
+				<p class="ms-muted"><small><?php echo esc_html( sprintf(
+					/* translators: 1: the largest number of photographs, 2: the largest size of one, in megabytes. */
+					__( 'JPEG, PNG ou WebP, %1$d au plus, %2$s Mo chacune. Elles sont ajoutées à la médiathèque quand le lot est créé.', 'ms-recipes-writer-ai' ),
+					MSRWA_Intake::MAX_PHOTOS,
+					number_format_i18n( MSRWA_Admin::photo_bytes() / 1000000, 0 )
+				) ); ?></small></p>
 				<div class="ms-thumbs" id="ms-thumbs"></div>
 			</section>
 

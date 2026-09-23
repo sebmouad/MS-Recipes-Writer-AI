@@ -52,14 +52,14 @@
   if (compose) {
     var recipes = document.getElementById('ms-recipes');
     var recipeCount = document.getElementById('ms-recipe-count');
-    var field = document.getElementById('ms-images');
+    var photos = document.getElementById('ms-photos');
     var thumbs = document.getElementById('ms-thumbs');
     var imageCount = document.getElementById('ms-image-count');
     var estimate = document.getElementById('ms-estimate');
     var status = document.getElementById('ms-compose-status');
     var budgetField = document.getElementById('ms-budget');
-    var picker = null;
     var chosen = [];
+    var previews = [];
 
     var pending = null;
 
@@ -125,27 +125,38 @@
     if (budgetField) { budgetField.addEventListener('input', refreshEstimate); }
     compose.querySelectorAll('input[name=profile]').forEach(function (input) { input.addEventListener('change', refreshEstimate); });
 
-    document.getElementById('ms-pick').addEventListener('click', function () {
-      if (!picker) {
-        picker = wp.media({ title: t.pickImages || '', multiple: true, library: { type: 'image' } });
-        picker.on('select', function () {
-          var selection = picker.state().get('selection');
-          chosen = [];
-          thumbs.innerHTML = '';
-          selection.each(function (item) {
-            chosen.push(item.id);
-            var sizes = item.get('sizes') || {};
-            var src = (sizes.thumbnail || sizes.medium || sizes.full || {}).url || item.get('url');
-            var img = document.createElement('img');
-            img.src = src;
-            img.alt = '';
-            thumbs.appendChild(img);
-          });
-          field.value = chosen.join(',');
-          say(imageCount, chosen.length === 1 ? t.oneImage : (t.manyImages || '').replace('%d', chosen.length));
-        });
+    function megabytes(bytes) { return String(Math.floor(bytes / 1000000)); }
+
+    // Checked here so a writer hears about a wrong file before waiting on an
+    // upload; the server checks the same things again from the bytes.
+    function photoProblem(files) {
+      var types = ['image/jpeg', 'image/png', 'image/webp'];
+      var total = 0;
+      if (files.length > (t.photoCount || 30)) { return (t.photoMany || '').replace('%d', t.photoCount); }
+      for (var i = 0; i < files.length; i++) {
+        total += files[i].size;
+        if (types.indexOf(files[i].type) === -1) { return (t.photoType || '').replace('%s', files[i].name); }
+        if (t.photoBytes && files[i].size > t.photoBytes) { return (t.photoTooBig || '').replace('%1$s', files[i].name).replace('%2$s', megabytes(t.photoBytes)); }
       }
-      picker.open();
+      if (t.postBytes && total > t.postBytes * 0.95) { return (t.photoTotal || '').replace('%s', megabytes(t.postBytes)); }
+      return '';
+    }
+
+    photos.addEventListener('change', function () {
+      previews.forEach(function (url) { URL.revokeObjectURL(url); });
+      previews = [];
+      chosen = Array.prototype.slice.call(photos.files || []);
+      thumbs.innerHTML = '';
+      chosen.forEach(function (file) {
+        var img = document.createElement('img');
+        img.src = URL.createObjectURL(file);
+        img.alt = file.name;
+        previews.push(img.src);
+        thumbs.appendChild(img);
+      });
+      var problem = photoProblem(chosen);
+      say(imageCount, problem || (chosen.length === 0 ? (t.noImage || '') : chosen.length === 1 ? t.oneImage : (t.manyImages || '').replace('%d', chosen.length)));
+      refreshEstimate();
     });
 
     compose.addEventListener('submit', function (event) {
@@ -157,16 +168,21 @@
       // The photographs are described here, one call each. It is the slow part
       // of submitting and the only part that spends before a run exists, so it
       // says so rather than sitting on a spinner.
-      say(status, t.describing || '');
-      call('/batches', {
-        method: 'POST',
-        body: JSON.stringify({
-          recipes: recipes.value,
-          images: field.value,
-          budget: ceiling(),
-          profile: (compose.querySelector('input[name=profile]:checked') || {}).value,
-          language: document.getElementById('ms-language').value
-        })
+      var problem = photoProblem(chosen);
+      if (problem) { say(status, problem); button.disabled = false; return; }
+      var form = new FormData();
+      form.append('recipes', recipes.value);
+      form.append('budget', String(ceiling()));
+      form.append('profile', (compose.querySelector('input[name=profile]:checked') || {}).value || '');
+      form.append('language', document.getElementById('ms-language').value);
+      chosen.forEach(function (file) { form.append('photos[]', file, file.name); });
+      say(status, chosen.length ? (t.uploading || '') + ' ' + (t.describing || '') : '');
+      // No Content-Type of our own: the browser writes the multipart boundary.
+      fetch(endpoint('/batches'), { method: 'POST', headers: { 'X-WP-Nonce': MSRWA.nonce }, body: form }).then(function (response) {
+        return response.json().then(function (data) {
+          if (!response.ok) throw new Error(data.message || t.failed || 'Erreur.');
+          return data;
+        });
       }).then(function (data) {
         window.location = 'admin.php?page=msrwa-batch&batch_id=' + data.id;
       }).catch(function (error) {

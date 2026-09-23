@@ -102,6 +102,10 @@ run carries.
   lost is re-armed by the watchdog; the fact check's ceiling rose to 12000; a
   refused sentence is repaired in code and judged again
   (`tests/test-engine-repair.php`, `tests/test-operations.php`).
+- [x] Photographs are uploaded from the writer's computer, never picked from
+  the media library, live (`tests/real/test-upload.php`, 1/1): a fake photo
+  refuses the lot and adds nothing; a real one becomes the writer's
+  attachment. Offline: `tests/test-intake.php`.
 - [ ] A complete lot on Claude — the account has no credit. — the Gemini key's
   grounding quota is exhausted, OpenAI is unreachable from the test
   environment and the Claude account has no credit.

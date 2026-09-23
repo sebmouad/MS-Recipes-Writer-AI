@@ -83,7 +83,6 @@ final class MSRWA_Admin {
 		wp_enqueue_style( 'msrwa-admin', MSRWA_URL . 'assets/admin.css', array(), MSRWA_VERSION . '.' . filemtime( MSRWA_DIR . 'assets/admin.css' ) );
 		if ( ! $ours ) { return; }
 
-		wp_enqueue_media();
 		wp_enqueue_script( 'msrwa-admin', MSRWA_URL . 'assets/admin.js', array(), MSRWA_VERSION . '.' . filemtime( MSRWA_DIR . 'assets/admin.js' ), true );
 
 		// Every word the script can print comes from here, so the interface is
@@ -97,10 +96,22 @@ final class MSRWA_Admin {
 				'oneRecipe' => __( '1 recette détectée', 'ms-recipes-writer-ai' ),
 				/* translators: %d is a number of recipes. */
 				'manyRecipes' => __( '%d recettes détectées', 'ms-recipes-writer-ai' ),
+				'noImage' => __( 'aucune photographie', 'ms-recipes-writer-ai' ),
 				'oneImage' => __( '1 photographie', 'ms-recipes-writer-ai' ),
 				/* translators: %d is a number of photographs. */
 				'manyImages' => __( '%d photographies', 'ms-recipes-writer-ai' ),
-				'pickImages' => __( 'Photographies des recettes', 'ms-recipes-writer-ai' ),
+				'photoBytes' => self::photo_bytes(),
+				'photoCount' => MSRWA_Intake::MAX_PHOTOS,
+				'postBytes' => self::post_bytes(),
+				/* translators: 1: a file name, 2: the largest size allowed, in megabytes. */
+				'photoTooBig' => __( '%1$s dépasse %2$s Mo.', 'ms-recipes-writer-ai' ),
+				/* translators: %s is a file name. */
+				'photoType' => __( '%s n’est pas une photographie JPEG, PNG ou WebP.', 'ms-recipes-writer-ai' ),
+				/* translators: %d is the largest number of photographs a lot may carry. */
+				'photoMany' => __( 'Un lot accepte au plus %d photographies.', 'ms-recipes-writer-ai' ),
+				/* translators: %s is a size in megabytes. */
+				'photoTotal' => __( 'Ensemble, ces photographies dépassent les %s Mo que ce serveur accepte en un envoi.', 'ms-recipes-writer-ai' ),
+				'uploading' => __( 'Envoi des photographies…', 'ms-recipes-writer-ai' ),
 				/* translators: 1: likely cost, 2: the ceiling, 3: number of recipes. */
 				'estimate' => __( 'Environ %1$s pour %3$d recette(s), et au maximum %2$s : le plafond arrête un run avant de le dépasser.', 'ms-recipes-writer-ai' ),
 				'noRecipes' => __( 'Il n’y a aucune recette dans ce texte.', 'ms-recipes-writer-ai' ),
@@ -169,5 +180,20 @@ final class MSRWA_Admin {
 		$invalid = MSRWA_Engine_Settings::save( isset( $_POST['msrwa_engine'] ) ? (array) wp_unslash( $_POST['msrwa_engine'] ) : array() );
 		wp_safe_redirect( add_query_arg( array( 'page' => 'msrwa-engine', 'saved' => 1, 'invalid' => implode( ',', $invalid ) ), admin_url( 'admin.php' ) ) );
 		exit;
+	}
+
+	/**
+	 * The largest photograph a writer may send: what the engine reads, or less
+	 * when the server accepts less in one upload.
+	 */
+	public static function photo_bytes() {
+		$engine = (int) ( MSRWA_Engine_Settings::effective( 'limits' )['max_image_bytes'] ?? 10000000 );
+		$server = function_exists( 'wp_max_upload_size' ) ? (int) wp_max_upload_size() : 0;
+		return max( 1, $server > 0 ? min( $engine, $server ) : $engine );
+	}
+
+	/** What the server accepts in one request, every photograph together. */
+	public static function post_bytes() {
+		return function_exists( 'wp_convert_hr_to_bytes' ) ? (int) wp_convert_hr_to_bytes( (string) ini_get( 'post_max_size' ) ) : 0;
 	}
 }

@@ -143,6 +143,7 @@ Real, `php tests/real/run.php`:
 | --- | --- | --- |
 | `test-site.php` | nothing | schema and migration, capabilities per role, cron armed, uploads writable, an estimate exists, every key opens its provider, a lot over its ceiling is refused, nothing answers anonymously |
 | `test-flow.php` | one article-only recipe | submit → dispatch → cron → draft, cost within the ceiling and near the estimate, the draft carries its excerpt, slug and tags |
+| `test-upload.php` | one photograph, described once | a lot with photographs sent from disk as a browser form does: a file that is not a photograph refuses the lot and leaves the media library untouched, a real one becomes the writer's attachment |
 
 ## Gaps
 

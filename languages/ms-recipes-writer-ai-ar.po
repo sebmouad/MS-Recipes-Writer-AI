@@ -1690,6 +1690,30 @@ msgstr "مقروء من صفحة المزوّد"
 msgid "Réflexion ou qualité"
 msgstr "التفكير أو الجودة"
 
+msgid "%1$s dépasse %2$s Mo."
+msgstr "%1$s أكبر من %2$s ميغابايت."
+
+msgid "%s n’a pas été reçu en entier."
+msgstr "لم يُستلم %s كاملًا."
+
+msgid "%s n’est pas une photographie JPEG, PNG ou WebP."
+msgstr "%s ليس صورة بصيغة JPEG أو PNG أو WebP."
+
+msgid "Choisir sur mon ordinateur"
+msgstr "اختيار من حاسوبي"
+
+msgid "Ensemble, ces photographies dépassent les %s Mo que ce serveur accepte en un envoi."
+msgstr "مجموع هذه الصور يتجاوز %s ميغابايت، وهو أقصى ما يقبله هذا الخادم في إرسال واحد."
+
+msgid "Envoi des photographies…"
+msgstr "جارٍ إرسال الصور…"
+
+msgid "JPEG, PNG ou WebP, %1$d au plus, %2$s Mo chacune. Elles sont ajoutées à la médiathèque quand le lot est créé."
+msgstr "بصيغة JPEG أو PNG أو WebP، %1$d صورة على الأكثر، و%2$s ميغابايت لكل صورة. تُضاف إلى مكتبة الوسائط عند إنشاء الدفعة."
+
+msgid "Un lot accepte au plus %d photographies."
+msgstr "تقبل الدفعة %d صورة على الأكثر."
+
 msgid "aucune page citée"
 msgstr "لم تُذكر أي صفحة"
 

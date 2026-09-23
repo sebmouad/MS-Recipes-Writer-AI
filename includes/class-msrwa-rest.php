@@ -78,9 +78,13 @@ final class MSRWA_REST {
 		$recipes = MSRWA_Intake::recipes( (string) $request->get_param( 'recipes' ) );
 		if ( ! $recipes ) { return new WP_Error( 'msrwa_no_recipes', __( 'Aucune recette lisible dans ce texte.', 'ms-recipes-writer-ai' ), array( 'status' => 400 ) ); }
 
-		$ids = $request->get_param( 'images' );
-		$ids = is_string( $ids ) ? array_filter( array_map( 'absint', explode( ',', $ids ) ) ) : (array) $ids;
-		$images = MSRWA_Intake::images( $ids );
+		// Photographs come from the writer's computer, never from the media
+		// library: a lot can only carry pictures its writer actually sent, and
+		// an attachment id posted here is not read.
+		$files = MSRWA_Intake::files( $request->get_file_params()['photos'] ?? array() );
+		$uploaded = MSRWA_Intake::upload( $files, MSRWA_Admin::photo_bytes() );
+		if ( '' !== $uploaded['error'] ) { return new WP_Error( 'msrwa_bad_photo', $uploaded['error'], array( 'status' => 400 ) ); }
+		$images = MSRWA_Intake::images( $uploaded['ids'] );
 
 		// The per-recipe ceiling is the site's unless the person may set it. It
 		// used to be worked out here and then not used, so anybody who could
@@ -91,7 +95,7 @@ final class MSRWA_REST {
 			sanitize_key( (string) $request->get_param( 'profile' ) ),
 			sanitize_key( (string) $request->get_param( 'language' ) )
 		);
-		if ( is_wp_error( $id ) ) { return $id; }
+		if ( is_wp_error( $id ) ) { MSRWA_Intake::discard( $uploaded['ids'] ); return $id; }
 		return rest_ensure_response( array( 'id' => (int) $id, 'recipes' => count( $recipes ), 'images' => count( $images ) ) );
 	}
 

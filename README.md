@@ -5,9 +5,9 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.18.3
+## État actuel — 0.18.4
 
-La version `0.18.3` fait approuver les trois recettes d’un lot réel aux réglages par défaut — image à la une en `low`, collage en `medium` — pour 0,132 $ en moyenne ; la `0.18.2` permettait de choisir le modèle et la qualité de chaque image
+La version `0.18.4` fait envoyer les photographies d’un lot depuis l’ordinateur du rédacteur ; la `0.18.3` faisait approuver les trois recettes d’un lot réel aux réglages par défaut — image à la une en `low`, collage en `medium` — pour 0,132 $ en moyenne ; la `0.18.2` permettait de choisir le modèle et la qualité de chaque image
 séparément ; la `0.18.1` fait tenir le plafond par recette jusque dans les reprises
 de l’approbation finale ; la `0.18.0` ramène une recette complète à environ 0,11 $ réels —
 recherche web comprise — sans perte de qualité mesurée ; la `0.17.0` faisait
@@ -74,6 +74,24 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.18.4
+
+**Les photographies viennent de l’ordinateur, plus de la médiathèque.** Sur
+l’écran *Nouveau lot*, le bouton « Choisir dans la médiathèque » devient
+« Choisir sur mon ordinateur » : le rédacteur sélectionne ses fichiers, en
+voit les vignettes, et ils partent avec le lot. Le serveur les vérifie
+d’après leur contenu — JPEG, PNG ou WebP, taille maximale selon le moteur et
+le serveur (affichée sous le bouton), 30 au plus — puis les ajoute à la
+médiathèque au nom du rédacteur. Un seul fichier refusé refuse le lot entier
+avec son nom, et rien n’est laissé dans la médiathèque ; une photographie de
+la médiathèque ne peut plus être glissée dans un lot, même par la REST API.
+La taille et le type sont aussi vérifiés dans le navigateur, avant l’envoi.
+
+Vérifié en réel (`tests/real/test-upload.php`) : un faux `.jpg` refuse le lot
+sans rien ajouter à la médiathèque ; une vraie photographie devient une pièce
+jointe du rédacteur et la photographie du lot. Le formulaire lui-même a été
+rempli dans Chromium : fichier choisi, vignette, lot créé.
 
 ## Version 0.18.3
 
