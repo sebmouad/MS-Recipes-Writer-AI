@@ -98,8 +98,7 @@ administrateur et en auteur, sur ordinateur et sur téléphone.
   créé. Il lit désormais la décision sur la recette et les remarques dans le
   brouillon.
 - *Moteur.* Les groupes JSON sont repliés (ils s’ouvrent d’eux-mêmes quand
-  l’un d’eux a été modifié) : la page passe de près de 10 000 à environ
-  3 000 pixels. Les noms d’étapes et les descriptions des groupes sont
+  l’un d’eux a été modifié) : la page passe de 9 775 à 4 874 pixels de haut. Les noms d’étapes et les descriptions des groupes sont
   traduits, et le registre des étapes indique le vrai modèle des images et
   « aucun » pour les corrections appliquées en code.
 - *Modèles.* Les cases « étapes qu’il a le droit de servir » débordaient de la
