@@ -269,7 +269,7 @@ msgstr ""
 msgid "Aucun modèle enregistré. Réactivez l’extension pour installer le catalogue livré."
 msgstr ""
 
-#: class-msrwa-prices.php:38
+#: class-msrwa-prices.php:54
 msgid "Aucun modèle n’est routé pour faire cette recherche. Enregistrez une clé d’abord."
 msgstr ""
 
@@ -1815,6 +1815,10 @@ msgstr ""
 msgid "aucun entretien planifié"
 msgstr ""
 
+#: class-msrwa-prices.php:72
+msgid "aucun modèle disponible n’a pu lire la page du fournisseur"
+msgstr ""
+
 #: class-msrwa-screen-models.php:144
 msgid "aucun tarif"
 msgstr ""
@@ -1823,7 +1827,7 @@ msgstr ""
 msgid "aucun tarif connu — le coût de cette étape ne peut pas être estimé"
 msgstr ""
 
-#: class-msrwa-prices.php:129
+#: class-msrwa-prices.php:190
 msgid "aucun tarif trouvé sur la page du fournisseur"
 msgstr ""
 
@@ -1835,7 +1839,7 @@ msgstr ""
 msgid "aucune clé enregistrée"
 msgstr ""
 
-#: class-msrwa-prices.php:142
+#: class-msrwa-prices.php:203
 msgid "aucune page citée"
 msgstr ""
 
@@ -1867,11 +1871,11 @@ msgstr ""
 msgid "brouillons prêts"
 msgstr ""
 
-#: class-msrwa-keys.php:179
+#: class-msrwa-keys.php:178
 msgid "clé acceptée"
 msgstr ""
 
-#: class-msrwa-keys.php:183
+#: class-msrwa-keys.php:182
 msgid "clé acceptée, mais le quota est atteint pour l’instant"
 msgstr ""
 
@@ -1879,15 +1883,15 @@ msgstr ""
 msgid "clé enregistrée"
 msgstr ""
 
-#: class-msrwa-keys.php:181
+#: class-msrwa-keys.php:180
 msgid "clé refusée par le fournisseur : vérifiez-la ou remplacez-la"
 msgstr ""
 
-#: class-msrwa-keys.php:70
+#: class-msrwa-keys.php:69
 msgid "clé valide, mais le compte du fournisseur n’a plus de crédit : le dernier appel réel a été refusé. Recharger le compte chez le fournisseur."
 msgstr ""
 
-#: class-msrwa-keys.php:71
+#: class-msrwa-keys.php:70
 msgid "clé valide, mais le quota du compte est épuisé : le dernier appel réel a été refusé. Attendre qu’il se réinitialise ou relever la limite chez le fournisseur."
 msgstr ""
 
@@ -1963,7 +1967,7 @@ msgstr ""
 msgid "inchangée"
 msgstr ""
 
-#: class-msrwa-keys.php:176
+#: class-msrwa-keys.php:175
 msgid "injoignable depuis ce serveur : le pare-feu de l’hébergeur bloque peut-être la sortie"
 msgstr ""
 
@@ -1987,7 +1991,11 @@ msgstr ""
 msgid "la page citée"
 msgstr ""
 
-#: class-msrwa-prices.php:136
+#: class-msrwa-prices.php:209
+msgid "la page citée n’est pas celle du fournisseur"
+msgstr ""
+
+#: class-msrwa-prices.php:197
 msgid "la réponse n’est pas un tarif plausible"
 msgstr ""
 
@@ -2003,7 +2011,7 @@ msgstr ""
 msgid "le fournisseur ne sert pas ce nom : l’étape échouera"
 msgstr ""
 
-#: class-msrwa-keys.php:185
+#: class-msrwa-keys.php:184
 msgid "le fournisseur répond %d : réessayez plus tard"
 msgstr ""
 

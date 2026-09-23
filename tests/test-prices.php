@@ -9,6 +9,7 @@ define( 'MSRWA_VERSION', '0.0.0-test' );
 define( 'MSRWA_DIR', dirname( __DIR__ ) . '/' );
 require __DIR__ . '/bootstrap.php';
 msrwa_test_load( 'catalog', 'json', 'prices' );
+require_once dirname( __DIR__ ) . '/includes/engine/load.php';
 
 /** What remember_price() was asked to store, without a database. */
 $GLOBALS['msrwa_stored_prices'] = array();
@@ -42,6 +43,10 @@ $refused = array(
 	'words instead of a number' => array( 'key' => 'claude:claude-sonnet-5', 'input' => 'about three dollars', 'output' => 15, 'source' => 'https://example.test/p' ),
 	'a null price' => array( 'key' => 'claude:claude-sonnet-5', 'input' => null, 'output' => 15, 'source' => 'https://example.test/p' ),
 	'only half a rate' => array( 'key' => 'claude:claude-sonnet-5', 'input' => 3, 'source' => 'https://example.test/p' ),
+	'a page that is not the provider’s' => array( 'key' => 'claude:claude-sonnet-5', 'input' => 3, 'output' => 15, 'source' => 'https://llm-prices.example.com/claude' ),
+	'another provider’s page' => array( 'key' => 'claude:claude-sonnet-5', 'input' => 3, 'output' => 15, 'source' => 'https://ai.google.dev/gemini-api/docs/pricing' ),
+	'a look-alike host' => array( 'key' => 'claude:claude-sonnet-5', 'input' => 3, 'output' => 15, 'source' => 'https://notanthropic.com/pricing' ),
+	'plain http' => array( 'key' => 'claude:claude-sonnet-5', 'input' => 3, 'output' => 15, 'source' => 'http://platform.claude.com/docs/en/about-claude/pricing' ),
 );
 foreach ( $refused as $why => $entry ) {
 	$out = MSRWA_Prices::apply( $wanted, array( 'prices' => array( $entry ) ) );
@@ -75,5 +80,49 @@ msrwa_test_contains( $prompt, 'MILLION', 'It fixes the unit, because providers q
 msrwa_test_contains( $prompt, 'source', 'It demands the page the number was read from.' );
 msrwa_test_contains( $prompt, 'A missing entry is correct', 'And makes omission the right answer, so a gap is not filled with a guess.' );
 msrwa_test_contains( $prompt, 'provider\'s own', 'Only the provider\'s own page counts as a source.' );
+
+// One provider per question, pointed at its page: Gemini reads it with
+// url_context, which worked on a key whose search grounding was out of quota.
+$claude_only = array( 'claude:claude-sonnet-5' => $wanted['claude:claude-sonnet-5'] );
+msrwa_test_contains( MSRWA_Prices::prompt( $claude_only, 'claude' ), 'https://platform.claude.com/docs/en/about-claude/pricing', 'The question names the provider’s own page.' );
+msrwa_test_contains( $prompt, 'thinking', 'It says reasoning is billed as output, which is where Gemini’s real rate lives.' );
+$images = array( 'openai:gpt-image-2.5-flare' => array( 'provider' => 'openai', 'model_id' => 'gpt-image-2.5-flare' ) );
+msrwa_test_contains( MSRWA_Prices::prompt( $images, 'openai' ), 'IMAGE output', 'An image model is asked for its image output rate, not its text one.' );
+msrwa_test_assert( false === strpos( $prompt, 'IMAGE output' ), 'A text model is not.' );
+foreach ( MSRWA_Prices::pages() as $provider => $page ) {
+	msrwa_test_assert( MSRWA_Prices::own_page( $provider, $page['url'] ), 'The page the lookup is sent to is one it will accept: ' . $provider . '.' );
+}
+msrwa_test_assert( MSRWA_Prices::own_page( 'openai', 'https://platform.openai.com/docs/pricing' ), 'A subdomain of the provider is the provider.' );
+
+$gemini = MSRWA_Prices::wire( array( 'provider' => 'gemini', 'wire' => array( 'web_search_tool' => array( 'google_search' => array() ) ) ) );
+msrwa_test_assert( array( 'url_context' => array() ) === $gemini['web_search_tool'], 'Gemini opens the page instead of searching for it.' );
+$claude = MSRWA_Prices::wire( array( 'provider' => 'claude', 'wire' => array( 'web_search_tool' => array( 'type' => 'web_search_20250305' ) ) ) );
+msrwa_test_assert( 'web_search_20250305' === $claude['web_search_tool']['type'], 'The others keep their search tool.' );
+
+// --- Which routes are tried --------------------------------------------------
+
+putenv( 'OPENAI_API_KEY=' );
+putenv( 'ANTHROPIC_API_KEY=' );
+putenv( 'GEMINI_API_KEY=' );
+$config = MSRWA_Engine_Config::create( array(
+	'routing' => array( 'research' => 'claude:medium' ),
+	'settings' => array( 'keys' => array( 'claude' => 'k1', 'gemini' => 'k2' ) ),
+) );
+$rows = array(
+	array( 'provider' => 'gemini', 'model_id' => 'gemini-3.5-flash-lite', 'input_usd' => 0.30, 'served' => true ),
+	array( 'provider' => 'gemini', 'model_id' => 'gemini-3.8-flash', 'input_usd' => 0.75, 'served' => null ),
+	array( 'provider' => 'gemini', 'model_id' => 'gemini-2.0-gone', 'input_usd' => 0.10, 'served' => false ),
+	array( 'provider' => 'gemini', 'model_id' => 'lyria-3.5', 'input_usd' => 0.01, 'served' => true ),
+	array( 'provider' => 'openai', 'model_id' => 'gpt-5-nano', 'input_usd' => 0.05, 'served' => true ),
+);
+$routes = array_map( static function ( $route ) { return $route['provider'] . ':' . $route['model']; }, MSRWA_Prices::routes( $config, $rows ) );
+msrwa_test_assert( 'claude:claude-sonnet-5' === $routes[0], 'The research route is tried first; got ' . implode( ', ', $routes ) );
+msrwa_test_assert( in_array( 'gemini:gemini-3.1-flash-lite', $routes, true ), 'Then another provider the site has a key for, so one refusal does not end the lookup.' );
+msrwa_test_assert( ! preg_grep( '/^openai:/', $routes ), 'A provider with no key is never tried.' );
+msrwa_test_assert( count( $routes ) === count( array_unique( $routes ) ), 'No route is tried twice.' );
+msrwa_test_assert( 'gemini:gemini-3.5-flash-lite' === $routes[1], 'After research, the cheapest model the site can write with, enabled or not; got ' . implode( ', ', $routes ) );
+msrwa_test_assert( ! in_array( 'gemini:gemini-2.0-gone', $routes, true ), 'Never a model the provider no longer serves.' );
+msrwa_test_assert( ! in_array( 'gemini:lyria-3.5', $routes, true ), 'Nor one that cannot write.' );
+msrwa_test_assert( count( $routes ) <= MSRWA_Prices::ATTEMPTS, 'A lookup gives up after a bounded number of refusals.' );
 
 msrwa_test_done( 'looked-up prices' );

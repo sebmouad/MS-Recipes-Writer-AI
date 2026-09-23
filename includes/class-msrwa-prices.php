@@ -23,8 +23,27 @@ final class MSRWA_Prices {
 	const FLOOR = 0.001;
 	const CEILING = 1000.0;
 
+	/** How many refusals one lookup accepts before it gives up. */
+	const ATTEMPTS = 8;
+
+	/** Each provider's own pricing page: the only source a rate may cite. */
+	public static function pages() {
+		return array(
+			'openai' => array( 'url' => 'https://developers.openai.com/api/docs/pricing', 'hosts' => array( 'openai.com' ) ),
+			'gemini' => array( 'url' => 'https://ai.google.dev/gemini-api/docs/pricing', 'hosts' => array( 'ai.google.dev', 'cloud.google.com' ) ),
+			'claude' => array( 'url' => 'https://platform.claude.com/docs/en/about-claude/pricing', 'hosts' => array( 'claude.com', 'anthropic.com' ) ),
+		);
+	}
+
 	/**
 	 * Looks up every model that has no price a person stands behind.
+	 *
+	 * One question per provider, each pointed at that provider's own page. A
+	 * single question about every model at once sent a model searching three
+	 * sites for sixty names and ran out of room before it answered. And when the
+	 * route refuses — quota spent, no credit, a model "experiencing high demand",
+	 * all three seen on real keys on 2026-09-23 — the next route this site has a
+	 * key for is tried, instead of the whole lookup ending on the first refusal.
 	 *
 	 * Returns what it did, per model, so the screen can show the reasoning
 	 * rather than a spinner that ends in a number nobody can account for.
@@ -33,28 +52,39 @@ final class MSRWA_Prices {
 		$wanted = self::wanted( $only );
 		if ( ! $wanted ) { return array( 'asked' => 0, 'found' => 0, 'results' => array() ); }
 
-		$route = self::route();
-		if ( ! $route ) {
+		$routes = self::routes();
+		if ( ! $routes ) {
 			return array( 'asked' => 0, 'found' => 0, 'error' => __( 'Aucun modèle n’est routé pour faire cette recherche. Enregistrez une clé d’abord.', 'ms-recipes-writer-ai' ), 'results' => array() );
 		}
 
-		// The wire has to be the configured one. Left out, the call builds its
-		// own from the engine's bare defaults, which carry no keys — and the
-		// lookup fails with "No API key" on a site that has three.
-		$answer = MSRWA_Engine_Call::text(
-			$route['provider'],
-			$route['model'],
-			self::prompt( $wanted ),
-			4000,
-			true,
-			true,
-			$route['wire']
-		);
-		if ( ! empty( $answer['error'] ) ) {
-			return array( 'asked' => count( $wanted ), 'found' => 0, 'error' => MSRWA_DB::sanitize( (string) $answer['error'] ), 'results' => array() );
-		}
+		$groups = array();
+		foreach ( $wanted as $key => $row ) { $groups[ $row['provider'] ][ $key ] = $row; }
 
-		return self::apply( $wanted, MSRWA_Json::decode( (string) ( $answer['text'] ?? '' ) ) );
+		$out = array( 'asked' => count( $wanted ), 'found' => 0, 'results' => array() );
+		$errors = array();
+		$answered = false;
+		foreach ( $groups as $provider => $group ) {
+			$answer = null;
+			foreach ( $routes as $index => $route ) {
+				$answer = MSRWA_Engine_Call::text( $route['provider'], $route['model'], self::prompt( $group, $provider ), 8000, true, true, self::wire( $route ) );
+				if ( empty( $answer['error'] ) ) { break; }
+				$errors[] = $route['provider'] . ':' . $route['model'] . ' — ' . MSRWA_DB::sanitize( (string) $answer['error'] );
+				// A route that refused once will refuse the next provider too.
+				unset( $routes[ $index ] );
+			}
+			if ( ! $answer || ! empty( $answer['error'] ) ) {
+				foreach ( $group as $key => $row ) { $out['results'][ $key ] = array( 'state' => 'missing', 'why' => __( 'aucun modèle disponible n’a pu lire la page du fournisseur', 'ms-recipes-writer-ai' ) ); }
+				continue;
+			}
+			$answered = true;
+			$applied = self::apply( $group, MSRWA_Json::decode( (string) ( $answer['text'] ?? '' ) ) );
+			$out['found'] += $applied['found'];
+			$out['results'] += $applied['results'];
+		}
+		// Only when nothing answered at all: a page read that found no rate is an
+		// answer, and the refusals before it are not what the owner needs to see.
+		if ( ! $answered && $errors ) { $out['error'] = implode( ' · ', $errors ); }
+		return $out;
 	}
 
 	/**
@@ -78,28 +108,72 @@ final class MSRWA_Prices {
 		return $out;
 	}
 
-	/** The step that does the looking, on whatever this site has a key for. */
-	private static function route() {
-		$config = MSRWA_Engine_Config::create( MSRWA_Engine_Settings::stored(), array( 'settings' => MSRWA_Settings::engine_settings() ) );
-		// Research is the step already routed at a model with web search, so
-		// the lookup rides the site's own choice rather than inventing one.
-		$route = $config->model_for( 'research' );
-		$wire = $config->provider( $route['provider'], $route['model'] );
-		if ( empty( $wire['has_key'] ) ) { return null; }
-		return $route + array( 'wire' => $wire );
+	/**
+	 * Every route that can do the looking, in the order worth trying.
+	 *
+	 * Research first, because it is the step the owner already pointed at a
+	 * model that reads the web; then every model the catalogue knows can write,
+	 * on a provider this site has a key for, cheapest first. Reading a table
+	 * off a page is not work that needs the dearest model, and on 2026-09-23 the
+	 * research route, both tiers of Gemini and Claude refused at the same
+	 * moment while a Gemini model two places down the price list answered.
+	 */
+	public static function routes( $config = null, array $rows = null ) {
+		$config = $config ? $config : MSRWA_Engine_Config::create( MSRWA_Engine_Settings::stored(), array( 'settings' => MSRWA_Settings::engine_settings() ) );
+		$candidates = array( $config->model_for( 'research' ) );
+		$writers = array_filter( null === $rows ? MSRWA_Catalog::rows() : $rows, static function ( $row ) {
+			return false !== $row['served'] && 'text' === MSRWA_Catalog::role( $row['provider'], $row['model_id'] );
+		} );
+		usort( $writers, static function ( $a, $b ) { return (float) ( $a['input_usd'] ?? 1000 ) <=> (float) ( $b['input_usd'] ?? 1000 ); } );
+		foreach ( $writers as $row ) { $candidates[] = array( 'provider' => $row['provider'], 'model' => $row['model_id'] ); }
+		foreach ( (array) $config->get( 'tiers', array() ) as $models ) {
+			foreach ( (array) $models as $provider => $model ) { $candidates[] = array( 'provider' => $provider, 'model' => (string) $model ); }
+		}
+		$out = array();
+		foreach ( $candidates as $route ) {
+			$key = $route['provider'] . ':' . $route['model'];
+			if ( '' === (string) $route['model'] || isset( $out[ $key ] ) ) { continue; }
+			$wire = $config->provider( $route['provider'], $route['model'] );
+			if ( empty( $wire['has_key'] ) ) { continue; }
+			$out[ $key ] = array( 'provider' => $route['provider'], 'model' => $route['model'], 'wire' => $wire );
+		}
+		return array_slice( array_values( $out ), 0, self::ATTEMPTS );
 	}
 
-	/** Asked for one thing at a time, in the words the answer must come back in. */
-	public static function prompt( array $wanted ) {
+	/**
+	 * The wire, with the tool that reads a page rather than one that searches.
+	 *
+	 * The prompt names the page, so Gemini needs only to open it: url_context
+	 * read Google's pricing page on a key whose search grounding was out of
+	 * quota. Search remains the tool for the other two, which find the page
+	 * themselves.
+	 */
+	public static function wire( array $route ) {
+		$wire = $route['wire'];
+		if ( 'gemini' === $route['provider'] ) { $wire['web_search_tool'] = array( 'url_context' => array() ); }
+		return $wire;
+	}
+
+	/** Asked for one provider at a time, in the words the answer must come back in. */
+	public static function prompt( array $wanted, $provider = '' ) {
 		$lines = array();
-		foreach ( $wanted as $key => $row ) { $lines[] = '- ' . $key; }
+		$image = false;
+		foreach ( $wanted as $key => $row ) {
+			$lines[] = '- ' . $key;
+			if ( 'image' === MSRWA_Catalog::role( $row['provider'], $row['model_id'] ) ) { $image = true; }
+		}
+		$page = self::pages()[ $provider ]['url'] ?? '';
 
 		return "Find the current published API price of each model listed below.\n\n"
 			. implode( "\n", $lines ) . "\n\n"
-			. "Each line is `provider:model_id`. Use the provider's own published pricing page and no other source.\n\n"
-			. "Report USD per ONE MILLION tokens, standard (non-batch, non-cached) rates.\n"
-			. "If a provider quotes per 1,000 tokens, multiply by 1000.\n\n"
-			. "Return JSON only, of this shape:\n"
+			. "Each line is `provider:model_id`. Use the provider's own published pricing page and no other source."
+			. ( '' !== $page ? ' That page is ' . $page . " — read it.\n\n" : "\n\n" )
+			. "Report USD per ONE MILLION tokens, standard rates: not batch, not flex, not priority, not cached input.\n"
+			. "If a provider quotes per 1,000 tokens, multiply by 1000.\n"
+			. "Where a model's rate depends on prompt length, report the rate for prompts under 200,000 tokens.\n"
+			. "`output` is the rate for output tokens, which on reasoning models includes thinking tokens.\n"
+			. ( $image ? "For an image generation model, `input` is the text input rate and `output` is the IMAGE output token rate.\n" : '' )
+			. "\nReturn JSON only, of this shape:\n"
 			. '{"prices":[{"key":"provider:model_id","input":0.00,"output":0.00,"source":"https://..."}]}' . "\n\n"
 			. "Rules that matter more than completeness:\n"
 			. "- Omit any model whose price you cannot find on the provider's own page. A missing entry is correct; a guessed one is not.\n"
@@ -142,11 +216,28 @@ final class MSRWA_Prices {
 				$results[ $key ] = array( 'state' => 'refused', 'why' => __( 'aucune page citée', 'ms-recipes-writer-ai' ) );
 				continue;
 			}
+			if ( ! self::own_page( $row['provider'], $source ) ) {
+				// A reseller's table or a blog post is how a stale or invented
+				// rate gets in with a citation that looks like proof.
+				$results[ $key ] = array( 'state' => 'refused', 'why' => __( 'la page citée n’est pas celle du fournisseur', 'ms-recipes-writer-ai' ) );
+				continue;
+			}
 			MSRWA_Catalog::remember_price( $row['provider'], $row['model_id'], $input, $output, MSRWA_Catalog::LOOKED_UP, $source );
 			$results[ $key ] = array( 'state' => 'found', 'input' => $input, 'output' => $output, 'source' => $source );
 			$found++;
 		}
 		return array( 'asked' => count( $wanted ), 'found' => $found, 'results' => $results );
+	}
+
+	/** Whether a cited page belongs to the provider it prices. */
+	public static function own_page( $provider, $url ) {
+		$host = strtolower( (string) wp_parse_url( (string) $url, PHP_URL_HOST ) );
+		$scheme = strtolower( (string) wp_parse_url( (string) $url, PHP_URL_SCHEME ) );
+		if ( 'https' !== $scheme || '' === $host ) { return false; }
+		foreach ( self::pages()[ sanitize_key( (string) $provider ) ]['hosts'] ?? array() as $allowed ) {
+			if ( $host === $allowed || substr( $host, -strlen( '.' . $allowed ) ) === '.' . $allowed ) { return true; }
+		}
+		return false;
 	}
 
 	/** A number that could be a published rate, or null. */

@@ -188,9 +188,15 @@ final class MSRWA_REST {
 		return rest_ensure_response( $out );
 	}
 
-	/** Reads the providers' published pricing pages. Costs a little, can be wrong. */
-	public static function fetch_prices() {
-		return rest_ensure_response( MSRWA_Prices::lookup() );
+	/**
+	 * Reads the providers' published pricing pages. Costs a little, can be wrong.
+	 *
+	 * `models` names `provider:model_id` keys to check even when they already
+	 * carry a rate, which is how a shipped rate is confirmed against its page.
+	 */
+	public static function fetch_prices( $request = null ) {
+		$only = $request instanceof WP_REST_Request ? array_values( array_filter( array_map( 'sanitize_text_field', (array) $request->get_param( 'models' ) ) ) ) : array();
+		return rest_ensure_response( MSRWA_Prices::lookup( $only ) );
 	}
 
 	/**

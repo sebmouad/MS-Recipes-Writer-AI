@@ -1631,6 +1631,12 @@ msgstr "no rate"
 msgid "aucun tarif trouvé sur la page du fournisseur"
 msgstr "no rate found on the provider’s page"
 
+msgid "aucun modèle disponible n’a pu lire la page du fournisseur"
+msgstr "no available model could read the provider’s page"
+
+msgid "la page citée n’est pas celle du fournisseur"
+msgstr "the page cited is not the provider’s own"
+
 msgid "aucune page citée"
 msgstr "no page cited"
 
