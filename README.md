@@ -5,9 +5,9 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.18.6
+## État actuel — 0.18.7
 
-La version `0.18.6` range les photographies envoyées avec le brouillon qu’elles ont servi à écrire ; la `0.18.5` faisait passer un lot de trois recettes en 8 minutes pour 0,125 $ la recette, toutes approuvées ; la `0.18.4` faisait envoyer les photographies d’un lot depuis l’ordinateur du rédacteur ; la `0.18.3` faisait approuver les trois recettes d’un lot réel aux réglages par défaut — image à la une en `low`, collage en `medium` — pour 0,132 $ en moyenne ; la `0.18.2` permettait de choisir le modèle et la qualité de chaque image
+La version `0.18.7` dit juste ce que fait le plafond par recette ; la `0.18.6` rangeait les photographies envoyées avec le brouillon qu’elles ont servi à écrire ; la `0.18.5` faisait passer un lot de trois recettes en 8 minutes pour 0,125 $ la recette, toutes approuvées ; la `0.18.4` faisait envoyer les photographies d’un lot depuis l’ordinateur du rédacteur ; la `0.18.3` faisait approuver les trois recettes d’un lot réel aux réglages par défaut — image à la une en `low`, collage en `medium` — pour 0,132 $ en moyenne ; la `0.18.2` permettait de choisir le modèle et la qualité de chaque image
 séparément ; la `0.18.1` fait tenir le plafond par recette jusque dans les reprises
 de l’approbation finale ; la `0.18.0` ramène une recette complète à environ 0,11 $ réels —
 recherche web comprise — sans perte de qualité mesurée ; la `0.17.0` faisait
@@ -74,6 +74,18 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.18.7
+
+**Le plafond par recette est décrit tel qu’il agit.** L’écran Réglages et le
+formulaire de lot disaient qu’une recette dont le coût maximal dépasse le
+plafond « serait arrêtée avant la fin ». Ce n’est plus vrai depuis la 0.18.1 :
+la recette se termine toujours, le plafond arrête seulement les nouvelles
+tentatives de l’approbation finale avant qu’elles ne le franchissent, et le
+dernier verdict va au rédacteur. Aux réglages par défaut (0,30 $ par recette,
+estimée à 0,121 $, au plus 0,349 $), l’écran Réglages ne s’affiche plus en
+avertissement : il ne le fait que lorsque le coût attendu lui-même dépasse le
+plafond, le seul cas où un lot est refusé.
 
 ## Version 0.18.6
 

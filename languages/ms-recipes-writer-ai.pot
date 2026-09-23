@@ -47,7 +47,7 @@ msgstr ""
 msgid "%1$d étapes sur %2$d"
 msgstr ""
 
-#: class-msrwa-admin.php:107 class-msrwa-intake.php:120
+#: class-msrwa-admin.php:107 class-msrwa-intake.php:123
 msgid "%1$s dépasse %2$s Mo."
 msgstr ""
 
@@ -125,11 +125,11 @@ msgstr ""
 msgid "%s du temps"
 msgstr ""
 
-#: class-msrwa-intake.php:111 class-msrwa-intake.php:116
+#: class-msrwa-intake.php:114 class-msrwa-intake.php:119
 msgid "%s n’a pas été reçu en entier."
 msgstr ""
 
-#: class-msrwa-admin.php:109 class-msrwa-intake.php:126
+#: class-msrwa-admin.php:109 class-msrwa-intake.php:129
 msgid "%s n’est pas une photographie JPEG, PNG ou WebP."
 msgstr ""
 
@@ -334,7 +334,7 @@ msgid "Aucune table d’une version précédente."
 msgstr ""
 
 #: class-msrwa-screen-settings.php:68
-msgid "Avec le routage actuel, une recette complète est estimée à %1$s, et jusqu’à %2$s si l’approbation finale refuse à chaque tentative. Un plafond sous la première valeur refuse le lot au lancement ; sous la seconde, il peut arrêter une recette avant la fin."
+msgid "Avec le routage actuel, une recette complète est estimée à %1$s, et jusqu’à %2$s si l’approbation finale refuse à chaque tentative. Un plafond sous la première valeur refuse le lot au lancement ; sous la seconde, il arrête les nouvelles tentatives avant de le franchir, et la recette se termine avec le dernier verdict."
 msgstr ""
 
 #: class-msrwa-editor.php:109 class-msrwa-editor.php:183
@@ -565,10 +565,6 @@ msgstr ""
 msgid "Coûte quelques centimes. Un modèle avec recherche web lit les pages de tarifs des fournisseurs. Ce qu’il rapporte est marqué « trouvé par IA » et cite sa page : c’est une indication à vérifier, jamais une facture. Un tarif saisi à la main n’est jamais remplacé."
 msgstr ""
 
-#: class-msrwa-admin.php:161
-msgid "C’est plus que le plafond par recette : elle serait alors arrêtée avant la fin."
-msgstr ""
-
 #: class-msrwa-diagnostics.php:201
 msgid "DISABLE_WP_CRON est actif : vérifiez que le cron du serveur appelle bien wp-cron.php."
 msgstr ""
@@ -681,7 +677,7 @@ msgstr ""
 msgid "En attente : la file est suspendue par un administrateur. Elle repartira d’elle-même quand la file reprendra."
 msgstr ""
 
-#: class-msrwa-run.php:146
+#: class-msrwa-run.php:170
 msgid "En attente de : %s, qui n’est jamais arrivé."
 msgstr ""
 
@@ -821,11 +817,11 @@ msgstr ""
 msgid "Il n’y a aucune recette dans ce texte."
 msgstr ""
 
-#: class-msrwa-draft.php:180
+#: class-msrwa-draft.php:181
 msgid "Image Facebook"
 msgstr ""
 
-#: class-msrwa-draft.php:180 class-msrwa-ui.php:83
+#: class-msrwa-draft.php:181 class-msrwa-ui.php:83
 msgid "Image à la une"
 msgstr ""
 
@@ -1041,6 +1037,10 @@ msgstr ""
 
 #: class-msrwa-budget.php:86
 msgid "Le plafond du jour est atteint : %1$s dépensés sur %2$s. Rien de plus ne sera lancé avant demain."
+msgstr ""
+
+#: class-msrwa-admin.php:161
+msgid "Le plafond par recette est plus bas : il arrête les nouvelles tentatives avant de le franchir, la recette se termine et le dernier verdict va au rédacteur."
 msgstr ""
 
 #: class-msrwa-screen-engine.php:275
@@ -1751,7 +1751,7 @@ msgstr ""
 msgid "Un filtre impose une autre durée pour : %s. C’est le filtre qui s’applique, pas ce qui est saisi ici."
 msgstr ""
 
-#: class-msrwa-admin.php:111 class-msrwa-intake.php:142
+#: class-msrwa-admin.php:111 class-msrwa-intake.php:145
 msgid "Un lot accepte au plus %d photographies."
 msgstr ""
 

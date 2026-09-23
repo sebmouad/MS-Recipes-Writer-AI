@@ -158,7 +158,7 @@ final class MSRWA_Admin {
 				'previewThinking' => __( 'Réflexion', 'ms-recipes-writer-ai' ),
 				/* translators: %s is an amount in US dollars. */
 				'retryMax' => __( 'Si l’approbation finale refuse à chaque tentative et fait redessiner les images, une recette peut coûter jusqu’à %s.', 'ms-recipes-writer-ai' ),
-				'retryOverCeiling' => __( 'C’est plus que le plafond par recette : elle serait alors arrêtée avant la fin.', 'ms-recipes-writer-ai' ),
+				'retryOverCeiling' => __( 'Le plafond par recette est plus bas : il arrête les nouvelles tentatives avant de le franchir, la recette se termine et le dernier verdict va au rédacteur.', 'ms-recipes-writer-ai' ),
 				/* translators: %s is an amount in US dollars. */
 				'previewTotal' => __( 'Une recette complète est estimée à %s — une estimation, jamais une facture.', 'ms-recipes-writer-ai' ),
 				'previewUnpriced' => __( 'Sans tarif, donc absentes du total :', 'ms-recipes-writer-ai' ),

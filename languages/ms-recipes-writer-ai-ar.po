@@ -1714,6 +1714,12 @@ msgstr "بصيغة JPEG أو PNG أو WebP، %1$d صورة على الأكثر،
 msgid "Un lot accepte au plus %d photographies."
 msgstr "تقبل الدفعة %d صورة على الأكثر."
 
+msgid "Avec le routage actuel, une recette complète est estimée à %1$s, et jusqu’à %2$s si l’approbation finale refuse à chaque tentative. Un plafond sous la première valeur refuse le lot au lancement ; sous la seconde, il arrête les nouvelles tentatives avant de le franchir, et la recette se termine avec le dernier verdict."
+msgstr "مع التوجيه الحالي، تُقدَّر الوصفة الكاملة بـ %1$s، وحتى %2$s إذا رفضت الموافقة النهائية في كل محاولة. سقف أقل من القيمة الأولى يرفض الدفعة عند الإطلاق؛ وسقف أقل من الثانية يوقف المحاولات الإضافية قبل تجاوزه، وتكتمل الوصفة بآخر حكم."
+
+msgid "Le plafond par recette est plus bas : il arrête les nouvelles tentatives avant de le franchir, la recette se termine et le dernier verdict va au rédacteur."
+msgstr "سقف الوصفة أقل من ذلك: يوقف المحاولات الإضافية قبل تجاوزه، وتكتمل الوصفة ويذهب آخر حكم إلى المحرر."
+
 msgid "aucune page citée"
 msgstr "لم تُذكر أي صفحة"
 

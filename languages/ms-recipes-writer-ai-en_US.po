@@ -1698,6 +1698,12 @@ msgstr "JPEG, PNG or WebP, at most %1$d, %2$s MB each. They are added to the med
 msgid "Un lot accepte au plus %d photographies."
 msgstr "A lot accepts at most %d photographs."
 
+msgid "Avec le routage actuel, une recette complète est estimée à %1$s, et jusqu’à %2$s si l’approbation finale refuse à chaque tentative. Un plafond sous la première valeur refuse le lot au lancement ; sous la seconde, il arrête les nouvelles tentatives avant de le franchir, et la recette se termine avec le dernier verdict."
+msgstr "With the current routing, a complete recipe is estimated at %1$s, and up to %2$s if the final approval refuses at every attempt. A ceiling below the first figure refuses the lot at launch; below the second, it stops further attempts before crossing it, and the recipe finishes with the last verdict."
+
+msgid "Le plafond par recette est plus bas : il arrête les nouvelles tentatives avant de le franchir, la recette se termine et le dernier verdict va au rédacteur."
+msgstr "The per-recipe ceiling is lower: it stops further attempts before crossing it, the recipe finishes and the last verdict goes to the writer."
+
 msgid "aucune page citée"
 msgstr "no page cited"
 
