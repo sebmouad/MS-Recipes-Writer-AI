@@ -18,9 +18,11 @@ final class MSRWA_Estimate {
 	/** Rough output tokens per step, from what real runs actually produced. */
 	private static function shape() {
 		return array(
-			// Search is billed per query on top of the tokens, and is priced at
-			// the configured ceiling (`limits.web_searches`).
-			'research' => array( 'input' => 65000, 'output' => 6200 ),
+			// Measured on seven live research calls with the search-economy rule and
+			// low search context: 23 000–64 000 tokens in, 3 800–6 300 out, and
+			// 1, 4, 1, 1, 1, 1, 1 paid searches. Two searches is the average
+			// rounded up; the maximum prices every tool call as one.
+			'research' => array( 'input' => 45000, 'output' => 5500, 'searches' => 2 ),
 			'canonical_recipe' => array( 'input' => 4200, 'output' => 3100 ),
 			'article' => array( 'input' => 6900, 'output' => 6600 ),
 			'review' => array( 'input' => 11200, 'output' => 2200 ),
@@ -68,9 +70,10 @@ final class MSRWA_Estimate {
 			// Thinking above the level the shapes were measured at is extra output;
 			// the ceiling still caps the lot, because nothing is billed past it.
 			$thinking = 'image_generation' === $capability ? '' : $config->thinking( $name, $route['provider'] );
-			$usage['output'] = min( (int) $usage['output'] + MSRWA_Engine_Config::thinking_allowance( $thinking ), $config->max_output( $name ) );
+			$usage['output'] = min( max( (int) ( $usage['output'] / 2 ), (int) $usage['output'] + MSRWA_Engine_Config::thinking_allowance( $thinking ) ), $config->max_output( $name ) );
 
-			$cost = $config->price( $route['provider'], $route['model'], array( 'input_tokens' => $usage['input'], 'output_tokens' => $usage['output'], 'web_searches' => 'web_search' === $capability ? $config->web_searches( $route['provider'] ) : 0 ) );
+			$searches = 'web_search' === $capability ? min( (int) ( $usage['searches'] ?? 2 ), $config->web_searches( $route['provider'] ) ) : 0;
+			$cost = $config->price( $route['provider'], $route['model'], array( 'input_tokens' => $usage['input'], 'output_tokens' => $usage['output'], 'web_searches' => $searches ) );
 			if ( null === $cost ) { $unknown[] = $name; continue; }
 
 			// Research also reads up to `limits.images_inspected` of the photographs
@@ -85,6 +88,7 @@ final class MSRWA_Estimate {
 			$steps[ $name ] = array(
 				'model' => $route['provider'] . ':' . $route['model'],
 				'thinking' => $thinking,
+				'searches' => $searches,
 				'bucket' => MSRWA_Engine_Steps::bucket( $name, $registry ),
 				'cost_usd' => round( (float) $cost, 6 ),
 			);
@@ -99,10 +103,18 @@ final class MSRWA_Estimate {
 		// approval ran three times, $0.2804 against a one-pass $0.2119. The
 		// expected figure stays one pass; the maximum is every attempt used,
 		// with both images redrawn each time — the most the engine can spend.
+		// Research may search more than it is asked to: at most every tool call
+		// it is allowed, each priced as a paid search.
 		$retry = 0.0;
+		foreach ( $steps as $name => $step ) {
+			if ( empty( $step['searches'] ) ) { continue; }
+			list( $provider ) = explode( ':', $step['model'], 2 );
+			$retry += ( $config->web_tool_calls( $provider ) - $step['searches'] ) * (float) $config->get( 'providers.' . $provider . '.web_search_usd', 0 );
+		}
 		if ( isset( $steps['final_approval'] ) ) {
-			foreach ( array( 'featured_image', 'facebook_image', 'final_approval' ) as $again ) { $retry += (float) ( $steps[ $again ]['cost_usd'] ?? 0 ); }
-			$retry *= max( 0, $config->attempts( 'final_approval' ) - 1 );
+			$approval = 0.0;
+			foreach ( array( 'featured_image', 'facebook_image', 'final_approval' ) as $again ) { $approval += (float) ( $steps[ $again ]['cost_usd'] ?? 0 ); }
+			$retry += $approval * max( 0, $config->attempts( 'final_approval' ) - 1 );
 		}
 
 		return array(
@@ -116,7 +128,7 @@ final class MSRWA_Estimate {
 
 	/** One look at one photograph: the shape the matcher and research both pay. */
 	private static function vision_usage( MSRWA_Engine_Config $config, $provider ) {
-		return array( 'input_tokens' => 1100, 'output_tokens' => 180 + MSRWA_Engine_Config::thinking_allowance( $config->thinking( 'vision', $provider ) ) );
+		return array( 'input_tokens' => 1100, 'output_tokens' => max( 180, 180 + MSRWA_Engine_Config::thinking_allowance( $config->thinking( 'vision', $provider ) ) ) );
 	}
 
 	/**

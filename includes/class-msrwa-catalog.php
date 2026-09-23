@@ -488,7 +488,7 @@ final class MSRWA_Catalog {
 	 * outright: gemini-3.6-flash ships priced, and routed by name it read as
 	 * unpriced and stopped the run.
 	 */
-	public static function for_engine( array $rows = null ) {
+	public static function for_engine( ?array $rows = null ) {
 		$models = array();
 		$priced = array();
 		foreach ( null === $rows ? self::rows() : $rows as $row ) {

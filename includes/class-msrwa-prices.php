@@ -132,7 +132,7 @@ final class MSRWA_Prices {
 	 * research route, both tiers of Gemini and Claude refused at the same
 	 * moment while a Gemini model two places down the price list answered.
 	 */
-	public static function routes( $config = null, array $rows = null ) {
+	public static function routes( $config = null, ?array $rows = null ) {
 		$config = $config ? $config : MSRWA_Engine_Config::create( MSRWA_Engine_Settings::stored(), array( 'settings' => MSRWA_Settings::engine_settings() ) );
 		$candidates = array( $config->model_for( 'research' ) );
 		$writers = array_filter( null === $rows ? MSRWA_Catalog::rows() : $rows, static function ( $row ) {

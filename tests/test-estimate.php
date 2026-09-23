@@ -11,23 +11,28 @@ require_once dirname( __DIR__ ) . '/includes/class-msrwa-estimate.php';
 
 $full = MSRWA_Estimate::recipe( MSRWA_Profile::FULL );
 
-// Real runs on the shipped configuration, 2026-09-23, OpenAI. A full recipe
-// billed $0.2804, of which two refusals by the final approval — two redrawn
-// collages and two extra approvals — were $0.0684: one pass was $0.2120. The
-// article profile, with searches capped, billed $0.1627. An estimate outside a
-// quarter of that is not an estimate.
-$measured = 0.2120;
+// Real runs on the shipped configuration, 2026-09-23, OpenAI, after the search
+// and thinking economies: one pass of a full recipe cost $0.1055, $0.109 and
+// $0.115 on three dishes, the article profile about $0.050. The estimate must
+// never read below what was billed — that is how a lot passes a ceiling it
+// then breaks — and not so far above it that it stops meaning anything.
+$measured = 0.110;
 msrwa_test_assert(
-	abs( $full['cost_usd'] - $measured ) / $measured < 0.25,
-	'The full estimate must land near what one real pass cost; got ' . $full['cost_usd'] . ' against ' . $measured
+	$full['cost_usd'] >= $measured && $full['cost_usd'] <= $measured * 1.4,
+	'The full estimate must sit at or just above what one real pass cost; got ' . $full['cost_usd'] . ' against ' . $measured
 );
 $article_only = MSRWA_Estimate::recipe( MSRWA_Profile::ARTICLE );
-msrwa_test_assert( abs( $article_only['cost_usd'] - 0.1627 ) / 0.1627 < 0.25, 'The article profile must land near its real run; got ' . $article_only['cost_usd'] );
+msrwa_test_assert( $article_only['cost_usd'] >= 0.050 && $article_only['cost_usd'] <= 0.050 * 1.5, 'The article profile must sit at or just above its real runs; got ' . $article_only['cost_usd'] );
 // The maximum is what the engine can spend when every approval refuses, and
 // the run that was refused twice must fall inside it.
-msrwa_test_assert( $full['max_usd'] >= 0.2804, 'The maximum covers the real run refused twice; got ' . $full['max_usd'] );
+msrwa_test_assert( $full['max_usd'] >= 0.1839, 'The maximum covers the real run refused twice ($0.1839); got ' . $full['max_usd'] );
 msrwa_test_assert( $full['max_usd'] > $full['cost_usd'], 'A recipe that can be refused has a maximum above its expected cost.' );
-msrwa_test_assert( $article_only['max_usd'] === $article_only['cost_usd'], 'Without a final approval there is nothing to retry.' );
+// Without a final approval nothing is redrawn; what remains between the two
+// figures is research spending every tool call it is allowed on paid searches.
+$config = MSRWA_Engine_Config::create();
+$route = $config->model_for( 'research' );
+$extra = ( $config->web_tool_calls( $route['provider'] ) - $article_only['steps']['research']['searches'] ) * (float) $config->get( 'providers.' . $route['provider'] . '.web_search_usd' );
+msrwa_test_assert( abs( $article_only['max_usd'] - $article_only['cost_usd'] - $extra ) < 1e-6, 'Without a final approval, the maximum is research at its tool-call cap; got ' . $article_only['max_usd'] );
 msrwa_test_assert( array() === $full['unpriced'], 'Every shipped route must be priced; unpriced: ' . implode( ', ', $full['unpriced'] ) );
 
 // Images are the expensive half and route through `routing.image`, not through
