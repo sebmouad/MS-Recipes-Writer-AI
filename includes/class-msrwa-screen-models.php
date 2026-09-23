@@ -147,6 +147,7 @@ final class MSRWA_Screen_Models {
 		$tones = array(
 			MSRWA_Catalog::MANUAL => array( 'good', __( 'saisi à la main', 'ms-recipes-writer-ai' ) ),
 			MSRWA_Catalog::LOOKED_UP => array( 'warn', __( 'trouvé par IA — à vérifier', 'ms-recipes-writer-ai' ) ),
+			MSRWA_Catalog::READ => array( 'good', __( 'lu sur la page du fournisseur', 'ms-recipes-writer-ai' ) ),
 			MSRWA_Catalog::SHIPPED => array( 'idle', __( 'livré avec l’extension', 'ms-recipes-writer-ai' ) ),
 		);
 		list( $tone, $label ) = $tones[ $row['price_method'] ] ?? array( 'idle', $row['price_method'] );

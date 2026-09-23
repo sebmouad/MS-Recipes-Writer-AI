@@ -1672,6 +1672,21 @@ msgstr "التفكير"
 msgid "par défaut"
 msgstr "افتراضي"
 
+#, php-format
+msgid "Avec le routage actuel, une recette complète est estimée à %1$s, et jusqu’à %2$s si l’approbation finale refuse à chaque tentative. Un plafond sous la première valeur refuse le lot au lancement ; sous la seconde, il peut arrêter une recette avant la fin."
+msgstr "بالتوجيه الحالي، تُقدَّر الوصفة الكاملة بـ %1$s، وقد تصل إلى %2$s إذا رفضت الموافقة النهائية في كل محاولة. الحد الأدنى من القيمة الأولى يرفض الدفعة عند الإطلاق؛ وما دون الثانية قد يوقف وصفة قبل نهايتها."
+
+#, php-format
+msgid "C’est plus que le plafond par recette : elle serait alors arrêtée avant la fin."
+msgstr "هذا أكثر من الحد لكل وصفة: ستتوقف حينها قبل النهاية."
+
+#, php-format
+msgid "Si l’approbation finale refuse à chaque tentative et fait redessiner les images, une recette peut coûter jusqu’à %s."
+msgstr "إذا رفضت الموافقة النهائية في كل محاولة وأعادت رسم الصور، قد تكلّف الوصفة حتى %s."
+
+msgid "lu sur la page du fournisseur"
+msgstr "مقروء من صفحة المزوّد"
+
 msgid "aucune page citée"
 msgstr "لم تُذكر أي صفحة"
 

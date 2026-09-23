@@ -1656,6 +1656,21 @@ msgstr "Thinking"
 msgid "par défaut"
 msgstr "default"
 
+#, php-format
+msgid "Avec le routage actuel, une recette complète est estimée à %1$s, et jusqu’à %2$s si l’approbation finale refuse à chaque tentative. Un plafond sous la première valeur refuse le lot au lancement ; sous la seconde, il peut arrêter une recette avant la fin."
+msgstr "With the current routing, a complete recipe is estimated at %1$s, and up to %2$s if the final approval refuses at every attempt. A ceiling below the first figure refuses the lot at launch; below the second, it may stop a recipe before the end."
+
+#, php-format
+msgid "C’est plus que le plafond par recette : elle serait alors arrêtée avant la fin."
+msgstr "That is more than the per-recipe ceiling: it would then be stopped before the end."
+
+#, php-format
+msgid "Si l’approbation finale refuse à chaque tentative et fait redessiner les images, une recette peut coûter jusqu’à %s."
+msgstr "If the final approval refuses at every attempt and has the images redrawn, a recipe can cost up to %s."
+
+msgid "lu sur la page du fournisseur"
+msgstr "read from the provider’s page"
+
 msgid "aucune page citée"
 msgstr "no page cited"
 

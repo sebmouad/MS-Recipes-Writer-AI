@@ -29,7 +29,9 @@ final class MSRWA_Prices {
 	/** Each provider's own pricing page: the only source a rate may cite. */
 	public static function pages() {
 		return array(
-			'openai' => array( 'url' => 'https://developers.openai.com/api/docs/pricing', 'hosts' => array( 'openai.com' ) ),
+			// OpenAI's pricing page shows only its flagship models until a script
+			// runs; each model's own page carries its rate in the markup.
+			'openai' => array( 'url' => 'https://developers.openai.com/api/docs/pricing', 'model_url' => 'https://developers.openai.com/api/docs/models/%s', 'hosts' => array( 'openai.com' ) ),
 			'gemini' => array( 'url' => 'https://ai.google.dev/gemini-api/docs/pricing', 'hosts' => array( 'ai.google.dev', 'cloud.google.com' ) ),
 			'claude' => array( 'url' => 'https://platform.claude.com/docs/en/about-claude/pricing', 'hosts' => array( 'claude.com', 'anthropic.com' ) ),
 		);
@@ -52,15 +54,27 @@ final class MSRWA_Prices {
 		$wanted = self::wanted( $only );
 		if ( ! $wanted ) { return array( 'asked' => 0, 'found' => 0, 'results' => array() ); }
 
+		$out = array( 'asked' => count( $wanted ), 'found' => 0, 'results' => array() );
+
+		// What can be read straight off a provider's page needs no model: it is
+		// free, and it cannot invent a number.
+		foreach ( $wanted as $key => $row ) {
+			$read = self::read_page( $row['provider'], $row['model_id'] );
+			if ( ! $read ) { continue; }
+			MSRWA_Catalog::remember_price( $row['provider'], $row['model_id'], $read['input'], $read['output'], MSRWA_Catalog::READ, $read['source'] );
+			$out['results'][ $key ] = array( 'state' => 'found' ) + $read;
+			$out['found']++;
+			unset( $wanted[ $key ] );
+		}
+		if ( ! $wanted ) { return $out; }
+
 		$routes = self::routes();
 		if ( ! $routes ) {
-			return array( 'asked' => 0, 'found' => 0, 'error' => __( 'Aucun modèle n’est routé pour faire cette recherche. Enregistrez une clé d’abord.', 'ms-recipes-writer-ai' ), 'results' => array() );
+			return array_merge( $out, array( 'error' => __( 'Aucun modèle n’est routé pour faire cette recherche. Enregistrez une clé d’abord.', 'ms-recipes-writer-ai' ) ) );
 		}
 
 		$groups = array();
 		foreach ( $wanted as $key => $row ) { $groups[ $row['provider'] ][ $key ] = $row; }
-
-		$out = array( 'asked' => count( $wanted ), 'found' => 0, 'results' => array() );
 		$errors = array();
 		$answered = false;
 		foreach ( $groups as $provider => $group ) {
@@ -160,8 +174,9 @@ final class MSRWA_Prices {
 	public static function prompt( array $wanted, $provider = '' ) {
 		$lines = array();
 		$image = false;
+		$model_url = self::pages()[ $provider ]['model_url'] ?? '';
 		foreach ( $wanted as $key => $row ) {
-			$lines[] = '- ' . $key;
+			$lines[] = '- ' . $key . ( '' !== $model_url ? ' — its own page: ' . sprintf( $model_url, rawurlencode( (string) $row['model_id'] ) ) : '' );
 			if ( 'image' === MSRWA_Catalog::role( $row['provider'], $row['model_id'] ) ) { $image = true; }
 		}
 		$page = self::pages()[ $provider ]['url'] ?? '';
@@ -229,6 +244,37 @@ final class MSRWA_Prices {
 			$found++;
 		}
 		return array( 'asked' => count( $wanted ), 'found' => $found, 'results' => $results );
+	}
+
+	/**
+	 * A model's rate read off its provider's own page, or null.
+	 *
+	 * Only OpenAI publishes a page per model whose markup states the rate
+	 * outright — "Input $0.20 … Output $1.20", before any comparison with
+	 * other models. Its pricing page shows only the flagships until a script
+	 * runs, and a model with web search read "no rate found" for Luna there.
+	 */
+	public static function read_page( $provider, $model_id ) {
+		$template = self::pages()[ $provider ]['model_url'] ?? '';
+		if ( '' === $template ) { return null; }
+		$url = sprintf( $template, rawurlencode( (string) $model_id ) );
+		$response = wp_remote_get( $url, array( 'timeout' => 20 ) );
+		if ( is_wp_error( $response ) || 200 !== (int) wp_remote_retrieve_response_code( $response ) ) { return null; }
+		$rate = self::parse_page( (string) wp_remote_retrieve_body( $response ) );
+		return $rate ? $rate + array( 'source' => $url ) : null;
+	}
+
+	/** The first input and output rate a model page states. Pure, for the tests. */
+	public static function parse_page( $html ) {
+		$text = preg_replace( '#<(script|style)\b[^>]*>.*?</\1>#is', ' ', (string) $html );
+		$text = preg_replace( '/\s+/u', ' ', html_entity_decode( wp_strip_all_tags( (string) $text ), ENT_QUOTES, 'UTF-8' ) );
+		// The labels run into their neighbours in the markup ("tokensInput$0.20…
+		// $0.02Output$1.20"), so no word boundary is required; the capital I and
+		// O keep "Cached input" out of it.
+		if ( ! preg_match( '/Input\s*\$\s*([0-9]+(?:\.[0-9]+)?)(.{0,80}?)Output\s*\$\s*([0-9]+(?:\.[0-9]+)?)/u', $text, $m ) ) { return null; }
+		$input = self::rate( $m[1] );
+		$output = self::rate( $m[3] );
+		return null === $input || null === $output ? null : array( 'input' => $input, 'output' => $output );
 	}
 
 	/** Whether a cited page belongs to the provider it prices. */

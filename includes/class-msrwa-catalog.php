@@ -27,6 +27,8 @@ final class MSRWA_Catalog {
 	const MANUAL = 'manual';
 	/** A price a model looked up, with the page it read. Never silently trusted. */
 	const LOOKED_UP = 'ai';
+	/** A price this plugin read off the provider's own page, with no model in between. */
+	const READ = 'page';
 
 	public static function defaults() {
 		return array(
@@ -34,22 +36,19 @@ final class MSRWA_Catalog {
 				'gpt-5.6-luna' => array( 'label' => 'GPT-5.6 Luna', 'stable' => true, 'text' => true, 'vision' => true, 'web_search' => true, 'image_generation' => false, 'input' => 0.20, 'output' => 1.20, 'source' => 'https://developers.openai.com/api/docs/models/gpt-5.6-luna' ),
 				'gpt-5.6-terra' => array( 'label' => 'GPT-5.6 Terra', 'stable' => true, 'text' => true, 'vision' => true, 'web_search' => true, 'image_generation' => false, 'input' => 2.00, 'output' => 12.00, 'source' => 'https://developers.openai.com/api/docs/models/gpt-5.6-terra' ),
 				'gpt-5.6-sol' => array( 'label' => 'GPT-5.6 Sol', 'stable' => true, 'text' => true, 'vision' => true, 'web_search' => true, 'image_generation' => false, 'input' => 4.00, 'output' => 20.00, 'source' => 'https://developers.openai.com/api/docs/models/gpt-5.6-sol' ),
-				'gpt-5' => array( 'label' => 'GPT-5', 'stable' => true, 'text' => true, 'vision' => true, 'web_search' => true, 'image_generation' => false, 'input' => 1.25, 'output' => 10.00, 'source' => 'https://developers.openai.com/api/docs/pricing', 'enabled' => false ),
-				'gpt-5-mini' => array( 'label' => 'GPT-5 mini', 'stable' => true, 'text' => true, 'vision' => true, 'web_search' => true, 'image_generation' => false, 'input' => 0.25, 'output' => 2.00, 'source' => 'https://developers.openai.com/api/docs/pricing', 'enabled' => false ),
-				'gpt-image-1' => array( 'label' => 'GPT Image 1', 'stable' => true, 'text' => false, 'vision' => true, 'web_search' => false, 'image_generation' => true, 'input' => 5.00, 'image_input' => 10.00, 'output' => 40.00, 'source' => 'https://developers.openai.com/api/docs/pricing', 'enabled' => false ),
+				'gpt-6-luna' => array( 'label' => 'GPT-6 Luna', 'stable' => true, 'text' => true, 'vision' => true, 'web_search' => true, 'image_generation' => false, 'input' => 0.10, 'output' => 0.50, 'source' => 'https://developers.openai.com/api/docs/pricing', 'enabled' => false ),
+				'gpt-6-sol' => array( 'label' => 'GPT-6 Sol', 'stable' => true, 'text' => true, 'vision' => true, 'web_search' => true, 'image_generation' => false, 'input' => 2.00, 'output' => 10.00, 'source' => 'https://developers.openai.com/api/docs/pricing', 'enabled' => false ),
+				'gpt-6-astra' => array( 'label' => 'GPT-6 Astra', 'stable' => true, 'text' => true, 'vision' => true, 'web_search' => true, 'image_generation' => false, 'input' => 10.00, 'output' => 50.00, 'source' => 'https://developers.openai.com/api/docs/pricing', 'enabled' => false ),
 				'gpt-image-2.5-flare' => array( 'label' => 'GPT Image 2.5 Flare', 'stable' => true, 'text' => false, 'vision' => true, 'web_search' => false, 'image_generation' => true, 'image_tokens' => array( '1024x1024' => array( 'low' => 272, 'medium' => 1056, 'high' => 4160 ), '1024x1536' => array( 'low' => 408, 'medium' => 1584, 'high' => 6240 ), '1536x1024' => array( 'low' => 400, 'medium' => 1568, 'high' => 6208 ) ), 'input' => 5.00, 'image_input' => 8.00, 'output' => 30.00, 'source' => 'https://developers.openai.com/api/docs/models/gpt-image-2.5-flare' ),
 				'gpt-image-2.5-sunburst' => array( 'label' => 'GPT Image 2.5 Sunburst', 'stable' => true, 'text' => false, 'vision' => true, 'web_search' => false, 'image_generation' => true, 'image_tokens' => array( '1024x1024' => array( 'low' => 272, 'medium' => 1056, 'high' => 4160 ), '1024x1536' => array( 'low' => 408, 'medium' => 1584, 'high' => 6240 ), '1536x1024' => array( 'low' => 400, 'medium' => 1568, 'high' => 6208 ) ), 'input' => 5.00, 'image_input' => 8.00, 'output' => 30.00, 'source' => 'https://developers.openai.com/api/docs/models/gpt-image-2.5-sunburst' ),
 			),
-			// Read from the provider's own pricing page on 2026-09-23. A model marked
+			// Read from each provider's own pricing page on 2026-09-23. A model marked
 			// `enabled => false` is priced so a fetch finds it costed, but is not
 			// offered until the owner ticks it: the tiers are chosen by price among
 			// enabled models, and shipping a dearer one enabled would move them.
 			'gemini' => array(
 				'gemini-3.5-flash' => array( 'label' => 'Gemini 3.5 Flash', 'stable' => true, 'text' => true, 'vision' => true, 'web_search' => true, 'image_generation' => false, 'input' => 1.50, 'output' => 9.00, 'source' => 'https://ai.google.dev/gemini-api/docs/pricing' ),
 				'gemini-3.1-flash-lite' => array( 'label' => 'Gemini 3.1 Flash-Lite', 'stable' => true, 'text' => true, 'vision' => true, 'web_search' => true, 'image_generation' => false, 'input' => 0.25, 'output' => 1.50, 'source' => 'https://ai.google.dev/gemini-api/docs/pricing' ),
-				'gemini-3-flash-preview' => array( 'label' => 'Gemini 3 Flash Preview', 'stable' => true, 'text' => true, 'vision' => true, 'web_search' => true, 'image_generation' => false, 'input' => 0.50, 'output' => 3.00, 'source' => 'https://ai.google.dev/gemini-api/docs/pricing', 'enabled' => false ),
-				'gemini-3.5-flash-lite' => array( 'label' => 'Gemini 3.5 Flash-Lite', 'stable' => true, 'text' => true, 'vision' => true, 'web_search' => true, 'image_generation' => false, 'input' => 0.30, 'output' => 2.50, 'source' => 'https://ai.google.dev/gemini-api/docs/pricing', 'enabled' => false ),
-				'gemini-3.6-flash' => array( 'label' => 'Gemini 3.6 Flash', 'stable' => true, 'text' => true, 'vision' => true, 'web_search' => true, 'image_generation' => false, 'input' => 0.75, 'output' => 3.75, 'source' => 'https://ai.google.dev/gemini-api/docs/pricing', 'enabled' => false ),
 				'gemini-3.7-flash' => array( 'label' => 'Gemini 3.7 Flash', 'stable' => true, 'text' => true, 'vision' => true, 'web_search' => true, 'image_generation' => false, 'input' => 0.75, 'output' => 3.75, 'source' => 'https://ai.google.dev/gemini-api/docs/pricing', 'enabled' => false ),
 				'gemini-3.8-flash' => array( 'label' => 'Gemini 3.8 Flash', 'stable' => true, 'text' => true, 'vision' => true, 'web_search' => true, 'image_generation' => false, 'input' => 0.75, 'output' => 3.75, 'source' => 'https://ai.google.dev/gemini-api/docs/pricing', 'enabled' => false ),
 			),
@@ -59,13 +58,6 @@ final class MSRWA_Catalog {
 				'claude-opus-5' => array( 'label' => 'Claude Opus 5', 'stable' => true, 'text' => true, 'vision' => true, 'web_search' => true, 'image_generation' => false, 'input' => 5.00, 'output' => 25.00, 'source' => 'https://platform.claude.com/docs/en/about-claude/pricing' ),
 				'claude-opus-5-5' => array( 'label' => 'Claude Opus 5.5', 'stable' => true, 'text' => true, 'vision' => true, 'web_search' => true, 'image_generation' => false, 'input' => 4.00, 'output' => 20.00, 'source' => 'https://platform.claude.com/docs/en/about-claude/pricing', 'enabled' => false ),
 				'claude-fable-5-1' => array( 'label' => 'Claude Fable 5.1', 'stable' => true, 'text' => true, 'vision' => true, 'web_search' => true, 'image_generation' => false, 'input' => 10.00, 'output' => 50.00, 'source' => 'https://platform.claude.com/docs/en/about-claude/pricing', 'enabled' => false ),
-				'claude-fable-5' => array( 'label' => 'Claude Fable 5', 'stable' => true, 'text' => true, 'vision' => true, 'web_search' => true, 'image_generation' => false, 'input' => 10.00, 'output' => 50.00, 'source' => 'https://platform.claude.com/docs/en/about-claude/pricing', 'enabled' => false ),
-				'claude-opus-4-8' => array( 'label' => 'Claude Opus 4.8', 'stable' => true, 'text' => true, 'vision' => true, 'web_search' => true, 'image_generation' => false, 'input' => 5.00, 'output' => 25.00, 'source' => 'https://platform.claude.com/docs/en/about-claude/pricing', 'enabled' => false ),
-				'claude-opus-4-7' => array( 'label' => 'Claude Opus 4.7', 'stable' => true, 'text' => true, 'vision' => true, 'web_search' => true, 'image_generation' => false, 'input' => 5.00, 'output' => 25.00, 'source' => 'https://platform.claude.com/docs/en/about-claude/pricing', 'enabled' => false ),
-				'claude-opus-4-6' => array( 'label' => 'Claude Opus 4.6', 'stable' => true, 'text' => true, 'vision' => true, 'web_search' => true, 'image_generation' => false, 'input' => 5.00, 'output' => 25.00, 'source' => 'https://platform.claude.com/docs/en/about-claude/pricing', 'enabled' => false ),
-				'claude-sonnet-4-6' => array( 'label' => 'Claude Sonnet 4.6', 'stable' => true, 'text' => true, 'vision' => true, 'web_search' => true, 'image_generation' => false, 'input' => 3.00, 'output' => 15.00, 'source' => 'https://platform.claude.com/docs/en/about-claude/pricing', 'enabled' => false ),
-				'claude-opus-4-5-20251101' => array( 'label' => 'Claude Opus 4.5', 'stable' => true, 'text' => true, 'vision' => true, 'web_search' => true, 'image_generation' => false, 'input' => 5.00, 'output' => 25.00, 'source' => 'https://platform.claude.com/docs/en/about-claude/pricing', 'enabled' => false ),
-				'claude-sonnet-4-5-20250929' => array( 'label' => 'Claude Sonnet 4.5', 'stable' => true, 'text' => true, 'vision' => true, 'web_search' => true, 'image_generation' => false, 'input' => 3.00, 'output' => 15.00, 'source' => 'https://platform.claude.com/docs/en/about-claude/pricing', 'enabled' => false ),
 			),
 		);
 	}
@@ -104,19 +96,60 @@ final class MSRWA_Catalog {
 	/**
 	 * The identifiers worth a row, out of one provider's answer.
 	 *
-	 * A preview is dropped when the same model is served without the suffix:
-	 * `gemini-3.1-flash-lite-preview` beside `gemini-3.1-flash-lite` is the same
-	 * model twice, and the preview is the one that gets retired.
+	 * The two newest generations of each role, and nothing older unless this
+	 * site has a reason to keep it: a rate that ships, a model the engine's own
+	 * list names, or a route somebody typed. OpenAI listed 132 identifiers on
+	 * 2026-09-23 and even the chat families alone came to 21 — every point
+	 * release from GPT-5 to GPT-6. A preview is dropped when the same model is
+	 * served without the suffix: it is the same model twice, and the preview is
+	 * the one that gets retired.
 	 */
 	public static function keep( $provider, array $ids ) {
 		$ids = array_values( array_unique( array_map( 'strval', $ids ) ) );
-		$out = array();
+		$roles = array();
 		foreach ( $ids as $id ) {
-			if ( '' === self::role( $provider, $id ) ) { continue; }
+			$role = self::role( $provider, $id );
+			if ( '' === $role ) { continue; }
 			if ( preg_match( '/^(.+)-preview$/', $id, $m ) && in_array( $m[1], $ids, true ) ) { continue; }
-			$out[] = $id;
+			$roles[ $role ][ $id ] = self::generation( $provider, $id );
 		}
-		return $out;
+		$pinned = self::pinned( $provider );
+		$out = array();
+		foreach ( $roles as $generations ) {
+			$newest = array_values( array_unique( $generations ) );
+			rsort( $newest );
+			$newest = array_slice( $newest, 0, 2 );
+			foreach ( $generations as $id => $generation ) {
+				if ( in_array( $generation, $newest, true ) || in_array( (string) $id, $pinned, true ) ) { $out[] = (string) $id; }
+			}
+		}
+		return array_values( array_intersect( $ids, $out ) );
+	}
+
+	/** A model's generation as a comparable number: gpt-5.6 → 5.6, claude-opus-4-5 → 4.5. */
+	public static function generation( $provider, $model_id ) {
+		$id = strtolower( (string) $model_id );
+		if ( preg_match( '/^claude-[a-z]+-(\d+)(?:-(\d{1,2}))?(?:-\d{8})?$/', $id, $m ) ) { return (float) ( $m[1] . '.' . ( $m[2] ?? '0' ) ); }
+		if ( preg_match( '/^(?:gpt-image|gpt|gemini)-(\d+(?:\.\d+)?)/', $id, $m ) ) { return (float) $m[1]; }
+		return 0.0;
+	}
+
+	/** Models kept whatever their generation: shipped, used by the engine, or routed to by name. */
+	private static function pinned( $provider ) {
+		$provider = sanitize_key( (string) $provider );
+		$pinned = array_keys( self::defaults()[ $provider ] ?? array() );
+		if ( class_exists( 'MSRWA_Engine_Config' ) ) {
+			$engine = MSRWA_Engine_Config::defaults();
+			$pinned = array_merge( $pinned, array_keys( (array) ( $engine['models'][ $provider ] ?? array() ) ) );
+			foreach ( (array) ( $engine['tiers'] ?? array() ) as $models ) { $pinned[] = (string) ( $models[ $provider ] ?? '' ); }
+		}
+		if ( class_exists( 'MSRWA_Engine_Settings' ) && function_exists( 'get_option' ) ) {
+			foreach ( (array) ( MSRWA_Engine_Settings::typed()['routing'] ?? array() ) as $route ) {
+				$parts = explode( ':', (string) $route, 2 );
+				if ( $provider === $parts[0] && isset( $parts[1] ) ) { $pinned[] = $parts[1]; }
+			}
+		}
+		return array_values( array_filter( array_unique( $pinned ) ) );
 	}
 
 	// --- Reading ---------------------------------------------------------
@@ -426,7 +459,7 @@ final class MSRWA_Catalog {
 		global $wpdb;
 		$t = MSRWA_DB::tables();
 		if ( empty( $t['catalog'] ) || ! MSRWA_DB::table_exists( $t['catalog'] ) ) { return false; }
-		$method = in_array( $method, array( self::SHIPPED, self::MANUAL, self::LOOKED_UP ), true ) ? $method : self::MANUAL;
+		$method = in_array( $method, array( self::SHIPPED, self::MANUAL, self::LOOKED_UP, self::READ ), true ) ? $method : self::MANUAL;
 		$now = current_time( 'mysql', true );
 		return false !== $wpdb->update( $t['catalog'], array(
 			'input_usd' => null === $input ? null : max( 0, (float) $input ),

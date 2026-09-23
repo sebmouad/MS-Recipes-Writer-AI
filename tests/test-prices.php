@@ -85,6 +85,9 @@ msrwa_test_contains( $prompt, 'provider\'s own', 'Only the provider\'s own page 
 // url_context, which worked on a key whose search grounding was out of quota.
 $claude_only = array( 'claude:claude-sonnet-5' => $wanted['claude:claude-sonnet-5'] );
 msrwa_test_contains( MSRWA_Prices::prompt( $claude_only, 'claude' ), 'https://platform.claude.com/docs/en/about-claude/pricing', 'The question names the provider’s own page.' );
+// OpenAI's pricing page hides every model but its flagships behind a script;
+// the lookup read "no rate found" for Luna there. Each model's page has it.
+msrwa_test_contains( MSRWA_Prices::prompt( array( 'openai:gpt-5.6-luna' => $wanted['openai:gpt-5.6-luna'] ), 'openai' ), 'https://developers.openai.com/api/docs/models/gpt-5.6-luna', 'An OpenAI model is asked about on its own page.' );
 msrwa_test_contains( $prompt, 'thinking', 'It says reasoning is billed as output, which is where Gemini’s real rate lives.' );
 $images = array( 'openai:gpt-image-2.5-flare' => array( 'provider' => 'openai', 'model_id' => 'gpt-image-2.5-flare' ) );
 msrwa_test_contains( MSRWA_Prices::prompt( $images, 'openai' ), 'IMAGE output', 'An image model is asked for its image output rate, not its text one.' );
@@ -98,6 +101,19 @@ $gemini = MSRWA_Prices::wire( array( 'provider' => 'gemini', 'wire' => array( 'w
 msrwa_test_assert( array( 'url_context' => array() ) === $gemini['web_search_tool'], 'Gemini opens the page instead of searching for it.' );
 $claude = MSRWA_Prices::wire( array( 'provider' => 'claude', 'wire' => array( 'web_search_tool' => array( 'type' => 'web_search_20250305' ) ) ) );
 msrwa_test_assert( 'web_search_20250305' === $claude['web_search_tool']['type'], 'The others keep their search tool.' );
+
+// --- Read straight off the page -------------------------------------------
+
+// OpenAI's page for each model, trimmed from the real one of 2026-09-23: the
+// labels run into their neighbours, and a comparison with other models
+// follows. The first input and output rate are the model's own.
+$page = '<div>Text tokens<span>Per 1M tokens</span><div>Input</div><div>$0.20</div><div>Cached input</div><div>$0.02</div><div>Output</div><div>$1.20</div>'
+	. '<div>Quick comparison</div><div>Input</div><div>Cached input</div><div>Output</div><div>GPT-5.6 Terra</div><div>$2.00</div></div><script>var x = "Input$9.99 Output$99";</script>';
+msrwa_test_assert( array( 'input' => 0.2, 'output' => 1.2 ) === MSRWA_Prices::parse_page( $page ), 'The model’s own rate is read, not the comparison beside it.' );
+msrwa_test_assert( null === MSRWA_Prices::parse_page( '<p>GPT-Image-2 Model</p>' ), 'A page that states no rate yields none.' );
+msrwa_test_assert( null === MSRWA_Prices::parse_page( '<p>Input $0 Output $0</p>' ), 'A rate of zero is not a rate.' );
+msrwa_test_assert( null === MSRWA_Prices::read_page( 'gemini', 'gemini-3.5-flash' ), 'Only a provider with a page per model is read this way.' );
+msrwa_test_assert( 'page' === MSRWA_Catalog::READ && ! in_array( MSRWA_Catalog::READ, array( MSRWA_Catalog::SHIPPED, MSRWA_Catalog::MANUAL, MSRWA_Catalog::LOOKED_UP ), true ), 'A rate read off the page is its own provenance.' );
 
 // --- Which routes are tried --------------------------------------------------
 

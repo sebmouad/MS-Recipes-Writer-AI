@@ -8,7 +8,7 @@
 // that decides what the engine is handed, which is pure given rows.
 define( 'ABSPATH', dirname( __DIR__ ) . '/' );
 require __DIR__ . '/bootstrap.php';
-msrwa_test_load( 'catalog' );
+msrwa_test_load( 'catalog', 'engine-settings' );
 require_once dirname( __DIR__ ) . '/includes/engine/load.php';
 
 /** A catalogue row as the table hands it over. */
@@ -175,8 +175,29 @@ msrwa_test_assert( 'text' === MSRWA_Catalog::role( 'claude', 'claude-opus-5-5' )
 msrwa_test_assert( '' === MSRWA_Catalog::role( 'claude', 'claude-3-haiku-20240307' ), 'A Claude 3 model is not.' );
 msrwa_test_assert( '' === MSRWA_Catalog::role( 'mistral', 'mistral-large' ), 'Nor is a provider the engine does not call.' );
 
-$kept = MSRWA_Catalog::keep( 'gemini', array( 'gemini-3.1-flash-lite-preview', 'gemini-3.1-flash-lite', 'gemini-3-flash-preview', 'gemini-3.5-flash-lite', 'lyria-3.5' ) );
-msrwa_test_assert( array( 'gemini-3.1-flash-lite', 'gemini-3-flash-preview', 'gemini-3.5-flash-lite' ) === $kept, 'A preview is dropped only when its stable twin is served; got ' . implode( ', ', $kept ) );
+$kept = MSRWA_Catalog::keep( 'gemini', array( 'gemini-3.1-flash-lite-preview', 'gemini-3.1-flash-lite', 'gemini-3.5-flash-lite-preview', 'lyria-3.5' ) );
+msrwa_test_assert( array( 'gemini-3.1-flash-lite', 'gemini-3.5-flash-lite-preview' ) === $kept, 'A preview is dropped only when its stable twin is served; got ' . implode( ', ', $kept ) );
+
+// Only the two newest generations of each role, plus what this site has a
+// reason to keep. OpenAI's real listing of 2026-09-23: 132 identifiers.
+$openai = array( 'gpt-5', 'gpt-5-mini', 'gpt-5-nano', 'gpt-5.1', 'gpt-5.2', 'gpt-5.4', 'gpt-5.4-mini', 'gpt-5.4-nano', 'gpt-5.5', 'gpt-5.6-luna', 'gpt-5.6-sol', 'gpt-5.6-terra', 'gpt-6-astra', 'gpt-6-luna', 'gpt-6-sol', 'gpt-image-1', 'gpt-image-1-mini', 'gpt-image-1.5', 'gpt-image-2', 'gpt-image-2.5-flare', 'gpt-image-2.5-sunburst', 'whisper-1', 'o3' );
+$kept = MSRWA_Catalog::keep( 'openai', $openai );
+foreach ( array( 'gpt-6-luna', 'gpt-6-sol', 'gpt-6-astra', 'gpt-5.6-luna', 'gpt-5.6-terra', 'gpt-5.6-sol', 'gpt-image-2.5-flare', 'gpt-image-2' ) as $id ) {
+	msrwa_test_assert( in_array( $id, $kept, true ), $id . ' is of the two newest generations of its role, and is kept.' );
+}
+foreach ( array( 'gpt-5-nano', 'gpt-5.4-mini', 'gpt-image-1-mini' ) as $id ) {
+	msrwa_test_assert( in_array( $id, $kept, true ), $id . ' is older, but the engine names it, so it is kept.' );
+}
+foreach ( array( 'gpt-5', 'gpt-5.1', 'gpt-5.2', 'gpt-5.4', 'gpt-5.5', 'gpt-image-1', 'gpt-image-1.5' ) as $id ) {
+	msrwa_test_assert( ! in_array( $id, $kept, true ), $id . ' is a superseded generation nobody uses, and is left out.' );
+}
+msrwa_test_assert( 12 === count( $kept ), 'OpenAI keeps twelve models, not its whole listing; got ' . count( $kept ) );
+msrwa_test_assert( 5.6 === MSRWA_Catalog::generation( 'openai', 'gpt-5.6-luna' ) && 4.5 === MSRWA_Catalog::generation( 'claude', 'claude-haiku-4-5-20251001' ) && 5.0 === MSRWA_Catalog::generation( 'claude', 'claude-opus-5' ), 'A generation is read the way each provider numbers it.' );
+
+// A route somebody typed keeps its model, however old.
+$GLOBALS['msrwa_test_options']['msrwa_engine_config'] = array( 'routing' => array( 'article' => 'openai:gpt-5.2' ) );
+msrwa_test_assert( in_array( 'gpt-5.2', MSRWA_Catalog::keep( 'openai', $openai ), true ), 'A model a typed route names is never dropped: its rate is what the run is billed on.' );
+unset( $GLOBALS['msrwa_test_options']['msrwa_engine_config'] );
 
 // The three provenances are distinct values, because a rate a model looked up
 // must never be indistinguishable from one a person checked.

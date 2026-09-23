@@ -21,7 +21,7 @@ if ( ! $listed ) { msrwa_real_skip( 'no provider key lists models on this site' 
 msrwa_real_budget();
 // Asked about models whose rate shipped, so the answer can be compared with
 // a figure read off the same page by hand. One per provider with a key.
-$ask = array( 'gemini:gemini-3.5-flash', 'gemini:gemini-3.6-flash', 'claude:claude-sonnet-5', 'openai:gpt-5.6-luna' );
+$ask = array( 'gemini:gemini-3.5-flash', 'gemini:gemini-3.7-flash', 'claude:claude-sonnet-5', 'openai:gpt-5.6-luna' );
 $lookup = msrwa_real_request( 'POST', '/msrwa/v1/catalog/prices', array( 'models' => $ask ), 900 );
 msrwa_real_assert( 200 === $lookup['status'], 'The price lookup must answer an administrator (got ' . $lookup['status'] . ').' );
 $body = (array) $lookup['body'];
@@ -32,7 +32,7 @@ msrwa_real_spend( 0.05 );
 msrwa_real_assert( count( $ask ) === (int) ( $body['asked'] ?? 0 ), 'Every model named is asked about, priced or not.' );
 msrwa_real_assert( empty( $body['error'] ), 'At least one route must answer: ' . ( $body['error'] ?? '' ) );
 msrwa_real_assert( (int) ( $body['found'] ?? 0 ) > 0, 'At least one rate must come back from a provider’s own page.' );
-$shipped = array( 'gemini:gemini-3.5-flash' => array( 1.50, 9.00 ), 'gemini:gemini-3.6-flash' => array( 0.75, 3.75 ), 'claude:claude-sonnet-5' => array( 2.00, 10.00 ), 'openai:gpt-5.6-luna' => array( 0.20, 1.20 ) );
+$shipped = array( 'gemini:gemini-3.5-flash' => array( 1.50, 9.00 ), 'gemini:gemini-3.7-flash' => array( 0.75, 3.75 ), 'claude:claude-sonnet-5' => array( 2.00, 10.00 ), 'openai:gpt-5.6-luna' => array( 0.20, 1.20 ) );
 $pages = array( 'openai' => 'openai.com', 'gemini' => 'google.dev', 'claude' => 'claude.com' );
 foreach ( (array) ( $body['results'] ?? array() ) as $key => $result ) {
 	if ( 'found' !== ( $result['state'] ?? '' ) ) { msrwa_real_note( $key . ': ' . ( $result['why'] ?? '' ) ); continue; }
@@ -53,10 +53,10 @@ msrwa_real_assert( empty( $estimate['body']['unpriced'] ), 'Every configured rou
 // The Moteur simulation resolves what is on screen over the catalogue, and
 // prices it. A model that ships priced but switched off, named by a route,
 // must still read as priced: an unpriced route stops the run.
-$simulation = msrwa_real_request( 'POST', '/msrwa/v1/diagnostics/config', array( 'config' => array( 'routing' => wp_json_encode_compat( array( 'article' => 'gemini:gemini-3.6-flash', 'research' => 'gemini:medium' ) ) ) ) );
+$simulation = msrwa_real_request( 'POST', '/msrwa/v1/diagnostics/config', array( 'config' => array( 'routing' => wp_json_encode_compat( array( 'article' => 'gemini:gemini-3.7-flash', 'research' => 'gemini:medium' ) ) ) ) );
 msrwa_real_assert( 200 === $simulation['status'], 'The simulation must answer (got ' . $simulation['status'] . ').' );
 $routes = (array) ( $simulation['body']['routes'] ?? array() );
-msrwa_real_assert( 'gemini-3.6-flash' === ( $routes['article']['route']['model'] ?? '' ), 'The simulation resolves the route typed on screen, not the saved one.' );
+msrwa_real_assert( 'gemini-3.7-flash' === ( $routes['article']['route']['model'] ?? '' ), 'The simulation resolves the route typed on screen, not the saved one.' );
 msrwa_real_assert( ! empty( $routes['article']['price_known'] ) && (float) ( $routes['article']['cost_usd'] ?? 0 ) > 0, 'A shipped rate reaches the simulation even for a model not switched on.' );
 msrwa_real_assert( 0 === strpos( (string) ( $routes['featured_image']['route']['model'] ?? '' ), 'gpt-image' ), 'An image step is simulated on the image route.' );
 msrwa_real_assert( (float) ( $simulation['body']['cost_usd'] ?? 0 ) > 0 && empty( $simulation['body']['unpriced'] ), 'The simulation totals a full recipe with nothing unpriced.' );
@@ -65,7 +65,7 @@ msrwa_real_assert( 'low' === ( $routes['article']['thinking'] ?? '' ), 'A Gemini
 
 // A thinking level typed on screen reaches every step and the money.
 $harder = msrwa_real_request( 'POST', '/msrwa/v1/diagnostics/config', array( 'config' => array(
-	'routing' => wp_json_encode_compat( array( 'article' => 'gemini:gemini-3.6-flash', 'research' => 'gemini:medium' ) ),
+	'routing' => wp_json_encode_compat( array( 'article' => 'gemini:gemini-3.7-flash', 'research' => 'gemini:medium' ) ),
 	'thinking' => wp_json_encode_compat( array( 'default' => 'high' ) ),
 ) ) );
 msrwa_real_assert( 'high' === ( $harder['body']['routes']['article']['thinking'] ?? '' ), 'The level on screen is the level simulated.' );
