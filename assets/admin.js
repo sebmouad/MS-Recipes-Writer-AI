@@ -57,7 +57,6 @@
     var imageCount = document.getElementById('ms-image-count');
     var estimate = document.getElementById('ms-estimate');
     var status = document.getElementById('ms-compose-status');
-    var budgetField = document.getElementById('ms-budget');
     var chosen = [];
     var previews = [];
 
@@ -81,7 +80,6 @@
           recipes: count,
           images: chosen.length
         };
-        if (budgetField) { query.budget = ceiling(); }
         call('/estimate', {}, query).then(function (data) {
           compose.classList.toggle('ms-over-ceiling', data.fits === false);
           // A writer is told whether the lot fits, never what it costs.
@@ -118,11 +116,10 @@
     // A writer is never shown money, so the field is simply not there for
     // them and the server applies the site's own ceiling.
     function ceiling() {
-      return budgetField ? (parseFloat(budgetField.value) || 0) : 0;
+      return t.ceilingUsd || 0;
     }
 
     recipes.addEventListener('input', refreshEstimate);
-    if (budgetField) { budgetField.addEventListener('input', refreshEstimate); }
     compose.querySelectorAll('input[name=profile]').forEach(function (input) { input.addEventListener('change', refreshEstimate); });
 
     function megabytes(bytes) { return String(Math.floor(bytes / 1000000)); }
@@ -142,22 +139,83 @@
       return '';
     }
 
-    photos.addEventListener('change', function () {
+    // A tile per photograph, added to across several picks and drops: the
+    // list is the writer's to build and prune, not replaced by each pick.
+    function fileProblem(file) {
+      if (['image/jpeg', 'image/png', 'image/webp'].indexOf(file.type) === -1) { return (t.photoType || '').replace('%s', file.name); }
+      if (t.photoBytes && file.size > t.photoBytes) { return (t.photoTooBig || '').replace('%1$s', file.name).replace('%2$s', megabytes(t.photoBytes)); }
+      return '';
+    }
+
+    function sizeLabel(bytes) {
+      return bytes >= 1000000 ? (bytes / 1000000).toFixed(1) + ' MB' : Math.max(1, Math.round(bytes / 1000)) + ' kB';
+    }
+
+    function renderPhotos() {
       previews.forEach(function (url) { URL.revokeObjectURL(url); });
       previews = [];
-      chosen = Array.prototype.slice.call(photos.files || []);
       thumbs.innerHTML = '';
-      chosen.forEach(function (file) {
-        var img = document.createElement('img');
-        img.src = URL.createObjectURL(file);
-        img.alt = file.name;
-        previews.push(img.src);
-        thumbs.appendChild(img);
+      chosen.forEach(function (file, index) {
+        var problem = fileProblem(file);
+        var tile = document.createElement('li');
+        tile.className = 'ms-photo' + (problem ? ' ms-photo-bad' : '');
+        if (!problem) {
+          var img = document.createElement('img');
+          img.src = URL.createObjectURL(file);
+          img.alt = '';
+          previews.push(img.src);
+          tile.appendChild(img);
+        }
+        var name = document.createElement('span');
+        name.className = 'ms-photo-name';
+        name.textContent = file.name;
+        name.title = file.name;
+        tile.appendChild(name);
+        var meta = document.createElement('span');
+        meta.className = 'ms-photo-meta';
+        meta.textContent = problem || sizeLabel(file.size);
+        tile.appendChild(meta);
+        var remove = document.createElement('button');
+        remove.type = 'button';
+        remove.className = 'ms-photo-remove';
+        remove.setAttribute('aria-label', (t.removePhoto || '%s').replace('%s', file.name));
+        remove.textContent = '×';
+        remove.addEventListener('click', function () { chosen.splice(index, 1); renderPhotos(); });
+        tile.appendChild(remove);
+        thumbs.appendChild(tile);
       });
       var problem = photoProblem(chosen);
       say(imageCount, problem || (chosen.length === 0 ? (t.noImage || '') : chosen.length === 1 ? t.oneImage : (t.manyImages || '').replace('%d', chosen.length)));
       refreshEstimate();
+    }
+
+    function addPhotos(list) {
+      Array.prototype.forEach.call(list || [], function (file) {
+        var known = chosen.some(function (other) { return other.name === file.name && other.size === file.size && other.lastModified === file.lastModified; });
+        if (!known) { chosen.push(file); }
+      });
+      renderPhotos();
+    }
+
+    photos.addEventListener('change', function () {
+      addPhotos(photos.files);
+      // Emptied so picking the same file again after removing it still fires.
+      photos.value = '';
     });
+
+    var drop = document.getElementById('ms-drop');
+    if (drop) {
+      ['dragenter', 'dragover'].forEach(function (type) {
+        drop.addEventListener(type, function (event) { event.preventDefault(); drop.classList.add('is-over'); });
+      });
+      ['dragleave', 'dragend', 'drop'].forEach(function (type) {
+        drop.addEventListener(type, function () { drop.classList.remove('is-over'); });
+      });
+      drop.addEventListener('drop', function (event) {
+        event.preventDefault();
+        if (event.dataTransfer) { addPhotos(event.dataTransfer.files); }
+      });
+    }
 
     compose.addEventListener('submit', function (event) {
       event.preventDefault();
@@ -172,9 +230,7 @@
       if (problem) { say(status, problem); button.disabled = false; return; }
       var form = new FormData();
       form.append('recipes', recipes.value);
-      form.append('budget', String(ceiling()));
       form.append('profile', (compose.querySelector('input[name=profile]:checked') || {}).value || '');
-      form.append('language', document.getElementById('ms-language').value);
       chosen.forEach(function (file) { form.append('photos[]', file, file.name); });
       say(status, chosen.length ? (t.uploading || '') + ' ' + (t.describing || '') : '');
       // No Content-Type of our own: the browser writes the multipart boundary.

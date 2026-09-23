@@ -61,7 +61,8 @@ final class MSRWA_REST {
 			(int) $request->get_param( 'images' )
 		);
 		$site_ceiling = (float) MSRWA_Settings::get()['per_recipe_budget_usd'];
-		$ceiling = MSRWA_Rights::may_see_money() && null !== $request->get_param( 'budget' ) ? (float) $request->get_param( 'budget' ) : $site_ceiling;
+		// One ceiling for every lot: the site's, set in the settings.
+		$ceiling = $site_ceiling;
 		$fits = MSRWA_Estimate::fits( (float) $estimate['per_recipe_usd'], $ceiling );
 		// Money is an operator's concern: a writer learns whether the lot fits,
 		// never what it costs or what the ceiling is.
@@ -89,11 +90,13 @@ final class MSRWA_REST {
 		// The per-recipe ceiling is the site's unless the person may set it. It
 		// used to be worked out here and then not used, so anybody who could
 		// submit a lot could name their own ceiling by posting one.
-		$budget = MSRWA_Rights::may_see_money() ? (float) $request->get_param( 'budget' ) : (float) MSRWA_Settings::get()['per_recipe_budget_usd'];
+		// Language and ceiling are the site's settings, never the request's: a
+		// lot cannot name a language nobody reviews in or a ceiling of its own.
+		$budget = (float) MSRWA_Settings::get()['per_recipe_budget_usd'];
 		$id = MSRWA_Batch::create(
 			$recipes, $images, $budget,
 			sanitize_key( (string) $request->get_param( 'profile' ) ),
-			sanitize_key( (string) $request->get_param( 'language' ) )
+			sanitize_key( (string) MSRWA_Settings::get()['site_language'] )
 		);
 		if ( is_wp_error( $id ) ) { MSRWA_Intake::discard( $uploaded['ids'] ); return $id; }
 		return rest_ensure_response( array( 'id' => (int) $id, 'recipes' => count( $recipes ), 'images' => count( $images ) ) );

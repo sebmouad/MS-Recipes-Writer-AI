@@ -24,7 +24,9 @@ final class MSRWA_Schema {
 
 	/** Recipe plugins that print their own Recipe markup. */
 	public static function another_plugin_prints_it() {
-		return defined( 'WPRM_VERSION' ) || defined( 'TASTY_RECIPES_PLUGIN_VERSION' ) || class_exists( 'Mediavine\Create\Plugin' ) || defined( 'WPZOOM_RCB_VERSION' );
+		// The MS stack builds its Recipe graph from the fields this plugin fills,
+		// and MSRWA_Stack::enrich() adds what only this plugin knows to it.
+		return MSRWA_Stack::owns_head() || defined( 'WPRM_VERSION' ) || defined( 'TASTY_RECIPES_PLUGIN_VERSION' ) || class_exists( 'Mediavine\Create\Plugin' ) || defined( 'WPZOOM_RCB_VERSION' );
 	}
 
 	/** The JSON-LD for one post, or null when there is nothing to say. */

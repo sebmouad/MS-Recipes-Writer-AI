@@ -5,9 +5,9 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.19.0
+## État actuel — 0.20.0
 
-La version `0.19.0` ramène une recette approuvée du premier coup à 0,09–0,10 $ sans perte mesurée ; la `0.18.9` reprenait chaque écran après une revue complète dans le navigateur ; la `0.18.8` réservait l’extension, renommée « MS Recipes AI » dans le menu, à ceux qui peuvent téléverser des fichiers ; la `0.18.7` disait juste ce que fait le plafond par recette ; la `0.18.6` rangeait les photographies envoyées avec le brouillon qu’elles ont servi à écrire ; la `0.18.5` faisait passer un lot de trois recettes en 8 minutes pour 0,125 $ la recette, toutes approuvées ; la `0.18.4` faisait envoyer les photographies d’un lot depuis l’ordinateur du rédacteur ; la `0.18.3` faisait approuver les trois recettes d’un lot réel aux réglages par défaut — image à la une en `low`, collage en `medium` — pour 0,132 $ en moyenne ; la `0.18.2` permettait de choisir le modèle et la qualité de chaque image
+La version `0.20.0` remplit chaque brouillon comme le lisent le thème MS Recipes, MS SEO Plus, MS FB Posts et MS Image Optimizer ; la `0.19.0` ramenait une recette approuvée du premier coup à 0,09–0,10 $ sans perte mesurée ; la `0.18.9` reprenait chaque écran après une revue complète dans le navigateur ; la `0.18.8` réservait l’extension, renommée « MS Recipes AI » dans le menu, à ceux qui peuvent téléverser des fichiers ; la `0.18.7` disait juste ce que fait le plafond par recette ; la `0.18.6` rangeait les photographies envoyées avec le brouillon qu’elles ont servi à écrire ; la `0.18.5` faisait passer un lot de trois recettes en 8 minutes pour 0,125 $ la recette, toutes approuvées ; la `0.18.4` faisait envoyer les photographies d’un lot depuis l’ordinateur du rédacteur ; la `0.18.3` faisait approuver les trois recettes d’un lot réel aux réglages par défaut — image à la une en `low`, collage en `medium` — pour 0,132 $ en moyenne ; la `0.18.2` permettait de choisir le modèle et la qualité de chaque image
 séparément ; la `0.18.1` fait tenir le plafond par recette jusque dans les reprises
 de l’approbation finale ; la `0.18.0` ramène une recette complète à environ 0,11 $ réels —
 recherche web comprise — sans perte de qualité mesurée ; la `0.17.0` faisait
@@ -74,6 +74,55 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.20.0
+
+**Le brouillon parle la langue du reste de la pile MS.** Chaque champ est
+écrit dans le format que son lecteur analyse, et rien n’est inventé pour en
+remplir un : une valeur que la recette n’a pas reste vide, parce que chacune
+atteint un moteur de recherche comme un fait sur le plat.
+
+| Champ | Lu par | Rempli ? |
+| --- | --- | --- |
+| `_recipe_prep_time`, `_recipe_cook_time` | fiche recette du thème, MS SEO Plus, JSON-LD | oui, en minutes entières |
+| `_recipe_servings`, `_recipe_calories` | fiche, JSON-LD (`recipeYield`, `nutrition`) | oui (les calories sont l’estimation de la recette) |
+| `_recipe_ingredients`, `_recipe_instructions`, `_recipe_equipment`, `_recipe_notes` | fiche, JSON-LD | oui, une ligne par élément, quantité en tête pour le calcul des portions |
+| `_recipe_cuisine`, `_recipe_keywords` | fiche, JSON-LD | oui |
+| `_recipe_difficulty` | fiche | oui, en `easy` / `medium` / `hard` ; vide si la recette dit autre chose |
+| `_recipe_faq` | MS SEO Plus | oui |
+| `_seo_title`, `_seo_description` | thème, MS SEO Plus, MS Image Optimizer | oui, coupés à un mot sous 60 et 155 caractères |
+| `fb_images_data` | MS FB Posts | oui : le collage et la légende Facebook |
+| Catégorie | thème, JSON-LD (`recipeCategory`) | oui, parmi les catégories existantes (« plat principal » → « Plats principaux ») ; aucune n’est créée, la suggestion reste sur le brouillon sinon |
+| Étiquettes, extrait, identifiant d’URL, titre | WordPress, thème | oui |
+| Image à la une, texte alternatif | thème, Open Graph, JSON-LD | oui, avec des recadrages 4:3 et 16:9 pour les résultats de recettes |
+| Photographies du rédacteur | médiathèque | oui, attachées au brouillon |
+| Canonique, Open Graph, Twitter, fil d’Ariane | le thème (ou MS SEO Plus) | produits par eux ; l’extension n’imprime plus les siens en double |
+| JSON-LD Recipe | le thème (ou MS SEO Plus) | produit par eux, enrichi par l’extension : trois formats d’image, ustensiles (`tool`), langue, catégorie de la recette si l’article n’en a pas, durée totale réelle quand la recette repose |
+| `_recipe_video` | fiche, JSON-LD | **non** : aucune vidéo n’est produite |
+| `_recipe_rating_sum`, `_recipe_rating_count` | fiche, `aggregateRating` | **non**, volontairement : seuls les votes réels comptent |
+| `_seo_noindex` | thème, MS SEO Plus | **non**, volontairement : l’article est indexable |
+| Biographie de l’auteur | thème (E-E-A-T) | **non** : c’est le profil WordPress de l’auteur |
+| `_ms_recipes_sidebar` | thème | **non** : choix de mise en page du site |
+
+**La langue et le plafond sont ceux des réglages.** Le formulaire *Nouveau
+lot* ne les demande plus ; il les rappelle, avec un lien vers les réglages pour
+un administrateur. Un lot ne peut plus porter son propre plafond ni sa langue,
+même par l’API.
+
+**Les photographies se déposent.** L’étape devient une zone où glisser ses
+fichiers, avec des vignettes carrées, le nom et le poids de chacune, un bouton
+pour la retirer, et la raison du refus sur celle qui ne passerait pas.
+
+**Corrigé en chemin.** La règle « une photographie sans plat reconnu n’est
+pas associée » (0.18.9) lisait les photographies avant leur description et
+désassociait donc toutes les photographies. Le test réel l’a trouvé avec une
+vraie photographie de tarte ; elle est désormais associée et attachée au
+brouillon.
+
+Vérifié en réel avec le thème MS Recipes, MS FB Posts et MS Image Optimizer
+actifs : une recette complète en 211 s pour 0,088 $, une seule balise
+description, un seul canonique, un seul graphe Recipe, la fiche sans aucun
+JSON brut, la catégorie « Desserts » trouvée seule.
 
 ## Version 0.19.0
 

@@ -31,7 +31,9 @@ final class MSRWA_Match {
 
 		return array(
 			'images' => $seen['images'],
-			'pairs' => self::normalise( $decision['pairs'], count( $recipes ), $images ),
+			// The described photographs: the raw ones carry no dish, and the rule
+			// against pairing an unrecognised photograph read that as none, everywhere.
+			'pairs' => self::normalise( $decision['pairs'], count( $recipes ), $seen['images'] ),
 			'reasoning' => $decision['reasoning'],
 			'cost_usd' => round( (float) $seen['cost_usd'] + (float) $decision['cost_usd'], 6 ),
 			'seconds' => round( (float) $seen['seconds'] + (float) $decision['seconds'], 1 ),
@@ -165,7 +167,7 @@ final class MSRWA_Match {
 			// and not left to the model: a live pairing gave a plain brown square
 			// to a tart "with confidence" while saying no dish was visible. A
 			// photograph nobody could name waits for the writer.
-			if ( null !== $recipe && '' === trim( (string) ( $images[ $image ]['dish'] ?? '' ) ) ) {
+			if ( null !== $recipe && array_key_exists( 'dish', (array) $images[ $image ] ) && '' === trim( (string) $images[ $image ]['dish'] ) ) {
 				$recipe = null;
 				$confidence = 'basse';
 				$why = 'Aucun plat reconnu sur la photographie : à associer à la main si elle appartient à une recette.';

@@ -119,6 +119,13 @@ run carries.
 - [x] Proofread by changes and shorter image prompts, live on six recipes:
   6/6 approved, first-pass recipes at $0.090–0.099, average $0.115 against
   $0.125 (`tests/test-engine-proofread.php`, `tests/test-image-prompt.php`).
+- [x] The draft fills the MS stack, live with the MS Recipes theme, MS FB Posts
+  and MS Image Optimizer active: one head of each kind, the card without JSON,
+  the enriched Recipe graph, the category matched, `fb_images_data` set
+  (`tests/test-stack.php`, `tests/real/test-flow.php` with `MSRWA_TEST_PHOTO`).
+- [x] Language and ceiling come from the settings only
+  (`tests/test-screens.php`, `tests/test-dispatch-ceiling.php`,
+  `tests/real/test-site.php`).
 - [ ] A complete lot on Claude — the account has no credit. — the Gemini key's
   grounding quota is exhausted, OpenAI is unreachable from the test
   environment and the Claude account has no credit.

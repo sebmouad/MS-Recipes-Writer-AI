@@ -30,6 +30,9 @@ final class MSRWA_Head {
 	 * answerable before `wp_head` runs.
 	 */
 	public static function another_plugin_prints_it() {
+		// The MS Recipes theme prints them itself when no SEO plugin runs, and
+		// MS SEO Plus when it does: this plugin then feeds their fields instead.
+		if ( MSRWA_Stack::owns_head() ) { return true; }
 		foreach ( array( 'WPSEO_VERSION', 'RANK_MATH_VERSION', 'SEOPRESS_VERSION', 'AIOSEO_VERSION', 'SLIM_SEO_VER', 'SQ_VERSION', 'THE_SEO_FRAMEWORK_PRESENT' ) as $constant ) {
 			if ( defined( $constant ) ) { return true; }
 		}

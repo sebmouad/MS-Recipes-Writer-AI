@@ -340,3 +340,13 @@ Break these and the plugin misreports itself.
     `_msrwa_sent_by_writer`; the draft adopts its recipe's photographs
     (`MSRWA_Intake::adopt()`), and deleting a lot removes those no draft took
     (`forget()`). Nothing without that mark is ever moved or removed.
+
+17. **The draft is written for the MS stack, in its readers' formats.**
+    `MSRWA_Stack::write()` owns the keys in `MSRWA_Stack::KEYS` (the generic
+    mapping skips them): minutes as integers, lists one per line, difficulty
+    as `easy|medium|hard`, `fb_images_data` as a slashed JSON string. No value
+    is invented; an absent one stays absent. When the MS Recipes theme or MS
+    SEO Plus prints the head (`MSRWA_Stack::owns_head()`), `MSRWA_Head` and
+    `MSRWA_Schema` print nothing and `MSRWA_Stack::enrich()` adds to their
+    Recipe graph instead. A lot's language and ceiling are the site settings;
+    `POST /batches` reads neither from the request.

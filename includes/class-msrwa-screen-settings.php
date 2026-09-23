@@ -60,7 +60,7 @@ final class MSRWA_Screen_Settings {
 				<p>
 					<label for="ms-per-recipe"><strong><?php esc_html_e( 'Par recette', 'ms-recipes-writer-ai' ); ?></strong></label><br>
 					<input type="number" id="ms-per-recipe" name="msrwa_settings[per_recipe_budget_usd]" value="<?php echo esc_attr( (float) $settings['per_recipe_budget_usd'] ); ?>" step="0.01" min="0" class="small-text ms-num"> $
-					<br><small class="ms-muted"><?php esc_html_e( 'La valeur proposée sur un nouveau lot, et celle qui s’applique à un lot déposé par quelqu’un qui ne voit pas les montants.', 'ms-recipes-writer-ai' ); ?></small>
+					<br><small class="ms-muted"><?php esc_html_e( 'S’applique à chaque recette de chaque lot : le formulaire de lot n’en propose plus.', 'ms-recipes-writer-ai' ); ?></small>
 					<?php $recipe = MSRWA_Estimate::recipe( MSRWA_Profile::FULL ); ?>
 					<br><small class="ms-muted<?php echo MSRWA_Estimate::fits( (float) $recipe['cost_usd'], (float) $settings['per_recipe_budget_usd'] ) ? '' : ' ms-warn'; ?>"><?php
 						echo esc_html( sprintf(
@@ -91,7 +91,7 @@ final class MSRWA_Screen_Settings {
 							<option value="<?php echo esc_attr( $code ); ?>" <?php selected( (string) $settings['site_language'], $code ); ?>><?php echo esc_html( $name ); ?></option>
 						<?php endforeach; ?>
 					</select>
-					<br><small class="ms-muted"><?php esc_html_e( 'Proposée par défaut sur chaque nouveau lot. Un lot peut toujours en demander une autre.', 'ms-recipes-writer-ai' ); ?></small>
+					<br><small class="ms-muted"><?php esc_html_e( 'La langue de chaque article, pour tous les lots : le formulaire de lot n’en propose plus.', 'ms-recipes-writer-ai' ); ?></small>
 				</p>
 				<p>
 					<label for="ms-min-words"><strong><?php esc_html_e( 'Longueur', 'ms-recipes-writer-ai' ); ?></strong></label><br>

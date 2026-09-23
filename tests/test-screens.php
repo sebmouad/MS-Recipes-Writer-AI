@@ -115,8 +115,11 @@ msrwa_test_missing( $html, 'plafond', 'A writer is not told about ceilings on th
 msrwa_test_as_admin();
 $GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
 $html = msrwa_render( array( 'MSRWA_Screen_Compose', 'render' ) )['html'] ?? '';
-msrwa_test_contains( $html, 'id="ms-budget"', 'Somebody who may set a ceiling is asked for one.' );
-msrwa_test_contains( $html, 'value="0.33"', 'The ceiling offered is the site’s, not a number hardcoded in a template.' );
+// The ceiling is the site's, set in the settings: a lot is not asked for one,
+// and the screen says which one applies and where it is changed.
+msrwa_test_missing( $html, 'id="ms-budget"', 'A lot does not carry a ceiling of its own.' );
+msrwa_test_contains( $html, '0.33', 'The ceiling shown is the site’s, not a number hardcoded in a template.' );
+msrwa_test_contains( $html, 'page=msrwa-settings', 'An administrator is pointed to where it is changed.' );
 
 unset( $GLOBALS['msrwa_test_options'][ MSRWA_Settings::OPTION ] );
 
@@ -134,7 +137,9 @@ msrwa_test_missing( msrwa_render( array( 'MSRWA_Screen_Compose', 'render' ) )['h
 msrwa_test_as_admin();
 $GLOBALS['msrwa_test_options'][ MSRWA_Settings::OPTION ] = array( 'site_language' => 'en' );
 $GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
-msrwa_test_contains( msrwa_render( array( 'MSRWA_Screen_Compose', 'render' ) )['html'] ?? '', "value=\"en\"  selected='selected'", 'The site language is the one offered.' );
+$compose = msrwa_render( array( 'MSRWA_Screen_Compose', 'render' ) )['html'] ?? '';
+msrwa_test_contains( $compose, 'Article en Anglais', 'The site language is the one a lot is written in.' );
+msrwa_test_missing( $compose, 'id="ms-language"', 'A lot does not choose a language of its own.' );
 unset( $GLOBALS['msrwa_test_options'][ MSRWA_Settings::OPTION ] );
 
 // --- A writer reads a sentence, not a stack trace ----------------------------

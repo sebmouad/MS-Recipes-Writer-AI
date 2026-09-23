@@ -1781,6 +1781,30 @@ msgstr "Review the drafts"
 msgid "Déposer mon premier lot"
 msgstr "Submit my first lot"
 
+msgid "Article en %1$s · plafond de %2$s par recette."
+msgstr "Article in %1$s · ceiling of %2$s per recipe."
+
+msgid "Article en %s."
+msgstr "Article in %s."
+
+msgid "Modifier dans les réglages"
+msgstr "Change in settings"
+
+msgid "S’applique à chaque recette de chaque lot : le formulaire de lot n’en propose plus."
+msgstr "Applies to every recipe of every lot: the lot form no longer offers one."
+
+msgid "La langue de chaque article, pour tous les lots : le formulaire de lot n’en propose plus."
+msgstr "The language of every article, for all lots: the lot form no longer offers one."
+
+msgid "Déposez vos photographies ici"
+msgstr "Drop your photographs here"
+
+msgid "Retirer %s"
+msgstr "Remove %s"
+
+msgid "ou"
+msgstr "or"
+
 msgid "aucune page citée"
 msgstr "no page cited"
 

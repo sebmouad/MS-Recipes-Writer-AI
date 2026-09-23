@@ -266,8 +266,27 @@
 .ms-choice small { display: block; color: var(--ms-ink-soft); margin-block-start: 2px; }
 .ms-choice-cost { margin-inline-start: auto; font-family: var(--ms-mono); font-size: 12px; color: var(--ms-ink-soft); white-space: nowrap; font-variant-numeric: tabular-nums; }
 
-.ms-thumbs { display: flex; flex-wrap: wrap; gap: 8px; margin-block-start: 11px; }
-.ms-thumbs img { inline-size: 72px; block-size: 72px; object-fit: cover; border-radius: 6px; border: 1px solid var(--ms-line); }
+/* The photographs: a drop zone, then a grid of what was picked. */
+.ms-drop { position: relative; display: grid; justify-items: center; gap: 6px; padding: 26px 20px; text-align: center; border: 2px dashed var(--ms-line); border-radius: var(--ms-radius); background: var(--ms-sunk); transition: border-color .15s ease, background-color .15s ease; }
+.ms-drop.is-over { border-color: var(--ms-lamp); background: var(--ms-lamp-soft); }
+.ms-drop:focus-within { border-color: var(--ms-lamp); }
+.ms-drop-input { position: absolute; inline-size: 1px; block-size: 1px; opacity: 0; overflow: hidden; }
+.ms-drop-icon.dashicons { inline-size: 36px; block-size: 36px; font-size: 36px; color: var(--ms-ink-faint); }
+.ms-drop p { margin: 0; }
+.ms-drop-title { font-size: 14px; font-weight: 600; color: var(--ms-ink); }
+.ms-drop-or { color: var(--ms-ink-soft); }
+.ms-drop-hint { max-inline-size: 60ch; font-size: 12px; color: var(--ms-ink-soft); line-height: 1.5; }
+.ms-photo-count { margin: 10px 0 0; }
+.ms-photo-grid { list-style: none; margin: 12px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); gap: 12px; }
+.ms-photo { position: relative; margin: 0; display: grid; gap: 3px; padding: 6px; border: 1px solid var(--ms-line); border-radius: var(--ms-radius); background: var(--ms-raised); }
+.ms-photo img { display: block; inline-size: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 5px; background: var(--ms-sunk); }
+.ms-photo-name { font-size: 12px; font-weight: 600; color: var(--ms-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ms-photo-meta { font-size: 11px; color: var(--ms-ink-soft); }
+.ms-photo-bad { border-color: var(--ms-stop); background: var(--ms-stop-soft); }
+.ms-photo-bad .ms-photo-meta { color: var(--ms-stop); white-space: normal; }
+.ms-photo-remove { position: absolute; inset-block-start: 10px; inset-inline-end: 10px; inline-size: 26px; block-size: 26px; padding: 0; border: 0; border-radius: 50%; font-size: 17px; line-height: 26px; cursor: pointer; color: var(--ms-raised); background: var(--ms-ink); opacity: .78; }
+.ms-photo-remove:hover, .ms-photo-remove:focus-visible { background: var(--ms-stop); opacity: 1; }
+.ms-photo-bad .ms-photo-remove { position: static; justify-self: end; }
 
 /* --- Pairing ----------------------------------------------------------- */
 

@@ -40,16 +40,20 @@ final class MSRWA_Screen_Compose {
 			<section class="ms-step">
 				<h3><?php esc_html_e( 'Les photographies', 'ms-recipes-writer-ai' ); ?></h3>
 				<p><?php esc_html_e( 'Sans dire lesquelles vont avec quoi : chacune sera décrite depuis ses propres pixels, puis associée à une recette. Une photographie est facturée une fois, même si vous corrigez ensuite l’association.', 'ms-recipes-writer-ai' ); ?></p>
-				<label class="button" for="ms-photos"><?php esc_html_e( 'Choisir sur mon ordinateur', 'ms-recipes-writer-ai' ); ?></label>
-				<input type="file" id="ms-photos" name="photos[]" class="screen-reader-text" multiple accept="image/jpeg,image/png,image/webp">
-				<span class="ms-muted" id="ms-image-count" aria-live="polite"><?php esc_html_e( 'aucune photographie', 'ms-recipes-writer-ai' ); ?></span>
-				<p class="ms-muted"><small><?php echo esc_html( sprintf(
-					/* translators: 1: the largest number of photographs, 2: the largest size of one, in megabytes. */
-					__( 'JPEG, PNG ou WebP, %1$d au plus, %2$s Mo chacune. Elles sont ajoutées à la médiathèque quand le lot est créé.', 'ms-recipes-writer-ai' ),
-					MSRWA_Intake::MAX_PHOTOS,
-					number_format_i18n( MSRWA_Admin::photo_bytes() / 1000000, 0 )
-				) ); ?></small></p>
-				<div class="ms-thumbs" id="ms-thumbs"></div>
+				<div class="ms-drop" id="ms-drop">
+					<input type="file" id="ms-photos" name="photos[]" class="ms-drop-input" multiple accept="image/jpeg,image/png,image/webp">
+					<span class="dashicons dashicons-format-image ms-drop-icon" aria-hidden="true"></span>
+					<p class="ms-drop-title"><?php esc_html_e( 'Déposez vos photographies ici', 'ms-recipes-writer-ai' ); ?></p>
+					<p class="ms-drop-or"><?php esc_html_e( 'ou', 'ms-recipes-writer-ai' ); ?> <label class="button" for="ms-photos"><?php esc_html_e( 'Choisir sur mon ordinateur', 'ms-recipes-writer-ai' ); ?></label></p>
+					<p class="ms-drop-hint"><?php echo esc_html( sprintf(
+						/* translators: 1: the largest number of photographs, 2: the largest size of one, in megabytes. */
+						__( 'JPEG, PNG ou WebP, %1$d au plus, %2$s Mo chacune. Elles sont ajoutées à la médiathèque quand le lot est créé.', 'ms-recipes-writer-ai' ),
+						MSRWA_Intake::MAX_PHOTOS,
+						number_format_i18n( MSRWA_Admin::photo_bytes() / 1000000, 0 )
+					) ); ?></p>
+				</div>
+				<p class="ms-muted ms-photo-count" id="ms-image-count" aria-live="polite"><?php esc_html_e( 'aucune photographie', 'ms-recipes-writer-ai' ); ?></p>
+				<ul class="ms-photo-grid" id="ms-thumbs"></ul>
 			</section>
 
 			<section class="ms-step">
@@ -73,26 +77,26 @@ final class MSRWA_Screen_Compose {
 				</div>
 			</section>
 
-			<section class="ms-step">
-				<h3><?php echo esc_html( MSRWA_Rights::may_see_money() ? __( 'La langue et le plafond', 'ms-recipes-writer-ai' ) : __( 'La langue', 'ms-recipes-writer-ai' ) ); ?></h3>
-				<p><?php echo esc_html( MSRWA_Rights::may_see_money()
-					? __( 'La langue de l’article, qui n’est pas celle de cette interface. Le plafond s’applique à chaque recette : au-delà, le run s’arrête plutôt que de dépenser.', 'ms-recipes-writer-ai' )
-					: __( 'La langue de l’article, qui n’est pas celle de cette interface.', 'ms-recipes-writer-ai' ) ); ?></p>
-				<p>
-					<label for="ms-language"><strong><?php esc_html_e( 'Langue de l’article', 'ms-recipes-writer-ai' ); ?></strong></label><br>
-					<select id="ms-language" name="language">
-						<?php foreach ( MSRWA_Profile::languages() as $code => $name ) : ?>
-							<option value="<?php echo esc_attr( $code ); ?>" <?php selected( (string) MSRWA_Settings::get()['site_language'], $code ); ?>><?php echo esc_html( $name ); ?></option>
-						<?php endforeach; ?>
-					</select>
-				</p>
-				<?php if ( MSRWA_Rights::may_see_money() ) : ?>
-					<p>
-						<label for="ms-budget"><strong><?php esc_html_e( 'Plafond par recette', 'ms-recipes-writer-ai' ); ?></strong></label><br>
-						<input type="number" id="ms-budget" name="budget" value="<?php echo esc_attr( (float) MSRWA_Settings::get()['per_recipe_budget_usd'] ); ?>" step="0.01" min="0.01" class="small-text ms-num"> $
-					</p>
-				<?php endif; ?>
-			</section>
+			<?php
+			// Language and ceiling are the site's, set once in the settings: a
+			// lot used to carry its own, and a writer could pick a language
+			// nobody reviews in, or an administrator a ceiling nobody meant.
+			$settings = MSRWA_Settings::get();
+			$languages = MSRWA_Profile::languages();
+			$language = $languages[ (string) $settings['site_language'] ] ?? (string) $settings['site_language'];
+			?>
+			<p class="ms-muted ms-lot-defaults" id="ms-lot-defaults">
+				<?php
+				echo esc_html( MSRWA_Rights::may_see_money()
+					/* translators: 1: a language name, 2: an amount in US dollars. */
+					? sprintf( __( 'Article en %1$s · plafond de %2$s par recette.', 'ms-recipes-writer-ai' ), $language, MSRWA_I18N::money( (float) $settings['per_recipe_budget_usd'], 2 ) )
+					/* translators: %s is a language name. */
+					: sprintf( __( 'Article en %s.', 'ms-recipes-writer-ai' ), $language ) );
+				if ( MSRWA_Rights::may_manage() ) {
+					echo ' <a href="' . esc_url( admin_url( 'admin.php?page=msrwa-settings' ) ) . '">' . esc_html__( 'Modifier dans les réglages', 'ms-recipes-writer-ai' ) . '</a>';
+				}
+				?>
+			</p>
 
 			<div class="ms-card">
 				<p id="ms-estimate" class="ms-muted" aria-live="polite"></p>

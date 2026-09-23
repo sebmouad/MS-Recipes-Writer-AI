@@ -63,7 +63,7 @@ msrwa_test_contains( $prompt, 'never one comma-separated string', 'The prompt mu
 // meta this file writes strips markup first; this mapping must too, or a
 // dish description that talks a model into writing a script tag becomes
 // stored XSS the moment a card plugin echoes it.
-msrwa_test_load( 'draft' );
+msrwa_test_load( 'draft', 'stack' );
 msrwa_test_settings( array( 'integration_mapping' => array(
 	'description' => '_recipe_description', 'notes' => '_recipe_notes',
 	'instructions' => '_recipe_instructions', 'seo_title' => '_seo_title',
@@ -88,5 +88,15 @@ foreach ( array( '_recipe_description', '_recipe_notes', '_recipe_instructions',
 	msrwa_test_missing( $stored, 'onerror=', 'The recipe-card mapping strips markup from ' . $meta_key . '.' );
 }
 msrwa_test_contains( (string) $GLOBALS['msrwa_test_meta'][4104]['_recipe_description'], 'Une tarte', 'Stripping markup keeps the text around it.' );
+
+// The MS stack keys are written by MSRWA_Stack, and strip markup the same way.
+$stack = MSRWA_Stack::recipe_meta(
+	array( 'notes' => array( 'Se garde <img src=x onerror=alert(1)> trois jours.' ), 'steps' => array( array( 'text' => 'Cuire <b>doucement</b>.' ) ) ),
+	array( 'seo_title' => '<script>alert(2)</script> titre SEO' )
+);
+foreach ( array( '_recipe_notes', '_recipe_instructions', '_seo_title' ) as $meta_key ) {
+	msrwa_test_assert( isset( $stack[ $meta_key ] ), 'The stack writes ' . $meta_key . '.' );
+	msrwa_test_missing( (string) ( $stack[ $meta_key ] ?? '' ), '<', 'The stack strips markup from ' . $meta_key . '.' );
+}
 
 msrwa_test_done( 'recipe structured data' );

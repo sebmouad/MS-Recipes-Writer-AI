@@ -40,6 +40,7 @@ screen, where the plugin encrypts them, and the tests drive that site.
 | `MSRWA_WP_USER` | an administrator's login on that site | every real test |
 | `MSRWA_WP_APP_PASSWORD` | that user's application password (*Users → Profile*) | every real test |
 | `MSRWA_TEST_BUDGET_USD` | the most one real run may spend, for example `1.00` | every test that calls a provider |
+| `MSRWA_TEST_PHOTO` | optional: a real photograph of a Normandy apple tart | `test-flow.php`, to check the writer's photograph is paired and attached to the draft |
 | `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GEMINI_API_KEY` | provider keys for the lab only | `tools/lab.php` |
 
 A real test that would exceed `MSRWA_TEST_BUDGET_USD` refuses to start, and

@@ -60,6 +60,7 @@ final class MSRWA_Draft {
 		$batch = MSRWA_Batch::get( (int) $run['batch_id'] );
 		if ( $batch && '' !== (string) $batch['language'] ) { update_post_meta( $post_id, '_msrwa_language', sanitize_key( (string) $batch['language'] ) ); }
 		self::attach_images( $post_id, $run_id, $artifacts, $title );
+		MSRWA_Stack::write( $post_id, $canonical, $article, (int) get_post_meta( $post_id, '_msrwa_facebook_image_id', true ) );
 		MSRWA_Intake::adopt( $post_id, array_column( (array) ( $brief['images'] ?? array() ), 'id' ) );
 
 		global $wpdb;
@@ -114,14 +115,7 @@ final class MSRWA_Draft {
 		$tags = array_values( array_filter( array_map( static function ( $tag ) { return trim( wp_strip_all_tags( (string) $tag ) ); }, self::listed( $article['tags'] ?? array() ) ) ) );
 		if ( $tags ) { wp_set_post_tags( $post_id, array_slice( $tags, 0, 12 ), false ); }
 
-		// A category is part of a site's structure, so the article may only choose
-		// among the ones that exist; it never invents a new one.
-		$categories = array();
-		foreach ( self::listed( $article['categories'] ?? array() ) as $name ) {
-			$term = get_term_by( 'name', trim( wp_strip_all_tags( (string) $name ) ), 'category' );
-			if ( $term && ! is_wp_error( $term ) ) { $categories[] = (int) $term->term_id; }
-		}
-		if ( $categories ) { wp_set_post_categories( $post_id, array_unique( $categories ), false ); }
+		// Categories are chosen by MSRWA_Stack::write(), among the ones that exist.
 
 		self::map_recipe( $post_id, $canonical, $seo_title, $seo_description );
 	}
@@ -148,6 +142,8 @@ final class MSRWA_Draft {
 		foreach ( $mapping as $field => $meta_key ) {
 			$meta_key = sanitize_key( (string) $meta_key );
 			if ( '' === $meta_key || 'facebook_meta' === $field || ! isset( $values[ $field ] ) ) { continue; }
+			// These are written by MSRWA_Stack, in the shape their readers parse.
+			if ( in_array( $meta_key, MSRWA_Stack::KEYS, true ) ) { continue; }
 			$value = $values[ $field ];
 			if ( is_array( $value ) ) {
 				$value = wp_slash( wp_json_encode( $value, JSON_UNESCAPED_UNICODE ) );
@@ -189,7 +185,7 @@ final class MSRWA_Draft {
 			// generation prompt is art direction, not a description, so the dish
 			// is the honest answer.
 			update_post_meta( $attachment, '_wp_attachment_image_alt', wp_strip_all_tags( $title ) );
-			if ( 'featured' === $kind ) { set_post_thumbnail( $post_id, $attachment ); }
+			if ( 'featured' === $kind ) { set_post_thumbnail( $post_id, $attachment ); MSRWA_Stack::crops( $attachment ); }
 			update_post_meta( $post_id, '_msrwa_' . $kind . '_image_id', (int) $attachment );
 		}
 	}

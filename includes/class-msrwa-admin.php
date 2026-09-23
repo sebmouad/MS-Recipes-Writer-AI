@@ -130,6 +130,8 @@ final class MSRWA_Admin {
 				'oneImage' => __( '1 photographie', 'ms-recipes-writer-ai' ),
 				/* translators: %d is a number of photographs. */
 				'manyImages' => __( '%d photographies', 'ms-recipes-writer-ai' ),
+				// The site's ceiling, for the estimate line; a writer is never sent it.
+				'ceilingUsd' => MSRWA_Rights::may_see_money() ? (float) MSRWA_Settings::get()['per_recipe_budget_usd'] : 0,
 				'photoBytes' => self::photo_bytes(),
 				'photoCount' => MSRWA_Intake::MAX_PHOTOS,
 				'postBytes' => self::post_bytes(),
@@ -142,6 +144,8 @@ final class MSRWA_Admin {
 				/* translators: %s is a size in megabytes. */
 				'photoTotal' => __( 'Ensemble, ces photographies dépassent les %s Mo que ce serveur accepte en un envoi.', 'ms-recipes-writer-ai' ),
 				'uploading' => __( 'Envoi des photographies…', 'ms-recipes-writer-ai' ),
+				/* translators: %s is a file name. */
+				'removePhoto' => __( 'Retirer %s', 'ms-recipes-writer-ai' ),
 				/* translators: 1: likely cost, 2: the ceiling, 3: number of recipes. */
 				'estimate' => __( 'Environ %1$s pour %3$d recette(s), et au maximum %2$s : le plafond arrête un run avant de le dépasser.', 'ms-recipes-writer-ai' ),
 				'noRecipes' => __( 'Il n’y a aucune recette dans ce texte.', 'ms-recipes-writer-ai' ),

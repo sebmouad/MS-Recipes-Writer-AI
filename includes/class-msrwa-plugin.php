@@ -77,6 +77,7 @@ final class MSRWA_Plugin {
 		if ( is_admin() ) { MSRWA_Admin::hooks(); MSRWA_Editor::hooks(); }
 		MSRWA_Schema::hooks();
 		MSRWA_Head::hooks();
+		MSRWA_Stack::hooks();
 		if ( get_option( 'msrwa_db_version' ) !== MSRWA_VERSION ) { MSRWA_DB::install(); self::caps(); }
 	}
 

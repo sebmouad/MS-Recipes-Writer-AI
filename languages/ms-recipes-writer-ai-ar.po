@@ -1801,6 +1801,30 @@ msgstr "راجع المسودات"
 msgid "Déposer mon premier lot"
 msgstr "إرسال دفعتي الأولى"
 
+msgid "Article en %1$s · plafond de %2$s par recette."
+msgstr "المقال باللغة %1$s · سقف %2$s لكل وصفة."
+
+msgid "Article en %s."
+msgstr "المقال باللغة %s."
+
+msgid "Modifier dans les réglages"
+msgstr "التعديل في الإعدادات"
+
+msgid "S’applique à chaque recette de chaque lot : le formulaire de lot n’en propose plus."
+msgstr "يُطبَّق على كل وصفة في كل دفعة: لم يعد نموذج الدفعة يعرضه."
+
+msgid "La langue de chaque article, pour tous les lots : le formulaire de lot n’en propose plus."
+msgstr "لغة كل مقال في جميع الدفعات: لم يعد نموذج الدفعة يعرضها."
+
+msgid "Déposez vos photographies ici"
+msgstr "أفلت صورك هنا"
+
+msgid "Retirer %s"
+msgstr "إزالة %s"
+
+msgid "ou"
+msgstr "أو"
+
 msgid "aucune page citée"
 msgstr "لم تُذكر أي صفحة"
 

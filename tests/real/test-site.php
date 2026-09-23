@@ -80,18 +80,22 @@ foreach ( (array) $keys['body'] as $provider => $verdict ) {
 }
 
 
-// --- A lot that cannot finish under its ceiling is refused, free -------------
+// --- The ceiling and the language are the site's, not the lot's ---------------
 
-// No photographs, so creating the lot calls no provider; dispatch is refused
-// before any run exists. Nothing here spends.
-$tight = msrwa_real_request( 'POST', '/msrwa/v1/batches', array( 'recipes' => "Test de plafond\nNe doit jamais partir.", 'images' => '', 'budget' => 0.001, 'profile' => 'article', 'language' => 'fr' ) );
-if ( 200 === $tight['status'] && ! empty( $tight['body']['id'] ) ) {
-	$refused = msrwa_real_request( 'POST', '/msrwa/v1/batches/' . (int) $tight['body']['id'] . '/dispatch' );
-	msrwa_real_assert( $refused['status'] >= 400, 'A lot estimated above its per-recipe ceiling must be refused at dispatch (got ' . $refused['status'] . ').' );
-	msrwa_real_assert( 'msrwa_over_ceiling' === (string) ( $refused['body']['code'] ?? '' ), 'The refusal must be the per-recipe ceiling, not something else (got ' . (string) ( $refused['body']['code'] ?? '' ) . ').' );
-	msrwa_real_request( 'DELETE', '/msrwa/v1/batches/' . (int) $tight['body']['id'] );
-} else {
-	msrwa_real_fail( 'A lot without photographs must be accepted (got ' . $tight['status'] . ').' );
+// A lot used to carry its own ceiling and language. Both now come from the
+// settings, whatever a request sends: the estimate is measured against the
+// site's ceiling even when asked about another. Nothing here dispatches — an
+// earlier version of this check did, once the lot's own ceiling stopped
+// counting, and only a cancel kept it from spending.
+$estimate = msrwa_real_request( 'GET', '/msrwa/v1/estimate?profile=article&recipes=1&images=0&budget=0.001' );
+$ceiling = (float) ( $estimate['body']['ceiling_usd'] ?? 0 );
+msrwa_real_assert( $ceiling > 0.001, 'The estimate is measured against the site ceiling, not one a request names (got ' . $ceiling . ').' );
+msrwa_real_note( 'site ceiling $' . number_format( $ceiling, 2 ) . ' per recipe' );
+$lot = msrwa_real_upload( '/msrwa/v1/batches', array( 'recipes' => "Test de plafond\nNe doit jamais partir.", 'budget' => '0.001', 'language' => 'ar', 'profile' => 'article' ), array() );
+msrwa_real_assert( 200 === $lot['status'] && ! empty( $lot['body']['id'] ), 'A lot without photographs is accepted (got ' . $lot['status'] . ').' );
+if ( ! empty( $lot['body']['id'] ) ) {
+	// Never dispatched: removed as soon as it is known to exist.
+	msrwa_real_request( 'DELETE', '/msrwa/v1/batches/' . (int) $lot['body']['id'] );
 }
 
 // --- Nothing here answers the public -------------------------------------

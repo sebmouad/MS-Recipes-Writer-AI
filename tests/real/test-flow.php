@@ -33,8 +33,14 @@ $fields = array(
 	'profile' => $profile,
 	'language' => 'fr',
 );
+// A real photograph of the dish when one is given; otherwise a drawn one,
+// which the pairing rightly sets aside: no dish can be recognised on it.
 $photo = '';
-if ( function_exists( 'imagecreatetruecolor' ) ) {
+$real_photo = (string) getenv( 'MSRWA_TEST_PHOTO' );
+if ( '' !== $real_photo && is_readable( $real_photo ) ) {
+	$photo = sys_get_temp_dir() . '/msrwa-flow-tarte-' . getmypid() . '.' . pathinfo( $real_photo, PATHINFO_EXTENSION );
+	copy( $real_photo, $photo );
+} elseif ( function_exists( 'imagecreatetruecolor' ) ) {
 	$photo = sys_get_temp_dir() . '/msrwa-flow-tarte-' . getmypid() . '.jpg';
 	$image = imagecreatetruecolor( 640, 480 );
 	imagefill( $image, 0, 0, imagecolorallocate( $image, 222, 196, 150 ) );
@@ -119,7 +125,12 @@ if ( $photo ) {
 	$media = msrwa_real_request( 'GET', '/wp/v2/media?parent=' . $post . '&per_page=20&context=edit' );
 	$sent = array_filter( (array) $media['body'], static function ( $item ) { return false !== strpos( (string) ( $item['source_url'] ?? '' ), 'msrwa-flow-tarte' ); } );
 	msrwa_real_note( count( (array) $media['body'] ) . ' attachment(s) on the draft, ' . count( $sent ) . ' of them the photograph sent' );
-	msrwa_real_assert( 1 === count( $sent ), 'The writer\'s photograph is attached to the draft.' );
+	if ( '' !== $real_photo ) {
+		msrwa_real_assert( 1 === count( $sent ), 'The writer\'s photograph is attached to the draft.' );
+	} else {
+		msrwa_real_assert( count( $sent ) <= 1, 'A drawn photograph is attached at most once.' );
+		msrwa_real_note( 'no real photograph given (MSRWA_TEST_PHOTO): the drawn one ' . ( $sent ? 'was paired' : 'was set aside by the pairing, as it should be' ) );
+	}
 }
 
 // What the article wrote about itself must reach the post: proofreading returns

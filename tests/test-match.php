@@ -17,6 +17,12 @@ $clean = function ( $pairs, $recipes = 2 ) use ( $normalise, $images ) { return 
 // the screen makes, so the code keeps it.
 $blank = $normalise->invoke( null, array( array( 'image' => 0, 'recipe' => 0, 'confidence' => 'haute', 'why' => 'aucun plat visible' ) ), 1, array( array( 'file' => 'brun.jpg', 'dish' => '' ) ) );
 msrwa_test_assert( null === $blank[0]['recipe'] && 'basse' === $blank[0]['confidence'], 'A photograph with no recognised dish waits for the writer.' );
+// A photograph that was never described is not "unrecognised": the rule once
+// read the raw uploads, found no dish on any of them, and unpaired them all.
+$raw = $normalise->invoke( null, array( array( 'image' => 0, 'recipe' => 0, 'confidence' => 'haute', 'why' => 'tarte' ) ), 1, array( array( 'file' => 'tarte.jpg' ) ) );
+msrwa_test_assert( 0 === $raw[0]['recipe'], 'The rule applies to described photographs only.' );
+$source = file_get_contents( dirname( __DIR__ ) . '/includes/class-msrwa-match.php' );
+msrwa_test_contains( $source, "self::normalise( \$decision['pairs'], count( \$recipes ), \$seen['images'] )", 'The pairing is checked against the described photographs.' );
 
 // Every photograph comes back, whether or not the answer mentioned it.
 $all = $clean( array( array( 'image' => 0, 'recipe' => 1, 'confidence' => 'haute', 'why' => 'ok' ) ) );
