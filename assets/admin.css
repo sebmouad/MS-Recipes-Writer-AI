@@ -372,3 +372,27 @@
 .ms-extras dt { font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: var(--ms-ink-faint); margin: 6px 0 0; }
 .ms-extras dd { margin: 0; }
 .ms-extras textarea { font-size: 13px; resize: vertical; }
+
+/* --- The catalogue grid -----------------------------------------------
+   A model against every step it may serve. Wide by nature, so the cell
+   wraps into columns rather than forcing the table to scroll sideways —
+   a horizontal scrollbar inside a table inside an admin page is a place
+   people lose things. */
+
+.ms-catalog .ms-grid-cell { min-inline-size: 22rem; }
+
+.ms-grid-step {
+	display: inline-block;
+	inline-size: 10.5rem;
+	margin-block-end: 2px;
+	font-size: 12px;
+	color: var(--ms-ink-soft);
+	vertical-align: top;
+}
+
+.ms-catalog .ms-num { inline-size: 6.5rem; }
+
+@media (max-inline-size: 900px) {
+	.ms-catalog .ms-grid-cell { min-inline-size: 0; }
+	.ms-grid-step { inline-size: 100%; }
+}

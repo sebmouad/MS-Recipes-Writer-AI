@@ -22,6 +22,8 @@ final class MSRWA_REST {
 			array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_manage' ), 'callback' => array( __CLASS__, 'queue_control' ) ),
 		) );
 		register_rest_route( 'msrwa/v1', '/keys/check', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_manage' ), 'callback' => array( __CLASS__, 'check_keys' ) ) );
+		register_rest_route( 'msrwa/v1', '/catalog/models', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_manage' ), 'callback' => array( __CLASS__, 'fetch_models' ) ) );
+		register_rest_route( 'msrwa/v1', '/catalog/prices', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_manage' ), 'callback' => array( __CLASS__, 'fetch_prices' ) ) );
 		register_rest_route( 'msrwa/v1', '/retention', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_manage' ), 'callback' => array( __CLASS__, 'prune' ) ) );
 		register_rest_route( 'msrwa/v1', '/runs/bulk', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'bulk' ) ) );
 		register_rest_route( 'msrwa/v1', '/runs/(?P<id>\d+)/retry', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'retry' ) ) );
@@ -164,6 +166,31 @@ final class MSRWA_REST {
 	/** Whether each stored key opens its provider. Costs nothing: it lists models. */
 	public static function check_keys() {
 		return rest_ensure_response( MSRWA_Keys::check() );
+	}
+
+	/**
+	 * Asks each provider what it serves. Free, and certain.
+	 *
+	 * The same listing the key check reads, asked for on its own so that
+	 * refreshing the catalogue is not something an operator has to know is
+	 * hidden inside a button about keys.
+	 */
+	public static function fetch_models() {
+		$out = array();
+		foreach ( MSRWA_Keys::check() as $provider => $verdict ) {
+			$out[ $provider ] = array(
+				'label' => $verdict['label'],
+				'state' => $verdict['state'],
+				'message' => $verdict['message'],
+				'models' => (int) ( $verdict['models'] ?? 0 ),
+			);
+		}
+		return rest_ensure_response( $out );
+	}
+
+	/** Reads the providers' published pricing pages. Costs a little, can be wrong. */
+	public static function fetch_prices() {
+		return rest_ensure_response( MSRWA_Prices::lookup() );
 	}
 
 	/**

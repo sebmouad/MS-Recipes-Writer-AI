@@ -124,6 +124,7 @@ final class MSRWA_Diagnostics {
 		$keyless = array();
 		$unpriced = array();
 		$unserved = array();
+		$forbidden = array();
 
 		foreach ( $config->steps() as $step => $definition ) {
 			$capability = (string) ( $definition['capability'] ?? '' );
@@ -137,6 +138,20 @@ final class MSRWA_Diagnostics {
 			// for every step before it, and nothing else here can see it: a key
 			// works, a price exists, and the name is simply no longer served.
 			if ( 'no' === MSRWA_Catalog::served( $route['provider'], $route['model'] ) ) { $unserved[ $route['model'] ] = $route['provider'] . ':' . $route['model']; }
+			// The owner's own grid. A model ticked for some steps and not this
+			// one is a decision, and routing round it silently would make the
+			// grid decorative.
+			if ( ! MSRWA_Catalog::may_serve( $route['provider'], $route['model'], $step ) ) {
+				$forbidden[ $step ] = (string) ( $definition['label'] ?? $step );
+			}
+		}
+
+		if ( $forbidden ) {
+			return self::check( 'warn', __( 'Routage', 'ms-recipes-writer-ai' ), sprintf(
+				/* translators: %s is a comma-separated list of step names. */
+				__( 'Ces étapes tournent sur un modèle auquel vous ne les avez pas autorisées : %s.', 'ms-recipes-writer-ai' ),
+				implode( ', ', $forbidden )
+			), __( 'Modifiez la grille dans Modèles, ou routez ces étapes autrement.', 'ms-recipes-writer-ai' ) );
 		}
 
 		if ( $unserved ) {

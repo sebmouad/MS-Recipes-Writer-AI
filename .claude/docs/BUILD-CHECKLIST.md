@@ -1,6 +1,6 @@
 # Build checklist — for the model doing the work
 
-## Verified on a real site — 0.11.0, 2026-09-22
+## Verified on a real site — 0.12.0, 2026-09-23
 
 WordPress 7.1.1 with the SQLite database integration (the only database the
 test sandbox could run; a MySQL pass is still owed), the plugin activated, lots
@@ -46,6 +46,18 @@ run carries.
   Anthropic does not serve, and a second price list in the plugin that
   disagrees with the engine's. Both in ENGINE.md §7; the Diagnostic screen
   turns the routing red for the first.
+- [x] The catalogue table, live: seeded 21 models from both price lists, then
+  fetching from the providers grew it to 81 and marked `claude-haiku-4-5`
+  unserved. The generated tiers changed accordingly, and `claude:low` now
+  resolves to `claude-haiku-4-5-20251001`.
+- [x] The model × step grid saved and enforced: restricting `claude-sonnet-5`
+  to article and proofread, then routing research at it, turns the Diagnostic
+  routing check amber with the step named.
+- [~] The AI price lookup: the request is well-formed and reaches the provider
+  — Gemini answers with the account's quota error, not a malformed request —
+  but no provider on this sandbox can complete it, so no rate has been looked
+  up for real. The validation half (which is where a hallucinated rate would
+  get in) is covered offline in `tests/test-prices.php`.
 - [ ] Image steps, the final judge and the matcher live — need a reachable and
   funded OpenAI or Gemini key.
 - [ ] The same suite on MySQL.

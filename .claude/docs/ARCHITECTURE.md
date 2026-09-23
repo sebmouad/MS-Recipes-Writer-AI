@@ -199,14 +199,25 @@ engine drew for sharing and falling back to the featured one; it steps aside
 when any of the usual SEO plugins is active, and speaks only for posts this
 plugin wrote.
 
-`MSRWA_Catalog` holds two different kinds of knowledge, deliberately kept
-apart. What a model costs and what it can do is shipped: no API tells you a
-price, so it is written down and corrected by hand against the source each
-entry names. Which identifiers a provider still answers to is the opposite —
-only the provider knows, and it changes when a model is renamed or retired, so
-the key check keeps the list it downloads (it used to read the status code and
-throw the body away) and the Moteur screen and the Diagnostic screen both read
-it back. A route naming a model the provider does not list is a stop, because
+`MSRWA_Catalog` is the table that keeps the engine holding nothing but the
+editorial process. Which models exist, what they cost and which step each may
+serve are not process — they change when a provider renames a model or moves a
+price — so they are data the owner edits on the Modèles screen, and the engine
+is handed generated `models` and `tiers` through the caller layer it already
+accepts. No engine change was needed: both groups were already overridable, and
+a group typed by hand still wins over the generated one.
+
+Tiers are derived rather than stored: the cheapest, middle and dearest of what
+the site actually has, among models that are priced and known to write. That is
+what stops a tier naming a model nobody priced or the provider retired. They
+are the text routes only — image generation names its model outright — which is
+why "known to write" is required and not assumed.
+
+It holds three kinds of knowledge, deliberately kept apart. which identifiers exist, which only the provider knows and which is
+fetched; what they cost, which no provider API states — checked against all
+three live responses — so a rate is typed by a person or looked up by a model
+and marked as such, never silently trusted; and which step a model may serve,
+which is the owner's editorial judgement and is only ever set by hand. A route naming a model the provider does not list is a stop, because
 that step cannot run; a provider never asked says nothing about its models, so
 silence is reported as unknown rather than as absence.
 

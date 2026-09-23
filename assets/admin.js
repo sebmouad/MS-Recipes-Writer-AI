@@ -467,6 +467,62 @@
     });
   }
 
+  // --- The catalogue: two buttons, two very different kinds of answer -----
+
+  var catalogResult = document.getElementById('ms-catalog-result');
+
+  function catalogSay(html, tone) {
+    if (!catalogResult) return;
+    catalogResult.innerHTML = '';
+    var p = document.createElement('p');
+    if (tone) p.className = 'ms-' + tone;
+    p.innerHTML = html;
+    catalogResult.appendChild(p);
+  }
+
+  function catalogRun(button, route, working, done) {
+    if (!button) return;
+    button.addEventListener('click', function () {
+      button.disabled = true;
+      catalogSay(working);
+      call(route, { method: 'POST' })
+        .then(function (data) { catalogSay(done(data)); })
+        .catch(function (error) { catalogSay(String(error && error.message ? error.message : error), 'stop'); })
+        .then(function () { button.disabled = false; });
+    });
+  }
+
+  catalogRun(
+    document.getElementById('ms-fetch-models'),
+    '/catalog/models',
+    MSRWA.text.askingProviders,
+    function (data) {
+      var lines = Object.keys(data).map(function (provider) {
+        var row = data[provider];
+        return row.label + ' : ' + (row.models ? MSRWA.text.modelsListed.replace('%d', row.models) : row.message);
+      });
+      return lines.join('<br>') + '<br><em>' + MSRWA.text.reloadToSee + '</em>';
+    }
+  );
+
+  catalogRun(
+    document.getElementById('ms-fetch-prices'),
+    '/catalog/prices',
+    MSRWA.text.readingPrices,
+    function (data) {
+      if (data.error) return data.error;
+      if (!data.asked) return MSRWA.text.nothingToPrice;
+      var lines = [MSRWA.text.pricesFound.replace('%1$d', data.found).replace('%2$d', data.asked)];
+      Object.keys(data.results || {}).forEach(function (key) {
+        var row = data.results[key];
+        if (row.state === 'found') lines.push(key + ' : $' + row.input + ' / $' + row.output);
+        else lines.push(key + ' : ' + row.why);
+      });
+      lines.push('<em>' + MSRWA.text.pricesAreIndicative + '</em>');
+      return lines.join('<br>');
+    }
+  );
+
   // --- Resolving the form as it stands, without saving or spending --------
 
   var preview = document.getElementById('ms-engine-preview');

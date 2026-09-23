@@ -5,9 +5,9 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.11.0
+## État actuel — 0.12.0
 
-La version `0.11.0` est installable et vérifiée de bout en bout sur un vrai
+La version `0.12.0` est installable et vérifiée de bout en bout sur un vrai
 WordPress (7.1.1) : un lot part, le cron le fait avancer vague par vague, et un
 brouillon arrive **en blocs**, avec son article, sa recette, son extrait, son
 identifiant d’URL, ses étiquettes, ses images attachées et décrites, ses
@@ -65,6 +65,55 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.12.0
+
+**Le moteur ne contient plus que le processus éditorial.** Quels modèles
+existent, ce qu’ils coûtent et quelle étape chacun a le droit de servir ne sont
+pas du processus : cela change quand un fournisseur renomme un modèle ou
+déplace un tarif, et ni l’un ni l’autre ne devrait obliger à toucher la chaîne
+qui écrit un article. Tout cela passe dans une table à part, et le moteur
+reçoit des `models` et des `tiers` engendrés, par la couche appelante qu’il
+acceptait déjà. **Aucune modification du moteur n’a été nécessaire** : les deux
+groupes étaient déjà surchargeables. Ce qui est saisi à la main l’emporte
+toujours — qui édite `tiers` lui-même sait ce qu’il fait.
+
+**Une page Modèles, avec deux boutons qui ne se ressemblent pas.** Demander à
+un fournisseur la liste de ce qu’il sert est gratuit et certain : c’est une
+action. Demander à un modèle de lire des pages de tarifs coûte quelques
+centimes et peut se tromper : c’en est une autre, et ce qu’elle rapporte est
+marqué « trouvé par IA », cite la page lue, et ne remplace jamais un tarif
+saisi à la main. Un nombre faux qui a l’air sûr est pire qu’une case vide : la
+case vide arrête l’estimation, le nombre faux se facture en silence. Ce qui
+revient est donc refusé s’il n’est pas dans l’ordre de grandeur d’un vrai
+tarif, ou s’il ne cite aucune page.
+
+**Aucun fournisseur ne publie ses tarifs par API.** Vérifié sur les réponses
+réelles des trois : pas un champ de prix. En revanche Gemini donne ses limites
+de jetons et les méthodes qu’un modèle supporte, et Anthropic déclare ses
+capacités — `image_input`, `structured_outputs` — donc tout cela est relevé.
+Une capacité qu’un fournisseur ne mentionne pas est laissée telle quelle et non
+mise à faux : un silence n’est pas un refus, et écraser un drapeau correct
+retirerait du service un modèle qui marche.
+
+**La grille modèle × étape.** Chaque modèle, chaque étape, à cocher. Rien de
+coché veut dire aucune restriction, pour qu’une installation neuve tourne. Et
+la grille n’est pas décorative : le Diagnostic prévient quand une étape tourne
+sur un modèle auquel elle n’a pas été autorisée.
+
+**Ce que cela a corrigé.** `claude:low` désignait `claude-haiku-4-5`, qu’Anthropic
+ne sert pas. Les niveaux sont désormais engendrés — le moins cher, le milieu et
+le plus cher de ce que le site a vraiment — donc il désigne
+`claude-haiku-4-5-20251001`, qui existe. Corrigé comme une donnée, sans toucher
+au moteur. Les engendrer au prix seul était faux et le premier relevé réel l’a
+montré : cela plaçait `gpt-image-2.5-sunburst` derrière l’étape Article. Un
+niveau est une route de texte ; il faut donc savoir écrire pour en être un, et
+une capacité non déclarée n’est pas supposée présente.
+
+**Et les deux listes de tarifs n’en font plus qu’une.** Le moteur en tarifait
+dix-neuf, le plugin neuf, sous des identifiants différents pour le même modèle.
+Seule celle du moteur était facturée. C’est la table, maintenant, et elle est
+semée des deux.
 
 ## Version 0.11.0
 

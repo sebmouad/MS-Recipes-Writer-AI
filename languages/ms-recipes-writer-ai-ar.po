@@ -1580,3 +1580,126 @@ msgstr "الرؤية"
 
 msgid "La couche appelante, telle quelle : ce qui a été saisi ici, plus les modèles et les niveaux que la page Modèles engendre. Vide signifie que tout suit le moteur."
 msgstr "الطبقة المُستدعية كما هي: ما أُدخل هنا، إضافةً إلى النماذج والمستويات التي تولّدها صفحة النماذج. الفراغ يعني أن كل شيء يتبع المحرّك."
+
+msgid "%1$d tarif(s) trouvé(s) sur %2$d demandé(s)."
+msgstr "عُثر على %1$d سعر من أصل %2$d مطلوب."
+
+msgid "%d modèle(s)"
+msgstr "%d نموذج/نماذج"
+
+msgid "Aucun modèle enregistré. Réactivez l’extension pour installer le catalogue livré."
+msgstr "لا نموذج مسجَّل. أعد تفعيل الملحق لتثبيت الفهرس المرفق."
+
+msgid "Aucun modèle n’est routé pour faire cette recherche. Enregistrez une clé d’abord."
+msgstr "لا نموذج موجَّه للقيام بهذا البحث. احفظ مفتاحًا أولًا."
+
+msgid "Ce que le moteur reçoit"
+msgstr "ما يتلقّاه المحرّك"
+
+msgid "Ces tarifs sont une indication à vérifier, jamais une facture. Rechargez la page."
+msgstr "هذه الأسعار مؤشّر يجب التحقق منه، لا فاتورة. أعد تحميل الصفحة."
+
+msgid "Chercher les tarifs manquants"
+msgstr "ابحث عن الأسعار الناقصة"
+
+msgid "Coûte quelques centimes. Un modèle avec recherche web lit les pages de tarifs des fournisseurs. Ce qu’il rapporte est marqué « trouvé par IA » et cite sa page : c’est une indication à vérifier, jamais une facture. Un tarif saisi à la main n’est jamais remplacé."
+msgstr "يكلّف بضعة سنتات. يقرأ نموذج مزوّد بالبحث على الويب صفحات أسعار المزوّدين. ما يعيده يُوسَم بـ«وجده الذكاء الاصطناعي» ويستشهد بصفحته: مؤشّر يجب التحقق منه، لا فاتورة. ولا يُستبدل أبدًا سعر أُدخل يدويًا."
+
+msgid "D’où vient ce tarif"
+msgstr "من أين جاء هذا السعر"
+
+msgid "Engendré par ce tableau, puis remis au moteur comme couche appelante. Les niveaux sont le moins cher, le milieu et le plus cher de ce que ce site a vraiment — c’est ce qui empêche un niveau de désigner un modèle que personne n’a tarifé ou que le fournisseur a retiré. Seules les étapes de texte passent par un niveau ; la génération d’image nomme son modèle directement."
+msgstr "يُولَّد من هذا الجدول ثم يُسلَّم إلى المحرّك بوصفه الطبقة المُستدعية. المستويات هي الأرخص والأوسط والأغلى مما يملكه هذا الموقع فعلًا — وهذا ما يمنع مستوًى من تسمية نموذج لم يسعّره أحد أو سحبه المزوّد. خطوات النص وحدها تمرّ بمستوى؛ أما توليد الصور فيسمّي نموذجه مباشرة."
+
+msgid "Entrée $/M"
+msgstr "إدخال $/م"
+
+msgid "Gratuit. Demande à chaque fournisseur la liste de ce qu’il sert, et ce qu’il en dit : capacités, limites. Aucun fournisseur ne publie ses tarifs par API, donc aucun tarif n’est touché ici."
+msgstr "مجاني. يسأل كل مزوّد عن قائمة ما يخدمه وما يقوله عنه: القدرات والحدود. لا ينشر أي مزوّد أسعاره عبر واجهة برمجية، لذا لا يُمسّ أي سعر هنا."
+
+msgid "Interrogation des fournisseurs…"
+msgstr "جارٍ سؤال المزوّدين…"
+
+msgid "Le catalogue"
+msgstr "الفهرس"
+
+msgid "Lecture des pages de tarifs…"
+msgstr "جارٍ قراءة صفحات الأسعار…"
+
+msgid "Mettre le catalogue à jour"
+msgstr "حدّث الفهرس"
+
+msgid "Modèles"
+msgstr "النماذج"
+
+msgid "Niveau"
+msgstr "المستوى"
+
+msgid "Quels modèles ce site peut utiliser, ce qu’ils coûtent, et quelle étape chacun a le droit de servir. Le moteur ne contient que le processus éditorial : tout ce qui est ici est une donnée, modifiable sans toucher à la manière dont un article est écrit."
+msgstr "أي النماذج يجوز لهذا الموقع استخدامها، وكم تكلّف، وأي خطوة يُسمح لكل منها بخدمتها. لا يحوي المحرّك إلا العملية التحريرية: كل ما هنا بيانات قابلة للتعديل دون المساس بطريقة كتابة المقال."
+
+msgid "Rechargez la page pour voir le catalogue à jour."
+msgstr "أعد تحميل الصفحة لرؤية الفهرس المحدَّث."
+
+msgid "Relever les modèles chez les fournisseurs"
+msgstr "اجلب النماذج من المزوّدين"
+
+msgid "Rien d’engendré : aucun modèle tarifé et connu pour écrire. Les valeurs par défaut du moteur s’appliquent."
+msgstr "لم يُولَّد شيء: لا نموذج مُسعَّر ومعروف بالكتابة معًا. تُطبَّق قيم المحرّك الافتراضية."
+
+msgid "Rien à chercher : chaque modèle servi a déjà un tarif."
+msgstr "لا شيء للبحث عنه: كل نموذج مخدوم له سعر بالفعل."
+
+msgid "Sortie $/M"
+msgstr "إخراج $/م"
+
+msgid "aucun tarif"
+msgstr "لا سعر"
+
+msgid "aucun tarif trouvé sur la page du fournisseur"
+msgstr "لم يُعثر على سعر في صفحة المزوّد"
+
+msgid "aucune page citée"
+msgstr "لم تُذكر أي صفحة"
+
+msgid "jamais relevé"
+msgstr "لم يُجلب قط"
+
+msgid "la page citée"
+msgstr "الصفحة المذكورة"
+
+msgid "la réponse n’est pas un tarif plausible"
+msgstr "الجواب ليس سعرًا معقولًا"
+
+msgid "le fournisseur ne le sert plus"
+msgstr "لم يعد المزوّد يخدمه"
+
+msgid "livré avec l’extension"
+msgstr "مرفق مع الملحق"
+
+msgid "modèles"
+msgstr "نماذج"
+
+msgid "retirés"
+msgstr "مسحوبة"
+
+msgid "rien de coché : aucune restriction"
+msgstr "لا شيء محدَّد: بلا قيود"
+
+msgid "saisi à la main"
+msgstr "أُدخل يدويًا"
+
+msgid "sans tarif"
+msgstr "بلا سعر"
+
+msgid "trouvé par IA — à vérifier"
+msgstr "وجده الذكاء الاصطناعي — للتحقق"
+
+msgid "Étapes qu’il a le droit de servir"
+msgstr "الخطوات المسموح له بخدمتها"
+
+msgid "Ces étapes tournent sur un modèle auquel vous ne les avez pas autorisées : %s."
+msgstr "تعمل هذه الخطوات على نموذج لم تسمح لها به: %s."
+
+msgid "Modifiez la grille dans Modèles, ou routez ces étapes autrement."
+msgstr "عدّل الشبكة في صفحة النماذج، أو وجّه هذه الخطوات إلى غيره."

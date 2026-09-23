@@ -13,6 +13,7 @@ final class MSRWA_Admin {
 		add_action( 'admin_menu', array( __CLASS__, 'menu' ), 30 );
 		add_action( 'admin_post_msrwa_save_settings', array( __CLASS__, 'save_settings' ) );
 		add_action( 'admin_post_msrwa_save_engine', array( __CLASS__, 'save_engine' ) );
+		add_action( 'admin_post_msrwa_save_models', array( 'MSRWA_Screen_Models', 'save' ) );
 		add_action( 'admin_post_msrwa_report', array( 'MSRWA_Operations', 'report' ) );
 		add_action( 'admin_post_msrwa_export', array( 'MSRWA_Export', 'send' ) );
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'assets' ) );
@@ -30,6 +31,7 @@ final class MSRWA_Admin {
 		add_submenu_page( 'msrwa', __( 'Articles', 'ms-recipes-writer-ai' ), __( 'Articles', 'ms-recipes-writer-ai' ), $write, 'msrwa-articles', array( 'MSRWA_Screen_Articles', 'render' ) );
 		add_submenu_page( 'msrwa', __( 'Analyse', 'ms-recipes-writer-ai' ), __( 'Analyse', 'ms-recipes-writer-ai' ), $manage, 'msrwa-analysis', array( 'MSRWA_Screen_Analysis', 'render' ) );
 		add_submenu_page( 'msrwa', __( 'Moteur', 'ms-recipes-writer-ai' ), __( 'Moteur', 'ms-recipes-writer-ai' ), $manage, 'msrwa-engine', array( 'MSRWA_Screen_Engine', 'render' ) );
+		add_submenu_page( 'msrwa', __( 'Modèles', 'ms-recipes-writer-ai' ), __( 'Modèles', 'ms-recipes-writer-ai' ), $manage, 'msrwa-models', array( 'MSRWA_Screen_Models', 'render' ) );
 		add_submenu_page( 'msrwa', __( 'Diagnostic', 'ms-recipes-writer-ai' ), __( 'Diagnostic', 'ms-recipes-writer-ai' ), $manage, 'msrwa-diagnostics', array( 'MSRWA_Screen_Diagnostics', 'render' ) );
 		add_submenu_page( 'msrwa', __( 'Réglages', 'ms-recipes-writer-ai' ), __( 'Réglages', 'ms-recipes-writer-ai' ), $manage, 'msrwa-settings', array( 'MSRWA_Screen_Settings', 'render' ) );
 
@@ -104,6 +106,15 @@ final class MSRWA_Admin {
 				'noRecipes' => __( 'Il n’y a aucune recette dans ce texte.', 'ms-recipes-writer-ai' ),
 				'describing' => __( 'Description des photographies…', 'ms-recipes-writer-ai' ),
 				'saving' => __( 'Enregistrement…', 'ms-recipes-writer-ai' ),
+				'askingProviders' => __( 'Interrogation des fournisseurs…', 'ms-recipes-writer-ai' ),
+				'readingPrices' => __( 'Lecture des pages de tarifs…', 'ms-recipes-writer-ai' ),
+				'reloadToSee' => __( 'Rechargez la page pour voir le catalogue à jour.', 'ms-recipes-writer-ai' ),
+				/* translators: %d is a number of models. */
+				'modelsListed' => __( '%d modèle(s)', 'ms-recipes-writer-ai' ),
+				'nothingToPrice' => __( 'Rien à chercher : chaque modèle servi a déjà un tarif.', 'ms-recipes-writer-ai' ),
+				/* translators: 1: number of prices found, 2: number asked about. */
+				'pricesFound' => __( '%1$d tarif(s) trouvé(s) sur %2$d demandé(s).', 'ms-recipes-writer-ai' ),
+				'pricesAreIndicative' => __( 'Ces tarifs sont une indication à vérifier, jamais une facture. Rechargez la page.', 'ms-recipes-writer-ai' ),
 				'saved' => __( 'Appariement enregistré.', 'ms-recipes-writer-ai' ),
 				'sending' => __( 'Envoi au moteur…', 'ms-recipes-writer-ai' ),
 				'retrying' => __( 'Reprise…', 'ms-recipes-writer-ai' ),
