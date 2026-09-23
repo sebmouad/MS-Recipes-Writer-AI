@@ -712,9 +712,13 @@
         .map(function (box) { return parseInt(box.value, 10); });
     }
 
+    var bulkDo = document.getElementById('ms-bulk-do');
+
+    // Nothing is preselected: an action that stops or deletes recipes is
+    // chosen, never inherited from the first line of a list.
     function countPicked() {
       var n = picked().length;
-      go.disabled = 0 === n;
+      go.disabled = 0 === n || '' === bulkDo.value;
       say(bulkStatus, n ? (1 === n ? t.onePicked : (t.manyPicked || '').replace('%d', n)) : '');
     }
 
@@ -725,11 +729,12 @@
     rail.addEventListener('change', function (event) {
       if (event.target.classList.contains('ms-pick-run')) { countPicked(); }
     });
+    bulkDo.addEventListener('change', countPicked);
 
     go.addEventListener('click', function () {
       var runs = picked();
-      var action = document.getElementById('ms-bulk-do').value;
-      if (!runs.length) return;
+      var action = bulkDo.value;
+      if (!runs.length || !action) return;
       // Deleting destroys the record of what was spent and cannot be undone,
       // so it is the one action that asks first.
       if ('delete' === action && !window.confirm((t.confirmDelete || '').replace('%d', runs.length))) return;

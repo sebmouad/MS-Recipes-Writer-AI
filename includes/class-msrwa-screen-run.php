@@ -134,12 +134,13 @@ final class MSRWA_Screen_Run {
 		echo '<p>' . esc_html__( 'L’avis du moteur sur sa propre production. Ce n’est pas une validation éditoriale : c’est à vous de décider si l’article part.', 'ms-recipes-writer-ai' ) . '</p>';
 
 		$figures = array();
-		foreach ( array(
+		$targets = array(
 			'article' => __( 'article', 'ms-recipes-writer-ai' ),
 			'featured_image' => __( 'image à la une', 'ms-recipes-writer-ai' ),
 			'facebook_image' => __( 'collage', 'ms-recipes-writer-ai' ),
 			'consistency' => __( 'cohérence', 'ms-recipes-writer-ai' ),
-		) as $key => $label ) {
+		);
+		foreach ( $targets as $key => $label ) {
 			$entry = (array) ( $approval[ $key ] ?? array() );
 			if ( empty( $entry['verdict'] ) ) { continue; }
 			$figures[] = array( 'label' => $label, 'value' => self::verdict_word( (string) $entry['verdict'] ), 'note' => (string) ( $entry['summary'] ?? '' ) );
@@ -158,7 +159,7 @@ final class MSRWA_Screen_Run {
 			$blocking = 'blocking' === ( $finding['severity'] ?? '' );
 			echo '<tr><td><span class="ms-state ms-state-' . ( $blocking ? 'stop' : 'warn' ) . '">'
 				. esc_html( $blocking ? __( 'bloquante', 'ms-recipes-writer-ai' ) : __( 'mineure', 'ms-recipes-writer-ai' ) ) . '</span></td>'
-				. '<td class="ms-key">' . esc_html( (string) ( $finding['target'] ?? '' ) ) . '</td>'
+				. '<td>' . esc_html( $targets[ (string) ( $finding['target'] ?? '' ) ] ?? (string) ( $finding['target'] ?? '' ) ) . '</td>'
 				. '<td>' . esc_html( (string) ( $finding['reason'] ?? '' ) );
 			if ( ! empty( $finding['quote'] ) ) { echo '<small>« ' . esc_html( (string) $finding['quote'] ) . ' »</small>'; }
 			if ( ! empty( $finding['fix'] ) ) { echo '<small><strong>' . esc_html__( 'Correction :', 'ms-recipes-writer-ai' ) . '</strong> ' . esc_html( (string) $finding['fix'] ) . '</small>'; }
@@ -212,7 +213,7 @@ final class MSRWA_Screen_Run {
 			if ( MSRWA_Rights::may_see_money() ) {
 				echo '<td class="ms-num">' . esc_html( null === $step['cost_usd'] ? __( 'tarif inconnu', 'ms-recipes-writer-ai' ) : MSRWA_I18N::money( $step['cost_usd'] ) ) . '</td>';
 			}
-			echo '<td class="ms-num">' . esc_html( null === $step['passed'] ? '—' : $step['passed'] . ' / ' . $step['total'] ) . '</td><td>';
+			echo '<td class="ms-num">' . esc_html( null === $step['passed'] ? '—' : $step['passed'] . ' / ' . $step['total'] ) . '</td><td class="ms-wrap">';
 			$failed = array_filter( (array) $step['checks'], static function ( $check ) { return is_array( $check ) && empty( $check['pass'] ); } );
 			if ( ! $failed ) { echo '—'; }
 			foreach ( $failed as $label => $check ) {

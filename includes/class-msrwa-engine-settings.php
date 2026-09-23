@@ -20,25 +20,25 @@ final class MSRWA_Engine_Settings {
 	/** Groups a person tunes by hand. */
 	public static function simple() {
 		return array(
-			'routing'    => 'Quel fournisseur et quel niveau pour chaque étape, sous la forme `fournisseur:niveau` ou `fournisseur:modèle`.',
-			'max_output' => 'Plafond de tokens en sortie, par étape. Une réponse coupée est facturée entière.',
-			'thinking'   => 'Réflexion permise avant de répondre, par étape : `minimal`, `low`, `medium` ou `high` ; vide, le fournisseur décide. La réflexion est facturée comme de la sortie et prise sur le plafond.',
-			'attempts'   => 'Nombre de tentatives, par étape.',
-			'limits'     => 'Délais, concurrence, taille des images inspectées. Le budget vient du lot.',
-			'images'     => 'Format, qualité, dimensions et nombre de panneaux du collage.',
-			'thresholds' => 'Les seuils au-dessus desquels une étape est considérée réussie.',
+			'routing'    => __( 'Quel fournisseur et quel niveau pour chaque étape, sous la forme `fournisseur:niveau` ou `fournisseur:modèle`.', 'ms-recipes-writer-ai' ),
+			'max_output' => __( 'Plafond de tokens en sortie, par étape. Une réponse coupée est facturée entière.', 'ms-recipes-writer-ai' ),
+			'thinking'   => __( 'Réflexion permise avant de répondre, par étape : `minimal`, `low`, `medium` ou `high` ; vide, le fournisseur décide. La réflexion est facturée comme de la sortie et prise sur le plafond.', 'ms-recipes-writer-ai' ),
+			'attempts'   => __( 'Nombre de tentatives, par étape.', 'ms-recipes-writer-ai' ),
+			'limits'     => __( 'Délais, concurrence, taille des images inspectées. Le budget vient du lot.', 'ms-recipes-writer-ai' ),
+			'images'     => __( 'Format, qualité, dimensions et nombre de panneaux du collage.', 'ms-recipes-writer-ai' ),
+			'thresholds' => __( 'Les seuils au-dessus desquels une étape est considérée réussie.', 'ms-recipes-writer-ai' ),
 		);
 	}
 
 	/** Groups that are structures rather than settings, edited as JSON. */
 	public static function structural() {
 		return array(
-			'providers' => 'Points d’entrée, en-têtes et variable d’environnement par fournisseur.',
-			'models'    => 'Tarifs par million de tokens : `[entrée, sortie]`. Un modèle sans tarif rend la dépense invérifiable et arrête le run.',
-			'tiers'     => 'Quel modèle répond derrière `low`, `medium` et `high`.',
-			'steps'     => 'Le registre des étapes : dépendances, capacité, gabarit, poste de dépense.',
-			'prompts'   => 'Gabarits de prompt qui remplacent ceux livrés avec le moteur.',
-			'observation_fields' => 'Les champs d’observation qui atteignent un prompt d’image.',
+			'providers' => __( 'Points d’entrée, en-têtes et variable d’environnement par fournisseur.', 'ms-recipes-writer-ai' ),
+			'models'    => __( 'Tarifs par million de tokens : `[entrée, sortie]`. Un modèle sans tarif rend la dépense invérifiable et arrête le run.', 'ms-recipes-writer-ai' ),
+			'tiers'     => __( 'Quel modèle répond derrière `low`, `medium` et `high`.', 'ms-recipes-writer-ai' ),
+			'steps'     => __( 'Le registre des étapes : dépendances, capacité, gabarit, poste de dépense.', 'ms-recipes-writer-ai' ),
+			'prompts'   => __( 'Gabarits de prompt qui remplacent ceux livrés avec le moteur.', 'ms-recipes-writer-ai' ),
+			'observation_fields' => __( 'Les champs d’observation qui atteignent un prompt d’image.', 'ms-recipes-writer-ai' ),
 		);
 	}
 

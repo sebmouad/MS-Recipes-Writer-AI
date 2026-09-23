@@ -77,4 +77,20 @@ $html = msrwa_analysis_html(
 );
 msrwa_test_missing( $html, 'Où part l’argent', 'A single bucket is the total, and the total is already on screen.' );
 
+// --- What the judge decided, after the drafts took the verdicts ----------
+
+// A draft keeps the verdict in its post meta and the run's own copy is
+// released; counting artifacts alone reported one judged run out of twenty-six.
+msrwa_test_as_admin();
+$GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
+$GLOBALS['wpdb']->on( '_msrwa_judge_report', array(
+	array( 'approved' => '1', 'verdict' => json_encode( array( 'approved' => true, 'article' => array( 'verdict' => 'good' ), 'findings' => array( array( 'severity' => 'minor' ) ) ) ) ),
+	array( 'approved' => '0', 'verdict' => json_encode( array( 'approved' => false, 'article' => array( 'verdict' => 'bad' ), 'findings' => array( array( 'severity' => 'blocking' ) ) ) ) ),
+	array( 'approved' => '1', 'verdict' => null ),
+) );
+$verdicts = MSRWA_Ledger::verdicts( 30 );
+msrwa_test_assert( 3 === $verdicts['judged'] && 2 === $verdicts['approved'], 'Every judged run counts, from the run row, whether or not its verdict is still at hand; got ' . $verdicts['judged'] . ' judged, ' . $verdicts['approved'] . ' approved.' );
+msrwa_test_assert( 2 === $verdicts['findings'] && 1 === $verdicts['blocking'], 'Findings are read from the draft\'s copy of the verdict.' );
+msrwa_test_contains( $GLOBALS['wpdb']->log(), 'wp_postmeta', 'The draft\'s post meta is read.' );
+
 msrwa_test_done( 'analytics across many runs' );

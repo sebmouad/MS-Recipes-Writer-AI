@@ -220,16 +220,22 @@ final class MSRWA_Ledger {
 		$scope = MSRWA_Rights::scope_sql( 'r.owner_id' );
 		$since = $days > 0 ? $wpdb->prepare( ' AND r.created_at >= DATE_SUB(UTC_TIMESTAMP(), INTERVAL %d DAY)', (int) $days ) : '';
 
-		$rows = (array) $wpdb->get_col(
-			"SELECT a.content_json FROM {$t['artifacts']} a INNER JOIN {$t['runs']} r ON r.id = a.run_id
-			WHERE {$scope}{$since} AND a.artifact_key = 'approval'" );
+		// Once a draft exists the verdict lives in its post meta and this
+		// plugin's copy is released, so reading the artifact alone counted one
+		// judged run out of twenty-six. The decision itself is on the run row,
+		// which is never released; the findings come from wherever the verdict is.
+		$rows = (array) $wpdb->get_results(
+			"SELECT r.approved, COALESCE(a.content_json, pm.meta_value) AS verdict FROM {$t['runs']} r
+			LEFT JOIN {$t['artifacts']} a ON a.run_id = r.id AND a.artifact_key = 'approval'
+			LEFT JOIN {$wpdb->postmeta} pm ON pm.post_id = r.draft_post_id AND r.draft_post_id > 0 AND pm.meta_key = '_msrwa_judge_report'
+			WHERE {$scope}{$since} AND r.approved IS NOT NULL", ARRAY_A );
 
 		$out = array( 'judged' => 0, 'approved' => 0, 'findings' => 0, 'blocking' => 0, 'targets' => array() );
-		foreach ( $rows as $json ) {
-			$verdict = json_decode( (string) $json, true );
-			if ( ! is_array( $verdict ) ) { continue; }
+		foreach ( $rows as $row ) {
 			$out['judged']++;
-			if ( ! empty( $verdict['approved'] ) ) { $out['approved']++; }
+			if ( (int) $row['approved'] ) { $out['approved']++; }
+			$verdict = json_decode( (string) $row['verdict'], true );
+			if ( ! is_array( $verdict ) ) { continue; }
 			foreach ( (array) ( $verdict['findings'] ?? array() ) as $finding ) {
 				$out['findings']++;
 				if ( 'blocking' === ( $finding['severity'] ?? '' ) ) { $out['blocking']++; }

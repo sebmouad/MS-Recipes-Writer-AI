@@ -35,10 +35,19 @@ final class MSRWA_Screen_Pass {
 
 		self::warnings();
 
+		// Somebody who has never sent a recipe learns nothing from four zeros.
+		// They get the three things that will happen instead, and the button.
+		if ( ! $moving['total'] && ! $attention['total'] && ! MSRWA_Ledger::runs( array( 'per_page' => 1 ) )['total'] ) {
+			self::queue();
+			self::welcome();
+			echo '</div>';
+			return;
+		}
+
 		$figures = array(
 			array( 'label' => __( 'en cours', 'ms-recipes-writer-ai' ), 'value' => number_format_i18n( $now['moving'] ) ),
 			array( 'label' => __( 'à relire', 'ms-recipes-writer-ai' ), 'value' => number_format_i18n( $now['to_read'] ), 'note' => __( 'brouillons prêts', 'ms-recipes-writer-ai' ) ),
-			array( 'label' => __( 'réserves du juge', 'ms-recipes-writer-ai' ), 'value' => number_format_i18n( $now['reserved'] ) ),
+			array( 'label' => __( 'à corriger', 'ms-recipes-writer-ai' ), 'value' => number_format_i18n( $now['reserved'] ) ),
 			array( 'label' => __( 'échecs', 'ms-recipes-writer-ai' ), 'value' => number_format_i18n( $now['failed'] ) ),
 		);
 		if ( $money ) {
@@ -62,6 +71,26 @@ final class MSRWA_Screen_Pass {
 		}
 
 		echo '</div>';
+	}
+
+	/** The first visit: what a lot is, in the order it happens. */
+	private static function welcome() {
+		$steps = array(
+			array( __( 'Déposez un lot', 'ms-recipes-writer-ai' ), __( 'Collez une ou plusieurs recettes, séparées par une ligne de tirets, et ajoutez leurs photographies depuis votre ordinateur, sans dire laquelle va avec quoi.', 'ms-recipes-writer-ai' ) ),
+			array( __( 'Vérifiez l’appariement', 'ms-recipes-writer-ai' ), __( 'Chaque photographie est rapprochée de sa recette. Corrigez si besoin, puis lancez : rien n’est écrit avant.', 'ms-recipes-writer-ai' ) ),
+			array( __( 'Relisez les brouillons', 'ms-recipes-writer-ai' ), __( 'Chaque recette devient un brouillon WordPress avec son article, ses images et les remarques du contrôle final. Rien n’est jamais publié sans vous.', 'ms-recipes-writer-ai' ) ),
+		);
+		?>
+		<section class="ms-card ms-welcome">
+			<h2><?php esc_html_e( 'Comment ça marche', 'ms-recipes-writer-ai' ); ?></h2>
+			<ol class="ms-welcome-steps">
+				<?php foreach ( $steps as $step ) : ?>
+					<li><strong><?php echo esc_html( $step[0] ); ?></strong><span><?php echo esc_html( $step[1] ); ?></span></li>
+				<?php endforeach; ?>
+			</ol>
+			<p><a class="button button-primary button-hero" href="<?php echo esc_url( admin_url( 'admin.php?page=msrwa-compose' ) ); ?>"><?php esc_html_e( 'Déposer mon premier lot', 'ms-recipes-writer-ai' ); ?></a></p>
+		</section>
+		<?php
 	}
 
 	/**

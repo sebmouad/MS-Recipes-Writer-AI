@@ -9,8 +9,14 @@ require_once dirname( __DIR__ ) . '/includes/class-msrwa-match.php';
 
 $normalise = new ReflectionMethod( MSRWA_Match::class, 'normalise' );
 $normalise->setAccessible( true );
-$images = array( array( 'file' => 'a.jpg' ), array( 'file' => 'b.jpg' ), array( 'file' => 'c.jpg' ) );
+$images = array( array( 'file' => 'a.jpg', 'dish' => 'tarte aux pommes' ), array( 'file' => 'b.jpg', 'dish' => 'poulet yassa' ), array( 'file' => 'c.jpg', 'dish' => 'daube' ) );
 $clean = function ( $pairs, $recipes = 2 ) use ( $normalise, $images ) { return $normalise->invoke( null, $pairs, $recipes, $images ); };
+
+// A photograph on which no dish could be recognised is never paired by the
+// model, however sure it claims to be: "in doubt, do not pair" is a promise
+// the screen makes, so the code keeps it.
+$blank = $normalise->invoke( null, array( array( 'image' => 0, 'recipe' => 0, 'confidence' => 'haute', 'why' => 'aucun plat visible' ) ), 1, array( array( 'file' => 'brun.jpg', 'dish' => '' ) ) );
+msrwa_test_assert( null === $blank[0]['recipe'] && 'basse' === $blank[0]['confidence'], 'A photograph with no recognised dish waits for the writer.' );
 
 // Every photograph comes back, whether or not the answer mentioned it.
 $all = $clean( array( array( 'image' => 0, 'recipe' => 1, 'confidence' => 'haute', 'why' => 'ok' ) ) );

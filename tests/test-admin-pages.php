@@ -51,7 +51,8 @@ msrwa_test_assert( MSRWA_Rights::may_see_money(), 'An administrator is shown the
 // A finished run is work waiting for an editor, never work that was approved.
 msrwa_test_assert( 'en cours' === MSRWA_UI::state_of( array( 'status' => 'running' ) )['label'], 'A run in flight says so.' );
 msrwa_test_assert( 'à relire' === MSRWA_UI::state_of( array( 'status' => 'done', 'approved' => 1 ) )['label'], 'A finished run waits for a reader; it is never called approved.' );
-msrwa_test_contains( MSRWA_UI::state_of( array( 'status' => 'done', 'approved' => 0 ) )['label'], 'réserves', 'A judge’s objection is reported as the judge’s, not as a failure.' );
+$refused = MSRWA_UI::state_of( array( 'status' => 'done', 'approved' => 0 ) );
+msrwa_test_assert( 'à corriger' === $refused['label'] && 'warn' === $refused['tone'], 'A refused article says the editor has something to fix, and is not reported as a failure.' );
 msrwa_test_assert( 'échec' === MSRWA_UI::state_of( array( 'status' => 'failed' ) )['label'], 'A failure says so plainly.' );
 
 // --- The menu says how much is waiting, for this reader ------------------

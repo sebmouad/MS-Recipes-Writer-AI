@@ -8,6 +8,7 @@
 class MSRWA_Fake_Wpdb {
 	public $prefix = 'wp_';
 	public $posts = 'wp_posts';
+	public $postmeta = 'wp_postmeta';
 	public $insert_id = 0;
 	public $queries = array();
 	private $handlers = array();

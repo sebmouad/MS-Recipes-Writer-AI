@@ -5,9 +5,9 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.18.8
+## État actuel — 0.18.9
 
-La version `0.18.8` réserve l’extension, renommée « MS Recipes AI » dans le menu, à ceux qui peuvent téléverser des fichiers ; la `0.18.7` disait juste ce que fait le plafond par recette ; la `0.18.6` rangeait les photographies envoyées avec le brouillon qu’elles ont servi à écrire ; la `0.18.5` faisait passer un lot de trois recettes en 8 minutes pour 0,125 $ la recette, toutes approuvées ; la `0.18.4` faisait envoyer les photographies d’un lot depuis l’ordinateur du rédacteur ; la `0.18.3` faisait approuver les trois recettes d’un lot réel aux réglages par défaut — image à la une en `low`, collage en `medium` — pour 0,132 $ en moyenne ; la `0.18.2` permettait de choisir le modèle et la qualité de chaque image
+La version `0.18.9` reprend chaque écran après une revue complète dans le navigateur ; la `0.18.8` réservait l’extension, renommée « MS Recipes AI » dans le menu, à ceux qui peuvent téléverser des fichiers ; la `0.18.7` disait juste ce que fait le plafond par recette ; la `0.18.6` rangeait les photographies envoyées avec le brouillon qu’elles ont servi à écrire ; la `0.18.5` faisait passer un lot de trois recettes en 8 minutes pour 0,125 $ la recette, toutes approuvées ; la `0.18.4` faisait envoyer les photographies d’un lot depuis l’ordinateur du rédacteur ; la `0.18.3` faisait approuver les trois recettes d’un lot réel aux réglages par défaut — image à la une en `low`, collage en `medium` — pour 0,132 $ en moyenne ; la `0.18.2` permettait de choisir le modèle et la qualité de chaque image
 séparément ; la `0.18.1` fait tenir le plafond par recette jusque dans les reprises
 de l’approbation finale ; la `0.18.0` ramène une recette complète à environ 0,11 $ réels —
 recherche web comprise — sans perte de qualité mesurée ; la `0.17.0` faisait
@@ -74,6 +74,43 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.18.9
+
+**Chaque écran repris après une revue complète dans le navigateur**, en
+administrateur et en auteur, sur ordinateur et sur téléphone.
+
+- *Première visite.* Un rédacteur qui n’a encore rien envoyé ne voit plus
+  quatre zéros : le pass explique en trois étapes ce qui va se passer — déposer
+  un lot, vérifier l’appariement, relire les brouillons — avec le bouton pour
+  commencer.
+- *« À corriger ».* Un article refusé par le contrôle final s’affichait
+  « réserves du juge » ; il dit maintenant ce que l’éditeur a à faire.
+- *Actions groupées.* La liste des articles proposait « Arrêter » par défaut :
+  un « Appliquer » distrait arrêtait les recettes cochées. Il faut désormais
+  choisir l’action.
+- *Appariement.* Une photographie sur laquelle aucun plat n’est reconnu
+  n’est plus jamais associée d’office, même si le modèle s’en dit sûr : un
+  aplat brun avait été rattaché à une tarte « avec confiance ». Le rédacteur
+  l’associe à la main si elle appartient à une recette.
+- *Analyse.* Le bloc du juge comptait un seul article jugé sur vingt-six : il
+  lisait une copie du verdict que l’extension efface une fois le brouillon
+  créé. Il lit désormais la décision sur la recette et les remarques dans le
+  brouillon.
+- *Moteur.* Les groupes JSON sont repliés (ils s’ouvrent d’eux-mêmes quand
+  l’un d’eux a été modifié) : la page passe de près de 10 000 à environ
+  3 000 pixels. Les noms d’étapes et les descriptions des groupes sont
+  traduits, et le registre des étapes indique le vrai modèle des images et
+  « aucun » pour les corrections appliquées en code.
+- *Modèles.* Les cases « étapes qu’il a le droit de servir » débordaient de la
+  carte ; elles passent à la ligne, traduites, et un modèle d’image ne se voit
+  plus proposer que les étapes d’image (et inversement).
+- *Recette.* Les avis du juge se lisent en texte courant et non plus en
+  police à chasse fixe ; les contrôles non tenus passent à la ligne au lieu
+  de sortir de la carte ; « porte sur » dit « collage » plutôt que
+  `facebook_image`.
+- *Menu.* Sur les pages d’un lot ou d’une recette, le menu « MS Recipes AI »
+  reste ouvert, avec le pass ou les articles en surbrillance.
 
 ## Version 0.18.8
 

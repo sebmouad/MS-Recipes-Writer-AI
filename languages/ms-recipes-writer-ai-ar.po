@@ -1720,6 +1720,87 @@ msgstr "مع التوجيه الحالي، تُقدَّر الوصفة الكا�
 msgid "Le plafond par recette est plus bas : il arrête les nouvelles tentatives avant de le franchir, la recette se termine et le dernier verdict va au rédacteur."
 msgstr "سقف الوصفة أقل من ذلك: يوقف المحاولات الإضافية قبل تجاوزه، وتكتمل الوصفة ويذهب آخر حكم إلى المحرر."
 
+msgid "Choisir…"
+msgstr "اختر…"
+
+msgid "à corriger"
+msgstr "للتصحيح"
+
+msgid "Délais, concurrence, taille des images inspectées. Le budget vient du lot."
+msgstr "المهل والتزامن وحجم الصور المفحوصة. تأتي الميزانية من الدفعة."
+
+msgid "Format, qualité, dimensions et nombre de panneaux du collage."
+msgstr "الصيغة والجودة والأبعاد وعدد لوحات الكولاج."
+
+msgid "Gabarits de prompt qui remplacent ceux livrés avec le moteur."
+msgstr "قوالب التعليمات التي تحل محل المرفقة بالمحرك."
+
+msgid "Le registre des étapes : dépendances, capacité, gabarit, poste de dépense."
+msgstr "سجل الخطوات: التبعيات والقدرة والقالب وبند الإنفاق."
+
+msgid "Les champs d’observation qui atteignent un prompt d’image."
+msgstr "حقول الملاحظة التي تصل إلى تعليمات الصورة."
+
+msgid "Les seuils au-dessus desquels une étape est considérée réussie."
+msgstr "العتبات التي تُعدّ الخطوة فوقها ناجحة."
+
+msgid "Nombre de tentatives, par étape."
+msgstr "عدد المحاولات لكل خطوة."
+
+msgid "Plafond de tokens en sortie, par étape. Une réponse coupée est facturée entière."
+msgstr "سقف رموز الإخراج لكل خطوة. الإجابة المقطوعة تُحتسب كاملة."
+
+msgid "Points d’entrée, en-têtes et variable d’environnement par fournisseur."
+msgstr "نقاط الوصول والترويسات ومتغير البيئة لكل مزوّد."
+
+msgid "Quel fournisseur et quel niveau pour chaque étape, sous la forme `fournisseur:niveau` ou `fournisseur:modèle`."
+msgstr "أي مزوّد وأي مستوى لكل خطوة، بصيغة `provider:level` أو `provider:model`."
+
+msgid "Quel modèle répond derrière `low`, `medium` et `high`."
+msgstr "أي نموذج يجيب خلف `low` و`medium` و`high`."
+
+msgid "Réflexion permise avant de répondre, par étape : `minimal`, `low`, `medium` ou `high` ; vide, le fournisseur décide. La réflexion est facturée comme de la sortie et prise sur le plafond."
+msgstr "التفكير المسموح قبل الإجابة لكل خطوة: `minimal` أو `low` أو `medium` أو `high`؛ وإن تُرك فارغًا يقرر المزوّد. يُحتسب التفكير كمخرجات ويُقتطع من السقف."
+
+msgid "Tarifs par million de tokens : `[entrée, sortie]`. Un modèle sans tarif rend la dépense invérifiable et arrête le run."
+msgstr "الأسعار لكل مليون رمز: `[إدخال، إخراج]`. النموذج بلا سعر يجعل الإنفاق غير قابل للتحقق ويوقف التشغيل."
+
+msgid "%d groupe en JSON, pour une modification à la main"
+msgid_plural "%d groupes en JSON, pour une modification à la main"
+msgstr[0] "لا مجموعات JSON"
+msgstr[1] "مجموعة JSON واحدة للتعديل اليدوي"
+msgstr[2] "مجموعتا JSON للتعديل اليدوي"
+msgstr[3] "%d مجموعات JSON للتعديل اليدوي"
+msgstr[4] "%d مجموعة JSON للتعديل اليدوي"
+msgstr[5] "%d مجموعة JSON للتعديل اليدوي"
+
+msgid "aucun — appliqué en code"
+msgstr "لا شيء — يُطبَّق برمجيًا"
+
+msgid "Chaque photographie est rapprochée de sa recette. Corrigez si besoin, puis lancez : rien n’est écrit avant."
+msgstr "تُطابَق كل صورة مع وصفتها. صحّح ذلك إن لزم ثم أطلق الدفعة: لا يُكتب شيء قبل ذلك."
+
+msgid "Chaque recette devient un brouillon WordPress avec son article, ses images et les remarques du contrôle final. Rien n’est jamais publié sans vous."
+msgstr "تصبح كل وصفة مسودة ووردبريس مع مقالها وصورها وملاحظات الفحص النهائي. لا يُنشر شيء أبدًا من دونك."
+
+msgid "Collez une ou plusieurs recettes, séparées par une ligne de tirets, et ajoutez leurs photographies depuis votre ordinateur, sans dire laquelle va avec quoi."
+msgstr "الصق وصفة أو أكثر، يفصل بينها سطر من الشرطات، وأضف صورها من حاسوبك دون تحديد أيها لأي وصفة."
+
+msgid "Comment ça marche"
+msgstr "كيف يعمل"
+
+msgid "Déposez un lot"
+msgstr "أرسل دفعة"
+
+msgid "Vérifiez l’appariement"
+msgstr "تحقق من المطابقة"
+
+msgid "Relisez les brouillons"
+msgstr "راجع المسودات"
+
+msgid "Déposer mon premier lot"
+msgstr "إرسال دفعتي الأولى"
+
 msgid "aucune page citée"
 msgstr "لم تُذكر أي صفحة"
 

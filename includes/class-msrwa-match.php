@@ -159,12 +159,19 @@ final class MSRWA_Match {
 			if ( $image < 0 || $image >= count( $images ) || isset( $taken[ $image ] ) ) { continue; }
 			$recipe = isset( $pair['recipe'] ) && null !== $pair['recipe'] ? (int) $pair['recipe'] : null;
 			if ( null !== $recipe && ( $recipe < 0 || $recipe >= (int) $recipe_count ) ) { $recipe = null; }
+			$confidence = in_array( (string) ( $pair['confidence'] ?? '' ), array( 'haute', 'moyenne', 'basse' ), true ) ? (string) $pair['confidence'] : 'basse';
+			$why = mb_substr( (string) ( $pair['why'] ?? '' ), 0, 300 );
+			// "In doubt, do not pair" is a promise on screen, so it is kept here
+			// and not left to the model: a live pairing gave a plain brown square
+			// to a tart "with confidence" while saying no dish was visible. A
+			// photograph nobody could name waits for the writer.
+			if ( null !== $recipe && '' === trim( (string) ( $images[ $image ]['dish'] ?? '' ) ) ) {
+				$recipe = null;
+				$confidence = 'basse';
+				$why = 'Aucun plat reconnu sur la photographie : à associer à la main si elle appartient à une recette.';
+			}
 			$taken[ $image ] = true;
-			$out[] = array(
-				'image' => $image, 'recipe' => $recipe,
-				'confidence' => in_array( (string) ( $pair['confidence'] ?? '' ), array( 'haute', 'moyenne', 'basse' ), true ) ? (string) $pair['confidence'] : 'basse',
-				'why' => mb_substr( (string) ( $pair['why'] ?? '' ), 0, 300 ),
-			);
+			$out[] = array( 'image' => $image, 'recipe' => $recipe, 'confidence' => $confidence, 'why' => $why );
 		}
 		// A photograph the answer never mentioned is unassigned, not missing.
 		foreach ( array_keys( $images ) as $image ) {
@@ -177,7 +184,7 @@ final class MSRWA_Match {
 	 * The brief for one recipe, in the shape the engine's `run()` takes.
 	 *
 	 * The engine defines this shape; the plugin fills it. The writer's own text
-	 * is the instruction, and the photographs he paired with it are the images
+	 * is the instruction, and the photographs they paired with it are the images
 	 * the engine will observe.
 	 */
 	public static function brief( array $recipe, array $images ) {

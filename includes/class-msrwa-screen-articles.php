@@ -105,6 +105,7 @@ final class MSRWA_Screen_Articles {
 			<div>
 				<label for="ms-bulk-do"><?php esc_html_e( 'Action', 'ms-recipes-writer-ai' ); ?></label>
 				<select id="ms-bulk-do">
+					<option value="" selected><?php esc_html_e( 'Choisir…', 'ms-recipes-writer-ai' ); ?></option>
 					<option value="cancel"><?php esc_html_e( 'Arrêter', 'ms-recipes-writer-ai' ); ?></option>
 					<option value="retry"><?php esc_html_e( 'Reprendre', 'ms-recipes-writer-ai' ); ?></option>
 					<?php if ( MSRWA_Rights::may_manage() ) : ?>

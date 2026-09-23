@@ -17,7 +17,34 @@ final class MSRWA_Admin {
 		add_action( 'admin_post_msrwa_report', array( 'MSRWA_Operations', 'report' ) );
 		add_action( 'admin_post_msrwa_export', array( 'MSRWA_Export', 'send' ) );
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'assets' ) );
+		add_action( 'admin_head', array( __CLASS__, 'unlist_hidden' ) );
+		add_filter( 'parent_file', array( __CLASS__, 'parent_file' ) );
+		add_filter( 'submenu_file', array( __CLASS__, 'submenu_file' ) );
 	}
+
+	/**
+	 * The lot and recipe screens have no menu entry of their own, so WordPress
+	 * showed the whole menu folded while one was open. They belong under the
+	 * plugin's menu: a recipe under Articles, a lot under the pass.
+	 */
+	private static function hidden_parent() {
+		$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification
+		return array( 'msrwa-batch' => 'msrwa', 'msrwa-run' => 'msrwa-articles' )[ $page ] ?? '';
+	}
+
+	/**
+	 * WordPress recomputes the parent right after the `parent_file` filter,
+	 * finds the page under `options.php`, and folds the menu again. Access has
+	 * already been checked by then, so the entry can go before the menu is drawn.
+	 */
+	public static function unlist_hidden() {
+		$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification
+		if ( '' !== self::hidden_parent() ) { remove_submenu_page( 'options.php', $page ); }
+	}
+
+	public static function parent_file( $file ) { return '' !== self::hidden_parent() ? 'msrwa' : $file; }
+
+	public static function submenu_file( $file ) { return '' !== self::hidden_parent() ? self::hidden_parent() : $file; }
 
 	/** In the order the work happens: the pass, submitting, the record, the levers. */
 	public static function menu() {

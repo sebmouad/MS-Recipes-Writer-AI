@@ -11,11 +11,11 @@ msgstr ""
 msgid " et %d autres"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:230
+#: class-msrwa-screen-engine.php:243
 msgid "$%1$s entrée / $%2$s sortie par million de jetons"
 msgstr ""
 
-#: class-msrwa-screen-pass.php:96
+#: class-msrwa-screen-pass.php:125
 msgid "%1$d en attente, %2$d en cours"
 msgstr ""
 
@@ -27,7 +27,7 @@ msgstr ""
 msgid "%1$d min %2$d s"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:332
+#: class-msrwa-screen-engine.php:354
 msgid "%1$d modèle(s) servis d’après le fournisseur, relevés le %2$s."
 msgstr ""
 
@@ -43,7 +43,7 @@ msgstr ""
 msgid "%1$d traitée(s), %2$d ignorée(s) : l’action ne s’appliquait pas, ou elles ne vous appartiennent pas."
 msgstr ""
 
-#: class-msrwa-ui.php:167
+#: class-msrwa-ui.php:169
 msgid "%1$d étapes sur %2$d"
 msgstr ""
 
@@ -70,6 +70,12 @@ msgstr ""
 #: class-msrwa-screen-analysis.php:167
 msgid "%d au total"
 msgstr ""
+
+#: class-msrwa-screen-engine.php:71
+msgid "%d groupe en JSON, pour une modification à la main"
+msgid_plural "%d groupes en JSON, pour une modification à la main"
+msgstr[0] ""
+msgstr[1] ""
 
 #: class-msrwa-admin.php:127
 msgid "%d modèle(s)"
@@ -109,7 +115,7 @@ msgstr[1] ""
 msgid "%d étape(s) ont tourné sur un modèle sans tarif publié. Le coût de cette recette est incomplet, pas exact."
 msgstr ""
 
-#: class-msrwa-screen-pass.php:50
+#: class-msrwa-screen-pass.php:59
 msgid "%d étape(s) sans tarif publié"
 msgstr ""
 
@@ -181,7 +187,7 @@ msgstr ""
 msgid "Anglais"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:128
+#: class-msrwa-screen-engine.php:139
 msgid "Anthropic Claude"
 msgstr ""
 
@@ -201,7 +207,7 @@ msgstr ""
 msgid "Application…"
 msgstr ""
 
-#: class-msrwa-screen-articles.php:119
+#: class-msrwa-screen-articles.php:120
 msgid "Appliquer"
 msgstr ""
 
@@ -209,7 +215,7 @@ msgstr ""
 msgid "Arabe"
 msgstr ""
 
-#: class-msrwa-screen-articles.php:108
+#: class-msrwa-screen-articles.php:109
 msgid "Arrêter"
 msgstr ""
 
@@ -217,11 +223,11 @@ msgstr ""
 msgid "Arrêtez les recettes avant de supprimer le lot."
 msgstr ""
 
-#: class-msrwa-ui.php:113
+#: class-msrwa-ui.php:115
 msgid "Arrêtée à la demande. Elle peut être reprise là où elle s’était arrêtée."
 msgstr ""
 
-#: class-msrwa-screen-articles.php:133
+#: class-msrwa-screen-articles.php:134
 msgid "Arrêtés"
 msgstr ""
 
@@ -253,7 +259,7 @@ msgstr ""
 msgid "Association sûre"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:282
+#: class-msrwa-screen-engine.php:295
 msgid "Attend"
 msgstr ""
 
@@ -289,7 +295,7 @@ msgstr ""
 msgid "Aucun plafond n’arrête de travail en ce moment."
 msgstr ""
 
-#: class-msrwa-screen-pass.php:114
+#: class-msrwa-screen-pass.php:143
 msgid "Aucune clé d’API n’est enregistrée, donc rien ne peut être généré. %s"
 msgstr ""
 
@@ -341,7 +347,7 @@ msgstr ""
 msgid "Bloquant"
 msgstr ""
 
-#: class-msrwa-ui.php:210
+#: class-msrwa-ui.php:212
 msgid "Brouillon"
 msgstr ""
 
@@ -377,7 +383,7 @@ msgstr ""
 msgid "Ce que chaque article doit être. Ces réglages atteignent directement les prompts et les contrôles du moteur."
 msgstr ""
 
-#: class-msrwa-screen-engine.php:272 class-msrwa-screen-engine.php:278
+#: class-msrwa-screen-engine.php:285 class-msrwa-screen-engine.php:291
 msgid "Ce que fait le moteur, étape par étape"
 msgstr ""
 
@@ -385,7 +391,7 @@ msgstr ""
 msgid "Ce que le juge a relevé"
 msgstr ""
 
-#: class-msrwa-screen-models.php:168
+#: class-msrwa-screen-models.php:178
 msgid "Ce que le moteur reçoit"
 msgstr ""
 
@@ -409,7 +415,7 @@ msgstr ""
 msgid "Ce qui est en cours, ce qui attend une relecture, et ce qui s’est arrêté."
 msgstr ""
 
-#: class-msrwa-screen-engine.php:105
+#: class-msrwa-screen-engine.php:116
 msgid "Ce qui est réellement transmis au moteur"
 msgstr ""
 
@@ -449,6 +455,14 @@ msgstr ""
 msgid "Chaque photographie a été décrite depuis ses propres pixels, puis rapprochée d’une recette. Dans le doute, le modèle n’associe pas : une photographie laissée de côté coûte moins cher qu’une photographie attribuée au mauvais plat."
 msgstr ""
 
+#: class-msrwa-screen-pass.php:80
+msgid "Chaque photographie est rapprochée de sa recette. Corrigez si besoin, puis lancez : rien n’est écrit avant."
+msgstr ""
+
+#: class-msrwa-screen-pass.php:81
+msgid "Chaque recette devient un brouillon WordPress avec son article, ses images et les remarques du contrôle final. Rien n’est jamais publié sans vous."
+msgstr ""
+
 #: class-msrwa-screen-compose.php:58
 msgid "Chaque recette suit le même chemin. Les montants sont calculés depuis le routage et les tarifs réellement configurés — ce sont des estimations, jamais une facture."
 msgstr ""
@@ -465,7 +479,7 @@ msgstr ""
 msgid "Chaque étape a une clé et un tarif publié."
 msgstr ""
 
-#: class-msrwa-screen-models.php:75
+#: class-msrwa-screen-models.php:79
 msgid "Chercher les tarifs manquants"
 msgstr ""
 
@@ -477,6 +491,10 @@ msgstr ""
 msgid "Choisir sur mon ordinateur"
 msgstr ""
 
+#: class-msrwa-screen-articles.php:108
+msgid "Choisir…"
+msgstr ""
+
 #: class-msrwa-admin.php:158
 msgid "Clé présente"
 msgstr ""
@@ -485,12 +503,20 @@ msgstr ""
 msgid "Clés d’API"
 msgstr ""
 
-#: class-msrwa-ui.php:84
+#: class-msrwa-ui.php:86
 msgid "Collage Facebook"
+msgstr ""
+
+#: class-msrwa-screen-pass.php:79
+msgid "Collez une ou plusieurs recettes, séparées par une ligne de tirets, et ajoutez leurs photographies depuis votre ordinateur, sans dire laquelle va avec quoi."
 msgstr ""
 
 #: class-msrwa-screen-compose.php:20
 msgid "Collez vos recettes et ajoutez les photographies. Elles seront décrites puis associées ; vous confirmez l’appariement avant que quoi que ce soit ne soit généré."
+msgstr ""
+
+#: class-msrwa-screen-pass.php:85
+msgid "Comment ça marche"
 msgstr ""
 
 #: class-msrwa-operations.php:20
@@ -501,7 +527,7 @@ msgstr ""
 msgid "Contrôle"
 msgstr ""
 
-#: class-msrwa-ui.php:89
+#: class-msrwa-ui.php:91
 msgid "Contrôle final"
 msgstr ""
 
@@ -529,7 +555,7 @@ msgstr ""
 msgid "Correction :"
 msgstr ""
 
-#: class-msrwa-ui.php:88
+#: class-msrwa-ui.php:90
 msgid "Correction de la langue"
 msgstr ""
 
@@ -537,7 +563,7 @@ msgstr ""
 msgid "Correction proposée :"
 msgstr ""
 
-#: class-msrwa-ui.php:87
+#: class-msrwa-ui.php:89
 msgid "Corrections"
 msgstr ""
 
@@ -561,7 +587,7 @@ msgstr ""
 msgid "Coût moy."
 msgstr ""
 
-#: class-msrwa-screen-models.php:76
+#: class-msrwa-screen-models.php:80
 msgid "Coûte quelques centimes. Un modèle avec recherche web lit les pages de tarifs des fournisseurs. Ce qu’il rapporte est marqué « trouvé par IA » et cite sa page : c’est une indication à vérifier, jamais une facture. Un tarif saisi à la main n’est jamais remplacé."
 msgstr ""
 
@@ -573,7 +599,7 @@ msgstr ""
 msgid "DISABLE_WP_CRON est actif. C’est la configuration recommandée, mais elle suppose qu’un cron serveur appelle wp-cron.php : sans lui, les recettes resteront en attente indéfiniment."
 msgstr ""
 
-#: class-msrwa-screen-pass.php:123
+#: class-msrwa-screen-pass.php:152
 msgid "DISABLE_WP_CRON est actif. Les lots n’avanceront que si un cron serveur appelle wp-cron.php ; sans cela ils resteront en attente sans rien signaler."
 msgstr ""
 
@@ -581,11 +607,11 @@ msgstr ""
 msgid "Date illisible."
 msgstr ""
 
-#: class-msrwa-screen-articles.php:130 class-msrwa-screen-pass.php:61
+#: class-msrwa-screen-articles.php:131 class-msrwa-screen-pass.php:70
 msgid "Demande une décision"
 msgstr ""
 
-#: class-msrwa-screen-models.php:72
+#: class-msrwa-screen-models.php:76
 msgid "Demande à chaque fournisseur la liste de ce qu’il sert, gratuitement, puis cherche aussitôt le tarif des nouveaux modèles qui n’en ont pas : quelques centimes, et seulement s’il en manque. Aucun fournisseur ne publie ses tarifs par API."
 msgstr ""
 
@@ -645,7 +671,11 @@ msgstr ""
 msgid "Décrire et apparier"
 msgstr ""
 
-#: class-msrwa-screen-pass.php:143
+#: class-msrwa-engine-settings.php:27
+msgid "Délais, concurrence, taille des images inspectées. Le budget vient du lot."
+msgstr ""
+
+#: class-msrwa-screen-pass.php:172
 msgid "Départ"
 msgstr ""
 
@@ -653,12 +683,20 @@ msgstr ""
 msgid "Dépense"
 msgstr ""
 
-#: class-msrwa-screen-pass.php:58
+#: class-msrwa-screen-pass.php:91
+msgid "Déposer mon premier lot"
+msgstr ""
+
+#: class-msrwa-screen-pass.php:67
 msgid "Déposez des recettes et des photographies pour lancer un lot."
 msgstr ""
 
 #: class-msrwa-screen-articles.php:72
 msgid "Déposez des recettes et des photographies pour lancer un premier lot."
+msgstr ""
+
+#: class-msrwa-screen-pass.php:79
+msgid "Déposez un lot"
 msgstr ""
 
 #: class-msrwa-screen-run.php:261 class-msrwa-screen-settings.php:222
@@ -669,11 +707,11 @@ msgstr ""
 msgid "Désactivez puis réactivez l’extension : l’installation des tables se rejoue à l’activation."
 msgstr ""
 
-#: class-msrwa-screen-models.php:96
+#: class-msrwa-screen-models.php:100
 msgid "D’où vient ce tarif"
 msgstr ""
 
-#: class-msrwa-ui.php:106
+#: class-msrwa-ui.php:108
 msgid "En attente : la file est suspendue par un administrateur. Elle repartira d’elle-même quand la file reprendra."
 msgstr ""
 
@@ -681,19 +719,19 @@ msgstr ""
 msgid "En attente de : %s, qui n’est jamais arrivé."
 msgstr ""
 
-#: class-msrwa-ui.php:107
+#: class-msrwa-ui.php:109
 msgid "En attente de son tour. Elle partira d’elle-même ; rien à faire."
 msgstr ""
 
-#: class-msrwa-screen-articles.php:129 class-msrwa-screen-pass.php:58
+#: class-msrwa-screen-articles.php:130 class-msrwa-screen-pass.php:67
 msgid "En cours"
 msgstr ""
 
-#: class-msrwa-ui.php:111
+#: class-msrwa-ui.php:113
 msgid "En cours d’écriture : %1$d étape(s) sur %2$d. Vous pouvez quitter cette page, le travail continue."
 msgstr ""
 
-#: class-msrwa-screen-models.php:169
+#: class-msrwa-screen-models.php:179
 msgid "Engendré par ce tableau, puis remis au moteur comme couche appelante. Les niveaux sont le moins cher, le milieu et le plus cher de ce que ce site a vraiment — c’est ce qui empêche un niveau de désigner un modèle que personne n’a tarifé ou que le fournisseur a retiré. Seules les étapes de texte passent par un niveau ; la génération d’image nomme son modèle directement."
 msgstr ""
 
@@ -701,7 +739,7 @@ msgstr ""
 msgid "Enregistrement…"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:94 class-msrwa-screen-models.php:136 class-msrwa-screen-settings.php:131
+#: class-msrwa-screen-engine.php:105 class-msrwa-screen-models.php:146 class-msrwa-screen-settings.php:131
 msgid "Enregistrer"
 msgstr ""
 
@@ -733,11 +771,11 @@ msgstr ""
 msgid "Entrée"
 msgstr ""
 
-#: class-msrwa-screen-models.php:94
+#: class-msrwa-screen-models.php:98
 msgid "Entrée $/M"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:343
+#: class-msrwa-screen-engine.php:365
 msgid "Entrée / sortie par million"
 msgstr ""
 
@@ -765,7 +803,7 @@ msgstr ""
 msgid "Exéc."
 msgstr ""
 
-#: class-msrwa-screen-articles.php:111 class-msrwa-screen-run.php:97
+#: class-msrwa-screen-articles.php:112 class-msrwa-screen-run.php:97
 msgid "Faire passer devant"
 msgstr ""
 
@@ -785,7 +823,11 @@ msgstr ""
 msgid "Fixez un plafond de dépense par recette."
 msgstr ""
 
-#: class-msrwa-screen-engine.php:240
+#: class-msrwa-engine-settings.php:28
+msgid "Format, qualité, dimensions et nombre de panneaux du collage."
+msgstr ""
+
+#: class-msrwa-screen-engine.php:253
 msgid "Fournisseur et niveau"
 msgstr ""
 
@@ -797,7 +839,11 @@ msgstr ""
 msgid "GD est nécessaire pour conserver le collage entier au ratio demandé."
 msgstr ""
 
-#: class-msrwa-screen-engine.php:127
+#: class-msrwa-engine-settings.php:40
+msgid "Gabarits de prompt qui remplacent ceux livrés avec le moteur."
+msgstr ""
+
+#: class-msrwa-screen-engine.php:138
 msgid "Google Gemini"
 msgstr ""
 
@@ -805,7 +851,7 @@ msgstr ""
 msgid "Gravité"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:146
+#: class-msrwa-screen-engine.php:159
 msgid "Génération d’image (à la une et collage Facebook)"
 msgstr ""
 
@@ -821,7 +867,7 @@ msgstr ""
 msgid "Image Facebook"
 msgstr ""
 
-#: class-msrwa-draft.php:181 class-msrwa-ui.php:83
+#: class-msrwa-draft.php:181 class-msrwa-ui.php:85
 msgid "Image à la une"
 msgstr ""
 
@@ -853,7 +899,7 @@ msgstr ""
 msgid "JSON invalide, donc ignoré pour : %s. Le reste a bien été enregistré, et ces groupes gardent leur valeur précédente."
 msgstr ""
 
-#: class-msrwa-screen-engine.php:336
+#: class-msrwa-screen-engine.php:358
 msgid "Jamais interrogé. « Vérifier les clés », dans les réglages, relève la liste sans rien dépenser."
 msgstr ""
 
@@ -861,7 +907,7 @@ msgstr ""
 msgid "La chaîne complète, jugement final compris : c’est le seul moment où le texte et les deux images sont confrontés."
 msgstr ""
 
-#: class-msrwa-screen-engine.php:106
+#: class-msrwa-screen-engine.php:117
 msgid "La couche appelante, telle quelle : ce qui a été saisi ici, plus les modèles et les niveaux que la page Modèles engendre. Vide signifie que tout suit le moteur."
 msgstr ""
 
@@ -869,11 +915,11 @@ msgstr ""
 msgid "La dépense du site entier, pas celle d’un rédacteur : un plafond appartient au site, et quelqu’un qui n’en verrait que sa part ne comprendrait jamais pourquoi son lot a été refusé."
 msgstr ""
 
-#: class-msrwa-screen-engine.php:236
+#: class-msrwa-screen-engine.php:249
 msgid "La façon courante de changer une route : un fournisseur, un niveau. Ceci réécrit le champ « routing » plus bas à chaque changement ; ce qui y est modifié à la main reste possible et prévaut en cas de désaccord entre les deux après un chargement de page."
 msgstr ""
 
-#: class-msrwa-screen-pass.php:88
+#: class-msrwa-screen-pass.php:117
 msgid "La file"
 msgstr ""
 
@@ -881,11 +927,11 @@ msgstr ""
 msgid "La file est suspendue ; %d recette(s) attendent."
 msgstr ""
 
-#: class-msrwa-screen-pass.php:90
+#: class-msrwa-screen-pass.php:119
 msgid "La file est suspendue. Rien de nouveau ne part ; ce qui est déjà commencé garde tout ce qui a été fait et reprendra à l’endroit exact."
 msgstr ""
 
-#: class-msrwa-screen-pass.php:83
+#: class-msrwa-screen-pass.php:112
 msgid "La file n’avance pas : la plus ancienne recette attend depuis %s et rien ne tourne. Sur un site peu visité, c’est le cron."
 msgstr ""
 
@@ -913,11 +959,11 @@ msgstr ""
 msgid "La narration minute par minute. La table qui grossit le plus vite, et celle que personne ne relit."
 msgstr ""
 
-#: class-msrwa-ui.php:158
+#: class-msrwa-ui.php:160
 msgid "La recette s’est arrêtée avant la fin. La reprendre relance seulement ce qui a échoué."
 msgstr ""
 
-#: class-msrwa-ui.php:156
+#: class-msrwa-ui.php:158
 msgid "La recette s’est arrêtée à l’étape « %s ». La reprendre relance seulement ce qui a échoué."
 msgstr ""
 
@@ -951,19 +997,19 @@ msgstr ""
 msgid "Le brouillon a été modifié depuis sa génération : %s caractères d’écart. Les contrôles ci-dessous portent sur ce que la machine a écrit, pas sur la version actuelle."
 msgstr ""
 
-#: class-msrwa-ui.php:120
+#: class-msrwa-ui.php:122
 msgid "Le brouillon est prêt à être relu. Rien n’est publié tant que vous ne le décidez pas."
 msgstr ""
 
-#: class-msrwa-ui.php:118
+#: class-msrwa-ui.php:120
 msgid "Le brouillon est prêt, mais le contrôle final a relevé des points à vérifier. Lisez-les avant de publier."
 msgstr ""
 
-#: class-msrwa-screen-models.php:89 class-msrwa-screen-models.php:90
+#: class-msrwa-screen-models.php:93 class-msrwa-screen-models.php:94
 msgid "Le catalogue"
 msgstr ""
 
-#: class-msrwa-ui.php:134
+#: class-msrwa-ui.php:136
 msgid "Le compte du service d’écriture n’a plus de crédit. Un administrateur doit le recharger, puis reprendre la recette : rien de ce qui est fait n’est perdu."
 msgstr ""
 
@@ -1027,7 +1073,7 @@ msgstr ""
 msgid "Le pass → « Reprendre la file » quand vous voulez qu’elles repartent."
 msgstr ""
 
-#: class-msrwa-ui.php:143
+#: class-msrwa-ui.php:145
 msgid "Le plafond de dépense de cette recette a été atteint avant la fin. Ce qui est fait est gardé ; un administrateur peut relever le plafond et la reprendre."
 msgstr ""
 
@@ -1043,7 +1089,7 @@ msgstr ""
 msgid "Le plafond par recette est plus bas : il arrête les nouvelles tentatives avant de le franchir, la recette se termine et le dernier verdict va au rédacteur."
 msgstr ""
 
-#: class-msrwa-screen-engine.php:275
+#: class-msrwa-screen-engine.php:288
 msgid "Le profil complet en compte %s. Une étape part dès que tout ce dont elle dépend est prêt : c’est ce qui découpe une recette en vagues, et ce qui fait qu’une reprise ne repaie pas ce qui a réussi."
 msgstr ""
 
@@ -1051,23 +1097,27 @@ msgstr ""
 msgid "Le quota du compte a été atteint récemment chez : %s. La clé est bonne ; la limite est du côté du fournisseur."
 msgstr ""
 
+#: class-msrwa-engine-settings.php:39
+msgid "Le registre des étapes : dépendances, capacité, gabarit, poste de dépense."
+msgstr ""
+
 #: class-msrwa-diagnostics.php:66
 msgid "Le schéma enregistré est %1$d ; cette version en attend %2$d."
 msgstr ""
 
-#: class-msrwa-ui.php:140
+#: class-msrwa-ui.php:142
 msgid "Le service d’écriture a refusé la clé du site. Un administrateur doit la vérifier dans les réglages, puis reprendre la recette."
 msgstr ""
 
-#: class-msrwa-ui.php:152
+#: class-msrwa-ui.php:154
 msgid "Le service d’écriture n’a pas répondu à temps. Reprendre la recette suffit en général : rien de ce qui est fait n’est perdu."
 msgstr ""
 
-#: class-msrwa-ui.php:149
+#: class-msrwa-ui.php:151
 msgid "Le service d’écriture refuse d’en traiter davantage pour le moment : c’est une limite de son côté, pas du site. Reprendre la recette plus tard suffit souvent ; si cela se répète, la limite du compte doit être relevée chez le fournisseur."
 msgstr ""
 
-#: class-msrwa-ui.php:137
+#: class-msrwa-ui.php:139
 msgid "Le site n’est relié à aucun service d’écriture pour une étape de cette recette. Un administrateur doit enregistrer la clé, puis la reprendre."
 msgstr ""
 
@@ -1075,7 +1125,7 @@ msgstr ""
 msgid "Le total est incomplet : %s tourne(nt) sur un modèle sans tarif publié."
 msgstr ""
 
-#: class-msrwa-ui.php:115
+#: class-msrwa-ui.php:117
 msgid "Le travail est terminé, mais aucun brouillon n’a pu être créé. Un administrateur doit regarder le détail."
 msgstr ""
 
@@ -1083,12 +1133,16 @@ msgstr ""
 msgid "Lecture des pages de tarifs…"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:144
+#: class-msrwa-screen-engine.php:157
 msgid "Lecture des photographies (appariement, observation avant génération)"
 msgstr ""
 
 #: class-msrwa-screen-settings.php:85
 msgid "Les articles"
+msgstr ""
+
+#: class-msrwa-engine-settings.php:41
+msgid "Les champs d’observation qui atteignent un prompt d’image."
 msgstr ""
 
 #: class-msrwa-screen-settings.php:21
@@ -1127,11 +1181,15 @@ msgstr ""
 msgid "Les recettes seront générées sans photographie fournie : le moteur cherchera ses propres références."
 msgstr ""
 
+#: class-msrwa-engine-settings.php:29
+msgid "Les seuils au-dessus desquels une étape est considérée réussie."
+msgstr ""
+
 #: class-msrwa-diagnostics.php:73
 msgid "Les six tables sont là, schéma %d."
 msgstr ""
 
-#: class-msrwa-screen-engine.php:322
+#: class-msrwa-screen-engine.php:344
 msgid "Les tarifs sont saisis à la main d’après la page de chaque fournisseur : aucune API ne les donne, et une estimation ne vaut que ce qu’ils valent. La liste des identifiants, elle, vient du fournisseur lui-même et se met à jour à chaque « Vérifier les clés »."
 msgstr ""
 
@@ -1139,7 +1197,7 @@ msgstr ""
 msgid "Longueur"
 msgstr ""
 
-#: class-msrwa-admin.php:50 class-msrwa-screen-pass.php:141
+#: class-msrwa-admin.php:50 class-msrwa-screen-pass.php:170
 msgid "Lot"
 msgstr ""
 
@@ -1175,7 +1233,7 @@ msgstr ""
 msgid "MS Recipes AI — à vérifier avant publication"
 msgstr ""
 
-#: class-msrwa-screen-models.php:69
+#: class-msrwa-screen-models.php:73
 msgid "Mettre le catalogue à jour"
 msgstr ""
 
@@ -1187,15 +1245,15 @@ msgstr ""
 msgid "Modifiez la grille dans Modèles, ou routez ces étapes autrement."
 msgstr ""
 
-#: class-msrwa-screen-analysis.php:220 class-msrwa-screen-engine.php:284 class-msrwa-screen-engine.php:341 class-msrwa-screen-models.php:93 class-msrwa-screen-run.php:200 class-msrwa-screen-run.php:232
+#: class-msrwa-screen-analysis.php:220 class-msrwa-screen-engine.php:297 class-msrwa-screen-engine.php:363 class-msrwa-screen-models.php:97 class-msrwa-screen-run.php:200 class-msrwa-screen-run.php:232
 msgid "Modèle"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:235
+#: class-msrwa-screen-engine.php:248
 msgid "Modèle par étape"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:241
+#: class-msrwa-screen-engine.php:254
 msgid "Modèle qui tournera"
 msgstr ""
 
@@ -1203,7 +1261,7 @@ msgstr ""
 msgid "Modèles"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:321
+#: class-msrwa-screen-engine.php:343
 msgid "Modèles et tarifs"
 msgstr ""
 
@@ -1223,7 +1281,7 @@ msgstr ""
 msgid "Nettoyer maintenant"
 msgstr ""
 
-#: class-msrwa-screen-models.php:175
+#: class-msrwa-screen-models.php:185
 msgid "Niveau"
 msgstr ""
 
@@ -1235,6 +1293,10 @@ msgstr ""
 msgid "Nombre de mots maximal"
 msgstr ""
 
+#: class-msrwa-engine-settings.php:26
+msgid "Nombre de tentatives, par étape."
+msgstr ""
+
 #: class-msrwa-screen-batch.php:98
 msgid "Non décrite."
 msgstr ""
@@ -1243,19 +1305,19 @@ msgstr ""
 msgid "Non vérifiable :"
 msgstr ""
 
-#: class-msrwa-admin.php:33 class-msrwa-screen-articles.php:34 class-msrwa-screen-articles.php:73 class-msrwa-screen-compose.php:19 class-msrwa-screen-pass.php:33 class-msrwa-screen-pass.php:164
+#: class-msrwa-admin.php:33 class-msrwa-screen-articles.php:34 class-msrwa-screen-articles.php:73 class-msrwa-screen-compose.php:19 class-msrwa-screen-pass.php:33 class-msrwa-screen-pass.php:193
 msgid "Nouveau lot"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:247
+#: class-msrwa-screen-engine.php:260
 msgid "Nécessite JavaScript ; sans cela, utilisez directement le champ « routing » ci-dessous."
 msgstr ""
 
-#: class-msrwa-screen-engine.php:126
+#: class-msrwa-screen-engine.php:137
 msgid "OpenAI"
 msgstr ""
 
-#: class-msrwa-screen-pass.php:156
+#: class-msrwa-screen-pass.php:185
 msgid "Ouvrir"
 msgstr ""
 
@@ -1263,7 +1325,7 @@ msgstr ""
 msgid "Ouvrir le brouillon"
 msgstr ""
 
-#: class-msrwa-screen-pass.php:115
+#: class-msrwa-screen-pass.php:144
 msgid "Ouvrir les réglages"
 msgstr ""
 
@@ -1299,12 +1361,16 @@ msgstr ""
 msgid "Pas de collage. Le jugement final s’exécute quand même et confronte le texte à l’image produite ; il n’a simplement pas de collage à comparer."
 msgstr ""
 
-#: class-msrwa-screen-pass.php:139 class-msrwa-screen-pass.php:140
+#: class-msrwa-screen-pass.php:168 class-msrwa-screen-pass.php:169
 msgid "Pas encore parti"
 msgstr ""
 
 #: class-msrwa-screen-batch.php:128
 msgid "Peu sûr — à confirmer"
+msgstr ""
+
+#: class-msrwa-engine-settings.php:24
+msgid "Plafond de tokens en sortie, par étape. Une réponse coupée est facturée entière."
 msgstr ""
 
 #: class-msrwa-screen-compose.php:91
@@ -1327,6 +1393,10 @@ msgstr ""
 msgid "Plus tard"
 msgstr ""
 
+#: class-msrwa-engine-settings.php:36
+msgid "Points d’entrée, en-têtes et variable d’environnement par fournisseur."
+msgstr ""
+
 #: class-msrwa-screen-run.php:154
 msgid "Porte sur"
 msgstr ""
@@ -1343,7 +1413,7 @@ msgstr ""
 msgid "Productions lourdes"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:283
+#: class-msrwa-screen-engine.php:296
 msgid "Produit"
 msgstr ""
 
@@ -1355,7 +1425,7 @@ msgstr ""
 msgid "Proposée par défaut sur chaque nouveau lot. Un lot peut toujours en demander une autre."
 msgstr ""
 
-#: class-msrwa-screen-engine.php:92
+#: class-msrwa-screen-engine.php:103
 msgid "Prévisualiser"
 msgstr ""
 
@@ -1365,6 +1435,14 @@ msgstr ""
 
 #: class-msrwa-screen-settings.php:116
 msgid "Publier la recette en données structurées (Recipe JSON-LD)"
+msgstr ""
+
+#: class-msrwa-engine-settings.php:23
+msgid "Quel fournisseur et quel niveau pour chaque étape, sous la forme `fournisseur:niveau` ou `fournisseur:modèle`."
+msgstr ""
+
+#: class-msrwa-engine-settings.php:38
+msgid "Quel modèle répond derrière `low`, `medium` et `high`."
 msgstr ""
 
 #: class-msrwa-screen-diagnostics.php:34
@@ -1391,7 +1469,7 @@ msgstr ""
 msgid "Recette"
 msgstr ""
 
-#: class-msrwa-ui.php:81
+#: class-msrwa-ui.php:83
 msgid "Recette de référence"
 msgstr ""
 
@@ -1403,7 +1481,7 @@ msgstr ""
 msgid "Recette pour la photographie %s"
 msgstr ""
 
-#: class-msrwa-screen-batch.php:171 class-msrwa-screen-pass.php:142
+#: class-msrwa-screen-batch.php:171 class-msrwa-screen-pass.php:171
 msgid "Recettes"
 msgstr ""
 
@@ -1419,27 +1497,31 @@ msgstr ""
 msgid "Rechargez n’importe quel écran d’administration : la migration se déclenche au premier chargement après une mise à jour."
 msgstr ""
 
-#: class-msrwa-ui.php:80
+#: class-msrwa-ui.php:82
 msgid "Recherche"
 msgstr ""
 
-#: class-msrwa-ui.php:85
+#: class-msrwa-ui.php:87
 msgid "Relecture éditoriale"
 msgstr ""
 
-#: class-msrwa-screen-models.php:71
+#: class-msrwa-screen-models.php:75
 msgid "Relever les modèles chez les fournisseurs"
+msgstr ""
+
+#: class-msrwa-screen-pass.php:81
+msgid "Relisez les brouillons"
 msgstr ""
 
 #: class-msrwa-screen-run.php:97
 msgid "Remettre dans l’ordre"
 msgstr ""
 
-#: class-msrwa-screen-articles.php:109 class-msrwa-screen-run.php:89
+#: class-msrwa-screen-articles.php:110 class-msrwa-screen-run.php:89
 msgid "Reprendre"
 msgstr ""
 
-#: class-msrwa-screen-pass.php:103
+#: class-msrwa-screen-pass.php:132
 msgid "Reprendre la file"
 msgstr ""
 
@@ -1463,7 +1545,7 @@ msgstr ""
 msgid "Retour au pass"
 msgstr ""
 
-#: class-msrwa-screen-models.php:171
+#: class-msrwa-screen-models.php:181
 msgid "Rien d’engendré : aucun modèle tarifé et connu pour écrire. Les valeurs par défaut du moteur s’appliquent."
 msgstr ""
 
@@ -1471,7 +1553,7 @@ msgstr ""
 msgid "Rien ne correspond"
 msgstr ""
 
-#: class-msrwa-screen-pass.php:58
+#: class-msrwa-screen-pass.php:67
 msgid "Rien ne tourne."
 msgstr ""
 
@@ -1523,7 +1605,7 @@ msgstr ""
 msgid "Rédacteur"
 msgstr ""
 
-#: class-msrwa-ui.php:82
+#: class-msrwa-ui.php:84
 msgid "Rédaction"
 msgstr ""
 
@@ -1531,8 +1613,12 @@ msgstr ""
 msgid "Réflexion"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:242
+#: class-msrwa-screen-engine.php:255
 msgid "Réflexion ou qualité"
+msgstr ""
+
+#: class-msrwa-engine-settings.php:25
+msgid "Réflexion permise avant de répondre, par étape : `minimal`, `low`, `medium` ou `high` ; vide, le fournisseur décide. La réflexion est facturée comme de la sortie et prise sur le plafond."
 msgstr ""
 
 #: class-msrwa-editor.php:113 class-msrwa-editor.php:222
@@ -1551,11 +1637,11 @@ msgstr ""
 msgid "Réglages → Plafonds de dépense, ou attendez la fenêtre suivante."
 msgstr ""
 
-#: class-msrwa-screen-engine.php:93
+#: class-msrwa-screen-engine.php:104
 msgid "Résout ce qui est à l’écran sans l’enregistrer et sans appeler personne."
 msgstr ""
 
-#: class-msrwa-screen-engine.php:342
+#: class-msrwa-screen-engine.php:364
 msgid "Sait faire"
 msgstr ""
 
@@ -1575,7 +1661,7 @@ msgstr ""
 msgid "Score"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:344
+#: class-msrwa-screen-engine.php:366
 msgid "Servi"
 msgstr ""
 
@@ -1595,7 +1681,7 @@ msgstr ""
 msgid "Sortie"
 msgstr ""
 
-#: class-msrwa-screen-models.php:95
+#: class-msrwa-screen-models.php:99
 msgid "Sortie $/M"
 msgstr ""
 
@@ -1607,7 +1693,7 @@ msgstr ""
 msgid "Structures"
 msgstr ""
 
-#: class-msrwa-screen-articles.php:114
+#: class-msrwa-screen-articles.php:115
 msgid "Supprimer"
 msgstr ""
 
@@ -1643,7 +1729,7 @@ msgstr ""
 msgid "Sur trente jours"
 msgstr ""
 
-#: class-msrwa-screen-pass.php:103
+#: class-msrwa-screen-pass.php:132
 msgid "Suspendre la file"
 msgstr ""
 
@@ -1655,7 +1741,7 @@ msgstr ""
 msgid "Sélection"
 msgstr ""
 
-#: class-msrwa-ui.php:186
+#: class-msrwa-ui.php:188
 msgid "Sélectionner %s"
 msgstr ""
 
@@ -1675,6 +1761,10 @@ msgstr ""
 msgid "Tarif connu"
 msgstr ""
 
+#: class-msrwa-engine-settings.php:37
+msgid "Tarifs par million de tokens : `[entrée, sortie]`. Un modèle sans tarif rend la dépense invérifiable et arrête le run."
+msgstr ""
+
 #: class-msrwa-screen-compose.php:36
 msgid "Tarte aux pommes normande\nPâte brisée, pommes, crème, calvados…\n\n---\n\nPoulet yassa\nPoulet, oignons, citron…"
 msgstr ""
@@ -1687,7 +1777,7 @@ msgstr ""
 msgid "Temps"
 msgstr ""
 
-#: class-msrwa-screen-articles.php:131
+#: class-msrwa-screen-articles.php:132
 msgid "Terminés"
 msgstr ""
 
@@ -1707,7 +1797,7 @@ msgstr ""
 msgid "Titre qui ouvre la seconde page"
 msgstr ""
 
-#: class-msrwa-screen-articles.php:54 class-msrwa-screen-articles.php:128
+#: class-msrwa-screen-articles.php:54 class-msrwa-screen-articles.php:129
 msgid "Tous"
 msgstr ""
 
@@ -1715,7 +1805,7 @@ msgstr ""
 msgid "Tout"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:378
+#: class-msrwa-screen-engine.php:400
 msgid "Tout ce que le fournisseur sert"
 msgstr ""
 
@@ -1795,7 +1885,7 @@ msgstr ""
 msgid "Une recette de ce lot est estimée à %1$s, au-dessus de son plafond de %2$s : elle s’arrêterait en route après avoir dépensé. Relevez le plafond ou choisissez une sortie plus légère."
 msgstr ""
 
-#: class-msrwa-screen-engine.php:84
+#: class-msrwa-screen-engine.php:94
 msgid "Valeur par défaut du moteur"
 msgstr ""
 
@@ -1815,11 +1905,11 @@ msgstr ""
 msgid "Vous n’avez pas accès à cet export."
 msgstr ""
 
-#: class-msrwa-admin.php:173 class-msrwa-admin.php:181 class-msrwa-screen-analysis.php:16 class-msrwa-screen-articles.php:15 class-msrwa-screen-batch.php:16 class-msrwa-screen-compose.php:15 class-msrwa-screen-diagnostics.php:14 class-msrwa-screen-engine.php:16 class-msrwa-screen-models.php:19 class-msrwa-screen-models.php:199 class-msrwa-screen-pass.php:14 class-msrwa-screen-run.php:15 class-msrwa-screen-settings.php:15
+#: class-msrwa-admin.php:173 class-msrwa-admin.php:181 class-msrwa-screen-analysis.php:16 class-msrwa-screen-articles.php:15 class-msrwa-screen-batch.php:16 class-msrwa-screen-compose.php:15 class-msrwa-screen-diagnostics.php:14 class-msrwa-screen-engine.php:16 class-msrwa-screen-models.php:19 class-msrwa-screen-models.php:209 class-msrwa-screen-pass.php:14 class-msrwa-screen-run.php:15 class-msrwa-screen-settings.php:15
 msgid "Vous n’avez pas accès à cet écran."
 msgstr ""
 
-#: class-msrwa-ui.php:86
+#: class-msrwa-ui.php:88
 msgid "Vérification des faits"
 msgstr ""
 
@@ -1829,6 +1919,10 @@ msgstr ""
 
 #: class-msrwa-screen-settings.php:50
 msgid "Vérifier les clés"
+msgstr ""
+
+#: class-msrwa-screen-pass.php:80
+msgid "Vérifiez l’appariement"
 msgstr ""
 
 #: class-msrwa-diagnostics.php:216 class-msrwa-screen-settings.php:195
@@ -1859,7 +1953,7 @@ msgstr ""
 msgid "article"
 msgstr ""
 
-#: class-msrwa-screen-pass.php:153
+#: class-msrwa-screen-pass.php:182
 msgid "attend votre confirmation"
 msgstr ""
 
@@ -1871,16 +1965,20 @@ msgstr ""
 msgid "aucun modèle disponible n’a pu lire la page du fournisseur"
 msgstr ""
 
-#: class-msrwa-screen-models.php:144
+#: class-msrwa-screen-models.php:154
 msgid "aucun tarif"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:227
+#: class-msrwa-screen-engine.php:240
 msgid "aucun tarif connu — le coût de cette étape ne peut pas être estimé"
 msgstr ""
 
 #: class-msrwa-prices.php:220
 msgid "aucun tarif trouvé sur la page du fournisseur"
+msgstr ""
+
+#: class-msrwa-screen-engine.php:316
+msgid "aucun — appliqué en code"
 msgstr ""
 
 #: class-msrwa-screen-settings.php:45
@@ -1919,7 +2017,7 @@ msgstr ""
 msgid "bon"
 msgstr ""
 
-#: class-msrwa-screen-pass.php:40
+#: class-msrwa-screen-pass.php:49
 msgid "brouillons prêts"
 msgstr ""
 
@@ -1963,7 +2061,7 @@ msgstr ""
 msgid "coût"
 msgstr ""
 
-#: class-msrwa-screen-pass.php:46
+#: class-msrwa-screen-pass.php:55
 msgid "coût moyen"
 msgstr ""
 
@@ -1991,7 +2089,7 @@ msgstr ""
 msgid "en attente"
 msgstr ""
 
-#: class-msrwa-screen-pass.php:39 class-msrwa-ui.php:63
+#: class-msrwa-screen-pass.php:48 class-msrwa-ui.php:63
 msgid "en cours"
 msgstr ""
 
@@ -2003,7 +2101,7 @@ msgstr ""
 msgid "groupes modifiés"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:350
+#: class-msrwa-screen-engine.php:372
 msgid "génération d’image"
 msgstr ""
 
@@ -2023,11 +2121,11 @@ msgstr ""
 msgid "injoignable depuis ce serveur : le pare-feu de l’hébergeur bloque peut-être la sortie"
 msgstr ""
 
-#: class-msrwa-screen-models.php:112
+#: class-msrwa-screen-models.php:116
 msgid "jamais relevé"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:229
+#: class-msrwa-screen-engine.php:242
 msgid "jamais vérifié auprès du fournisseur"
 msgstr ""
 
@@ -2039,7 +2137,7 @@ msgstr ""
 msgid "jugés"
 msgstr ""
 
-#: class-msrwa-screen-models.php:156
+#: class-msrwa-screen-models.php:166
 msgid "la page citée"
 msgstr ""
 
@@ -2055,11 +2153,11 @@ msgstr ""
 msgid "langue"
 msgstr ""
 
-#: class-msrwa-screen-models.php:110
+#: class-msrwa-screen-models.php:114
 msgid "le fournisseur ne le sert plus"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:228
+#: class-msrwa-screen-engine.php:241
 msgid "le fournisseur ne sert pas ce nom : l’étape échouera"
 msgstr ""
 
@@ -2075,11 +2173,11 @@ msgstr ""
 msgid "le serveur"
 msgstr ""
 
-#: class-msrwa-screen-models.php:151
+#: class-msrwa-screen-models.php:161
 msgid "livré avec l’extension"
 msgstr ""
 
-#: class-msrwa-screen-models.php:150
+#: class-msrwa-screen-models.php:160
 msgid "lu sur la page du fournisseur"
 msgstr ""
 
@@ -2103,7 +2201,7 @@ msgstr ""
 msgid "mineure"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:74
+#: class-msrwa-screen-engine.php:84
 msgid "modifié"
 msgstr ""
 
@@ -2115,19 +2213,19 @@ msgstr ""
 msgid "mots"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:366
+#: class-msrwa-screen-engine.php:388
 msgid "non"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:368
+#: class-msrwa-screen-engine.php:390
 msgid "non vérifié"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:364
+#: class-msrwa-screen-engine.php:386
 msgid "oui"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:226
+#: class-msrwa-screen-engine.php:239
 msgid "par défaut"
 msgstr ""
 
@@ -2135,11 +2233,11 @@ msgstr ""
 msgid "par recette"
 msgstr ""
 
-#: class-msrwa-screen-pass.php:51
+#: class-msrwa-screen-pass.php:60
 msgid "par recette, sur 30 jours"
 msgstr ""
 
-#: class-msrwa-ui.php:203
+#: class-msrwa-ui.php:205
 msgid "passe devant"
 msgstr ""
 
@@ -2163,7 +2261,7 @@ msgstr ""
 msgid "recettes"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:350
+#: class-msrwa-screen-engine.php:372
 msgid "recherche web"
 msgstr ""
 
@@ -2175,7 +2273,7 @@ msgstr ""
 msgid "retirés"
 msgstr ""
 
-#: class-msrwa-screen-models.php:127
+#: class-msrwa-screen-models.php:137
 msgid "rien de coché : aucune restriction"
 msgstr ""
 
@@ -2183,15 +2281,11 @@ msgstr ""
 msgid "réserves"
 msgstr ""
 
-#: class-msrwa-screen-pass.php:41 class-msrwa-ui.php:68
-msgid "réserves du juge"
-msgstr ""
-
 #: class-msrwa-screen-articles.php:33
 msgid "résultats"
 msgstr ""
 
-#: class-msrwa-screen-models.php:148
+#: class-msrwa-screen-models.php:158
 msgid "saisi à la main"
 msgstr ""
 
@@ -2211,7 +2305,7 @@ msgstr ""
 msgid "tarif inconnu"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:350
+#: class-msrwa-screen-engine.php:372
 msgid "texte"
 msgstr ""
 
@@ -2223,7 +2317,7 @@ msgstr ""
 msgid "trente jours"
 msgstr ""
 
-#: class-msrwa-screen-models.php:149
+#: class-msrwa-screen-models.php:159
 msgid "trouvé par IA — à vérifier"
 msgstr ""
 
@@ -2231,11 +2325,11 @@ msgstr ""
 msgid "téléversements"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:350
+#: class-msrwa-screen-engine.php:372
 msgid "vision"
 msgstr ""
 
-#: class-msrwa-screen-analysis.php:198 class-msrwa-screen-analysis.php:248 class-msrwa-screen-articles.php:132
+#: class-msrwa-screen-analysis.php:198 class-msrwa-screen-analysis.php:248 class-msrwa-screen-articles.php:133
 msgid "Échecs"
 msgstr ""
 
@@ -2243,7 +2337,7 @@ msgstr ""
 msgid "Élargissez le filtre, ou repartez de la liste complète."
 msgstr ""
 
-#: class-msrwa-admin.php:156 class-msrwa-screen-analysis.php:190 class-msrwa-screen-analysis.php:247 class-msrwa-screen-engine.php:239 class-msrwa-screen-engine.php:281 class-msrwa-screen-run.php:199 class-msrwa-screen-run.php:232
+#: class-msrwa-admin.php:156 class-msrwa-screen-analysis.php:190 class-msrwa-screen-analysis.php:247 class-msrwa-screen-engine.php:252 class-msrwa-screen-engine.php:294 class-msrwa-screen-run.php:199 class-msrwa-screen-run.php:232
 msgid "Étape"
 msgstr ""
 
@@ -2251,7 +2345,7 @@ msgstr ""
 msgid "Étapes"
 msgstr ""
 
-#: class-msrwa-screen-models.php:97
+#: class-msrwa-screen-models.php:101
 msgid "Étapes qu’il a le droit de servir"
 msgstr ""
 
@@ -2267,6 +2361,10 @@ msgstr ""
 msgid "à"
 msgstr ""
 
+#: class-msrwa-screen-pass.php:50 class-msrwa-ui.php:70
+msgid "à corriger"
+msgstr ""
+
 #: class-msrwa-editor.php:173
 msgid "à corriger avant publication."
 msgstr ""
@@ -2275,7 +2373,7 @@ msgstr ""
 msgid "à regarder"
 msgstr ""
 
-#: class-msrwa-screen-pass.php:40 class-msrwa-ui.php:69
+#: class-msrwa-screen-pass.php:49 class-msrwa-ui.php:71
 msgid "à relire"
 msgstr ""
 
@@ -2283,7 +2381,7 @@ msgstr ""
 msgid "échec"
 msgstr ""
 
-#: class-msrwa-screen-pass.php:42
+#: class-msrwa-screen-pass.php:51
 msgid "échecs"
 msgstr ""
 

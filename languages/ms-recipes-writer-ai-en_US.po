@@ -1704,6 +1704,83 @@ msgstr "With the current routing, a complete recipe is estimated at %1$s, and up
 msgid "Le plafond par recette est plus bas : il arrête les nouvelles tentatives avant de le franchir, la recette se termine et le dernier verdict va au rédacteur."
 msgstr "The per-recipe ceiling is lower: it stops further attempts before crossing it, the recipe finishes and the last verdict goes to the writer."
 
+msgid "Choisir…"
+msgstr "Choose…"
+
+msgid "à corriger"
+msgstr "to fix"
+
+msgid "Délais, concurrence, taille des images inspectées. Le budget vient du lot."
+msgstr "Timeouts, concurrency, size of the images inspected. The budget comes from the lot."
+
+msgid "Format, qualité, dimensions et nombre de panneaux du collage."
+msgstr "Format, quality, dimensions and number of collage panels."
+
+msgid "Gabarits de prompt qui remplacent ceux livrés avec le moteur."
+msgstr "Prompt templates that replace the ones shipped with the engine."
+
+msgid "Le registre des étapes : dépendances, capacité, gabarit, poste de dépense."
+msgstr "The step registry: dependencies, capability, template, spending bucket."
+
+msgid "Les champs d’observation qui atteignent un prompt d’image."
+msgstr "The observation fields that reach an image prompt."
+
+msgid "Les seuils au-dessus desquels une étape est considérée réussie."
+msgstr "The thresholds above which a step counts as passed."
+
+msgid "Nombre de tentatives, par étape."
+msgstr "Number of attempts, per step."
+
+msgid "Plafond de tokens en sortie, par étape. Une réponse coupée est facturée entière."
+msgstr "Output token ceiling, per step. A cut-off answer is billed in full."
+
+msgid "Points d’entrée, en-têtes et variable d’environnement par fournisseur."
+msgstr "Endpoints, headers and environment variable per provider."
+
+msgid "Quel fournisseur et quel niveau pour chaque étape, sous la forme `fournisseur:niveau` ou `fournisseur:modèle`."
+msgstr "Which provider and which level for each step, as `provider:level` or `provider:model`."
+
+msgid "Quel modèle répond derrière `low`, `medium` et `high`."
+msgstr "Which model answers behind `low`, `medium` and `high`."
+
+msgid "Réflexion permise avant de répondre, par étape : `minimal`, `low`, `medium` ou `high` ; vide, le fournisseur décide. La réflexion est facturée comme de la sortie et prise sur le plafond."
+msgstr "Thinking allowed before answering, per step: `minimal`, `low`, `medium` or `high`; empty, the provider decides. Thinking is billed as output and taken from the ceiling."
+
+msgid "Tarifs par million de tokens : `[entrée, sortie]`. Un modèle sans tarif rend la dépense invérifiable et arrête le run."
+msgstr "Rates per million tokens: `[input, output]`. A model without a rate makes spending unverifiable and stops the run."
+
+msgid "%d groupe en JSON, pour une modification à la main"
+msgid_plural "%d groupes en JSON, pour une modification à la main"
+msgstr[0] "%d JSON group, for a hand edit"
+msgstr[1] "%d JSON groups, for a hand edit"
+
+msgid "aucun — appliqué en code"
+msgstr "none — applied in code"
+
+msgid "Chaque photographie est rapprochée de sa recette. Corrigez si besoin, puis lancez : rien n’est écrit avant."
+msgstr "Each photograph is matched to its recipe. Correct it if needed, then launch: nothing is written before."
+
+msgid "Chaque recette devient un brouillon WordPress avec son article, ses images et les remarques du contrôle final. Rien n’est jamais publié sans vous."
+msgstr "Each recipe becomes a WordPress draft with its article, its images and the final check's remarks. Nothing is ever published without you."
+
+msgid "Collez une ou plusieurs recettes, séparées par une ligne de tirets, et ajoutez leurs photographies depuis votre ordinateur, sans dire laquelle va avec quoi."
+msgstr "Paste one or more recipes, separated by a line of dashes, and add their photographs from your computer, without saying which goes with which."
+
+msgid "Comment ça marche"
+msgstr "How it works"
+
+msgid "Déposez un lot"
+msgstr "Submit a lot"
+
+msgid "Vérifiez l’appariement"
+msgstr "Check the pairing"
+
+msgid "Relisez les brouillons"
+msgstr "Review the drafts"
+
+msgid "Déposer mon premier lot"
+msgstr "Submit my first lot"
+
 msgid "aucune page citée"
 msgstr "no page cited"
 

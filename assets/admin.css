@@ -50,6 +50,7 @@
 	--ms-stop: #a11d1d;
 	--ms-stop-soft: #fbeceb;
 
+	--ms-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
 	--ms-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
 	--ms-radius: 8px;
 	--ms-gap: 20px;
@@ -118,7 +119,7 @@
 .ms-figure { background: var(--ms-raised); padding: 15px 17px; outline: 1px solid var(--ms-line); }
 .ms-figure dt, .ms-figure > span { display: block; margin: 0 0 7px; font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: var(--ms-ink-faint); }
 .ms-figure dd, .ms-figure > strong { display: block; margin: 0; font-family: var(--ms-mono); font-size: 25px; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.05; letter-spacing: -0.02em; }
-.ms-figure small { display: block; margin-block-start: 6px; font-family: inherit; font-size: 12px; color: var(--ms-ink-soft); }
+.ms-figure small { display: block; margin-block-start: 6px; font-family: var(--ms-sans); font-size: 12.5px; font-weight: 400; letter-spacing: normal; line-height: 1.45; color: var(--ms-ink-soft); }
 
 /* The button that ends a form belongs to the form, not to the space between
    two cards; on a settings page long enough to scroll it stays in reach. */
@@ -210,10 +211,14 @@
 /* Inside a scrolling region the content sets the width, so a model name or a
    duration never breaks mid-token to fit a column that was always too narrow. */
 .ms-scroll > .ms-table td, .ms-scroll > .ms-table th { white-space: nowrap; }
+.ms-scroll > .ms-table td.ms-grid-cell, .ms-scroll > .ms-table td.ms-wrap { white-space: normal; }
+.ms-table td.ms-wrap { min-inline-size: 18rem; }
 .ms-scroll:focus-visible { outline: 2px solid var(--ms-lamp); outline-offset: -2px; }
 .ms-table { inline-size: 100%; border-collapse: collapse; font-size: 13px; }
 .ms-table th, .ms-table td { padding: 10px 16px; text-align: start; vertical-align: top; border-block-end: 1px solid var(--ms-line-soft); }
 .ms-table th { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--ms-ink-faint); background: var(--ms-sunk); font-weight: 650; }
+/* A row header names the row: it reads as text, not as a column label. */
+.ms-table tbody th { font-size: inherit; text-transform: none; letter-spacing: normal; color: var(--ms-ink); background: none; font-weight: 600; }
 .ms-table tbody tr:hover { background: var(--ms-sunk); }
 .ms-table td.ms-num, .ms-table th.ms-num { text-align: end; font-family: var(--ms-mono); font-variant-numeric: tabular-nums; }
 .ms-table .ms-key { font-family: var(--ms-mono); font-size: 12px; color: var(--ms-ink-soft); }
@@ -422,3 +427,22 @@
 	.ms-routing-picker select { inline-size: 100%; max-inline-size: 100%; }
 	.ms-routing-picker .ms-route-resolved { padding-block-start: 6px; }
 }
+
+/* Raw JSON groups on the Engine screen: folded, one line to open them. */
+.ms-advanced { margin: 28px 0 var(--ms-gap); }
+.ms-advanced > summary { cursor: pointer; list-style: none; display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; padding: 12px 16px; background: var(--ms-sunk); border: 1px solid var(--ms-line); border-radius: var(--ms-radius); }
+.ms-advanced > summary::-webkit-details-marker { display: none; }
+.ms-advanced > summary::before { content: "▸"; color: var(--ms-ink-soft); }
+.ms-advanced[open] > summary::before { content: "▾"; }
+.ms-advanced > summary h2 { display: inline; margin: 0; }
+.ms-advanced[open] > summary { margin-bottom: var(--ms-gap); }
+
+/* Help under a field reads as a sentence, not a banner across the card. */
+.ms-card p > small.ms-muted { display: inline-block; max-inline-size: 90ch; line-height: 1.5; }
+
+/* The first visit: three numbered steps, then the one button. */
+.ms-welcome-steps { counter-reset: ms-step; list-style: none; margin: 8px 0 22px; padding: 0; display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); }
+.ms-welcome-steps li { counter-increment: ms-step; margin: 0; padding: 16px 16px 16px 56px; position: relative; background: var(--ms-sunk); border-radius: var(--ms-radius); }
+.ms-welcome-steps li::before { content: counter(ms-step); position: absolute; inset-inline-start: 16px; inset-block-start: 14px; inline-size: 28px; block-size: 28px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; color: var(--ms-lamp); background: var(--ms-lamp-soft); border: 1px solid var(--ms-lamp); }
+.ms-welcome-steps strong { display: block; margin-block-end: 4px; color: var(--ms-ink); }
+.ms-welcome-steps span { color: var(--ms-ink-soft); line-height: 1.5; }

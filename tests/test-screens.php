@@ -97,7 +97,10 @@ if ( preg_match( '/id="ms-engine-routing-data">(.*?)<\/script>/s', $engine['html
 
 // --- An empty site is not an error -------------------------------------
 
-msrwa_test_contains( ( msrwa_render( array( 'MSRWA_Screen_Pass', 'render' ) )['html'] ?? '' ), 'ms-empty', 'With nothing to show, the pass invites the reader to act.' );
+$first = msrwa_render( array( 'MSRWA_Screen_Pass', 'render' ) )['html'] ?? '';
+msrwa_test_contains( $first, 'ms-welcome', 'With nothing to show, the pass explains what will happen instead of showing zeros.' );
+msrwa_test_contains( $first, 'page=msrwa-compose', 'And it invites the reader to act.' );
+msrwa_test_missing( $first, 'ms-figures', 'A first visit is not a row of zeros.' );
 
 // --- A writer is never shown money, on the way in either ----------------
 

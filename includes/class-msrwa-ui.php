@@ -65,7 +65,9 @@ final class MSRWA_UI {
 		if ( 'failed' === $status ) { return array( 'tone' => 'stop', 'label' => __( 'échec', 'ms-recipes-writer-ai' ) ); }
 
 		$approved = $run['approved'] ?? null;
-		if ( null !== $approved && ! $approved ) { return array( 'tone' => 'warn', 'label' => __( 'réserves du juge', 'ms-recipes-writer-ai' ) ); }
+		// A refusal carries its findings, and the editor has to act on them:
+		// that is what the label says, rather than how the check felt.
+		if ( null !== $approved && ! $approved ) { return array( 'tone' => 'warn', 'label' => __( 'à corriger', 'ms-recipes-writer-ai' ) ); }
 		return array( 'tone' => 'good', 'label' => __( 'à relire', 'ms-recipes-writer-ai' ) );
 	}
 

@@ -60,8 +60,18 @@ final class MSRWA_Screen_Engine {
 				__( 'Réglages', 'ms-recipes-writer-ai' ) => MSRWA_Engine_Settings::simple(),
 				__( 'Structures', 'ms-recipes-writer-ai' ) => MSRWA_Engine_Settings::structural(),
 			) as $section => $groups ) :
+				// The picker above is the everyday control; the raw groups are for
+				// the rare hand edit, so they stay folded unless one was changed.
+				$open = (bool) array_intersect_key( $groups, $stored );
 				?>
-				<h2 style="margin-top:28px"><?php echo esc_html( $section ); ?></h2>
+				<details class="ms-advanced"<?php echo $open ? ' open' : ''; ?>>
+				<summary><h2><?php echo esc_html( $section ); ?></h2>
+					<span class="ms-muted"><?php echo esc_html( sprintf(
+						/* translators: %d is a number of configuration groups. */
+						_n( '%d groupe en JSON, pour une modification à la main', '%d groupes en JSON, pour une modification à la main', count( $groups ), 'ms-recipes-writer-ai' ),
+						count( $groups )
+					) ); ?></span>
+				</summary>
 				<?php foreach ( $groups as $group => $help ) : ?>
 					<?php
 					$effective = MSRWA_Engine_Settings::effective( $group );
@@ -86,6 +96,7 @@ final class MSRWA_Screen_Engine {
 						</details>
 					</section>
 				<?php endforeach; ?>
+				</details>
 			<?php endforeach; ?>
 
 			<div class="ms-card ms-save">
@@ -138,8 +149,10 @@ final class MSRWA_Screen_Engine {
 		}
 		$keys = array();
 		foreach ( $routing_keys as $key ) {
-			if ( isset( $steps[ $key ]['label'] ) ) {
-				$keys[ $key ] = $steps[ $key ]['label'];
+			if ( isset( $steps[ $key ] ) ) {
+				// The screen's own words, translated, rather than the engine's
+				// registry labels, which are French whatever the admin speaks.
+				$keys[ $key ] = MSRWA_UI::step_name( $key ) !== $key ? MSRWA_UI::step_name( $key ) : (string) ( $steps[ $key ]['label'] ?? $key );
 			} elseif ( 'vision' === $key ) {
 				$keys[ $key ] = __( 'Lecture des photographies (appariement, observation avant génération)', 'ms-recipes-writer-ai' );
 			} elseif ( 'image' === $key ) {
@@ -285,17 +298,26 @@ final class MSRWA_Screen_Engine {
 				</tr></thead>
 				<tbody>
 				<?php foreach ( $steps as $key => $step ) : ?>
-					<?php $route = $config->model_for( $key ); ?>
+					<?php
+					// An image step is routed on its own key — or the shared `image`
+					// one — and a step that asks no model has no model to show.
+					$capability = MSRWA_Engine_Steps::capability( $key, $steps );
+					$route = 'none' === $capability ? array() : $config->model_for( 'image_generation' === $capability ? $config->image_route( $key ) : $key );
+					?>
 					<tr>
 						<th scope="row">
-							<?php echo esc_html( (string) ( $step['label'] ?? $key ) ); ?>
+							<?php echo esc_html( MSRWA_UI::step_name( $key ) !== $key ? MSRWA_UI::step_name( $key ) : (string) ( $step['label'] ?? $key ) ); ?>
 							<br><small class="ms-muted"><?php echo esc_html( (string) ( $step['expects'] ?? '' ) ); ?></small>
 						</th>
 						<td><?php echo esc_html( $step['needs'] ? implode( ', ', (array) $step['needs'] ) : '—' ); ?></td>
 						<td><code class="ms-key"><?php echo esc_html( (string) ( $step['produces'] ?? '' ) ); ?></code></td>
 						<td>
-							<code class="ms-key"><?php echo esc_html( (string) ( $route['model'] ?? '' ) ); ?></code>
-							<br><small class="ms-muted"><?php echo esc_html( (string) ( $route['route'] ?? '' ) ); ?></small>
+							<?php if ( empty( $route['model'] ) ) : ?>
+								<span class="ms-muted"><?php esc_html_e( 'aucun — appliqué en code', 'ms-recipes-writer-ai' ); ?></span>
+							<?php else : ?>
+								<code class="ms-key"><?php echo esc_html( (string) $route['model'] ); ?></code>
+								<br><small class="ms-muted"><?php echo esc_html( (string) ( $route['route'] ?? '' ) ); ?></small>
+							<?php endif; ?>
 						</td>
 					</tr>
 				<?php endforeach; ?>

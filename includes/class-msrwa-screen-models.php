@@ -58,7 +58,11 @@ final class MSRWA_Screen_Models {
 		$config = MSRWA_Engine_Config::create( MSRWA_Engine_Settings::stored(), array( 'settings' => MSRWA_Settings::engine_settings() ) );
 		$out = array();
 		foreach ( (array) $config->steps() as $key => $step ) {
-			$out[ $key ] = (string) ( $step['label'] ?? $key );
+			$capability = (string) ( $step['capability'] ?? 'text' );
+			// A step that calls no model cannot be given one.
+			if ( 'none' === $capability ) { continue; }
+			$name = MSRWA_UI::step_name( $key );
+			$out[ $key ] = array( 'label' => $name !== $key ? $name : (string) ( $step['label'] ?? $key ), 'image' => 'image_generation' === $capability );
 		}
 		return $out;
 	}
@@ -116,11 +120,17 @@ final class MSRWA_Screen_Models {
 							<td><input type="number" step="0.000001" min="0" class="small-text ms-num" name="model[<?php echo esc_attr( $name ); ?>][output]" value="<?php echo esc_attr( null === $row['output_usd'] ? '' : $row['output_usd'] ); ?>"></td>
 							<td><?php self::provenance( $row ); ?></td>
 							<td class="ms-grid-cell">
-								<?php foreach ( $steps as $key => $label ) : ?>
+								<?php
+								// An image model draws and a text model writes: each is offered
+								// only the steps it could actually serve.
+								$draws = ! empty( $row['capabilities']['image_generation'] );
+								?>
+								<?php foreach ( $steps as $key => $step ) : ?>
+									<?php if ( $step['image'] !== $draws ) { continue; } ?>
 									<label class="ms-grid-step">
 										<input type="checkbox" name="model[<?php echo esc_attr( $name ); ?>][steps][]" value="<?php echo esc_attr( $key ); ?>"
 											<?php checked( $row['steps'] && in_array( $key, $row['steps'], true ) ); ?>>
-										<?php echo esc_html( $label ); ?>
+										<?php echo esc_html( $step['label'] ); ?>
 									</label>
 								<?php endforeach; ?>
 								<?php if ( ! $row['steps'] ) : ?>
