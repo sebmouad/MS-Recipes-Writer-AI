@@ -5,9 +5,9 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.20.1
+## État actuel — 0.20.2
 
-La version `0.20.1` ne laisse confier une étape qu’à un modèle capable de la faire ; la `0.20.0` remplissait chaque brouillon comme le lisent le thème MS Recipes, MS SEO Plus, MS FB Posts et MS Image Optimizer ; la `0.19.0` ramenait une recette approuvée du premier coup à 0,09–0,10 $ sans perte mesurée ; la `0.18.9` reprenait chaque écran après une revue complète dans le navigateur ; la `0.18.8` réservait l’extension, renommée « MS Recipes AI » dans le menu, à ceux qui peuvent téléverser des fichiers ; la `0.18.7` disait juste ce que fait le plafond par recette ; la `0.18.6` rangeait les photographies envoyées avec le brouillon qu’elles ont servi à écrire ; la `0.18.5` faisait passer un lot de trois recettes en 8 minutes pour 0,125 $ la recette, toutes approuvées ; la `0.18.4` faisait envoyer les photographies d’un lot depuis l’ordinateur du rédacteur ; la `0.18.3` faisait approuver les trois recettes d’un lot réel aux réglages par défaut — image à la une en `low`, collage en `medium` — pour 0,132 $ en moyenne ; la `0.18.2` permettait de choisir le modèle et la qualité de chaque image
+La version `0.20.2` rend l’écran Moteur lisible sur ordinateur comme sur téléphone et distingue le modèle de la réflexion ; la `0.20.1` ne laissait confier une étape qu’à un modèle capable de la faire ; la `0.20.0` remplissait chaque brouillon comme le lisent le thème MS Recipes, MS SEO Plus, MS FB Posts et MS Image Optimizer ; la `0.19.0` ramenait une recette approuvée du premier coup à 0,09–0,10 $ sans perte mesurée ; la `0.18.9` reprenait chaque écran après une revue complète dans le navigateur ; la `0.18.8` réservait l’extension, renommée « MS Recipes AI » dans le menu, à ceux qui peuvent téléverser des fichiers ; la `0.18.7` disait juste ce que fait le plafond par recette ; la `0.18.6` rangeait les photographies envoyées avec le brouillon qu’elles ont servi à écrire ; la `0.18.5` faisait passer un lot de trois recettes en 8 minutes pour 0,125 $ la recette, toutes approuvées ; la `0.18.4` faisait envoyer les photographies d’un lot depuis l’ordinateur du rédacteur ; la `0.18.3` faisait approuver les trois recettes d’un lot réel aux réglages par défaut — image à la une en `low`, collage en `medium` — pour 0,132 $ en moyenne ; la `0.18.2` permettait de choisir le modèle et la qualité de chaque image
 séparément ; la `0.18.1` fait tenir le plafond par recette jusque dans les reprises
 de l’approbation finale ; la `0.18.0` ramène une recette complète à environ 0,11 $ réels —
 recherche web comprise — sans perte de qualité mesurée ; la `0.17.0` faisait
@@ -74,6 +74,36 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.20.2
+
+**Le modèle et la réflexion ne se confondent plus.** Chaque étape offrait deux
+listes où revenaient les mêmes mots — `low`, `medium`, `high` — pour deux
+réglages différents : le premier choisit *quel modèle* travaille, le second
+*combien il réfléchit*. Lus côte à côte, ils passaient pour le même réglage
+donné deux fois.
+
+- Le niveau est nommé par le modèle qu’il désigne chez le fournisseur choisi :
+  « GPT-5.6 Luna · standard », « Gemini 3.1 Flash-Lite · économique ».
+- La réflexion porte ses propres mots : minimale, légère, moyenne, poussée ;
+  la qualité d’une image : basse, moyenne, haute. Chaque liste a son nom
+  au-dessus d’elle.
+- Trois encadrés, en tête du tableau, disent ce que décide chacun : le modèle
+  fixe le prix du jeton, la réflexion le nombre de jetons, la qualité le prix
+  d’une image.
+- Le modèle qui tournera, son tarif et ses éventuels blocages s’affichent sous
+  les listes au lieu d’une colonne à part.
+
+**L’écran Moteur tient sur un téléphone.** Les tableaux des étapes et des
+modèles deviennent des fiches à deux colonnes au lieu de défiler de côté ; les
+listes du choix des modèles prennent toute la largeur. Plus rien ne dépasse de
+l’écran à 390 px.
+
+**Un seul tableau des étapes.** Le tableau « Où irait chaque étape » répétait
+celui des étapes, en anglais sans accents et avec un modèle de texte sur les
+deux images ; ce qu’il ajoutait — clé présente, tarif connu, plafond de
+sortie, tentatives — est passé dans le tableau des étapes. Le JSON transmis au
+moteur est replié, pour le dépannage.
 
 ## Version 0.20.1
 

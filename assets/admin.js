@@ -455,9 +455,11 @@
 
     // Options that resolve to a model unable to serve the step stay visible,
     // greyed and named as such, so the reason for the absence is on screen.
-    function markBlocked(select, key, routeOf) {
+    // labelOf names an option afresh: a level's model changes with the provider.
+    function markBlocked(select, key, routeOf, labelOf) {
       var blocked = (schema.blocked || {})[key] || {};
       Array.prototype.forEach.call(select.options, function (opt) {
+        if (labelOf) { opt.dataset.label = labelOf(opt.value); }
         if (!opt.dataset.label) { opt.dataset.label = opt.textContent; }
         var why = blocked[routeOf(opt.value)];
         opt.disabled = !!why && !opt.selected;
@@ -474,16 +476,41 @@
       return el;
     }
 
+    function small(tone, text) {
+      var el = document.createElement('small');
+      el.className = 'ms-muted' + (tone ? ' ms-' + tone : '');
+      el.textContent = text;
+      return el;
+    }
+
+    // A visible name over each control: on a phone the column headers are gone,
+    // and two selects reading "medium" one above the other were the confusion.
+    function field(label, control) {
+      var wrap = document.createElement('label');
+      wrap.className = 'ms-route-field';
+      var name = document.createElement('span');
+      name.className = 'ms-route-field-name';
+      name.textContent = label;
+      wrap.appendChild(name);
+      wrap.appendChild(control);
+      return wrap;
+    }
+
     Object.keys(schema.keys).forEach(function (key) {
       var row = document.createElement('tr');
       row.dataset.route = key;
 
-      var labelCell = document.createElement('td');
+      var labelCell = document.createElement('th');
+      labelCell.scope = 'row';
       labelCell.textContent = schema.keys[key];
       row.appendChild(labelCell);
 
       var current = parseRoute(schema.current[key]);
-      var controlCell = document.createElement('td');
+      var modelCell = document.createElement('td');
+      modelCell.dataset.label = schema.labels.model;
+      var controls = document.createElement('div');
+      controls.className = 'ms-route-controls';
+      modelCell.appendChild(controls);
 
       var isImage = 'featured_image' === key || 'facebook_image' === key;
       if (isImage) {
@@ -494,7 +521,8 @@
         });
         markBlocked(modelSelect, key, function (value) { return value; });
         modelSelect.addEventListener('change', writeRouting);
-        controlCell.appendChild(modelSelect);
+        controls.appendChild(field(schema.labels.model, modelSelect));
+        controls.classList.add('ms-route-controls-one');
       } else {
         var providerSelect = document.createElement('select');
         providerSelect.className = 'ms-route-provider';
@@ -512,102 +540,92 @@
           tierSelect.insertBefore(option(current.named, current.named, true), tierSelect.firstChild);
         }
         var tierRoute = function (tier) { return providerSelect.value + ':' + tier; };
-        markBlocked(tierSelect, key, tierRoute);
+        // The level is named by the model it picks, then by what it is for.
+        var tierLabel = function (tier) {
+          var info = schema.resolved[tierRoute(tier)];
+          var name = (schema.tierNames || {})[tier];
+          if (!name) return tier;
+          return info ? (info.label || info.id) + ' · ' + name : name;
+        };
+        markBlocked(tierSelect, key, tierRoute, tierLabel);
         // A provider change can land on a level that cannot serve this step:
         // the first one that can is chosen instead of leaving a refused route.
         providerSelect.addEventListener('change', function () {
-          markBlocked(tierSelect, key, tierRoute);
+          markBlocked(tierSelect, key, tierRoute, tierLabel);
           if (tierSelect.selectedOptions[0] && tierSelect.selectedOptions[0].disabled) {
             var usable = Array.prototype.find.call(tierSelect.options, function (opt) { return !opt.disabled; });
-            if (usable) { tierSelect.value = usable.value; }
+            if (usable) { tierSelect.value = usable.value; markBlocked(tierSelect, key, tierRoute, tierLabel); }
           }
         });
+        tierSelect.addEventListener('change', function () { markBlocked(tierSelect, key, tierRoute, tierLabel); });
         providerSelect.addEventListener('change', writeRouting);
         tierSelect.addEventListener('change', writeRouting);
-        controlCell.appendChild(providerSelect);
-        controlCell.appendChild(document.createTextNode(' '));
-        controlCell.appendChild(tierSelect);
+        controls.appendChild(field(schema.labels.provider, providerSelect));
+        controls.appendChild(field(schema.labels.model, tierSelect));
       }
 
-      row.appendChild(controlCell);
-
-      // Which model this actually is. A provider and a quality name are not an
-      // answer: the tier map turns them into an identifier, and that is the
-      // thing that runs, costs money, and can fail to exist.
-      var resolvedCell = document.createElement('td');
-      resolvedCell.className = 'ms-route-resolved';
-      row.appendChild(resolvedCell);
+      // Which model this actually is, what it costs, and whether it can run:
+      // that is the thing that is billed and that can fail to exist.
+      var info = document.createElement('div');
+      info.className = 'ms-route-info';
+      modelCell.appendChild(info);
+      row.appendChild(modelCell);
 
       function describe() {
-        var route = (function () {
-          var model = row.querySelector('.ms-route-model');
-          if (model) return model.value;
-          return row.querySelector('.ms-route-provider').value + ':' + row.querySelector('.ms-route-tier').value;
-        })();
-        var info = schema.resolved[route];
-        resolvedCell.textContent = '';
-        if (!info) {
-          resolvedCell.appendChild(muted(schema.labels.unknown));
-          return;
-        }
+        var model = row.querySelector('.ms-route-model');
+        var route = model ? model.value : row.querySelector('.ms-route-provider').value + ':' + row.querySelector('.ms-route-tier').value;
+        var resolved = schema.resolved[route];
+        info.textContent = '';
+        if (!resolved) { info.appendChild(small('', schema.labels.unknown)); return; }
         var name = document.createElement('code');
         name.className = 'ms-key';
-        name.textContent = info.id;
-        resolvedCell.appendChild(name);
-
-        if (info.priced) {
-          resolvedCell.appendChild(muted(schema.labels.perMillion
-            .replace('%1$s', info.input.toFixed(2))
-            .replace('%2$s', info.output.toFixed(2))));
+        name.textContent = resolved.id;
+        info.appendChild(name);
+        if (resolved.priced) {
+          info.appendChild(small('', schema.labels.perMillion
+            .replace('%1$s', resolved.input.toFixed(2))
+            .replace('%2$s', resolved.output.toFixed(2))));
         } else {
-          resolvedCell.appendChild(flag('warn', schema.labels.unpriced));
+          info.appendChild(small('warn', schema.labels.unpriced));
         }
-        if (info.served === 'no') resolvedCell.appendChild(flag('stop', schema.labels.unserved));
+        if (resolved.served === 'no') info.appendChild(small('stop', schema.labels.unserved));
         var why = ((schema.blocked || {})[key] || {})[route];
-        if (why) resolvedCell.appendChild(flag('stop', why));
+        if (why) info.appendChild(small('stop', why));
       }
 
-      function muted(text) {
-        var el = document.createElement('small');
-        el.className = 'ms-muted';
-        el.style.display = 'block';
-        el.textContent = text;
-        return el;
-      }
-
-      function flag(tone, text) {
-        var el = document.createElement('small');
-        el.className = 'ms-muted ms-' + tone;
-        el.style.display = 'block';
-        el.textContent = text;
-        return el;
-      }
-
-      Array.prototype.forEach.call(controlCell.querySelectorAll('select'), function (select) {
+      Array.prototype.forEach.call(controls.querySelectorAll('select'), function (select) {
         select.addEventListener('change', describe);
       });
       describe();
 
       // An image model does not think: its effort is its quality, one per image,
       // written into the `images` group. Every other route may be told how hard to think.
-      var thinkingCell = document.createElement('td');
+      var effortCell = document.createElement('td');
       if (isImage) {
         var qualitySelect = document.createElement('select');
         qualitySelect.className = 'ms-route-quality';
-        var current = (schema.imageQuality || {})[key] || 'medium';
-        (schema.qualities || []).forEach(function (name) { qualitySelect.appendChild(option(name, name, name === current)); });
+        var quality = (schema.imageQuality || {})[key] || 'medium';
+        (schema.qualities || []).forEach(function (name) {
+          qualitySelect.appendChild(option(name, (schema.qualityNames || {})[name] || name, name === quality));
+        });
         qualitySelect.addEventListener('change', function () { writeImageQuality(key, qualitySelect.value); });
-        thinkingCell.appendChild(qualitySelect);
+        effortCell.dataset.label = schema.labels.quality;
+        effortCell.appendChild(field(schema.labels.quality, qualitySelect));
       } else {
         var thinkingSelect = document.createElement('select');
         thinkingSelect.className = 'ms-route-thinking';
         var level = (schema.thinking || {})[key] || '';
-        thinkingSelect.appendChild(option('', schema.labels.thinkingDefault + ((schema.thinking || {})['default'] ? ' (' + schema.thinking['default'] + ')' : ''), '' === level));
-        schema.thinkingLevels.forEach(function (name) { thinkingSelect.appendChild(option(name, name, name === level)); });
+        var siteLevel = (schema.thinking || {})['default'];
+        var names = schema.thinkingNames || {};
+        thinkingSelect.appendChild(option('', siteLevel
+          ? schema.labels.thinkingSite.replace('%s', names[siteLevel] || siteLevel)
+          : schema.labels.thinkingDefault, '' === level));
+        schema.thinkingLevels.forEach(function (name) { thinkingSelect.appendChild(option(name, names[name] || name, name === level)); });
         thinkingSelect.addEventListener('change', function () { writeThinking(key, thinkingSelect.value); });
-        thinkingCell.appendChild(thinkingSelect);
+        effortCell.dataset.label = schema.labels.thinking;
+        effortCell.appendChild(field(schema.labels.thinking, thinkingSelect));
       }
-      row.appendChild(thinkingCell);
+      row.appendChild(effortCell);
 
       body.appendChild(row);
     });

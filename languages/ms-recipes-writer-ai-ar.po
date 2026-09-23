@@ -1873,6 +1873,87 @@ msgstr "لا شيء يثبت أن هذا النموذج يستطيع %s، وهو
 msgid "rédiger du texte"
 msgstr "كتابة النصوص"
 
+msgid "%s tentative"
+msgid_plural "%s tentatives"
+msgstr[0] "لا محاولات"
+msgstr[1] "محاولة واحدة"
+msgstr[2] "محاولتان"
+msgstr[3] "%s محاولات"
+msgstr[4] "%s محاولة"
+msgstr[5] "%s محاولة"
+
+msgid "%s jetons en sortie"
+msgstr "%s وحدة في المخرجات"
+
+msgid "Chaque changement réécrit les champs « routing », « thinking » et « images » des réglages plus bas ; ce qui y est modifié à la main prévaut après un chargement de page."
+msgstr "كل تغيير يعيد كتابة حقول « routing » و« thinking » و« images » في الإعدادات أدناه؛ وما يُعدَّل هناك يدويًا هو الذي يسري بعد إعادة تحميل الصفحة."
+
+msgid "Combien ce modèle réfléchit avant de répondre. Plus il réfléchit, plus il consomme de jetons facturés — sans changer de modèle."
+msgstr "مقدار تفكير هذا النموذج قبل الإجابة. كلما فكّر أكثر استهلك وحدات مفوترة أكثر — دون تغيير النموذج."
+
+msgid "Fournisseur"
+msgstr "المزوّد"
+
+msgid "Limites"
+msgstr "الحدود"
+
+msgid "Pour les deux images, qui ne réfléchissent pas : le niveau de détail du rendu, qui en fixe le prix."
+msgstr "للصورتين، اللتين لا تفكّران: مستوى تفاصيل الإخراج، وهو الذي يحدد سعرها."
+
+msgid "Qualité de l’image"
+msgstr "جودة الصورة"
+
+msgid "Qui fait le travail, et donc le prix de chaque jeton. Économique, standard et avancé désignent un modèle précis chez chaque fournisseur."
+msgstr "من يُنجز العمل، وبالتالي سعر كل وحدة. الاقتصادي والقياسي والمتقدم يشير كل منها إلى نموذج محدد لدى كل مزوّد."
+
+msgid "aucun tarif connu"
+msgstr "لا سعر معروف"
+
+msgid "aucune clé pour ce fournisseur"
+msgstr "لا مفتاح لهذا المزوّد"
+
+msgid "avancé"
+msgstr "متقدم"
+
+msgid "basse"
+msgstr "منخفضة"
+
+msgid "haute"
+msgstr "عالية"
+
+msgid "légère"
+msgstr "خفيف"
+
+msgid "maximale"
+msgstr "قصوى"
+
+msgid "minimale"
+msgstr "أدنى"
+
+msgid "moyenne"
+msgstr "متوسط"
+
+msgid "par défaut (%s)"
+msgstr "افتراضي (%s)"
+
+msgid "pour un dépannage"
+msgstr "لاستكشاف الأعطال"
+
+msgid "poussée"
+msgstr "معمّق"
+
+msgid "réglage du fournisseur"
+msgstr "إعداد المزوّد"
+
+msgid "standard"
+msgstr "قياسي"
+
+msgid "très haute"
+msgstr "عالية جدًا"
+
+msgid "économique"
+msgstr "اقتصادي"
+
 msgid "aucune page citée"
 msgstr "لم تُذكر أي صفحة"
 

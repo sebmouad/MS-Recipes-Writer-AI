@@ -421,30 +421,65 @@
 	.ms-grid-step { inline-size: 100%; }
 }
 
+/* --- The model picker -------------------------------------------------
+   Each step reads left to right as one sentence: this step, on this model,
+   thinking this hard. The selects are named on the page itself, because
+   "medium" beside "medium" was read as one setting given twice. */
+
+.ms-route-help { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); margin: 4px 0 18px; }
+.ms-route-help > div { padding: 12px 14px; background: var(--ms-sunk); border-radius: 6px; border-inline-start: var(--ms-rail) solid var(--ms-line); }
+.ms-route-help dt { font-weight: 650; margin: 0 0 3px; }
+.ms-route-help dd { margin: 0; color: var(--ms-ink-soft); line-height: 1.5; }
+
+.ms-routing-picker { table-layout: fixed; }
+.ms-routing-picker thead th:nth-child(1) { inline-size: 24%; }
+.ms-routing-picker thead th:nth-child(3) { inline-size: 13rem; }
+.ms-routing-picker tbody th { padding-block-start: 30px; }
+.ms-routing-picker select { inline-size: 100%; max-inline-size: 100%; min-inline-size: 0; }
+
+.ms-route-controls { display: grid; grid-template-columns: minmax(0, 11rem) minmax(0, 1fr); gap: 8px; }
+.ms-route-controls-one { grid-template-columns: minmax(0, 1fr); }
+.ms-route-field { display: flex; flex-direction: column; gap: 4px; min-inline-size: 0; }
+.ms-route-field-name { font-size: 11px; font-weight: 650; letter-spacing: .06em; text-transform: uppercase; color: var(--ms-ink-faint); }
+.ms-route-info { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; margin-block-start: 8px; }
+.ms-route-info small { margin: 0; }
+.ms-route-info small.ms-stop, .ms-route-info small.ms-warn { flex-basis: 100%; }
+.msrwa small.ms-stop { color: var(--ms-stop); }
+.msrwa small.ms-warn { color: var(--ms-warn); font-weight: 600; }
+
+.ms-registry tbody th small { font-weight: 400; }
+.ms-registry thead th:nth-child(1) { inline-size: 30%; }
+.ms-registry thead th:nth-child(5) { inline-size: 11rem; }
+/* An identifier is read whole or not at all: fact_chec / k is neither. */
+.ms-registry td code { white-space: nowrap; }
+
 /* --- Tables that stop being tables on a phone -------------------------
-   Three columns of selects and a model identifier do not fit 390px, and a
-   sideways scrollbar inside a table inside an admin page is where people
-   lose things. Each row becomes a block instead, its headers carried by
-   data-label, which is what the report template already does. */
+   A sideways scrollbar inside a table inside an admin page is where people
+   lose things. On a phone each row of an .ms-stack table becomes a block;
+   a cell names itself through data-label, the row header leads. */
 
 @media (max-width: 782px) {
-	.ms-routing-picker thead { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); }
-	.ms-routing-picker,
-	.ms-routing-picker tbody,
-	.ms-routing-picker tr,
-	.ms-routing-picker td,
-	.ms-routing-picker th { display: block; inline-size: auto; }
+	.ms-stack thead { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); }
+	.ms-stack, .ms-stack tbody, .ms-stack tr, .ms-stack td, .ms-stack tbody th { display: block; inline-size: auto; }
+	.ms-stack { table-layout: auto; }
+	.ms-stack tr { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 16px; padding: 12px 14px; border-block-end: 1px solid var(--ms-line-soft); }
+	.ms-stack tbody th { grid-column: 1 / -1; }
+	.ms-card:not(.ms-card-flush) .ms-stack tr { padding-inline: 0; }
+	.ms-stack tbody tr:hover { background: none; }
+	.ms-stack td, .ms-stack tbody th { border-block-end: 0; padding: 4px 0; white-space: normal; }
+	.ms-stack tbody th { font-size: 14px; padding-block: 0 6px; }
+	.ms-stack td[data-label]::before { content: attr(data-label); display: block; font-size: 11px; font-weight: 650; letter-spacing: .06em; text-transform: uppercase; color: var(--ms-ink-faint); margin-block-end: 2px; }
 
-	.ms-routing-picker tr {
-		padding-block: 12px;
-		border-block-end: 1px solid var(--ms-line-soft);
-	}
+	/* The picker names its own selects, so its cells do not repeat it. */
+	.ms-routing-picker tr { grid-template-columns: minmax(0, 1fr); }
+	.ms-routing-picker td[data-label]::before { content: none; }
+	.ms-routing-picker tbody th { padding-block-start: 0; }
+	.ms-route-controls { grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); }
+	.ms-routing-picker select { font-size: 16px; min-block-size: 40px; }
+}
 
-	.ms-routing-picker td,
-	.ms-routing-picker th { border-block-end: 0; padding-block: 4px; }
-
-	.ms-routing-picker select { inline-size: 100%; max-inline-size: 100%; }
-	.ms-routing-picker .ms-route-resolved { padding-block-start: 6px; }
+@media (max-width: 420px) {
+	.ms-route-controls { grid-template-columns: minmax(0, 1fr); }
 }
 
 /* Raw JSON groups on the Engine screen: folded, one line to open them. */

@@ -154,33 +154,4 @@ final class MSRWA_Operations {
 		$image['mime'] = $info['mime'];
 		return $image;
 	}
-
-	/**
-	 * Where every step would actually go, resolved locally.
-	 *
-	 * Answers the question that otherwise costs money to answer: is there a key
-	 * for this route, and is its model priced? A key being present does not
-	 * prove it works — only that a call would be attempted.
-	 */
-	public static function diagnostics() {
-		$config = MSRWA_Engine_Config::create( MSRWA_Engine_Settings::stored(), array( 'settings' => MSRWA_Settings::engine_settings() ) );
-		$rows = array();
-		foreach ( $config->steps() as $step => $definition ) {
-			$route = $config->model_for( $step );
-			$provider = $config->provider( $route['provider'], $route['model'] );
-			$rows[] = array( 'etape' => $step, 'capacite' => $definition['capability'], 'dependances' => implode( ', ', (array) $definition['needs'] ), 'modele' => $route['provider'] . ':' . $route['model'], 'cle_presente' => empty( $provider['has_key'] ) ? 'NON' : 'oui', 'tarif_connu' => null === $config->price( $route['provider'], $route['model'], array() ) ? 'NON' : 'oui', 'tokens_max' => $config->max_output( $step ), 'tentatives' => $config->attempts( $step ) );
-		}
-		self::table( __( 'Où irait chaque étape', 'ms-recipes-writer-ai' ), $rows );
-		echo '<p class="ms-muted">' . esc_html__( 'Contrôle local uniquement, sans aucun appel facturé : la présence d’une clé ne prouve pas qu’elle est valide, seulement qu’un appel serait tenté.', 'ms-recipes-writer-ai' ) . '</p>';
-	}
-
-	private static function table( $title, array $rows ) {
-		echo '<section class="ms-card ms-card-flush"><h2>' . esc_html( $title ) . '</h2>';
-		if ( ! $rows ) { echo '<p class="ms-muted" style="padding:0 20px 18px">' . esc_html__( 'Aucune donnée.', 'ms-recipes-writer-ai' ) . '</p></section>'; return; }
-		echo MSRWA_UI::scroll( $title ) . '<table class="ms-table"><thead><tr>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- scroll() escapes its own.
-		foreach ( array_keys( $rows[0] ) as $key ) { echo '<th scope="col">' . esc_html( str_replace( '_', ' ', $key ) ) . '</th>'; }
-		echo '</tr></thead><tbody>';
-		foreach ( $rows as $row ) { echo '<tr>'; foreach ( $row as $value ) { echo '<td>' . esc_html( null === $value ? '—' : $value ) . '</td>'; } echo '</tr>'; }
-		echo '</tbody></table></div></section>';
-	}
 }

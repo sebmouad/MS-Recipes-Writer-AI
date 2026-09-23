@@ -73,6 +73,10 @@ foreach ( array_keys( array_merge( MSRWA_Engine_Settings::simple(), MSRWA_Engine
 
 // A key must never reach a screen, whatever else is on it.
 msrwa_test_missing( $engine['html'] ?? '', 'key_env', 'The engine screen does not print where keys are kept.' );
+// One table of the steps: the local dry-run beside it said the same with the
+// wrong model on both images.
+msrwa_test_missing( $engine['html'] ?? '', 'Où irait chaque étape', 'The engine screen shows the steps once.' );
+msrwa_test_contains( $engine['html'] ?? '', 'ms-table ms-stack ms-registry', 'The step table stacks on a phone.' );
 
 // The friendly routing picker must offer every route the engine's own
 // defaults name — a picker missing one would silently drop an admin's choice
@@ -91,6 +95,15 @@ if ( preg_match( '/id="ms-engine-routing-data">(.*?)<\/script>/s', $engine['html
 	}
 	msrwa_test_assert( ! empty( $picker_data['imageModels'] ), 'The routing picker lists at least one image-capable model.' );
 	msrwa_test_missing( $match[1], 'key_env', 'The routing picker data embeds no provider header, key included.' );
+	// Level, thinking and image quality all say low/medium/high; each is named
+	// for what it decides, or they read as one setting given twice.
+	foreach ( array( 'tierNames', 'thinkingNames', 'qualityNames' ) as $names ) {
+		msrwa_test_assert( ! empty( $picker_data[ $names ]['medium'] ), 'The picker names "medium" for what it means in ' . $names . '.' );
+	}
+	msrwa_test_assert( $picker_data['tierNames']['medium'] !== $picker_data['thinkingNames']['medium'], 'A level and a thinking effort never carry the same word.' );
+	foreach ( (array) $picker_data['resolved'] as $route => $model ) {
+		msrwa_test_assert( '' !== (string) ( $model['label'] ?? '' ), 'The level ' . $route . ' is named by its model.' );
+	}
 } else {
 	msrwa_test_assert( false, 'The routing picker data script must be present and well-formed.' );
 }

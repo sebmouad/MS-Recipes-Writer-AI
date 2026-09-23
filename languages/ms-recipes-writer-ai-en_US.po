@@ -1853,6 +1853,83 @@ msgstr "nothing establishes that this model can %s, which this step requires"
 msgid "rédiger du texte"
 msgstr "write text"
 
+msgid "%s tentative"
+msgid_plural "%s tentatives"
+msgstr[0] "%s attempt"
+msgstr[1] "%s attempts"
+
+msgid "%s jetons en sortie"
+msgstr "%s output tokens"
+
+msgid "Chaque changement réécrit les champs « routing », « thinking » et « images » des réglages plus bas ; ce qui y est modifié à la main prévaut après un chargement de page."
+msgstr "Each change rewrites the “routing”, “thinking” and “images” fields in the settings below; what is edited there by hand wins after a page load."
+
+msgid "Combien ce modèle réfléchit avant de répondre. Plus il réfléchit, plus il consomme de jetons facturés — sans changer de modèle."
+msgstr "How much this model thinks before answering. The more it thinks, the more billed tokens it uses — without changing the model."
+
+msgid "Fournisseur"
+msgstr "Provider"
+
+msgid "Limites"
+msgstr "Limits"
+
+msgid "Pour les deux images, qui ne réfléchissent pas : le niveau de détail du rendu, qui en fixe le prix."
+msgstr "For the two images, which do not think: the level of detail of the render, which sets its price."
+
+msgid "Qualité de l’image"
+msgstr "Image quality"
+
+msgid "Qui fait le travail, et donc le prix de chaque jeton. Économique, standard et avancé désignent un modèle précis chez chaque fournisseur."
+msgstr "Who does the work, and so the price of each token. Economy, standard and advanced each name one specific model at each provider."
+
+msgid "aucun tarif connu"
+msgstr "no known price"
+
+msgid "aucune clé pour ce fournisseur"
+msgstr "no key for this provider"
+
+msgid "avancé"
+msgstr "advanced"
+
+msgid "basse"
+msgstr "low"
+
+msgid "haute"
+msgstr "high"
+
+msgid "légère"
+msgstr "light"
+
+msgid "maximale"
+msgstr "maximum"
+
+msgid "minimale"
+msgstr "minimal"
+
+msgid "moyenne"
+msgstr "medium"
+
+msgid "par défaut (%s)"
+msgstr "default (%s)"
+
+msgid "pour un dépannage"
+msgstr "for troubleshooting"
+
+msgid "poussée"
+msgstr "deep"
+
+msgid "réglage du fournisseur"
+msgstr "provider’s setting"
+
+msgid "standard"
+msgstr "standard"
+
+msgid "très haute"
+msgstr "very high"
+
+msgid "économique"
+msgstr "economy"
+
 msgid "aucune page citée"
 msgstr "no page cited"
 

@@ -118,13 +118,16 @@ final class MSRWA_Screen_Engine {
 		<?php self::step_registry(); ?>
 		<?php self::model_catalogue(); ?>
 
-		<?php MSRWA_Operations::diagnostics(); ?>
 
-		<section class="ms-card">
-			<h2><?php esc_html_e( 'Ce qui est réellement transmis au moteur', 'ms-recipes-writer-ai' ); ?></h2>
-			<p><?php esc_html_e( 'La couche appelante, telle quelle : ce qui a été saisi ici, plus les modèles et les niveaux que la page Modèles engendre. Vide signifie que tout suit le moteur.', 'ms-recipes-writer-ai' ); ?></p>
-			<pre class="ms-code"><?php echo esc_html( $encode( MSRWA_Engine_Settings::stored() ) ); ?></pre>
-		</section>
+		<details class="ms-advanced">
+			<summary><h2><?php esc_html_e( 'Ce qui est réellement transmis au moteur', 'ms-recipes-writer-ai' ); ?></h2>
+				<span class="ms-muted"><?php esc_html_e( 'pour un dépannage', 'ms-recipes-writer-ai' ); ?></span>
+			</summary>
+			<section class="ms-card">
+				<p><?php esc_html_e( 'La couche appelante, telle quelle : ce qui a été saisi ici, plus les modèles et les niveaux que la page Modèles engendre. Vide signifie que tout suit le moteur.', 'ms-recipes-writer-ai' ); ?></p>
+				<pre class="ms-code"><?php echo esc_html( $encode( MSRWA_Engine_Settings::stored() ) ); ?></pre>
+			</section>
+		</details>
 		<?php
 		echo '</div>';
 	}
@@ -264,8 +267,36 @@ final class MSRWA_Screen_Engine {
 			'imageQuality' => $quality,
 			'qualities' => array_values( array_diff( MSRWA_Images::qualities(), array( 'auto' ) ) ),
 			'thinkingLevels' => MSRWA_Engine_Config::thinking_levels(),
+			// The tiers, the thinking levels and the image qualities share the
+			// words low, medium and high; shown raw side by side they read as
+			// the same setting twice. Each is named for what it decides.
+			'tierNames' => array(
+				'low' => __( 'économique', 'ms-recipes-writer-ai' ),
+				'medium' => __( 'standard', 'ms-recipes-writer-ai' ),
+				'high' => __( 'avancé', 'ms-recipes-writer-ai' ),
+			),
+			'thinkingNames' => array(
+				'minimal' => __( 'minimale', 'ms-recipes-writer-ai' ),
+				'low' => __( 'légère', 'ms-recipes-writer-ai' ),
+				'medium' => __( 'moyenne', 'ms-recipes-writer-ai' ),
+				'high' => __( 'poussée', 'ms-recipes-writer-ai' ),
+			),
+			'qualityNames' => array(
+				'low' => __( 'basse', 'ms-recipes-writer-ai' ),
+				'medium' => __( 'moyenne', 'ms-recipes-writer-ai' ),
+				'high' => __( 'haute', 'ms-recipes-writer-ai' ),
+				'xhigh' => __( 'très haute', 'ms-recipes-writer-ai' ),
+				'max' => __( 'maximale', 'ms-recipes-writer-ai' ),
+			),
 			'labels' => array(
-				'thinkingDefault' => __( 'par défaut', 'ms-recipes-writer-ai' ),
+				'step' => __( 'Étape', 'ms-recipes-writer-ai' ),
+				'model' => __( 'Modèle', 'ms-recipes-writer-ai' ),
+				'thinking' => __( 'Réflexion', 'ms-recipes-writer-ai' ),
+				'quality' => __( 'Qualité de l’image', 'ms-recipes-writer-ai' ),
+				'provider' => __( 'Fournisseur', 'ms-recipes-writer-ai' ),
+				'thinkingDefault' => __( 'réglage du fournisseur', 'ms-recipes-writer-ai' ),
+				/* translators: %s is a thinking level such as "moyenne". */
+				'thinkingSite' => __( 'par défaut (%s)', 'ms-recipes-writer-ai' ),
 				/* translators: %s is a level or model name. */
 				'blockedOption' => __( '%s — ne convient pas à cette étape', 'ms-recipes-writer-ai' ),
 				'unpriced' => __( 'aucun tarif connu — le coût de cette étape ne peut pas être estimé', 'ms-recipes-writer-ai' ),
@@ -277,17 +308,21 @@ final class MSRWA_Screen_Engine {
 		?>
 		<section class="ms-card" id="ms-engine-routing-picker">
 			<h2><?php esc_html_e( 'Modèle par étape', 'ms-recipes-writer-ai' ); ?></h2>
-			<p><?php esc_html_e( 'La façon courante de changer une route : un fournisseur, un niveau. Ceci réécrit le champ « routing » plus bas à chaque changement ; ce qui y est modifié à la main reste possible et prévaut en cas de désaccord entre les deux après un chargement de page.', 'ms-recipes-writer-ai' ); ?></p>
-			<table class="ms-table ms-routing-picker">
+			<dl class="ms-route-help">
+				<div><dt><?php esc_html_e( 'Modèle', 'ms-recipes-writer-ai' ); ?></dt><dd><?php esc_html_e( 'Qui fait le travail, et donc le prix de chaque jeton. Économique, standard et avancé désignent un modèle précis chez chaque fournisseur.', 'ms-recipes-writer-ai' ); ?></dd></div>
+				<div><dt><?php esc_html_e( 'Réflexion', 'ms-recipes-writer-ai' ); ?></dt><dd><?php esc_html_e( 'Combien ce modèle réfléchit avant de répondre. Plus il réfléchit, plus il consomme de jetons facturés — sans changer de modèle.', 'ms-recipes-writer-ai' ); ?></dd></div>
+				<div><dt><?php esc_html_e( 'Qualité de l’image', 'ms-recipes-writer-ai' ); ?></dt><dd><?php esc_html_e( 'Pour les deux images, qui ne réfléchissent pas : le niveau de détail du rendu, qui en fixe le prix.', 'ms-recipes-writer-ai' ); ?></dd></div>
+			</dl>
+			<table class="ms-table ms-routing-picker ms-stack">
 				<thead><tr>
 					<th scope="col"><?php esc_html_e( 'Étape', 'ms-recipes-writer-ai' ); ?></th>
-					<th scope="col"><?php esc_html_e( 'Fournisseur et niveau', 'ms-recipes-writer-ai' ); ?></th>
-					<th scope="col"><?php esc_html_e( 'Modèle qui tournera', 'ms-recipes-writer-ai' ); ?></th>
+					<th scope="col"><?php esc_html_e( 'Modèle', 'ms-recipes-writer-ai' ); ?></th>
 					<th scope="col"><?php esc_html_e( 'Réflexion ou qualité', 'ms-recipes-writer-ai' ); ?></th>
 				</tr></thead>
 				<tbody></tbody>
 			</table>
 			<script type="application/json" id="ms-engine-routing-data"><?php echo wp_json_encode( $data, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP ); ?></script>
+			<p class="ms-muted"><small><?php esc_html_e( 'Chaque changement réécrit les champs « routing », « thinking » et « images » des réglages plus bas ; ce qui y est modifié à la main prévaut après un chargement de page.', 'ms-recipes-writer-ai' ); ?></small></p>
 			<noscript><p class="ms-muted"><?php esc_html_e( 'Nécessite JavaScript ; sans cela, utilisez directement le champ « routing » ci-dessous.', 'ms-recipes-writer-ai' ); ?></p></noscript>
 		</section>
 		<?php
@@ -319,13 +354,13 @@ final class MSRWA_Screen_Engine {
 				__( 'Le profil complet en compte %s. Une étape part dès que tout ce dont elle dépend est prêt : c’est ce qui découpe une recette en vagues, et ce qui fait qu’une reprise ne repaie pas ce qui a réussi.', 'ms-recipes-writer-ai' ),
 				number_format_i18n( count( $steps ) )
 			) ); ?></p>
-			<?php echo MSRWA_UI::scroll( esc_attr__( 'Ce que fait le moteur, étape par étape', 'ms-recipes-writer-ai' ) ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
-			<table class="ms-table">
+			<table class="ms-table ms-stack ms-registry">
 				<thead><tr>
 					<th scope="col"><?php esc_html_e( 'Étape', 'ms-recipes-writer-ai' ); ?></th>
 					<th scope="col"><?php esc_html_e( 'Attend', 'ms-recipes-writer-ai' ); ?></th>
 					<th scope="col"><?php esc_html_e( 'Produit', 'ms-recipes-writer-ai' ); ?></th>
 					<th scope="col"><?php esc_html_e( 'Modèle', 'ms-recipes-writer-ai' ); ?></th>
+					<th scope="col"><?php esc_html_e( 'Limites', 'ms-recipes-writer-ai' ); ?></th>
 				</tr></thead>
 				<tbody>
 				<?php foreach ( $steps as $key => $step ) : ?>
@@ -334,27 +369,44 @@ final class MSRWA_Screen_Engine {
 					// one — and a step that asks no model has no model to show.
 					$capability = MSRWA_Engine_Steps::capability( $key, $steps );
 					$route = 'none' === $capability ? array() : $config->model_for( 'image_generation' === $capability ? $config->image_route( $key ) : $key );
+					$has_key = ! empty( $route['model'] ) && ! empty( $config->provider( $route['provider'], $route['model'] )['has_key'] );
+					$priced = ! empty( $route['model'] ) && null !== $config->price( $route['provider'], $route['model'], array() );
 					?>
 					<tr>
 						<th scope="row">
 							<?php echo esc_html( MSRWA_UI::step_name( $key ) !== $key ? MSRWA_UI::step_name( $key ) : (string) ( $step['label'] ?? $key ) ); ?>
 							<br><small class="ms-muted"><?php echo esc_html( (string) ( $step['expects'] ?? '' ) ); ?></small>
 						</th>
-						<td><?php echo esc_html( $step['needs'] ? implode( ', ', (array) $step['needs'] ) : '—' ); ?></td>
-						<td><code class="ms-key"><?php echo esc_html( (string) ( $step['produces'] ?? '' ) ); ?></code></td>
-						<td>
+						<td data-label="<?php esc_attr_e( 'Attend', 'ms-recipes-writer-ai' ); ?>"><?php echo esc_html( $step['needs'] ? implode( ', ', (array) $step['needs'] ) : '—' ); ?></td>
+						<td data-label="<?php esc_attr_e( 'Produit', 'ms-recipes-writer-ai' ); ?>"><code class="ms-key"><?php echo esc_html( (string) ( $step['produces'] ?? '' ) ); ?></code></td>
+						<td data-label="<?php esc_attr_e( 'Modèle', 'ms-recipes-writer-ai' ); ?>">
 							<?php if ( empty( $route['model'] ) ) : ?>
 								<span class="ms-muted"><?php esc_html_e( 'aucun — appliqué en code', 'ms-recipes-writer-ai' ); ?></span>
 							<?php else : ?>
 								<code class="ms-key"><?php echo esc_html( (string) $route['model'] ); ?></code>
-								<br><small class="ms-muted"><?php echo esc_html( (string) ( $route['route'] ?? '' ) ); ?></small>
+								<small class="ms-muted"><?php echo esc_html( (string) ( $route['route'] ?? '' ) ); ?></small>
+								<?php if ( ! $has_key ) : ?><small class="ms-stop"><?php esc_html_e( 'aucune clé pour ce fournisseur', 'ms-recipes-writer-ai' ); ?></small><?php endif; ?>
+								<?php if ( ! $priced ) : ?><small class="ms-warn"><?php esc_html_e( 'aucun tarif connu', 'ms-recipes-writer-ai' ); ?></small><?php endif; ?>
 							<?php endif; ?>
+						</td>
+						<td data-label="<?php esc_attr_e( 'Limites', 'ms-recipes-writer-ai' ); ?>">
+							<?php if ( ! empty( $route['model'] ) ) : ?>
+								<?php echo esc_html( sprintf(
+									/* translators: %s is a number of tokens. */
+									__( '%s jetons en sortie', 'ms-recipes-writer-ai' ),
+									number_format_i18n( $config->max_output( $key ) )
+								) ); ?>
+								<small class="ms-muted"><?php echo esc_html( sprintf(
+									/* translators: %s is a number of attempts. */
+									_n( '%s tentative', '%s tentatives', $config->attempts( $key ), 'ms-recipes-writer-ai' ),
+									number_format_i18n( $config->attempts( $key ) )
+								) ); ?></small>
+							<?php else : ?>—<?php endif; ?>
 						</td>
 					</tr>
 				<?php endforeach; ?>
 				</tbody>
 			</table>
-			</div>
 		</section>
 		<?php
 	}
@@ -388,8 +440,7 @@ final class MSRWA_Screen_Engine {
 					)
 					: __( 'Jamais interrogé. « Vérifier les clés », dans les réglages, relève la liste sans rien dépenser.', 'ms-recipes-writer-ai' )
 				); ?></p>
-				<?php echo MSRWA_UI::scroll( esc_attr( $label ) ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
-				<table class="ms-table">
+				<table class="ms-table ms-stack">
 					<thead><tr>
 						<th scope="col"><?php esc_html_e( 'Modèle', 'ms-recipes-writer-ai' ); ?></th>
 						<th scope="col"><?php esc_html_e( 'Sait faire', 'ms-recipes-writer-ai' ); ?></th>
@@ -410,9 +461,9 @@ final class MSRWA_Screen_Engine {
 								<code class="ms-key"><?php echo esc_html( $id ); ?></code>
 								<br><small class="ms-muted"><?php echo esc_html( (string) $model['label'] ); ?></small>
 							</th>
-							<td><?php echo esc_html( implode( ', ', $can ) ); ?></td>
-							<td><?php echo esc_html( sprintf( '$%s / $%s', number_format_i18n( (float) ( $model['input'] ?? 0 ), 2 ), number_format_i18n( (float) ( $model['output'] ?? 0 ), 2 ) ) ); ?></td>
-							<td><?php
+							<td data-label="<?php esc_attr_e( 'Sait faire', 'ms-recipes-writer-ai' ); ?>"><?php echo esc_html( implode( ', ', $can ) ); ?></td>
+							<td data-label="<?php esc_attr_e( 'Entrée / sortie par million', 'ms-recipes-writer-ai' ); ?>" class="ms-num-cell"><?php echo esc_html( sprintf( '$%s / $%s', number_format_i18n( (float) ( $model['input'] ?? 0 ), 2 ), number_format_i18n( (float) ( $model['output'] ?? 0 ), 2 ) ) ); ?></td>
+							<td data-label="<?php esc_attr_e( 'Servi', 'ms-recipes-writer-ai' ); ?>"><?php
 							if ( 'yes' === $served ) {
 								echo '<span class="ms-state ms-state-good">' . esc_html__( 'oui', 'ms-recipes-writer-ai' ) . '</span>';
 							} elseif ( 'no' === $served ) {
@@ -425,7 +476,6 @@ final class MSRWA_Screen_Engine {
 					<?php endforeach; ?>
 					</tbody>
 				</table>
-				</div>
 				<?php if ( $available ) : ?>
 					<details>
 						<summary><?php esc_html_e( 'Tout ce que le fournisseur sert', 'ms-recipes-writer-ai' ); ?></summary>
@@ -440,8 +490,11 @@ final class MSRWA_Screen_Engine {
 	private static function describe_model( $provider, $model, array $prices ) {
 		$rate = $prices[ $provider ][ $model ] ?? null;
 		$priced = is_array( $rate ) && isset( $rate[0], $rate[1] );
+		$shipped = MSRWA_Catalog::defaults()[ $provider ][ $model ]['label'] ?? '';
+		$row = '' === $shipped ? MSRWA_Catalog::row( $provider, $model ) : null;
 		return array(
 			'id' => $model,
+			'label' => '' !== $shipped ? (string) $shipped : (string) ( $row['label'] ?? $model ),
 			'input' => $priced ? (float) $rate[0] : null,
 			'output' => $priced ? (float) $rate[1] : null,
 			'priced' => $priced,

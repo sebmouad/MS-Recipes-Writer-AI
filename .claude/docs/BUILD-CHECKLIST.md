@@ -130,6 +130,10 @@ run carries.
   picker greys OpenAI · low (gpt-5-nano) on Research with the measured reason,
   a save routing it there is refused and stores nothing, the Modèles screen
   locks the steps a model cannot do (`tests/test-compat.php`).
+- [x] The Engine screen reads on a phone and keeps the model apart from the
+  thinking effort: levels named by their model, thinking and image quality in
+  their own words, no horizontal overflow at 390 or 1280 px, one step table
+  (`tests/test-screens.php`, checked in Chromium at both widths).
 - [ ] A complete lot on Claude — the account has no credit. — the Gemini key's
   grounding quota is exhausted, OpenAI is unreachable from the test
   environment and the Claude account has no credit.
