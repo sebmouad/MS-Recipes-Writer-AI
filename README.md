@@ -5,11 +5,12 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.14.0
+## État actuel — 0.15.0
 
-La version `0.14.0` corrige ce que coûte réellement un appel et ce que le
-catalogue garde ; voir ci-dessous ce qui a été vérifié en conditions réelles et
-ce qui ne l’a pas été. La `0.13.0` était installable et vérifiée de bout en bout sur un vrai
+La version `0.15.0` fait arriver jusqu’au moteur chaque tarif relevé ou corrigé,
+borne la réflexion de Gemini et chiffre la simulation ; la `0.14.0` corrigeait ce
+que coûte réellement un appel et ce que le catalogue garde. Voir ci-dessous ce
+qui a été vérifié en conditions réelles et ce qui ne l’a pas été. La `0.13.0` était installable et vérifiée de bout en bout sur un vrai
 WordPress (7.1.1) : un lot part, le cron le fait avancer vague par vague, et un
 brouillon arrive **en blocs**, avec son article, sa recette, son extrait, son
 identifiant d’URL, ses étiquettes, ses images attachées et décrites, ses
@@ -67,6 +68,52 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.15.0
+
+**Un tarif relevé ou corrigé n’atteignait plus le moteur après un seul
+enregistrement de l’écran Moteur.** Le formulaire affiche les tarifs du
+catalogue ; l’enregistrer sans rien toucher les stockait comme saisis à la main,
+parce que le JSON réécrit 4.0 en 4 et que la comparaison était stricte. Ce
+groupe figé remplaçait ensuite tout le catalogue : chaque tarif relevé, cherché
+ou corrigé sur l’écran Modèles restait sans effet. Reproduit en réel. La
+comparaison se fait désormais en valeur et contre le catalogue ; un tarif saisi
+ne masque plus que son propre modèle ; et la migration retire les copies déjà
+figées.
+
+**Un modèle désactivé perdait son tarif.** Seuls les modèles activés
+transmettaient leur tarif au moteur, si bien qu’une route nommant
+`gemini-3.6-flash` — livré tarifé mais désactivé — était « sans tarif » et
+arrêtait le run. Activer ne décide plus que des paliers ; tout tarif connu est
+transmis.
+
+**Les tarifs suivent le relevé.** Après « Relever les modèles », la recherche de
+tarifs part aussitôt pour les seuls modèles qui n’en ont pas (rien n’est
+dépensé s’il n’en manque aucun). GPT-5, GPT-5 mini, GPT Image 1 et Gemini 3
+Flash Preview sont livrés tarifés, et une ligne restée sans tarif est remplie
+dès qu’un tarif est livré. Les réponses affichées sont échappées.
+
+**La simulation de l’écran Moteur chiffre.** Elle résout ce qui est à l’écran
+par-dessus le catalogue — et non plus contre la seule liste du moteur, où tout
+modèle du catalogue paraissait sans tarif —, route les images comme le moteur,
+dit si la clé existe vraiment, et donne le coût de chaque étape et d’une recette
+complète.
+
+**Gemini ne pense plus jusqu’au plafond.** Gemini compte sa réflexion dans le
+plafond de sortie : une recette canonique réelle sur `gemini-3.5-flash` a pensé
+jusqu’à 4 500 jetons, s’est arrêtée sur `MAX_TOKENS` avec un JSON coupé, et a
+été facturée 0,046 $ pour rien. Le moteur demande désormais une réflexion
+`low` (`providers.gemini.thinking`) : la même étape, en réel, passe 4/4 en
+8,8 s pour 0,0227 $. Une réponse coupée est signalée d’après ce que le
+fournisseur dit, et plus seulement d’après le compte de jetons. Changement du
+moteur consigné dans [`.claude/docs/ENGINE.md`](.claude/docs/ENGINE.md) §7.
+
+**Vérifié en réel** : recette canonique (4/4, 0,0227 $) et article (8/10,
+0,0556 $, estimé 0,0698 $) sur Gemini ; simulation, relevé et recherche de
+tarifs sur un WordPress 6.8.3. **Non vérifié** : un lot complet — la recherche
+exige une recherche web, épuisée sur la clé Gemini ; OpenAI reste injoignable
+depuis l’environnement de test malgré l’accès annoncé, et le compte Claude n’a
+pas de crédit.
 
 ## Version 0.14.0
 

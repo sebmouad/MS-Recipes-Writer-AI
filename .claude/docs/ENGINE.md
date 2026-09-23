@@ -354,6 +354,16 @@ here, approved, and are in. `tests/test-engine-language.php` holds them.
    OpenAI and Anthropic, 0.014 for Google, each overridable through the caller
    layer. `tests/test-engine-usage.php` holds the live shapes.
 
+9. **Gemini thought its way through the output ceiling.** Gemini counts
+   thinking inside `maxOutputTokens` and thinks hard by default. A live
+   canonical recipe on `gemini-3.5-flash` spent the whole 4 500-token ceiling,
+   stopped on `MAX_TOKENS` with its JSON cut, and was billed $0.046. Every
+   Gemini request now carries `providers.gemini.thinking` as `thinkingConfig`,
+   shipped as `{"thinkingLevel": "low"}`; the same step then passed 4/4 for
+   $0.0227. A cut answer is also recognised from the provider's own stop
+   reason (`MAX_TOKENS`, `max_tokens`, `incomplete`), since Gemini stops a few
+   tokens short of the ceiling and the count alone missed it.
+
 ### Still open
 
 6. **The engine's `models` list is a second source of truth for prices.** The

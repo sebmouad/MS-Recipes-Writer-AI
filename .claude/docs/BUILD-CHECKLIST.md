@@ -71,6 +71,18 @@ run carries.
   tokens of page, none of which the engine counted. Thinking, tool input,
   Claude's cache tokens and each web search are now priced
   (`tests/test-engine-usage.php`).
+- [x] A rate changed after the Moteur screen was saved reaches the engine,
+  live: before the fix one untouched save froze `models` and a corrected
+  Gemini rate never arrived; after it, nothing is stored and the rate arrives.
+- [x] The Moteur simulation prices every route over the catalogue, live
+  (`tests/real/test-catalog.php`), including a model shipped priced but not
+  enabled.
+- [x] Gemini steps finish under their ceiling, live: canonical recipe 4/4 for
+  $0.0227 and article 8/10 for $0.0556 (estimated $0.0698) on
+  `gemini-3.5-flash`, where the unbounded canonical stopped on MAX_TOKENS.
+- [ ] A complete lot on a funded provider with web search — the Gemini key's
+  grounding quota is exhausted, OpenAI is unreachable from the test
+  environment and the Claude account has no credit.
 - [x] The tiers the engine chose are the ones a site gets: a fresh site's
   `openai:medium` resolved to Terra instead of Luna and estimated a full recipe
   at $0.69; after the fix the same site estimates $0.14.

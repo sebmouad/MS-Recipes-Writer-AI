@@ -219,7 +219,11 @@ What a provider lists is filtered before it is stored: `MSRWA_Catalog::role()`
 keeps the chat and image families the engine can call and nothing else, so
 speech, music, video, embeddings, dated snapshots and retired generations never
 become rows. Rates that shipped are brought up to date on each version; a rate a
-person typed or a model looked up never is.
+person typed or a model looked up never is. Every priced model hands its rate
+to the engine — enabling a model only decides whether it can be a tier — and
+what the Moteur screen stores is merged over the catalogue model by model, and
+compared against it by value, so saving that form never freezes the
+catalogue's rates in place.
 
 It holds three kinds of knowledge, deliberately kept apart. which identifiers exist, which only the provider knows and which is
 fetched; what they cost, which no provider API states — checked against all
