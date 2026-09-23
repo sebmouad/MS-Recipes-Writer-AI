@@ -71,6 +71,7 @@ TASK: combine the editor brief with current web research. Return the best concis
 
 RULES:
 - Search the web. Prefer culinary schools, established publications, recognised producers, and authoritative food-safety sources over content farms.
+- Each search query is billed; opening and reading a page is not. Run at most three searches, each precise enough to find a complete recipe page from a reliable source, then open and read the best pages they return instead of searching again.
 - Each textual fact carries its source_url. A fact with no source does not belong in the answer.
 - Keep facts short and actionable: one statement each, retaining useful figures and disagreements.
 - Report disagreement between sources rather than averaging it away.
@@ -168,6 +169,7 @@ RULES:
 - Paragraphs of 2 to 4 sentences; lists reserved for ingredients, equipment and steps.
 - Respect the canonical recipe\'s quantities, times and temperatures exactly. Invent no figure.
 - SOURCING. You may state only what the canonical recipe contains or the research package documents. This binds the substitutions and the serving suggestions hardest, because that is where invention is easiest: offer a replacement ingredient only when a research fact names it, and an accompaniment only when a fact names that. Where the research documents none, write that plainly — "les sources consultées ne documentent pas de remplacement pour cet ingrédient" — and explain instead what the ingredient does in the dish, which is useful and true. A section is never padded with a plausible swap.
+- The same holds for storage, reheating and food safety, which invite the most generic advice. Say how long the dish keeps, how to reheat it and what is unsafe only as the canonical recipe or a research fact says it; where they say nothing, write that the sources do not document it. No precaution is added because it sounds prudent.
 - The same holds for method. Do not add a step, a technique, a placement, a resting time or a separate operation that neither the canonical recipe nor the research contains, however sensible it sounds — no reducing the juices separately, no arranging by size or by hot spot, unless a source says so.
 - Use the research package for ingredient choice, technique, success cues, failures, safety, storage and visual description. When it conflicts with the canonical recipe, keep the canonical figures and avoid repeating the disputed claim.
 - Treat visual observations as appearance evidence only. Never infer hidden ingredients, quantities or preparation steps from an image.
@@ -371,6 +373,10 @@ PANEL ROLES:
 6. APPETITE HERO — the fully cooked final recipe at peak texture, in the single serving presentation the visual brief names, at the colour the observations record. Appetite comes from light, framing and texture, never from cooking it further: a browner crust, a darker glaze or a deeper caramel than the observations describe is a defect, not an improvement, and it makes this panel disagree with the featured photograph of the same dish. Structured food must show a cut, lifted or plated portion and its true layers/crumb/filling. Stews and soups must show a natural plated bowl, ladled serving or close pot hero; never force an irrelevant slice or cheese pull.
 
 ORDER OUTRANKS ROLE. The roles above say which six moments are worth showing. The canonical recipe says in which order they happen, and the recipe always wins. Map each chosen moment back to its step number and lay the panels out in ascending step order. If a role would place a moment before a step that must precede it — whisking a filling before the case that holds it is lined, saucing before the thing being sauced is cooked — move it, or choose a different moment for that panel. A collage whose panels run out of order teaches the reader the wrong recipe, and that is the single most common failure of this format.
+
+A STEP LEFT OUT STILL HAPPENED. Six panels cannot show every step, but every panel shows the food in the state all the earlier steps leave it in, shown or not. If the recipe bakes the case or the fruit before the filling goes in, the panel where the filling is poured shows a visibly part-baked case and softened fruit, never raw ones; if meat is browned before it is braised, it goes into the liquid already browned. Give each cooking stage — every time the dish goes into the oven, the pan or the pot — its own panel before giving one to a preparation moment, and merge preparation moments to make room. Skipping a cooking stage is how a collage teaches the wrong recipe.
+
+AN INGREDIENT ENTERS AT ITS OWN STEP. Nothing appears in a bowl, a marinade, a pan or a dish before the step of the canonical recipe that adds it — olives added after the chicken returns to the pot are not in the marinade, a garnish added at serving is not in the oven. Check each panel\'s contents against the steps up to that point.
 
 Before returning the image, read your six panels in order and confirm each one could only happen after the one before it. Fix any that could not.
 

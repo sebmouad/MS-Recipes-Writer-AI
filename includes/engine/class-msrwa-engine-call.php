@@ -194,8 +194,9 @@ final class MSRWA_Engine_Call {
 		if ( 'openai' === $provider ) {
 			$payload = array( 'model' => $model, 'input' => (string) $input, 'store' => false, 'max_output_tokens' => max( 16, (int) $max_tokens ) );
 			if ( $tools ) { $payload['tools'] = array( $tools ); }
-			// The only built-in tool given is search, so this caps the searches.
-			if ( $tools && ! empty( $wire['web_searches'] ) ) { $payload['max_tool_calls'] = (int) $wire['web_searches']; }
+			// Caps every action of the search tool, paid searches and free page
+			// reads alike: OpenAI offers no cap on searches alone.
+			if ( $tools && ! empty( $wire['web_tool_calls'] ) ) { $payload['max_tool_calls'] = (int) $wire['web_tool_calls']; }
 			if ( $json_output && ! $tools ) { $payload['text'] = array( 'format' => array( 'type' => 'json_object' ) ); }
 		} elseif ( 'gemini' === $provider ) {
 			$payload = array(
@@ -301,9 +302,17 @@ final class MSRWA_Engine_Call {
 			$usage = array( 'input_tokens' => (int) ( $body['usage']['input_tokens'] ?? 0 ), 'output_tokens' => (int) ( $body['usage']['output_tokens'] ?? 0 ), 'cached_input_tokens' => (int) ( $body['usage']['input_tokens_details']['cached_tokens'] ?? 0 ) );
 			$reasoning = (int) ( $body['usage']['output_tokens_details']['reasoning_tokens'] ?? 0 );
 			if ( $reasoning ) { $usage['thinking_tokens'] = $reasoning; }
+			// Only a `search` action is billed. Opening a page and finding in it
+			// are free, and counting them priced a live research call at 13
+			// searches. An item that names no action is counted, to be safe.
 			$searches = 0;
-			foreach ( (array) ( $body['output'] ?? array() ) as $item ) { if ( 'web_search_call' === ( $item['type'] ?? '' ) ) { $searches++; } }
+			$reads = 0;
+			foreach ( (array) ( $body['output'] ?? array() ) as $item ) {
+				if ( 'web_search_call' !== ( $item['type'] ?? '' ) ) { continue; }
+				if ( in_array( $item['action']['type'] ?? 'search', array( 'open_page', 'find_in_page', 'find' ), true ) ) { $reads++; } else { $searches++; }
+			}
 			if ( $searches ) { $usage['web_searches'] = $searches; }
+			if ( $reads ) { $usage['page_reads'] = $reads; }
 			$status = $body['status'] ?? '';
 			$model = $body['model'] ?? $model;
 		} elseif ( 'gemini' === $provider ) {

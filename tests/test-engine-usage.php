@@ -56,7 +56,13 @@ $openai = msrwa_usage_read( 'openai', array(
 	'output' => array( array( 'type' => 'web_search_call' ), array( 'type' => 'web_search_call' ), array( 'type' => 'message', 'content' => array( array( 'text' => '{}' ) ) ) ),
 	'usage' => array( 'input_tokens' => 4000, 'output_tokens' => 800 ), 'status' => 'completed',
 ) );
-msrwa_test_assert( 2 === $openai['usage']['web_searches'], 'Each web_search_call item is one billed search.' );
+msrwa_test_assert( 2 === $openai['usage']['web_searches'], 'A web_search_call that names no action is counted as a billed search, to be safe.' );
+$reading = msrwa_usage_read( 'openai', array(
+	'output' => array( array( 'type' => 'web_search_call', 'action' => array( 'type' => 'search' ) ), array( 'type' => 'web_search_call', 'action' => array( 'type' => 'open_page' ) ), array( 'type' => 'web_search_call', 'action' => array( 'type' => 'open_page' ) ), array( 'type' => 'web_search_call', 'action' => array( 'type' => 'find_in_page' ) ) ),
+	'usage' => array( 'input_tokens' => 4000, 'output_tokens' => 800 ), 'status' => 'completed',
+) );
+msrwa_test_assert( 1 === $reading['usage']['web_searches'], 'Only a search action is billed; opening a page and finding in it are free.' );
+msrwa_test_assert( 3 === $reading['usage']['page_reads'], 'The free reads are recorded beside it.' );
 msrwa_test_assert( 4000 === $openai['usage']['input_tokens'], 'OpenAI already counts search content and reasoning in its totals.' );
 
 // --- Pricing -----------------------------------------------------------------
@@ -90,7 +96,10 @@ msrwa_test_assert( isset( $judge['request']['payload']['generationConfig']['thin
 
 // OpenAI and Claude think at their own default unless a level is set.
 $plan = MSRWA_Engine_Call::plan_text( 'openai', 'gpt-5.6-luna', 'x', 4500, true, false, $config->provider( 'openai', 'gpt-5.6-luna', 'article' ) );
-msrwa_test_assert( ! isset( $plan['request']['payload']['reasoning'] ), 'OpenAI keeps its own default when nothing is set.' );
+msrwa_test_assert( array( 'effort' => 'low' ) === ( $plan['request']['payload']['reasoning'] ?? null ), 'OpenAI writes at low effort: a full recipe kept every score for $0.1030 against $0.1822.' );
+$judge_wire = $config->provider( 'openai', 'gpt-5.6-luna', 'final_approval' );
+msrwa_test_assert( 'medium' === $judge_wire['thinking_level'], 'The steps that judge keep the measured default.' );
+msrwa_test_assert( 'medium' === $config->thinking( 'fact_check', 'openai' ), 'The fact check too.' );
 
 // One level per step, spelled the way each provider spells it.
 $tuned = MSRWA_Engine_Config::create( $keys + array( 'thinking' => array( 'default' => 'medium', 'research' => 'high', 'review' => 'minimal' ) ) );
@@ -113,7 +122,7 @@ foreach ( array( 'claude-sonnet-4-5-20250929', 'claude-haiku-4-5-20251001' ) as 
 // What thinking costs, in the estimate: the shapes were measured at the
 // providers' default, medium, so only a higher level adds output.
 msrwa_test_assert( 3000 === MSRWA_Engine_Config::thinking_allowance( 'high' ), 'high adds tokens to every call.' );
-msrwa_test_assert( 0 === MSRWA_Engine_Config::thinking_allowance( 'low' ), 'low subtracts nothing: an estimate must not read low.' );
+msrwa_test_assert( -500 === MSRWA_Engine_Config::thinking_allowance( 'low' ), 'low takes off the least it was measured to save.' );
 msrwa_test_assert( 0 === MSRWA_Engine_Config::thinking_allowance( '' ), 'The provider’s default is what was measured.' );
 
 $cut = msrwa_usage_read( 'gemini', array( 'candidates' => array( array( 'content' => array( 'parts' => array( array( 'text' => '{"title":' ) ) ), 'finishReason' => 'MAX_TOKENS' ) ), 'usageMetadata' => array( 'promptTokenCount' => 3759, 'candidatesTokenCount' => 1050, 'thoughtsTokenCount' => 3435 ) ) );

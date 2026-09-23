@@ -62,7 +62,14 @@ final class MSRWA_Engine_Config {
 			 * thinking_level`, else the provider's own default). Thinking is billed
 			 * as output and, on Gemini and Claude, spent out of the output ceiling.
 			 */
-			'thinking' => array( 'default' => '' ),
+			// Writing and research think lightly; the steps that judge — the
+			// fact check and the final approval — keep the providers' measured
+			// default. A full recipe at `low` everywhere kept every score and cost
+			// $0.1030 against $0.1822; the judges are kept at medium so that no
+			// saving is taken out of what catches a defect.
+			// Proofreading returns the whole article, and once at `low` answered
+			// without it; it keeps medium too.
+			'thinking' => array( 'default' => '', 'fact_check' => 'medium', 'proofread' => 'medium', 'final_approval' => 'medium' ),
 
 			// Output ceilings. Every one of these has been too low at least once,
 			// and a truncated answer is billed in full and scores nothing.
@@ -109,12 +116,14 @@ final class MSRWA_Engine_Config {
 				'concurrency'        => 4,
 				'max_image_bytes'    => 10000000,
 				'observation_phrases'=> 8,
-				// Web searches one call may run, each billed on top of the tokens.
-				// Uncapped, a live OpenAI research call ran 13 and cost $0.1525
-				// against an estimate of $0.0504 that had assumed three. The
-				// estimate prices exactly this many, so it is a ceiling and not a
-				// guess. Gemini offers no cap; its grounding is priced the same way.
-				'web_searches'       => 10,
+				// Paid searches one call is expected to run. The research prompt asks
+				// for at most three, and on live runs it used one to four; Claude's
+				// tool is capped here, and the expected estimate prices this many.
+				'web_searches'       => 3,
+				// Every search-tool action one call may take: OpenAI's paid searches
+				// and its free page reads together, sent as max_tool_calls. The
+				// maximum estimate prices them all as searches.
+				'web_tool_calls'     => 10,
 			),
 
 			'language' => 'fr',
@@ -139,8 +148,12 @@ final class MSRWA_Engine_Config {
 					'image_endpoint'  => 'https://api.openai.com/v1/images/generations',
 					'headers'         => array( 'Content-Type: application/json', 'Authorization: Bearer {{key}}' ),
 					'key_env'         => array( 'OPENAI_API_KEY', 'MSRWA_OPENAI_KEY' ),
-					'web_search_tool' => array( 'type' => 'web_search' ),
+					// `low` hands the model less of each result page. Measured on two
+					// dishes: every research answer still scored 14/14, for $0.0547
+					// against $0.0707 at medium.
+					'web_search_tool' => array( 'type' => 'web_search', 'search_context_size' => 'low' ),
 					'web_search_usd'  => 0.01,
+					'thinking_level'  => 'low',
 					// Cached input is billed at a tenth of the input rate on every
 					// current model on OpenAI's pricing page.
 					'cached_input_ratio' => 0.1,
@@ -332,10 +345,13 @@ final class MSRWA_Engine_Config {
 	 * with `max_uses` 3, and the lower of two ceilings is the one that binds.
 	 */
 	public function web_searches( $provider = '' ) {
-		$limit = max( 1, (int) $this->get( 'limits.web_searches', 10 ) );
+		$limit = max( 1, (int) $this->get( 'limits.web_searches', 3 ) );
 		$own = (int) ( ( (array) $this->get( 'providers.' . $provider . '.web_search_tool', array() ) )['max_uses'] ?? 0 );
 		return $own > 0 ? min( $limit, $own ) : $limit;
 	}
+
+	/** Every search-tool action one call may take, paid or free. Never fewer than the paid searches. */
+	public function web_tool_calls( $provider = '' ) { return max( $this->web_searches( $provider ), (int) $this->get( 'limits.web_tool_calls', 10 ) ); }
 
 	/** The thinking levels the engine knows how to ask for. */
 	public static function thinking_levels() { return array( 'minimal', 'low', 'medium', 'high' ); }
@@ -353,15 +369,17 @@ final class MSRWA_Engine_Config {
 	}
 
 	/**
-	 * Output tokens a level adds to a call, over what the step's measured shape
-	 * already holds. The shapes were measured at the providers' default
-	 * reasoning, which is `medium`, so only a higher level adds anything; a
-	 * lower one is not subtracted, because an estimate that reads low lets a lot
-	 * past a ceiling it will break.
+	 * Output tokens a level adds to a call, or saves, against the step's
+	 * measured shape. The shapes were measured at the providers' default,
+	 * `medium`. A higher level adds its thinking. A lower one takes off only
+	 * what it was measured to save: a full recipe on gpt-5.6-luna at `low`
+	 * wrote 500 to 1 400 fewer tokens per text step, so 500 is taken off,
+	 * the least of what was seen — an estimate that reads low lets a lot past
+	 * a ceiling it will break.
 	 */
 	public static function thinking_allowance( $level ) {
-		$tokens = array( 'minimal' => 0, 'low' => 1000, 'medium' => 3000, 'high' => 6000 );
-		return max( 0, ( $tokens[ $level ] ?? $tokens['medium'] ) - $tokens['medium'] );
+		$tokens = array( 'minimal' => -800, 'low' => -500, 'medium' => 0, 'high' => 3000 );
+		return $tokens[ $level ] ?? 0;
 	}
 
 	/** How one provider is reached, with {{model}} and {{key}} resolved, and how hard `$step` may think on it. */
@@ -377,6 +395,7 @@ final class MSRWA_Engine_Config {
 		$provider['has_key'] = '' !== $key;
 		$provider['thinking_level'] = $this->thinking( '' === (string) $step ? 'default' : (string) $step, $name );
 		$provider['web_searches'] = $this->web_searches( $name );
+		$provider['web_tool_calls'] = $this->web_tool_calls( $name );
 		return $provider;
 	}
 
