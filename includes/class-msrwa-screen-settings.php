@@ -61,12 +61,13 @@ final class MSRWA_Screen_Settings {
 					<label for="ms-per-recipe"><strong><?php esc_html_e( 'Par recette', 'ms-recipes-writer-ai' ); ?></strong></label><br>
 					<input type="number" id="ms-per-recipe" name="msrwa_settings[per_recipe_budget_usd]" value="<?php echo esc_attr( (float) $settings['per_recipe_budget_usd'] ); ?>" step="0.01" min="0" class="small-text ms-num"> $
 					<br><small class="ms-muted"><?php esc_html_e( 'La valeur proposée sur un nouveau lot, et celle qui s’applique à un lot déposé par quelqu’un qui ne voit pas les montants.', 'ms-recipes-writer-ai' ); ?></small>
-					<?php $full = (float) MSRWA_Estimate::recipe( MSRWA_Profile::FULL )['cost_usd']; ?>
-					<br><small class="ms-muted<?php echo MSRWA_Estimate::fits( $full, (float) $settings['per_recipe_budget_usd'] ) ? '' : ' ms-warn'; ?>"><?php
+					<?php $recipe = MSRWA_Estimate::recipe( MSRWA_Profile::FULL ); ?>
+					<br><small class="ms-muted<?php echo MSRWA_Estimate::fits( (float) $recipe['max_usd'], (float) $settings['per_recipe_budget_usd'] ) ? '' : ' ms-warn'; ?>"><?php
 						echo esc_html( sprintf(
-							/* translators: %s is the estimated cost of one complete recipe. */
-							__( 'Avec le routage actuel, une recette complète est estimée à %s. Un plafond en dessous refuse le lot au lancement ; laissez de la marge pour les reprises.', 'ms-recipes-writer-ai' ),
-							MSRWA_I18N::money( $full, 4 )
+							/* translators: 1: the expected cost of one complete recipe, 2: the most it can cost when every final approval refuses. */
+							__( 'Avec le routage actuel, une recette complète est estimée à %1$s, et jusqu’à %2$s si l’approbation finale refuse à chaque tentative. Un plafond sous la première valeur refuse le lot au lancement ; sous la seconde, il peut arrêter une recette avant la fin.', 'ms-recipes-writer-ai' ),
+							MSRWA_I18N::money( (float) $recipe['cost_usd'], 4 ),
+							MSRWA_I18N::money( (float) $recipe['max_usd'], 4 )
 						) );
 					?></small>
 				</p>

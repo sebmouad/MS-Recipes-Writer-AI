@@ -11,13 +11,16 @@ if ( $budget <= 0 ) { msrwa_real_skip( 'MSRWA_TEST_BUDGET_USD is not set; this t
 $health = msrwa_real_request( 'GET', '/msrwa/v1/health' );
 if ( empty( $health['body']['providers'] ) ) { msrwa_real_skip( 'No API key is stored on the site; nothing can be generated.' ); }
 
-// Article only: the cheapest way to exercise the whole machine. Images are the
-// expensive half and are not what is being proved here.
-$estimate = msrwa_real_request( 'GET', '/msrwa/v1/estimate?profile=article&recipes=1&images=0' );
+// Article only by default: the cheapest way to exercise the whole machine.
+// MSRWA_TEST_PROFILE=full runs the images and the final approval too, which is
+// what the estimate of a complete recipe is measured against.
+$profile = in_array( getenv( 'MSRWA_TEST_PROFILE' ), array( 'article', 'featured', 'full' ), true ) ? getenv( 'MSRWA_TEST_PROFILE' ) : 'article';
+$estimate = msrwa_real_request( 'GET', '/msrwa/v1/estimate?profile=' . $profile . '&recipes=1&images=0' );
 $expected = (float) ( $estimate['body']['cost_usd'] ?? 0 );
+$most = (float) ( $estimate['body']['max_usd'] ?? $expected );
 msrwa_real_assert( $expected > 0, 'The article profile must be priced before it is run.' );
 if ( $expected > $budget ) { msrwa_real_skip( 'One article is estimated at $' . $expected . ', over the $' . $budget . ' ceiling.' ); }
-msrwa_real_note( 'estimated $' . number_format( $expected, 4 ) . ', ceiling $' . number_format( $budget, 4 ) );
+msrwa_real_note( 'estimated $' . number_format( $expected, 4 ) . ', at most $' . number_format( $most, 4 ) . ', ceiling $' . number_format( $budget, 4 ) );
 
 // --- Submit ---------------------------------------------------------------
 
@@ -25,7 +28,7 @@ $created = msrwa_real_request( 'POST', '/msrwa/v1/batches', array(
 	'recipes' => "Tarte aux pommes normande\nPâte brisée, pommes, crème, œufs, calvados. Cuire 45 minutes à 180 °C.",
 	'images' => '',
 	'budget' => round( $budget, 4 ),
-	'profile' => 'article',
+	'profile' => $profile,
 	'language' => 'fr',
 ), 180 );
 
@@ -73,10 +76,18 @@ msrwa_real_assert(
 	$billed <= $budget,
 	'A run must never exceed the ceiling it was given: billed $' . $billed . ' against $' . $budget . '.'
 );
+// Two numbers, both checked. What is billed may run above the expected cost
+// when the final approval refuses, but never above the maximum — with a tenth
+// of slack, because OpenAI can run one search past the cap it was given.
 msrwa_real_assert(
-	abs( $billed - $expected ) / max( 0.0001, $expected ) < 0.5,
-	'The estimate must be in the right region: estimated $' . number_format( $expected, 4 ) . ', billed $' . number_format( $billed, 4 ) . '.'
+	$billed >= $expected * 0.5,
+	'The estimate must not be far above the bill: estimated $' . number_format( $expected, 4 ) . ', billed $' . number_format( $billed, 4 ) . '.'
 );
+msrwa_real_assert(
+	$billed <= $most * 1.1,
+	'The bill must stay within the estimated maximum: at most $' . number_format( $most, 4 ) . ', billed $' . number_format( $billed, 4 ) . '.'
+);
+msrwa_real_note( 'billed ' . round( 100 * $billed / max( 0.0001, $expected ) ) . '% of the expected cost' );
 
 // --- The draft ------------------------------------------------------------
 

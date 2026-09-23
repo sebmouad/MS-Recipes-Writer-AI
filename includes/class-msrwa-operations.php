@@ -51,6 +51,7 @@ final class MSRWA_Operations {
 				'notice' => __( 'Simulation locale : aucune sauvegarde, aucun appel API. Vérifiez les routes et les valeurs effectives ci-dessous.', 'ms-recipes-writer-ai' ),
 				'routes' => $routes,
 				'cost_usd' => $estimate['cost_usd'],
+				'max_usd' => $estimate['max_usd'],
 				'unpriced' => $estimate['unpriced'],
 				'effective' => $config->to_array(),
 			) );

@@ -11,13 +11,23 @@ require_once dirname( __DIR__ ) . '/includes/class-msrwa-estimate.php';
 
 $full = MSRWA_Estimate::recipe( MSRWA_Profile::FULL );
 
-// Two real runs of the same brief on the shipped configuration cost $0.1165
-// and $0.1128. An estimate outside a quarter of that is not an estimate.
-$measured = 0.1147;
+// Real runs on the shipped configuration, 2026-09-23, OpenAI. A full recipe
+// billed $0.2804, of which two refusals by the final approval — two redrawn
+// collages and two extra approvals — were $0.0684: one pass was $0.2120. The
+// article profile, with searches capped, billed $0.1627. An estimate outside a
+// quarter of that is not an estimate.
+$measured = 0.2120;
 msrwa_test_assert(
 	abs( $full['cost_usd'] - $measured ) / $measured < 0.25,
-	'The full estimate must land near what real runs cost; got ' . $full['cost_usd'] . ' against ' . $measured
+	'The full estimate must land near what one real pass cost; got ' . $full['cost_usd'] . ' against ' . $measured
 );
+$article_only = MSRWA_Estimate::recipe( MSRWA_Profile::ARTICLE );
+msrwa_test_assert( abs( $article_only['cost_usd'] - 0.1627 ) / 0.1627 < 0.25, 'The article profile must land near its real run; got ' . $article_only['cost_usd'] );
+// The maximum is what the engine can spend when every approval refuses, and
+// the run that was refused twice must fall inside it.
+msrwa_test_assert( $full['max_usd'] >= 0.2804, 'The maximum covers the real run refused twice; got ' . $full['max_usd'] );
+msrwa_test_assert( $full['max_usd'] > $full['cost_usd'], 'A recipe that can be refused has a maximum above its expected cost.' );
+msrwa_test_assert( $article_only['max_usd'] === $article_only['cost_usd'], 'Without a final approval there is nothing to retry.' );
 msrwa_test_assert( array() === $full['unpriced'], 'Every shipped route must be priced; unpriced: ' . implode( ', ', $full['unpriced'] ) );
 
 // Images are the expensive half and route through `routing.image`, not through

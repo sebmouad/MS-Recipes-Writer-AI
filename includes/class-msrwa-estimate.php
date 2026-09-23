@@ -18,9 +18,9 @@ final class MSRWA_Estimate {
 	/** Rough output tokens per step, from what real runs actually produced. */
 	private static function shape() {
 		return array(
-			// Search is billed per query on top of the tokens; three is the
-			// ceiling the research step is given.
-			'research' => array( 'input' => 65000, 'output' => 6200, 'searches' => 3 ),
+			// Search is billed per query on top of the tokens, and is priced at
+			// the configured ceiling (`limits.web_searches`).
+			'research' => array( 'input' => 65000, 'output' => 6200 ),
 			'canonical_recipe' => array( 'input' => 4200, 'output' => 3100 ),
 			'article' => array( 'input' => 6900, 'output' => 6600 ),
 			'review' => array( 'input' => 11200, 'output' => 2200 ),
@@ -70,8 +70,16 @@ final class MSRWA_Estimate {
 			$thinking = 'image_generation' === $capability ? '' : $config->thinking( $name, $route['provider'] );
 			$usage['output'] = min( (int) $usage['output'] + MSRWA_Engine_Config::thinking_allowance( $thinking ), $config->max_output( $name ) );
 
-			$cost = $config->price( $route['provider'], $route['model'], array( 'input_tokens' => $usage['input'], 'output_tokens' => $usage['output'], 'web_searches' => (int) ( $usage['searches'] ?? 0 ) ) );
+			$cost = $config->price( $route['provider'], $route['model'], array( 'input_tokens' => $usage['input'], 'output_tokens' => $usage['output'], 'web_searches' => 'web_search' === $capability ? $config->web_searches( $route['provider'] ) : 0 ) );
 			if ( null === $cost ) { $unknown[] = $name; continue; }
+
+			// Research also reads up to `limits.images_inspected` of the photographs
+			// it cites, one vision call each: $0.0021 on a real run, and missing.
+			if ( 'web_search' === $capability ) {
+				$vision = $config->model_for( 'vision' );
+				$look = $config->price( $vision['provider'], $vision['model'], self::vision_usage( $config, $vision['provider'] ) );
+				$cost += null === $look ? 0.0 : (float) $look * max( 0, (int) $config->get( 'limits.images_inspected', 3 ) );
+			}
 
 			$total += (float) $cost;
 			$steps[ $name ] = array(
@@ -85,12 +93,30 @@ final class MSRWA_Estimate {
 		$buckets = array( 'article' => 0.0, 'featured' => 0.0, 'facebook' => 0.0, 'other' => 0.0 );
 		foreach ( $steps as $step ) { $buckets[ $step['bucket'] ] += $step['cost_usd']; }
 
+		// The final approval may refuse. Each refusal redraws the images it
+		// blocked and asks again, up to `attempts.final_approval`. A real full
+		// recipe was refused twice: the collage was drawn three times and the
+		// approval ran three times, $0.2804 against a one-pass $0.2119. The
+		// expected figure stays one pass; the maximum is every attempt used,
+		// with both images redrawn each time — the most the engine can spend.
+		$retry = 0.0;
+		if ( isset( $steps['final_approval'] ) ) {
+			foreach ( array( 'featured_image', 'facebook_image', 'final_approval' ) as $again ) { $retry += (float) ( $steps[ $again ]['cost_usd'] ?? 0 ); }
+			$retry *= max( 0, $config->attempts( 'final_approval' ) - 1 );
+		}
+
 		return array(
 			'cost_usd' => round( $total, 6 ),
+			'max_usd' => round( $total + $retry, 6 ),
 			'steps' => $steps,
 			'buckets' => array_map( static function ( $value ) { return round( $value, 6 ); }, $buckets ),
 			'unpriced' => $unknown,
 		);
+	}
+
+	/** One look at one photograph: the shape the matcher and research both pay. */
+	private static function vision_usage( MSRWA_Engine_Config $config, $provider ) {
+		return array( 'input_tokens' => 1100, 'output_tokens' => 180 + MSRWA_Engine_Config::thinking_allowance( $config->thinking( 'vision', $provider ) ) );
 	}
 
 	/**
@@ -103,7 +129,7 @@ final class MSRWA_Estimate {
 		// The pairing reads image bytes, so it is priced on the vision route the
 		// matcher actually uses.
 		$route = $config->model_for( 'vision' );
-		$per_image = $config->price( $route['provider'], $route['model'], array( 'input_tokens' => 1100, 'output_tokens' => 180 + MSRWA_Engine_Config::thinking_allowance( $config->thinking( 'vision', $route['provider'] ) ) ) );
+		$per_image = $config->price( $route['provider'], $route['model'], self::vision_usage( $config, $route['provider'] ) );
 
 		$recipes = max( 0, (int) $recipes );
 		$images = max( 0, (int) $images );
@@ -112,8 +138,10 @@ final class MSRWA_Estimate {
 		return array(
 			'recipes' => $recipes,
 			'per_recipe_usd' => $recipe['cost_usd'],
+			'per_recipe_max_usd' => $recipe['max_usd'],
 			'matching_usd' => $matching,
 			'cost_usd' => round( $recipe['cost_usd'] * $recipes + (float) $matching, 6 ),
+			'max_usd' => round( $recipe['max_usd'] * $recipes + (float) $matching, 6 ),
 			'buckets' => $recipe['buckets'],
 			'unpriced' => $recipe['unpriced'],
 			'matching_unpriced' => null === $matching,

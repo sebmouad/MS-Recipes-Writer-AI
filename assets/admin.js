@@ -102,6 +102,11 @@
           }
           if (data.fits === false) {
             line += ' ' + (t.overCeiling || '').replace('%1$s', money(data.per_recipe_usd)).replace('%2$s', money(data.ceiling_usd));
+          } else if (data.per_recipe_max_usd > data.per_recipe_usd) {
+            // The final approval can refuse and have the images redrawn; a real
+            // recipe refused twice cost a third more than one pass.
+            line += ' ' + (t.retryMax || '').replace('%s', money(data.per_recipe_max_usd));
+            if (data.ceiling_usd > 0 && data.per_recipe_max_usd > data.ceiling_usd) { line += ' ' + (t.retryOverCeiling || ''); }
           }
           say(estimate, line);
         }).catch(function () {
@@ -606,6 +611,7 @@
           previewResult.appendChild(table);
           var total = document.createElement('p');
           total.textContent = (t.previewTotal || '%s').replace('%s', money(data.cost_usd || 0));
+          if (data.max_usd > data.cost_usd) { total.textContent += ' ' + (t.retryMax || '').replace('%s', money(data.max_usd)); }
           if (data.unpriced && data.unpriced.length) {
             total.className = 'ms-warn';
             total.textContent += ' ' + (t.previewUnpriced || '') + ' ' + data.unpriced.join(', ');
