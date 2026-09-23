@@ -1,6 +1,6 @@
 # Build checklist — for the model doing the work
 
-## Verified on a real site — 0.12.0, 2026-09-23
+## Verified on a real site — 0.13.0, 2026-09-23
 
 WordPress 7.1.1 with the SQLite database integration (the only database the
 test sandbox could run; a MySQL pass is still owed), the plugin activated, lots
@@ -58,6 +58,11 @@ run carries.
   but no provider on this sandbox can complete it, so no rate has been looked
   up for real. The validation half (which is where a hallucinated rate would
   get in) is covered offline in `tests/test-prices.php`.
+- [x] Both roles over all eight screens at 1400px and 390px: the writer is
+  refused from every administrative screen, no amount, model name or token
+  count appears on any screen they reach, and page-level overflow is 0
+  everywhere.
+- [x] The nine engine tier routes, each priced and each served by its provider.
 - [ ] Image steps, the final judge and the matcher live — need a reachable and
   funded OpenAI or Gemini key.
 - [ ] The same suite on MySQL.

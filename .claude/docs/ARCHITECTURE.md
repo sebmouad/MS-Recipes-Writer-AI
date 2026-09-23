@@ -222,7 +222,14 @@ that step cannot run; a provider never asked says nothing about its models, so
 silence is reported as unknown rather than as absence.
 
 The interface is light only, by the owner's decision, and ships in French,
-English and Arabic. `tools/i18n.php` extracts and
+English and Arabic. `MSRWA_I18N::load()` is hooked on `init`: WordPress 6.7 and
+later would load the catalogues without it, which is why nothing noticed it was
+missing, but an older site would have stayed French whatever the reader chose.
+
+Anything a provider says back is a credential risk, not only what this plugin
+sends. `MSRWA_DB::sanitize()` masks by key name *and* redacts key-shaped
+strings wherever they appear, because OpenAI answers a bad key by quoting part
+of it and that sentence is stored as a step's error. `tools/i18n.php` extracts and
 compiles the catalogues, because there is no gettext toolchain and no build step.
 
 ## REST

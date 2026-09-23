@@ -5,9 +5,9 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.12.0
+## État actuel — 0.13.0
 
-La version `0.12.0` est installable et vérifiée de bout en bout sur un vrai
+La version `0.13.0` est installable et vérifiée de bout en bout sur un vrai
 WordPress (7.1.1) : un lot part, le cron le fait avancer vague par vague, et un
 brouillon arrive **en blocs**, avec son article, sa recette, son extrait, son
 identifiant d’URL, ses étiquettes, ses images attachées et décrites, ses
@@ -65,6 +65,57 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.13.0
+
+**Le moteur parle enfin les trois langues.** Cinq corrections, proposées dans
+[`.claude/docs/ENGINE.md`](.claude/docs/ENGINE.md) §7 et approuvées par le
+propriétaire. Le gabarit d’article exigeait « é, è, ê, à… » et rejetait un
+texte sans accents, quelle que soit la langue qu’il venait de recevoir. Le
+contrôle des sections obligatoires ne connaissait que des intitulés français :
+un article anglais correct échouait à chaque fois — 9/10 en conditions réelles,
+« missing: choix, matériel, erreurs, conservation » — et payait une reprise
+incapable de corriger quoi que ce soit. La clé `language` de premier niveau
+était enregistrée à chaque run, affichée sur l’écran Moteur, et lue par
+personne. Le contrôle de longueur ne regardait que le minimum : un article
+anglais réel est revenu à 5 988 mots pour une cible de 2 800–3 600, et un
+article trop long est payé deux fois de plus, puisque la revue et la relecture
+le lisent en entier. Et `claude:low` nommait `claude-haiku-4-5`, qu’Anthropic
+ne sert pas.
+
+**Un audit de sécurité, et ce qu’il a trouvé.** `sanitize()` masquait par nom
+de clé — ce qui attrape une charge utile construite ici, mais pas ce que le
+fournisseur répond : OpenAI refuse une mauvaise clé par « Incorrect API key
+provided: sk-proj-… », et cette phrase était enregistrée telle quelle comme
+erreur d’étape puis affichée sur deux écrans. Toute chaîne ayant la forme d’une
+clé est désormais masquée, où qu’elle se trouve, y compris imbriquée — et la
+prose ordinaire est conservée mot pour mot, car une erreur trop caviardée ne
+sert plus à rien.
+
+**Et ce qu’il a trouvé côté écrans.** Deux requêtes média utilisaient
+`max-inline-size`, qui n’est pas une caractéristique média reconnue : elles
+étaient mortes en silence. Une fois vivantes, l’écran Moteur débordait encore
+de 206 px à 390 px de large. Les tableaux larges tiennent maintenant dans la
+région défilante que l’extension possédait déjà — focalisable et nommée, pour
+qui ne peut pas faire glisser. Débordement nul sur les huit écrans, aux deux
+largeurs, pour les deux rôles ; et le rédacteur ne rencontre toujours aucun
+montant, aucun nom de modèle, aucun compte de jetons.
+
+**Les listes imbriquées sont devenues des blocs.** Une liste dans une liste
+était écrite en HTML brut dans l’élément : rien n’était perdu et l’éditeur ne
+signalait rien, mais elle n’était pas un bloc — impossible de l’indenter, de la
+réordonner, de lui ajouter une ligne. WordPress imbrique un bloc de liste dans
+l’élément ; c’est ce qui est fait, vérifié dans l’éditeur.
+
+**Du code mort en moins, et une vraie lacune qu’il cachait.** Six méthodes que
+rien n’appelait, trouvées par graphe d’appels. `MSRWA_I18N::load()` en faisait
+partie — sauf que c’est elle qui charge les catalogues. Rien ne l’appelait : les
+traductions n’apparaissaient que parce que WordPress 6.7 s’est mis à charger le
+dossier `/languages` d’une extension à la demande. Invisible sur un site à
+jour, total sur un site plus ancien, où chaque écran serait resté français quel
+que soit le choix du lecteur. Elle est accrochée à `init`. Huit entrées de
+catalogue devenues orphelines sont parties : 553 chaînes, 553 traduites dans
+les deux langues.
 
 ## Version 0.12.0
 
