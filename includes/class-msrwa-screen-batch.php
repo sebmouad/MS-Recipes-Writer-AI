@@ -66,6 +66,14 @@ final class MSRWA_Screen_Batch {
 
 		echo '<section class="ms-card ms-card-flush"><h2>' . esc_html__( 'Appariement', 'ms-recipes-writer-ai' ) . '</h2>';
 		echo '<p>' . esc_html__( 'Chaque photographie a été décrite depuis ses propres pixels, puis rapprochée d’une recette. Dans le doute, le modèle n’associe pas : une photographie laissée de côté coûte moins cher qu’une photographie attribuée au mauvais plat.', 'ms-recipes-writer-ai' ) . '</p>';
+		$named = array_filter( $recipes, static function ( $recipe ) { return ! empty( $recipe['from_photographs'] ); } );
+		if ( $named ) {
+			echo '<p class="ms-note ms-note-live">' . esc_html( sprintf(
+				/* translators: %s lists the dish names read from the photographs. */
+				__( 'Aucun texte fourni : ces recettes ont été nommées d’après les photographies — %s. Chacune sera établie d’après les sources ; vérifiez-les avant de lancer.', 'ms-recipes-writer-ai' ),
+				implode( ', ', array_map( static function ( $recipe ) { return (string) $recipe['title']; }, $named ) )
+			) ) . '</p>';
+		}
 
 		if ( ! $images ) {
 			MSRWA_UI::nothing(

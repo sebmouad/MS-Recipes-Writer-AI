@@ -5,9 +5,9 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.20.2
+## État actuel — 0.21.0
 
-La version `0.20.2` rend l’écran Moteur lisible sur ordinateur comme sur téléphone et distingue le modèle de la réflexion ; la `0.20.1` ne laissait confier une étape qu’à un modèle capable de la faire ; la `0.20.0` remplissait chaque brouillon comme le lisent le thème MS Recipes, MS SEO Plus, MS FB Posts et MS Image Optimizer ; la `0.19.0` ramenait une recette approuvée du premier coup à 0,09–0,10 $ sans perte mesurée ; la `0.18.9` reprenait chaque écran après une revue complète dans le navigateur ; la `0.18.8` réservait l’extension, renommée « MS Recipes AI » dans le menu, à ceux qui peuvent téléverser des fichiers ; la `0.18.7` disait juste ce que fait le plafond par recette ; la `0.18.6` rangeait les photographies envoyées avec le brouillon qu’elles ont servi à écrire ; la `0.18.5` faisait passer un lot de trois recettes en 8 minutes pour 0,125 $ la recette, toutes approuvées ; la `0.18.4` faisait envoyer les photographies d’un lot depuis l’ordinateur du rédacteur ; la `0.18.3` faisait approuver les trois recettes d’un lot réel aux réglages par défaut — image à la une en `low`, collage en `medium` — pour 0,132 $ en moyenne ; la `0.18.2` permettait de choisir le modèle et la qualité de chaque image
+La version `0.21.0` accepte un lot fait de texte, de photographies ou des deux, et fait lire aux écrans Modèles et Moteur la même règle ; la `0.20.2` rendait l’écran Moteur lisible sur ordinateur comme sur téléphone et distingue le modèle de la réflexion ; la `0.20.1` ne laissait confier une étape qu’à un modèle capable de la faire ; la `0.20.0` remplissait chaque brouillon comme le lisent le thème MS Recipes, MS SEO Plus, MS FB Posts et MS Image Optimizer ; la `0.19.0` ramenait une recette approuvée du premier coup à 0,09–0,10 $ sans perte mesurée ; la `0.18.9` reprenait chaque écran après une revue complète dans le navigateur ; la `0.18.8` réservait l’extension, renommée « MS Recipes AI » dans le menu, à ceux qui peuvent téléverser des fichiers ; la `0.18.7` disait juste ce que fait le plafond par recette ; la `0.18.6` rangeait les photographies envoyées avec le brouillon qu’elles ont servi à écrire ; la `0.18.5` faisait passer un lot de trois recettes en 8 minutes pour 0,125 $ la recette, toutes approuvées ; la `0.18.4` faisait envoyer les photographies d’un lot depuis l’ordinateur du rédacteur ; la `0.18.3` faisait approuver les trois recettes d’un lot réel aux réglages par défaut — image à la une en `low`, collage en `medium` — pour 0,132 $ en moyenne ; la `0.18.2` permettait de choisir le modèle et la qualité de chaque image
 séparément ; la `0.18.1` fait tenir le plafond par recette jusque dans les reprises
 de l’approbation finale ; la `0.18.0` ramène une recette complète à environ 0,11 $ réels —
 recherche web comprise — sans perte de qualité mesurée ; la `0.17.0` faisait
@@ -74,6 +74,42 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.21.0
+
+**Un lot se compose de texte, de photographies, ou des deux.**
+
+- Texte seul : comme avant, sans l’appel d’appariement qui était payé pour
+  rien quand il n’y avait aucune photographie.
+- Photographies seules : chacune est décrite, puis un appel de texte les
+  regroupe par plat ; chaque plat devient une recette nommée d’après ce que
+  montrent ses photographies, à établir d’après les sources. Deux vues d’une
+  même tarte font une recette ; une photographie où aucun plat n’est reconnu
+  n’en fait aucune. Si aucun plat n’est reconnu, le lot est refusé et ses
+  photographies retirées. L’écran du lot dit que les recettes ont été nommées
+  d’après les photographies, pour qu’on les vérifie avant de lancer.
+- Les deux : inchangé.
+- Mesuré sur le site de test : deux photographies sans texte, une tarte aux
+  pommes et une souris d’agneau, ont donné deux recettes justement nommées ;
+  le regroupement a coûté 0,0007 $ en 6 secondes.
+
+**Les écrans Modèles et Moteur appliquent la même règle.** Les deux lisent
+`MSRWA_Compat` :
+
+- la même liste d’étapes, dans le même ordre et sous les mêmes noms — la
+  lecture des photographies apparaît désormais sur l’écran Modèles ;
+- les mêmes modèles : le Moteur propose, étape par étape, chaque modèle activé
+  sur l’écran Modèles et de la bonne famille (texte ou image), et plus seulement
+  trois niveaux ; un niveau reste proposé sous le nom de son modèle,
+  « GPT-5.6 Luna · standard » ;
+- les mêmes refus : un modèle désactivé sur l’écran Modèles ne sert plus
+  aucune étape — l’enregistrement et le lancement le refusent — et il est grisé
+  sur le Moteur avec la raison ;
+- les mêmes mots : économique, standard, avancé sur les deux écrans.
+
+Le tableau « Modèles et tarifs » du Moteur, qui lisait la liste livrée avec
+l’extension plutôt que le catalogue du site, est remplacé par un lien vers
+l’écran Modèles.
 
 ## Version 0.20.2
 

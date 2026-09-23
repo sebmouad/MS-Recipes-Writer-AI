@@ -50,6 +50,46 @@ msrwa_test_assert( 'basse' === $odd[0]['confidence'], 'An unknown confidence rea
 $rubbish = $clean( array( 'pas un tableau', null, array( 'image' => 1, 'recipe' => 0 ) ) );
 msrwa_test_assert( 3 === count( $rubbish ), 'A malformed entry is skipped, not fatal; got ' . count( $rubbish ) );
 
+// --- Photographs without any text ----------------------------------------
+// Each dish the photographs show becomes a recipe; two shots of one dish are
+// one recipe, and a dish no photograph was given is not one.
+
+$proposal = new ReflectionMethod( MSRWA_Match::class, 'proposal' );
+$proposal->setAccessible( true );
+$shots = array(
+	array( 'file' => 'tarte-1.jpg', 'dish' => 'tarte aux pommes', 'describes' => 'Une tarte dorée aux pommes en lamelles.' ),
+	array( 'file' => 'tarte-2.jpg', 'dish' => 'tarte normande', 'describes' => 'Une part de tarte aux pommes.' ),
+	array( 'file' => 'flou.jpg', 'dish' => '', 'describes' => 'Une surface brune floue.' ),
+	array( 'file' => 'yassa.jpg', 'dish' => 'poulet yassa', 'describes' => 'Du poulet aux oignons confits.' ),
+);
+$proposed = $proposal->invoke( null, array(
+	'recipes' => array( array( 'title' => '<b>Tarte aux pommes</b>' ), array( 'title' => 'Soupe inventée' ), array( 'title' => 'Poulet yassa' ) ),
+	'pairs' => array(
+		array( 'image' => 0, 'recipe' => 0, 'confidence' => 'haute' ),
+		array( 'image' => 1, 'recipe' => 0, 'confidence' => 'haute' ),
+		array( 'image' => 2, 'recipe' => null ),
+		array( 'image' => 3, 'recipe' => 2, 'confidence' => 'haute' ),
+	),
+	'reasoning' => 'Deux plats.',
+), $shots );
+msrwa_test_assert( 2 === count( $proposed['recipes'] ), 'Two dishes photographed are two recipes, and the one nobody photographed is dropped; got ' . count( $proposed['recipes'] ) );
+msrwa_test_assert( 'Tarte aux pommes' === $proposed['recipes'][0]['title'], 'A proposed title is plain text: model output is data, never markup.' );
+msrwa_test_assert( ! empty( $proposed['recipes'][0]['from_photographs'] ), 'A recipe named from photographs says so, for the lot screen.' );
+msrwa_test_contains( $proposed['recipes'][0]['text'], 'Une part de tarte aux pommes.', 'Both shots of the tart describe the one recipe.' );
+msrwa_test_contains( $proposed['recipes'][0]['text'], 'Aucun texte fourni', 'The brief says the recipe is to be established from sources.' );
+$yassa = array_values( array_filter( $proposed['pairs'], static function ( $pair ) { return 3 === $pair['image']; } ) );
+msrwa_test_assert( 1 === $yassa[0]['recipe'], 'Dropping the invented dish moves the yassa photograph to the yassa recipe; got ' . var_export( $yassa[0]['recipe'], true ) );
+$paired = $normalise->invoke( null, $proposed['pairs'], count( $proposed['recipes'] ), $shots );
+$blur = array_values( array_filter( $paired, static function ( $pair ) { return 2 === $pair['image']; } ) );
+msrwa_test_assert( null === $blur[0]['recipe'], 'A photograph with no recognised dish belongs to no recipe.' );
+
+$nothing = $proposal->invoke( null, array( 'recipes' => array( array( 'title' => 'Tarte' ) ), 'pairs' => array() ), $shots );
+msrwa_test_assert( array() === $nothing['recipes'], 'A title no photograph was given yields no recipe at all.' );
+
+// Text alone pays for no pairing call; photographs alone ask for recipes.
+msrwa_test_contains( $source, "if ( ! \$seen['images'] ) {", 'Without photographs, nothing is paired or billed.' );
+msrwa_test_contains( $source, '$decision = self::propose( $seen[\'images\'], $config );', 'Without text, the photographs propose the recipes.' );
+
 // --- The brief handed to the engine -------------------------------------
 
 $brief = MSRWA_Match::brief(

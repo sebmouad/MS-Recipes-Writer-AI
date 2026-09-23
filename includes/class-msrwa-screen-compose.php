@@ -17,7 +17,7 @@ final class MSRWA_Screen_Compose {
 		echo '<div class="wrap msrwa">';
 		MSRWA_UI::head(
 			__( 'Nouveau lot', 'ms-recipes-writer-ai' ),
-			__( 'Collez vos recettes et ajoutez les photographies. Elles seront décrites puis associées ; vous confirmez l’appariement avant que quoi que ce soit ne soit généré.', 'ms-recipes-writer-ai' ),
+			__( 'Des recettes, des photographies, ou les deux. Les photographies sont décrites puis associées ; sans texte, chaque plat qu’elles montrent devient une recette. Vous confirmez avant que quoi que ce soit ne soit généré.', 'ms-recipes-writer-ai' ),
 			array(),
 			'<a class="button" href="' . esc_url( admin_url( 'admin.php?page=msrwa' ) ) . '">' . esc_html__( 'Retour au pass', 'ms-recipes-writer-ai' ) . '</a>'
 		);
@@ -31,15 +31,15 @@ final class MSRWA_Screen_Compose {
 		<form id="ms-compose" class="ms-steps">
 
 			<section class="ms-step">
-				<h3><?php esc_html_e( 'Les recettes', 'ms-recipes-writer-ai' ); ?></h3>
-				<p><?php esc_html_e( 'Une ligne de trois tirets ou plus sépare deux recettes. La première ligne de chaque bloc en devient le titre.', 'ms-recipes-writer-ai' ); ?></p>
+				<h3><?php esc_html_e( 'Les recettes', 'ms-recipes-writer-ai' ); ?> <span class="ms-optional"><?php esc_html_e( 'facultatif avec des photographies', 'ms-recipes-writer-ai' ); ?></span></h3>
+				<p><?php esc_html_e( 'Une ligne de trois tirets ou plus sépare deux recettes. La première ligne de chaque bloc en devient le titre. Le nom du plat suffit : le reste est établi d’après les sources.', 'ms-recipes-writer-ai' ); ?></p>
 				<textarea id="ms-recipes" name="recipes" rows="14" class="large-text ms-code" spellcheck="false" placeholder="<?php echo esc_attr( __( "Tarte aux pommes normande\nPâte brisée, pommes, crème, calvados…\n\n---\n\nPoulet yassa\nPoulet, oignons, citron…", 'ms-recipes-writer-ai' ) ); ?>"></textarea>
 				<p class="ms-muted" id="ms-recipe-count" aria-live="polite"></p>
 			</section>
 
 			<section class="ms-step">
-				<h3><?php esc_html_e( 'Les photographies', 'ms-recipes-writer-ai' ); ?></h3>
-				<p><?php esc_html_e( 'Sans dire lesquelles vont avec quoi : chacune sera décrite depuis ses propres pixels, puis associée à une recette. Une photographie est facturée une fois, même si vous corrigez ensuite l’association.', 'ms-recipes-writer-ai' ); ?></p>
+				<h3><?php esc_html_e( 'Les photographies', 'ms-recipes-writer-ai' ); ?> <span class="ms-optional"><?php esc_html_e( 'facultatif avec du texte', 'ms-recipes-writer-ai' ); ?></span></h3>
+				<p><?php esc_html_e( 'Sans dire lesquelles vont avec quoi : chacune sera décrite depuis ses propres pixels, puis associée à une recette — ou, sans texte, regroupée avec les autres photographies du même plat. Une photographie est facturée une fois, même si vous corrigez ensuite l’association.', 'ms-recipes-writer-ai' ); ?></p>
 				<div class="ms-drop" id="ms-drop">
 					<input type="file" id="ms-photos" name="photos[]" class="ms-drop-input" multiple accept="image/jpeg,image/png,image/webp">
 					<span class="dashicons dashicons-format-image ms-drop-icon" aria-hidden="true"></span>
@@ -104,7 +104,7 @@ final class MSRWA_Screen_Compose {
 					<button type="submit" class="button button-primary button-hero" id="ms-submit"><?php esc_html_e( 'Décrire et apparier', 'ms-recipes-writer-ai' ); ?></button>
 					<span id="ms-compose-status" class="ms-muted"></span>
 				</p>
-				<p class="ms-muted"><?php esc_html_e( 'Rien n’est écrit à cette étape : seules les photographies sont décrites. Vous verrez l’appariement avant de lancer quoi que ce soit.', 'ms-recipes-writer-ai' ); ?></p>
+				<p class="ms-muted"><?php esc_html_e( 'Rien n’est écrit à cette étape : seules les photographies sont décrites. Vous verrez les recettes et l’appariement avant de lancer quoi que ce soit.', 'ms-recipes-writer-ai' ); ?></p>
 			</div>
 		</form>
 		<?php

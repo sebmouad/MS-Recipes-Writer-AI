@@ -76,8 +76,9 @@ final class MSRWA_REST {
 
 	/** Splits the submission, describes the photographs, pairs them. */
 	public static function create( WP_REST_Request $request ) {
+		// A text, photographs, or both. Without text, each dish the photographs
+		// show becomes a recipe, and the writer confirms it with the pairing.
 		$recipes = MSRWA_Intake::recipes( (string) $request->get_param( 'recipes' ) );
-		if ( ! $recipes ) { return new WP_Error( 'msrwa_no_recipes', __( 'Aucune recette lisible dans ce texte.', 'ms-recipes-writer-ai' ), array( 'status' => 400 ) ); }
 
 		// Photographs come from the writer's computer, never from the media
 		// library: a lot can only carry pictures its writer actually sent, and
@@ -86,6 +87,7 @@ final class MSRWA_REST {
 		$uploaded = MSRWA_Intake::upload( $files, MSRWA_Admin::photo_bytes() );
 		if ( '' !== $uploaded['error'] ) { return new WP_Error( 'msrwa_bad_photo', $uploaded['error'], array( 'status' => 400 ) ); }
 		$images = MSRWA_Intake::images( $uploaded['ids'] );
+		if ( ! $recipes && ! $images ) { return new WP_Error( 'msrwa_no_recipes', __( 'Collez au moins une recette ou ajoutez au moins une photographie.', 'ms-recipes-writer-ai' ), array( 'status' => 400 ) ); }
 
 		// The per-recipe ceiling is the site's unless the person may set it. It
 		// used to be worked out here and then not used, so anybody who could
@@ -98,8 +100,9 @@ final class MSRWA_REST {
 			sanitize_key( (string) $request->get_param( 'profile' ) ),
 			sanitize_key( (string) MSRWA_Settings::get()['site_language'] )
 		);
-		if ( is_wp_error( $id ) ) { MSRWA_Intake::discard( $uploaded['ids'] ); return $id; }
-		return rest_ensure_response( array( 'id' => (int) $id, 'recipes' => count( $recipes ), 'images' => count( $images ) ) );
+		if ( is_wp_error( $id ) ) { MSRWA_Intake::discard( $uploaded['ids'] ); return new WP_Error( $id->get_error_code(), $id->get_error_message(), array( 'status' => 400 ) ); }
+		$created = MSRWA_Batch::get( (int) $id );
+		return rest_ensure_response( array( 'id' => (int) $id, 'recipes' => (int) ( $created['recipes'] ?? count( $recipes ) ), 'images' => count( $images ) ) );
 	}
 
 	private static function batch( $id ) {

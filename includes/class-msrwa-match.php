@@ -27,9 +27,19 @@ final class MSRWA_Match {
 	 */
 	public static function run( array $recipes, array $images, MSRWA_Engine_Config $config ) {
 		$seen = self::describe( $images, $config );
-		$decision = self::pair( $recipes, $seen['images'], $config );
+		// Text alone has nothing to pair; photographs alone name their own
+		// recipes, one per dish they show.
+		if ( ! $seen['images'] ) {
+			$decision = array( 'pairs' => array(), 'reasoning' => '', 'cost_usd' => 0.0, 'seconds' => 0.0, 'errors' => array() );
+		} elseif ( ! $recipes ) {
+			$decision = self::propose( $seen['images'], $config );
+			$recipes = $decision['recipes'];
+		} else {
+			$decision = self::pair( $recipes, $seen['images'], $config );
+		}
 
 		return array(
+			'recipes' => $recipes,
 			'images' => $seen['images'],
 			// The described photographs: the raw ones carry no dish, and the rule
 			// against pairing an unrecognised photograph read that as none, everywhere.
@@ -106,6 +116,98 @@ final class MSRWA_Match {
 			'seconds' => round( microtime( true ) - $started, 1 ),
 			'errors' => is_array( $decoded ) ? array() : array( 'Appariement illisible : ' . mb_substr( (string) ( $answer['error'] ?? $answer['text'] ?? '' ), 0, 200 ) ),
 		);
+	}
+
+	/**
+	 * Recipes out of photographs alone: one per distinct dish, with the
+	 * photographs of it. Two shots of one tart are one recipe, which a
+	 * grouping on the recognised names could not tell — "tarte aux pommes"
+	 * and "tarte normande" — so one cheap text call decides it.
+	 */
+	private static function propose( array $images, MSRWA_Engine_Config $config ) {
+		$route = $config->model_for( 'canonical_recipe' );
+		$wire = $config->provider( $route['provider'], $route['model'], 'canonical_recipe' );
+		$started = microtime( true );
+		$named = array_filter( $images, static function ( $image ) { return '' !== trim( (string) ( $image['dish'] ?? '' ) ); } );
+		$out = array( 'recipes' => array(), 'pairs' => array(), 'reasoning' => '', 'cost_usd' => 0.0, 'seconds' => 0.0, 'errors' => array() );
+		if ( ! $named ) { return $out; }
+
+		$answer = MSRWA_Engine_Call::text( $route['provider'], $route['model'], self::proposal_prompt( $images ), 1500, true, false, $wire );
+		$out['cost_usd'] = (float) $config->price( $route['provider'], $route['model'], (array) ( $answer['usage'] ?? array() ) );
+		$out['seconds'] = round( microtime( true ) - $started, 1 );
+		$decoded = MSRWA_Json::decode( (string) ( $answer['text'] ?? '' ) );
+		if ( ! is_array( $decoded ) ) {
+			$out['errors'][] = 'Regroupement illisible : ' . mb_substr( (string) ( $answer['error'] ?? $answer['text'] ?? '' ), 0, 200 );
+			return $out;
+		}
+		return array_merge( $out, self::proposal( $decoded, $images ) );
+	}
+
+	/**
+	 * The grouping answer, checked: titles are plain text, a recipe no
+	 * photograph was given is dropped, and the pairs follow the recipes kept.
+	 */
+	private static function proposal( array $decoded, array $images ) {
+		$titles = array();
+		// Model output is data: a title is plain text, and a dish nobody photographed is not a recipe.
+		foreach ( (array) ( $decoded['recipes'] ?? array() ) as $recipe ) {
+			$titles[] = mb_substr( trim( wp_strip_all_tags( (string) ( is_array( $recipe ) ? ( $recipe['title'] ?? '' ) : $recipe ) ) ), 0, 180 );
+		}
+		$pairs = array_values( array_filter( (array) ( $decoded['pairs'] ?? array() ), 'is_array' ) );
+		$used = array();
+		foreach ( $pairs as $pair ) {
+			if ( isset( $pair['recipe'], $pair['image'] ) && isset( $images[ (int) $pair['image'] ] ) ) { $used[ (int) $pair['recipe'] ] = true; }
+		}
+		$recipes = array();
+		$shift = array();
+		foreach ( $titles as $index => $title ) {
+			$recipe = '' !== $title ? self::from_photographs( $title, $images, $pairs, $index, isset( $used[ $index ] ) ) : null;
+			$shift[ $index ] = $recipe ? count( $recipes ) : null;
+			if ( $recipe ) { $recipes[] = $recipe; }
+		}
+		// Dropping a recipe shifts the ones after it: the pairs follow.
+		foreach ( $pairs as $key => $pair ) {
+			if ( isset( $pair['recipe'] ) && null !== $pair['recipe'] ) { $pairs[ $key ]['recipe'] = $shift[ (int) $pair['recipe'] ] ?? null; }
+		}
+		return array( 'recipes' => $recipes, 'pairs' => $pairs, 'reasoning' => (string) ( $decoded['reasoning'] ?? '' ) );
+	}
+
+	/** A recipe the writer did not type: the dish's name, and what its photographs show. */
+	private static function from_photographs( $title, array $images, array $pairs, $index, $photographed ) {
+		if ( ! $photographed ) { return null; }
+		$seen = array();
+		foreach ( $pairs as $pair ) {
+			if ( ! is_array( $pair ) || ! isset( $pair['recipe'], $pair['image'] ) || (int) $pair['recipe'] !== (int) $index ) { continue; }
+			$described = trim( (string) ( $images[ (int) $pair['image'] ]['describes'] ?? '' ) );
+			if ( '' !== $described ) { $seen[] = '- ' . $described; }
+		}
+		$text = $title . "\n\n" . 'Aucun texte fourni : la recette est à établir d’après les sources, pour le plat que montrent les photographies.';
+		if ( $seen ) { $text .= "\n\n" . 'Ce que montrent les photographies :' . "\n" . implode( "\n", array_unique( $seen ) ); }
+		return array( 'title' => $title, 'text' => $text, 'from_photographs' => true );
+	}
+
+	private static function proposal_prompt( array $images ) {
+		$lines = array(
+			'Un rédacteur a fourni des photographies de plats, sans aucun texte.',
+			'Chaque plat distinct deviendra une recette, illustrée par ses photographies.',
+			'',
+			'PHOTOGRAPHIES, décrites depuis leurs propres pixels :',
+		);
+		foreach ( $images as $index => $image ) {
+			$lines[] = sprintf( '%d. fichier « %s » — plat reconnu : %s — %s', $index, $image['file'], '' !== $image['dish'] ? $image['dish'] : 'non identifié', $image['describes'] );
+		}
+		$lines[] = '';
+		$lines[] = 'RÈGLES :';
+		$lines[] = '- Deux photographies du même plat vont à la même recette, même si le nom reconnu diffère un peu.';
+		$lines[] = '- Le titre est le nom usuel du plat, en français, sans adjectif publicitaire.';
+		$lines[] = '- Une photographie où aucun plat n’est reconnu n’appartient à aucune recette.';
+		$lines[] = '- N’invente aucun plat qu’aucune photographie ne montre.';
+		$lines[] = '';
+		$lines[] = 'RÉPONSE — un objet JSON valide, sans Markdown, avec exactement ces clés :';
+		$lines[] = '- "recipes" : tableau de {"title": le nom du plat}';
+		$lines[] = '- "pairs" : tableau de {"image": entier, "recipe": indice dans "recipes" ou null, "confidence": "haute"|"moyenne"|"basse", "why": une phrase en français}';
+		$lines[] = '- "reasoning" : une phrase sur la façon dont l’ensemble se répartit';
+		return implode( "\n", $lines );
 	}
 
 	private static function vision_instruction() {

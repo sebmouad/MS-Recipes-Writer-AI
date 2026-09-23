@@ -26,14 +26,15 @@ final class MSRWA_Batch {
 	 */
 	public static function create( array $recipes, array $images, $budget_per_recipe, $profile = MSRWA_Profile::FULL, $language = 'fr', array $config_overrides = array() ) {
 		global $wpdb;
-		if ( ! $recipes ) { return new WP_Error( 'msrwa_no_recipes', __( 'Aucune recette dans ce qui a été fourni.', 'ms-recipes-writer-ai' ) ); }
+		// A text, photographs, or both: photographs alone name their recipes once described.
+		if ( ! $recipes && ! $images ) { return new WP_Error( 'msrwa_no_recipes', __( 'Collez au moins une recette ou ajoutez au moins une photographie.', 'ms-recipes-writer-ai' ) ); }
 		$budget = round( (float) $budget_per_recipe, 4 );
 		if ( $budget <= 0 ) { return new WP_Error( 'msrwa_no_budget', __( 'Fixez un plafond de dépense par recette.', 'ms-recipes-writer-ai' ) ); }
 
 		$now = current_time( 'mysql', true );
 		$wpdb->insert( self::table(), array(
 			'owner_id' => get_current_user_id(),
-			'label' => mb_substr( (string) $recipes[0]['title'], 0, 190 ) . ( count( $recipes ) > 1 ? sprintf( /* translators: %d is how many further recipes the lot carries. */ __( ' et %d autres', 'ms-recipes-writer-ai' ), count( $recipes ) - 1 ) : '' ),
+			'label' => $recipes ? self::label( $recipes ) : __( 'Photographies à reconnaître', 'ms-recipes-writer-ai' ),
 			'status' => 'matching', 'recipes' => count( $recipes ), 'images' => count( $images ),
 			'budget_usd' => $budget,
 			'profile' => MSRWA_Profile::exists( $profile ) ? $profile : MSRWA_Profile::FULL,
@@ -46,8 +47,16 @@ final class MSRWA_Batch {
 		if ( ! $id ) { return new WP_Error( 'msrwa_not_created', __( 'Le lot n’a pas pu être enregistré.', 'ms-recipes-writer-ai' ) ); }
 
 		$match = MSRWA_Match::run( $recipes, $images, self::engine_config( self::config_overrides( $id ) ) );
+		$recipes = $match['recipes'];
+		if ( ! $recipes ) {
+			// Photographs in which no dish could be named leave nothing to write.
+			$wpdb->delete( self::table(), array( 'id' => $id ) );
+			return new WP_Error( 'msrwa_no_dish', __( 'Aucun plat n’a été reconnu sur ces photographies. Ajoutez le nom de chaque recette dans le texte, avec ou sans les photographies.', 'ms-recipes-writer-ai' ) );
+		}
 		$wpdb->update( self::table(), array(
 			'status' => 'ready',
+			'label' => self::label( $recipes ),
+			'recipes' => count( $recipes ),
 			'matching_json' => wp_json_encode( MSRWA_DB::sanitize( array(
 				'recipes' => $recipes, 'images' => $match['images'], 'pairs' => $match['pairs'],
 				'reasoning' => $match['reasoning'], 'cost_usd' => $match['cost_usd'], 'seconds' => $match['seconds'],
@@ -56,6 +65,11 @@ final class MSRWA_Batch {
 			'updated_at' => current_time( 'mysql', true ),
 		), array( 'id' => $id ) );
 		return $id;
+	}
+
+	/** A lot is known by its first recipe, and how many follow. */
+	private static function label( array $recipes ) {
+		return mb_substr( (string) $recipes[0]['title'], 0, 190 ) . ( count( $recipes ) > 1 ? sprintf( /* translators: %d is how many further recipes the lot carries. */ __( ' et %d autres', 'ms-recipes-writer-ai' ), count( $recipes ) - 1 ) : '' );
 	}
 
 	public static function get( $id ) {

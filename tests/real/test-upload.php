@@ -47,6 +47,25 @@ msrwa_real_request( 'DELETE', '/msrwa/v1/batches/' . (int) $sent['body']['id'] )
 $gone = msrwa_real_request( 'GET', '/wp/v2/media/' . (int) $added['id'] . '?context=edit' );
 msrwa_real_assert( 404 === $gone['status'], 'Deleting the lot removed the photograph no draft took (got ' . $gone['status'] . ').' );
 if ( 404 !== $gone['status'] ) { msrwa_real_request( 'DELETE', '/wp/v2/media/' . (int) $added['id'] . '?force=true' ); }
+// Photographs without any text: each dish they show becomes a recipe. Needs
+// real photographs of food — a drawn disc names no dish — so it runs only
+// when MSRWA_TEST_PHOTO (and, for two dishes, MSRWA_TEST_PHOTO_2) name some.
+$real = array_values( array_filter( array( getenv( 'MSRWA_TEST_PHOTO' ), getenv( 'MSRWA_TEST_PHOTO_2' ) ), static function ( $file ) { return $file && is_readable( $file ); } ) );
+if ( $real ) {
+	$alone = msrwa_real_upload( '/msrwa/v1/batches', array( 'recipes' => '', 'profile' => 'article' ), $real );
+	msrwa_real_assert( 200 === $alone['status'], 'Photographs alone make a lot (got ' . $alone['status'] . ': ' . wp_json_encode_compat( $alone['body'] ) . ').' );
+	msrwa_real_spend( 0.01 * count( $real ) + 0.005 );
+	msrwa_real_assert( count( $real ) === (int) ( $alone['body']['recipes'] ?? 0 ), 'Each dish photographed became one recipe: ' . count( $real ) . ' expected, ' . (int) ( $alone['body']['recipes'] ?? 0 ) . ' made.' );
+	msrwa_real_note( 'photographs alone: lot #' . (int) ( $alone['body']['id'] ?? 0 ) . ', ' . (int) ( $alone['body']['recipes'] ?? 0 ) . ' recipe(s) from ' . count( $real ) . ' photograph(s)' );
+	if ( ! empty( $alone['body']['id'] ) ) { msrwa_real_request( 'DELETE', '/msrwa/v1/batches/' . (int) $alone['body']['id'] ); }
+} else {
+	msrwa_real_note( 'MSRWA_TEST_PHOTO not set: photographs without text not tried' );
+}
+
+// Neither text nor photograph is refused before anything is spent.
+$empty = msrwa_real_upload( '/msrwa/v1/batches', array( 'recipes' => '', 'profile' => 'article' ), array() );
+msrwa_real_assert( 400 === $empty['status'], 'A lot with neither text nor photograph is refused (got ' . $empty['status'] . ').' );
+
 array_map( 'unlink', glob( $dir . '/*' ) );
 @rmdir( $dir );
-msrwa_real_done( 'photographs are sent from the computer, checked, and owned by their writer' );
+msrwa_real_done( 'photographs are sent from the computer, checked, owned by their writer, and enough on their own' );

@@ -124,6 +124,8 @@ final class MSRWA_Admin {
 			'text' => array(
 				'failed' => __( 'Une erreur est survenue.', 'ms-recipes-writer-ai' ),
 				'oneRecipe' => __( '1 recette détectée', 'ms-recipes-writer-ai' ),
+				/* translators: %d is a number of photographs. */
+				'fromPhotos' => __( 'Aucun texte : chaque plat reconnu sur les photographies deviendra une recette (%d au plus).', 'ms-recipes-writer-ai' ),
 				/* translators: %d is a number of recipes. */
 				'manyRecipes' => __( '%d recettes détectées', 'ms-recipes-writer-ai' ),
 				'noImage' => __( 'aucune photographie', 'ms-recipes-writer-ai' ),
@@ -148,7 +150,7 @@ final class MSRWA_Admin {
 				'removePhoto' => __( 'Retirer %s', 'ms-recipes-writer-ai' ),
 				/* translators: 1: likely cost, 2: the ceiling, 3: number of recipes. */
 				'estimate' => __( 'Environ %1$s pour %3$d recette(s), et au maximum %2$s : le plafond arrête un run avant de le dépasser.', 'ms-recipes-writer-ai' ),
-				'noRecipes' => __( 'Il n’y a aucune recette dans ce texte.', 'ms-recipes-writer-ai' ),
+				'noRecipes' => __( 'Collez au moins une recette ou ajoutez au moins une photographie.', 'ms-recipes-writer-ai' ),
 				'describing' => __( 'Description des photographies…', 'ms-recipes-writer-ai' ),
 				'saving' => __( 'Enregistrement…', 'ms-recipes-writer-ai' ),
 				'askingProviders' => __( 'Interrogation des fournisseurs…', 'ms-recipes-writer-ai' ),

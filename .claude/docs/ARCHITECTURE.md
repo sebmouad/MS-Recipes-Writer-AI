@@ -356,8 +356,15 @@ Break these and the plugin misreports itself.
     web, the final approval and the photograph reading read images, the images
     are drawn), must not be in the measured-unfit table
     (`MSRWA_Compat::unfit()` — gpt-5-nano and gpt-5.4-mini on research), and
-    must not be taken off the step on the Modèles screen. A capability nobody
+    must be switched on and not taken off the step on the Modèles screen. A capability nobody
     established counts as missing. Tiers are resolved as the engine resolves
     them, so `openai:low` is judged as gpt-5-nano. Saving the Moteur screen,
     dispatching a lot and the routing diagnostic all refuse on the same rule;
-    the pickers disable what it refuses.
+    the pickers disable what it refuses. The Modèles and Moteur screens read
+    the same `MSRWA_Compat::steps()` and `choices()`: one list of steps, one
+    family rule, one catalogue.
+
+19. **A lot is text, photographs, or both.** Without text, `MSRWA_Match`
+    names one recipe per dish the photographs show (`propose()`), marked
+    `from_photographs`; a lot in which no dish is recognised is refused and
+    its uploads discarded. Without photographs, nothing is paired or billed.

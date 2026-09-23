@@ -63,8 +63,13 @@
     var pending = null;
 
     function refreshEstimate() {
-      var count = countRecipes(recipes.value);
-      say(recipeCount, count ? (count === 1 ? t.oneRecipe : (t.manyRecipes || '').replace('%d', count)) : '');
+      var typed = countRecipes(recipes.value);
+      // Without text, each dish the photographs show becomes a recipe: at most
+      // one per photograph, which is the figure the estimate has to hold.
+      var count = typed || chosen.length;
+      say(recipeCount, typed
+        ? (typed === 1 ? t.oneRecipe : (t.manyRecipes || '').replace('%d', typed))
+        : (chosen.length ? (t.fromPhotos || '').replace('%d', chosen.length) : ''));
       if (!count) { say(estimate, ''); return; }
 
       // The figure comes from the server, because it is worked out from the
@@ -220,7 +225,7 @@
     compose.addEventListener('submit', function (event) {
       event.preventDefault();
       var button = document.getElementById('ms-submit');
-      if (!countRecipes(recipes.value)) { say(status, t.noRecipes || ''); return; }
+      if (!countRecipes(recipes.value) && !chosen.length) { say(status, t.noRecipes || ''); return; }
 
       button.disabled = true;
       // The photographs are described here, one call each. It is the slow part
