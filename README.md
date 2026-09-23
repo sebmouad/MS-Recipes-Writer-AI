@@ -91,6 +91,11 @@ franchirait le plafond, s’arrête et laisse le verdict à l’éditeur. Un tes
 ligne rejoue la boucle sans réseau : sans cette garde, cinq appels là où le
 budget n’en permettait qu’un.
 
+Suite réelle complète verte sur le WordPress de test en 0.18.1 : site, catalogue
+(quatre tarifs lus sur les pages des fournisseurs) et une recette complète —
+estimée 0,1266 $, facturée 0,1542 $ avec un collage redessiné une fois,
+brouillon complet avec image à la une, blocs et données structurées Recipe.
+
 ## Version 0.18.0
 
 **Environ 0,11 $ la recette complète, frais de recherche compris.** Les
