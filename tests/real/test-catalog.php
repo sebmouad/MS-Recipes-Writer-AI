@@ -61,6 +61,16 @@ msrwa_real_assert( ! empty( $routes['article']['price_known'] ) && (float) ( $ro
 msrwa_real_assert( 0 === strpos( (string) ( $routes['featured_image']['route']['model'] ?? '' ), 'gpt-image' ), 'An image step is simulated on the image route.' );
 msrwa_real_assert( (float) ( $simulation['body']['cost_usd'] ?? 0 ) > 0 && empty( $simulation['body']['unpriced'] ), 'The simulation totals a full recipe with nothing unpriced.' );
 msrwa_real_note( 'simulated full recipe: $' . number_format( (float) ( $simulation['body']['cost_usd'] ?? 0 ), 4 ) );
+msrwa_real_assert( 'low' === ( $routes['article']['thinking'] ?? '' ), 'A Gemini route thinks at the level its provider ships (got "' . ( $routes['article']['thinking'] ?? '' ) . '").' );
+
+// A thinking level typed on screen reaches every step and the money.
+$harder = msrwa_real_request( 'POST', '/msrwa/v1/diagnostics/config', array( 'config' => array(
+	'routing' => wp_json_encode_compat( array( 'article' => 'gemini:gemini-3.6-flash', 'research' => 'gemini:medium' ) ),
+	'thinking' => wp_json_encode_compat( array( 'default' => 'high' ) ),
+) ) );
+msrwa_real_assert( 'high' === ( $harder['body']['routes']['article']['thinking'] ?? '' ), 'The level on screen is the level simulated.' );
+msrwa_real_assert( (float) ( $harder['body']['cost_usd'] ?? 0 ) > (float) ( $simulation['body']['cost_usd'] ?? 0 ), 'Thinking harder is simulated as costing more.' );
+msrwa_real_note( 'the same recipe at high thinking: $' . number_format( (float) ( $harder['body']['cost_usd'] ?? 0 ), 4 ) );
 
 msrwa_real_done( 'the catalogue keeps what it can use and prices it from the providers’ pages' );
 

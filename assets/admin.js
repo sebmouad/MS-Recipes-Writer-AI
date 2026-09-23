@@ -356,6 +356,17 @@
       routingField.value = JSON.stringify(value, null, 4);
     }
 
+    // The thinking level lives in its own group; the picker edits one key of
+    // it and leaves every other key somebody typed there alone.
+    var thinkingField = document.getElementById('ms-engine-thinking');
+    function writeThinking(key, level) {
+      if (!thinkingField) return;
+      var value;
+      try { value = JSON.parse(thinkingField.value || '{}') || {}; } catch (error) { return; }
+      if (level) value[key] = level; else delete value[key];
+      thinkingField.value = JSON.stringify(value, null, 4);
+    }
+
     function option(value, label, selected) {
       var el = document.createElement('option');
       el.value = value;
@@ -463,6 +474,19 @@
       });
       describe();
 
+      // An image model does not think; every other route may be told how hard to.
+      var thinkingCell = document.createElement('td');
+      if ('image' !== key) {
+        var thinkingSelect = document.createElement('select');
+        thinkingSelect.className = 'ms-route-thinking';
+        var level = (schema.thinking || {})[key] || '';
+        thinkingSelect.appendChild(option('', schema.labels.thinkingDefault + ((schema.thinking || {})['default'] ? ' (' + schema.thinking['default'] + ')' : ''), '' === level));
+        schema.thinkingLevels.forEach(function (name) { thinkingSelect.appendChild(option(name, name, name === level)); });
+        thinkingSelect.addEventListener('change', function () { writeThinking(key, thinkingSelect.value); });
+        thinkingCell.appendChild(thinkingSelect);
+      }
+      row.appendChild(thinkingCell);
+
       body.appendChild(row);
     });
   }
@@ -561,7 +585,7 @@
           var table = document.createElement('table');
           table.className = 'ms-table';
           var head = table.insertRow();
-          [t.previewStep || 'Étape', t.previewRoute || 'Route', t.previewKey || 'Clé', t.previewPrice || 'Tarif', t.previewCost || 'Coût'].forEach(function (title) {
+          [t.previewStep || 'Étape', t.previewRoute || 'Route', t.previewThinking || 'Réflexion', t.previewKey || 'Clé', t.previewPrice || 'Tarif', t.previewCost || 'Coût'].forEach(function (title) {
             var cell = document.createElement('th');
             cell.textContent = title;
             head.appendChild(cell);
@@ -572,6 +596,7 @@
             var row = table.insertRow();
             row.insertCell().textContent = step;
             row.insertCell().textContent = route.route.provider + ':' + route.route.model;
+            row.insertCell().textContent = route.thinking || '—';
             row.insertCell().textContent = route.has_key ? '✓' : '✗';
             row.insertCell().textContent = route.price_known ? '✓' : '✗';
             var cost = row.insertCell();

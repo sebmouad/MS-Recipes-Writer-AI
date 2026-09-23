@@ -22,6 +22,7 @@ final class MSRWA_Engine_Settings {
 		return array(
 			'routing'    => 'Quel fournisseur et quel niveau pour chaque étape, sous la forme `fournisseur:niveau` ou `fournisseur:modèle`.',
 			'max_output' => 'Plafond de tokens en sortie, par étape. Une réponse coupée est facturée entière.',
+			'thinking'   => 'Réflexion permise avant de répondre, par étape : `minimal`, `low`, `medium` ou `high` ; vide, le fournisseur décide. La réflexion est facturée comme de la sortie et prise sur le plafond.',
 			'attempts'   => 'Nombre de tentatives, par étape.',
 			'limits'     => 'Délais, concurrence, taille des images inspectées. Le budget vient du lot.',
 			'images'     => 'Format, qualité, dimensions et nombre de panneaux du collage.',

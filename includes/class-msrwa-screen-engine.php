@@ -117,7 +117,10 @@ final class MSRWA_Screen_Engine {
 	 * submits, so nothing about saving or validating `routing` changes.
 	 */
 	private static function routing_picker( $stored, $defaults ) {
-		$config = MSRWA_Engine_Config::create( $stored );
+		// Over the catalogue, like everything the engine is handed: built on
+		// the typed settings alone, the picker named the engine's own tiers and
+		// called every model the catalogue priced unpriced.
+		$config = MSRWA_Engine_Config::create( MSRWA_Engine_Settings::stored() );
 		$catalog = MSRWA_Catalog::defaults();
 		$providers = array(
 			'openai' => __( 'OpenAI', 'ms-recipes-writer-ai' ),
@@ -195,7 +198,10 @@ final class MSRWA_Screen_Engine {
 			'keys' => $keys,
 			'current' => $current,
 			'resolved' => $resolved,
+			'thinking' => array_map( 'strval', (array) $config->get( 'thinking', array() ) ),
+			'thinkingLevels' => MSRWA_Engine_Config::thinking_levels(),
 			'labels' => array(
+				'thinkingDefault' => __( 'par défaut', 'ms-recipes-writer-ai' ),
 				'unpriced' => __( 'aucun tarif connu — le coût de cette étape ne peut pas être estimé', 'ms-recipes-writer-ai' ),
 				'unserved' => __( 'le fournisseur ne sert pas ce nom : l’étape échouera', 'ms-recipes-writer-ai' ),
 				'unknown' => __( 'jamais vérifié auprès du fournisseur', 'ms-recipes-writer-ai' ),
@@ -211,6 +217,7 @@ final class MSRWA_Screen_Engine {
 					<th scope="col"><?php esc_html_e( 'Étape', 'ms-recipes-writer-ai' ); ?></th>
 					<th scope="col"><?php esc_html_e( 'Fournisseur et niveau', 'ms-recipes-writer-ai' ); ?></th>
 					<th scope="col"><?php esc_html_e( 'Modèle qui tournera', 'ms-recipes-writer-ai' ); ?></th>
+					<th scope="col"><?php esc_html_e( 'Réflexion', 'ms-recipes-writer-ai' ); ?></th>
 				</tr></thead>
 				<tbody></tbody>
 			</table>

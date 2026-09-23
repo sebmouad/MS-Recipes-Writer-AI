@@ -10,7 +10,7 @@
  *   php tools/lab.php prompts
  *   php tools/lab.php prune  [--dry-run]
  *
- * Common flags: --provider --tier --model --budget --only --attempts --quality
+ * Common flags: --provider --tier --model --budget --only --attempts --quality --thinking
  * Saved artifacts: --research= --canonical= --article= --featured= --facebook=
  *
  * There is almost nothing here. The engine runs the recipe, scores it and
@@ -45,6 +45,7 @@ function lab_config( array $options, $step = '' ) {
 	}
 
 	if ( isset( $options['max-output'] ) && '' !== $step ) { $config['max_output'] = array( $step => (int) $options['max-output'] ); }
+	if ( isset( $options['thinking'] ) ) { $config['thinking'] = array( 'default' => (string) $options['thinking'] ); }
 	if ( isset( $options['budget'] ) ) { $config['limits'] = array( 'budget_usd' => (float) $options['budget'] ); }
 	if ( isset( $options['attempts'] ) ) { $config['attempts'] = array( 'default' => (int) $options['attempts'], 'final_approval' => (int) $options['attempts'] ); }
 	if ( isset( $options['quality'] ) ) { $config['images'] = array( 'featured_quality' => $options['quality'], 'facebook_quality' => $options['quality'] ); }

@@ -1666,6 +1666,12 @@ msgstr "بلا تسعيرة، لذا لم تُحتسب في المجموع:"
 msgid "Une recette complète est estimée à %s — une estimation, jamais une facture."
 msgstr "تُقدَّر الوصفة الكاملة بـ %s — تقدير، وليست فاتورة أبدًا."
 
+msgid "Réflexion"
+msgstr "التفكير"
+
+msgid "par défaut"
+msgstr "افتراضي"
+
 msgid "aucune page citée"
 msgstr "لم تُذكر أي صفحة"
 

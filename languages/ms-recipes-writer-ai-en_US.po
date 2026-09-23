@@ -1650,6 +1650,12 @@ msgstr "Unpriced, so left out of the total:"
 msgid "Une recette complète est estimée à %s — une estimation, jamais une facture."
 msgstr "A full recipe is estimated at %s — an estimate, never an invoice."
 
+msgid "Réflexion"
+msgstr "Thinking"
+
+msgid "par défaut"
+msgstr "default"
+
 msgid "aucune page citée"
 msgstr "no page cited"
 
