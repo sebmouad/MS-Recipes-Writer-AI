@@ -329,7 +329,9 @@ final class MSRWA_Engine {
 			if ( isset( $call['error'] ) ) { return self::failed( $call['error'], $call['seconds'] ?? 0, $route ); }
 			self::report_call( $result, $name, $route, $wire['text_endpoint'] ?? '', $call, $config );
 
-			if ( (int) ( $call['usage']['output_tokens'] ?? 0 ) >= $ceiling ) {
+			// Each provider also says so outright; Gemini stops a few tokens short
+			// of the ceiling, so the count alone missed it.
+			if ( (int) ( $call['usage']['output_tokens'] ?? 0 ) >= $ceiling || in_array( strtolower( (string) ( $call['status'] ?? '' ) ), array( 'max_tokens', 'incomplete' ), true ) ) {
 				$result->event( 'warning', $name, sprintf( 'Stopped on the %d-token ceiling; the answer is cut and was billed in full.', $ceiling ) );
 			}
 

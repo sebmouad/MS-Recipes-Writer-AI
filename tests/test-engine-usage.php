@@ -72,4 +72,22 @@ $free = MSRWA_Engine_Config::create( array( 'providers' => array( 'gemini' => ar
 msrwa_test_assert( 0.0 === (float) $free->price( 'gemini', 'x', array( 'web_searches' => 5 ) ), 'A caller on a plan with free searches can set the fee to zero.' );
 msrwa_test_assert( null === $config->price( 'gemini', 'unpriced', array( 'web_searches' => 5 ) ), 'An unpriced model stays unknown, never the search fee alone.' );
 
+// --- How hard Gemini may think -----------------------------------------------
+
+// Gemini counts thinking inside its output ceiling. Left unbounded, a live
+// canonical recipe thought its way through the whole ceiling, stopped on
+// MAX_TOKENS with its JSON cut in half, and was billed in full.
+$wire = MSRWA_Engine_Config::create( array( 'settings' => array( 'keys' => array( 'gemini' => 'k' ) ) ) )->provider( 'gemini', 'gemini-3.5-flash' );
+$plan = MSRWA_Engine_Call::plan_text( 'gemini', 'gemini-3.5-flash', 'x', 4500, true, false, $wire );
+msrwa_test_assert( array( 'thinkingLevel' => 'low' ) === ( $plan['request']['payload']['generationConfig']['thinkingConfig'] ?? null ), 'Gemini is asked to think at the shipped level.' );
+msrwa_test_assert( 4500 === $plan['request']['payload']['generationConfig']['maxOutputTokens'], 'The ceiling is unchanged.' );
+$vision = MSRWA_Engine_Call::plan_vision( 'gemini', 'gemini-3.5-flash', array( 'mime' => 'image/jpeg', 'data' => 'AAAA' ), 'x', 900, $wire );
+msrwa_test_assert( isset( $vision['request']['payload']['generationConfig']['thinkingConfig'] ), 'A vision pass is bounded the same way.' );
+$unbounded = $wire;
+unset( $unbounded['thinking'] );
+$plan = MSRWA_Engine_Call::plan_text( 'gemini', 'gemini-3.5-flash', 'x', 4500, true, false, $unbounded );
+msrwa_test_assert( ! isset( $plan['request']['payload']['generationConfig']['thinkingConfig'] ), 'A caller that removes the setting gets Google’s default.' );
+$cut = msrwa_usage_read( 'gemini', array( 'candidates' => array( array( 'content' => array( 'parts' => array( array( 'text' => '{"title":' ) ) ), 'finishReason' => 'MAX_TOKENS' ) ), 'usageMetadata' => array( 'promptTokenCount' => 3759, 'candidatesTokenCount' => 1050, 'thoughtsTokenCount' => 3435 ) ) );
+msrwa_test_assert( 'MAX_TOKENS' === $cut['status'], 'A cut answer says so, so the run can warn that it was billed in full.' );
+
 msrwa_test_done( 'engine usage and pricing' );

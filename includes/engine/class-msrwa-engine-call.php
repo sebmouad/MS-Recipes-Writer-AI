@@ -198,7 +198,7 @@ final class MSRWA_Engine_Call {
 		} elseif ( 'gemini' === $provider ) {
 			$payload = array(
 				'contents' => array( array( 'role' => 'user', 'parts' => array( array( 'text' => (string) $input ) ) ) ),
-				'generationConfig' => array( 'maxOutputTokens' => max( 16, (int) $max_tokens ) ),
+				'generationConfig' => self::gemini_generation( $wire, max( 16, (int) $max_tokens ) ),
 			);
 			if ( $json_output && ! $tools ) { $payload['generationConfig']['responseMimeType'] = 'application/json'; }
 			// An empty tool object must reach the wire as {}, not as [].
@@ -218,6 +218,22 @@ final class MSRWA_Engine_Call {
 			'kind' => 'text', 'provider' => $provider, 'model' => $model,
 			'request' => array( 'url' => $wire['text_endpoint'], 'headers' => $wire['headers'], 'payload' => $payload, 'timeout' => (int) ( $wire['timeout'] ?? 600 ) ),
 		);
+	}
+
+	/**
+	 * Gemini's generation settings: the ceiling, and how hard it may think.
+	 *
+	 * Gemini counts thinking inside maxOutputTokens and, left to itself,
+	 * thinks hard. A live canonical recipe on gemini-3.5-flash spent the whole
+	 * 4 500-token ceiling — about 3 400 of it thinking — stopped on
+	 * MAX_TOKENS, returned JSON cut in half and was billed $0.046 for it.
+	 * `providers.gemini.thinking` is passed as thinkingConfig; `low` took the
+	 * same question from 2 717 thinking tokens to 731.
+	 */
+	private static function gemini_generation( array $wire, $max_tokens ) {
+		$config = array( 'maxOutputTokens' => (int) $max_tokens );
+		if ( ! empty( $wire['thinking'] ) && is_array( $wire['thinking'] ) ) { $config['thinkingConfig'] = $wire['thinking']; }
+		return $config;
 	}
 
 	/** Reads one answer back, whatever provider and kind of call produced it. */
@@ -446,7 +462,7 @@ final class MSRWA_Engine_Call {
 		if ( 'openai' === $provider ) {
 			$payload = array( 'model' => $model, 'store' => false, 'max_output_tokens' => $max_tokens, 'input' => array( array( 'role' => 'user', 'content' => array( array( 'type' => 'input_text', 'text' => $instruction ), array( 'type' => 'input_image', 'image_url' => 'data:' . $image['mime'] . ';base64,' . $image['data'] ) ) ) ), 'text' => array( 'format' => array( 'type' => 'json_object' ) ) );
 		} elseif ( 'gemini' === $provider ) {
-			$payload = array( 'contents' => array( array( 'role' => 'user', 'parts' => array( array( 'text' => $instruction ), array( 'inline_data' => array( 'mime_type' => $image['mime'], 'data' => $image['data'] ) ) ) ) ), 'generationConfig' => array( 'maxOutputTokens' => $max_tokens, 'responseMimeType' => 'application/json' ) );
+			$payload = array( 'contents' => array( array( 'role' => 'user', 'parts' => array( array( 'text' => $instruction ), array( 'inline_data' => array( 'mime_type' => $image['mime'], 'data' => $image['data'] ) ) ) ) ), 'generationConfig' => self::gemini_generation( $wire, $max_tokens ) + array( 'responseMimeType' => 'application/json' ) );
 		} else {
 			$payload = array( 'model' => $model, 'max_tokens' => $max_tokens, 'messages' => array( array( 'role' => 'user', 'content' => array( array( 'type' => 'image', 'source' => array( 'type' => 'base64', 'media_type' => $image['mime'], 'data' => $image['data'] ) ), array( 'type' => 'text', 'text' => $instruction ) ) ) ) );
 		}
@@ -492,7 +508,7 @@ final class MSRWA_Engine_Call {
 				$parts[] = array( 'text' => 'IMAGE — ' . $image['label'] );
 				$parts[] = array( 'inline_data' => array( 'mime_type' => $image['mime'], 'data' => $image['data'] ) );
 			}
-			$payload = array( 'contents' => array( array( 'role' => 'user', 'parts' => $parts ) ), 'generationConfig' => array( 'maxOutputTokens' => $max_tokens, 'responseMimeType' => 'application/json' ) );
+			$payload = array( 'contents' => array( array( 'role' => 'user', 'parts' => $parts ) ), 'generationConfig' => self::gemini_generation( $wire, $max_tokens ) + array( 'responseMimeType' => 'application/json' ) );
 		} else {
 			$content = array();
 			foreach ( $images as $image ) {

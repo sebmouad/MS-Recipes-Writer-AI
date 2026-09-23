@@ -135,6 +135,7 @@ final class MSRWA_Engine_Config {
 					'key_env'         => array( 'GEMINI_API_KEY', 'MSRWA_GEMINI_KEY' ),
 					'web_search_tool' => array( 'google_search' => array() ),
 					'web_search_usd'  => 0.014,
+					'thinking'        => array( 'thinkingLevel' => 'low' ),
 				),
 				'claude' => array(
 					'text_endpoint'   => 'https://api.anthropic.com/v1/messages',
