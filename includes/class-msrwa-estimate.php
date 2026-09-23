@@ -65,7 +65,10 @@ final class MSRWA_Estimate {
 			// The ceiling is what the caller will be billed for if the model
 			// runs long, so an estimate uses the smaller of the two rather than
 			// promising an output nobody guaranteed.
-			$usage['output'] = min( (int) $usage['output'], $config->max_output( $name ) );
+			// Thinking above the level the shapes were measured at is extra output;
+			// the ceiling still caps the lot, because nothing is billed past it.
+			$thinking = 'image_generation' === $capability ? '' : $config->thinking( $name, $route['provider'] );
+			$usage['output'] = min( (int) $usage['output'] + MSRWA_Engine_Config::thinking_allowance( $thinking ), $config->max_output( $name ) );
 
 			$cost = $config->price( $route['provider'], $route['model'], array( 'input_tokens' => $usage['input'], 'output_tokens' => $usage['output'], 'web_searches' => (int) ( $usage['searches'] ?? 0 ) ) );
 			if ( null === $cost ) { $unknown[] = $name; continue; }
@@ -73,6 +76,7 @@ final class MSRWA_Estimate {
 			$total += (float) $cost;
 			$steps[ $name ] = array(
 				'model' => $route['provider'] . ':' . $route['model'],
+				'thinking' => $thinking,
 				'bucket' => MSRWA_Engine_Steps::bucket( $name, $registry ),
 				'cost_usd' => round( (float) $cost, 6 ),
 			);
@@ -99,7 +103,7 @@ final class MSRWA_Estimate {
 		// The pairing reads image bytes, so it is priced on the vision route the
 		// matcher actually uses.
 		$route = $config->model_for( 'vision' );
-		$per_image = $config->price( $route['provider'], $route['model'], array( 'input_tokens' => 1100, 'output_tokens' => 180 ) );
+		$per_image = $config->price( $route['provider'], $route['model'], array( 'input_tokens' => 1100, 'output_tokens' => 180 + MSRWA_Engine_Config::thinking_allowance( $config->thinking( 'vision', $route['provider'] ) ) ) );
 
 		$recipes = max( 0, (int) $recipes );
 		$images = max( 0, (int) $images );

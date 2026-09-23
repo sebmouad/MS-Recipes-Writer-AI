@@ -35,6 +35,16 @@ $route = MSRWA_Engine_Config::create()->model_for( 'research' );
 $tokens_only = MSRWA_Engine_Config::create()->price( $route['provider'], $route['model'], array( 'input_tokens' => 65000, 'output_tokens' => min( 6200, MSRWA_Engine_Config::create()->max_output( 'research' ) ) ) );
 msrwa_test_assert( $full['steps']['research']['cost_usd'] > $tokens_only, 'The research estimate includes its searches.' );
 
+// Thinking harder costs more, and is capped by the ceiling it is spent from.
+$high = MSRWA_Estimate::recipe( MSRWA_Profile::FULL, array( 'thinking' => array( 'default' => 'high' ) ) );
+msrwa_test_assert( $high['cost_usd'] > $full['cost_usd'], 'A recipe allowed to think harder is estimated higher.' );
+msrwa_test_assert( 'high' === $high['steps']['article']['thinking'], 'Each step says the level it was estimated at.' );
+msrwa_test_assert( '' === $high['steps']['featured_image']['thinking'], 'An image model does not think.' );
+// 256 is the smallest ceiling the engine accepts.
+$capped = MSRWA_Estimate::recipe( MSRWA_Profile::ARTICLE, array( 'thinking' => array( 'default' => 'high' ), 'max_output' => array( 'article' => 256 ) ) );
+$route = MSRWA_Engine_Config::create()->model_for( 'article' );
+msrwa_test_assert( abs( $capped['steps']['article']['cost_usd'] - round( MSRWA_Engine_Config::create()->price( $route['provider'], $route['model'], array( 'input_tokens' => 6900, 'output_tokens' => 256 ) ), 6 ) ) < 1e-9, 'Never past the ceiling, whatever the level.' );
+
 // Asking for less must cost less, in the bucket it was removed from.
 $featured = MSRWA_Estimate::recipe( MSRWA_Profile::FEATURED );
 $article = MSRWA_Estimate::recipe( MSRWA_Profile::ARTICLE );
