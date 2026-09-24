@@ -138,6 +138,7 @@ final class MSRWA_Engine {
 		$spent = 0.0;
 		$seconds = 0.0;
 		$outcome = array();
+		$extra = false;
 
 		for ( $attempt = 1; $attempt <= $attempts; $attempt++ ) {
 			// The first attempt may already have been made, alongside the rest of its
@@ -154,6 +155,14 @@ final class MSRWA_Engine {
 			$outcome['seconds'] = round( $seconds, 1 );
 			$outcome['attempts'] = $attempt;
 
+			// Letters from another alphabet are a slip, not a judgement: when they
+			// are all that failed, the step is asked once more even on its last
+			// attempt, rather than carried into the article.
+			if ( '' !== $outcome['retry'] && $attempt >= $attempts && ! $extra && self::only_stray( $outcome ) ) {
+				$extra = true;
+				$attempts++;
+				$result->event( 'retry', $name, 'Characters from another alphabet in the answer; asking once more.' );
+			}
 			if ( '' === $outcome['retry'] || $attempt >= $attempts ) { break; }
 			// The budget was only checked between waves, so a refused approval
 			// could redraw and ask again past a ceiling the run had nearly
@@ -256,6 +265,15 @@ final class MSRWA_Engine {
 	/** One step, asked and answered. */
 	private static function call( $name, MSRWA_Engine_Config $config, MSRWA_Result $result, array $options, array $findings = array() ) {
 		return self::settle( self::prepare( $name, $config, $result, $options, $findings ) );
+	}
+
+	/** Whether the only check an answer failed is the one for foreign letters. */
+	private static function only_stray( array $outcome ) {
+		$failed = array();
+		foreach ( (array) ( $outcome['checks'] ?? array() ) as $name => $check ) {
+			if ( is_array( $check ) && empty( $check['pass'] ) ) { $failed[] = (string) $name; }
+		}
+		return array( 'one alphabet' ) === $failed;
 	}
 
 	/**

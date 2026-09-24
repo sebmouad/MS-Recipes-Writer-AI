@@ -57,7 +57,9 @@ final class MSRWA_Prompt {
 			'facebook_ratio'       => (string) ( $s['facebook_ratio'] ?? '4:5' ),
 			'image_format'         => strtoupper( (string) ( $s['image_format'] ?? 'webp' ) ),
 			'image_quality'        => (string) ( $s['image_quality'] ?? 'medium' ),
-			'facebook_steps'       => (int) ( $s['facebook_collage_steps'] ?? 6 ),
+			// The collage prompt is written for six moments in a 2 × 3 grid; a
+			// count the site could change contradicted it at any other value.
+			'facebook_steps'       => 6,
 			'research_facts_max'      => (int) ( $s['research_facts_max'] ?? 12 ),
 			'research_references_max' => (int) ( $s['research_references_max'] ?? 6 ),
 		);

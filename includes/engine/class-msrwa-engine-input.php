@@ -429,7 +429,7 @@ final class MSRWA_Engine_Input {
 		if ( 'facebook' === $kind ) {
 			$all_steps = array_values( (array) ( $canonical['steps'] ?? array() ) );
 			$steps = array();
-			$panels = (int) ( $options['collage_panels'] ?? $settings['facebook_collage_steps'] ?? 6 );
+			$panels = (int) ( $options['collage_panels'] ?? 6 );
 			$selected = array_values( array_filter( array_map( 'intval', explode( ',', (string) ( $options['steps'] ?? '' ) ) ) ) );
 			foreach ( $selected as $number ) {
 				if ( isset( $all_steps[ $number - 1 ] ) ) { $steps[] = count( $steps ) + 1 . '. ' . ( $all_steps[ $number - 1 ]['text'] ?? '' ); }

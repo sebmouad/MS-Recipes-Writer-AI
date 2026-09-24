@@ -39,7 +39,6 @@ final class MSRWA_Settings {
 			'recipe_schema'       => 1,
 			'seo_meta'            => 1,
 			'article_page2_heading' => 'Préparation de la recette étape par étape',
-			'facebook_collage_steps' => 6,
 			'required_sections'   => array(),
 
 			'quality_max_words'        => 3600,
@@ -503,7 +502,6 @@ FORBIDDEN anywhere, in any panel, even as a prop: text, letters, numbers, captio
 		$out['site_language'] = isset( $raw['site_language'] ) && in_array( $raw['site_language'], array( 'fr', 'en', 'ar', 'es' ), true ) ? $raw['site_language'] : $defaults['site_language'];
 		$heading = isset( $raw['article_page2_heading'] ) ? trim( sanitize_text_field( (string) $raw['article_page2_heading'] ) ) : '';
 		$out['article_page2_heading'] = '' !== $heading ? mb_substr( $heading, 0, 120 ) : $defaults['article_page2_heading'];
-		$out['facebook_collage_steps'] = isset( $raw['facebook_collage_steps'] ) ? min( 9, max( 2, absint( $raw['facebook_collage_steps'] ) ) ) : $defaults['facebook_collage_steps'];
 		if ( isset( $raw['required_sections'] ) && is_array( $raw['required_sections'] ) ) {
 			$out['required_sections'] = array_values( array_filter( array_map( static function ( $line ) { return mb_substr( trim( sanitize_text_field( (string) $line ) ), 0, 160 ); }, $raw['required_sections'] ) ) );
 		}

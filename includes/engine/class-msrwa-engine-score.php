@@ -27,6 +27,8 @@ final class MSRWA_Engine_Score {
 
 	/** Scores an answer against the contract of its step. */
 	public static function step( $step, $text, $brief, $thresholds = array() ) {
+		// The research branch below reuses $step as its loop variable.
+		$name = (string) $step;
 		$settings = MSRWA_Engine_Input::settings();
 		$limits = self::thresholds( $thresholds );
 		$checks = array();
@@ -162,6 +164,14 @@ final class MSRWA_Engine_Score {
 			$checks['French typography'] = array( 'pass' => self::accent_density( $corrected ) >= self::accent_density( $original ) - (float) $limits['proofread_accent_slack'], 'detail' => sprintf( '%.1f vs %.1f per 1000', self::accent_density( $corrected ), self::accent_density( $original ) ) );
 		}
 
+		// A model writing French once put a Chinese character in the middle of
+		// a word — "润ir les pommes" — and the answer scored 13/13. Letters
+		// from an alphabet the article is not written in are never meant.
+		if ( in_array( $name, array( 'research', 'canonical_recipe', 'article', 'fact_check', 'proofread' ), true ) && $json ) {
+			$stray = self::stray_script( $json, (string) ( $settings['site_language'] ?? 'fr' ) );
+			$checks['one alphabet'] = array( 'pass' => ! $stray, 'detail' => $stray ? 'foreign characters: ' . implode( ' · ', array_slice( $stray, 0, 3 ) ) : 'none' );
+		}
+
 		if ( 'review' === $step ) {
 			$checks['verdict is boolean'] = array( 'pass' => array_key_exists( 'pass', $json ) && is_bool( $json['pass'] ), 'detail' => isset( $json['pass'] ) ? var_export( $json['pass'], true ) : 'missing' );
 			$checks['findings are structured'] = array( 'pass' => isset( $json['findings'] ) && is_array( $json['findings'] ), 'detail' => count( (array) ( $json['findings'] ?? array() ) ) . ' findings' );
@@ -170,6 +180,29 @@ final class MSRWA_Engine_Score {
 		$passed = 0;
 		foreach ( $checks as $check ) { if ( $check['pass'] ) { $passed++; } }
 		return array( 'checks' => $checks, 'passed' => $passed, 'total' => count( $checks ), 'pass' => $passed === count( $checks ) );
+	}
+
+	/**
+	 * Every place in an answer where letters of a foreign alphabet appear,
+	 * each with a few characters around it. The article's languages are
+	 * written in Latin letters, and Arabic in Arabic with Latin names and
+	 * units beside it; nothing else belongs. Addresses are not text.
+	 */
+	public static function stray_script( $value, $language = 'fr' ) {
+		$foreign = '\p{Han}\p{Hiragana}\p{Katakana}\p{Hangul}\p{Cyrillic}\p{Thai}\p{Hebrew}\p{Devanagari}' . ( 'ar' === $language ? '' : '\p{Arabic}' );
+		$found = array();
+		$walk = static function ( $value, $key = '' ) use ( &$walk, &$found, $foreign ) {
+			if ( is_array( $value ) ) {
+				foreach ( $value as $inner_key => $inner ) { $walk( $inner, (string) $inner_key ); }
+				return;
+			}
+			if ( ! is_string( $value ) || preg_match( '/(^|_)url$/', $key ) ) { return; }
+			if ( preg_match_all( '/.{0,8}[' . $foreign . ']+.{0,8}/u', $value, $matches ) ) {
+				foreach ( $matches[0] as $match ) { $found[] = trim( $match ); }
+			}
+		};
+		$walk( $value );
+		return array_values( array_unique( $found ) );
 	}
 
 	/**

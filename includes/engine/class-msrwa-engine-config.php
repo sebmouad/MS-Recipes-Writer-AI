@@ -130,7 +130,10 @@ final class MSRWA_Engine_Config {
 				// the caller layer as well as here — and a lot picks one by key.
 				'facebook_template'  => 'collage',
 				'facebook_templates' => array(
-					'collage' => array( 'label' => 'Collage de préparation', 'prompt' => 'facebook_image.tpl.txt', 'columns' => 2 ),
+					// Six moments in a 2 × 3 grid is what its prompt is written for,
+					// so the template fixes it; `collage_panels` serves templates
+					// that name no count of their own.
+					'collage' => array( 'label' => 'Collage de préparation', 'prompt' => 'facebook_image.tpl.txt', 'panels' => 6, 'columns' => 2 ),
 				),
 			),
 

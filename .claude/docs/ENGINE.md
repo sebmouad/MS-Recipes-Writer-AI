@@ -555,15 +555,22 @@ photograph, and otherwise use the photograph without the cost of a search.
     where it always said "2 columns × 3 rows". Shipped: one template,
     `collage`, the existing prompt. Adding one: a prompt file and an entry.
 
+27. **The collage is six panels; foreign letters are caught.** Owner's
+    decision, 2026-09-24. The `collage` template declares `panels: 6`, the
+    count its prompt is written for; the site setting that could change it,
+    and so contradict the prompt, is gone. `MSRWA_Engine_Score::step()` gains
+    `one alphabet` on research, the recipe, the article, the fact check and
+    the proofread: letters from Han, kana, Hangul, Cyrillic, Thai, Hebrew or
+    Devanagari — and Arabic outside an Arabic article — fail it; Greek stays
+    allowed for units and symbols, and addresses are skipped. When that is
+    the only failed check, `perform()` asks once more even on the step's last
+    attempt. Found with the fix: the research branch of `step()` reused
+    `$step` as a loop variable, so any check placed after it never ran for
+    research. Across 328 stored answers the check fires once, on the
+    "润ir les pommes" that prompted it.
+
 ### Still open
 
-8. **The collage prompt fixes six moments whatever the panel setting.**
-   `facebook_image.tpl.txt` describes a 2-column × 3-row grid and six named
-   moments; the site setting `facebook_collage_steps` accepts 2 to 9 and is
-   compiled into `{{facebook_steps}}` beside those words. At any value but 6
-   the prompt contradicts itself. *Proposal:* the `collage` template declares
-   `panels: 6` and the setting is removed, or the prompt's geometry is written
-   from the grid. Awaiting the owner.
 
 6. **The engine's `models` list is a second source of truth for prices.** The
    plugin now owns the catalogue — models, rates and per-step compatibility in
