@@ -161,9 +161,19 @@ final class MSRWA_DB {
 	 */
 	private static function rename_generated_keys() {
 		global $wpdb;
+		// The posts that carried the old keys had their images skipped by the
+		// optimizer, "no longer assigned to this role": it had queued them as
+		// article content. Moving the keys is silent, so they are handed back to
+		// it — the most recent hundred, which is every site this has run on.
+		$touched = array_map( 'intval', (array) $wpdb->get_col( "SELECT DISTINCT post_id FROM {$wpdb->postmeta} WHERE meta_key IN ('_msrwa_featured_image_id','_msrwa_facebook_image_id') ORDER BY post_id DESC LIMIT 100" ) );
 		foreach ( array( 'featured', 'facebook' ) as $kind ) {
 			$wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->postmeta} SET meta_key = %s WHERE meta_key = %s", MSRWA_Draft::generated_key( $kind ), '_msrwa_' . $kind . '_image_id' ) );
 		}
+		// Their images were stored lossless, which no later encoding compresses.
+		foreach ( $touched as $post_id ) {
+			foreach ( array( 'featured', 'facebook' ) as $kind ) { MSRWA_Stack::make_lossy( (int) get_post_meta( $post_id, MSRWA_Draft::generated_key( $kind ), true ) ); }
+		}
+		if ( $touched ) { MSRWA_Stack::reoptimize( $touched ); }
 	}
 
 	private static function backfill_check_counts() {

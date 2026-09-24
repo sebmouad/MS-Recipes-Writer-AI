@@ -99,6 +99,38 @@ final class MSRWA_Stack {
 		return $sources;
 	}
 
+	/**
+	 * Re-encodes a generated image already in the media library once, when it
+	 * is still a lossless WebP, and rebuilds its sizes. Images stored before
+	 * MSRWA_Draft::lossy() existed could not be compressed by anything.
+	 */
+	public static function make_lossy( $attachment_id ) {
+		$attachment_id = absint( $attachment_id );
+		$path = $attachment_id ? (string) get_attached_file( $attachment_id ) : '';
+		if ( '' === $path || ! is_file( $path ) || 'image/webp' !== get_post_mime_type( $attachment_id ) ) { return false; }
+		$bytes = MSRWA_Draft::lossy( $path, 'image/webp' );
+		if ( strlen( $bytes ) >= (int) filesize( $path ) ) { return false; }
+		if ( false === file_put_contents( $path, $bytes ) ) { return false; }
+		require_once ABSPATH . 'wp-admin/includes/image.php';
+		wp_update_attachment_metadata( $attachment_id, wp_generate_attachment_metadata( $attachment_id, $path ) );
+		return true;
+	}
+
+	/**
+	 * Hands posts back to MS Image Optimizer, through its own queue, when it is
+	 * active. Returns how many image jobs it queued.
+	 */
+	public static function reoptimize( array $post_ids ) {
+		if ( ! class_exists( 'MSIMG_Plugin' ) || ! method_exists( 'MSIMG_Plugin', 'instance' ) ) { return 0; }
+		$worker = MSIMG_Plugin::instance()->worker ?? null;
+		if ( ! is_object( $worker ) || ! method_exists( $worker, 'enqueue_post' ) ) { return 0; }
+		$queued = 0;
+		foreach ( array_slice( array_map( 'absint', $post_ids ), 0, 100 ) as $post_id ) {
+			if ( $post_id ) { $queued += (int) $worker->enqueue_post( $post_id, '', 50 ); }
+		}
+		return $queued;
+	}
+
 	/** Raises the PHP time limit for MS Image Optimizer's worker, when it is set and too low. */
 	public static function room_for_images() {
 		$want = (int) apply_filters( 'msrwa_image_optimizer_seconds', 180 );
