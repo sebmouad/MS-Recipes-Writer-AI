@@ -117,4 +117,13 @@ foreach ( (array) glob( dirname( __DIR__ ) . '/includes/*.php' ) as $file ) {
 }
 msrwa_test_assert( ! $raw, count( $raw ) . ' error message(s) reach a reader untranslated: ' . implode( ', ', array_slice( $raw, 0, 5 ) ) );
 
+// Each compiled catalogue carries its plural rule, which WordPress reads from
+// the .mo header: without it Arabic took English's two forms, and one recipe
+// read "no recipes".
+foreach ( glob( dirname( __DIR__ ) . '/languages/*.po' ) as $po ) {
+	$mo = (string) @file_get_contents( preg_replace( '/\.po$/', '.mo', $po ) );
+	preg_match( '/Plural-Forms: *nplurals=(\d+)/', (string) file_get_contents( $po ), $declared );
+	msrwa_test_contains( $mo, 'Plural-Forms: nplurals=' . ( $declared[1] ?? '?' ), basename( $po ) . ' compiles with its plural rule.' );
+}
+
 msrwa_test_done( 'translation catalogues OK' );

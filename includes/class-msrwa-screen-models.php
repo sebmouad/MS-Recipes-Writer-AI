@@ -178,7 +178,7 @@ final class MSRWA_Screen_Models {
 			<?php if ( empty( $handed['tiers'] ) ) : ?>
 				<p class="ms-muted"><?php esc_html_e( 'Rien d’engendré : aucun modèle tarifé et connu pour écrire. Les valeurs par défaut du moteur s’appliquent.', 'ms-recipes-writer-ai' ); ?></p>
 			<?php else : ?>
-				<table class="ms-table">
+				<table class="ms-table ms-stack">
 					<thead><tr>
 						<th scope="col"><?php esc_html_e( 'Niveau', 'ms-recipes-writer-ai' ); ?></th>
 						<?php foreach ( array_keys( $handed['models'] ) as $provider ) : ?>
@@ -191,7 +191,7 @@ final class MSRWA_Screen_Models {
 						<tr>
 							<th scope="row"><?php echo esc_html( MSRWA_UI::tier_name( $tier ) ); ?></th>
 							<?php foreach ( array_keys( $handed['models'] ) as $provider ) : ?>
-								<td><code class="ms-key"><?php echo esc_html( (string) ( $handed['tiers'][ $tier ][ $provider ] ?? '—' ) ); ?></code></td>
+								<td data-label="<?php echo esc_attr( MSRWA_UI::provider_name( $provider ) ); ?>"><code class="ms-key"><?php echo esc_html( (string) ( $handed['tiers'][ $tier ][ $provider ] ?? '—' ) ); ?></code></td>
 							<?php endforeach; ?>
 						</tr>
 					<?php endforeach; ?>

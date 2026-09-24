@@ -166,6 +166,20 @@ function msrwa_i18n_po_unescape( $quoted ) {
 }
 
 /**
+ * The catalogue's header — the msgstr of the empty msgid — as a .mo carries
+ * it. WordPress reads the plural rule from it: without it every catalogue
+ * got English's two forms, and in Arabic one recipe read "no recipes" and
+ * five read "one recipe".
+ */
+function msrwa_i18n_po_header( $path ) {
+	$text = (string) file_get_contents( $path );
+	if ( ! preg_match( '/^msgid ""\s*\nmsgstr ((?:"[^\n]*"\s*\n)+)/m', $text, $match ) ) { return ''; }
+	$header = '';
+	foreach ( preg_split( '/\n/', trim( $match[1] ) ) as $line ) { $header .= msrwa_i18n_po_unescape( $line ); }
+	return $header;
+}
+
+/**
  * Writes a GNU .mo file.
  *
  * Little-endian, the original strings sorted, each table holding a length and
@@ -223,6 +237,8 @@ if ( 'extract' === $command ) {
 if ( 'compile' === $command ) {
 	foreach ( glob( msrwa_i18n_root() . '/languages/*.po' ) as $po ) {
 		$entries = msrwa_i18n_read_po( $po );
+		$header = msrwa_i18n_po_header( $po );
+		if ( '' !== $header ) { $entries[''] = $header; }
 		$mo = preg_replace( '/\.po$/', '.mo', $po );
 		printf( "%-40s %d translation(s)\n", basename( $mo ), msrwa_i18n_write_mo( $entries, $mo ) );
 	}

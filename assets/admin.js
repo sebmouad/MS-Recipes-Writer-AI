@@ -992,9 +992,10 @@
     var ticket = rail.querySelector('[data-run="' + run.id + '"]');
     if (!ticket) { window.location.reload(); return true; }
 
+    // A field the answer does not carry is left as the page drew it.
     var set = function (field, value) {
       var node = ticket.querySelector('[data-field="' + field + '"]');
-      if (node) node.textContent = value;
+      if (node && value !== undefined && String(value).indexOf('undefined') === -1) node.textContent = value;
     };
     set('steps', run.steps_done + '/' + run.steps_total);
     set('cost', money(run.cost_usd));

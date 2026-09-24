@@ -153,7 +153,10 @@ final class MSRWA_REST {
 			);
 			if ( ! MSRWA_Rights::may_see_money() ) {
 				$last = count( $out ) - 1;
-				unset( $out[ $last ]['step'], $out[ $last ]['steps_done'], $out[ $last ]['steps_total'], $out[ $last ]['cost_usd'], $out[ $last ]['seconds'] );
+				// How far along is the writer's to know, and their screen shows it:
+				// stripping it painted "undefined/undefined" on every refresh. The
+				// step's engine name, the cost and the time stay off.
+				unset( $out[ $last ]['step'], $out[ $last ]['cost_usd'], $out[ $last ]['seconds'] );
 			}
 		}
 		return rest_ensure_response( array( 'status' => (string) $batch['status'], 'runs' => $out ) );
