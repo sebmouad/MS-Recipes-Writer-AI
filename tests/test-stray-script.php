@@ -48,6 +48,24 @@ msrwa_test_assert( 'garniture' === ( $result->artifacts['research']['ingredients
 $events = implode( "\n", array_column( $result->events, 'message' ) );
 msrwa_test_contains( $events, 'another alphabet', 'And the timeline says why.' );
 
+// An answer that is not JSON at all is asked once more too: a research answer
+// that did not parse ended the whole recipe on its only attempt.
+$calls = 0;
+foreach ( $package['ingredients'] as &$one ) { $one['role'] = 'garniture'; } unset( $one );
+MSRWA_Engine_Call::$transport = static function ( $url, $payload ) use ( &$calls, $package, $seen ) {
+	if ( false !== strpos( json_encode( $payload ), 'input_image' ) ) {
+		return array( 'status' => 200, 'raw' => json_encode( array( 'status' => 'completed', 'output' => array( array( 'type' => 'message', 'content' => array( array( 'text' => json_encode( $seen ) ) ) ) ), 'usage' => array( 'input_tokens' => 10, 'output_tokens' => 10 ) ) ) );
+	}
+	$calls++;
+	$text = 1 === $calls ? '{"dish_identity":{"name":"Tarte' : json_encode( $package, JSON_UNESCAPED_UNICODE );
+	return array( 'status' => 200, 'raw' => json_encode( array( 'status' => 'completed', 'output' => array( array( 'type' => 'message', 'content' => array( array( 'text' => $text ) ) ) ), 'usage' => array( 'input_tokens' => 100, 'output_tokens' => 100 ) ) ) );
+};
+$result = MSRWA_Engine::run_step( 'research', $brief, array( 'read_image' => $reader, 'config' => array( 'settings' => array( 'keys' => array( 'openai' => 'k' ) ), 'attempts' => array( 'research' => 1 ) ) ) );
+MSRWA_Engine_Call::$transport = null;
+msrwa_test_assert( 2 === $calls, 'An unreadable answer is asked once more, even on its last attempt: ' . $calls . ' call(s).' );
+msrwa_test_assert( 'garniture' === ( $result->artifacts['research']['ingredients'][0]['role'] ?? '' ), 'The readable answer is the one kept.' );
+msrwa_test_contains( implode( "\n", array_column( $result->events, 'message' ) ), 'not readable JSON', 'And the timeline says why.' );
+
 // The collage is six panels, whatever an older setting said.
 $config = MSRWA_Engine_Config::create( array( 'images' => array( 'collage_panels' => 4 ) ) );
 msrwa_test_assert( 6 === $config->facebook_template()['panels'], 'The collage template fixes six panels.' );

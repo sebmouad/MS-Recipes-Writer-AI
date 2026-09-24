@@ -5,9 +5,9 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.26.6
+## État actuel — 0.26.7
 
-La version `0.26.6` dessine le visuel Facebook en qualité haute et ne fait plus redessiner un collage pour un aromate montré une étape trop tôt ; la `0.26.5` permettait au moteur de dessiner avec les modèles d'image de Gemini, au bon prix ; la `0.26.4` donnait au visuel Facebook le style des collages de référence du propriétaire : lumineux, net, cadré serré ; la `0.26.3` faisait ressembler le visuel Facebook à de vraies photographies plutôt qu'à des images de synthèse ; la `0.26.2` rendait le visuel Facebook plus chaleureux et plus proche du plat, et le fait toujours finir sur le plat ouvert ; la `0.26.1` retirait les copies des prompts que gardaient les réglages :
+La version `0.26.7` fait suivre à la recette le plat que décrit le rédacteur et relève le plafond par recette à 0,25 $ ; la `0.26.6` dessinait le visuel Facebook en qualité haute et ne fait plus redessiner un collage pour un aromate montré une étape trop tôt ; la `0.26.5` permettait au moteur de dessiner avec les modèles d'image de Gemini, au bon prix ; la `0.26.4` donnait au visuel Facebook le style des collages de référence du propriétaire : lumineux, net, cadré serré ; la `0.26.3` faisait ressembler le visuel Facebook à de vraies photographies plutôt qu'à des images de synthèse ; la `0.26.2` rendait le visuel Facebook plus chaleureux et plus proche du plat, et le fait toujours finir sur le plat ouvert ; la `0.26.1` retirait les copies des prompts que gardaient les réglages :
 le moteur exécute ses propres gabarits, et ce qui n’est lu par rien ne se
 périme plus en silence. Le détail de chaque version suit, de la plus récente à
 la plus ancienne.
@@ -76,6 +76,23 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.26.7
+
+**La recette suit le plat que le rédacteur décrit.** Le titre et le texte du
+rédacteur fixent la forme du plat, ses ingrédients principaux et la méthode
+qu'ils nomment. Un ingrédient principal qu'ajoute une source n'entre plus dans
+la recette : il devient une variante ou un accompagnement. Vérifié : le gratin
+de cabillaud à la béchamel revient avec du cabillaud, une béchamel et du
+fromage — les pommes de terre ne sont plus qu'une variante — et les chaussons
+reviennent en chaussons individuels, plus en un grand feuilleté. Un ingrédient
+listé deux fois est désormais signalé.
+
+- **Plafond par recette : 0,25 $** par défaut (au lieu de 0,20 $), pour laisser
+  la place à un second collage en qualité haute. Un site qui avait choisi son
+  propre plafond le garde.
+- Une réponse de recherche illisible ne met plus fin à la recette : elle est
+  redemandée une fois.
 
 ## Version 0.26.6
 

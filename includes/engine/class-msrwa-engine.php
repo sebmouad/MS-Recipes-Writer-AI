@@ -155,13 +155,14 @@ final class MSRWA_Engine {
 			$outcome['seconds'] = round( $seconds, 1 );
 			$outcome['attempts'] = $attempt;
 
-			// Letters from another alphabet are a slip, not a judgement: when they
-			// are all that failed, the step is asked once more even on its last
-			// attempt, rather than carried into the article.
-			if ( '' !== $outcome['retry'] && $attempt >= $attempts && ! $extra && self::only_stray( $outcome ) ) {
+			// Letters from another alphabet, or an answer that is not JSON at all,
+			// are a slip, not a judgement: the step is asked once more even on its
+			// last attempt. An unreadable research answer otherwise ended the
+			// whole recipe on its only try.
+			if ( '' !== $outcome['retry'] && $attempt >= $attempts && ! $extra && ( self::only_stray( $outcome ) || self::unreadable( $outcome ) ) ) {
 				$extra = true;
 				$attempts++;
-				$result->event( 'retry', $name, 'Characters from another alphabet in the answer; asking once more.' );
+				$result->event( 'retry', $name, self::unreadable( $outcome ) ? 'The answer was not readable JSON; asking once more.' : 'Characters from another alphabet in the answer; asking once more.' );
 			}
 			if ( '' === $outcome['retry'] || $attempt >= $attempts ) { break; }
 			// The budget was only checked between waves, so a refused approval
@@ -265,6 +266,12 @@ final class MSRWA_Engine {
 	/** One step, asked and answered. */
 	private static function call( $name, MSRWA_Engine_Config $config, MSRWA_Result $result, array $options, array $findings = array() ) {
 		return self::settle( self::prepare( $name, $config, $result, $options, $findings ) );
+	}
+
+	/** Whether the answer could not be read as JSON at all. */
+	private static function unreadable( array $outcome ) {
+		$check = $outcome['checks']['valid JSON'] ?? null;
+		return is_array( $check ) && empty( $check['pass'] );
 	}
 
 	/** Whether the only check an answer failed is the one for foreign letters. */

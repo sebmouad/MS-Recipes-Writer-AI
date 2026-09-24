@@ -9,6 +9,8 @@ RULES:
 - Times are realistic and add up: prep_minutes + cook_minutes must equal total_minutes, or state the resting time that explains the difference.
 - Temperatures are given in °C with the oven mode when it matters.
 - Steps are ordered, each one a single action with its sign of success. Never merge three gestures into one step.
+- The editor brief defines the dish: its form, its principal ingredients and any method it names. The ingredient list holds what the brief names and what its method needs — staples, and the ingredients of a preparation the brief names, such as the butter, flour and milk of a béchamel. A principal component the brief does not name — a vegetable, a meat, a starch, a second sauce — is never added, even when the research shows a source using it.
+- Each ingredient appears once in the list: two entries for the same ingredient are merged into one with the total quantity.
 - Use only ingredients and method details supported by the editor brief or research package. Invent nothing, and never pad the list to look complete.
 - Completeness beats caution: the list must let someone cook the dish without guessing. A staple the method plainly requires — cooking fat, salt, pepper, water or stock, a marinade's own liquid — belongs in the list with its quantity, even when no source spells it out, because a step that says to brown or to season needs it. What must not be invented is a distinctive ingredient that changes the dish: a spice, a spirit, a garnish, a regional addition.
 - Every ingredient appears in at least one step, and every ingredient a step names appears in the list. A step that seasons, browns or deglazes without a listed ingredient is an incomplete recipe.

@@ -104,4 +104,18 @@ foreach ( $engine as $file ) {
 	}
 }
 
+// An ingredient listed twice is caught, however it is capitalised or accented.
+require_once dirname( __DIR__ ) . '/tools/lib/steps.php';
+$recipe = lab_brief( 'gratin-cabillaud-bechamel' )['canonical'];
+$recipe['ingredients'] = array_values( $recipe['ingredients'] );
+$recipe['ingredients'][] = array_merge( $recipe['ingredients'][0], array( 'name' => mb_strtoupper( (string) $recipe['ingredients'][0]['name'] ) ) );
+$doubled = MSRWA_Engine_Score::step( 'canonical_recipe', wp_json_encode( $recipe ), $brief, lab_settings() );
+msrwa_test_assert( false === $doubled['checks']['ingredients listed once']['pass'], 'An ingredient listed twice fails its check.' );
+array_pop( $recipe['ingredients'] );
+$names = array();
+foreach ( $recipe['ingredients'] as $key => $ingredient ) { $fold = MSRWA_Engine_Score::fold( $ingredient['name'] ); if ( isset( $names[ $fold ] ) ) { unset( $recipe['ingredients'][ $key ] ); } $names[ $fold ] = true; }
+$recipe['ingredients'] = array_values( $recipe['ingredients'] );
+$single = MSRWA_Engine_Score::step( 'canonical_recipe', wp_json_encode( $recipe ), $brief, lab_settings() );
+msrwa_test_assert( true === $single['checks']['ingredients listed once']['pass'], 'A list with each ingredient once passes: ' . $single['checks']['ingredients listed once']['detail'] );
+
 msrwa_test_done( 'engine configurability' );

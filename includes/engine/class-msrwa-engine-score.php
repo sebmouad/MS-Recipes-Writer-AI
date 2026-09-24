@@ -88,6 +88,17 @@ final class MSRWA_Engine_Score {
 			$checks['recipe schema'] = array( 'pass' => empty( $errors ), 'detail' => $errors ? implode( ', ', array_keys( $errors ) ) : 'valid' );
 			$checks['ingredients'] = array( 'pass' => count( (array) ( $json['ingredients'] ?? array() ) ) >= (int) $settings['quality_min_ingredients'], 'detail' => count( (array) ( $json['ingredients'] ?? array() ) ) . ' items' );
 			$checks['steps'] = array( 'pass' => count( (array) ( $json['steps'] ?? array() ) ) >= (int) $settings['quality_min_steps'], 'detail' => count( (array) ( $json['steps'] ?? array() ) ) . ' steps' );
+			// The same ingredient listed twice ("Beurre demi-sel" and "Beurre
+			// demi-sel") reads as a mistake and splits one quantity in two.
+			$seen = array();
+			$twice = array();
+			foreach ( (array) ( $json['ingredients'] ?? array() ) as $ingredient ) {
+				$key = self::fold( (string) ( is_array( $ingredient ) ? ( $ingredient['name'] ?? '' ) : $ingredient ) );
+				if ( '' === $key ) { continue; }
+				if ( isset( $seen[ $key ] ) ) { $twice[] = $key; }
+				$seen[ $key ] = true;
+			}
+			$checks['ingredients listed once'] = array( 'pass' => empty( $twice ), 'detail' => $twice ? 'twice: ' . implode( ', ', array_unique( $twice ) ) : count( $seen ) . ' distinct' );
 		}
 
 		if ( 'article' === $step ) {

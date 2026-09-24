@@ -664,6 +664,22 @@ photograph, and otherwise use the photograph without the cost of a search.
     refusals for its aromatics and no approval before). The estimate rises to
     $0.140 for a full recipe.
 
+34. **The brief defines the dish; an unreadable answer is asked again.**
+    Owner's request, 2026-09-24: the cod gratin came back with potatoes,
+    artichokes and mushrooms, the turnovers as one large pastry. The research,
+    the research from photographs and the canonical recipe now hold the dish's
+    form, principal ingredients and named method to the brief; a principal
+    component a source adds goes to substitutions, accompaniments or
+    variations, never into the recipe. The canonical recipe lists each
+    ingredient once, and `MSRWA_Engine_Score::step()` checks it
+    (`ingredients listed once`). Live: the gratin came back as cod, béchamel
+    and cheese with potatoes as a variation; the turnovers as individual
+    half-moons. On the first turnovers run the research answer did not parse
+    and the recipe ended on its only attempt: an answer that fails `valid
+    JSON` is now asked once more even on its last attempt, as stray letters
+    already were. The plugin's shipped per-recipe ceiling rises to $0.25, which
+    leaves room for a second collage after one redraw at high.
+
 ### Still open
 
 
