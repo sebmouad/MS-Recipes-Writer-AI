@@ -649,6 +649,21 @@ photograph, and otherwise use the photograph without the cost of a search.
     carton; 3.1 Flash Lite Image (about $0.036) framed wide and sliced the
     roast raw. OpenAI stays the default.
 
+33. **The collage at high; small sequence faults are minor.** Owner's
+    decision, 2026-09-24. `images.facebook_quality` ships `high` (so does the
+    Standard preset, which reads the shipped value). The final approval's
+    sequence check now names what blocks — the principal food in a state the
+    steps before it cannot produce (raw after cooked, cooked before the step
+    that cooks it, filled before the case exists) — and what never does: a
+    seasoning, aromatic, herb, spice, garnish or secondary ingredient a step
+    early or late, or a secondary step out of order while the principal food
+    reads right. Measured the same day on the three briefs that had cost the
+    most redraws: the turnovers approved on the first collage ($0.120, against
+    three redraws and $0.196 before), the croquettes first time ($0.126), the
+    potée after one redraw for a whole last panel ($0.192, against three
+    refusals for its aromatics and no approval before). The estimate rises to
+    $0.140 for a full recipe.
+
 ### Still open
 
 

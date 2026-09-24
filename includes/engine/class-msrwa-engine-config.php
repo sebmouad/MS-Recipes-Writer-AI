@@ -114,9 +114,10 @@ final class MSRWA_Engine_Config {
 			'images' => array(
 				// The lowest quality the final approval passes: a featured image is
 				// judged good at every tier, and `low` costs $0.014 against $0.021.
-				// The collage needs `medium` to keep six panels legible.
+				// The collage is drawn at `high`, the owner's choice on 2026-09-24:
+				// the finest texture measured, about $0.056 against $0.025.
 				'featured_quality' => 'low',
-				'facebook_quality' => 'medium',
+				'facebook_quality' => 'high',
 				'format'           => 'webp',
 				'featured_ratio'   => '1:1',
 				'facebook_ratio'   => '2:3',

@@ -592,6 +592,9 @@ cost) in the task before changing anything.
 - [x] **A35 — Gemini images (2026-09-24).** Gemini draws through
   `generateContent`, priced at its image rate; compared live with OpenAI on the
   collage. See ENGINE.md §7, item 32.
+- [x] **A36 — Collage at high; small sequence faults minor (2026-09-24).**
+  Three live recipes: two approved at the first collage, the potée after one
+  redraw for a real fault. See ENGINE.md §7, item 33.
 - [x] **A11 — Model answers that do not parse (found 2026-09-20).** Two of the
   54 matrix cells scored zero for a reason that was ours, not the prompt's:
   Opus 5 wrote "I'll research this dish now." before the object, and Sonnet 5

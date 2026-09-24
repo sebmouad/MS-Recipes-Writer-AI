@@ -5,9 +5,9 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.26.5
+## État actuel — 0.26.6
 
-La version `0.26.5` permet au moteur de dessiner avec les modèles d'image de Gemini, au bon prix ; la `0.26.4` donnait au visuel Facebook le style des collages de référence du propriétaire : lumineux, net, cadré serré ; la `0.26.3` faisait ressembler le visuel Facebook à de vraies photographies plutôt qu'à des images de synthèse ; la `0.26.2` rendait le visuel Facebook plus chaleureux et plus proche du plat, et le fait toujours finir sur le plat ouvert ; la `0.26.1` retirait les copies des prompts que gardaient les réglages :
+La version `0.26.6` dessine le visuel Facebook en qualité haute et ne fait plus redessiner un collage pour un aromate montré une étape trop tôt ; la `0.26.5` permettait au moteur de dessiner avec les modèles d'image de Gemini, au bon prix ; la `0.26.4` donnait au visuel Facebook le style des collages de référence du propriétaire : lumineux, net, cadré serré ; la `0.26.3` faisait ressembler le visuel Facebook à de vraies photographies plutôt qu'à des images de synthèse ; la `0.26.2` rendait le visuel Facebook plus chaleureux et plus proche du plat, et le fait toujours finir sur le plat ouvert ; la `0.26.1` retirait les copies des prompts que gardaient les réglages :
 le moteur exécute ses propres gabarits, et ce qui n’est lu par rien ne se
 périme plus en silence. Le détail de chaque version suit, de la plus récente à
 la plus ancienne.
@@ -76,6 +76,28 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.26.6
+
+**Le visuel Facebook en qualité haute, et moins de refus inutiles.** Décision
+du propriétaire :
+
+- **Qualité haute par défaut** pour le collage, y compris dans le préréglage
+  Standard : la texture la plus fine mesurée, environ 0,056 $ le collage au
+  lieu de 0,025 $.
+- **Les petites fautes d'ordre ne bloquent plus.** Un aromate, une herbe, une
+  épice, une garniture ou un ingrédient secondaire visible une étape trop tôt
+  ou trop tard — l'ail et le thym déjà dans la marmite — est noté, sans faire
+  redessiner le collage. Reste bloquant : l'ingrédient principal dans un état
+  impossible à ce moment de la recette (cru après cuisson, garni avant que la
+  pâte existe), un panneau répété, un plat final non ouvert.
+
+Vérifié sur les trois recettes qui coûtaient le plus de reprises : les
+chaussons approuvés au premier collage (0,120 $ au lieu de trois reprises et
+0,196 $), les croquettes du premier coup (0,126 $), la potée après une seule
+reprise pour un dernier panneau non ouvert (0,192 $, là où elle était refusée
+trois fois pour ses aromates sans jamais être approuvée). L'estimation d'une
+recette complète passe à 0,140 $.
 
 ## Version 0.26.5
 
