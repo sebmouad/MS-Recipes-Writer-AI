@@ -667,6 +667,93 @@
 
       body.appendChild(row);
     });
+
+    // --- Quality presets: one choice for every step, "custom" once edited ---
+    var presetRow = document.querySelector('#ms-presets .ms-preset-row');
+    var presets = schema.presets || {};
+    function rowState(key) {
+      var row = body.querySelector('[data-route="' + key + '"]');
+      if (!row) return null;
+      var thinking = row.querySelector('.ms-route-thinking');
+      var quality = row.querySelector('.ms-route-quality');
+      return {
+        route: row.querySelector('.ms-route-tier').value,
+        thinking: thinking ? thinking.value : null,
+        quality: quality ? quality.value : null
+      };
+    }
+    function matches(preset) {
+      return Object.keys(schema.keys).every(function (key) {
+        var now = rowState(key);
+        if (!now || now.route !== (preset.routing || {})[key]) return false;
+        if (now.quality !== null) return now.quality === (preset.quality || {})[key];
+        return now.thinking === ((preset.thinking || {})[key] || '');
+      });
+    }
+    function setSelect(select, value) {
+      if (!select || select.value === value) return;
+      select.value = value;
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+    function applyPreset(name) {
+      var preset = presets[name];
+      Object.keys(schema.keys).forEach(function (key) {
+        var row = body.querySelector('[data-route="' + key + '"]');
+        var route = (preset.routing || {})[key];
+        if (!row || !route) return;
+        setSelect(row.querySelector('.ms-route-provider'), route.split(':')[0]);
+        setSelect(row.querySelector('.ms-route-tier'), route);
+        if (row.querySelector('.ms-route-quality')) { setSelect(row.querySelector('.ms-route-quality'), (preset.quality || {})[key] || 'medium'); }
+        else { setSelect(row.querySelector('.ms-route-thinking'), (preset.thinking || {})[key] || ''); }
+      });
+      refreshPresets();
+    }
+    var presetButtons = {};
+    Object.keys(presets).forEach(function (name) {
+      var preset = presets[name];
+      var button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'ms-preset';
+      button.dataset.preset = name;
+      var title = document.createElement('strong');
+      title.textContent = preset.label;
+      button.appendChild(title);
+      if (preset.cost) {
+        var cost = document.createElement('span');
+        cost.className = 'ms-preset-cost';
+        cost.textContent = (schema.labels.perRecipe || '%s').replace('%s', preset.cost);
+        button.appendChild(cost);
+      }
+      var note = document.createElement('small');
+      note.textContent = preset.note;
+      button.appendChild(note);
+      if (preset.over) {
+        var over = document.createElement('small');
+        over.className = 'ms-warn';
+        over.textContent = schema.labels.overCeiling || '';
+        button.appendChild(over);
+      }
+      button.addEventListener('click', function () { applyPreset(name); });
+      presetRow.appendChild(button);
+      presetButtons[name] = button;
+    });
+    var custom = document.createElement('span');
+    custom.className = 'ms-preset ms-preset-custom';
+    custom.setAttribute('aria-live', 'polite');
+    var customTitle = document.createElement('strong');
+    customTitle.textContent = schema.labels.custom || '';
+    custom.appendChild(customTitle);
+    if (presetRow) presetRow.appendChild(custom);
+    function refreshPresets() {
+      var active = '';
+      Object.keys(presets).forEach(function (name) { if (!active && matches(presets[name])) active = name; });
+      Object.keys(presetButtons).forEach(function (name) {
+        presetButtons[name].setAttribute('aria-pressed', name === active ? 'true' : 'false');
+      });
+      custom.classList.toggle('is-active', '' === active);
+    }
+    body.addEventListener('change', refreshPresets);
+    refreshPresets();
   }
 
   // --- The catalogue: two buttons, two very different kinds of answer -----

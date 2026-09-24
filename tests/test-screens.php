@@ -102,6 +102,14 @@ if ( preg_match( '/id="ms-engine-routing-data">(.*?)<\/script>/s', $engine['html
 		foreach ( $list as $choice ) { msrwa_test_assert( false === strpos( $choice['value'], 'image' ), 'The article is never offered an image model: ' . $choice['value'] ); }
 	}
 	msrwa_test_assert( array_keys( $picker_data['keys'] ) === array_keys( MSRWA_Compat::steps() ), 'The Moteur picker and the Modèles grid list the same steps, in the same order.' );
+	// Three quality presets, each a whole configuration built on the same rules.
+	msrwa_test_assert( array( 'economy', 'standard', 'premium' ) === array_keys( (array) $picker_data['presets'] ), 'Economy, standard and premium are offered.' );
+	foreach ( (array) $picker_data['presets'] as $name => $preset ) {
+		msrwa_test_assert( array_keys( $picker_data['keys'] ) === array_keys( $preset['routing'] ), $name . ' sets every step.' );
+	}
+	msrwa_test_assert( $picker_data['presets']['standard']['routing'] === $picker_data['current'], 'On a site that changed nothing, the current routing is the standard preset.' );
+	msrwa_test_assert( 'openai:low' !== $picker_data['presets']['economy']['routing']['research'], 'The economy preset never gives the research to the model measured unfit for it.' );
+	msrwa_test_assert( 'low' === $picker_data['presets']['economy']['quality']['facebook_image'] && 'high' === $picker_data['presets']['premium']['quality']['facebook_image'], 'Image quality follows the preset.' );
 	msrwa_test_missing( $match[1], 'key_env', 'The routing picker data embeds no provider header, key included.' );
 	// Level, thinking and image quality all say low/medium/high; each is named
 	// for what it decides, or they read as one setting given twice.

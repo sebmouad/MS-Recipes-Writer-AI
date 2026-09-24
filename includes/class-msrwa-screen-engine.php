@@ -196,6 +196,7 @@ final class MSRWA_Screen_Engine {
 		);
 
 		$data = array(
+			'presets' => self::presets( $config, $choices, $current ),
 			'providers' => $providers,
 			'choices' => $choices,
 			'keys' => $keys,
@@ -234,6 +235,11 @@ final class MSRWA_Screen_Engine {
 				'quality' => __( 'Qualité de l’image', 'ms-recipes-writer-ai' ),
 				'provider' => __( 'Fournisseur', 'ms-recipes-writer-ai' ),
 				'thinkingDefault' => __( 'réglage du fournisseur', 'ms-recipes-writer-ai' ),
+				'custom' => __( 'Personnalisé', 'ms-recipes-writer-ai' ),
+				/* translators: %s is the per-recipe ceiling. */
+				'overCeiling' => sprintf( __( 'Au-dessus du plafond de %s par recette : les lots seraient refusés tant qu’il n’est pas relevé dans les Réglages.', 'ms-recipes-writer-ai' ), MSRWA_I18N::money( (float) MSRWA_Settings::get()['per_recipe_budget_usd'], 2 ) ),
+				/* translators: %s is an estimated amount per recipe. */
+				'perRecipe' => __( '≈ %s par recette', 'ms-recipes-writer-ai' ),
 				/* translators: %s is a thinking level such as "moyenne". */
 				'thinkingSite' => __( 'par défaut (%s)', 'ms-recipes-writer-ai' ),
 				/* translators: %s is a level or model name. */
@@ -247,6 +253,11 @@ final class MSRWA_Screen_Engine {
 		?>
 		<section class="ms-card" id="ms-engine-routing-picker">
 			<h2><?php esc_html_e( 'Modèle par étape', 'ms-recipes-writer-ai' ); ?></h2>
+			<fieldset class="ms-presets" id="ms-presets">
+				<legend><?php esc_html_e( 'Qualité du contenu', 'ms-recipes-writer-ai' ); ?></legend>
+				<p class="ms-muted"><?php esc_html_e( 'Choisit d’un coup le modèle, la réflexion et la qualité d’image de chaque étape. Changer une étape à la main fait passer à « Personnalisé ».', 'ms-recipes-writer-ai' ); ?></p>
+				<div class="ms-preset-row"></div>
+			</fieldset>
 			<dl class="ms-route-help">
 				<div><dt><?php esc_html_e( 'Modèle', 'ms-recipes-writer-ai' ); ?></dt><dd><?php esc_html_e( 'Qui fait le travail, et donc le prix de chaque jeton. Économique, standard et avancé désignent un modèle précis chez chaque fournisseur.', 'ms-recipes-writer-ai' ); ?></dd></div>
 				<div><dt><?php esc_html_e( 'Réflexion', 'ms-recipes-writer-ai' ); ?></dt><dd><?php esc_html_e( 'Combien ce modèle réfléchit avant de répondre. Plus il réfléchit, plus il consomme de jetons facturés — sans changer de modèle.', 'ms-recipes-writer-ai' ); ?></dd></div>
@@ -348,6 +359,70 @@ final class MSRWA_Screen_Engine {
 			</table>
 		</section>
 		<?php
+	}
+
+	/**
+	 * Three whole configurations, each one choice: the model, the thinking and
+	 * the image quality of every step, for a content quality. Built from the
+	 * same candidates and refusals as the rows below, so a preset never picks
+	 * what a row would grey out: research stays on the standard model in the
+	 * economy preset, because the economy model is measured unfit for it.
+	 */
+	private static function presets( MSRWA_Engine_Config $config, array $choices, array $current ) {
+		$defaults = MSRWA_Engine_Config::defaults();
+		$shipped_thinking = (array) ( $defaults['thinking'] ?? array() );
+		$plans = array(
+			'economy' => array( 'tier' => 'low', 'thinking' => 'low', 'featured' => 'low', 'facebook' => 'low',
+				'label' => __( 'Économique', 'ms-recipes-writer-ai' ),
+				'note' => __( 'Les modèles les moins chers là où ils suffisent, peu de réflexion, images en qualité basse.', 'ms-recipes-writer-ai' ) ),
+			'standard' => array( 'tier' => 'medium', 'thinking' => null, 'featured' => (string) ( $defaults['images']['featured_quality'] ?? 'low' ), 'facebook' => (string) ( $defaults['images']['facebook_quality'] ?? 'medium' ),
+				'label' => __( 'Standard', 'ms-recipes-writer-ai' ),
+				'note' => __( 'Les réglages livrés, mesurés : chaque recette approuvée, le meilleur rapport qualité-prix.', 'ms-recipes-writer-ai' ) ),
+			'premium' => array( 'tier' => 'high', 'thinking' => 'medium', 'featured' => 'medium', 'facebook' => 'high',
+				'label' => __( 'Premium', 'ms-recipes-writer-ai' ),
+				'note' => __( 'Les modèles les plus avancés, plus de réflexion, images en haute qualité.', 'ms-recipes-writer-ai' ) ),
+		);
+		$out = array();
+		foreach ( $plans as $name => $plan ) {
+			$routing = array();
+			$thinking = array();
+			foreach ( $current as $key => $route ) {
+				if ( in_array( $key, array( 'featured_image', 'facebook_image' ), true ) ) {
+					$routing[ $key ] = (string) ( $defaults['routing']['image'] ?? $route );
+					continue;
+				}
+				$provider = (string) strtok( (string) ( $defaults['routing'][ $key ] ?? 'openai:medium' ), ':' );
+				$offered = array();
+				foreach ( (array) ( $choices[ $key ][ $provider ] ?? array() ) as $choice ) { if ( '' === $choice['tier'] || isset( $offered[ $choice['tier'] ] ) ) { continue; } $offered[ $choice['tier'] ] = $choice['value']; }
+				$tiers = (array) $config->get( 'tiers', array() );
+				$blocked = static function ( $value ) use ( $tiers, $key, $provider ) {
+					$named = (string) substr( (string) $value, strlen( $provider ) + 1 );
+					$model = (string) ( $tiers[ $named ][ $provider ] ?? $named );
+					return '' !== MSRWA_Compat::refusal( $provider, $model, $key );
+				};
+				$pick = '';
+				foreach ( array( $plan['tier'], 'medium' ) as $tier ) {
+					if ( isset( $offered[ $tier ] ) && ! $blocked( $offered[ $tier ] ) ) { $pick = $offered[ $tier ]; break; }
+				}
+				$routing[ $key ] = '' !== $pick ? $pick : (string) ( $defaults['routing'][ $key ] ?? $route );
+				$thinking[ $key ] = null === $plan['thinking'] ? (string) ( $shipped_thinking[ $key ] ?? '' ) : $plan['thinking'];
+			}
+			$quality = array( 'featured_image' => $plan['featured'], 'facebook_image' => $plan['facebook'] );
+			$overrides = array(
+				'routing' => $routing,
+				'thinking' => array_merge( array( 'default' => '' ), $thinking ),
+				'images' => array( 'featured_quality' => $plan['featured'], 'facebook_quality' => $plan['facebook'] ),
+			);
+			$estimate = MSRWA_Estimate::recipe_on( MSRWA_Engine_Config::create( MSRWA_Engine_Settings::merge( MSRWA_Engine_Settings::stored(), $overrides ) ), MSRWA_Profile::FULL );
+			$out[ $name ] = array(
+				'label' => $plan['label'], 'note' => $plan['note'],
+				'routing' => $routing, 'thinking' => $thinking, 'quality' => $quality,
+				'cost' => $estimate['unpriced'] ? null : MSRWA_I18N::money( (float) $estimate['cost_usd'], 3 ),
+				// A preset that costs more than the ceiling would have every lot refused.
+				'over' => ! $estimate['unpriced'] && ! MSRWA_Estimate::fits( (float) $estimate['cost_usd'], (float) MSRWA_Settings::get()['per_recipe_budget_usd'] ),
+			);
+		}
+		return $out;
 	}
 
 	private static function describe_model( $provider, $model, array $prices ) {

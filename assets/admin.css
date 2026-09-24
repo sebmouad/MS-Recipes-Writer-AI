@@ -552,3 +552,16 @@
 .ms-card-flush > .ms-note { margin-inline: 20px; }
 .ms-language-pick { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
 .ms-language-pick select { min-inline-size: 14rem; }
+
+/* Quality presets: one choice for the whole table, "custom" once it is edited. */
+.ms-presets { margin: 0 0 18px; padding: 0; border: 0; }
+.ms-presets legend { font-weight: 650; margin-block-end: 2px; padding: 0; }
+.ms-presets > p { margin: 0 0 10px; }
+.ms-preset-row { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); }
+.ms-preset { display: grid; gap: 4px; align-content: start; text-align: start; padding: 12px 14px; border: 1px solid var(--ms-line); border-radius: var(--ms-radius); background: var(--ms-raised); color: var(--ms-ink); font: inherit; cursor: pointer; }
+.ms-preset:hover { border-color: var(--ms-ink-faint); }
+.ms-preset[aria-pressed="true"] { border-color: var(--ms-lamp); background: var(--ms-lamp-soft); box-shadow: inset 0 0 0 1px var(--ms-lamp); }
+.ms-preset small { color: var(--ms-ink-soft); line-height: 1.45; }
+.ms-preset-cost { font-family: var(--ms-mono); font-size: 12px; color: var(--ms-ink-soft); }
+.ms-preset-custom { cursor: default; border-style: dashed; color: var(--ms-ink-faint); align-content: center; justify-items: center; }
+.ms-preset-custom.is-active { color: var(--ms-ink); border-style: solid; border-color: var(--ms-lamp); background: var(--ms-lamp-soft); box-shadow: inset 0 0 0 1px var(--ms-lamp); }

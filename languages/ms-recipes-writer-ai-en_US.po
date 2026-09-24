@@ -2043,6 +2043,39 @@ msgstr "Spanish"
 msgid "Les sections exigées, le titre de la page deux et la balise de langue suivent ce choix."
 msgstr "The required sections, the page-two heading and the language tag follow this choice."
 
+msgid "Choisit d’un coup le modèle, la réflexion et la qualité d’image de chaque étape. Changer une étape à la main fait passer à « Personnalisé »."
+msgstr "Sets the model, thinking and image quality of every step at once. Changing one step by hand switches to “Custom”."
+
+msgid "Les modèles les moins chers là où ils suffisent, peu de réflexion, images en qualité basse."
+msgstr "The cheapest models where they are good enough, little thinking, low-quality images."
+
+msgid "Les modèles les plus avancés, plus de réflexion, images en haute qualité."
+msgstr "The most advanced models, more thinking, high-quality images."
+
+msgid "Les réglages livrés, mesurés : chaque recette approuvée, le meilleur rapport qualité-prix."
+msgstr "The shipped settings, measured: every recipe approved, the best value for money."
+
+msgid "Personnalisé"
+msgstr "Custom"
+
+msgid "Premium"
+msgstr "Premium"
+
+msgid "Qualité du contenu"
+msgstr "Content quality"
+
+msgid "Standard"
+msgstr "Standard"
+
+msgid "Économique"
+msgstr "Economy"
+
+msgid "≈ %s par recette"
+msgstr "≈ %s per recipe"
+
+msgid "Au-dessus du plafond de %s par recette : les lots seraient refusés tant qu’il n’est pas relevé dans les Réglages."
+msgstr "Above the %s per-recipe ceiling: lots would be refused until it is raised in Settings."
+
 msgid "aucune page citée"
 msgstr "no page cited"
 

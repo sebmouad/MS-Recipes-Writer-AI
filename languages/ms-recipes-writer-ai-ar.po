@@ -2071,6 +2071,39 @@ msgstr "الإسبانية"
 msgid "Les sections exigées, le titre de la page deux et la balise de langue suivent ce choix."
 msgstr "الأقسام المطلوبة وعنوان الصفحة الثانية ووسم اللغة تتبع هذا الاختيار."
 
+msgid "Choisit d’un coup le modèle, la réflexion et la qualité d’image de chaque étape. Changer une étape à la main fait passer à « Personnalisé »."
+msgstr "يضبط النموذج والتفكير وجودة الصورة لكل مرحلة دفعة واحدة. تغيير مرحلة يدويًا ينقل إلى « مخصص »."
+
+msgid "Les modèles les moins chers là où ils suffisent, peu de réflexion, images en qualité basse."
+msgstr "أرخص النماذج حيث تكفي، تفكير قليل، صور بجودة منخفضة."
+
+msgid "Les modèles les plus avancés, plus de réflexion, images en haute qualité."
+msgstr "أكثر النماذج تقدمًا، تفكير أكثر، صور بجودة عالية."
+
+msgid "Les réglages livrés, mesurés : chaque recette approuvée, le meilleur rapport qualité-prix."
+msgstr "الإعدادات المرفقة، وقد قيست: كل وصفة معتمدة، وأفضل قيمة مقابل السعر."
+
+msgid "Personnalisé"
+msgstr "مخصص"
+
+msgid "Premium"
+msgstr "ممتاز"
+
+msgid "Qualité du contenu"
+msgstr "جودة المحتوى"
+
+msgid "Standard"
+msgstr "قياسي"
+
+msgid "Économique"
+msgstr "اقتصادي"
+
+msgid "≈ %s par recette"
+msgstr "≈ %s لكل وصفة"
+
+msgid "Au-dessus du plafond de %s par recette : les lots seraient refusés tant qu’il n’est pas relevé dans les Réglages."
+msgstr "أعلى من سقف %s لكل وصفة: ستُرفض الدفعات ما لم يُرفع في الإعدادات."
+
 msgid "aucune page citée"
 msgstr "لم تُذكر أي صفحة"
 

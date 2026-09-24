@@ -11,7 +11,7 @@ msgstr ""
 msgid " et %d autres"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:244
+#: class-msrwa-screen-engine.php:250
 msgid "$%1$s entrée / $%2$s sortie par million de jetons"
 msgstr ""
 
@@ -141,7 +141,7 @@ msgstr ""
 msgid "%s du temps"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:335
+#: class-msrwa-screen-engine.php:346
 msgid "%s jetons en sortie"
 msgstr ""
 
@@ -157,13 +157,13 @@ msgstr ""
 msgid "%s s"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:340
+#: class-msrwa-screen-engine.php:351
 msgid "%s tentative"
 msgid_plural "%s tentatives"
 msgstr[0] ""
 msgstr[1] ""
 
-#: class-msrwa-screen-engine.php:240
+#: class-msrwa-screen-engine.php:246
 msgid "%s — ne convient pas à cette étape"
 msgstr ""
 
@@ -287,7 +287,7 @@ msgstr ""
 msgid "Association sûre"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:299 class-msrwa-screen-engine.php:319
+#: class-msrwa-screen-engine.php:310 class-msrwa-screen-engine.php:330
 msgid "Attend"
 msgstr ""
 
@@ -297,6 +297,10 @@ msgstr ""
 
 #: class-msrwa-admin.php:189
 msgid "Attention : une recette est estimée à %1$s, au-dessus du plafond de %2$s. Elle s’arrêterait en route ; le lot sera refusé au lancement. Relevez le plafond ou choisissez une sortie plus légère."
+msgstr ""
+
+#: class-msrwa-screen-engine.php:240
+msgid "Au-dessus du plafond de %s par recette : les lots seraient refusés tant qu’il n’est pas relevé dans les Réglages."
 msgstr ""
 
 #: class-msrwa-screen-analysis.php:245
@@ -423,7 +427,7 @@ msgstr ""
 msgid "Ce que chaque article doit être. Ces réglages atteignent directement les prompts et les contrôles du moteur."
 msgstr ""
 
-#: class-msrwa-screen-engine.php:290
+#: class-msrwa-screen-engine.php:301
 msgid "Ce que fait le moteur, étape par étape"
 msgstr ""
 
@@ -491,7 +495,7 @@ msgstr ""
 msgid "Cette recette n’est pas arrêtée."
 msgstr ""
 
-#: class-msrwa-screen-engine.php:264
+#: class-msrwa-screen-engine.php:275
 msgid "Chaque changement réécrit les champs « routing », « thinking » et « images » des réglages plus bas ; ce qui y est modifié à la main prévaut après un chargement de page."
 msgstr ""
 
@@ -543,6 +547,10 @@ msgstr ""
 msgid "Choisir…"
 msgstr ""
 
+#: class-msrwa-screen-engine.php:258
+msgid "Choisit d’un coup le modèle, la réflexion et la qualité d’image de chaque étape. Changer une étape à la main fait passer à « Personnalisé »."
+msgstr ""
+
 #: class-msrwa-admin.php:197
 msgid "Clé présente"
 msgstr ""
@@ -563,7 +571,7 @@ msgstr ""
 msgid "Collez une ou plusieurs recettes, séparées par une ligne de tirets, et ajoutez leurs photographies depuis votre ordinateur, sans dire laquelle va avec quoi."
 msgstr ""
 
-#: class-msrwa-screen-engine.php:252
+#: class-msrwa-screen-engine.php:263
 msgid "Combien ce modèle réfléchit avant de répondre. Plus il réfléchit, plus il consomme de jetons facturés — sans changer de modèle."
 msgstr ""
 
@@ -879,7 +887,7 @@ msgstr ""
 msgid "Format, qualité, dimensions et nombre de panneaux du collage."
 msgstr ""
 
-#: class-msrwa-screen-engine.php:235
+#: class-msrwa-screen-engine.php:236
 msgid "Fournisseur"
 msgstr ""
 
@@ -1097,7 +1105,7 @@ msgstr ""
 msgid "Le plafond par recette est plus bas : il arrête les nouvelles tentatives avant de le franchir, la recette se termine et le dernier verdict va au rédacteur."
 msgstr ""
 
-#: class-msrwa-screen-engine.php:293
+#: class-msrwa-screen-engine.php:304
 msgid "Le profil complet en compte %s. Une étape part dès que tout ce dont elle dépend est prêt : c’est ce qui découpe une recette en vagues, et ce qui fait qu’une reprise ne repaie pas ce qui a réussi."
 msgstr ""
 
@@ -1161,6 +1169,14 @@ msgstr ""
 msgid "Les dimensions de l’image générée sont absentes."
 msgstr ""
 
+#: class-msrwa-screen-engine.php:377
+msgid "Les modèles les moins chers là où ils suffisent, peu de réflexion, images en qualité basse."
+msgstr ""
+
+#: class-msrwa-screen-engine.php:383
+msgid "Les modèles les plus avancés, plus de réflexion, images en haute qualité."
+msgstr ""
+
 #: class-msrwa-screen-engine.php:131
 msgid "Les modèles proposés ci-dessus sont ceux de l’écran Modèles : ceux qui y sont activés, avec leurs tarifs et les étapes qu’ils ont le droit de servir. Un modèle désactivé ou retiré d’une étape là-bas est grisé ici, avec la raison."
 msgstr ""
@@ -1193,6 +1209,10 @@ msgstr ""
 msgid "Les recettes seront écrites d’après les références trouvées sur le web."
 msgstr ""
 
+#: class-msrwa-screen-engine.php:380
+msgid "Les réglages livrés, mesurés : chaque recette approuvée, le meilleur rapport qualité-prix."
+msgstr ""
+
 #: class-msrwa-screen-engine.php:70
 msgid "Les sections exigées, le titre de la page deux et la balise de langue suivent ce choix."
 msgstr ""
@@ -1205,7 +1225,7 @@ msgstr ""
 msgid "Les six tables sont là, schéma %d."
 msgstr ""
 
-#: class-msrwa-screen-engine.php:302 class-msrwa-screen-engine.php:331
+#: class-msrwa-screen-engine.php:313 class-msrwa-screen-engine.php:342
 msgid "Limites"
 msgstr ""
 
@@ -1281,11 +1301,11 @@ msgstr ""
 msgid "Modifiez la grille dans Modèles, ou routez ces étapes autrement."
 msgstr ""
 
-#: class-msrwa-screen-analysis.php:220 class-msrwa-screen-engine.php:232 class-msrwa-screen-engine.php:251 class-msrwa-screen-engine.php:258 class-msrwa-screen-engine.php:301 class-msrwa-screen-engine.php:321 class-msrwa-screen-models.php:90 class-msrwa-screen-run.php:201 class-msrwa-screen-run.php:233
+#: class-msrwa-screen-analysis.php:220 class-msrwa-screen-engine.php:233 class-msrwa-screen-engine.php:262 class-msrwa-screen-engine.php:269 class-msrwa-screen-engine.php:312 class-msrwa-screen-engine.php:332 class-msrwa-screen-models.php:90 class-msrwa-screen-run.php:201 class-msrwa-screen-run.php:233
 msgid "Modèle"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:249
+#: class-msrwa-screen-engine.php:255
 msgid "Modèle par étape"
 msgstr ""
 
@@ -1341,7 +1361,7 @@ msgstr ""
 msgid "Nouveau lot"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:265
+#: class-msrwa-screen-engine.php:276
 msgid "Nécessite JavaScript ; sans cela, utilisez directement le champ « routing » ci-dessous."
 msgstr ""
 
@@ -1397,6 +1417,10 @@ msgstr ""
 msgid "Pas encore parti"
 msgstr ""
 
+#: class-msrwa-screen-engine.php:238
+msgid "Personnalisé"
+msgstr ""
+
 #: class-msrwa-screen-batch.php:175
 msgid "Peu sûr — à confirmer"
 msgstr ""
@@ -1441,8 +1465,12 @@ msgstr ""
 msgid "Poste"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:253
+#: class-msrwa-screen-engine.php:264
 msgid "Pour les deux images, qui ne réfléchissent pas : le niveau de détail du rendu, qui en fixe le prix."
+msgstr ""
+
+#: class-msrwa-screen-engine.php:382
+msgid "Premium"
 msgstr ""
 
 #: class-msrwa-screen-run.php:252
@@ -1453,7 +1481,7 @@ msgstr ""
 msgid "Productions lourdes"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:300 class-msrwa-screen-engine.php:320
+#: class-msrwa-screen-engine.php:311 class-msrwa-screen-engine.php:331
 msgid "Produit"
 msgstr ""
 
@@ -1473,8 +1501,12 @@ msgstr ""
 msgid "Publier la recette en données structurées (Recipe JSON-LD)"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:234 class-msrwa-screen-engine.php:253
+#: class-msrwa-screen-engine.php:235 class-msrwa-screen-engine.php:264
 msgid "Qualité de l’image"
+msgstr ""
+
+#: class-msrwa-screen-engine.php:257
+msgid "Qualité du contenu"
 msgstr ""
 
 #: class-msrwa-engine-settings.php:23
@@ -1493,7 +1525,7 @@ msgstr ""
 msgid "Quels modèles ce site peut utiliser, ce qu’ils coûtent, et quelle étape chacun a le droit de servir. Le moteur ne contient que le processus éditorial : tout ce qui est ici est une donnée, modifiable sans toucher à la manière dont un article est écrit."
 msgstr ""
 
-#: class-msrwa-screen-engine.php:251
+#: class-msrwa-screen-engine.php:262
 msgid "Qui fait le travail, et donc le prix de chaque jeton. Économique, standard et avancé désignent un modèle précis chez chaque fournisseur."
 msgstr ""
 
@@ -1665,11 +1697,11 @@ msgstr ""
 msgid "Rédaction"
 msgstr ""
 
-#: class-msrwa-admin.php:200 class-msrwa-screen-engine.php:233 class-msrwa-screen-engine.php:252
+#: class-msrwa-admin.php:200 class-msrwa-screen-engine.php:234 class-msrwa-screen-engine.php:263
 msgid "Réflexion"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:259
+#: class-msrwa-screen-engine.php:270
 msgid "Réflexion ou qualité"
 msgstr ""
 
@@ -1735,6 +1767,10 @@ msgstr ""
 
 #: class-msrwa-screen-models.php:92
 msgid "Sortie $/M"
+msgstr ""
+
+#: class-msrwa-screen-engine.php:379
+msgid "Standard"
 msgstr ""
 
 #: class-msrwa-operations.php:59
@@ -2045,11 +2081,11 @@ msgstr ""
 msgid "aucun tarif"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:328
+#: class-msrwa-screen-engine.php:339
 msgid "aucun tarif connu"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:241
+#: class-msrwa-screen-engine.php:247
 msgid "aucun tarif connu — le coût de cette étape ne peut pas être estimé"
 msgstr ""
 
@@ -2057,7 +2093,7 @@ msgstr ""
 msgid "aucun tarif trouvé sur la page du fournisseur"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:323
+#: class-msrwa-screen-engine.php:334
 msgid "aucun — appliqué en code"
 msgstr ""
 
@@ -2069,7 +2105,7 @@ msgstr ""
 msgid "aucune clé enregistrée"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:327
+#: class-msrwa-screen-engine.php:338
 msgid "aucune clé pour ce fournisseur"
 msgstr ""
 
@@ -2093,7 +2129,7 @@ msgstr ""
 msgid "avancé"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:224
+#: class-msrwa-screen-engine.php:225
 msgid "basse"
 msgstr ""
 
@@ -2221,7 +2257,7 @@ msgstr ""
 msgid "généré"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:226
+#: class-msrwa-screen-engine.php:227
 msgid "haute"
 msgstr ""
 
@@ -2241,7 +2277,7 @@ msgstr ""
 msgid "jamais relevé"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:243
+#: class-msrwa-screen-engine.php:249
 msgid "jamais vérifié auprès du fournisseur"
 msgstr ""
 
@@ -2273,7 +2309,7 @@ msgstr ""
 msgid "le fournisseur ne le sert plus"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:242
+#: class-msrwa-screen-engine.php:248
 msgid "le fournisseur ne sert pas ce nom : l’étape échouera"
 msgstr ""
 
@@ -2301,7 +2337,7 @@ msgstr ""
 msgid "lu sur la page du fournisseur"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:219
+#: class-msrwa-screen-engine.php:220
 msgid "légère"
 msgstr ""
 
@@ -2321,7 +2357,7 @@ msgstr ""
 msgid "mauvais"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:228
+#: class-msrwa-screen-engine.php:229
 msgid "maximale"
 msgstr ""
 
@@ -2329,7 +2365,7 @@ msgstr ""
 msgid "mineure"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:218
+#: class-msrwa-screen-engine.php:219
 msgid "minimale"
 msgstr ""
 
@@ -2345,7 +2381,7 @@ msgstr ""
 msgid "mots"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:220 class-msrwa-screen-engine.php:225
+#: class-msrwa-screen-engine.php:221 class-msrwa-screen-engine.php:226
 msgid "moyenne"
 msgstr ""
 
@@ -2353,7 +2389,7 @@ msgstr ""
 msgid "ou"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:238
+#: class-msrwa-screen-engine.php:244
 msgid "par défaut (%s)"
 msgstr ""
 
@@ -2389,7 +2425,7 @@ msgstr ""
 msgid "pour un dépannage"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:221
+#: class-msrwa-screen-engine.php:222
 msgid "poussée"
 msgstr ""
 
@@ -2421,7 +2457,7 @@ msgstr ""
 msgid "rédiger du texte"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:236
+#: class-msrwa-screen-engine.php:237
 msgid "réglage du fournisseur"
 msgstr ""
 
@@ -2469,7 +2505,7 @@ msgstr ""
 msgid "trouvé par IA — à vérifier"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:227
+#: class-msrwa-screen-engine.php:228
 msgid "très haute"
 msgstr ""
 
@@ -2481,11 +2517,15 @@ msgstr ""
 msgid "Échecs"
 msgstr ""
 
+#: class-msrwa-screen-engine.php:376
+msgid "Économique"
+msgstr ""
+
 #: class-msrwa-screen-articles.php:71
 msgid "Élargissez le filtre, ou repartez de la liste complète."
 msgstr ""
 
-#: class-msrwa-admin.php:195 class-msrwa-screen-analysis.php:190 class-msrwa-screen-analysis.php:247 class-msrwa-screen-engine.php:231 class-msrwa-screen-engine.php:257 class-msrwa-screen-engine.php:298 class-msrwa-screen-run.php:200 class-msrwa-screen-run.php:233
+#: class-msrwa-admin.php:195 class-msrwa-screen-analysis.php:190 class-msrwa-screen-analysis.php:247 class-msrwa-screen-engine.php:232 class-msrwa-screen-engine.php:268 class-msrwa-screen-engine.php:309 class-msrwa-screen-run.php:200 class-msrwa-screen-run.php:233
 msgid "Étape"
 msgstr ""
 
@@ -2539,5 +2579,9 @@ msgstr ""
 
 #: class-msrwa-screen-run.php:60
 msgid "étapes"
+msgstr ""
+
+#: class-msrwa-screen-engine.php:242
+msgid "≈ %s par recette"
 msgstr ""
 
