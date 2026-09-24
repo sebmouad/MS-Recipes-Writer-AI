@@ -5,9 +5,9 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.26.3
+## État actuel — 0.26.4
 
-La version `0.26.3` fait ressembler le visuel Facebook à de vraies photographies plutôt qu'à des images de synthèse ; la `0.26.2` rendait le visuel Facebook plus chaleureux et plus proche du plat, et le fait toujours finir sur le plat ouvert ; la `0.26.1` retirait les copies des prompts que gardaient les réglages :
+La version `0.26.4` donne au visuel Facebook le style des collages de référence du propriétaire : lumineux, net, cadré serré ; la `0.26.3` faisait ressembler le visuel Facebook à de vraies photographies plutôt qu'à des images de synthèse ; la `0.26.2` rendait le visuel Facebook plus chaleureux et plus proche du plat, et le fait toujours finir sur le plat ouvert ; la `0.26.1` retirait les copies des prompts que gardaient les réglages :
 le moteur exécute ses propres gabarits, et ce qui n’est lu par rien ne se
 périme plus en silence. Le détail de chaque version suit, de la plus récente à
 la plus ancienne.
@@ -76,6 +76,27 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.26.4
+
+**Le visuel Facebook prend le style voulu par le propriétaire.** Comparé à ses
+collages de référence, la 0.26.3 avait pris « réaliste » dans le sens d'une
+photographie d'ambiance — bois chaud, grain, flou d'arrière-plan. Ses
+références sont l'inverse, et le collage les suit désormais :
+
+- **Lumineux** : lumière du jour douce et égale, sans coin sombre.
+- **Fond neutre** : un seul plan de travail clair, gris pâle ou bois clair, sans
+  torchon, herbes ni accessoires.
+- **Net partout** : tout l'aliment est net, avec ses détails — fibres de la
+  viande, nervures du chou, lamelles des champignons —, sans grain.
+- **Cadré serré et généreux** : le plat n'est jamais vu en entier, ses bords
+  sortent du cadre ; la mise en place est un tas d'ingrédients serrés qui
+  remplit l'image.
+
+Les règles de réalisme (morceaux irréguliers, dorure inégale, pas d'aspect
+cireux) et de séquence restent. Mis au point en trois essais sur le rôti Orloff
+et la potée, comparés côte à côte avec les références ; qualité moyenne, environ
+0,025 $ par collage.
 
 ## Version 0.26.3
 

@@ -615,6 +615,20 @@ photograph, and otherwise use the photograph without the cost of a search.
     `--image-model` now takes `provider:model`; Gemini could not be compared
     because the engine has no Gemini image endpoint.
 
+31. **The owner's look: bright, sharp, full-frame food.** Same day, the owner
+    set two of his reference collages against item 30 — "this is what I
+    expect". Item 30 had read "realistic" as moody photography; his references
+    are high-key and even, on a plain pale surface with no props, sharp from
+    front to back, in clean bright colour, cropped so the food is the whole
+    picture and the mise en place piled up. The prompt now asks for exactly
+    that: one plain pale-grey or light-wood surface and no props (the warm
+    wood, gingham and herbs of item 29 are gone), even diffused daylight,
+    no grain or blur on the food, a crop that never shows a vessel whole,
+    a generous overlapping mise en place. The realism rules of item 30 stay,
+    minus the camera settings that asked for shallow focus and grain. Three
+    rounds on `roti-orloff` and `potee-porc-chou`, compared side by side with
+    his references; medium quality, about $0.025 a collage.
+
 ### Still open
 
 

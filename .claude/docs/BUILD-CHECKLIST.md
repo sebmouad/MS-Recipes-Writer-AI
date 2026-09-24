@@ -586,6 +586,9 @@ cost) in the task before changing anything.
   the tells of an AI image and asks for real food's irregularity and a real
   camera's grain. Compared live on two briefs against the previous prompt,
   high quality and `gpt-image-2`. See ENGINE.md §7, item 30.
+- [x] **A34 — The owner's look (2026-09-24).** Bright, even, sharp, a plain pale
+  surface with no props, cropped tight with a piled mise en place — matched to
+  his reference collages in three live rounds. See ENGINE.md §7, item 31.
 - [x] **A11 — Model answers that do not parse (found 2026-09-20).** Two of the
   54 matrix cells scored zero for a reason that was ours, not the prompt's:
   Opus 5 wrote "I'll research this dish now." before the object, and Sonnet 5
