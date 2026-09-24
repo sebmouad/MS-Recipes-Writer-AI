@@ -1,0 +1,547 @@
+{
+  "title": "Chaussons feuilletés jambon-fromage",
+  "text": "Chaussons de pâte feuilletée garnis de dés de jambon, fromage râpé et béchamel, dorés à l’œuf et cuits au four. Préciser comment souder les bords, éviter que la garniture coule et réchauffer.",
+  "editor_input": {
+    "type": "article",
+    "title": "Chaussons feuilletés jambon-fromage",
+    "text": "Chaussons de pâte feuilletée garnis de dés de jambon, fromage râpé et béchamel, dorés à l’œuf et cuits au four. Préciser comment souder les bords, éviter que la garniture coule et réchauffer.",
+    "images": []
+  },
+  "research": {
+    "dish_identity": {
+      "name": "Chaussons feuilletés jambon-fromage à la béchamel",
+      "confidence": "élevée",
+      "evidence": "Le brief décrit une pâte feuilletée garnie de jambon, fromage râpé et béchamel, puis dorée à l’œuf; les recettes 750g documentent le même assemblage et la même cuisson."
+    },
+    "recipe_outline": {
+      "servings": 4,
+      "prep_minutes": 30,
+      "cook_minutes": 20,
+      "total_minutes": 50,
+      "category": "plat salé ou entrée",
+      "cuisine": "française",
+      "difficulty": "moyenne",
+      "source_url": "https://www.750g.com/feuillete-au-jambon-et-au-fromage-r71005.htm"
+    },
+    "ingredients": [
+      {
+        "name": "pâte feuilletée",
+        "quantity": "2",
+        "unit": "rouleaux",
+        "role": "enveloppe croustillante",
+        "essential": true,
+        "source_url": "https://www.750g.com/feuillete-au-jambon-et-au-fromage-r71005.htm"
+      },
+      {
+        "name": "jambon blanc",
+        "quantity": "4",
+        "unit": "tranches",
+        "role": "garniture salée",
+        "essential": true,
+        "source_url": "https://www.750g.com/feuillete-au-jambon-et-au-fromage-r71005.htm"
+      },
+      {
+        "name": "emmental râpé",
+        "quantity": "1",
+        "unit": "sachet",
+        "role": "fromage fondant",
+        "essential": true,
+        "source_url": "https://www.750g.com/feuillete-au-jambon-et-au-fromage-r71005.htm"
+      },
+      {
+        "name": "farine",
+        "quantity": 40,
+        "unit": "g",
+        "role": "épaississant de la béchamel",
+        "essential": true,
+        "source_url": "https://www.750g.com/feuillete-au-jambon-et-au-fromage-r71005.htm"
+      },
+      {
+        "name": "beurre",
+        "quantity": 50,
+        "unit": "g",
+        "role": "matière grasse du roux",
+        "essential": true,
+        "source_url": "https://www.750g.com/feuillete-au-jambon-et-au-fromage-r71005.htm"
+      },
+      {
+        "name": "lait",
+        "quantity": 10,
+        "unit": "cl",
+        "role": "base liquide de la béchamel",
+        "essential": true,
+        "source_url": "https://www.750g.com/feuillete-au-jambon-et-au-fromage-r71005.htm"
+      },
+      {
+        "name": "noix de muscade",
+        "quantity": "1 pincée",
+        "unit": "",
+        "role": "assaisonnement de la béchamel",
+        "essential": false,
+        "source_url": "https://www.750g.com/feuillete-au-jambon-et-au-fromage-r71005.htm"
+      },
+      {
+        "name": "sel",
+        "quantity": "au goût",
+        "unit": "",
+        "role": "assaisonnement",
+        "essential": false,
+        "source_url": "https://www.750g.com/feuillete-au-jambon-et-au-fromage-r71005.htm"
+      },
+      {
+        "name": "poivre",
+        "quantity": "au goût",
+        "unit": "",
+        "role": "assaisonnement",
+        "essential": false,
+        "source_url": "https://www.750g.com/feuillete-au-jambon-et-au-fromage-r71005.htm"
+      },
+      {
+        "name": "jaune d’œuf",
+        "quantity": 1,
+        "unit": "",
+        "role": "dorure et aide au scellement",
+        "essential": true,
+        "source_url": "https://www.750g.com/feuillete-au-jambon-et-au-fromage-r71005.htm"
+      }
+    ],
+    "preparation": [
+      {
+        "step": 1,
+        "action": "Faire fondre le beurre à feu doux, ajouter la farine puis incorporer progressivement le lait en fouettant sans arrêt.",
+        "cue": "La sauce épaissit progressivement sans grumeaux.",
+        "minutes": null,
+        "temperature_c": null,
+        "source_url": "https://www.750g.com/feuillete-au-jambon-et-au-fromage-r71005.htm"
+      },
+      {
+        "step": 2,
+        "action": "Saler, poivrer et ajouter une pincée de noix de muscade.",
+        "cue": "La béchamel est homogène et assaisonnée.",
+        "minutes": null,
+        "temperature_c": null,
+        "source_url": "https://www.750g.com/feuillete-au-jambon-et-au-fromage-r71005.htm"
+      },
+      {
+        "step": 3,
+        "action": "Préchauffer le four.",
+        "cue": "Le four atteint 220 °C.",
+        "minutes": null,
+        "temperature_c": 220,
+        "source_url": "https://www.750g.com/feuillete-au-jambon-et-au-fromage-r71005.htm"
+      },
+      {
+        "step": 4,
+        "action": "Découenner et couper le jambon en morceaux, puis le mélanger à la béchamel avec l’emmental.",
+        "cue": "La garniture est uniformément mélangée.",
+        "minutes": null,
+        "temperature_c": null,
+        "source_url": "https://www.750g.com/feuillete-au-jambon-et-au-fromage-r71005.htm"
+      },
+      {
+        "step": 5,
+        "action": "Déposer une pâte feuilletée sur une plaque recouverte de papier cuisson et piquer le fond à la fourchette.",
+        "cue": "Le fond est régulièrement perforé.",
+        "minutes": null,
+        "temperature_c": null,
+        "source_url": "https://www.750g.com/feuillete-au-jambon-et-au-fromage-r71005.htm"
+      },
+      {
+        "step": 6,
+        "action": "Déposer la garniture au centre en laissant une bordure libre.",
+        "cue": "La garniture reste éloignée du bord et ne déborde pas.",
+        "minutes": null,
+        "temperature_c": null,
+        "source_url": "https://www.750g.com/feuillete-au-jambon-et-au-fromage-r71005.htm"
+      },
+      {
+        "step": 7,
+        "action": "Recouvrir avec la seconde pâte et presser les bords pour les souder.",
+        "cue": "Les deux pâtes sont jointes tout autour.",
+        "minutes": null,
+        "temperature_c": null,
+        "source_url": "https://www.750g.com/feuillete-au-jambon-et-au-fromage-r71005.htm"
+      },
+      {
+        "step": 8,
+        "action": "Battre le jaune d’œuf et en badigeonner la surface.",
+        "cue": "La pâte est entièrement et régulièrement brillante.",
+        "minutes": null,
+        "temperature_c": null,
+        "source_url": "https://www.750g.com/feuillete-au-jambon-et-au-fromage-r71005.htm"
+      },
+      {
+        "step": 9,
+        "action": "Cuire au four en surveillant la coloration.",
+        "cue": "Le feuilletage est doré et croustillant.",
+        "minutes": 20,
+        "temperature_c": 220,
+        "source_url": "https://www.750g.com/feuillete-au-jambon-et-au-fromage-r71005.htm"
+      },
+      {
+        "step": 10,
+        "action": "Pour une variante plus épaisse, laisser une bordure d’environ 2,5 cm, presser les bords avec les doigts et pratiquer une petite incision au centre.",
+        "cue": "La bordure est fermée et une ouverture permet à la vapeur de s’échapper.",
+        "minutes": null,
+        "temperature_c": null,
+        "source_url": "https://www.ricardocuisine.com/en/recipes/10878-ham-and-cheese-puff-pastry-tart"
+      },
+      {
+        "step": 11,
+        "action": "Laisser refroidir avant de servir lorsque la garniture est très chaude.",
+        "cue": "Le feuilleté est suffisamment stable pour être découpé.",
+        "minutes": 30,
+        "temperature_c": null,
+        "source_url": "https://www.ricardocuisine.com/en/recipes/10878-ham-and-cheese-puff-pastry-tart"
+      }
+    ],
+    "substitutions": [
+      {
+        "ingredient": "jambon",
+        "replacement": "poulet",
+        "note": "Une variante documentée remplace le jambon par du poulet.",
+        "source_url": "https://www.750g.com/nina-metayer-partage-la-recette-preferee-de-ses-enfants-ses-feuilletes-jambon-bechamel-a42418.htm"
+      },
+      {
+        "ingredient": "jambon",
+        "replacement": "fondue de poireaux",
+        "note": "Une version végétarienne documentée utilise uniquement une fondue de poireaux.",
+        "source_url": "https://www.750g.com/nina-metayer-partage-la-recette-preferee-de-ses-enfants-ses-feuilletes-jambon-bechamel-a42418.htm"
+      },
+      {
+        "ingredient": "emmental",
+        "replacement": "un autre fromage",
+        "note": "La source indique que le fromage peut varier, sans imposer une variété précise.",
+        "source_url": "https://www.750g.com/nina-metayer-partage-la-recette-preferee-de-ses-enfants-ses-feuilletes-jambon-bechamel-a42418.htm"
+      }
+    ],
+    "accompaniments": [
+      {
+        "name": "salade verte",
+        "note": "Le feuilleté est conseillé avec une belle salade verte.",
+        "source_url": "https://www.750g.com/feuillete-au-jambon-et-au-fromage-r71005.htm"
+      },
+      {
+        "name": "soupe de tomates rôties et de courge",
+        "note": "Une recette proche de tarte feuilletée jambon-fromage la sert avec cette soupe.",
+        "source_url": "https://www.ricardocuisine.com/en/recipes/10878-ham-and-cheese-puff-pastry-tart"
+      }
+    ],
+    "common_failures": [
+      {
+        "problem": "Béchamel grumeleuse",
+        "cause": "Le lait est incorporé trop rapidement ou sans fouetter.",
+        "remedy": "Ajouter le lait petit à petit en mélangeant constamment.",
+        "source_url": "https://www.750g.com/feuillete-au-jambon-et-au-fromage-r71005.htm"
+      },
+      {
+        "problem": "Garniture qui fuit",
+        "cause": "La garniture touche la bordure ou les bords sont mal pressés.",
+        "remedy": "Laisser une bordure libre et presser fermement tout le pourtour.",
+        "source_url": "https://www.ricardocuisine.com/en/recipes/10878-ham-and-cheese-puff-pastry-tart"
+      },
+      {
+        "problem": "Dessus peu doré",
+        "cause": "La surface n’est pas entièrement couverte de dorure ou la cuisson est insuffisante.",
+        "remedy": "Badigeonner toute la surface et poursuivre jusqu’à ce que le feuilletage soit bien doré.",
+        "source_url": "https://www.ricardocuisine.com/en/recipes/10878-ham-and-cheese-puff-pastry-tart"
+      },
+      {
+        "problem": "Pâte déformée ou trop gonflée",
+        "cause": "La vapeur reste enfermée dans le feuilleté.",
+        "remedy": "Pratiquer une petite incision au centre de la pâte supérieure.",
+        "source_url": "https://www.ricardocuisine.com/en/recipes/10878-ham-and-cheese-puff-pastry-tart"
+      },
+      {
+        "problem": "Garniture trop liquide à la découpe",
+        "cause": "La béchamel n’a pas suffisamment épaissi ou le feuilleté est servi immédiatement.",
+        "remedy": "Cuire la sauce jusqu’à épaississement et laisser reposer avant de découper.",
+        "source_url": "https://www.750g.com/feuillete-au-jambon-et-au-fromage-r71005.htm"
+      }
+    ],
+    "storage": [
+      {
+        "method": "réfrigération de la béchamel",
+        "duration": "2 jours",
+        "note": "Couvrir directement la surface de la sauce avant de la réfrigérer.",
+        "source_url": "https://www.ricardocuisine.com/en/recipes/10878-ham-and-cheese-puff-pastry-tart"
+      },
+      {
+        "method": "réchauffage au four",
+        "duration": "10 à 15 minutes",
+        "note": "Réchauffer à 190 °C jusqu’à ce que le feuilleté soit entièrement chaud.",
+        "source_url": "https://www.ricardocuisine.com/en/recipes/10878-ham-and-cheese-puff-pastry-tart"
+      },
+      {
+        "method": "réchauffage à l’air fryer",
+        "duration": "10 minutes",
+        "note": "Réchauffer à 180 °C dans un panier chemisé de papier cuisson.",
+        "source_url": "https://www.ricardocuisine.com/en/recipes/10878-ham-and-cheese-puff-pastry-tart"
+      }
+    ],
+    "food_safety": [
+      {
+        "source_url": "https://www.ricardocuisine.com/en/recipes/10878-ham-and-cheese-puff-pastry-tart",
+        "text": "Refroidir rapidement la béchamel puis la conserver au réfrigérateur sous film posé directement à sa surface."
+      },
+      {
+        "source_url": "https://www.ricardocuisine.com/en/recipes/10878-ham-and-cheese-puff-pastry-tart",
+        "text": "Réchauffer le feuilleté jusqu’à ce qu’il soit entièrement chaud à cœur."
+      },
+      {
+        "source_url": "https://www.ricardocuisine.com/en/recipes/10878-ham-and-cheese-puff-pastry-tart",
+        "text": "Maintenir la pâte feuilletée froide après décongélation avant le montage."
+      }
+    ],
+    "references": [
+      {
+        "url": "https://www.750g.com/feuillete-au-jambon-et-au-fromage-r71005.htm",
+        "title": "Feuilleté au jambon et au fromage",
+        "publisher": "750g"
+      },
+      {
+        "url": "https://www.750g.com/ultra-confort-delicieux-addictif-francois-regis-gaudry-partage-une-recette-de-feuillete-jambon-fromage-a39844.htm",
+        "title": "Feuilleté jambon-fromage de François-Régis Gaudry",
+        "publisher": "750g"
+      },
+      {
+        "url": "https://www.ricardocuisine.com/en/recipes/10878-ham-and-cheese-puff-pastry-tart",
+        "title": "Ham and Cheese Puff Pastry Tart",
+        "publisher": "RICARDO"
+      },
+      {
+        "url": "https://www.750g.com/nina-metayer-partage-la-recette-preferee-de-ses-enfants-ses-feuilletes-jambon-bechamel-a42418.htm",
+        "title": "Feuilletés jambon-béchamel",
+        "publisher": "750g"
+      }
+    ],
+    "visual_references": [
+      {
+        "image_url": "https://static.750g.com/images/640-400/02df9415a3ba017177256532ee050c3a/feuillete-au-jambon-et-au-fromage-r71005.png",
+        "source_url": "https://www.750g.com/feuillete-au-jambon-et-au-fromage-r71005.htm",
+        "title": "Feuilleté au jambon et au fromage",
+        "tier": 1
+      },
+      {
+        "image_url": "https://ucarecdn.com/5f486490-96a5-4e7e-b661-846cfd4c5762/-/crop/5504x7441/0%2C0/-/preview/-/scale_crop/496x670/-/quality/smart/-/format/preserve/",
+        "source_url": "https://www.ricardocuisine.com/en/recipes/10878-ham-and-cheese-puff-pastry-tart",
+        "title": "Ham and Cheese Puff Pastry Tart",
+        "tier": 1
+      },
+      {
+        "image_url": "https://static.750g.com/images/200-160/4e754bbf771f6b434065b0055dec3f49/feuillete-au-jambon-et-au-fromage-r71005.png",
+        "source_url": "https://www.750g.com/feuillete-au-jambon-et-au-fromage-r71005.htm",
+        "title": "Feuilleté au jambon et au fromage, vue rapprochée",
+        "tier": 1
+      }
+    ],
+    "visual_observations": [
+      {
+        "image_url": "https://static.750g.com/images/640-400/02df9415a3ba017177256532ee050c3a/feuillete-au-jambon-et-au-fromage-r71005.png",
+        "source_url": "https://www.750g.com/feuillete-au-jambon-et-au-fromage-r71005.htm",
+        "observable_details": "Le plat présente une pâte feuilletée dorée à brun doré, avec une surface brillante et plusieurs couches fines nettement visibles. L’intérieur paraît moelleux et feuilleté, avec une garniture pâle, crémeuse et fondante en apparence. Une portion est servie directement dans un plat sombre à bord arrondi.",
+        "composition": "Le feuilleté occupe la majeure partie de la surface visible du plat. La couche supérieure est irrégulièrement croustillante et laminée, tandis que la garniture est visible sur la tranche et semble plus tendre.",
+        "couleurs": "Dominance de tons dorés, ambrés et brun clair pour la pâte, avec un intérieur jaune pâle à crème. Une petite zone rougeâtre est visible dans la garniture.",
+        "textures": "Surface croustillante, brillante et stratifiée; bords friables; intérieur visiblement souple, dense et crémeux.",
+        "incertainties": "La nature exacte de la garniture et de la zone rougeâtre ne peut pas être confirmée à partir de l’image. Le degré de cuisson semble avancé en surface, mais l’intérieur ne peut pas être évalué avec certitude.",
+        "lumiere_et_angle": "Éclairage chaud et latéral, créant des reflets sur la pâte et des ombres douces. La prise de vue est réalisée sous un angle bas, proche du niveau du plat."
+      }
+    ],
+    "uncertainties": [
+      "La recette principale de 750g décrit un feuilleté familial plutôt que des chaussons individuels.",
+      "La quantité d’emmental est donnée comme un sachet sans poids.",
+      "La recette principale indique 220 °C pendant 20 minutes, tandis qu’une recette proche indique 190 °C pendant 30 minutes.",
+      "Les sources consultées ne documentent pas la durée de conservation du feuilleté cuit; seules la conservation de la béchamel et les méthodes de réchauffage sont précisées."
+    ],
+    "originality_notes": [
+      "Les quantités et les étapes sont reformulées sans reproduire la prose des sources.",
+      "Aucune quantité cachée ni aucun ingrédient n’a été déduit d’une photographie.",
+      "Les conseils de soudure, d’échappement de vapeur et de réchauffage sont attribués uniquement aux sources qui les documentent."
+    ]
+  },
+  "canonical": {
+    "title": "Chaussons feuilletés jambon-fromage à la béchamel",
+    "description": "Ces chaussons feuilletés croustillants renferment une garniture crémeuse au jambon et au fromage, à servir en entrée ou en plat avec une salade verte.",
+    "servings": 4,
+    "prep_minutes": 30,
+    "cook_minutes": 20,
+    "total_minutes": 50,
+    "cuisine": "française",
+    "recipe_category": "plat principal",
+    "difficulty": "moyenne",
+    "calories_estimate": 620,
+    "ingredients": [
+      {
+        "name": "pâte feuilletée",
+        "quantity": 2,
+        "unit": "rouleaux"
+      },
+      {
+        "name": "jambon blanc",
+        "quantity": 4,
+        "unit": "tranches"
+      },
+      {
+        "name": "emmental râpé",
+        "quantity": 1,
+        "unit": "sachet"
+      },
+      {
+        "name": "beurre",
+        "quantity": 50,
+        "unit": "g"
+      },
+      {
+        "name": "farine",
+        "quantity": 40,
+        "unit": "g"
+      },
+      {
+        "name": "lait",
+        "quantity": 10,
+        "unit": "cl"
+      },
+      {
+        "name": "noix de muscade",
+        "quantity": 1,
+        "unit": "pincée"
+      },
+      {
+        "name": "sel",
+        "quantity": 1,
+        "unit": "g"
+      },
+      {
+        "name": "poivre",
+        "quantity": 1,
+        "unit": "g"
+      },
+      {
+        "name": "jaune d’œuf",
+        "quantity": 1,
+        "unit": "pièce"
+      }
+    ],
+    "steps": [
+      {
+        "text": "Faire fondre le beurre à feu doux dans une casserole."
+      },
+      {
+        "text": "Ajouter la farine et mélanger jusqu’à obtenir un roux homogène."
+      },
+      {
+        "text": "Verser progressivement le lait en fouettant constamment."
+      },
+      {
+        "text": "Cuire la béchamel jusqu’à ce qu’elle épaississe et devienne lisse, sans grumeaux."
+      },
+      {
+        "text": "Ajouter le sel, le poivre et la noix de muscade, puis mélanger."
+      },
+      {
+        "text": "Laisser tiédir la béchamel jusqu’à ce qu’elle ne soit plus liquide."
+      },
+      {
+        "text": "Préchauffer le four à 220 °C en chaleur traditionnelle."
+      },
+      {
+        "text": "Découenner puis couper le jambon en petits morceaux."
+      },
+      {
+        "text": "Mélanger le jambon, la béchamel et l’emmental râpé jusqu’à obtenir une garniture uniforme."
+      },
+      {
+        "text": "Dérouler une pâte feuilletée sur une plaque recouverte de papier cuisson."
+      },
+      {
+        "text": "Piquer régulièrement le fond de la pâte avec une fourchette."
+      },
+      {
+        "text": "Déposer la garniture au centre en laissant une bordure libre d’environ 2,5 cm."
+      },
+      {
+        "text": "Recouvrir avec le second rouleau de pâte feuilletée."
+      },
+      {
+        "text": "Presser fermement les deux pâtes tout autour avec les doigts pour souder les bords."
+      },
+      {
+        "text": "Pratiquer une petite incision au centre de la pâte supérieure pour laisser s’échapper la vapeur."
+      },
+      {
+        "text": "Battre le jaune d’œuf dans un petit récipient."
+      },
+      {
+        "text": "Badigeonner toute la surface du feuilleté avec le jaune d’œuf."
+      },
+      {
+        "text": "Cuire à 220 °C pendant 20 minutes, jusqu’à ce que la pâte soit dorée, brillante et croustillante."
+      },
+      {
+        "text": "Laisser refroidir 30 minutes avant de découper afin que la garniture se stabilise."
+      }
+    ],
+    "equipment": [
+      "casserole",
+      "fouet",
+      "fourchette",
+      "plaque de cuisson",
+      "papier cuisson",
+      "pinceau de cuisine",
+      "petit récipient"
+    ],
+    "notes": [
+      "Gardez les pâtes feuilletées froides jusqu’au montage pour qu’elles restent faciles à manipuler.",
+      "La bordure libre et le soudage ferme des bords limitent les fuites de béchamel.",
+      "La béchamel doit être suffisamment épaisse avant le montage; laissez-la tiédir pour éviter qu’elle ne détrempe la pâte.",
+      "L’incision centrale évacue la vapeur et limite la déformation du feuilleté.",
+      "Servez avec une salade verte.",
+      "Pour réchauffer le feuilleté, placez-le au four à 190 °C pendant 10 à 15 minutes, jusqu’à ce qu’il soit chaud à cœur. Une friteuse à air peut aussi convenir à 180 °C pendant 10 minutes."
+    ],
+    "faq": [
+      {
+        "question": "Comment éviter que la garniture coule ?",
+        "answer": "Laissez une bordure libre d’environ 2,5 cm, ne surchargez pas les bords et pressez fermement les deux pâtes tout autour."
+      },
+      {
+        "question": "Pourquoi la béchamel doit-elle être épaisse ?",
+        "answer": "Une béchamel épaisse reste mieux en place dans le feuilleté et rend la découpe plus nette après le refroidissement."
+      },
+      {
+        "question": "Comment bien souder les bords ?",
+        "answer": "Après avoir posé la seconde pâte, pressez les deux couches avec les doigts sur tout le pourtour, sans laisser d’ouverture."
+      },
+      {
+        "question": "Pourquoi pratiquer une incision au centre ?",
+        "answer": "Cette petite ouverture permet à la vapeur de s’échapper et limite le gonflement ou la déformation de la pâte."
+      },
+      {
+        "question": "Peut-on remplacer l’emmental ?",
+        "answer": "Oui, la source indique qu’un autre fromage peut être utilisé, sans préciser de variété particulière."
+      }
+    ],
+    "keywords": [
+      "chaussons feuilletés",
+      "jambon-fromage",
+      "béchamel",
+      "pâte feuilletée",
+      "emmental",
+      "cuisine française",
+      "entrée chaude",
+      "feuilleté"
+    ],
+    "food_safety": [
+      "Le jambon et le fromage sont des allergènes ou aliments à déclarer selon les besoins: la recette contient du lait, du beurre, de la farine de blé et de l’œuf.",
+      "Refroidissez rapidement toute béchamel non utilisée et conservez-la au réfrigérateur sous un film posé directement sur sa surface, pendant 2 jours au maximum.",
+      "Réchauffez le feuilleté jusqu’à ce qu’il soit entièrement chaud à cœur avant de le servir.",
+      "Conservez les pâtes feuilletées froides après décongélation et ne les laissez pas attendre longtemps à température ambiante.",
+      "Le jaune d’œuf est cuit pendant la cuisson du feuilleté."
+    ],
+    "uncertainties": [
+      "La quantité d’emmental est fournie par la source sous la forme d’un sachet, sans poids précisé.",
+      "La recette principale indique 220 °C pendant 20 minutes, tandis qu’une recette proche indique 190 °C pendant 30 minutes; la valeur principale de 220 °C pendant 20 minutes est retenue.",
+      "Le temps total de 50 minutes correspond à 30 minutes de préparation et 20 minutes de cuisson; le refroidissement recommandé de 30 minutes est un temps d’attente supplémentaire avant la découpe.",
+      "Les sources ne précisent pas la durée de conservation du feuilleté cuit."
+    ]
+  }
+}

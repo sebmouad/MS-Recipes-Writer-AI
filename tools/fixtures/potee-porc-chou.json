@@ -1,0 +1,543 @@
+{
+  "title": "Potée au chou et au porc",
+  "text": "Potée traditionnelle : jarret et poitrine de porc demi-sel, saucisse fumée, chou vert frisé, carottes, pommes de terre, poireaux et oignon piqué de clous de girofle, cuits longuement dans un bouillon aromatique. Préciser le dessalage, l’ordre d’ajout des légumes, le service et la conservation.",
+  "editor_input": {
+    "type": "article",
+    "title": "Potée au chou et au porc",
+    "text": "Potée traditionnelle : jarret et poitrine de porc demi-sel, saucisse fumée, chou vert frisé, carottes, pommes de terre, poireaux et oignon piqué de clous de girofle, cuits longuement dans un bouillon aromatique. Préciser le dessalage, l’ordre d’ajout des légumes, le service et la conservation.",
+    "images": []
+  },
+  "research": {
+    "dish_identity": {
+      "name": "Potée au chou et au porc",
+      "confidence": "élevée",
+      "evidence": "Le brief correspond à une potée française réunissant porc demi-sel ou salé, chou vert, pommes de terre, carottes, aromates et saucisse fumée; une variante documente aussi les poireaux et le dessalage préalable.",
+      "source_url": "https://www.750g.com/potee-au-chou-r204230.htm"
+    },
+    "recipe_outline": {
+      "servings": 4,
+      "prep_minutes": 20,
+      "cook_minutes": 150,
+      "total_minutes": 170,
+      "category": "plat complet mijoté",
+      "cuisine": "française régionale",
+      "difficulty": "facile",
+      "source_url": "https://www.750g.com/potee-au-chou-r204230.htm"
+    },
+    "ingredients": [
+      {
+        "name": "jarret de porc salé",
+        "quantity": "500",
+        "unit": "g",
+        "role": "viande principale et base du bouillon",
+        "essential": true,
+        "source_url": "https://www.750g.com/potee-au-chou-r204230.htm"
+      },
+      {
+        "name": "poitrine de porc salée",
+        "quantity": "200",
+        "unit": "g",
+        "role": "matière grasse et saveur fumée ou salée",
+        "essential": true,
+        "source_url": "https://www.750g.com/potee-au-chou-r204230.htm"
+      },
+      {
+        "name": "saucisses fumées",
+        "quantity": "2",
+        "unit": "pièces",
+        "role": "garniture carnée",
+        "essential": true,
+        "source_url": "https://www.750g.com/potee-au-chou-r204230.htm"
+      },
+      {
+        "name": "chou vert",
+        "quantity": "1",
+        "unit": "pièce",
+        "role": "légume principal",
+        "essential": true,
+        "source_url": "https://www.750g.com/potee-au-chou-r204230.htm"
+      },
+      {
+        "name": "pommes de terre",
+        "quantity": "3",
+        "unit": "pièces",
+        "role": "garniture féculente",
+        "essential": true,
+        "source_url": "https://www.750g.com/potee-au-chou-r204230.htm"
+      },
+      {
+        "name": "carottes",
+        "quantity": "3",
+        "unit": "pièces",
+        "role": "légume doux et coloré",
+        "essential": false,
+        "source_url": "https://www.750g.com/potee-au-chou-r204230.htm"
+      },
+      {
+        "name": "poireaux",
+        "quantity": "8",
+        "unit": "pièces",
+        "role": "légume aromatique",
+        "essential": false,
+        "source_url": "https://www.750g.com/potee-facon-jurassienne-r50092.htm"
+      },
+      {
+        "name": "oignon",
+        "quantity": "1",
+        "unit": "pièce",
+        "role": "base aromatique",
+        "essential": false,
+        "source_url": "https://www.750g.com/potee-facon-jurassienne-r50092.htm"
+      },
+      {
+        "name": "clous de girofle",
+        "quantity": "2 à 3",
+        "unit": "pièces",
+        "role": "parfum de l'oignon piqué",
+        "essential": false,
+        "source_url": "https://www.750g.com/potee-au-chou-r204230.htm"
+      },
+      {
+        "name": "thym et laurier",
+        "quantity": "1 branche et 1 feuille",
+        "unit": "assortiment",
+        "role": "parfum du bouillon",
+        "essential": false,
+        "source_url": "https://www.750g.com/potee-au-chou-r204230.htm"
+      }
+    ],
+    "preparation": [
+      {
+        "step": 1,
+        "action": "Faire dessaler les viandes demi-sel dans un grand volume d'eau froide en renouvelant régulièrement l'eau; prévoir environ 12 heures selon leur salinité.",
+        "cue": "Les viandes sont égouttées et leur salinité n'est plus excessive.",
+        "minutes": 720,
+        "temperature_c": null,
+        "source_url": "https://www.750g.com/potee-facon-jurassienne-r50092.htm"
+      },
+      {
+        "step": 2,
+        "action": "Couper le chou en quartiers et le blanchir dans l'eau bouillante, puis l'égoutter.",
+        "cue": "Le chou est assoupli et débarrassé de son amertume.",
+        "minutes": 10,
+        "temperature_c": null,
+        "source_url": "https://www.750g.com/potee-facon-jurassienne-r50092.htm"
+      },
+      {
+        "step": 3,
+        "action": "Plonger brièvement les saucisses piquées, la poitrine et le jarret dans l'eau froide, porter à ébullition, puis retirer les viandes et les saucisses.",
+        "cue": "Le premier bouillon est obtenu et les morceaux sont retirés après l'ébullition courte.",
+        "minutes": 5,
+        "temperature_c": null,
+        "source_url": "https://www.750g.com/potee-au-chou-r204230.htm"
+      },
+      {
+        "step": 4,
+        "action": "Remettre les viandes dans un faitout, couvrir largement d'eau froide et ajouter l'oignon piqué, l'ail, le thym, le laurier et le poivre; laisser frémir.",
+        "cue": "Le bouillon frémit doucement et peut être écumé.",
+        "minutes": 60,
+        "temperature_c": null,
+        "source_url": "https://www.750g.com/potee-facon-jurassienne-r50092.htm"
+      },
+      {
+        "step": 5,
+        "action": "Ajouter les carottes, les poireaux, le chou et, selon la variante, les autres légumes; poursuivre la cuisson.",
+        "cue": "Les légumes commencent à s'attendrir sans se défaire.",
+        "minutes": 30,
+        "temperature_c": null,
+        "source_url": "https://www.750g.com/potee-facon-jurassienne-r50092.htm"
+      },
+      {
+        "step": 6,
+        "action": "Ajouter les pommes de terre et les saucisses fumées préalablement piquées.",
+        "cue": "Les pommes de terre sont tendres à cœur et les saucisses restent intactes.",
+        "minutes": 30,
+        "temperature_c": null,
+        "source_url": "https://www.750g.com/potee-facon-jurassienne-r50092.htm"
+      },
+      {
+        "step": 7,
+        "action": "Goûter le bouillon et rectifier seulement si nécessaire en sel et en poivre.",
+        "cue": "Le bouillon est assaisonné sans dominante salée.",
+        "minutes": null,
+        "temperature_c": null,
+        "source_url": "https://www.750g.com/potee-facon-jurassienne-r50092.htm"
+      },
+      {
+        "step": 8,
+        "action": "Trancher les viandes, dresser les légumes dans un grand plat creux et servir chaud.",
+        "cue": "Les viandes sont assez fondantes pour être tranchées et les légumes restent entiers.",
+        "minutes": null,
+        "temperature_c": null,
+        "source_url": "https://www.750g.com/potee-dauvergne-r37965.htm"
+      }
+    ],
+    "substitutions": [
+      {
+        "ingredient": "jarret ou jambonneau",
+        "replacement": "jambonneau ou rouelle",
+        "note": "La source présente le jambonneau et la rouelle comme d'excellents morceaux de remplacement pour une potée.",
+        "source_url": "https://www.750g.com/potee-dauvergne-r37965.htm"
+      },
+      {
+        "ingredient": "saucisse fumée",
+        "replacement": "saucisse de Morteau",
+        "note": "La variante jurassienne emploie une saucisse de Morteau percée avant cuisson.",
+        "source_url": "https://www.750g.com/potee-facon-jurassienne-r50092.htm"
+      },
+      {
+        "ingredient": "lardons",
+        "replacement": "fines allumettes de bacon",
+        "note": "La source indique que les allumettes de bacon peuvent remplacer les lardons dans une variante de potée au chou.",
+        "source_url": "https://www.750g.com/la-potee-au-chou-frise-r49911.htm"
+      }
+    ],
+    "accompaniments": [
+      {
+        "name": "pain de campagne",
+        "note": "La potée jurassienne est servie avec du pain de campagne.",
+        "source_url": "https://www.750g.com/potee-facon-jurassienne-r50092.htm"
+      },
+      {
+        "name": "moutarde",
+        "note": "La source recommande la moutarde au moment du service.",
+        "source_url": "https://www.750g.com/potee-facon-jurassienne-r50092.htm"
+      },
+      {
+        "name": "bouillon avec petites pâtes",
+        "note": "Le bouillon filtré peut servir le lendemain à cuire des coquillettes ou des vermicelles.",
+        "source_url": "https://www.750g.com/potee-au-chou-r204230.htm"
+      },
+      {
+        "name": "bouillon sur pain frotté à l'ail",
+        "note": "Le bouillon peut aussi être servi chaud sur des tranches de pain de campagne frottées à l'ail.",
+        "source_url": "https://www.750g.com/potee-au-chou-r204230.htm"
+      }
+    ],
+    "common_failures": [
+      {
+        "problem": "Bouillon trop salé",
+        "cause": "Les viandes demi-sel ou salées n'ont pas été suffisamment dessalées ou le sel a été ajouté trop tôt.",
+        "remedy": "Dessaler selon la salinité, ne pas saler au début et rectifier après dégustation.",
+        "source_url": "https://www.750g.com/potee-facon-jurassienne-r50092.htm"
+      },
+      {
+        "problem": "Saucisse éclatée",
+        "cause": "La saucisse n'a pas été percée avant de rejoindre le faitout.",
+        "remedy": "La piquer de quelques trous avec une aiguille fine avant cuisson.",
+        "source_url": "https://www.750g.com/potee-facon-jurassienne-r50092.htm"
+      },
+      {
+        "problem": "Chou amer",
+        "cause": "Le chou n'a pas été blanchi.",
+        "remedy": "Le blanchir quelques minutes dans l'eau bouillante puis l'égoutter.",
+        "source_url": "https://www.750g.com/potee-au-chou-r204230.htm"
+      },
+      {
+        "problem": "Pommes de terre désagrégées",
+        "cause": "Elles ont été ajoutées trop tôt dans une cuisson longue.",
+        "remedy": "Les ajouter dans la dernière demi-heure selon la méthode jurassienne.",
+        "source_url": "https://www.750g.com/potee-facon-jurassienne-r50092.htm"
+      },
+      {
+        "problem": "Viandes ou légumes peu fondants",
+        "cause": "La cuisson n'a pas été maintenue assez longtemps à faible frémissement.",
+        "remedy": "Poursuivre la cuisson douce jusqu'à ce que les légumes soient fondants et les viandes tendres.",
+        "source_url": "https://www.750g.com/potee-au-chou-r204230.htm"
+      }
+    ],
+    "storage": [
+      {
+        "method": "Réfrigération du bouillon filtré",
+        "duration": "jusqu'au lendemain",
+        "note": "La source recommande de garder le bouillon pour le lendemain.",
+        "source_url": "https://www.750g.com/potee-au-chou-r204230.htm"
+      },
+      {
+        "method": "Réfrigération des restes cuits",
+        "duration": "3 à 4 jours",
+        "note": "Conserver rapidement les restes dans un récipient couvert au réfrigérateur.",
+        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/leftovers-and-food-safety"
+      },
+      {
+        "method": "Réchauffage",
+        "duration": "jusqu'à ce que le plat soit fumant",
+        "note": "Réchauffer les restes jusqu'à 74 °C à cœur selon les recommandations de sécurité alimentaire.",
+        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/leftovers-and-food-safety"
+      }
+    ],
+    "food_safety": [
+      {
+        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/leftovers-and-food-safety",
+        "text": "Réfrigérer les restes dans les deux heures suivant la cuisson, ou dans l'heure si la température ambiante dépasse 32 °C."
+      },
+      {
+        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/leftovers-and-food-safety",
+        "text": "Conserver les restes cuits au réfrigérateur pendant trois à quatre jours."
+      },
+      {
+        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/leftovers-and-food-safety",
+        "text": "Réchauffer les restes jusqu'à 74 °C à cœur."
+      }
+    ],
+    "references": [
+      {
+        "url": "https://www.750g.com/potee-au-chou-r204230.htm",
+        "title": "Recette La potée au chou",
+        "publisher": "750g"
+      },
+      {
+        "url": "https://www.750g.com/potee-facon-jurassienne-r50092.htm",
+        "title": "Recette Potée façon jurassienne",
+        "publisher": "750g"
+      },
+      {
+        "url": "https://www.750g.com/potee-dauvergne-r37965.htm",
+        "title": "Recette Potée d'Auvergne",
+        "publisher": "750g"
+      },
+      {
+        "url": "https://www.750g.com/la-potee-au-chou-frise-r49911.htm",
+        "title": "Recette La potée au chou frisé",
+        "publisher": "750g"
+      },
+      {
+        "url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/leftovers-and-food-safety",
+        "title": "Leftovers and Food Safety",
+        "publisher": "USDA Food Safety and Inspection Service"
+      }
+    ],
+    "visual_references": [
+      {
+        "image_url": "https://static.750g.com/images/220-165/c5d45e2bb618d9546acc1d6851b165d7/potee-au-chou-r204230.png",
+        "source_url": "https://www.750g.com/potee-au-chou-r204230.htm",
+        "title": "La potée au chou",
+        "tier": 1
+      },
+      {
+        "image_url": "https://static.750g.com/images/220-165/c7f6f4fe5128b5bb61480836d000d8c8/adobestock-50061440.jpeg",
+        "source_url": "https://www.750g.com/potee-au-chou-r204230.htm",
+        "title": "Potée au chou servie",
+        "tier": 1
+      },
+      {
+        "image_url": "https://static.750g.com/images/220-165/1e030a69900091fef3e5e3ca6fa890ea/potee-auvergnate.png",
+        "source_url": "https://www.750g.com/potee-dauvergne-r37965.htm",
+        "title": "Potée d'Auvergne",
+        "tier": 2
+      }
+    ],
+    "visual_observations": [
+      {
+        "image_url": "https://static.750g.com/images/220-165/c5d45e2bb618d9546acc1d6851b165d7/potee-au-chou-r204230.png",
+        "source_url": "https://www.750g.com/potee-au-chou-r204230.htm",
+        "observable_details": "Un plat chaud est présenté dans un récipient profond et sombre, avec des feuilles vertes, des morceaux jaune pâle, orange, rosés et beige clair visibles à la surface. Les éléments paraissent cuits et tendres, avec quelques surfaces lisses et humides.",
+        "composition": "Le plat occupe la zone centrale de l’image et est photographié en vue légèrement plongeante. Il est servi directement dans un récipient rond, noir et profond, posé sur un support clair.",
+        "colours": "Dominante sombre du récipient, avec des tons verts, jaune pâle, orange, rose pâle et beige dans le plat.",
+        "textures": "Les feuilles présentent des plis et des nervures visibles. Les morceaux ont des textures variées, certaines surfaces étant lisses, d’autres légèrement irrégulières et humides.",
+        "uncertainties": "La nature précise des morceaux colorés et leur mode de préparation ne peuvent pas être déterminés avec certitude. La lumière est chaude et diffuse, avec des reflets modérés sur les surfaces humides."
+      }
+    ],
+    "uncertainties": [
+      "La recette principale indique des carottes et des pommes de terre mais pas de poireaux; les poireaux proviennent de la variante jurassienne.",
+      "Les sources divergent sur l'ordre exact des légumes: une méthode ajoute les pommes de terre avec les autres légumes, tandis qu'une autre les réserve aux trente dernières minutes.",
+      "Les sources ne donnent pas de température chiffrée; elles décrivent une ébullition initiale puis un frémissement ou une cuisson douce.",
+      "La durée de dessalage varie selon la salinité; une source conseille de demander l'avis du boucher et indique que le dessalage peut parfois être inutile."
+    ],
+    "originality_notes": [
+      "Le paquet distingue les faits documentés des choix éditoriaux et ne déduit pas de quantités absentes des sources.",
+      "Les observations visuelles ont été volontairement laissées vides conformément au protocole de laboratoire.",
+      "Les images de la potée et de la potée auvergnate sont citées comme références photographiques réelles; la troisième image est explicitement classée en variante visuelle."
+    ]
+  },
+  "canonical": {
+    "title": "Potée au chou et au porc",
+    "description": "Cette potée française associe porc fondant, saucisse fumée et légumes tendres dans un bouillon parfumé, pour un plat complet réconfortant à servir bien chaud.",
+    "servings": 4,
+    "prep_minutes": 20,
+    "cook_minutes": 150,
+    "total_minutes": 170,
+    "cuisine": "française régionale",
+    "recipe_category": "plat principal",
+    "difficulty": "facile",
+    "calories_estimate": 850,
+    "ingredients": [
+      {
+        "name": "jarret de porc demi-sel",
+        "quantity": 500,
+        "unit": "g"
+      },
+      {
+        "name": "poitrine de porc demi-sel",
+        "quantity": 200,
+        "unit": "g"
+      },
+      {
+        "name": "saucisses fumées",
+        "quantity": 2,
+        "unit": "pièces"
+      },
+      {
+        "name": "chou vert frisé",
+        "quantity": 1,
+        "unit": "pièce"
+      },
+      {
+        "name": "pommes de terre",
+        "quantity": 3,
+        "unit": "pièces"
+      },
+      {
+        "name": "carottes",
+        "quantity": 3,
+        "unit": "pièces"
+      },
+      {
+        "name": "poireaux",
+        "quantity": 8,
+        "unit": "pièces"
+      },
+      {
+        "name": "oignon",
+        "quantity": 1,
+        "unit": "pièce"
+      },
+      {
+        "name": "clous de girofle",
+        "quantity": 3,
+        "unit": "pièces"
+      },
+      {
+        "name": "ail",
+        "quantity": 1,
+        "unit": "gousse"
+      },
+      {
+        "name": "thym",
+        "quantity": 1,
+        "unit": "branche"
+      },
+      {
+        "name": "laurier",
+        "quantity": 1,
+        "unit": "feuille"
+      },
+      {
+        "name": "eau",
+        "quantity": 3,
+        "unit": "l"
+      },
+      {
+        "name": "poivre",
+        "quantity": 2,
+        "unit": "g"
+      },
+      {
+        "name": "sel",
+        "quantity": 0,
+        "unit": "g"
+      }
+    ],
+    "steps": [
+      {
+        "text": "Faire dessaler le jarret et la poitrine dans un grand volume d’eau froide pendant environ 12 heures, en renouvelant régulièrement l’eau ; les viandes doivent être égouttées et leur salinité modérée."
+      },
+      {
+        "text": "Couper le chou en quartiers ; les quartiers doivent rester entiers."
+      },
+      {
+        "text": "Blanchir le chou dans l’eau bouillante pendant environ 10 minutes ; il doit être assoupli et moins amer."
+      },
+      {
+        "text": "Piquer les saucisses avec une aiguille fine ; leur peau doit être percée de quelques trous."
+      },
+      {
+        "text": "Plonger brièvement le jarret, la poitrine et les saucisses dans l’eau froide puis porter à ébullition pendant environ 5 minutes ; retirer les morceaux dès le premier bouillon."
+      },
+      {
+        "text": "Remettre le jarret et la poitrine dans un faitout avec l’eau, l’oignon piqué de clous de girofle, l’ail, le thym, le laurier et le poivre ; le bouillon doit frémir doucement."
+      },
+      {
+        "text": "Laisser cuire les viandes à faible frémissement pendant 60 minutes en écumant si nécessaire ; le bouillon doit rester clair et les viandes commencer à s’attendrir."
+      },
+      {
+        "text": "Ajouter les carottes, les poireaux et le chou ; les légumes doivent être immergés dans le bouillon."
+      },
+      {
+        "text": "Poursuivre la cuisson à faible frémissement pendant 30 minutes ; les légumes doivent commencer à s’attendrir sans se défaire."
+      },
+      {
+        "text": "Ajouter les pommes de terre et les saucisses fumées ; les pommes de terre doivent rester immergées."
+      },
+      {
+        "text": "Poursuivre la cuisson pendant 30 minutes ; les pommes de terre doivent être tendres à cœur et les viandes fondantes."
+      },
+      {
+        "text": "Goûter le bouillon puis ajouter du sel uniquement si nécessaire ; l’assaisonnement doit rester équilibré et non dominant en sel."
+      },
+      {
+        "text": "Trancher le jarret et la poitrine ; les morceaux doivent pouvoir être coupés sans s’effilocher excessivement."
+      },
+      {
+        "text": "Dresser les légumes et les viandes dans un grand plat creux puis servir chaud ; le bouillon doit napper les ingrédients et leur surface rester humide."
+      }
+    ],
+    "equipment": [
+      "grand faitout",
+      "grande casserole",
+      "aiguille fine",
+      "écumoire",
+      "couteau",
+      "planche à découper",
+      "grand plat creux"
+    ],
+    "notes": [
+      "Le temps de dessalage, d’environ 12 heures, est un repos préalable et n’est pas compris dans les 170 minutes de préparation et de cuisson.",
+      "Ne salez pas le bouillon au début : les viandes demi-sel peuvent déjà l’assaisonner suffisamment.",
+      "La moutarde et le pain de campagne peuvent accompagner le service.",
+      "Le bouillon filtré peut être conservé jusqu’au lendemain et servir à cuire de petites pâtes."
+    ],
+    "faq": [
+      {
+        "question": "Faut-il toujours dessaler les viandes ?",
+        "answer": "La durée dépend de leur salinité. Un dessalage d’environ 12 heures, avec plusieurs changements d’eau, est la solution la plus sûre pour éviter un bouillon trop salé."
+      },
+      {
+        "question": "Pourquoi ajouter les pommes de terre à la fin ?",
+        "answer": "Elles cuisent ainsi pendant les 30 dernières minutes et restent tendres sans se désagréger dans la cuisson longue."
+      },
+      {
+        "question": "Comment éviter que les saucisses éclatent ?",
+        "answer": "Piquez-les de quelques trous avec une aiguille fine avant de les cuire."
+      },
+      {
+        "question": "Comment conserver la potée ?",
+        "answer": "Réfrigérez rapidement les restes dans un récipient couvert et consommez-les dans les 3 à 4 jours."
+      }
+    ],
+    "keywords": [
+      "potée",
+      "chou vert",
+      "porc demi-sel",
+      "saucisse fumée",
+      "jarret de porc",
+      "cuisine française",
+      "plat mijoté",
+      "plat complet"
+    ],
+    "food_safety": [
+      "Dessalez les viandes au réfrigérateur pendant les 12 heures de repos et maintenez-les froides jusqu’à la cuisson.",
+      "Réfrigérez les restes dans les 2 heures suivant la cuisson, ou dans l’heure si la température ambiante dépasse 32 °C.",
+      "Conservez les restes cuits au réfrigérateur pendant 3 à 4 jours.",
+      "Réchauffez les restes jusqu’à 74 °C à cœur, jusqu’à ce que le plat soit fumant.",
+      "Les allergènes principaux sont les éventuels ingrédients de la charcuterie, selon leur étiquetage."
+    ],
+    "uncertainties": [
+      "Les poireaux proviennent de la variante jurassienne, tandis que la recette principale mentionne surtout le chou, les carottes et les pommes de terre.",
+      "Les sources divergent sur l’ajout des pommes de terre ; elles sont ici réservées aux 30 dernières minutes pour limiter leur désagrégation.",
+      "La durée de dessalage dépend de la salinité réelle des viandes et peut parfois être réduite.",
+      "Aucune température chiffrée n’est donnée pour la cuisson ; la méthode repose sur une ébullition initiale puis un faible frémissement.",
+      "L’estimation calorique varie selon la teneur en gras des morceaux de porc et des saucisses."
+    ]
+  }
+}

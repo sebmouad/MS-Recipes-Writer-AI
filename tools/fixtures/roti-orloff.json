@@ -1,0 +1,587 @@
+{
+  "title": "Rôti Orloff",
+  "text": "Rôti de porc Orloff : rôti entaillé en tranches garnies de jambon, de fromage et de champignons, cuit au four dans une sauce crémée aux champignons. Préciser la découpe, la cuisson à cœur et le service.",
+  "editor_input": {
+    "type": "article",
+    "title": "Rôti Orloff",
+    "text": "Rôti de porc Orloff : rôti entaillé en tranches garnies de jambon, de fromage et de champignons, cuit au four dans une sauce crémée aux champignons. Préciser la découpe, la cuisson à cœur et le service.",
+    "images": []
+  },
+  "research": {
+    "dish_identity": {
+      "name": "Rôti de porc Orloff aux champignons, jambon et fromage",
+      "confidence": "élevée",
+      "evidence": "Le brief décrit la structure caractéristique du rôti Orloff : viande entaillée sans être détachée, garnie de jambon et de fromage, puis servie avec une sauce crémeuse aux champignons.",
+      "source_url": "https://www.academiedugout.fr/recettes/roti-de-porc-orloff_9985_2"
+    },
+    "recipe_outline": {
+      "servings": 4,
+      "prep_minutes": 10,
+      "cook_minutes": 40,
+      "total_minutes": 50,
+      "category": "plat principal",
+      "cuisine": "française",
+      "difficulty": "facile",
+      "source_url": "https://cuisine.journaldesfemmes.fr/recette/337494-roti-orloff-maison"
+    },
+    "ingredients": [
+      {
+        "name": "rôti de porc",
+        "quantity": "1",
+        "unit": "kg",
+        "role": "base du plat",
+        "essential": true,
+        "source_url": "https://www.sofiedumont.fr/pages/recette-veau-orloff-avec-de-la-sauce-champignons"
+      },
+      {
+        "name": "jambon cuit",
+        "quantity": "8",
+        "unit": "tranches",
+        "role": "garniture entre les entailles",
+        "essential": true,
+        "source_url": "https://www.sofiedumont.fr/pages/recette-veau-orloff-avec-de-la-sauce-champignons"
+      },
+      {
+        "name": "fromage affiné",
+        "quantity": "8",
+        "unit": "tranches",
+        "role": "garniture fondante",
+        "essential": true,
+        "source_url": "https://www.sofiedumont.fr/pages/recette-veau-orloff-avec-de-la-sauce-champignons"
+      },
+      {
+        "name": "champignons de Paris",
+        "quantity": "800",
+        "unit": "g",
+        "role": "garniture et sauce",
+        "essential": false,
+        "source_url": "https://www.iterroir.fr/cuisine/recettes/roti-orloff"
+      },
+      {
+        "name": "crème fraîche",
+        "quantity": "1",
+        "unit": "boîte ou berlingot",
+        "role": "base crémeuse de la sauce",
+        "essential": false,
+        "source_url": "https://www.iterroir.fr/cuisine/recettes/roti-orloff"
+      },
+      {
+        "name": "beurre",
+        "quantity": "1",
+        "unit": "noix",
+        "role": "coloration du rôti",
+        "essential": false,
+        "source_url": "https://www.sofiedumont.fr/pages/recette-veau-orloff-avec-de-la-sauce-champignons"
+      },
+      {
+        "name": "sel",
+        "quantity": null,
+        "unit": null,
+        "role": "assaisonnement",
+        "essential": false,
+        "source_url": "https://www.sofiedumont.fr/pages/recette-veau-orloff-avec-de-la-sauce-champignons"
+      },
+      {
+        "name": "poivre",
+        "quantity": null,
+        "unit": null,
+        "role": "assaisonnement",
+        "essential": false,
+        "source_url": "https://www.sofiedumont.fr/pages/recette-veau-orloff-avec-de-la-sauce-champignons"
+      },
+      {
+        "name": "oignons",
+        "quantity": "250",
+        "unit": "g",
+        "role": "base aromatique",
+        "essential": false,
+        "source_url": "https://www.academiedugout.fr/recettes/roti-de-porc-orloff_9985_2"
+      },
+      {
+        "name": "échalote",
+        "quantity": "1",
+        "unit": "pièce",
+        "role": "aromatique pour les champignons",
+        "essential": false,
+        "source_url": "https://www.academiedugout.fr/recettes/roti-de-porc-orloff_9985_2"
+      }
+    ],
+    "preparation": [
+      {
+        "step": 1,
+        "action": "Préchauffer le four entre 195 et 200 °C.",
+        "cue": "Le four est à température avant l'enfournement.",
+        "minutes": null,
+        "temperature_c": null,
+        "source_url": "https://www.sofiedumont.fr/pages/recette-veau-orloff-avec-de-la-sauce-champignons"
+      },
+      {
+        "step": 2,
+        "action": "Faire mousser le beurre dans un plat allant au four et dorer le rôti sur toutes ses faces.",
+        "cue": "La surface du rôti est bien dorée.",
+        "minutes": null,
+        "temperature_c": null,
+        "source_url": "https://www.sofiedumont.fr/pages/recette-veau-orloff-avec-de-la-sauce-champignons"
+      },
+      {
+        "step": 3,
+        "action": "Laisser le rôti refroidir légèrement puis l'entailler en tranches régulières sans aller jusqu'au fond.",
+        "cue": "Les tranches restent attachées à la base, avec environ 1 cm non coupé.",
+        "minutes": null,
+        "temperature_c": null,
+        "source_url": "https://www.academiedugout.fr/recettes/roti-de-porc-orloff_9985_2"
+      },
+      {
+        "step": 4,
+        "action": "Glisser une tranche de jambon et une tranche de fromage dans chaque entaille.",
+        "cue": "Chaque fente contient les deux éléments sans faire ouvrir complètement le rôti.",
+        "minutes": null,
+        "temperature_c": null,
+        "source_url": "https://www.sofiedumont.fr/pages/recette-veau-orloff-avec-de-la-sauce-champignons"
+      },
+      {
+        "step": 5,
+        "action": "Resserrer le rôti et le ficeler si nécessaire pour maintenir les garnitures.",
+        "cue": "Le rôti reste compact dans le plat.",
+        "minutes": null,
+        "temperature_c": null,
+        "source_url": "https://www.academiedugout.fr/recettes/roti-de-porc-orloff_9985_2"
+      },
+      {
+        "step": 6,
+        "action": "Cuire au four.",
+        "cue": "La viande n'est plus rose entre les entailles et le fromage est fondu et doré.",
+        "minutes": 40,
+        "temperature_c": null,
+        "source_url": "https://cuisine.journaldesfemmes.fr/recette/337494-roti-orloff-maison"
+      },
+      {
+        "step": 7,
+        "action": "Contrôler la température au centre de la partie la plus épaisse.",
+        "cue": "Le thermomètre indique au moins 63 °C, puis la viande repose au moins 3 minutes.",
+        "minutes": 3,
+        "temperature_c": 63,
+        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/leftovers-and-food-safety"
+      },
+      {
+        "step": 8,
+        "action": "Nettoyer et émincer les champignons, puis les faire dorer avec le beurre et l'échalote.",
+        "cue": "Les champignons sont bien dorés.",
+        "minutes": null,
+        "temperature_c": null,
+        "source_url": "https://www.sofiedumont.fr/pages/recette-champignonsaus"
+      },
+      {
+        "step": 9,
+        "action": "Ajouter la crème aux champignons et mélanger avec la sauce ou le jus de cuisson.",
+        "cue": "La sauce est chaude et crémeuse.",
+        "minutes": null,
+        "temperature_c": null,
+        "source_url": "https://www.iterroir.fr/cuisine/recettes/roti-orloff"
+      },
+      {
+        "step": 10,
+        "action": "Verser la sauce crémeuse autour du rôti.",
+        "cue": "La sauce entoure la viande dans le plat.",
+        "minutes": null,
+        "temperature_c": null,
+        "source_url": "https://www.sofiedumont.fr/pages/recette-veau-orloff-avec-de-la-sauce-champignons"
+      },
+      {
+        "step": 11,
+        "action": "Ajouter éventuellement une tranche de chaque fromage sur le dessus en fin de cuisson.",
+        "cue": "Le fromage de surface est fondu et nappe le rôti.",
+        "minutes": null,
+        "temperature_c": null,
+        "source_url": "https://cuisine.journaldesfemmes.fr/recette/337494-roti-orloff-maison"
+      },
+      {
+        "step": 12,
+        "action": "Découper et servir chaud.",
+        "cue": "Les tranches restent liées et montrent les couches de jambon et de fromage.",
+        "minutes": null,
+        "temperature_c": null,
+        "source_url": "https://www.sofiedumont.fr/pages/recette-veau-orloff-avec-de-la-sauce-champignons"
+      }
+    ],
+    "substitutions": [
+      {
+        "ingredient": "veau",
+        "replacement": "porc",
+        "note": "La recette est décrite comme réalisable avec du veau ou du porc.",
+        "source_url": "https://www.iterroir.fr/cuisine/recettes/roti-orloff"
+      },
+      {
+        "ingredient": "fromage affiné",
+        "replacement": "Gouda",
+        "note": "Le Gouda est le fromage choisi dans cette version.",
+        "source_url": "https://www.iterroir.fr/cuisine/recettes/roti-orloff"
+      },
+      {
+        "ingredient": "champignons blancs",
+        "replacement": "champignons de châtaigne",
+        "note": "Ils donnent un goût plus marqué à la sauce.",
+        "source_url": "https://www.sofiedumont.fr/pages/recette-champignonsaus"
+      },
+      {
+        "ingredient": "champignons blancs",
+        "replacement": "portobellos",
+        "note": "Ils peuvent être utilisés pour un goût plus intense.",
+        "source_url": "https://www.sofiedumont.fr/pages/recette-champignonsaus"
+      }
+    ],
+    "accompaniments": [
+      {
+        "name": "purée de pommes de terre",
+        "note": "La recette conseille de servir le rôti avec une purée.",
+        "source_url": "https://www.sofiedumont.fr/pages/recette-veau-orloff-avec-de-la-sauce-champignons"
+      },
+      {
+        "name": "croquettes de pommes de terre",
+        "note": "Les croquettes sont proposées comme alternative à la purée.",
+        "source_url": "https://www.sofiedumont.fr/pages/recette-veau-orloff-avec-de-la-sauce-champignons"
+      },
+      {
+        "name": "brocoli",
+        "note": "Le brocoli est cité parmi les légumes adaptés à ce plat riche.",
+        "source_url": "https://www.sofiedumont.fr/pages/recette-veau-orloff-avec-de-la-sauce-champignons"
+      },
+      {
+        "name": "salade verte",
+        "note": "Une salade verte peut contrebalancer la sauce et le fromage.",
+        "source_url": "https://www.sofiedumont.fr/pages/recette-veau-orloff-avec-de-la-sauce-champignons"
+      }
+    ],
+    "common_failures": [
+      {
+        "problem": "Les tranches se détachent.",
+        "cause": "Le rôti a été coupé jusqu'au fond.",
+        "remedy": "Laisser environ 1 cm intact à la base.",
+        "source_url": "https://www.sofiedumont.fr/pages/recette-veau-orloff-avec-de-la-sauce-champignons"
+      },
+      {
+        "problem": "Le rôti s'ouvre pendant la cuisson.",
+        "cause": "Les garnitures ne sont pas maintenues.",
+        "remedy": "Resserrer la pièce et la ficeler solidement.",
+        "source_url": "https://www.academiedugout.fr/recettes/roti-de-porc-orloff_9985_2"
+      },
+      {
+        "problem": "Le fromage reste peu fondu.",
+        "cause": "La surface n'a pas reçu assez de chaleur en fin de cuisson.",
+        "remedy": "Ajouter une tranche de chaque fromage sur le dessus avant la fin.",
+        "source_url": "https://cuisine.journaldesfemmes.fr/recette/337494-roti-orloff-maison"
+      },
+      {
+        "problem": "Les champignons donnent une sauce fade.",
+        "cause": "Ils n'ont pas suffisamment doré.",
+        "remedy": "Les laisser dorer avant d'ajouter la crème.",
+        "source_url": "https://www.sofiedumont.fr/pages/recette-champignonsaus"
+      },
+      {
+        "problem": "La viande est insuffisamment cuite à cœur.",
+        "cause": "Le temps varie selon l'épaisseur du rôti.",
+        "remedy": "Vérifier la température au centre avec un thermomètre.",
+        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/food-thermometers"
+      }
+    ],
+    "storage": [
+      {
+        "method": "réfrigérateur",
+        "duration": "non précisée",
+        "note": "Les restes peuvent être conservés au réfrigérateur.",
+        "source_url": "https://www.sofiedumont.fr/pages/recette-veau-orloff-avec-de-la-sauce-champignons"
+      },
+      {
+        "method": "réfrigération rapide",
+        "duration": "dans les 2 heures",
+        "note": "Les restes doivent être réfrigérés rapidement après le repas.",
+        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/leftovers-and-food-safety"
+      },
+      {
+        "method": "réchauffage doux",
+        "duration": "non précisée",
+        "note": "Réchauffer doucement au four ou au micro-ondes avant de servir.",
+        "source_url": "https://www.sofiedumont.fr/pages/recette-veau-orloff-avec-de-la-sauce-champignons"
+      }
+    ],
+    "food_safety": [
+      {
+        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/leftovers-and-food-safety",
+        "text": "Cuire le rôti de porc à au moins 63 °C au centre et le laisser reposer au moins 3 minutes."
+      },
+      {
+        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/food-thermometers",
+        "text": "Placer le thermomètre dans la partie la plus épaisse du rôti, en évitant le gras et les zones proches d'un os."
+      },
+      {
+        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/leftovers-and-food-safety",
+        "text": "Réfrigérer les restes dans les 2 heures et maintenir le réfrigérateur à 4 °C ou moins."
+      }
+    ],
+    "references": [
+      {
+        "url": "https://www.sofiedumont.fr/pages/recette-veau-orloff-avec-de-la-sauce-champignons",
+        "title": "Rôti Orloff à la mode de grand-mère",
+        "publisher": "Sofie Dumont"
+      },
+      {
+        "url": "https://www.academiedugout.fr/recettes/roti-de-porc-orloff_9985_2",
+        "title": "Rôti de porc Orloff",
+        "publisher": "Académie du Goût"
+      },
+      {
+        "url": "https://www.iterroir.fr/cuisine/recettes/roti-orloff",
+        "title": "Rôti Orloff",
+        "publisher": "iTerroir"
+      },
+      {
+        "url": "https://cuisine.journaldesfemmes.fr/recette/337494-roti-orloff-maison",
+        "title": "Rôti Orloff maison : la recette traditionnelle",
+        "publisher": "Journal des Femmes Cuisine"
+      },
+      {
+        "url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/leftovers-and-food-safety",
+        "title": "Leftovers and Food Safety",
+        "publisher": "USDA Food Safety and Inspection Service"
+      },
+      {
+        "url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/food-thermometers",
+        "title": "Food Thermometers",
+        "publisher": "USDA Food Safety and Inspection Service"
+      }
+    ],
+    "visual_references": [
+      {
+        "image_url": "https://www.sofiedumont.fr/cdn/shop/files/orlofgebraad-met-paddenstoelen-saus-door-sofie-dumont-scaled.jpg?v=1741474045",
+        "source_url": "https://www.sofiedumont.fr/pages/recette-veau-orloff-avec-de-la-sauce-champignons",
+        "title": "Rôti Orloff servi dans sa sauce aux champignons",
+        "tier": 1
+      },
+      {
+        "image_url": "https://www.iterroir.fr/images/photos-recettes/recette-roti-orloff.jpg",
+        "source_url": "https://www.iterroir.fr/cuisine/recettes/roti-orloff",
+        "title": "Photographie de la recette Rôti Orloff",
+        "tier": 1
+      },
+      {
+        "image_url": "https://www.sofiedumont.fr/cdn/shop/files/rlofgebraad-met-paddenstoelen-saus-door-sofie-dumont-2.png?v=1778162721",
+        "source_url": "https://www.sofiedumont.fr/pages/recette-veau-orloff-avec-de-la-sauce-champignons",
+        "title": "Vue rapprochée du rôti Orloff",
+        "tier": 2
+      }
+    ],
+    "visual_observations": [
+      {
+        "image_url": "https://www.sofiedumont.fr/cdn/shop/files/orlofgebraad-met-paddenstoelen-saus-door-sofie-dumont-scaled.jpg?v=1741474045",
+        "source_url": "https://www.sofiedumont.fr/pages/recette-veau-orloff-avec-de-la-sauce-champignons",
+        "observable_details": "Un rôti tranché est disposé dans une sauce brune et crémeuse, avec des éléments arrondis visibles autour des tranches. Les tranches montrent une alternance de parties rosées à brunies et de couches pâles fondues. L’ensemble paraît cuit et gratiné en surface, avec des zones légèrement roussies.",
+        "composition": "Le plat est présenté dans un grand récipient ovale en terre cuite vernissée. Les tranches sont alignées au centre, entourées de sauce. La prise de vue est réalisée presque à la verticale, avec une légère perspective plongeante.",
+        "couleurs": "Dominante de brun ambré pour le récipient et la sauce, avec des tons crème à jaune pâle sur les couches fondues, des tons rosés à brun foncé sur les tranches et quelques marques de coloration plus sombre.",
+        "textures": "Surface brillante et onctueuse de la sauce, couches fondues à l’aspect souple et luisant, bords des tranches légèrement dorés et irréguliers, avec des zones plus sèches et roussies.",
+        "incertainties": "La composition exacte des tranches, des couches pâles et des éléments arrondis n’est pas identifiable avec certitude à partir de l’image seule. La température du plat et le degré de cuisson à cœur ne peuvent pas être confirmés visuellement."
+      }
+    ],
+    "uncertainties": [
+      "Les sources varient sur la durée : 25 à 30 minutes à 195-200 °C dans une version et 40 minutes dans une autre.",
+      "La source d'iTerroir mentionne une sauce et des champignons mais ne donne pas de température précise pour le four.",
+      "Les quantités de sauce crémeuse varient et la source iTerroir indique seulement une boîte ou un berlingot de crème fraîche.",
+      "Deux photographies de rôti cuit provenant de domaines distincts ont été vérifiées ; la troisième référence visuelle provient du même domaine et sert uniquement de complément."
+    ],
+    "originality_notes": [
+      "Le package reformule les informations des sources sans reprendre leur prose.",
+      "Aucune quantité ou température non documentée n'a été ajoutée ; les désaccords de durée sont conservés.",
+      "Les photographies sont des images publiques de pages sources et les observations visuelles sont laissées vides conformément au protocole."
+    ]
+  },
+  "canonical": {
+    "title": "Rôti de porc Orloff aux champignons",
+    "description": "Ce rôti de porc entaillé, garni de jambon et de fromage, mijote dans une sauce crémeuse aux champignons pour un plat principal fondant et gratiné.",
+    "servings": 4,
+    "prep_minutes": 10,
+    "cook_minutes": 40,
+    "total_minutes": 50,
+    "cuisine": "française",
+    "recipe_category": "plat principal",
+    "difficulty": "facile",
+    "calories_estimate": 780,
+    "ingredients": [
+      {
+        "name": "rôti de porc",
+        "quantity": 1,
+        "unit": "kg"
+      },
+      {
+        "name": "jambon cuit",
+        "quantity": 8,
+        "unit": "tranches"
+      },
+      {
+        "name": "fromage affiné",
+        "quantity": 8,
+        "unit": "tranches"
+      },
+      {
+        "name": "champignons de Paris",
+        "quantity": 800,
+        "unit": "g"
+      },
+      {
+        "name": "crème fraîche",
+        "quantity": 1,
+        "unit": "boîte ou berlingot"
+      },
+      {
+        "name": "beurre",
+        "quantity": 1,
+        "unit": "noix"
+      },
+      {
+        "name": "oignons",
+        "quantity": 250,
+        "unit": "g"
+      },
+      {
+        "name": "échalote",
+        "quantity": 1,
+        "unit": "pièce"
+      },
+      {
+        "name": "sel",
+        "quantity": 5,
+        "unit": "g"
+      },
+      {
+        "name": "poivre",
+        "quantity": 2,
+        "unit": "g"
+      }
+    ],
+    "steps": [
+      {
+        "text": "Préchauffer le four à 200 °C."
+      },
+      {
+        "text": "Faire mousser la moitié du beurre dans un plat allant au four."
+      },
+      {
+        "text": "Dorer le rôti sur toutes ses faces dans le plat."
+      },
+      {
+        "text": "Saler et poivrer le rôti."
+      },
+      {
+        "text": "Laisser le rôti tiédir quelques instants."
+      },
+      {
+        "text": "Entailler le rôti en tranches régulières sans aller jusqu'au fond, en laissant environ 1 cm intact."
+      },
+      {
+        "text": "Glisser une tranche de jambon dans chaque entaille."
+      },
+      {
+        "text": "Glisser une tranche de fromage dans chaque entaille."
+      },
+      {
+        "text": "Resserrer le rôti et le ficeler si nécessaire."
+      },
+      {
+        "text": "Cuire le rôti au four pendant 40 minutes."
+      },
+      {
+        "text": "Contrôler la température au centre de la partie la plus épaisse avec un thermomètre."
+      },
+      {
+        "text": "Laisser reposer le rôti au moins 3 minutes lorsque le centre atteint 63 °C."
+      },
+      {
+        "text": "Nettoyer et émincer les champignons."
+      },
+      {
+        "text": "Émincer l'échalote."
+      },
+      {
+        "text": "Faire fondre le reste du beurre dans une poêle."
+      },
+      {
+        "text": "Faire revenir l'échalote dans le beurre."
+      },
+      {
+        "text": "Ajouter les champignons et les faire dorer."
+      },
+      {
+        "text": "Ajouter la crème fraîche aux champignons."
+      },
+      {
+        "text": "Mélanger la crème avec le jus de cuisson."
+      },
+      {
+        "text": "Verser la sauce crémeuse autour du rôti."
+      },
+      {
+        "text": "Découper le rôti en suivant les entailles."
+      },
+      {
+        "text": "Servir chaud lorsque les tranches restent liées et que le fromage est fondu."
+      }
+    ],
+    "equipment": [
+      "four",
+      "plat allant au four",
+      "ficelle de cuisine",
+      "poêle",
+      "couteau",
+      "planche à découper",
+      "thermomètre de cuisson"
+    ],
+    "notes": [
+      "Les entailles doivent s'arrêter à environ 1 cm du fond afin que les tranches restent attachées.",
+      "Ficeler le rôti s'il s'ouvre pendant le montage.",
+      "La purée de pommes de terre, les croquettes de pommes de terre, le brocoli ou une salade verte peuvent accompagner ce plat.",
+      "La durée de cuisson peut varier selon l'épaisseur du rôti ; la température à cœur prime sur le temps indiqué."
+    ],
+    "faq": [
+      {
+        "question": "Comment éviter que les tranches se détachent ?",
+        "answer": "Arrêter chaque entaille à environ 1 cm du fond et ficeler le rôti si nécessaire."
+      },
+      {
+        "question": "Comment vérifier la cuisson du porc ?",
+        "answer": "Placer le thermomètre au centre de la partie la plus épaisse, loin du gras, puis vérifier au moins 63 °C."
+      },
+      {
+        "question": "Que faire si le fromage est insuffisamment fondu ?",
+        "answer": "Ajouter une tranche de fromage sur le dessus vers la fin de la cuisson et poursuivre jusqu'à ce qu'il soit fondu."
+      },
+      {
+        "question": "Comment obtenir une sauce goûteuse ?",
+        "answer": "Faire dorer les champignons avant d'ajouter la crème."
+      },
+      {
+        "question": "Comment conserver les restes ?",
+        "answer": "Les réfrigérer dans les 2 heures à 4 °C ou moins, puis les réchauffer doucement avant de servir."
+      }
+    ],
+    "keywords": [
+      "rôti Orloff",
+      "rôti de porc",
+      "jambon",
+      "fromage fondu",
+      "champignons",
+      "sauce crémeuse",
+      "cuisine française",
+      "plat familial"
+    ],
+    "food_safety": [
+      "Cuire le rôti de porc jusqu'à une température à cœur d'au moins 63 °C, puis le laisser reposer au moins 3 minutes.",
+      "Placer le thermomètre dans la partie la plus épaisse du rôti, en évitant le gras et les zones proches d'un os.",
+      "Réfrigérer les restes dans les 2 heures suivant le repas et maintenir le réfrigérateur à 4 °C ou moins.",
+      "Réchauffer les restes doucement au four ou au micro-ondes avant de les servir.",
+      "Le plat contient du lait et des produits laitiers, notamment le fromage, le beurre et la crème fraîche."
+    ],
+    "uncertainties": [
+      "Les sources indiquent des durées de cuisson divergentes, de 25 à 30 minutes ou 40 minutes à 195-200 °C ; la version retenue utilise 40 minutes et impose un contrôle à 63 °C à cœur.",
+      "La quantité de crème est donnée comme une boîte ou un berlingot sans poids précis ; le format disponible peut donc modifier la quantité de sauce.",
+      "La nature exacte du fromage affiné n'est pas imposée par les sources ; le Gouda est cité comme choix possible."
+    ]
+  }
+}
