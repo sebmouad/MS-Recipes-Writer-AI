@@ -27,12 +27,4 @@ foreach ( array( 'ultra', '', 'HIGH', 'auto ' ) as $bad ) {
 	msrwa_test_assert( in_array( MSRWA_Images::quality( array( 'featured_image_quality' => $bad ), 'featured' ), MSRWA_Images::qualities(), true ), 'An invalid quality must fall back to a value the API accepts.' );
 }
 
-// The estimate must price each image at its own quality, or the budget misleads.
-msrwa_test_load( 'catalog', 'cost' );
-msrwa_test_settings( array( 'featured_image_quality' => 'low', 'facebook_image_quality' => 'high', 'featured_ratio' => '1:1', 'facebook_ratio' => '4:5' ) );
-$steps = MSRWA_Cost::steps( MSRWA_Settings::get() );
-msrwa_test_assert( isset( $steps['featured_image']['image'], $steps['facebook_image']['image'] ), 'Both image steps must declare which image they are.' );
-msrwa_test_assert( 'low' === MSRWA_Images::quality( MSRWA_Settings::get(), $steps['featured_image']['image'] ), 'The estimate must read the featured quality.' );
-msrwa_test_assert( 'high' === MSRWA_Images::quality( MSRWA_Settings::get(), $steps['facebook_image']['image'] ), 'The estimate must read the Facebook quality.' );
-
 msrwa_test_done( 'image quality' );

@@ -89,7 +89,7 @@ differently is expressed as the engine's own caller configuration:
 
 Seven classes are the engine's own dependencies rather than application code and
 must not be treated as the plugin's to delete: `MSRWA_Json`, `MSRWA_Recipe`,
-`MSRWA_Quality`, `MSRWA_Prompt`, `MSRWA_Images`, `MSRWA_Catalog`, `MSRWA_Cost`,
+`MSRWA_Quality`, `MSRWA_Prompt`, `MSRWA_Images`, `MSRWA_Catalog`,
 along with `MSRWA_Settings::defaults()`, which `Prompt`, `Quality` and `Images`
 all read.
 

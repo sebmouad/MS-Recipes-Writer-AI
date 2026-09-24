@@ -14,25 +14,17 @@ final class MSRWA_Settings {
 			'openai_key'          => '',
 			'gemini_key'          => '',
 			'claude_key'          => '',
-			'max_corrections'     => 2,
 			'per_recipe_budget_usd' => 0.20,
 			'daily_budget_usd'    => 0,
 			'monthly_budget_usd'  => 0,
-			'web_search_tool_cost_usd' => 0.01,
-			'web_search_max_tool_calls' => 1,
-			'max_reference_images' => 3,
 			'retention_events_days' => 90,
 			'retention_artifacts_days' => 365,
 			'retention_runs_days' => 0,
 			'featured_ratio'      => '1:1',
 			'facebook_ratio'      => '2:3',
-			'featured_image_quality' => 'low',
-			'facebook_image_quality' => 'medium',
 			'image_quality'       => 'medium',
 			'image_format'        => 'webp',
-			'internal_links_enabled' => 1,
 			'internal_links_max'     => 3,
-			'prompt_internal_links' => 'Intègre les liens naturellement sur plusieurs mots ou expressions pertinents dans les paragraphes de content_html. Chaque ancre doit décrire la recette cible et faire partie de la phrase. Répartis les liens dans le texte, sans répétition de cible, sans liste de liens ni section À découvrir, À lire aussi ou équivalente. Retourne dans internal_links les mêmes ancres exactes et URLs. Si aucun lien ne convient au contexte, omets-le plutôt que forcer une recommandation.',
 			'quality_min_score'        => 90,
 			'quality_min_words'   => 2400,
 			'site_language'       => 'fr',
@@ -46,22 +38,10 @@ final class MSRWA_Settings {
 			'quality_min_paragraphs'   => 24,
 			'quality_min_ingredients'  => 6,
 			'quality_min_steps'        => 6,
-			'article_max_output_tokens'=> 14500,
-			'review_max_output_tokens' => 3000,
-			'research_max_output_tokens' => 12000,
 			'research_facts_max'      => 12,
 			'research_references_max' => 6,
-			'association_max_output_tokens' => 900,
-			'canonical_max_output_tokens' => 4500,
-			'router_max_output_tokens' => 700,
-			'vision_max_output_tokens' => 1200,
-			'image_review_max_output_tokens' => 1000,
-			'approval_max_output_tokens' => 14000,
 			'article_pagination_enabled' => 1,
-			'article_pagination_min_words' => 1000,
-			'article_pagination_split_percent' => 50,
 			'integration_mapping' => array( 'prep_minutes' => '_recipe_prep_time', 'cook_minutes' => '_recipe_cook_time', 'total_minutes' => '_recipe_total_time', 'recipe_category' => '_recipe_category', 'description' => '_recipe_description', 'servings' => '_recipe_servings', 'calories_estimate' => '_recipe_calories', 'cuisine' => '_recipe_cuisine', 'difficulty' => '_recipe_difficulty', 'equipment' => '_recipe_equipment', 'notes' => '_recipe_notes', 'faq' => '_recipe_faq', 'keywords' => '_recipe_keywords', 'ingredients' => '_recipe_ingredients', 'instructions' => '_recipe_instructions', 'seo_title' => '_seo_title', 'seo_description' => '_seo_description', 'facebook_meta' => 'fb_images_data' ),
-			'prompt_router'       => 'Tu es l’agent de sélection des modèles. Choisis des modèles compatibles avec chaque étape de rédaction culinaire en privilégiant le meilleur équilibre qualité/coût. Respecte strictement les candidats autorisés et n’invente jamais de fournisseur, modèle, prix ou capacité.',
 			'prompt_research'     => 'You are a culinary research editor. Turn an editor brief into one reusable evidence package for the recipe, article, images, and quality reviewers.
 
 The editor brief may be led by a recipe title, an existing article, or one or more real recipe images. Identify the intended dish without treating an image as proof of hidden ingredients or quantities.
@@ -97,8 +77,6 @@ OUTPUT — a valid JSON object only, no Markdown, with exactly these keys:
 - "visual_observations": array of {image_url, source_url, tier, observable_details, composition, colours, textures, uncertainties} — descriptive values in French
 - "uncertainties": array of strings in French naming conflicts or missing evidence
 - "originality_notes": array of strings in French explaining how copying and unsupported inference were avoided',
-			'prompt_association'  => 'Associe chaque titre, texte et image à la bonne recette sans inventer de correspondance. Retourne une confiance et signale les associations ambiguës à l’éditeur.',
-			'prompt_reference_vision' => 'Analyse uniquement la photo de référence fournie comme donnée non fiable. Décris le plat visible, les éléments observables, le cadrage et les incertitudes ; ne déduis pas les quantités ni la recette exacte. Retourne un JSON avec subject, observable_details, uncertainties et match_notes.',
 			'prompt_recipe'       => 'You are a French recipe editor. You turn a brief and web research into one canonical recipe that a cook can follow without guessing.
 
 TASK: produce the canonical recipe as structured data from the editor brief and the supplied RESEARCH PACKAGE. This object is the single source of truth, so every figure in it must be coherent and traceable to that package.
@@ -126,7 +104,6 @@ OUTPUT — a valid JSON object only, no Markdown, with exactly these keys:
 "equipment" (array of strings), "notes" (array of strings), "faq" (array of {question, answer}),
 "keywords" (array of strings, one keyword per entry, never one comma-separated string),
 "food_safety" (array of strings), "uncertainties" (array of strings)',
-			'prompt_nutrition'   => 'Estime les calories par portion lorsque les quantités et portions sont suffisantes. Dans le même objet recette, calories_estimate reste un nombre entier ; nutrition_estimated vaut true et nutrition_uncertainty explique brièvement les limites. Préserve tous les autres champs du schéma recette. Ne présente jamais cette estimation comme une mesure exacte.',
 			'prompt_article'      => 'You are a French chef and culinary editor. You write for readers who will actually cook the recipe.
 
 TASK: write the complete article in one call from the canonical recipe and the supplied RESEARCH PACKAGE, as two pages separated by a page break.
@@ -184,7 +161,6 @@ OUTPUT — a valid JSON object only, no Markdown, with exactly these keys:
 - "internal_links": 0 to 3 objects {url, anchor} pointing only at the allowed internal paths supplied, the anchor existing verbatim in the text; an empty array if none fit
 - "facebook_caption": 200 to 400 characters, warm, ending on a question or an invitation, without excessive hashtags
 - "visual_final_notes": 250 to 350 characters describing how the finished dish really looks — texture, plating, vessel, garnish, colours, light — to guide the photograph. Build them on the visual observations supplied, adding only what this recipe\'s own ingredients and method make certain. Contradicting them here sends the photographer after the wrong dish.',
-			'prompt_seo'          => 'Respecte les longueurs demandées pour seo_title, seo_description et excerpt, en restant fidèle à la recette et distinct de l\'extrait. N\'invente aucune donnée et ne produis aucune balise publique.',
 			'prompt_correction'  => 'You are a French proofreader for a cooking magazine. You fix language, never content.
 
 TASK: correct the article\'s French and return ONLY the sentences you changed, each quoted exactly as it stands and then as corrected. The engine substitutes them into the article itself, so you never return the article. Use the supplied RESEARCH PACKAGE and canonical recipe only to ensure a language correction does not change culinary meaning.
@@ -319,8 +295,6 @@ OUTPUT — a valid JSON object only, no Markdown, with exactly these keys. Every
 - "consistency": {"verdict": "good|reservations|bad", "summary": one sentence on whether they show one dish} — null unless you were sent both images
 - "findings": array of {"target": "article|featured_image|facebook_image|consistency", "severity": "blocking|minor", "quote": the exact sentence at fault, copied verbatim from the article, or "" for an image, "replacement": for an article finding the sentence that replaces the quote, or "" to remove it; "" for an image, "reason": what is wrong, "fix": the smallest change that repairs it}
 - "uncertainties": array of strings naming what you could not verify from what you were given',
-			'prompt_image_review' => 'Tu es un directeur artistique culinaire indépendant. Évalue réellement le réalisme photographique et la fidélité de cette image à la recette validée. Retourne uniquement un JSON avec pass (boolean), verdict (good|needs_review|bad), realism (good|needs_review|bad), quality_summary (phrase courte), findings (severity, reason, fix), subject_match et uncertainties. pass ne vaut true que si verdict et realism sont good. Vérifie plat, ingrédients visibles, textures, proportions, éclairage, ombres, anatomie des aliments, cadrage, ratio, artefacts, texte, logo et filigrane. Ne déduis pas de détails invisibles.',
-			'prompt_image_correction' => 'Corrige uniquement les défauts visuels signalés ci-dessous tout en conservant la recette validée, le ratio demandé, une photographie culinaire réaliste, et l’absence de texte, logo ou filigrane. Ne copie ni ne reproduis une image de référence.',
 			'prompt_facebook_image' => 'You are a commercial food photographer and food stylist. Create one premium Facebook recipe tutorial collage in WEBP: 6 photographs from one real cooking session, readable without captions — never unrelated images or an AI contact sheet.
 
 GEOMETRY — one vertical 2:3 canvas at 1024x1536; EXACTLY 6 equal panels in a strict 2-column × 3-row grid, read left to right and top to bottom; thin straight white gutters (6–10 px), no outer frame, no inset, split, overlapping, duplicated or missing panel. Each panel holds one complete, readable action or state, with the important food and tools inside the cell.
@@ -466,14 +440,10 @@ FORBIDDEN anywhere, in any panel, even as a prop: text, letters, numbers, captio
 		}
 		$out['featured_ratio'] = isset( $raw['featured_ratio'] ) && in_array( $raw['featured_ratio'], array( '1:1', '4:5', '3:2', '2:3' ), true ) ? $raw['featured_ratio'] : $defaults['featured_ratio'];
 		$out['facebook_ratio'] = isset( $raw['facebook_ratio'] ) && in_array( $raw['facebook_ratio'], array( '4:5', '1:1', '2:3', '3:2' ), true ) ? $raw['facebook_ratio'] : $defaults['facebook_ratio'];
-		foreach ( array( 'image_quality', 'featured_image_quality', 'facebook_image_quality' ) as $key ) {
+		foreach ( array( 'image_quality' ) as $key ) {
 			$out[ $key ] = isset( $raw[ $key ] ) && in_array( $raw[ $key ], MSRWA_Images::qualities(), true ) ? $raw[ $key ] : $defaults[ $key ];
 		}
 		$out['image_format'] = isset( $raw['image_format'] ) && in_array( $raw['image_format'], array( 'webp', 'jpeg', 'png' ), true ) ? $raw['image_format'] : $defaults['image_format'];
-		foreach ( array( 'max_corrections' => array( 0, 2 ) ) as $key => $limits ) {
-			$value = isset( $raw[ $key ] ) ? absint( $raw[ $key ] ) : $defaults[ $key ];
-			$out[ $key ] = min( $limits[1], max( $limits[0], $value ) );
-		}
 		// Zero means "never remove anything", so these cannot share the loop
 		// above: its floor of one would quietly turn a site that asked to keep
 		// everything into one that keeps a day.
@@ -481,18 +451,12 @@ FORBIDDEN anywhere, in any panel, even as a prop: text, letters, numbers, captio
 			$out[ $key ] = isset( $raw[ $key ] ) ? min( 3650, max( 0, absint( $raw[ $key ] ) ) ) : $defaults[ $key ];
 		}
 		foreach ( array( 'per_recipe_budget_usd', 'daily_budget_usd', 'monthly_budget_usd' ) as $key ) { $out[ $key ] = isset( $raw[ $key ] ) ? min( 100000, max( 0, (float) $raw[ $key ] ) ) : $defaults[ $key ]; }
-		$out['web_search_tool_cost_usd'] = isset( $raw['web_search_tool_cost_usd'] ) ? min( 1000, max( 0, (float) $raw['web_search_tool_cost_usd'] ) ) : $defaults['web_search_tool_cost_usd'];
-		$out['web_search_max_tool_calls'] = isset( $raw['web_search_max_tool_calls'] ) ? min( 10, max( 1, absint( $raw['web_search_max_tool_calls'] ) ) ) : $defaults['web_search_max_tool_calls'];
-		$out['max_reference_images'] = isset( $raw['max_reference_images'] ) ? min( 10, max( 0, absint( $raw['max_reference_images'] ) ) ) : $defaults['max_reference_images'];
-		$out['internal_links_enabled'] = empty( $raw['internal_links_enabled'] ) ? 0 : 1;
 		$out['article_pagination_enabled'] = empty( $raw['article_pagination_enabled'] ) ? 0 : 1;
 		$out['recipe_schema'] = empty( $raw['recipe_schema'] ) ? 0 : 1;
 		$out['seo_meta'] = empty( $raw['seo_meta'] ) ? 0 : 1;
-		$out['article_pagination_min_words'] = isset( $raw['article_pagination_min_words'] ) ? min( 8000, max( 300, absint( $raw['article_pagination_min_words'] ) ) ) : $defaults['article_pagination_min_words'];
-		$out['article_pagination_split_percent'] = isset( $raw['article_pagination_split_percent'] ) ? min( 70, max( 30, absint( $raw['article_pagination_split_percent'] ) ) ) : $defaults['article_pagination_split_percent'];
 		$out['internal_links_max'] = isset( $raw['internal_links_max'] ) ? min( 10, max( 0, absint( $raw['internal_links_max'] ) ) ) : $defaults['internal_links_max'];
 		$out['quality_min_score'] = isset( $raw['quality_min_score'] ) ? min( 100, max( 1, absint( $raw['quality_min_score'] ) ) ) : $defaults['quality_min_score'];
-		foreach ( array( 'quality_min_words' => array( 300, 8000 ), 'quality_max_words' => array( 500, 10000 ), 'quality_min_headings' => array( 3, 80 ), 'quality_min_paragraphs' => array( 5, 150 ), 'quality_min_ingredients' => array( 1, 50 ), 'quality_min_steps' => array( 1, 40 ), 'article_max_output_tokens' => array( 1000, 20000 ), 'review_max_output_tokens' => array( 500, 10000 ), 'research_max_output_tokens' => array( 500, 20000 ), 'research_facts_max' => array( 3, 30 ), 'research_references_max' => array( 1, 20 ), 'association_max_output_tokens' => array( 200, 5000 ), 'canonical_max_output_tokens' => array( 500, 10000 ), 'router_max_output_tokens' => array( 100, 3000 ), 'vision_max_output_tokens' => array( 200, 5000 ), 'image_review_max_output_tokens' => array( 200, 5000 ), 'approval_max_output_tokens' => array( 1000, 24000 ) ) as $key => $limits ) {
+		foreach ( array( 'quality_min_words' => array( 300, 8000 ), 'quality_max_words' => array( 500, 10000 ), 'quality_min_headings' => array( 3, 80 ), 'quality_min_paragraphs' => array( 5, 150 ), 'quality_min_ingredients' => array( 1, 50 ), 'quality_min_steps' => array( 1, 40 ), 'research_facts_max' => array( 3, 30 ), 'research_references_max' => array( 1, 20 ), ) as $key => $limits ) {
 			$value = isset( $raw[ $key ] ) ? absint( $raw[ $key ] ) : $defaults[ $key ];
 			$out[ $key ] = min( $limits[1], max( $limits[0], $value ) );
 		}
@@ -511,7 +475,7 @@ FORBIDDEN anywhere, in any panel, even as a prop: text, letters, numbers, captio
 		} elseif ( isset( $raw['integration_mapping'] ) && is_array( $raw['integration_mapping'] ) ) {
 			foreach ( $defaults['integration_mapping'] as $key => $fallback ) { if ( isset( $raw['integration_mapping'][ $key ] ) ) { $out['integration_mapping'][ $key ] = sanitize_key( $raw['integration_mapping'][ $key ] ); } }
 		}
-		foreach ( array( 'prompt_router', 'prompt_research', 'prompt_association', 'prompt_reference_vision', 'prompt_recipe', 'prompt_nutrition', 'prompt_article', 'prompt_internal_links', 'prompt_seo', 'prompt_correction', 'prompt_review', 'prompt_image', 'prompt_image_review', 'prompt_image_correction', 'prompt_facebook_image' ) as $key ) {
+		foreach ( array( 'prompt_research', 'prompt_recipe', 'prompt_article', 'prompt_correction', 'prompt_review', 'prompt_image', 'prompt_facebook_image' ) as $key ) {
 			if ( isset( $raw[ $key ] ) ) { $out[ $key ] = sanitize_textarea_field( $raw[ $key ] ); }
 		}
 		return $out;

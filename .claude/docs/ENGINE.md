@@ -25,8 +25,8 @@ failure is a value, not an exception.**
 | `prompts/*.tpl.txt` | The nine prompts. Engine data: it runs them, it carries them | — |
 | `load.php` | Loads the shared plugin classes, then the engine | — |
 
-`MSRWA_Prompt`, `MSRWA_Quality`, `MSRWA_Recipe`, `MSRWA_Images`, `MSRWA_Json`
-and `MSRWA_Cost` are shared with the plugin and loaded by `load.php` when they
+`MSRWA_Prompt`, `MSRWA_Quality`, `MSRWA_Recipe`, `MSRWA_Images` and `MSRWA_Json`
+are shared with the plugin and loaded by `load.php` when they
 are not already there. Nothing else is required.
 
 ### The pipeline
