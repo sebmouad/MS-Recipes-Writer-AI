@@ -395,16 +395,11 @@ final class MSRWA_Engine {
 		$from_photographs = 'research' === $name && $brief['images'] && 'always' !== (string) $config->get( 'research.web_search', 'without_images' );
 		$editor_usage = array( 'input_tokens' => 0, 'output_tokens' => 0 );
 		if ( 'research' === $name && $brief['images'] ) { $brief['image_observations'] = self::observe_editor_images( $brief['images'], $config, $result, $editor_usage, $options ); }
-		// Photographs that could not be read are no evidence, and one is not
-		// enough: a recipe needs `research.min_photographs` visual references,
-		// and the web supplies the rest.
-		$readable = count( self::readable( (array) ( $brief['image_observations'] ?? array() ) ) );
-		$needed = (int) $config->get( 'research.min_photographs', 2 );
-		if ( $from_photographs && $readable < $needed ) {
+		// Photographs that could not be read are no evidence: search after all.
+		// One readable photograph is enough — it is the dish itself.
+		if ( $from_photographs && ! self::readable( (array) ( $brief['image_observations'] ?? array() ) ) ) {
 			$from_photographs = false;
-			$result->event( 'warning', 'research', $readable
-				? sprintf( '%d editor photograph(s) read, %d needed; searching the web for the rest.', $readable, $needed )
-				: 'No editor photograph could be read; searching the web instead.' );
+			$result->event( 'warning', 'research', 'No editor photograph could be read; searching the web instead.' );
 		}
 		if ( $from_photographs ) { $brief['research_mode'] = 'photographs'; }
 
@@ -484,7 +479,7 @@ final class MSRWA_Engine {
 	private static function observe( array $package, MSRWA_Engine_Config $config, MSRWA_Result $result, array &$usage, array $options = array() ) {
 		$route = $config->model_for( 'vision' );
 		if ( '' === $route['model'] ) { return $package; }
-		$limit = (int) $config->get( 'limits.images_inspected', 3 );
+		$limit = (int) $config->get( 'limits.web_images_inspected', 1 );
 		$observed = MSRWA_Engine_Call::observe_images( $route['provider'], $route['model'], $package, $limit, $config->provider( $route['provider'], $route['model'], 'vision' ), (int) $config->get( 'limits.max_image_bytes', 10000000 ), (string) $config->get( 'vision_instruction', '' ), is_callable( $options['keep_image'] ?? null ) ? $options['keep_image'] : null );
 		$usage['input_tokens'] = (int) ( $usage['input_tokens'] ?? 0 ) + (int) ( $observed['usage']['input_tokens'] ?? 0 );
 		$usage['output_tokens'] = (int) ( $usage['output_tokens'] ?? 0 ) + (int) ( $observed['usage']['output_tokens'] ?? 0 );

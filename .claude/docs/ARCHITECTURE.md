@@ -378,9 +378,9 @@ Break these and the plugin misreports itself.
 
 20. **A recipe with the writer's photographs is researched from them.** With
     `research.web_search` at `without_images`, the engine writes the research
-    from the brief and the photographs, with no web search, once it has
-    `research.min_photographs` (2) readable ones; with fewer it searches and
-    the writer's lead the visual references. Each photograph is read once, by
+    from the brief and the photographs, with no web search, as soon as one is
+    readable; without one it searches and reads one web photograph
+    (`limits.web_images_inspected`). Each photograph is read once, by
     the pairing, with the engine's own observation instruction; the brief
     carries that reading and the engine does not look again. A lot of one
     recipe is paired without a call. The plugin hands the engine

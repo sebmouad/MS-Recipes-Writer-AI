@@ -104,7 +104,7 @@ final class MSRWA_Estimate {
 			if ( 'web_search' === $capability && ! $from_photographs ) {
 				$vision = $config->model_for( 'vision' );
 				$look = $config->price( $vision['provider'], $vision['model'], self::vision_usage( $config, $vision['provider'] ) );
-				$looks = max( 0, (int) $config->get( 'limits.images_inspected', 3 ) );
+				$looks = max( 0, (int) $config->get( 'limits.web_images_inspected', 1 ) );
 				$cost += null === $look ? 0.0 : (float) $look * $looks;
 			}
 
@@ -173,12 +173,11 @@ final class MSRWA_Estimate {
 	 */
 	public static function lot( $profile, $recipes, $images, array $overrides = array() ) {
 		$recipe = self::recipe( $profile, $overrides );
-		// A recipe with enough photographs — `research.min_photographs`, two by
-		// default — is researched from them: as many recipes as the photographs
-		// cover, at most, are priced that way; the rest search.
+		// A recipe with a photograph is researched from it: as many recipes as
+		// there are photographs, at most, are priced that way; the rest search.
 		$pictured = self::recipe( $profile, $overrides, true );
+		$with = min( max( 0, (int) $recipes ), max( 0, (int) $images ) );
 		$config = MSRWA_Engine_Config::create( MSRWA_Engine_Settings::merge( MSRWA_Engine_Settings::stored(), $overrides ) );
-		$with = min( max( 0, (int) $recipes ), intdiv( max( 0, (int) $images ), max( 1, (int) $config->get( 'research.min_photographs', 2 ) ) ) );
 		// The pairing reads image bytes, so it is priced on the vision route the
 		// matcher actually uses.
 		$route = $config->model_for( 'vision' );

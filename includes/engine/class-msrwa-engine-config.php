@@ -109,10 +109,6 @@ final class MSRWA_Engine_Config {
 			// from those photographs and the editor's text, `always` searches.
 			'research' => array(
 				'web_search' => 'without_images',
-				// How many readable photographs replace the search. A recipe needs
-				// at least two visual references: with fewer from the editor, the
-				// research searches and the web supplies the rest.
-				'min_photographs' => 2,
 			),
 
 			'images' => array(
@@ -135,6 +131,9 @@ final class MSRWA_Engine_Config {
 				'seconds'            => 0,
 				'image_prompt_chars' => 30000,
 				'images_inspected'   => 3,
+				// Web photographs the research reads when the editor sent none. One
+				// visual reference is what a recipe needs; each more is a paid look.
+				'web_images_inspected' => 1,
 				'http_timeout'       => 600,
 				// How many provider calls a wave may have in flight. One means the
 				// engine waits for each in turn, which is what it used to do.
@@ -337,9 +336,9 @@ final class MSRWA_Engine_Config {
 			$values['attempts'][ $step ] = max( 1, min( 6, (int) $times ) );
 		}
 		$values['research']['web_search'] = 'always' === (string) ( $values['research']['web_search'] ?? '' ) ? 'always' : 'without_images';
-		$values['research']['min_photographs'] = max( 1, min( 10, (int) ( $values['research']['min_photographs'] ?? 2 ) ) );
 		$values['limits']['budget_usd'] = max( 0.0, (float) ( $values['limits']['budget_usd'] ?? 0 ) );
 		$values['limits']['images_inspected'] = max( 0, min( 20, (int) ( $values['limits']['images_inspected'] ?? 3 ) ) );
+		$values['limits']['web_images_inspected'] = max( 0, min( 20, (int) ( $values['limits']['web_images_inspected'] ?? 1 ) ) );
 		$values['limits']['http_timeout'] = max( 5, min( 3600, (int) ( $values['limits']['http_timeout'] ?? 600 ) ) );
 		$values['limits']['concurrency'] = max( 1, min( 12, (int) ( $values['limits']['concurrency'] ?? 4 ) ) );
 		return $values;

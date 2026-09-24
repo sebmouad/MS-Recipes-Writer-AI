@@ -85,17 +85,17 @@ msrwa_test_assert( 0 === count( $reader_asked ), 'A photograph the caller alread
 msrwa_test_assert( 1 === count( $sent ) && empty( $sent[0]['tools'] ), 'One call, no search: ' . count( $sent ) );
 msrwa_test_contains( (string) ( $reread->artifacts['research']['visual_observations'][1]['observable_details'] ?? '' ), 'rosace', 'The caller’s reading is the observation.' );
 
-// One photograph is one visual reference; a recipe needs two. The web supplies
-// the rest, and the editor's photograph still leads.
+// One photograph is enough: it is the dish itself, and a search would only
+// add another cook's version of it at a cost.
 $sent = array();
+$reader_asked = array();
 $single = $brief;
 $single['images'] = array_slice( $brief['images'], 0, 1 );
 $one_photo = MSRWA_Engine::run_step( 'research', $single, $options );
 $asks = array_values( array_filter( $sent, static function ( $payload ) { return false === strpos( json_encode( $payload ), 'input_image' ); } ) );
-msrwa_test_assert( ! empty( $asks[0]['tools'] ), 'With one photograph, the research searches the web.' );
-msrwa_test_assert( 'editor' === ( $one_photo->artifacts['research']['visual_references'][0]['source_url'] ?? '' ), 'The editor’s photograph leads the visual references.' );
-$config_one = MSRWA_Engine_Config::create( array( 'research' => array( 'min_photographs' => 1 ) ) );
-msrwa_test_assert( 1 === (int) $config_one->get( 'research.min_photographs' ), 'A site may accept one photograph as enough.' );
+msrwa_test_assert( 1 === count( $asks ) && empty( $asks[0]['tools'] ), 'With one photograph, the research does not search.' );
+msrwa_test_assert( 'editor' === ( $one_photo->artifacts['research']['visual_references'][0]['source_url'] ?? '' ), 'The editor’s photograph is the visual reference.' );
+msrwa_test_assert( 1 === (int) MSRWA_Engine_Config::create( array() )->get( 'limits.web_images_inspected' ), 'Without one, the research reads a single web photograph.' );
 
 // Set to search always, the research searches as it did.
 $sent = array();
@@ -133,9 +133,7 @@ $web = MSRWA_Estimate::recipe( MSRWA_Profile::FULL );
 $pictured = MSRWA_Estimate::recipe( MSRWA_Profile::FULL, array(), true );
 msrwa_test_assert( 0 === (int) $pictured['steps']['research']['searches'], 'A pictured recipe is estimated without a search.' );
 msrwa_test_assert( $pictured['steps']['research']['cost_usd'] < $web['steps']['research']['cost_usd'] / 3, sprintf( 'Its research is estimated well under the searched one: %.4f against %.4f.', $pictured['steps']['research']['cost_usd'], $web['steps']['research']['cost_usd'] ) );
-$lot = MSRWA_Estimate::lot( MSRWA_Profile::FULL, 3, 2 );
-msrwa_test_assert( abs( $lot['cost_usd'] - ( $pictured['cost_usd'] + 2 * $web['cost_usd'] + (float) $lot['matching_usd'] ) ) < 0.00001, 'A lot of three recipes and two photographs prices one pictured recipe and two searched.' );
 $lot = MSRWA_Estimate::lot( MSRWA_Profile::FULL, 3, 1 );
-msrwa_test_assert( abs( $lot['cost_usd'] - ( 3 * $web['cost_usd'] + (float) $lot['matching_usd'] ) ) < 0.00001, 'One photograph is not enough to skip the search.' );
+msrwa_test_assert( abs( $lot['cost_usd'] - ( $pictured['cost_usd'] + 2 * $web['cost_usd'] + (float) $lot['matching_usd'] ) ) < 0.00001, 'A lot of three recipes and one photograph prices one pictured recipe and two searched.' );
 
 msrwa_test_done( 'a recipe sent with photographs is researched from them, without a web search' );
