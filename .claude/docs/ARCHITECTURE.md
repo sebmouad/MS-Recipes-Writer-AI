@@ -409,8 +409,8 @@ Break these and the plugin misreports itself.
     `uploads/msrwa/<run>/history/`. A lot's stages are written with run 0
     and copied into each job's folder at dispatch. Nothing rewrites a stage.
     Rows and files pass through `MSRWA_DB::sanitize()`, follow the artifacts
-    retention age (`MSRWA_Retention::history()`), and go with the lot or the
-    job.
+    retention age (`MSRWA_Retention::history()`, which removes the job's
+    source photographs with it), and go with the lot or the job.
 
 24. **A lot names its Facebook template, among the site's.** `POST /batches`
     accepts `facebook_template` only when `MSRWA_Profile::facebook_templates()`

@@ -125,6 +125,9 @@ final class MSRWA_Sources {
 	/** Once every recipe has its photographs, the lot's own copies go. */
 	public static function forget_lot( $lot ) { self::remove( self::lot_dir( $lot ) ); }
 
+	/** The photographs a run was written from — the writer's and the web's — and nothing it drew. */
+	public static function forget_sources( $run ) { self::remove( self::run_dir( $run ) ); }
+
 	/** A run's whole folder: its sources and the images the engine drew. */
 	public static function forget_run( $run ) { self::remove( self::root() . '/' . absint( $run ) ); }
 

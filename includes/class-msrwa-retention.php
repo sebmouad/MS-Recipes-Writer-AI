@@ -135,7 +135,12 @@ final class MSRWA_Retention {
 			WHERE r.status NOT IN ('queued','running')
 				AND r.updated_at < DATE_SUB(UTC_TIMESTAMP(), INTERVAL %d DAY)
 			LIMIT %d", max( 1, (int) $days ), max( 10, (int) $limit ) ) );
-		foreach ( $runs as $run ) { MSRWA_History::forget_run( (int) $run ); }
+		// The photographs it was written from are part of that record and go
+		// with it; the draft's own images live in the media library.
+		foreach ( $runs as $run ) {
+			MSRWA_History::forget_run( (int) $run );
+			MSRWA_Sources::forget_sources( (int) $run );
+		}
 		// A lot's own stages, once the lot itself is that old.
 		$lots = (array) $wpdb->get_col( $wpdb->prepare(
 			"SELECT DISTINCT h.batch_id FROM {$t['history']} h INNER JOIN {$t['batches']} b ON b.id = h.batch_id
