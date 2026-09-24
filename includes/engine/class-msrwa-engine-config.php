@@ -196,7 +196,7 @@ final class MSRWA_Engine_Config {
 				),
 				'gemini' => array(
 					'text_endpoint'   => 'https://generativelanguage.googleapis.com/v1beta/models/{{model}}:generateContent',
-					'image_endpoint'  => '',
+					'image_endpoint'  => 'https://generativelanguage.googleapis.com/v1beta/models/{{model}}:generateContent',
 					'headers'         => array( 'Content-Type: application/json', 'x-goog-api-key: {{key}}' ),
 					'key_env'         => array( 'GEMINI_API_KEY', 'MSRWA_GEMINI_KEY' ),
 					'web_search_tool' => array( 'google_search' => array() ),
@@ -235,9 +235,13 @@ final class MSRWA_Engine_Config {
 					'gemini-2.5-flash' => array( 0.30, 2.50 ),
 					'gemini-3.1-pro-preview' => array( 2.00, 12.00 ),
 					'gemini-3.5-flash' => array( 1.50, 9.00 ),
-					'gemini-2.5-flash-image' => array( 0.30, 2.50 ),
-					'gemini-3.1-flash-image' => array( 0.50, 3.00 ),
-					'gemini-3-pro-image' => array( 2.00, 12.00 ),
+					// [input, text output, image output]: an image model bills the image
+					// far above the thinking beside it. Read from
+					// ai.google.dev/gemini-api/docs/pricing on 2026-09-24.
+					'gemini-2.5-flash-image' => array( 0.30, 2.50, 30.00 ),
+					'gemini-3.1-flash-lite-image' => array( 0.25, 1.50, 30.00 ),
+					'gemini-3.1-flash-image' => array( 0.50, 3.00, 60.00 ),
+					'gemini-3-pro-image' => array( 2.00, 12.00, 120.00 ),
 				),
 				'claude' => array(
 					'claude-haiku-4-5-20251001' => array( 1.00, 5.00 ),
@@ -484,7 +488,10 @@ final class MSRWA_Engine_Config {
 		$input = (int) ( $usage['input_tokens'] ?? 0 );
 		$cached = min( $input, (int) ( $usage['cached_input_tokens'] ?? 0 ) );
 		$ratio = min( 1.0, max( 0.0, (float) $this->get( 'providers.' . $provider . '.cached_input_ratio', 1.0 ) ) );
-		return ( ( $input - $cached + $cached * $ratio ) * (float) $rate[0] + (int) ( $usage['output_tokens'] ?? 0 ) * (float) $rate[1] ) / 1000000 + $searches;
+		// A third rate prices the image tokens of the output; the rest of it is text.
+		$output = (int) ( $usage['output_tokens'] ?? 0 );
+		$image = isset( $rate[2] ) ? min( $output, (int) ( $usage['image_tokens'] ?? 0 ) ) : 0;
+		return ( ( $input - $cached + $cached * $ratio ) * (float) $rate[0] + ( $output - $image ) * (float) $rate[1] + $image * (float) ( $rate[2] ?? 0 ) ) / 1000000 + $searches;
 	}
 
 	public function max_output( $step ) { return (int) $this->get( 'max_output.' . $step, 4000 ); }

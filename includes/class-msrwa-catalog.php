@@ -491,9 +491,13 @@ final class MSRWA_Catalog {
 	public static function for_engine( ?array $rows = null ) {
 		$models = array();
 		$priced = array();
+		// An image model's image rate is the engine's; the table holds the text
+		// rates. Dropping it billed a Gemini image at a tenth of its price.
+		$shipped = class_exists( 'MSRWA_Engine_Config' ) ? (array) ( MSRWA_Engine_Config::defaults()['models'] ?? array() ) : array();
 		foreach ( null === $rows ? self::rows() : $rows as $row ) {
 			if ( null === $row['input_usd'] || null === $row['output_usd'] ) { continue; }
 			$models[ $row['provider'] ][ $row['model_id'] ] = array( (float) $row['input_usd'], (float) $row['output_usd'] );
+			if ( isset( $shipped[ $row['provider'] ][ $row['model_id'] ][2] ) ) { $models[ $row['provider'] ][ $row['model_id'] ][] = (float) $shipped[ $row['provider'] ][ $row['model_id'] ][2]; }
 			if ( ! isset( $row['enabled'] ) || $row['enabled'] ) { $priced[ $row['provider'] ][ $row['model_id'] ] = $row; }
 		}
 		return array( 'models' => $models, 'tiers' => self::tiers( $priced ) );

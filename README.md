@@ -5,9 +5,9 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.26.4
+## État actuel — 0.26.5
 
-La version `0.26.4` donne au visuel Facebook le style des collages de référence du propriétaire : lumineux, net, cadré serré ; la `0.26.3` faisait ressembler le visuel Facebook à de vraies photographies plutôt qu'à des images de synthèse ; la `0.26.2` rendait le visuel Facebook plus chaleureux et plus proche du plat, et le fait toujours finir sur le plat ouvert ; la `0.26.1` retirait les copies des prompts que gardaient les réglages :
+La version `0.26.5` permet au moteur de dessiner avec les modèles d'image de Gemini, au bon prix ; la `0.26.4` donnait au visuel Facebook le style des collages de référence du propriétaire : lumineux, net, cadré serré ; la `0.26.3` faisait ressembler le visuel Facebook à de vraies photographies plutôt qu'à des images de synthèse ; la `0.26.2` rendait le visuel Facebook plus chaleureux et plus proche du plat, et le fait toujours finir sur le plat ouvert ; la `0.26.1` retirait les copies des prompts que gardaient les réglages :
 le moteur exécute ses propres gabarits, et ce qui n’est lu par rien ne se
 périme plus en silence. Le détail de chaque version suit, de la plus récente à
 la plus ancienne.
@@ -76,6 +76,22 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.26.5
+
+**Les modèles d'image de Gemini peuvent dessiner, et sont chiffrés comme des
+images.** Le moteur sait désormais demander une image à Gemini — format du
+collage respecté, 2K en qualité haute quand le modèle le propose — et la
+convertit au format du site. Les tarifs de ces modèles étaient ceux du texte,
+dix fois trop bas pour une image : ils suivent maintenant la page de prix de
+Google (image comptée au tarif image, réflexion au tarif texte), et Gemini
+3.1 Flash Lite Image s'ajoute à la liste.
+
+Comparé sur le rôti Orloff avec le même texte de consigne : la qualité haute
+d'OpenAI (environ 0,056 $) garde le cadrage serré, l'ordre de la recette et le
+dernier panneau ouvert ; Gemini 3 Pro Image (environ 0,15 $) a la texture la
+plus nette mais cadre large ; les deux Flash ont montré un plat entier, un
+emballage ou une étape dans le désordre. OpenAI reste le modèle par défaut.
 
 ## Version 0.26.4
 

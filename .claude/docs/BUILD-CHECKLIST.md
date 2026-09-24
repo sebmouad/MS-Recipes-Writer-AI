@@ -589,6 +589,9 @@ cost) in the task before changing anything.
 - [x] **A34 — The owner's look (2026-09-24).** Bright, even, sharp, a plain pale
   surface with no props, cropped tight with a piled mise en place — matched to
   his reference collages in three live rounds. See ENGINE.md §7, item 31.
+- [x] **A35 — Gemini images (2026-09-24).** Gemini draws through
+  `generateContent`, priced at its image rate; compared live with OpenAI on the
+  collage. See ENGINE.md §7, item 32.
 - [x] **A11 — Model answers that do not parse (found 2026-09-20).** Two of the
   54 matrix cells scored zero for a reason that was ours, not the prompt's:
   Opus 5 wrote "I'll research this dish now." before the object, and Sonnet 5

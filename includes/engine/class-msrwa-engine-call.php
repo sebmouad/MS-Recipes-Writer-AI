@@ -292,6 +292,27 @@ final class MSRWA_Engine_Call {
 		}
 		$body = json_decode( $result['raw'], true );
 
+		if ( 'image' === $plan['kind'] && 'gemini' === $provider ) {
+			$data = '';
+			foreach ( (array) ( $body['candidates'][0]['content']['parts'] ?? array() ) as $part ) {
+				if ( ! empty( $part['inlineData']['data'] ) ) { $data = (string) $part['inlineData']['data']; }
+			}
+			$binary = base64_decode( $data, true );
+			if ( false === $binary || '' === $binary ) { return array( 'error' => 'no image payload returned', 'seconds' => $result['seconds'] ); }
+			$binary = self::convert_image( $binary, (string) ( $plan['format'] ?? '' ) );
+			file_put_contents( $plan['destination'], $binary );
+			// The image tokens are billed at the image rate, the thinking beside them
+			// at the text rate; when the split is missing, all of it counts as image,
+			// which overstates and never understates.
+			$meta = $body['usageMetadata'] ?? array();
+			$output = (int) ( $meta['candidatesTokenCount'] ?? 0 ) + (int) ( $meta['thoughtsTokenCount'] ?? 0 );
+			$image = $output;
+			foreach ( (array) ( $meta['candidatesTokensDetails'] ?? array() ) as $detail ) {
+				if ( 'IMAGE' === ( $detail['modality'] ?? '' ) ) { $image = min( $output, (int) ( $detail['tokenCount'] ?? 0 ) ); }
+			}
+			$usage = array( 'input_tokens' => (int) ( $meta['promptTokenCount'] ?? 0 ), 'output_tokens' => $output, 'image_tokens' => $image );
+			return array( 'path' => $plan['destination'], 'bytes' => strlen( $binary ), 'seconds' => $result['seconds'], 'usage' => $usage, 'model' => (string) ( $body['modelVersion'] ?? $model ) );
+		}
 		if ( 'image' === $plan['kind'] ) {
 			$binary = base64_decode( (string) ( $body['data'][0]['b64_json'] ?? '' ), true );
 			if ( false === $binary || '' === $binary ) { return array( 'error' => 'no image payload returned', 'seconds' => $result['seconds'] ); }
@@ -372,7 +393,7 @@ final class MSRWA_Engine_Call {
 
 
 
-	/** Generates one OpenAI image and writes it to the lab runs directory. */
+	/** Generates one image, OpenAI's or Gemini's, and writes it where the caller asked. */
 	public static function image( $prompt, $model, $size, $quality, $output_format, $destination, $wire = array(), $provider = 'openai' ) {
 		$plan = self::plan_image( $prompt, $model, $size, $quality, $output_format, $destination, $wire, $provider );
 		if ( isset( $plan['error'] ) ) { return array( 'error' => $plan['error'], 'seconds' => 0, 'usage' => array() ); }
@@ -386,6 +407,18 @@ final class MSRWA_Engine_Call {
 		$unusable = self::unusable( $provider, $wire );
 		if ( '' !== $unusable ) { return array( 'error' => $unusable ); }
 		if ( '' === (string) ( $wire['image_endpoint'] ?? '' ) ) { return array( 'error' => $provider . ' has no image endpoint configured.' ); }
+		if ( 'gemini' === $provider ) {
+			return array(
+				'kind' => 'image', 'provider' => $provider, 'model' => $model, 'destination' => $destination, 'format' => $output_format,
+				'request' => array(
+					'url' => $wire['image_endpoint'], 'headers' => $wire['headers'], 'timeout' => (int) ( $wire['timeout'] ?? 600 ),
+					'payload' => array(
+						'contents' => array( array( 'parts' => array( array( 'text' => (string) $prompt ) ) ) ),
+						'generationConfig' => array( 'responseModalities' => array( 'IMAGE' ), 'imageConfig' => self::gemini_image_config( $model, $size, $quality ) ),
+					),
+				),
+			);
+		}
 		return array(
 			'kind' => 'image', 'provider' => $provider, 'model' => $model, 'destination' => $destination,
 			'request' => array(
@@ -393,6 +426,24 @@ final class MSRWA_Engine_Call {
 				'payload' => array( 'model' => $model, 'prompt' => (string) $prompt, 'size' => $size, 'quality' => $quality, 'output_format' => $output_format, 'n' => 1 ),
 			),
 		);
+	}
+
+	/**
+	 * Gemini takes a shape and a resolution, not pixels and a quality: the
+	 * ratio of the size asked for, and 2K for high where the model offers it.
+	 * Flash Lite Image draws 1K only, and 2.5 Flash Image takes no size at all.
+	 */
+	public static function gemini_image_config( $model, $size, $quality ) {
+		$config = array();
+		if ( preg_match( '/^(\d+)x(\d+)$/', (string) $size, $m ) && (int) $m[1] && (int) $m[2] ) {
+			$a = (int) $m[1]; $b = (int) $m[2];
+			for ( $x = $a, $y = $b; $y; ) { $t = $x % $y; $x = $y; $y = $t; }
+			$config['aspectRatio'] = ( $a / $x ) . ':' . ( $b / $x );
+		}
+		if ( 0 === strpos( (string) $model, 'gemini-3' ) && false === strpos( (string) $model, 'lite' ) ) {
+			$config['imageSize'] = 'high' === $quality ? '2K' : '1K';
+		}
+		return $config;
 	}
 
 	/**
@@ -422,6 +473,19 @@ final class MSRWA_Engine_Call {
 
 			'Describe only visible facts. Do not infer ingredients, quantities, authenticity, taste or unseen preparation.',
 		) );
+	}
+
+	/** Gemini answers in JPEG or PNG; the file is written in the format the run asked for. */
+	public static function convert_image( $binary, $format ) {
+		$writers = array( 'webp' => 'imagewebp', 'jpeg' => 'imagejpeg', 'png' => 'imagepng' );
+		$writer = $writers[ $format ] ?? '';
+		if ( '' === $writer || ! function_exists( 'imagecreatefromstring' ) || ! function_exists( $writer ) ) { return $binary; }
+		$image = @imagecreatefromstring( $binary ); // phpcs:ignore WordPress.PHP.NoSilencedErrors
+		if ( ! $image ) { return $binary; }
+		ob_start();
+		'png' === $format ? $writer( $image ) : $writer( $image, null, 92 );
+		$converted = (string) ob_get_clean();
+		return '' === $converted ? $binary : $converted;
 	}
 
 	/** Downloads a bounded public HTTPS image for evidence extraction, never reuse. */

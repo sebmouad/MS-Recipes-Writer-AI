@@ -204,4 +204,14 @@ unset( $GLOBALS['msrwa_test_options']['msrwa_engine_config'] );
 $methods = array( MSRWA_Catalog::SHIPPED, MSRWA_Catalog::MANUAL, MSRWA_Catalog::LOOKED_UP );
 msrwa_test_assert( 3 === count( array_unique( $methods ) ), 'Shipped, typed and looked-up are three different things.' );
 
+// An image model keeps the engine's image rate beside the site's text rates:
+// without it a Gemini image was billed at a tenth of its price.
+$image_handed = MSRWA_Catalog::for_engine( array( msrwa_row( 'gemini', 'gemini-3-pro-image', 2.0, 12.0, true ) ) );
+msrwa_test_assert( array( 2.0, 12.0, 120.0 ) === $image_handed['models']['gemini']['gemini-3-pro-image'], 'An image model reaches the engine with its image rate.' );
+$config = MSRWA_Engine_Config::create( $image_handed );
+$usd = $config->price( 'gemini', 'gemini-3-pro-image', array( 'input_tokens' => 1000, 'output_tokens' => 1500, 'image_tokens' => 1120 ) );
+msrwa_test_assert( abs( $usd - ( 1000 * 2.0 + 380 * 12.0 + 1120 * 120.0 ) / 1000000 ) < 1e-9, 'Image tokens are priced at the image rate, the rest of the output at the text rate: ' . $usd );
+msrwa_test_assert( array( 'aspectRatio' => '2:3', 'imageSize' => '2K' ) === MSRWA_Engine_Call::gemini_image_config( 'gemini-3-pro-image', '1024x1536', 'high' ), 'A 1024x1536 collage at high asks Gemini for 2:3 at 2K.' );
+msrwa_test_assert( array( 'aspectRatio' => '1:1' ) === MSRWA_Engine_Call::gemini_image_config( 'gemini-3.1-flash-lite-image', '1024x1024', 'high' ), 'Flash Lite Image draws 1K only, so it is asked no size.' );
+
 msrwa_test_done( 'model catalogue' );

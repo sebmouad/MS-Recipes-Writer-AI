@@ -629,6 +629,26 @@ photograph, and otherwise use the photograph without the cost of a search.
     rounds on `roti-orloff` and `potee-porc-chou`, compared side by side with
     his references; medium quality, about $0.025 a collage.
 
+32. **Gemini draws images, priced as images.** Owner's request, 2026-09-24:
+    try Gemini against OpenAI for the collage. `providers.gemini.image_endpoint`
+    is the same `generateContent` URL as text; `MSRWA_Engine_Call::plan_image()`
+    sends it `responseModalities: IMAGE` and an `imageConfig` —
+    `gemini_image_config()` turns the size into a ratio (1024x1536 → 2:3) and
+    asks 2K at high where the model offers sizes (Gemini 3, not Flash Lite).
+    `read()` takes the inline image and `convert_image()` writes it in the
+    format the run asked for. Pricing: a model's rate may carry a third
+    number, the image output rate; `price()` bills `image_tokens` at it and
+    the rest of the output at the text rate. The shipped rates had been the
+    text rates, a tenth of the image price; they are now [in, text out, image
+    out] from Google's pricing page, and `gemini-3.1-flash-lite-image` joins
+    them. `MSRWA_Catalog::for_engine()` hands the image rate through, since the
+    catalogue table holds only two. Measured on `roti-orloff`, same prompt:
+    OpenAI high ($0.056) kept the tight crop, the order and the opened last
+    panel; Gemini 3 Pro Image (about $0.150) was the cleanest texture but
+    framed wide; 3.1 Flash Image (about $0.071) ended whole and showed a
+    carton; 3.1 Flash Lite Image (about $0.036) framed wide and sliced the
+    roast raw. OpenAI stays the default.
+
 ### Still open
 
 
