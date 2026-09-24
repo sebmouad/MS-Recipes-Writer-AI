@@ -925,16 +925,19 @@
   }
 
   // --- One decision, several recipes -------------------------------------
+  // Every `var` here shares the whole script's scope: this list was `rail`
+  // until the live-rail block below took the same name and set it to null on
+  // this page, and no checkbox could be ticked.
 
   var bulk = document.getElementById('ms-bulk');
   if (bulk) {
-    var rail = document.getElementById('ms-bulk-rail');
+    var bulkRail = document.getElementById('ms-bulk-rail');
     var all = document.getElementById('ms-bulk-all');
     var go = document.getElementById('ms-bulk-go');
     var bulkStatus = document.getElementById('ms-bulk-status');
 
     function picked() {
-      return Array.prototype.filter.call(rail.querySelectorAll('.ms-pick-run'), function (box) { return box.checked; })
+      return Array.prototype.filter.call(bulkRail.querySelectorAll('.ms-pick-run'), function (box) { return box.checked; })
         .map(function (box) { return parseInt(box.value, 10); });
     }
 
@@ -949,10 +952,10 @@
     }
 
     all.addEventListener('change', function () {
-      rail.querySelectorAll('.ms-pick-run').forEach(function (box) { box.checked = all.checked; });
+      bulkRail.querySelectorAll('.ms-pick-run').forEach(function (box) { box.checked = all.checked; });
       countPicked();
     });
-    rail.addEventListener('change', function (event) {
+    bulkRail.addEventListener('change', function (event) {
       if (event.target.classList.contains('ms-pick-run')) { countPicked(); }
     });
     bulkDo.addEventListener('change', countPicked);
