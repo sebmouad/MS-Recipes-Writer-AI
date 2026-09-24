@@ -87,6 +87,22 @@ $collage = MSRWA_Engine_Input::image_prompt( 'facebook', $clean, array( 'collage
 msrwa_test_contains( $collage, 'Exactly 6 panels', 'The collage must restate its panel count last.' );
 msrwa_test_contains( $collage, "recipe's own order", 'The collage must restate that the recipe fixes the order.' );
 
+// A blind bake was drawn as a case heaped with beads on paper, and a seven-step
+// quiche came back as four rows of two. Both are said last, the count very last.
+msrwa_test_contains( $collage, 'no baking beans', 'A case baked blind must be drawn after its bake, without its weights.' );
+msrwa_test_assert( strpos( $collage, 'no baking beans' ) < strpos( $collage, 'Exactly 6 panels' ), 'The panel count stays the last rule.' );
+$steps_of = static function ( $count ) use ( $clean ) {
+	$recipe = $clean;
+	$recipe['canonical']['steps'] = array();
+	for ( $i = 1; $i <= $count; $i++ ) { $recipe['canonical']['steps'][] = array( 'text' => 'Étape ' . $i . '.' ); }
+	return MSRWA_Engine_Input::image_prompt( 'facebook', $recipe, array( 'collage_panels' => 6 ) );
+};
+msrwa_test_contains( $steps_of( 7 ), 'choose 5 moments', 'More steps than panels: the arithmetic is said, the dish taking the last panel.' );
+$short = $steps_of( 3 );
+msrwa_test_contains( $short, 'only 3 steps for 6 panels', 'Fewer steps than panels is said too.' );
+msrwa_test_contains( $short, 'Never invent a step', 'The extra panels are filled with visible states, never with invented steps.' );
+msrwa_test_contains( $steps_of( 6 ), 'nothing to select', 'As many steps as panels: one per panel.' );
+
 // Both images of one dish must be told the same serving presentation, or they
 // disagree — which was three refusals in four before it was written into both.
 $featured_serving = MSRWA_Engine_Input::serving_presentation( $clean['canonical'], $clean['research'], true );

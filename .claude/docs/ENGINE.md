@@ -501,6 +501,22 @@ photograph, and otherwise use the photograph without the cost of a search.
     `tests/test-engine-language.php` now requires an outline for every
     language the plugin offers.
 
+22. **The collage draws a result, keeps six cells, and the judge sees it.**
+    Owner's request, 2026-09-24, after a quiche and a fig tart were each
+    drawn with a case of baking beans on paper in panel 3.
+    `facebook_image.tpl.txt`: mise en place holds only raw ingredients and
+    empty cookware; a cooking stage is shown by its result, never by
+    equipment removed afterwards; paper liners, beans, weights and foil are
+    forbidden in every panel. `MSRWA_Engine_Input::image_prompt()`: the
+    closing checklist gains a blind-bake rule and ends on "exactly N panels,
+    2 × 3, every cell filled"; the step pool states the arithmetic when the
+    recipe has more steps than panels, and, when it has fewer, fills the
+    extra panels with a step's before and after states, never an invented
+    step. `final_approval.tpl.txt` check 4 blocks a panel whose subject is
+    equipment and an empty cell; image severity defers to check 4. Lab:
+    beads 0 of 10 draws, grid right in 9 of 10 at seven steps and 1 of 1 at
+    four.
+
 ### Still open
 
 6. **The engine's `models` list is a second source of truth for prices.** The

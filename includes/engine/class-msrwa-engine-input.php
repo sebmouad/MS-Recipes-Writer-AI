@@ -431,7 +431,16 @@ final class MSRWA_Engine_Input {
 					// to panel two, ahead of lining the case, in three runs out of five.
 					$prompt .= 'The recipe has exactly ' . $panels . ' steps, so there is nothing to select. Use these, one per panel, in this order: ' . implode( ' ', $steps ) . "\n";
 				} else {
-					$prompt .= 'Canonical step pool, numbered in the order the recipe performs them: ' . implode( ' ', $steps ) . "\nSelect exactly " . $panels . " visually distinct moments using the storyboard contract, then lay them out in ascending step number; do not sample mechanically or show passive filler.\n";
+					// More steps than panels is where the grid broke: a seven-step
+					// quiche came back as four rows of two, one panel per step and
+					// the dish added. Fewer steps than panels is the other way to
+					// miscount. The arithmetic is said outright, either way.
+					$prompt .= 'Canonical step pool, numbered in the order the recipe performs them: ' . implode( ' ', $steps ) . "\n";
+					if ( count( $all_steps ) > $panels ) {
+						$prompt .= 'The recipe has ' . count( $all_steps ) . ' steps and the canvas has room for ' . $panels . ' panels, no more: the finished dish takes the last one, so choose ' . ( $panels - 1 ) . " moments for the others, merging or leaving out the rest. Choose them with the storyboard contract, then lay them out in ascending step number; do not sample mechanically or show passive filler.\n";
+					} else {
+						$prompt .= 'The recipe has only ' . count( $all_steps ) . ' steps for ' . $panels . " panels: the mise en place opens and the finished dish closes, and where panels remain, show a step's two visible states — the food as it goes in, then as it comes out — for the steps that change most. Never invent a step, never repeat a panel, never leave a cell empty.\n";
+					}
 				}
 			}
 		}
@@ -441,7 +450,7 @@ final class MSRWA_Engine_Input {
 		// a bowl where the brief named a plate, another site's watermark, a garnish
 		// nobody bought. Restating them in six lines at the end costs about 400
 		// characters and is cheaper than one refused image.
-		$prompt .= "\nBEFORE YOU DRAW — the six rules a previous attempt at this brief broke:\n"
+		$prompt .= "\nBEFORE YOU DRAW — the rules a previous attempt at this brief broke:\n"
 			. "1. No text anywhere in the image: no caption, signature, watermark, logo, sticker, border or coloured frame. Nothing written, in any corner.\n"
 			. "2. No hands, no arms, no people. Nobody holds, carries or presents the dish.\n"
 			. "3. Nothing on the plate that is not in the exact ingredient list above. No herb sprig, no citrus wedge, no dusting, no drizzle, no scattered seeds, however usual that looks."
@@ -452,7 +461,16 @@ final class MSRWA_Engine_Input {
 			. " If an observation describes something only by its colour or its shape — coloured strips, an unidentified fruit, green tufts, pale pieces — that is another cook's garnish and it does not belong to this recipe: leave it out.\n"
 			. '4. Serve it exactly as the brief above says: ' . self::serving_presentation( $canonical, $research, true ) . "\n"
 			. "5. Anything the recipe says to lift out or discard before serving is not visible in the finished dish.\n"
-			. ( 'facebook' === $kind ? "6. Exactly " . (int) ( $options['collage_panels'] ?? $settings['facebook_collage_steps'] ?? 6 ) . " panels, in the recipe's own order, with the last one presented as rule 4 says.\n" : "6. One plate, one dish, photographed once. No collage, no before and after.\n" );
+			. ( 'facebook' === $kind
+				// A blind bake was drawn as a case heaped with white beads on paper,
+				// in collage after collage: the step names them, and a step's own
+				// words outweigh a rule stated pages earlier. Said here, narrowly —
+				// "show every cooking stage" made room for all four of a quiche's
+				// and came back as eight cells three times in four — and before the
+				// panel count, which stays the very last word.
+				? "6. A case baked blind appears as the golden, dry, empty case after its bake — no baking paper, no baking beans or ceramic weights, no foil, not even in a bowl nearby — even when the step names them.\n"
+					. "7. Exactly " . (int) ( $options['collage_panels'] ?? $settings['facebook_collage_steps'] ?? 6 ) . " panels in the recipe's own order, the last one presented as rule 4 says: 2 columns × 3 rows, every cell filled. When the recipe has more moments than panels, merge or leave some out — never add a row.\n"
+				: "6. One plate, one dish, photographed once. No collage, no before and after.\n" );
 
 		$findings = array_values( array_filter( (array) $findings, 'is_array' ) );
 		if ( $findings ) {

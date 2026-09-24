@@ -5,9 +5,9 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.23.3
+## État actuel — 0.23.4
 
-La version `0.23.3` corrige ce qu’un audit complet a trouvé — argent visible d’un rédacteur, pluriels arabes, droits, désinstallation ; la `0.23.2` créait articles et images par les chemins natifs de WordPress, au nom du rédacteur ; la `0.23.1` attribuait les images générées à l’auteur de leur article ; la `0.23.0` faisait traiter les images par MS Image Optimizer (compression, redimensionnement, champs SEO), écrit en espagnol, propose des préréglages de qualité, suit chaque article dans WordPress et répare les actions groupées ; la `0.22.0` écrivait la recherche d’après les photographies du rédacteur quand il en a fourni, sans recherche sur le web, et refait l’écran d’appariement ; la `0.21.0` acceptait un lot fait de texte, de photographies ou des deux, et fait lire aux écrans Modèles et Moteur la même règle ; la `0.20.2` rendait l’écran Moteur lisible sur ordinateur comme sur téléphone et distingue le modèle de la réflexion ; la `0.20.1` ne laissait confier une étape qu’à un modèle capable de la faire ; la `0.20.0` remplissait chaque brouillon comme le lisent le thème MS Recipes, MS SEO Plus, MS FB Posts et MS Image Optimizer ; la `0.19.0` ramenait une recette approuvée du premier coup à 0,09–0,10 $ sans perte mesurée ; la `0.18.9` reprenait chaque écran après une revue complète dans le navigateur ; la `0.18.8` réservait l’extension, renommée « MS Recipes AI » dans le menu, à ceux qui peuvent téléverser des fichiers ; la `0.18.7` disait juste ce que fait le plafond par recette ; la `0.18.6` rangeait les photographies envoyées avec le brouillon qu’elles ont servi à écrire ; la `0.18.5` faisait passer un lot de trois recettes en 8 minutes pour 0,125 $ la recette, toutes approuvées ; la `0.18.4` faisait envoyer les photographies d’un lot depuis l’ordinateur du rédacteur ; la `0.18.3` faisait approuver les trois recettes d’un lot réel aux réglages par défaut — image à la une en `low`, collage en `medium` — pour 0,132 $ en moyenne ; la `0.18.2` permettait de choisir le modèle et la qualité de chaque image
+La version `0.23.4` dessine la cuisson à blanc d’un collage par son fond doré, sans billes ni papier, tient la grille à six cases quel que soit le nombre d’étapes et fait refuser par la vérification finale un panneau d’ustensiles ou une case vide ; la `0.23.3` corrigeait ce qu’un audit complet a trouvé — argent visible d’un rédacteur, pluriels arabes, droits, désinstallation ; la `0.23.2` créait articles et images par les chemins natifs de WordPress, au nom du rédacteur ; la `0.23.1` attribuait les images générées à l’auteur de leur article ; la `0.23.0` faisait traiter les images par MS Image Optimizer (compression, redimensionnement, champs SEO), écrit en espagnol, propose des préréglages de qualité, suit chaque article dans WordPress et répare les actions groupées ; la `0.22.0` écrivait la recherche d’après les photographies du rédacteur quand il en a fourni, sans recherche sur le web, et refait l’écran d’appariement ; la `0.21.0` acceptait un lot fait de texte, de photographies ou des deux, et fait lire aux écrans Modèles et Moteur la même règle ; la `0.20.2` rendait l’écran Moteur lisible sur ordinateur comme sur téléphone et distingue le modèle de la réflexion ; la `0.20.1` ne laissait confier une étape qu’à un modèle capable de la faire ; la `0.20.0` remplissait chaque brouillon comme le lisent le thème MS Recipes, MS SEO Plus, MS FB Posts et MS Image Optimizer ; la `0.19.0` ramenait une recette approuvée du premier coup à 0,09–0,10 $ sans perte mesurée ; la `0.18.9` reprenait chaque écran après une revue complète dans le navigateur ; la `0.18.8` réservait l’extension, renommée « MS Recipes AI » dans le menu, à ceux qui peuvent téléverser des fichiers ; la `0.18.7` disait juste ce que fait le plafond par recette ; la `0.18.6` rangeait les photographies envoyées avec le brouillon qu’elles ont servi à écrire ; la `0.18.5` faisait passer un lot de trois recettes en 8 minutes pour 0,125 $ la recette, toutes approuvées ; la `0.18.4` faisait envoyer les photographies d’un lot depuis l’ordinateur du rédacteur ; la `0.18.3` faisait approuver les trois recettes d’un lot réel aux réglages par défaut — image à la une en `low`, collage en `medium` — pour 0,132 $ en moyenne ; la `0.18.2` permettait de choisir le modèle et la qualité de chaque image
 séparément ; la `0.18.1` fait tenir le plafond par recette jusque dans les reprises
 de l’approbation finale ; la `0.18.0` ramène une recette complète à environ 0,11 $ réels —
 recherche web comprise — sans perte de qualité mesurée ; la `0.17.0` faisait
@@ -74,6 +74,33 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.23.4
+
+**Le collage Facebook montre la recette, pas les ustensiles.** Deux collages
+réels — une quiche, une tarte aux figues — dessinaient en troisième case un fond
+couvert de papier cuisson et de billes, et répétaient le fond cru dans les deux
+premières. Trois causes : la règle d’ordre exigeait une case par passage au
+four, le texte de l’étape nommait les billes, et la mise en place autorisait un
+fond déjà foncé.
+
+- **Une cuisson à blanc se montre par son résultat** : le fond doré, sec et
+  vide après sa cuisson. Papier, billes, poids et papier d’aluminium sont
+  interdits dans toutes les cases, même quand l’étape les nomme. Sur dix
+  tirages réels, aucune bille.
+- **La mise en place ne montre que des ingrédients crus** et l’ustensile vide,
+  rien de ce qu’une case suivante montre en train d’être fait.
+- **Six cases, deux colonnes sur trois rangs, toujours.** Une recette de sept
+  étapes revenait en huit cases : le calcul est maintenant dit au modèle (le
+  plat fini prend la dernière case, cinq moments pour les autres). Une recette
+  de moins de six étapes ouvre sur la mise en place, se termine sur le plat, et
+  remplit les cases restantes avec les deux états visibles d’une même étape —
+  la pâte versée, puis le gâteau cuit — sans jamais inventer d’étape ni laisser
+  de case vide. Vérifié sur un gâteau en quatre étapes.
+- **La vérification finale bloque désormais** un panneau dont le sujet est un
+  ustensile plutôt que la nourriture, et une case vide. Elle laissait passer le
+  panneau aux billes parce qu’elle ne bloquait une image que si elle n’était pas
+  crédible, montrait un autre plat ou inversait l’ordre.
 
 ## Version 0.23.3
 

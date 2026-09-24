@@ -166,6 +166,10 @@ run carries.
   in the site's language; every screen clean as administrator and author, in
   three languages, right to left, at 1280 and 390 px (`tests/test-rest-money.php`,
   `tests/test-i18n.php`, `tests/test-uninstall.php`, `tests/test-match.php`).
+- [~] The collage, 0.23.4: a blind bake drawn as its baked case, six cells
+  whatever the step count, the final check blocking equipment panels and empty
+  cells (`tests/test-image-prompt.php`, `tests/test-approval.php`; eleven lab
+  draws, not yet a live lot).
 - [ ] A complete lot on Claude — the account has no credit. — the Gemini key's
   grounding quota is exhausted, OpenAI is unreachable from the test
   environment and the Claude account has no credit.

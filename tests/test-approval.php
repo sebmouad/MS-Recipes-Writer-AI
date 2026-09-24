@@ -65,6 +65,11 @@ $prompt = file_get_contents( dirname( __DIR__ ) . '/includes/engine/prompts/fina
 // only, and small details are not worth refusing over. Four earlier calibrations
 // each over-reached — a potted plant read as an ingredient, rice with a yassa
 // blocked, seventeen blocking findings on one tarte — so these are asserted.
+// A panel of baking beans on paper passed, as did an eight-cell grid: the
+// collage's blocking rules now name equipment and empty cells.
+msrwa_test_contains( $prompt, 'equipment rather than food', 'A panel showing equipment the recipe removes must block.' );
+msrwa_test_contains( $prompt, 'a blank or empty cell', 'An empty cell must block.' );
+msrwa_test_contains( $prompt, 'breaks a blocking rule of check 4', 'Image severity must defer to the collage rules.' );
 msrwa_test_contains( $prompt, 'the primary check', 'Realism must be named the primary check.' );
 // The owner's rule, 2026-09-21, and it is asymmetric: an image may omit a
 // secondary ingredient, because it can be dissolved, buried or out of frame. It
