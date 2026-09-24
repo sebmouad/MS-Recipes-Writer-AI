@@ -2151,6 +2151,30 @@ msgstr "in the bin"
 msgid "Photographie introuvable."
 msgstr "Photograph not found."
 
+msgid "Appariement corrigé par le rédacteur"
+msgstr "Pairing corrected by the writer"
+
+msgid "Brief complété par le moteur"
+msgstr "Brief completed by the engine"
+
+msgid "Brief remis au moteur"
+msgstr "Brief handed to the engine"
+
+msgid "Ce que le rédacteur a fourni"
+msgstr "What the writer provided"
+
+msgid "Lecture des photographies et appariement"
+msgstr "Photographs read and paired"
+
+msgid "Photographie trouvée par le moteur"
+msgstr "Photograph found by the engine"
+
+msgid "Résultat"
+msgstr "Result"
+
+msgid "Étape de création"
+msgstr "Creation step"
+
 msgid "aucune page citée"
 msgstr "no page cited"
 

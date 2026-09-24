@@ -399,3 +399,15 @@ Break these and the plugin misreports itself.
     Articles screen, the pass and its counters read the post's status; a
     "to review" or "to fix" flag holds only while the post is a draft or
     pending review.
+
+23. **Every job keeps its whole history, written once.** `MSRWA_History`
+    records each stage — `provided`, `matching`, `pairing` (the writer's
+    corrections), `brief` (the text and visual reference handed to the
+    engine), `web_reference`, `engine_brief` (what the research completed),
+    one `step` per engine step with its prompt, answer, checks and cost, and
+    `result` — as a row in `msrwa_history` and as a numbered file under
+    `uploads/msrwa/<run>/history/`. A lot's stages are written with run 0
+    and copied into each job's folder at dispatch. Nothing rewrites a stage.
+    Rows and files pass through `MSRWA_DB::sanitize()`, follow the artifacts
+    retention age (`MSRWA_Retention::history()`), and go with the lot or the
+    job.

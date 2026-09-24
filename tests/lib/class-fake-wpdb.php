@@ -36,7 +36,8 @@ class MSRWA_Fake_Wpdb {
 	public function get_results( $query, $output = null ) { $this->queries[] = $query; return (array) $this->resolve( $query, array() ); }
 	public function query( $query ) { $this->queries[] = $query; return 1; }
 	public function delete( $table, $where, $where_formats = null ) { $this->queries[] = 'DELETE FROM ' . $table . ' ' . wp_json_encode( $where ); return 1; }
-	public function insert( $table, $data, $formats = null ) { $this->queries[] = 'INSERT ' . $table; $this->insert_id++; return 1; }
+	public $inserted = array();
+	public function insert( $table, $data, $formats = null ) { $this->queries[] = 'INSERT ' . $table; $this->inserted[] = array( $table, $data ); $this->insert_id++; return 1; }
 	public function update( $table, $data, $where, $formats = null, $where_formats = null ) { $this->queries[] = 'UPDATE ' . $table . ' ' . wp_json_encode( $data ); return 1; }
 
 	private function resolve( $query, $fallback ) {

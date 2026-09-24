@@ -2179,6 +2179,30 @@ msgstr "في سلة المهملات"
 msgid "Photographie introuvable."
 msgstr "الصورة غير موجودة."
 
+msgid "Appariement corrigé par le rédacteur"
+msgstr "الربط كما صحّحه الكاتب"
+
+msgid "Brief complété par le moteur"
+msgstr "الموجز كما أكمله المحرك"
+
+msgid "Brief remis au moteur"
+msgstr "الموجز المُسلَّم إلى المحرك"
+
+msgid "Ce que le rédacteur a fourni"
+msgstr "ما قدّمه الكاتب"
+
+msgid "Lecture des photographies et appariement"
+msgstr "قراءة الصور وربطها"
+
+msgid "Photographie trouvée par le moteur"
+msgstr "صورة وجدها المحرك"
+
+msgid "Résultat"
+msgstr "النتيجة"
+
+msgid "Étape de création"
+msgstr "خطوة الإنشاء"
+
 msgid "aucune page citée"
 msgstr "لم تُذكر أي صفحة"
 

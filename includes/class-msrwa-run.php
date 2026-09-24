@@ -191,10 +191,27 @@ final class MSRWA_Run {
 		);
 
 		self::absorb( $id, $state, $result->to_array() );
+		self::remember( $id, $result, $registry );
 		if ( in_array( 'research', $wave, true ) && is_array( $result->artifacts['research'] ?? null ) ) { MSRWA_Sources::complete( $id, $result->artifacts['research'] ); }
 
 		$run = self::get( $id );
 		return $run && 'running' === $run['status'];
+	}
+
+	/**
+	 * Each step of the tick into the job's history: what it was asked, what it
+	 * answered, how it scored and what it cost. The working tables release the
+	 * article once WordPress holds it; the history keeps this.
+	 */
+	private static function remember( $id, MSRWA_Result $result, array $registry ) {
+		$steps = MSRWA_Engine_Steps::all( $registry );
+		foreach ( $result->steps as $step ) {
+			$produces = (string) ( $steps[ $step['step'] ]['produces'] ?? '' );
+			$answer = '' !== $produces && isset( $result->artifacts[ $produces ] ) ? $result->artifacts[ $produces ] : null;
+			// An image is a file in the job's folder; its bytes are not the record.
+			if ( is_array( $answer ) ) { unset( $answer['b64_json'], $answer['data'] ); }
+			MSRWA_History::run( $id, 'step', array_merge( $step, array( 'answer' => $answer ) ) );
+		}
 	}
 
 	/**
@@ -496,6 +513,16 @@ final class MSRWA_Run {
 		// sent a watcher away with draft #0.
 		MSRWA_Draft::create( (int) $id );
 		self::finish( $id, empty( $state['ok'] ) ? 'failed' : 'done', '' );
+		$run = self::get( $id );
+		MSRWA_History::run( $id, 'result', array(
+			'status' => (string) ( $run['status'] ?? '' ), 'draft_post_id' => (int) ( $run['draft_post_id'] ?? 0 ),
+			'approved' => $approved, 'cost_usd' => (float) ( $run['cost_usd'] ?? 0 ), 'seconds' => (float) ( $run['seconds'] ?? 0 ),
+			'images' => array_filter( array(
+				'featured' => (int) get_post_meta( (int) ( $run['draft_post_id'] ?? 0 ), MSRWA_Draft::generated_key( 'featured' ), true ),
+				'facebook' => (int) get_post_meta( (int) ( $run['draft_post_id'] ?? 0 ), MSRWA_Draft::generated_key( 'facebook' ), true ),
+			) ),
+			'verdict' => $approval,
+		) );
 		MSRWA_Batch::settle( (int) ( self::get( $id )['batch_id'] ?? 0 ) );
 	}
 
@@ -556,6 +583,7 @@ final class MSRWA_Run {
 		}
 		$wpdb->delete( self::table(), array( 'id' => absint( $id ) ), array( '%d' ) );
 		MSRWA_Sources::forget_run( (int) $id );
+		MSRWA_History::forget_run( (int) $id );
 		MSRWA_Batch::settle( (int) $run['batch_id'] );
 		return true;
 	}

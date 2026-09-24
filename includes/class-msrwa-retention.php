@@ -62,7 +62,7 @@ final class MSRWA_Retention {
 		$policy = self::policy();
 		$removed = array(
 			'events' => self::events( $policy['events'] ),
-			'artifacts' => self::artifacts( $policy['artifacts'] ),
+			'artifacts' => self::artifacts( $policy['artifacts'] ) + self::history( $policy['artifacts'] ),
 			'runs' => self::runs( $policy['runs'] ),
 		);
 		// Written down every time, including when it took nothing: "ran an hour
@@ -121,6 +121,31 @@ final class MSRWA_Retention {
 		return self::remove( $t['artifacts'], $ids );
 	}
 
+	/**
+	 * A settled job's history, at the artifacts age: it is the same record —
+	 * the research, the prompts, the answers — kept whole. Its rows and its
+	 * files go together; the job's figures, its draft and its images stay.
+	 */
+	public static function history( $days, $limit = 50 ) {
+		global $wpdb;
+		if ( $days <= 0 ) { return 0; }
+		$t = MSRWA_DB::tables();
+		$runs = (array) $wpdb->get_col( $wpdb->prepare(
+			"SELECT DISTINCT h.run_id FROM {$t['history']} h INNER JOIN {$t['runs']} r ON r.id = h.run_id
+			WHERE r.status NOT IN ('queued','running')
+				AND r.updated_at < DATE_SUB(UTC_TIMESTAMP(), INTERVAL %d DAY)
+			LIMIT %d", max( 1, (int) $days ), max( 10, (int) $limit ) ) );
+		foreach ( $runs as $run ) { MSRWA_History::forget_run( (int) $run ); }
+		// A lot's own stages, once the lot itself is that old.
+		$lots = (array) $wpdb->get_col( $wpdb->prepare(
+			"SELECT DISTINCT h.batch_id FROM {$t['history']} h INNER JOIN {$t['batches']} b ON b.id = h.batch_id
+			WHERE h.run_id = 0 AND b.status NOT IN ('matching','ready','running')
+				AND b.updated_at < DATE_SUB(UTC_TIMESTAMP(), INTERVAL %d DAY)
+			LIMIT %d", max( 1, (int) $days ), max( 10, (int) $limit ) ) );
+		foreach ( $lots as $lot ) { $wpdb->query( $wpdb->prepare( "DELETE FROM {$t['history']} WHERE batch_id = %d AND run_id = 0", (int) $lot ) ); }
+		return count( $runs );
+	}
+
 	/** Removes rows by their own ids, which every database agrees on. */
 	private static function remove( $table, array $ids ) {
 		global $wpdb;
@@ -157,6 +182,7 @@ final class MSRWA_Retention {
 			}
 			$removed += (int) $wpdb->delete( $t['runs'], array( 'id' => (int) $id ), array( '%d' ) );
 			MSRWA_Sources::forget_run( (int) $id );
+			MSRWA_History::forget_run( (int) $id );
 		}
 		return $removed;
 	}

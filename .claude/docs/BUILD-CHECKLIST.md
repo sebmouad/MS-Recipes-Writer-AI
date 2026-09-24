@@ -178,6 +178,10 @@ run carries.
   researched 13/13 from two photographs with no second read and no library
   entry (`tests/test-intake.php`, `tests/test-engine-research-photographs.php`,
   `tests/test-match.php`, `tests/test-estimate.php`).
+- [x] Full job history, 0.24.2: provided, matching, pairing, brief, engine
+  brief, each step and the result, as rows and numbered files, secret-free,
+  on the artifacts age (`tests/test-intake.php`, `tests/test-pairing.php`;
+  live lot #50 from one photograph).
 - [ ] A complete lot on Claude — the account has no credit. — the Gemini key's
   grounding quota is exhausted, OpenAI is unreachable from the test
   environment and the Claude account has no credit.

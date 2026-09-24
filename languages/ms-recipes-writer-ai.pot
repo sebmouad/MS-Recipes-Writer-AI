@@ -7,7 +7,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: tools/i18n.php\n"
 
-#: class-msrwa-batch.php:77
+#: class-msrwa-batch.php:88
 msgid " et %d autres"
 msgstr ""
 
@@ -77,7 +77,7 @@ msgstr[1] ""
 msgid "%d modèle(s)"
 msgstr ""
 
-#: class-msrwa-screen-batch.php:100
+#: class-msrwa-screen-batch.php:106
 msgid "%d photographie — écrite d’après elle"
 msgid_plural "%d photographies — écrite d’après elles"
 msgstr[0] ""
@@ -87,7 +87,7 @@ msgstr[1] ""
 msgid "%d photographies"
 msgstr ""
 
-#: class-msrwa-screen-batch.php:118 class-msrwa-screen-batch.php:119
+#: class-msrwa-screen-batch.php:124 class-msrwa-screen-batch.php:125
 msgid "%d photographies ne vont avec aucune recette : elles ne seront pas utilisées."
 msgstr ""
 
@@ -215,6 +215,10 @@ msgstr ""
 msgid "Anglais"
 msgstr ""
 
+#: class-msrwa-history.php:29
+msgid "Appariement corrigé par le rédacteur"
+msgstr ""
+
 #: class-msrwa-admin.php:165
 msgid "Appariement enregistré."
 msgstr ""
@@ -279,11 +283,11 @@ msgstr ""
 msgid "Articles"
 msgstr ""
 
-#: class-msrwa-screen-batch.php:174
+#: class-msrwa-screen-batch.php:180
 msgid "Association probable — vérifiez"
 msgstr ""
 
-#: class-msrwa-screen-batch.php:173
+#: class-msrwa-screen-batch.php:179
 msgid "Association sûre"
 msgstr ""
 
@@ -331,7 +335,7 @@ msgstr ""
 msgid "Aucun plafond n’arrête de travail en ce moment."
 msgstr ""
 
-#: class-msrwa-batch.php:58
+#: class-msrwa-batch.php:69
 msgid "Aucun plat n’a été reconnu sur ces photographies. Ajoutez le nom de chaque recette dans le texte, avec ou sans les photographies."
 msgstr ""
 
@@ -339,7 +343,7 @@ msgstr ""
 msgid "Aucun texte : chaque plat reconnu sur les photographies deviendra une recette (%d au plus)."
 msgstr ""
 
-#: class-msrwa-screen-batch.php:82
+#: class-msrwa-screen-batch.php:88
 msgid "Aucun texte fourni : ces recettes ont été nommées d’après les photographies — %s. Chacune sera établie d’après les sources ; vérifiez-les avant de lancer."
 msgstr ""
 
@@ -355,7 +359,7 @@ msgstr ""
 msgid "Aucune clé enregistrée : aucune recette ne peut partir."
 msgstr ""
 
-#: class-msrwa-screen-batch.php:108
+#: class-msrwa-screen-batch.php:114
 msgid "Aucune photographie"
 msgstr ""
 
@@ -383,6 +387,14 @@ msgstr ""
 msgid "Bloquant"
 msgstr ""
 
+#: class-msrwa-history.php:32
+msgid "Brief complété par le moteur"
+msgstr ""
+
+#: class-msrwa-history.php:30
+msgid "Brief remis au moteur"
+msgstr ""
+
 #: class-msrwa-ui.php:269
 msgid "Brouillon"
 msgstr ""
@@ -395,11 +407,11 @@ msgstr ""
 msgid "Cache"
 msgstr ""
 
-#: class-msrwa-batch.php:161
+#: class-msrwa-batch.php:173
 msgid "Ce lot a déjà été lancé."
 msgstr ""
 
-#: class-msrwa-batch.php:186
+#: class-msrwa-batch.php:198
 msgid "Ce lot dépasse le plafond par recette fixé pour le site : il s’arrêterait en route. Choisissez une sortie plus légère, ou demandez à un administrateur de relever le plafond."
 msgstr ""
 
@@ -419,11 +431,11 @@ msgstr ""
 msgid "Ce lot est estimé à %1$s et il ne reste que %2$s sous le plafond. Réduisez le lot, ou relevez le plafond dans les réglages."
 msgstr ""
 
-#: class-msrwa-batch.php:173
+#: class-msrwa-batch.php:185
 msgid "Ce lot ne peut pas partir : le réglage des modèles du site doit être corrigé par un administrateur."
 msgstr ""
 
-#: class-msrwa-batch.php:172
+#: class-msrwa-batch.php:184
 msgid "Ce lot ne peut pas partir : une étape est confiée à un modèle qui ne peut pas la faire. %s Changez-le sur l’écran Moteur."
 msgstr ""
 
@@ -441,6 +453,10 @@ msgstr ""
 
 #: class-msrwa-screen-models.php:176
 msgid "Ce que le moteur reçoit"
+msgstr ""
+
+#: class-msrwa-history.php:27
+msgid "Ce que le rédacteur a fourni"
 msgstr ""
 
 #: class-msrwa-screen-analysis.php:218
@@ -471,7 +487,7 @@ msgstr ""
 msgid "Ce qui ne va pas"
 msgstr ""
 
-#: class-msrwa-screen-batch.php:73
+#: class-msrwa-screen-batch.php:79
 msgid "Ce qui sera écrit"
 msgstr ""
 
@@ -539,7 +555,7 @@ msgstr ""
 msgid "Chiffrées à l’enregistrement et jamais réaffichées. Un champ laissé vide conserve la clé enregistrée ; il ne l’efface pas."
 msgstr ""
 
-#: class-msrwa-admin.php:170 class-msrwa-screen-batch.php:144
+#: class-msrwa-admin.php:170 class-msrwa-screen-batch.php:150
 msgid "Choisie par vous"
 msgstr ""
 
@@ -1019,7 +1035,7 @@ msgstr ""
 msgid "La suppression est réservée aux administrateurs."
 msgstr ""
 
-#: class-msrwa-screen-batch.php:216
+#: class-msrwa-screen-batch.php:222
 msgid "Lancer %d recette"
 msgid_plural "Lancer %d recettes"
 msgstr[0] ""
@@ -1173,6 +1189,10 @@ msgstr ""
 msgid "Lecture des photographies"
 msgstr ""
 
+#: class-msrwa-history.php:28
+msgid "Lecture des photographies et appariement"
+msgstr ""
+
 #: class-msrwa-screen-settings.php:85
 msgid "Les articles"
 msgstr ""
@@ -1221,11 +1241,11 @@ msgstr ""
 msgid "Les recettes"
 msgstr ""
 
-#: class-msrwa-screen-batch.php:231
+#: class-msrwa-screen-batch.php:237
 msgid "Les recettes avancent ensemble, une vague par tick de cron. Vous pouvez fermer cet onglet."
 msgstr ""
 
-#: class-msrwa-screen-batch.php:109
+#: class-msrwa-screen-batch.php:115
 msgid "Les recettes seront écrites d’après les références trouvées sur le web."
 msgstr ""
 
@@ -1261,7 +1281,7 @@ msgstr ""
 msgid "Lot %d"
 msgstr ""
 
-#: class-msrwa-batch.php:160 class-msrwa-rest.php:126 class-msrwa-rest.php:135 class-msrwa-rest.php:143 class-msrwa-rest.php:152 class-msrwa-rest.php:307 class-msrwa-schedule.php:22 class-msrwa-screen-batch.php:19
+#: class-msrwa-batch.php:172 class-msrwa-rest.php:126 class-msrwa-rest.php:135 class-msrwa-rest.php:143 class-msrwa-rest.php:152 class-msrwa-rest.php:307 class-msrwa-schedule.php:22 class-msrwa-screen-batch.php:19
 msgid "Lot introuvable."
 msgstr ""
 
@@ -1273,7 +1293,7 @@ msgstr ""
 msgid "Légende Facebook"
 msgstr ""
 
-#: class-msrwa-screen-batch.php:76
+#: class-msrwa-screen-batch.php:82
 msgid "L’appariement de ce lot est arrêté : il est parti avec ce qui suit."
 msgstr ""
 
@@ -1313,7 +1333,7 @@ msgstr ""
 msgid "Mineur"
 msgstr ""
 
-#: class-msrwa-admin.php:169 class-msrwa-screen-batch.php:144
+#: class-msrwa-admin.php:169 class-msrwa-screen-batch.php:150
 msgid "Mise de côté"
 msgstr ""
 
@@ -1377,7 +1397,7 @@ msgstr ""
 msgid "Nombre de tentatives, par étape."
 msgstr ""
 
-#: class-msrwa-screen-batch.php:143
+#: class-msrwa-screen-batch.php:149
 msgid "Non décrite."
 msgstr ""
 
@@ -1433,7 +1453,7 @@ msgstr ""
 msgid "Par étape"
 msgstr ""
 
-#: class-msrwa-screen-batch.php:209
+#: class-msrwa-screen-batch.php:215
 msgid "Partir le"
 msgstr ""
 
@@ -1449,12 +1469,16 @@ msgstr ""
 msgid "Personnalisé"
 msgstr ""
 
-#: class-msrwa-screen-batch.php:175
+#: class-msrwa-screen-batch.php:181
 msgid "Peu sûr — à confirmer"
 msgstr ""
 
 #: class-msrwa-rest.php:120
 msgid "Photographie introuvable."
+msgstr ""
+
+#: class-msrwa-history.php:31
+msgid "Photographie trouvée par le moteur"
 msgstr ""
 
 #: class-msrwa-batch.php:37
@@ -1473,7 +1497,7 @@ msgstr ""
 msgid "Plafonds de dépense"
 msgstr ""
 
-#: class-msrwa-screen-batch.php:129
+#: class-msrwa-screen-batch.php:135
 msgid "Plat non reconnu"
 msgstr ""
 
@@ -1481,7 +1505,7 @@ msgstr ""
 msgid "Plus rien ne les lit. Elles ne sont jamais supprimées d’ici : c’est à vous, une fois la sauvegarde faite."
 msgstr ""
 
-#: class-msrwa-screen-batch.php:207
+#: class-msrwa-screen-batch.php:213
 msgid "Plus tard…"
 msgstr ""
 
@@ -1517,7 +1541,7 @@ msgstr ""
 msgid "Produit"
 msgstr ""
 
-#: class-msrwa-screen-batch.php:211
+#: class-msrwa-screen-batch.php:217
 msgid "Programmer"
 msgstr ""
 
@@ -1605,11 +1629,11 @@ msgstr ""
 msgid "Recette introuvable."
 msgstr ""
 
-#: class-msrwa-screen-batch.php:132
+#: class-msrwa-screen-batch.php:138
 msgid "Recette pour la photographie %s"
 msgstr ""
 
-#: class-msrwa-screen-batch.php:225 class-msrwa-screen-pass.php:171
+#: class-msrwa-screen-batch.php:231 class-msrwa-screen-pass.php:171
 msgid "Recettes"
 msgstr ""
 
@@ -1681,7 +1705,7 @@ msgstr ""
 msgid "Retour au lot"
 msgstr ""
 
-#: class-msrwa-screen-batch.php:189 class-msrwa-screen-compose.php:22
+#: class-msrwa-screen-batch.php:195 class-msrwa-screen-compose.php:22
 msgid "Retour au pass"
 msgstr ""
 
@@ -1785,6 +1809,10 @@ msgstr ""
 msgid "Résout ce qui est à l’écran sans l’enregistrer et sans appeler personne."
 msgstr ""
 
+#: class-msrwa-history.php:34
+msgid "Résultat"
+msgstr ""
+
 #: class-msrwa-screen-articles.php:146
 msgid "Sans article"
 msgstr ""
@@ -1793,7 +1821,7 @@ msgstr ""
 msgid "Sans dire lesquelles vont avec quoi : chacune sera décrite depuis ses propres pixels, puis associée à une recette — ou, sans texte, regroupée avec les autres photographies du même plat. Une photographie est facturée une fois, même si vous corrigez ensuite l’association."
 msgstr ""
 
-#: class-msrwa-admin.php:171 class-msrwa-screen-batch.php:101
+#: class-msrwa-admin.php:171 class-msrwa-screen-batch.php:107
 msgid "Sans photographie — références cherchées sur le web"
 msgstr ""
 
@@ -1853,7 +1881,7 @@ msgstr ""
 msgid "Supprimer ce lot et tout ce que le moteur en a rapporté ? Les brouillons déjà produits sont conservés. C’est irréversible."
 msgstr ""
 
-#: class-msrwa-screen-batch.php:192
+#: class-msrwa-screen-batch.php:198
 msgid "Supprimer le lot"
 msgstr ""
 
@@ -2033,7 +2061,7 @@ msgstr ""
 msgid "Une ligne par étape"
 msgstr ""
 
-#: class-msrwa-screen-batch.php:118 class-msrwa-screen-batch.php:119
+#: class-msrwa-screen-batch.php:124 class-msrwa-screen-batch.php:125
 msgid "Une photographie ne va avec aucune recette : elle ne sera pas utilisée."
 msgstr ""
 
@@ -2041,11 +2069,11 @@ msgstr ""
 msgid "Une recette complète est estimée à %s — une estimation, jamais une facture."
 msgstr ""
 
-#: class-msrwa-batch.php:185
+#: class-msrwa-batch.php:197
 msgid "Une recette de ce lot est estimée à %1$s, au-dessus de son plafond de %2$s : elle s’arrêterait en route après avoir dépensé. Relevez le plafond ou choisissez une sortie plus légère."
 msgstr ""
 
-#: class-msrwa-screen-batch.php:150
+#: class-msrwa-screen-batch.php:156
 msgid "Va avec"
 msgstr ""
 
@@ -2061,7 +2089,7 @@ msgstr ""
 msgid "Voir"
 msgstr ""
 
-#: class-msrwa-screen-batch.php:139
+#: class-msrwa-screen-batch.php:145
 msgid "Voir en grand"
 msgstr ""
 
@@ -2069,7 +2097,7 @@ msgstr ""
 msgid "Voir le détail de la recette %d"
 msgstr ""
 
-#: class-msrwa-screen-batch.php:116
+#: class-msrwa-screen-batch.php:122
 msgid "Vos photographies"
 msgstr ""
 
@@ -2101,7 +2129,7 @@ msgstr ""
 msgid "Vérifiez l’appariement"
 msgstr ""
 
-#: class-msrwa-screen-batch.php:75
+#: class-msrwa-screen-batch.php:81
 msgid "Vérifiez à quelle recette va chaque photographie, puis lancez. Une recette illustrée par vos photographies est écrite d’après elles ; sans photographie, ses références sont cherchées sur le web."
 msgstr ""
 
@@ -2189,7 +2217,7 @@ msgstr ""
 msgid "aucune photographie"
 msgstr ""
 
-#: class-msrwa-screen-batch.php:152 class-msrwa-screen-batch.php:158
+#: class-msrwa-screen-batch.php:158 class-msrwa-screen-batch.php:164
 msgid "aucune recette"
 msgstr ""
 
@@ -2619,6 +2647,10 @@ msgstr ""
 
 #: class-msrwa-admin.php:195 class-msrwa-screen-analysis.php:190 class-msrwa-screen-analysis.php:247 class-msrwa-screen-engine.php:232 class-msrwa-screen-engine.php:268 class-msrwa-screen-engine.php:309 class-msrwa-screen-run.php:200 class-msrwa-screen-run.php:233
 msgid "Étape"
+msgstr ""
+
+#: class-msrwa-history.php:33
+msgid "Étape de création"
 msgstr ""
 
 #: class-msrwa-screen-run.php:186 class-msrwa-screen-run.php:198 class-msrwa-screen-run.php:199

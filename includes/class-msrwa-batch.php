@@ -49,10 +49,21 @@ final class MSRWA_Batch {
 		// Kept with the lot, named after their bytes: the same photograph sent
 		// twice is one file, never a name that already exists.
 		$images = MSRWA_Sources::receive( $id, $files );
+		MSRWA_History::lot( $id, 'provided', array(
+			'owner' => get_current_user_id(), 'language' => $language, 'profile' => $profile,
+			'recipes' => $recipes,
+			'photos' => array_map( static function ( $image ) { return array( 'file' => $image['id'], 'name' => $image['file'], 'mime' => $image['mime'] ); }, $images ),
+		) );
 		$match = MSRWA_Match::run( $recipes, $images, self::engine_config( self::config_overrides( $id ) ), MSRWA_Sources::lot_dir( $id ) );
 		$recipes = $match['recipes'];
+		MSRWA_History::lot( $id, 'matching', array(
+			'readings' => array_map( static function ( $image ) { return array( 'file' => $image['id'], 'dish' => $image['dish'] ?? '', 'description' => $image['describes'] ?? '', 'observation' => $image['observation'] ?? array() ); }, $match['images'] ),
+			'recipes' => $recipes, 'pairs' => $match['pairs'], 'reasoning' => $match['reasoning'],
+			'cost_usd' => $match['cost_usd'], 'seconds' => $match['seconds'], 'errors' => $match['errors'],
+		) );
 		if ( ! $recipes ) {
 			// Photographs in which no dish could be named leave nothing to write.
+			MSRWA_History::forget_lot( $id );
 			MSRWA_Sources::forget_lot( $id );
 			$wpdb->delete( self::table(), array( 'id' => $id ) );
 			return new WP_Error( 'msrwa_no_dish', __( 'Aucun plat n’a été reconnu sur ces photographies. Ajoutez le nom de chaque recette dans le texte, avec ou sans les photographies.', 'ms-recipes-writer-ai' ) );
@@ -144,6 +155,7 @@ final class MSRWA_Batch {
 		}
 		$matching['pairs'] = $clean;
 		$wpdb->update( self::table(), array( 'matching_json' => wp_json_encode( $matching ), 'updated_at' => current_time( 'mysql', true ) ), array( 'id' => absint( $id ) ) );
+		MSRWA_History::lot( $id, 'pairing', array( 'by' => get_current_user_id(), 'pairs' => $clean ) );
 		return true;
 	}
 
@@ -201,6 +213,7 @@ final class MSRWA_Batch {
 			$brief = MSRWA_Match::brief( $recipe, $images );
 			$run = MSRWA_Run::create( (int) $id, (int) $batch['owner_id'], $brief, $config, MSRWA_Profile::steps( $batch['profile'], (array) ( $config['steps'] ?? array() ) ) );
 			if ( $run ) {
+				MSRWA_History::inherit( (int) $id, $run );
 				MSRWA_Sources::hand_over( (int) $id, $run, $brief );
 				$started++;
 			}
@@ -259,8 +272,10 @@ final class MSRWA_Batch {
 		// stay in the media library with nothing pointing at them.
 		MSRWA_Intake::forget( array_filter( array_column( (array) ( self::matching( $id )['images'] ?? array() ), 'id' ), 'is_int' ) );
 		MSRWA_Sources::forget_lot( $id );
+		MSRWA_History::forget_lot( $id );
 		foreach ( MSRWA_Run::for_batch( $id ) as $run ) {
 			MSRWA_Sources::forget_run( (int) $run['id'] );
+			MSRWA_History::forget_run( (int) $run['id'] );
 			foreach ( array( 'steps', 'calls', 'events', 'artifacts' ) as $table ) {
 				$wpdb->query( $wpdb->prepare( 'DELETE FROM ' . $t[ $table ] . ' WHERE run_id = %d', (int) $run['id'] ) );
 			}

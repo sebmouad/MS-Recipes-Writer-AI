@@ -20,7 +20,7 @@ $msrwa_prefix = $wpdb->prefix . 'msrwa_';
 
 // Every table MSRWA_DB::tables() names; the catalogue was added later and was
 // left behind.
-foreach ( array( 'batches', 'runs', 'steps', 'calls', 'events', 'artifacts', 'catalog' ) as $msrwa_table ) {
+foreach ( array( 'batches', 'runs', 'steps', 'calls', 'events', 'artifacts', 'catalog', 'history' ) as $msrwa_table ) {
 	$wpdb->query( 'DROP TABLE IF EXISTS ' . $msrwa_prefix . $msrwa_table ); // phpcs:ignore WordPress.DB
 }
 

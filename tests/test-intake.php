@@ -79,6 +79,9 @@ msrwa_test_contains( MSRWA_Intake::check( $many ), (string) MSRWA_Intake::MAX_PH
 msrwa_test_load( 'db', 'sources' );
 if ( ! function_exists( 'rest_url' ) ) { function rest_url( $path = '' ) { return 'https://example.test/wp-json/' . ltrim( $path, '/' ); } }
 $root = MSRWA_Sources::root();
+// A previous run of this test may have left its folders behind if it failed.
+foreach ( array( 7, 8 ) as $lot ) { MSRWA_Sources::forget_lot( $lot ); }
+MSRWA_Sources::forget_run( 41 );
 msrwa_test_assert( is_file( $root . '/.htaccess' ) && is_file( $root . '/index.php' ), 'The folder is closed to the web.' );
 $kept = MSRWA_Sources::receive( 7, array( $photo( 'Tarte Normande.png', $dir . '/tarte.png' ), $photo( 'copie.png', $dir . '/refuse.png' ) ) );
 msrwa_test_assert( 1 === count( $kept ), 'The same photograph twice in one lot is kept once.' );
@@ -90,24 +93,36 @@ msrwa_test_assert( isset( MSRWA_Sources::read( MSRWA_Sources::lot_dir( 7 ), $kep
 msrwa_test_assert( '' === MSRWA_Sources::path( MSRWA_Sources::lot_dir( 7 ), '../8/' . $kept[0]['id'] ), 'A name is never a path.' );
 msrwa_test_assert( '' === MSRWA_Sources::name( '../../wp-config.php' ), 'Anything but a stored name is refused.' );
 
-// Sent: each recipe's photographs move into its run's folder with a record of
-// what the writer provided; the engine's findings and completion join it.
+// Sent: each recipe's photographs move into its run's folder, and its history
+// records the brief it was handed, what the engine found, what it completed.
+msrwa_test_load( 'history' );
+$GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
+MSRWA_History::lot( 7, 'provided', array( 'recipes' => array( array( 'title' => 'Tarte', 'text' => 'Pommes.' ) ) ) );
+MSRWA_History::inherit( 7, 41 );
 MSRWA_Sources::hand_over( 7, 41, array( 'title' => 'Tarte', 'text' => 'Pommes.', 'images' => array( array( 'id' => $kept[0]['id'], 'title' => 'Tarte Normande', 'observation' => array( 'colours' => 'doré' ) ) ) ) );
-$record = MSRWA_Sources::manifest( 41 );
-msrwa_test_assert( 'Pommes.' === $record['provided']['text'] && $kept[0]['id'] === $record['provided']['photos'][0]['file'], 'The record says what the writer provided: ' . json_encode( $record ) );
+$history = array_map( 'basename', (array) glob( MSRWA_History::dir( 41 ) . '/*.json' ) );
+msrwa_test_assert( array( '01-provided.json', '02-brief.json' ) === $history, 'The job’s history opens with its lot’s pages, then its brief: ' . implode( ', ', $history ) );
+$brief = json_decode( file_get_contents( MSRWA_History::dir( 41 ) . '/02-brief.json' ), true );
+msrwa_test_assert( 'Pommes.' === $brief['text_brief']['text'] && $kept[0]['id'] === $brief['visual_brief']['photos'][0]['file'] && 'writer' === $brief['visual_brief']['source'], 'The brief holds the text reference and the visual one: ' . json_encode( $brief ) );
 msrwa_test_assert( is_file( MSRWA_Sources::run_dir( 41 ) . '/' . $kept[0]['id'] ), 'The photograph is in the run’s folder.' );
+msrwa_test_assert( ! is_file( MSRWA_Sources::lot_dir( 7 ) . '/' . $kept[0]['id'] ), 'It is moved, not copied: a photograph belongs to one recipe.' );
 $reader = MSRWA_Sources::reader( 41 );
 msrwa_test_assert( isset( $reader( array( 'id' => $kept[0]['id'] ), 1000000 )['data'] ), 'The engine reads it from there.' );
 $keep = MSRWA_Sources::keeper( 41 );
-msrwa_test_assert( ! is_file( MSRWA_Sources::lot_dir( 7 ) . '/' . $kept[0]['id'] ), 'It is moved, not copied: a photograph belongs to one recipe.' );
 $keep( 'https://example.org/tarte.jpg', MSRWA_Sources::read( MSRWA_Sources::run_dir( 41 ), $kept[0]['id'] ) );
-$record = MSRWA_Sources::manifest( 41 );
-msrwa_test_assert( 1 === count( $record['completed']['references'] ) && 'https://example.org/tarte.jpg' === $record['completed']['references'][0]['url'], 'A photograph the engine found is kept and recorded.' );
+msrwa_test_assert( 1 === count( (array) glob( MSRWA_Sources::run_dir( 41 ) . '/references/*.png' ) ) && is_file( MSRWA_History::dir( 41 ) . '/03-web_reference.json' ), 'A photograph the engine found is kept and recorded.' );
 MSRWA_Sources::complete( 41, array( 'dish_identity' => array( 'name' => 'Tarte normande' ), 'ingredients' => array( array( 'name' => 'pommes' ) ), 'preparation' => array() ) );
-msrwa_test_assert( 'Tarte normande' === MSRWA_Sources::manifest( 41 )['completed']['recipe']['dish'], 'What the engine completed is recorded beside it.' );
+$completed = json_decode( file_get_contents( MSRWA_History::dir( 41 ) . '/04-engine_brief.json' ), true );
+msrwa_test_assert( 'Tarte normande' === $completed['text_brief']['dish']['name'], 'What the engine completed is recorded after it.' );
+$rows = array_column( $GLOBALS['wpdb']->inserted, 1 );
+msrwa_test_assert( array( 'provided', 'brief', 'web_reference', 'engine_brief' ) === array_column( $rows, 'stage' ), 'Each page is also a row: ' . implode( ', ', array_column( $rows, 'stage' ) ) );
+msrwa_test_assert( 0 === $rows[0]['run_id'] && 41 === $rows[1]['run_id'], 'A lot’s page belongs to the lot until the lot is sent.' );
+MSRWA_History::run( 41, 'step', array( 'step' => 'research', 'error' => 'refused: key sk-proj-abcdefghijklmnopqrstuvwxyz0123456789' ), 7 );
+msrwa_test_missing( (string) file_get_contents( MSRWA_History::dir( 41 ) . '/05-step-research.json' ), 'sk-proj-abcdefghijklmnopqrstuvwxyz', 'No secret reaches the history.' );
 MSRWA_Sources::forget_lot( 7 );
 MSRWA_Sources::forget_lot( 8 );
 MSRWA_Sources::forget_run( 41 );
+MSRWA_History::forget_run( 41 );
 msrwa_test_assert( ! is_dir( MSRWA_Sources::lot_dir( 7 ) ) && ! is_dir( dirname( MSRWA_Sources::run_dir( 41 ) ) ), 'A lot and a run leave nothing behind.' );
 
 // Lots sent before 0.24.0 named library photographs; deleting one still

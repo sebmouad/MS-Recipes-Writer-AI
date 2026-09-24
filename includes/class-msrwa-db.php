@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
 final class MSRWA_DB {
 
 	/** Bumped whenever the schema below changes. */
-	const SCHEMA = 9;
+	const SCHEMA = 10;
 
 	public static function tables() {
 		global $wpdb;
@@ -30,6 +30,7 @@ final class MSRWA_DB {
 			'events'    => $prefix . 'events',
 			'artifacts' => $prefix . 'artifacts',
 			'catalog'   => $prefix . 'catalog',
+			'history'   => $prefix . 'history',
 		);
 	}
 
@@ -78,6 +79,9 @@ final class MSRWA_DB {
 			// came from — shipped, typed by a person, or looked up by a model —
 			// because a rate nobody can trace is a rate nobody should bill on.
 			"CREATE TABLE {$t['catalog']} (\n id bigint(20) unsigned NOT NULL AUTO_INCREMENT,\n provider varchar(32) NOT NULL,\n model_id varchar(191) NOT NULL,\n label varchar(191) NOT NULL DEFAULT '',\n content_type varchar(32) NOT NULL DEFAULT 'recipe',\n enabled tinyint(1) NOT NULL DEFAULT 1,\n input_usd decimal(12,6) NULL,\n output_usd decimal(12,6) NULL,\n price_method varchar(16) NOT NULL DEFAULT '',\n price_source text NULL,\n price_checked_at datetime NULL,\n capabilities_json longtext NULL,\n limits_json longtext NULL,\n steps_json longtext NULL,\n served tinyint(1) NULL,\n listed_at datetime NULL,\n notes text NULL,\n created_at datetime NOT NULL,\n updated_at datetime NOT NULL,\n PRIMARY KEY (id),\n UNIQUE KEY provider_model (provider,model_id),\n KEY enabled_provider (enabled,provider)\n) $charset;",
+			// A job's history, one row per stage, written once. Lot stages carry
+			// run_id 0 until the lot is sent. See MSRWA_History.
+			"CREATE TABLE {$t['history']} (\n id bigint(20) unsigned NOT NULL AUTO_INCREMENT,\n batch_id bigint(20) unsigned NOT NULL DEFAULT 0,\n run_id bigint(20) unsigned NOT NULL DEFAULT 0,\n stage varchar(32) NOT NULL,\n step varchar(64) NOT NULL DEFAULT '',\n content_json longtext NULL,\n bytes int unsigned NOT NULL DEFAULT 0,\n created_at datetime NOT NULL,\n PRIMARY KEY (id),\n KEY run_order (run_id,id),\n KEY batch_order (batch_id,id),\n KEY created_at (created_at)\n) $charset;",
 		) as $statement ) { dbDelta( $statement ); }
 
 		foreach ( array(

@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
  *   msrwa/lots/<lot>/<hash>.<ext>               a lot's photographs, until it is sent
  *   msrwa/<run>/sources/<hash>.<ext>            the writer's photographs for one recipe
  *   msrwa/<run>/sources/references/<hash>.<ext> the photographs the engine found
- *   msrwa/<run>/sources/source.json             what was provided, and what the engine completed
+ *   msrwa/<run>/history/NN-<stage>.json         what happened to them: see MSRWA_History
  *
  * A file is named after its bytes, so the same photograph sent twice is one
  * file, never a name that already exists.
@@ -102,8 +102,9 @@ final class MSRWA_Sources {
 
 	/**
 	 * Moves one recipe's photographs from its lot into its run's folder and
-	 * writes down what the writer provided. A photograph belongs to one
-	 * recipe, so it is moved rather than copied.
+	 * writes down the brief the engine is handed: the writer's text as the
+	 * text reference, their photographs and what each shows as the visual
+	 * one. A photograph belongs to one recipe, so it is moved, not copied.
 	 */
 	public static function hand_over( $lot, $run, array $brief ) {
 		$dir = self::run_dir( $run );
@@ -115,14 +116,10 @@ final class MSRWA_Sources {
 			if ( ! @rename( $from, $dir . '/' . basename( $from ) ) ) { @copy( $from, $dir . '/' . basename( $from ) ); } // phpcs:ignore WordPress.PHP.NoSilencedErrors
 			$photos[] = array( 'file' => basename( $from ), 'name' => (string) ( $image['title'] ?? '' ), 'observation' => (array) ( $image['observation'] ?? array() ) );
 		}
-		self::record( $run, array(
-			'provided' => array(
-				'title' => (string) ( $brief['title'] ?? '' ),
-				'text' => (string) ( $brief['text'] ?? '' ),
-				'photos' => $photos,
-			),
-			'completed' => array( 'recipe' => array(), 'references' => array() ),
-		) );
+		MSRWA_History::run( $run, 'brief', array(
+			'text_brief' => array( 'title' => (string) ( $brief['title'] ?? '' ), 'text' => (string) ( $brief['text'] ?? '' ) ),
+			'visual_brief' => array( 'photos' => $photos, 'source' => $photos ? 'writer' : 'engine' ),
+		), $lot );
 	}
 
 	/** Once every recipe has its photographs, the lot's own copies go. */
@@ -155,44 +152,29 @@ final class MSRWA_Sources {
 			wp_mkdir_p( $dir );
 			$name = substr( hash( 'sha256', $bytes ), 0, 32 ) . '.' . $ext;
 			if ( ! is_file( $dir . '/' . $name ) ) { @file_put_contents( $dir . '/' . $name, $bytes ); } // phpcs:ignore WordPress.PHP.NoSilencedErrors
-			$record = self::manifest( $run );
-			$references = (array) ( $record['completed']['references'] ?? array() );
-			if ( ! in_array( $name, array_column( $references, 'file' ), true ) ) {
-				$references[] = array( 'file' => 'references/' . $name, 'url' => esc_url_raw( (string) $url ) );
-				$record['completed']['references'] = $references;
-				self::record( $run, $record );
-			}
+			MSRWA_History::run( $run, 'web_reference', array( 'file' => 'sources/references/' . $name, 'url' => esc_url_raw( (string) $url ), 'mime' => (string) $image['mime'] ) );
 		};
 	}
 
 	/**
-	 * What the engine completed of the recipe: the dish, its ingredients and
-	 * steps, as the research set them down — the text reference when the
-	 * writer sent only photographs, the evidence behind it when they did not.
+	 * What the engine completed of the brief: the dish, its figures,
+	 * ingredients and steps as the text reference, and the photographs it was
+	 * written from as the visual one — the writer's, or those it found.
 	 */
 	public static function complete( $run, array $research ) {
-		$record = self::manifest( $run );
-		if ( ! $record ) { return; }
-		$record['completed']['recipe'] = array(
-			'dish' => (string) ( $research['dish_identity']['name'] ?? '' ),
-			'ingredients' => array_values( (array) ( $research['ingredients'] ?? array() ) ),
-			'preparation' => array_values( (array) ( $research['preparation'] ?? array() ) ),
-			'visual_references' => array_values( (array) ( $research['visual_references'] ?? array() ) ),
-		);
-		self::record( $run, $record );
-	}
-
-	public static function manifest( $run ) {
-		$path = self::run_dir( $run ) . '/source.json';
-		$record = is_file( $path ) ? json_decode( (string) file_get_contents( $path ), true ) : null;
-		return is_array( $record ) ? $record : array();
-	}
-
-	private static function record( $run, array $record ) {
-		$dir = self::run_dir( $run );
-		wp_mkdir_p( $dir );
-		// Model output is data: stripped of anything that could carry a secret.
-		@file_put_contents( $dir . '/source.json', (string) wp_json_encode( MSRWA_DB::sanitize( $record ), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) ); // phpcs:ignore WordPress.PHP.NoSilencedErrors
+		MSRWA_History::run( $run, 'engine_brief', array(
+			'text_brief' => array(
+				'dish' => (array) ( $research['dish_identity'] ?? array() ),
+				'outline' => (array) ( $research['recipe_outline'] ?? array() ),
+				'ingredients' => array_values( (array) ( $research['ingredients'] ?? array() ) ),
+				'preparation' => array_values( (array) ( $research['preparation'] ?? array() ) ),
+				'references' => array_values( (array) ( $research['references'] ?? array() ) ),
+			),
+			'visual_brief' => array(
+				'references' => array_values( (array) ( $research['visual_references'] ?? array() ) ),
+				'observations' => array_values( (array) ( $research['visual_observations'] ?? array() ) ),
+			),
+		) );
 	}
 
 	/** Removes one directory under uploads/msrwa and everything in it, and nothing outside. */

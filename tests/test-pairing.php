@@ -4,7 +4,7 @@
 // Marking every row confirmed on each save erased the model's doubts about
 // the photographs nobody had looked at yet.
 require __DIR__ . '/bootstrap.php';
-msrwa_test_load( 'rights', 'profile', 'batch' );
+msrwa_test_load( 'rights', 'profile', 'batch', 'db', 'sources', 'history' );
 msrwa_test_as_admin();
 
 $matching = array(
@@ -23,6 +23,8 @@ $GLOBALS['wpdb']->on( 'WHERE id = 7', array( array( 'id' => 7, 'owner_id' => 1, 
 MSRWA_Batch::repair( 7, array( array( 'image' => 0, 'recipe' => 0 ), array( 'image' => 1, 'recipe' => null ), array( 'image' => 2, 'recipe' => '' ) ) );
 $update = $GLOBALS['wpdb']->matching( 'UPDATE ' );
 msrwa_test_assert( 1 === count( $update ), 'One save.' );
+$kept = array_values( array_filter( $GLOBALS['wpdb']->inserted, static function ( $row ) { return false !== strpos( $row[0], 'history' ); } ) );
+msrwa_test_assert( 1 === count( $kept ) && 'pairing' === $kept[0][1]['stage'] && 7 === $kept[0][1]['batch_id'], 'The writer’s correction is written into the lot’s history.' );
 $saved = json_decode( json_decode( substr( $update[0], strpos( $update[0], '{' ) ), true )['matching_json'], true );
 $by = array();
 foreach ( $saved['pairs'] as $pair ) { $by[ $pair['image'] ] = $pair; }
