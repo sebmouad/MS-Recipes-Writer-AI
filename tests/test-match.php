@@ -90,6 +90,19 @@ msrwa_test_assert( array() === $nothing['recipes'], 'A title no photograph was g
 msrwa_test_contains( $source, "if ( ! \$seen['images'] ) {", 'Without photographs, nothing is paired or billed.' );
 msrwa_test_contains( $source, '$decision = self::propose( $seen[\'images\'], $config );', 'Without text, the photographs propose the recipes.' );
 
+// The dish names become titles when there is no text, and the reasons are
+// read by the writer: both come in the lot's language, not always French.
+$language = new ReflectionMethod( MSRWA_Match::class, 'language' );
+$language->setAccessible( true );
+msrwa_test_assert( 'espagnol' === $language->invoke( null, MSRWA_Engine_Config::create( array( 'settings' => array( 'site_language' => 'es' ) ) ) ), 'A Spanish lot is described in Spanish.' );
+msrwa_test_assert( 'français' === $language->invoke( null, MSRWA_Engine_Config::create( array() ) ), 'A lot that says nothing is French, as before.' );
+$instruction = new ReflectionMethod( MSRWA_Match::class, 'vision_instruction' );
+$instruction->setAccessible( true );
+msrwa_test_assert( 2 === substr_count( $instruction->invoke( null, 'anglais' ), 'en anglais' ), 'The dish and its description are asked for in the lot’s language.' );
+$proposal_prompt = new ReflectionMethod( MSRWA_Match::class, 'proposal_prompt' );
+$proposal_prompt->setAccessible( true );
+msrwa_test_missing( $proposal_prompt->invoke( null, $shots, 'espagnol' ), 'en français', 'Nor are the titles or the reasons French on a Spanish site.' );
+
 // --- The brief handed to the engine -------------------------------------
 
 $brief = MSRWA_Match::brief(

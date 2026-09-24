@@ -54,4 +54,11 @@ foreach ( array( 'batches', 'runs', 'steps', 'calls', 'events', 'artifacts' ) as
 msrwa_test_missing( $uninstall, 'wp_delete_post', 'Uninstalling never deletes an article somebody may have published.' );
 msrwa_test_missing( $uninstall, 'wp_delete_attachment', 'Uninstalling never deletes a reader’s media.' );
 
+// Every table the plugin creates is dropped: the catalogue, added later, was not.
+if ( ! class_exists( 'MSRWA_DB' ) ) { require_once dirname( __DIR__ ) . '/includes/class-msrwa-db.php'; }
+$GLOBALS['wpdb'] = $GLOBALS['wpdb'] ?? new MSRWA_Fake_Wpdb();
+foreach ( array_keys( MSRWA_DB::tables() ) as $table ) {
+	msrwa_test_contains( $uninstall, "'" . $table . "'", 'Uninstalling drops the ' . $table . ' table.' );
+}
+
 msrwa_test_done( 'uninstall leaves nothing behind' );

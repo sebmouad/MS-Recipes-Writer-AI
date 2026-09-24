@@ -840,8 +840,6 @@
       document.querySelectorAll('textarea[id^="ms-engine-"]').forEach(function (area) {
         config[area.id.replace('ms-engine-', '')] = area.value;
       });
-      var languageField = document.querySelector('input[name="msrwa_engine[language]"]');
-      if (languageField) { config.language = languageField.value; }
 
       preview.disabled = true;
       previewResult.innerHTML = '';

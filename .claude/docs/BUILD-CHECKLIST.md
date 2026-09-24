@@ -161,6 +161,11 @@ run carries.
   Chromium at 390 and 1280 px, live bulk delete).
 - [x] Generated images carry their article's author, earlier ones credited
   on installation, checked live (`tests/test-media-author.php`).
+- [x] Fresh audit, 0.23.3: no money on any route or screen a writer reaches,
+  one rule for managing, Arabic plurals, uninstall complete, photo-only lots
+  in the site's language; every screen clean as administrator and author, in
+  three languages, right to left, at 1280 and 390 px (`tests/test-rest-money.php`,
+  `tests/test-i18n.php`, `tests/test-uninstall.php`, `tests/test-match.php`).
 - [ ] A complete lot on Claude — the account has no credit. — the Gemini key's
   grounding quota is exhausted, OpenAI is unreachable from the test
   environment and the Claude account has no credit.

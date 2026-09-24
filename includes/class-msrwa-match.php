@@ -70,7 +70,7 @@ final class MSRWA_Match {
 				$out['images'][ $index ] = array_merge( $image, array( 'describes' => '', 'dish' => '' ) );
 				continue;
 			}
-			$plan = MSRWA_Engine_Call::plan_vision( $route['provider'], $route['model'], $bytes, $image['title'], 400, $wire, self::vision_instruction() );
+			$plan = MSRWA_Engine_Call::plan_vision( $route['provider'], $route['model'], $bytes, $image['title'], 400, $wire, self::vision_instruction( self::language( $config ) ) );
 			if ( isset( $plan['error'] ) ) {
 				$out['errors'][] = $image['file'] . ' : ' . $plan['error'];
 				$out['images'][ $index ] = array_merge( $image, array( 'describes' => '', 'dish' => '' ) );
@@ -105,7 +105,7 @@ final class MSRWA_Match {
 		$wire = $config->provider( $route['provider'], $route['model'], 'canonical_recipe' );
 		$started = microtime( true );
 
-		$answer = MSRWA_Engine_Call::text( $route['provider'], $route['model'], self::prompt( $recipes, $images ), 1500, true, false, $wire );
+		$answer = MSRWA_Engine_Call::text( $route['provider'], $route['model'], self::prompt( $recipes, $images, self::language( $config ) ), 1500, true, false, $wire );
 		$cost = $config->price( $route['provider'], $route['model'], (array) ( $answer['usage'] ?? array() ) );
 		$decoded = MSRWA_Json::decode( (string) ( $answer['text'] ?? '' ) );
 
@@ -132,7 +132,7 @@ final class MSRWA_Match {
 		$out = array( 'recipes' => array(), 'pairs' => array(), 'reasoning' => '', 'cost_usd' => 0.0, 'seconds' => 0.0, 'errors' => array() );
 		if ( ! $named ) { return $out; }
 
-		$answer = MSRWA_Engine_Call::text( $route['provider'], $route['model'], self::proposal_prompt( $images ), 1500, true, false, $wire );
+		$answer = MSRWA_Engine_Call::text( $route['provider'], $route['model'], self::proposal_prompt( $images, self::language( $config ) ), 1500, true, false, $wire );
 		$out['cost_usd'] = (float) $config->price( $route['provider'], $route['model'], (array) ( $answer['usage'] ?? array() ) );
 		$out['seconds'] = round( microtime( true ) - $started, 1 );
 		$decoded = MSRWA_Json::decode( (string) ( $answer['text'] ?? '' ) );
@@ -186,7 +186,18 @@ final class MSRWA_Match {
 		return array( 'title' => $title, 'text' => $text, 'from_photographs' => true );
 	}
 
-	private static function proposal_prompt( array $images ) {
+	/**
+	 * The lot's language, as the prompts name it. A dish name the pairing
+	 * reads becomes a recipe's title when there is no text, and its reasons
+	 * are shown to the writer: both are written in the language of the site.
+	 */
+	private static function language( MSRWA_Engine_Config $config ) {
+		$names = array( 'fr' => 'français', 'en' => 'anglais', 'ar' => 'arabe', 'es' => 'espagnol' );
+		$code = (string) ( $config->settings()['site_language'] ?? $config->get( 'language', 'fr' ) );
+		return $names[ $code ] ?? 'français';
+	}
+
+	private static function proposal_prompt( array $images, $language = 'français' ) {
 		$lines = array(
 			'Un rédacteur a fourni des photographies de plats, sans aucun texte.',
 			'Chaque plat distinct deviendra une recette, illustrée par ses photographies.',
@@ -199,26 +210,26 @@ final class MSRWA_Match {
 		$lines[] = '';
 		$lines[] = 'RÈGLES :';
 		$lines[] = '- Deux photographies du même plat vont à la même recette, même si le nom reconnu diffère un peu.';
-		$lines[] = '- Le titre est le nom usuel du plat, en français, sans adjectif publicitaire.';
+		$lines[] = '- Le titre est le nom usuel du plat, en ' . $language . ', sans adjectif publicitaire.';
 		$lines[] = '- Une photographie où aucun plat n’est reconnu n’appartient à aucune recette.';
 		$lines[] = '- N’invente aucun plat qu’aucune photographie ne montre.';
 		$lines[] = '';
 		$lines[] = 'RÉPONSE — un objet JSON valide, sans Markdown, avec exactement ces clés :';
 		$lines[] = '- "recipes" : tableau de {"title": le nom du plat}';
-		$lines[] = '- "pairs" : tableau de {"image": entier, "recipe": indice dans "recipes" ou null, "confidence": "haute"|"moyenne"|"basse", "why": une phrase en français}';
+		$lines[] = '- "pairs" : tableau de {"image": entier, "recipe": indice dans "recipes" ou null, "confidence": "haute"|"moyenne"|"basse", "why": une phrase en ' . $language . '}';
 		$lines[] = '- "reasoning" : une phrase sur la façon dont l’ensemble se répartit';
 		return implode( "\n", $lines );
 	}
 
-	private static function vision_instruction() {
+	private static function vision_instruction( $language = 'français' ) {
 		return 'Tu regardes une photographie destinée à illustrer une recette. Réponds en JSON avec exactement deux clés : '
-			. '"dish", le nom du plat tel qu’un cuisinier le reconnaîtrait, en français, ou "" si tu ne peux pas le nommer ; '
-			. '"description", une phrase décrivant ce qui est visible — ingrédients principaux, couleur, cuisson, présentation. '
+			. '"dish", le nom du plat tel qu’un cuisinier le reconnaîtrait, en ' . $language . ', ou "" si tu ne peux pas le nommer ; '
+			. '"description", une phrase en ' . $language . ' décrivant ce qui est visible — ingrédients principaux, couleur, cuisson, présentation. '
 			. 'Ne décris que ce qui est visible. N’invente ni ingrédient caché, ni quantité, ni origine.';
 	}
 
 	/** What the pairing call is asked, with the recipes and the photographs numbered. */
-	private static function prompt( array $recipes, array $images ) {
+	private static function prompt( array $recipes, array $images, $language = 'français' ) {
 		$lines = array(
 			'Un rédacteur a fourni plusieurs recettes et plusieurs photographies, sans dire lesquelles vont ensemble.',
 			'Associe chaque photographie à la recette qu’elle illustre.',
@@ -241,7 +252,7 @@ final class MSRWA_Match {
 		$lines[] = '- Dans le doute, n’associe pas. Une photographie laissée de côté coûte moins qu’une photographie attribuée au mauvais plat, qui illustrera un article entier.';
 		$lines[] = '';
 		$lines[] = 'RÉPONSE — un objet JSON valide, sans Markdown, avec exactement ces clés :';
-		$lines[] = '- "pairs" : tableau de {"image": entier, "recipe": entier ou null, "confidence": "haute"|"moyenne"|"basse", "why": une phrase en français}';
+		$lines[] = '- "pairs" : tableau de {"image": entier, "recipe": entier ou null, "confidence": "haute"|"moyenne"|"basse", "why": une phrase en ' . $language . '}';
 		$lines[] = '- "reasoning" : une phrase sur la façon dont l’ensemble se répartit';
 		return implode( "\n", $lines );
 	}

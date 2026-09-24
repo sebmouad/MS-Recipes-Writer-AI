@@ -5,9 +5,9 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.23.2
+## État actuel — 0.23.3
 
-La version `0.23.2` crée articles et images par les chemins natifs de WordPress, au nom du rédacteur ; la `0.23.1` attribuait les images générées à l’auteur de leur article ; la `0.23.0` faisait traiter les images par MS Image Optimizer (compression, redimensionnement, champs SEO), écrit en espagnol, propose des préréglages de qualité, suit chaque article dans WordPress et répare les actions groupées ; la `0.22.0` écrivait la recherche d’après les photographies du rédacteur quand il en a fourni, sans recherche sur le web, et refait l’écran d’appariement ; la `0.21.0` acceptait un lot fait de texte, de photographies ou des deux, et fait lire aux écrans Modèles et Moteur la même règle ; la `0.20.2` rendait l’écran Moteur lisible sur ordinateur comme sur téléphone et distingue le modèle de la réflexion ; la `0.20.1` ne laissait confier une étape qu’à un modèle capable de la faire ; la `0.20.0` remplissait chaque brouillon comme le lisent le thème MS Recipes, MS SEO Plus, MS FB Posts et MS Image Optimizer ; la `0.19.0` ramenait une recette approuvée du premier coup à 0,09–0,10 $ sans perte mesurée ; la `0.18.9` reprenait chaque écran après une revue complète dans le navigateur ; la `0.18.8` réservait l’extension, renommée « MS Recipes AI » dans le menu, à ceux qui peuvent téléverser des fichiers ; la `0.18.7` disait juste ce que fait le plafond par recette ; la `0.18.6` rangeait les photographies envoyées avec le brouillon qu’elles ont servi à écrire ; la `0.18.5` faisait passer un lot de trois recettes en 8 minutes pour 0,125 $ la recette, toutes approuvées ; la `0.18.4` faisait envoyer les photographies d’un lot depuis l’ordinateur du rédacteur ; la `0.18.3` faisait approuver les trois recettes d’un lot réel aux réglages par défaut — image à la une en `low`, collage en `medium` — pour 0,132 $ en moyenne ; la `0.18.2` permettait de choisir le modèle et la qualité de chaque image
+La version `0.23.3` corrige ce qu’un audit complet a trouvé — argent visible d’un rédacteur, pluriels arabes, droits, désinstallation ; la `0.23.2` créait articles et images par les chemins natifs de WordPress, au nom du rédacteur ; la `0.23.1` attribuait les images générées à l’auteur de leur article ; la `0.23.0` faisait traiter les images par MS Image Optimizer (compression, redimensionnement, champs SEO), écrit en espagnol, propose des préréglages de qualité, suit chaque article dans WordPress et répare les actions groupées ; la `0.22.0` écrivait la recherche d’après les photographies du rédacteur quand il en a fourni, sans recherche sur le web, et refait l’écran d’appariement ; la `0.21.0` acceptait un lot fait de texte, de photographies ou des deux, et fait lire aux écrans Modèles et Moteur la même règle ; la `0.20.2` rendait l’écran Moteur lisible sur ordinateur comme sur téléphone et distingue le modèle de la réflexion ; la `0.20.1` ne laissait confier une étape qu’à un modèle capable de la faire ; la `0.20.0` remplissait chaque brouillon comme le lisent le thème MS Recipes, MS SEO Plus, MS FB Posts et MS Image Optimizer ; la `0.19.0` ramenait une recette approuvée du premier coup à 0,09–0,10 $ sans perte mesurée ; la `0.18.9` reprenait chaque écran après une revue complète dans le navigateur ; la `0.18.8` réservait l’extension, renommée « MS Recipes AI » dans le menu, à ceux qui peuvent téléverser des fichiers ; la `0.18.7` disait juste ce que fait le plafond par recette ; la `0.18.6` rangeait les photographies envoyées avec le brouillon qu’elles ont servi à écrire ; la `0.18.5` faisait passer un lot de trois recettes en 8 minutes pour 0,125 $ la recette, toutes approuvées ; la `0.18.4` faisait envoyer les photographies d’un lot depuis l’ordinateur du rédacteur ; la `0.18.3` faisait approuver les trois recettes d’un lot réel aux réglages par défaut — image à la une en `low`, collage en `medium` — pour 0,132 $ en moyenne ; la `0.18.2` permettait de choisir le modèle et la qualité de chaque image
 séparément ; la `0.18.1` fait tenir le plafond par recette jusque dans les reprises
 de l’approbation finale ; la `0.18.0` ramène une recette complète à environ 0,11 $ réels —
 recherche web comprise — sans perte de qualité mesurée ; la `0.17.0` faisait
@@ -74,6 +74,41 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.23.3
+
+**Audit complet** — sécurité, chaque écran en tant qu’administrateur et
+qu’auteur, en français, anglais et arabe de droite à gauche, sur ordinateur et
+téléphone, et la cohérence des derniers changements. Ce qui a été trouvé et
+corrigé :
+
+- **De l’argent atteignait un rédacteur.** La route `GET /queue`, ouverte aux
+  rédacteurs, renvoyait les plafonds quotidien et mensuel du site et ce qui
+  avait été dépensé. Un rédacteur n’y apprend plus que si le site peut encore
+  dépenser.
+- **Une seule règle pour administrer.** Les écrans de gestion s’ouvrent sur
+  `msrwa_manage`, les routes derrière leurs boutons exigeaient
+  `manage_options` : quelqu’un à qui l’on donne la première voyait les
+  boutons et recevait un refus. Tout passe désormais par `MSRWA_Rights`.
+- **Tous les pluriels arabes étaient faux.** Le compilateur des catalogues
+  laissait tomber l’en-tête, donc la règle des pluriels : WordPress appliquait
+  les deux formes de l’anglais, et « 1 recette » s’affichait « aucune
+  recette ». Les six formes de l’arabe sont désormais justes, et un test vérifie
+  chaque catalogue.
+- **« undefined/undefined »** remplaçait le compteur d’étapes d’un rédacteur
+  qui suivait son lot : l’avancement lui est rendu, sans le nom technique de
+  l’étape ni le coût.
+- **Désinstaller laissait la table du catalogue.** Elle est supprimée avec les
+  autres, et un test compare la liste aux tables du code.
+- **Lot fait de photographies seules sur un site non francophone** : les
+  titres de recettes, les descriptions et les raisons de l’appariement étaient
+  demandés en français ; ils le sont dans la langue du site.
+- Sur téléphone, le tableau des niveaux de l’écran Modèles débordait de 15 px.
+
+Vérifié : aucune erreur de script, aucun avertissement PHP, aucun débordement
+sur les dix écrans, dans les trois langues, aux deux largeurs ; aucun montant
+sur un écran qu’un auteur peut ouvrir ; les cinq écrans de gestion lui sont
+refusés ; le contenu d’un article traverse le filtre d’un auteur à l’octet près.
 
 ## Version 0.23.2
 
