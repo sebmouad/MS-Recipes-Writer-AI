@@ -117,10 +117,11 @@ final class MSRWA_Engine_Config {
 			'images' => array(
 				// The lowest quality the final approval passes: a featured image is
 				// judged good at every tier, and `low` costs $0.014 against $0.021.
-				// The collage is drawn at `high`, the owner's choice on 2026-09-24:
-				// the finest texture measured, about $0.056 against $0.025.
+				// The collage is drawn at `medium` from a reference image: the style
+				// comes from the reference, and on seven dishes medium matched high
+				// for $0.021 against $0.051 (owner's request to cut cost, 2026-09-24).
 				'featured_quality' => 'low',
-				'facebook_quality' => 'high',
+				'facebook_quality' => 'medium',
 				'format'           => 'webp',
 				'featured_ratio'   => '1:1',
 				'facebook_ratio'   => '2:3',
@@ -153,6 +154,9 @@ final class MSRWA_Engine_Config {
 				'budget_usd'         => 0.0,
 				'seconds'            => 0,
 				'image_prompt_chars' => 30000,
+				// The long side a collage's reference image is shrunk to before it
+				// is sent; 0 sends it as it is. Billed per tile read.
+				'reference_pixels'   => 768,
 				'images_inspected'   => 3,
 				// Web photographs the research reads when the editor sent none. One
 				// visual reference is what a recipe needs; each more is a paid look.

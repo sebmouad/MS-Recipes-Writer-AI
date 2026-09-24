@@ -727,6 +727,19 @@ photograph, and otherwise use the photograph without the cost of a search.
     the upload as a form and got HTTP 400; every send now passes the upload
     flag, and a test reads the source to keep it so.
 
+37. **Cheaper collage, no packaging.** Owner's request, 2026-09-24: the live
+    apple tart showed its pastry as a wrapped block in panel 1, and the collage
+    was 43% of a recipe's cost. The composing instruction now has everything
+    bought set out of its packaging (pastry as a sheet or ball of dough,
+    butter on a plate, cream in a jug) and bans cartons, packets, wrapped
+    blocks, film and labelled bottles in every panel. The reference image is
+    shrunk to `limits.reference_pixels` (768 on the long side) before it is
+    sent: 704 input image tokens instead of 1,536. `images.facebook_quality`
+    ships `medium` again: with a reference carrying the style, seven dishes at
+    medium matched high for $0.021 against $0.051 a collage. Three full runs:
+    first passes $0.086–0.109 (from about $0.126), each approved after one
+    redraw for a real fault, totals $0.114–0.133 with the redraw.
+
 ### Still open
 
 

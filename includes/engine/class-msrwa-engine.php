@@ -711,8 +711,35 @@ final class MSRWA_Engine {
 		return array( 'prompt' => $prompt, 'references' => $reference['image'] ? array( $reference['image'] ) : array() ) + $spent;
 	}
 
+	/**
+	 * A reference image made small before it is sent: the model is billed for
+	 * every tile it reads, and a style or a dish reads as well at a fraction of
+	 * a photograph's size. Returned as it was when GD cannot shrink it.
+	 */
+	private static function shrink_reference( array $image, $pixels ) {
+		$pixels = (int) $pixels;
+		if ( $pixels <= 0 || ! function_exists( 'imagecreatefromstring' ) ) { return $image; }
+		$source = @imagecreatefromstring( (string) base64_decode( (string) $image['data'] ) ); // phpcs:ignore WordPress.PHP.NoSilencedErrors
+		if ( ! $source ) { return $image; }
+		$width = imagesx( $source );
+		$height = imagesy( $source );
+		if ( max( $width, $height ) <= $pixels ) { return $image; }
+		$scale = $pixels / max( $width, $height );
+		$small = imagescale( $source, max( 1, (int) round( $width * $scale ) ), max( 1, (int) round( $height * $scale ) ) );
+		ob_start();
+		imagejpeg( $small, null, 88 );
+		$bytes = (string) ob_get_clean();
+		return '' === $bytes ? $image : array( 'mime' => 'image/jpeg', 'data' => base64_encode( $bytes ) );
+	}
+
 	/** The image a composed collage is drawn from: the editor's photograph, else a style reference. */
 	private static function collage_reference( MSRWA_Engine_Config $config, array $options, array $brief ) {
+		$found = self::find_reference( $config, $options, $brief );
+		if ( $found['image'] ) { $found['image'] = self::shrink_reference( $found['image'], (int) $config->get( 'limits.reference_pixels', 768 ) ); }
+		return $found;
+	}
+
+	private static function find_reference( MSRWA_Engine_Config $config, array $options, array $brief ) {
 		$max = (int) $config->get( 'limits.max_image_bytes', 10000000 );
 		foreach ( array_slice( array_values( (array) ( $brief['images'] ?? array() ) ), 0, 1 ) as $candidate ) {
 			$image = is_array( $candidate ) && is_callable( $options['read_image'] ?? null ) ? (array) call_user_func( $options['read_image'], $candidate, $max ) : array();

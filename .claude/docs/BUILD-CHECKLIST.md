@@ -607,6 +607,9 @@ cost) in the task before changing anything.
   in Réglages); the image is drawn with that reference. Real: lab runs on
   four dishes, and a full lot through the plugin with the uploaded reference.
   See ENGINE.md §7, item 36.
+- [x] **A40 — Cheaper collage, no packaging (2026-09-24).** Out-of-packaging
+  rule, reference shrunk to 768 px, collage at medium. Real: seven dishes
+  compared, three full runs. See ENGINE.md §7, item 37.
 - [x] **A11 — Model answers that do not parse (found 2026-09-20).** Two of the
   54 matrix cells scored zero for a reason that was ours, not the prompt's:
   Opus 5 wrote "I'll research this dish now." before the object, and Sonnet 5
