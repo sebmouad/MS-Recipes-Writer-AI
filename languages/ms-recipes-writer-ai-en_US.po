@@ -2148,6 +2148,9 @@ msgstr "deleted"
 msgid "à la corbeille"
 msgstr "in the bin"
 
+msgid "Photographie introuvable."
+msgstr "Photograph not found."
+
 msgid "aucune page citée"
 msgstr "no page cited"
 

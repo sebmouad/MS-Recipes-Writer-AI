@@ -40,18 +40,16 @@ foreach ( array( 'administrator', 'editor', 'author', 'writer' ) as $msrwa_role_
 	}
 }
 
-// The generated images live under uploads/msrwa/<run>/. They are only ever
-// referenced by rows that have just been dropped, so nothing else can be
-// reading them — but the walk stays inside that one directory and removes
-// nothing it did not expect to find.
+// uploads/msrwa/ holds the generated images of each run, the photographs each
+// recipe was written from and the lots still being paired. Only rows that have
+// just been dropped point at any of it. The walk stays inside that one
+// directory and follows no link out of it.
 $msrwa_uploads = wp_upload_dir();
-$msrwa_root = trailingslashit( $msrwa_uploads['basedir'] ) . 'msrwa';
-if ( is_dir( $msrwa_root ) ) {
-	foreach ( (array) glob( $msrwa_root . '/*', GLOB_ONLYDIR ) as $msrwa_run_dir ) {
-		foreach ( (array) glob( $msrwa_run_dir . '/*' ) as $msrwa_file ) {
-			if ( is_file( $msrwa_file ) ) { wp_delete_file( $msrwa_file ); }
-		}
-		@rmdir( $msrwa_run_dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors
+$msrwa_root = realpath( trailingslashit( $msrwa_uploads['basedir'] ) . 'msrwa' );
+if ( $msrwa_root && is_dir( $msrwa_root ) ) {
+	$msrwa_items = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $msrwa_root, FilesystemIterator::SKIP_DOTS ), RecursiveIteratorIterator::CHILD_FIRST );
+	foreach ( $msrwa_items as $msrwa_item ) {
+		if ( $msrwa_item->isLink() || $msrwa_item->isFile() ) { @unlink( $msrwa_item->getPathname() ); } else { @rmdir( $msrwa_item->getPathname() ); } // phpcs:ignore WordPress.PHP.NoSilencedErrors
 	}
 	@rmdir( $msrwa_root ); // phpcs:ignore WordPress.PHP.NoSilencedErrors
 }

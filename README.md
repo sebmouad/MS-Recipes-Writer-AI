@@ -5,9 +5,9 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.23.5
+## État actuel — 0.24.0
 
-La version `0.23.5` borne les listes de la recherche pour qu’elle ne s’arrête plus sur son plafond ; la `0.23.4` dessinait la cuisson à blanc d’un collage par son fond doré, sans billes ni papier, tient la grille à six cases quel que soit le nombre d’étapes et fait refuser par la vérification finale un panneau d’ustensiles ou une case vide ; la `0.23.3` corrigeait ce qu’un audit complet a trouvé — argent visible d’un rédacteur, pluriels arabes, droits, désinstallation ; la `0.23.2` créait articles et images par les chemins natifs de WordPress, au nom du rédacteur ; la `0.23.1` attribuait les images générées à l’auteur de leur article ; la `0.23.0` faisait traiter les images par MS Image Optimizer (compression, redimensionnement, champs SEO), écrit en espagnol, propose des préréglages de qualité, suit chaque article dans WordPress et répare les actions groupées ; la `0.22.0` écrivait la recherche d’après les photographies du rédacteur quand il en a fourni, sans recherche sur le web, et refait l’écran d’appariement ; la `0.21.0` acceptait un lot fait de texte, de photographies ou des deux, et fait lire aux écrans Modèles et Moteur la même règle ; la `0.20.2` rendait l’écran Moteur lisible sur ordinateur comme sur téléphone et distingue le modèle de la réflexion ; la `0.20.1` ne laissait confier une étape qu’à un modèle capable de la faire ; la `0.20.0` remplissait chaque brouillon comme le lisent le thème MS Recipes, MS SEO Plus, MS FB Posts et MS Image Optimizer ; la `0.19.0` ramenait une recette approuvée du premier coup à 0,09–0,10 $ sans perte mesurée ; la `0.18.9` reprenait chaque écran après une revue complète dans le navigateur ; la `0.18.8` réservait l’extension, renommée « MS Recipes AI » dans le menu, à ceux qui peuvent téléverser des fichiers ; la `0.18.7` disait juste ce que fait le plafond par recette ; la `0.18.6` rangeait les photographies envoyées avec le brouillon qu’elles ont servi à écrire ; la `0.18.5` faisait passer un lot de trois recettes en 8 minutes pour 0,125 $ la recette, toutes approuvées ; la `0.18.4` faisait envoyer les photographies d’un lot depuis l’ordinateur du rédacteur ; la `0.18.3` faisait approuver les trois recettes d’un lot réel aux réglages par défaut — image à la une en `low`, collage en `medium` — pour 0,132 $ en moyenne ; la `0.18.2` permettait de choisir le modèle et la qualité de chaque image
+La version `0.24.0` garde les photographies des rédacteurs hors de la médiathèque, dans un dossier propre à l’extension, avec pour chaque recette ce qui a été fourni et ce que le moteur a complété, et ne lit plus chaque photographie qu’une fois ; la `0.23.5` bornait les listes de la recherche pour qu’elle ne s’arrête plus sur son plafond ; la `0.23.4` dessinait la cuisson à blanc d’un collage par son fond doré, sans billes ni papier, tient la grille à six cases quel que soit le nombre d’étapes et fait refuser par la vérification finale un panneau d’ustensiles ou une case vide ; la `0.23.3` corrigeait ce qu’un audit complet a trouvé — argent visible d’un rédacteur, pluriels arabes, droits, désinstallation ; la `0.23.2` créait articles et images par les chemins natifs de WordPress, au nom du rédacteur ; la `0.23.1` attribuait les images générées à l’auteur de leur article ; la `0.23.0` faisait traiter les images par MS Image Optimizer (compression, redimensionnement, champs SEO), écrit en espagnol, propose des préréglages de qualité, suit chaque article dans WordPress et répare les actions groupées ; la `0.22.0` écrivait la recherche d’après les photographies du rédacteur quand il en a fourni, sans recherche sur le web, et refait l’écran d’appariement ; la `0.21.0` acceptait un lot fait de texte, de photographies ou des deux, et fait lire aux écrans Modèles et Moteur la même règle ; la `0.20.2` rendait l’écran Moteur lisible sur ordinateur comme sur téléphone et distingue le modèle de la réflexion ; la `0.20.1` ne laissait confier une étape qu’à un modèle capable de la faire ; la `0.20.0` remplissait chaque brouillon comme le lisent le thème MS Recipes, MS SEO Plus, MS FB Posts et MS Image Optimizer ; la `0.19.0` ramenait une recette approuvée du premier coup à 0,09–0,10 $ sans perte mesurée ; la `0.18.9` reprenait chaque écran après une revue complète dans le navigateur ; la `0.18.8` réservait l’extension, renommée « MS Recipes AI » dans le menu, à ceux qui peuvent téléverser des fichiers ; la `0.18.7` disait juste ce que fait le plafond par recette ; la `0.18.6` rangeait les photographies envoyées avec le brouillon qu’elles ont servi à écrire ; la `0.18.5` faisait passer un lot de trois recettes en 8 minutes pour 0,125 $ la recette, toutes approuvées ; la `0.18.4` faisait envoyer les photographies d’un lot depuis l’ordinateur du rédacteur ; la `0.18.3` faisait approuver les trois recettes d’un lot réel aux réglages par défaut — image à la une en `low`, collage en `medium` — pour 0,132 $ en moyenne ; la `0.18.2` permettait de choisir le modèle et la qualité de chaque image
 séparément ; la `0.18.1` fait tenir le plafond par recette jusque dans les reprises
 de l’approbation finale ; la `0.18.0` ramène une recette complète à environ 0,11 $ réels —
 recherche web comprise — sans perte de qualité mesurée ; la `0.17.0` faisait
@@ -74,6 +74,37 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.24.0
+
+**Les photographies des rédacteurs ne vont plus dans la médiathèque.** La
+médiathèque ne contient plus que les images des articles — image à la une et
+collage. Les photographies envoyées avec un lot sont des sources de travail :
+elles sont gardées dans `wp-content/uploads/msrwa/`, fermé au web, et ne
+s’affichent qu’à ceux qui peuvent voir le lot.
+
+- **Un dossier par recette.** À l’envoi du lot, les photographies de chaque
+  recette rejoignent son dossier avec un fichier `source.json` : ce que le
+  rédacteur a fourni (texte, photographies et ce que chacune montre), puis ce
+  que le moteur a complété (le plat, ses ingrédients et ses étapes) et les
+  photographies trouvées sur le web qu’il a lues, gardées dans `references/`.
+  Supprimer le lot ou la recette supprime son dossier.
+- **Plus d’erreur « le fichier existe déjà ».** Une photographie est nommée
+  d’après son contenu : envoyée deux fois, dans un lot ou dans deux, elle est
+  un seul fichier.
+- **Chaque photographie n’est lue qu’une fois.** L’appariement la lit avec les
+  consignes d’observation du moteur, et la recherche reprend cette lecture au
+  lieu de payer un second regard. Vérifié : recherche 13/13 depuis deux
+  photographies, sans recherche web ni seconde lecture, 0,0049 $.
+- **Un lot d’une seule recette n’est plus apparié par un appel payant** : ses
+  photographies sont les siennes.
+- **Deux références visuelles par recette.** Avec au moins deux photographies
+  lisibles, la recherche s’en contente ; avec une seule, elle cherche sur le
+  web le complément, la photographie du rédacteur en tête. Le réglage
+  `research.min_photographs` du moteur le fixe, et l’estimation le suit.
+
+Les lots envoyés avant cette version gardent leurs photographies dans la
+médiathèque ; elles partent avec leur lot comme avant.
 
 ## Version 0.23.5
 

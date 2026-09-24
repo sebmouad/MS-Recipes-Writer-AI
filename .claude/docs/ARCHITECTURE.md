@@ -159,7 +159,7 @@ checks are how a list ends up scoped on one screen and not the next.
 | `msrwa_manage` | settings, the engine, analysis, deletion, the whole ledger |
 
 The plugin is for users WordPress already trusts with uploads, since a lot's
-photographs enter the media library: `MSRWA_Rights::may_write()` requires
+photographs are stored on the site: `MSRWA_Rights::may_write()` requires
 `upload_files` beside `msrwa_create` — authors, editors and administrators by
 default, never a contributor. Without it there is no menu, no screen, no route
 and no box in the post editor, whatever else the user holds.
@@ -330,16 +330,23 @@ Break these and the plugin misreports itself.
     of markup first**, in `MSRWA_Draft::map_recipe()` as everywhere else in that
     file. A card plugin's own template is not this plugin's to trust.
 
-16. **A lot's photographs are the files its writer sent**, uploaded from their
-    computer with the lot (`photos[]`), never picked from the media library:
-    `POST /batches` reads no attachment id. `MSRWA_Intake::upload()` checks
-    every file from its bytes (JPEG, PNG or WebP, under
-    `MSRWA_Admin::photo_bytes()`, at most `MSRWA_Intake::MAX_PHOTOS`) before
-    adding any, refuses the whole lot on one bad file, and removes what it
-    added when the lot cannot be created. Each is marked
-    `_msrwa_sent_by_writer`; the draft adopts its recipe's photographs
-    (`MSRWA_Intake::adopt()`), and deleting a lot removes those no draft took
-    (`forget()`). Nothing without that mark is ever moved or removed.
+16. **A lot's photographs are the files its writer sent, kept out of the
+    media library.** They are uploaded from the writer's computer with the lot
+    (`photos[]`), never picked from the library: `POST /batches` reads no
+    attachment id. `MSRWA_Intake::check()` checks every file from its bytes
+    (JPEG, PNG or WebP, under `MSRWA_Admin::photo_bytes()`, at most
+    `MSRWA_Intake::MAX_PHOTOS`) and refuses the whole lot on one bad file.
+    `MSRWA_Sources` keeps them under `uploads/msrwa/` — closed by `.htaccess`
+    and served only by `GET /batches/<id>/photos/<name>` to someone who may see
+    the lot — named after their bytes, so the same file sent twice is one file.
+    `lots/<lot>/` holds them while the lot is paired; dispatch moves each into
+    its run's `<run>/sources/` with `source.json` (what the writer provided;
+    what the engine completed and the web photographs it read, in
+    `references/`) and drops the rest. Deleting a lot or a run, retention and
+    uninstall remove its folder. The media library holds only an article's
+    generated images. Lots sent before 0.24.0 still name library attachments
+    marked `_msrwa_sent_by_writer`; `MSRWA_Intake::forget()` and
+    `engine_image()` serve them and touch nothing else.
 
 17. **The draft is written for the MS stack, in its readers' formats.**
     `MSRWA_Stack::write()` owns the keys in `MSRWA_Stack::KEYS` (the generic
@@ -371,11 +378,16 @@ Break these and the plugin misreports itself.
 
 20. **A recipe with the writer's photographs is researched from them.** With
     `research.web_search` at `without_images`, the engine writes the research
-    from the brief and the photographs, with no web search. The plugin hands
-    the engine `MSRWA_Intake::engine_image()` as `read_image`, which reads a
-    photograph from disk only when it is marked as sent by a writer; the
-    engine never fetches a writer's photograph over the network. Saving the
-    pairing keeps the model's confidence on rows the writer left alone.
+    from the brief and the photographs, with no web search, once it has
+    `research.min_photographs` (2) readable ones; with fewer it searches and
+    the writer's lead the visual references. Each photograph is read once, by
+    the pairing, with the engine's own observation instruction; the brief
+    carries that reading and the engine does not look again. A lot of one
+    recipe is paired without a call. The plugin hands the engine
+    `MSRWA_Sources::reader()` as `read_image`, which reads only a stored name
+    in that run's folder, and `keeper()` as `keep_image`; the engine never
+    fetches a writer's photograph over the network. Saving the pairing keeps
+    the model's confidence on rows the writer left alone.
 
 21. **Generated images are left for MS Image Optimizer to finish.** They are
     stored lossy, named after the post slug, with alt, title, caption and

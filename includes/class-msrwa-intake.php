@@ -49,35 +49,14 @@ final class MSRWA_Intake {
 		return '';
 	}
 
-	/**
-	 * The uploaded photographs, as attachment ids the writer already owns.
-	 *
-	 * Images arrive through the media library rather than through this form, so
-	 * WordPress does the storing, the resizing and the permission checks, and a
-	 * photograph the writer may not read never reaches a brief.
-	 */
-	public static function images( $attachment_ids ) {
-		$out = array();
-		foreach ( (array) $attachment_ids as $id ) {
-			$id = absint( $id );
-			if ( ! $id || 'attachment' !== get_post_type( $id ) || ! current_user_can( 'read_post', $id ) ) { continue; }
-			$path = get_attached_file( $id );
-			if ( ! $path || ! is_readable( $path ) ) { continue; }
-			$out[] = array(
-				'id' => $id,
-				'title' => (string) get_the_title( $id ),
-				'file' => basename( $path ),
-				'url' => (string) wp_get_attachment_url( $id ),
-				'mime' => (string) get_post_mime_type( $id ),
-			);
-		}
-		return $out;
-	}
-
 	/** How many photographs one lot may carry. Each is described by a paid call. */
 	const MAX_PHOTOS = 30;
 
-	/** Marks a library photograph as one a writer sent with a lot. */
+	/**
+	 * Marked a library photograph as one a writer sent with a lot. Photographs
+	 * are kept in MSRWA_Sources since 0.24.0; lots sent before still name
+	 * these, and are read and cleaned up through them.
+	 */
 	const SENT = '_msrwa_sent_by_writer';
 
 	/** What a photograph may be: the types every provider's vision reads. */
@@ -105,7 +84,7 @@ final class MSRWA_Intake {
 	 * Why one uploaded file cannot be a photograph, or '' when it can.
 	 *
 	 * The type is read from the bytes, never taken from the name or from what
-	 * the browser claimed: the file is about to enter the media library.
+	 * the browser claimed: the file is about to be kept on the site's disk.
 	 */
 	public static function refuse( array $file, $max_bytes = 10000000 ) {
 		$name = sanitize_file_name( (string) ( $file['name'] ?? '' ) );
@@ -132,58 +111,25 @@ final class MSRWA_Intake {
 	}
 
 	/**
-	 * The photographs sent from the writer's computer, added to the media
-	 * library as theirs. All or nothing: one refused file refuses the lot, and
-	 * whatever was already added is removed again, so a failed submission
-	 * leaves no orphan in the library.
-	 *
-	 * Returns array( 'ids' => attachment ids, 'error' => '' or why ).
+	 * Why a lot's photographs cannot be kept, or '' when they can. All or
+	 * nothing: one refused file refuses the lot, before anything is stored.
 	 */
-	public static function upload( array $files, $max_bytes = 10000000 ) {
+	public static function check( array $files, $max_bytes = 10000000 ) {
 		if ( count( $files ) > self::MAX_PHOTOS ) {
 			/* translators: %d is the largest number of photographs a lot may carry. */
-			return array( 'ids' => array(), 'error' => sprintf( __( 'Un lot accepte au plus %d photographies.', 'ms-recipes-writer-ai' ), self::MAX_PHOTOS ) );
+			return sprintf( __( 'Un lot accepte au plus %d photographies.', 'ms-recipes-writer-ai' ), self::MAX_PHOTOS );
 		}
 		foreach ( $files as $file ) {
 			$why = self::refuse( (array) $file, $max_bytes );
-			if ( '' !== $why ) { return array( 'ids' => array(), 'error' => $why ); }
+			if ( '' !== $why ) { return $why; }
 		}
-		if ( ! function_exists( 'media_handle_sideload' ) && defined( 'ABSPATH' ) && is_readable( ABSPATH . 'wp-admin/includes/media.php' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/file.php';
-			require_once ABSPATH . 'wp-admin/includes/media.php';
-			require_once ABSPATH . 'wp-admin/includes/image.php';
-		}
-		$ids = array();
-		foreach ( $files as $file ) {
-			$id = media_handle_sideload( array( 'name' => sanitize_file_name( (string) $file['name'] ), 'tmp_name' => (string) $file['tmp_name'] ), 0 );
-			if ( is_wp_error( $id ) ) {
-				self::discard( $ids );
-				return array( 'ids' => array(), 'error' => sprintf( '%s : %s', sanitize_file_name( (string) $file['name'] ), $id->get_error_message() ) );
-			}
-			// Marked, so the plugin knows which library photographs it added and
-			// may attach to a draft or remove with their lot — and no other.
-			update_post_meta( (int) $id, self::SENT, 1 );
-			$ids[] = (int) $id;
-		}
-		return array( 'ids' => $ids, 'error' => '' );
-	}
-
-	/** Removes photographs a submission added and then could not use. */
-	public static function discard( array $ids ) {
-		foreach ( $ids as $id ) { wp_delete_attachment( absint( $id ), true ); }
+		return '';
 	}
 
 	/** Whether a library item is a photograph a writer sent with a lot and nothing has taken yet. */
 	public static function loose( $id ) {
 		$post = get_post( absint( $id ) );
 		return $post && 'attachment' === $post->post_type && ! (int) $post->post_parent && get_post_meta( $post->ID, self::SENT, true );
-	}
-
-	/** Hands a recipe's photographs to its draft, where the editor will look for them. */
-	public static function adopt( $post_id, array $ids ) {
-		foreach ( $ids as $id ) {
-			if ( self::loose( $id ) ) { wp_update_post( array( 'ID' => absint( $id ), 'post_parent' => absint( $post_id ) ) ); }
-		}
 	}
 
 	/** Removes a deleted lot's photographs that no draft took. */
@@ -193,7 +139,6 @@ final class MSRWA_Intake {
 		}
 	}
 
-	/** One image as the engine's vision call wants it: a media type and base64 bytes. */
 	/**
 	 * One of a brief's photographs, for the engine: read by its attachment id,
 	 * and only if it is a photograph a writer sent — a brief can name nothing

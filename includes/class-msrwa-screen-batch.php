@@ -62,6 +62,12 @@ final class MSRWA_Screen_Batch {
 
 	private static function pairing( array $matching, $settling, $recipe_count, $scheduled = '' ) {
 		$images = (array) ( $matching['images'] ?? array() );
+		// A lot's photographs are served by the REST API, which reads the
+		// logged-in writer from this nonce; an <img> sends no header.
+		foreach ( $images as &$image ) {
+			if ( ! empty( $image['url'] ) && ! is_int( $image['id'] ?? null ) ) { $image['url'] = add_query_arg( '_wpnonce', wp_create_nonce( 'wp_rest' ), $image['url'] ); }
+		}
+		unset( $image );
 		$recipes = (array) ( $matching['recipes'] ?? array() );
 		$chosen = array();
 		foreach ( array_keys( $images ) as $index ) { $chosen[ $index ] = array( 'recipe' => null, 'confidence' => 'basse', 'why' => '' ); }

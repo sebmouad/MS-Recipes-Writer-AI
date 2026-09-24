@@ -98,7 +98,11 @@ msrwa_test_assert( 'espagnol' === $language->invoke( null, MSRWA_Engine_Config::
 msrwa_test_assert( 'français' === $language->invoke( null, MSRWA_Engine_Config::create( array() ) ), 'A lot that says nothing is French, as before.' );
 $instruction = new ReflectionMethod( MSRWA_Match::class, 'vision_instruction' );
 $instruction->setAccessible( true );
-msrwa_test_assert( 2 === substr_count( $instruction->invoke( null, 'anglais' ), 'en anglais' ), 'The dish and its description are asked for in the lot’s language.' );
+msrwa_test_assert( 2 === substr_count( $instruction->invoke( null, 'anglais' ), 'in anglais' ), 'The dish and its description are asked for in the lot’s language.' );
+// One look serves the pairing and the research: the engine's own observation
+// instruction, and the engine is handed the reading so it does not look again.
+msrwa_test_contains( $instruction->invoke( null, 'anglais' ), 'observable_details', 'The pairing asks for the engine’s observation in the same call.' );
+msrwa_test_contains( $source, "1 === count( \$recipes )", 'A lot of one recipe is paired without a paid call.' );
 $proposal_prompt = new ReflectionMethod( MSRWA_Match::class, 'proposal_prompt' );
 $proposal_prompt->setAccessible( true );
 msrwa_test_missing( $proposal_prompt->invoke( null, $shots, 'espagnol' ), 'en français', 'Nor are the titles or the reasons French on a Spanish site.' );

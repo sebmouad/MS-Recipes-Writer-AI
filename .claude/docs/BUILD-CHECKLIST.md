@@ -170,6 +170,14 @@ run carries.
   whatever the step count, the final check blocking equipment panels and empty
   cells (`tests/test-image-prompt.php`, `tests/test-approval.php`; eleven lab
   draws, not yet a live lot).
+- [x] Sources out of the media library, 0.24.0: a lot's photographs kept under
+  uploads/msrwa/ by content, served behind the lot's rights, moved into each
+  recipe's folder with `source.json` at dispatch, read once by the pairing and
+  reused by the research, two needed to skip the search; live: upload,
+  duplicate, rights and deletion (`tests/real/test-upload.php`), and a recipe
+  researched 13/13 from two photographs with no second read and no library
+  entry (`tests/test-intake.php`, `tests/test-engine-research-photographs.php`,
+  `tests/test-match.php`, `tests/test-estimate.php`).
 - [ ] A complete lot on Claude — the account has no credit. — the Gemini key's
   grounding quota is exhausted, OpenAI is unreachable from the test
   environment and the Claude account has no credit.

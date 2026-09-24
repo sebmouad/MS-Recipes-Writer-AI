@@ -42,7 +42,10 @@ MSRWA_Engine_Call::$transport = $transport;
 
 $reader_asked = array();
 $reader = static function ( $image, $max ) use ( &$reader_asked ) { $reader_asked[] = $image; return array( 'mime' => 'image/jpeg', 'data' => base64_encode( 'bytes' ) ); };
-$brief = array( 'title' => 'Tarte aux pommes', 'text' => 'Tarte aux pommes normande', 'images' => array( array( 'id' => 12, 'url' => 'http://127.0.0.1:8080/wp-content/uploads/tarte.jpg', 'title' => 'tarte' ) ) );
+$brief = array( 'title' => 'Tarte aux pommes', 'text' => 'Tarte aux pommes normande', 'images' => array(
+	array( 'id' => 12, 'url' => 'http://127.0.0.1:8080/wp-content/uploads/tarte.jpg', 'title' => 'tarte' ),
+	array( 'id' => 13, 'url' => 'http://127.0.0.1:8080/wp-content/uploads/tarte-2.jpg', 'title' => 'tarte, une part' ),
+) );
 $options = array( 'config' => array( 'settings' => array( 'keys' => array( 'openai' => 'k' ) ) ), 'read_image' => $reader );
 
 $result = MSRWA_Engine::run_step( 'research', $brief, $options );
@@ -51,24 +54,48 @@ $asks = array_values( array_filter( $sent, static function ( $payload ) { return
 
 // The writer's photograph is read from the site's disk, not fetched from a
 // local http address the engine may not open — it never was, before.
-msrwa_test_assert( 1 === count( $reader_asked ) && 12 === $reader_asked[0]['id'], 'The editor’s photograph is read through the caller’s reader, by its id.' );
+msrwa_test_assert( 2 === count( $reader_asked ) && 12 === $reader_asked[0]['id'], 'The editor’s photographs are read through the caller’s reader, by their id.' );
 msrwa_test_assert( 1 === count( $asks ), 'One research call; got ' . count( $asks ) );
 msrwa_test_assert( empty( $asks[0]['tools'] ), 'No web search tool is offered when the editor sent photographs.' );
 msrwa_test_contains( json_encode( $asks[0], JSON_UNESCAPED_UNICODE ), 'no web search is run', 'The research is asked with the photographs prompt.' );
 msrwa_test_contains( json_encode( $asks[0], JSON_UNESCAPED_UNICODE ), 'Tarte ronde, pommes en rosace', 'The research is told what the photograph shows.' );
 
-msrwa_test_assert( 1 === count( (array) ( $research['visual_observations'] ?? array() ) ), 'The editor’s photograph is the package’s observation.' );
+msrwa_test_assert( 2 === count( (array) ( $research['visual_observations'] ?? array() ) ), 'The editor’s photographs are the package’s observations.' );
 msrwa_test_assert( 'editor' === ( $research['visual_references'][0]['source_url'] ?? '' ) && 1 === (int) ( $research['visual_references'][0]['tier'] ?? 0 ), 'It is cited as the editor’s, tier 1.' );
 msrwa_test_contains( (string) ( $research['visual_observations'][0]['observable_details'] ?? '' ), 'rosace', 'What it shows reaches every later step.' );
 $step = end( $result->steps );
 msrwa_test_assert( (int) $step['passed'] === (int) $step['total'], 'A package written from photographs passes its own contract: ' . json_encode( $step['checks'] ) );
-msrwa_test_assert( 5100 === (int) ( $step['usage']['input_tokens'] ?? 0 ), 'Reading the photograph is billed to the research: ' . json_encode( $step['usage'] ) );
+msrwa_test_assert( 6200 === (int) ( $step['usage']['input_tokens'] ?? 0 ), 'Reading the photographs is billed to the research: ' . json_encode( $step['usage'] ) );
 msrwa_test_assert( 0 === (int) ( $step['usage']['web_searches'] ?? 0 ), 'No search is billed.' );
 
 // Without a search to bound it, a research from photographs wrote 17,000
 // characters of lists and stopped on its ceiling, unparsed. Its lists are capped.
 msrwa_test_contains( json_encode( $asks[0], JSON_UNESCAPED_UNICODE ), 'At most 4 substitutions', 'The research from photographs caps its lists.' );
 msrwa_test_assert( 16000 <= (int) MSRWA_Engine_Config::create( array() )->get( 'max_output.research' ), 'And keeps a margin over the 12,413 tokens that were cut.' );
+
+// Read already by the caller — the pairing reads every photograph — a
+// photograph is not looked at twice, and not billed twice.
+$sent = array();
+$reader_asked = array();
+$read = $brief;
+foreach ( $read['images'] as &$one ) { $one['observation'] = $seen; }
+unset( $one );
+$reread = MSRWA_Engine::run_step( 'research', $read, $options );
+msrwa_test_assert( 0 === count( $reader_asked ), 'A photograph the caller already read is not read again.' );
+msrwa_test_assert( 1 === count( $sent ) && empty( $sent[0]['tools'] ), 'One call, no search: ' . count( $sent ) );
+msrwa_test_contains( (string) ( $reread->artifacts['research']['visual_observations'][1]['observable_details'] ?? '' ), 'rosace', 'The caller’s reading is the observation.' );
+
+// One photograph is one visual reference; a recipe needs two. The web supplies
+// the rest, and the editor's photograph still leads.
+$sent = array();
+$single = $brief;
+$single['images'] = array_slice( $brief['images'], 0, 1 );
+$one_photo = MSRWA_Engine::run_step( 'research', $single, $options );
+$asks = array_values( array_filter( $sent, static function ( $payload ) { return false === strpos( json_encode( $payload ), 'input_image' ); } ) );
+msrwa_test_assert( ! empty( $asks[0]['tools'] ), 'With one photograph, the research searches the web.' );
+msrwa_test_assert( 'editor' === ( $one_photo->artifacts['research']['visual_references'][0]['source_url'] ?? '' ), 'The editor’s photograph leads the visual references.' );
+$config_one = MSRWA_Engine_Config::create( array( 'research' => array( 'min_photographs' => 1 ) ) );
+msrwa_test_assert( 1 === (int) $config_one->get( 'research.min_photographs' ), 'A site may accept one photograph as enough.' );
 
 // Set to search always, the research searches as it did.
 $sent = array();
@@ -84,7 +111,7 @@ $sent = array();
 MSRWA_Engine::run_step( 'research', array( 'title' => 'Tarte aux pommes', 'text' => 'Tarte' ), $options );
 msrwa_test_assert( ! empty( $sent[0]['tools'] ), 'A brief without a photograph is researched on the web.' );
 
-// A photograph that cannot be read is no evidence: the research searches after all.
+// Photographs that cannot be read are no evidence: the research searches after all.
 $sent = array();
 $blind = $options;
 $blind['read_image'] = static function () { return array( 'error' => 'fichier introuvable' ); };
@@ -106,7 +133,9 @@ $web = MSRWA_Estimate::recipe( MSRWA_Profile::FULL );
 $pictured = MSRWA_Estimate::recipe( MSRWA_Profile::FULL, array(), true );
 msrwa_test_assert( 0 === (int) $pictured['steps']['research']['searches'], 'A pictured recipe is estimated without a search.' );
 msrwa_test_assert( $pictured['steps']['research']['cost_usd'] < $web['steps']['research']['cost_usd'] / 3, sprintf( 'Its research is estimated well under the searched one: %.4f against %.4f.', $pictured['steps']['research']['cost_usd'], $web['steps']['research']['cost_usd'] ) );
+$lot = MSRWA_Estimate::lot( MSRWA_Profile::FULL, 3, 2 );
+msrwa_test_assert( abs( $lot['cost_usd'] - ( $pictured['cost_usd'] + 2 * $web['cost_usd'] + (float) $lot['matching_usd'] ) ) < 0.00001, 'A lot of three recipes and two photographs prices one pictured recipe and two searched.' );
 $lot = MSRWA_Estimate::lot( MSRWA_Profile::FULL, 3, 1 );
-msrwa_test_assert( abs( $lot['cost_usd'] - ( $pictured['cost_usd'] + 2 * $web['cost_usd'] + (float) $lot['matching_usd'] ) ) < 0.00001, 'A lot of three recipes and one photograph prices one pictured recipe and two searched.' );
+msrwa_test_assert( abs( $lot['cost_usd'] - ( 3 * $web['cost_usd'] + (float) $lot['matching_usd'] ) ) < 0.00001, 'One photograph is not enough to skip the search.' );
 
 msrwa_test_done( 'a recipe sent with photographs is researched from them, without a web search' );

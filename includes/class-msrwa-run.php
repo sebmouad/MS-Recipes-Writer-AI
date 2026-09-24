@@ -185,10 +185,13 @@ final class MSRWA_Run {
 			array_merge( $brief, array( 'artifacts' => $artifacts ) ),
 			// The writer's photographs are read from the site's own files: their
 			// address is the site's, which need not be public or HTTPS.
-			array( 'config' => $config, 'only' => $wave, 'workspace' => $workspace, 'read_image' => array( 'MSRWA_Intake', 'engine_image' ) )
+			// The engine keeps what it found on the web beside them, so the
+			// recipe's record says what it was written from.
+			array( 'config' => $config, 'only' => $wave, 'workspace' => $workspace, 'read_image' => MSRWA_Sources::reader( $id ), 'keep_image' => MSRWA_Sources::keeper( $id ) )
 		);
 
 		self::absorb( $id, $state, $result->to_array() );
+		if ( in_array( 'research', $wave, true ) && is_array( $result->artifacts['research'] ?? null ) ) { MSRWA_Sources::complete( $id, $result->artifacts['research'] ); }
 
 		$run = self::get( $id );
 		return $run && 'running' === $run['status'];
@@ -552,6 +555,7 @@ final class MSRWA_Run {
 			$wpdb->query( $wpdb->prepare( 'DELETE FROM ' . $t[ $table ] . ' WHERE run_id = %d', absint( $id ) ) );
 		}
 		$wpdb->delete( self::table(), array( 'id' => absint( $id ) ), array( '%d' ) );
+		MSRWA_Sources::forget_run( (int) $id );
 		MSRWA_Batch::settle( (int) $run['batch_id'] );
 		return true;
 	}

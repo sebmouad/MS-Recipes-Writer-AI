@@ -2176,6 +2176,9 @@ msgstr "محذوف"
 msgid "à la corbeille"
 msgstr "في سلة المهملات"
 
+msgid "Photographie introuvable."
+msgstr "الصورة غير موجودة."
+
 msgid "aucune page citée"
 msgstr "لم تُذكر أي صفحة"
 

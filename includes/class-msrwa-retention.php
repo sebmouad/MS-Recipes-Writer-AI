@@ -156,6 +156,7 @@ final class MSRWA_Retention {
 				$wpdb->query( $wpdb->prepare( "DELETE FROM {$t[ $table ]} WHERE run_id = %d", (int) $id ) );
 			}
 			$removed += (int) $wpdb->delete( $t['runs'], array( 'id' => (int) $id ), array( '%d' ) );
+			MSRWA_Sources::forget_run( (int) $id );
 		}
 		return $removed;
 	}

@@ -592,7 +592,7 @@ final class MSRWA_Engine_Call {
 	 * of six in a row. The evidence and its cost are identical; only the waiting
 	 * is gone.
 	 */
-	public static function observe_images( $provider, $model, $package, $limit = 3, $wire = array(), $max_bytes = 10000000, $instruction = '' ) {
+	public static function observe_images( $provider, $model, $package, $limit = 3, $wire = array(), $max_bytes = 10000000, $instruction = '', $keep = null ) {
 		$package['visual_observations'] = array();
 		$usage = array( 'input_tokens' => 0, 'output_tokens' => 0 );
 		$references = array_slice( (array) ( $package['visual_references'] ?? array() ), 0, $limit );
@@ -605,6 +605,9 @@ final class MSRWA_Engine_Call {
 		foreach ( $references as $key => $reference ) {
 			$image = (array) ( $images[ $key ] ?? array( 'error' => 'image was not fetched' ) );
 			if ( isset( $image['error'] ) ) { $package['uncertainties'][] = 'Image non analysée : ' . $image['error']; continue; }
+			// The caller may keep what was read, so its record of what a recipe
+			// was written from holds the photographs, not only their addresses.
+			if ( is_callable( $keep ) ) { call_user_func( $keep, (string) ( $reference['image_url'] ?? '' ), $image ); }
 			$plan = self::plan_vision( $provider, $model, $image, (string) ( $reference['title'] ?? '' ), 900, $wire, $instruction );
 			if ( isset( $plan['error'] ) ) { $package['uncertainties'][] = 'Image non analysée : ' . $plan['error']; continue; }
 			$plans[ $key ] = $plan;

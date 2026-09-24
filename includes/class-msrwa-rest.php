@@ -16,6 +16,7 @@ final class MSRWA_REST {
 		register_rest_route( 'msrwa/v1', '/batches/(?P<id>\d+)/schedule', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'schedule' ) ) );
 		register_rest_route( 'msrwa/v1', '/batches/(?P<id>\d+)/dispatch', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'dispatch' ) ) );
 		register_rest_route( 'msrwa/v1', '/batches/(?P<id>\d+)/runs', array( 'methods' => 'GET', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'runs' ) ) );
+		register_rest_route( 'msrwa/v1', '/batches/(?P<id>\d+)/photos/(?P<name>[a-f0-9]{32}\.(?:jpg|png|webp))', array( 'methods' => 'GET', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'photo' ) ) );
 		register_rest_route( 'msrwa/v1', '/batches/(?P<id>\d+)', array( 'methods' => 'DELETE', 'permission_callback' => array( __CLASS__, 'can_manage' ), 'callback' => array( __CLASS__, 'remove' ) ) );
 		register_rest_route( 'msrwa/v1', '/queue', array(
 			array( 'methods' => 'GET', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'queue' ) ),
@@ -84,12 +85,12 @@ final class MSRWA_REST {
 
 		// Photographs come from the writer's computer, never from the media
 		// library: a lot can only carry pictures its writer actually sent, and
-		// an attachment id posted here is not read.
+		// an attachment id posted here is not read. They are kept with the lot,
+		// out of the library, which holds only what articles show.
 		$files = MSRWA_Intake::files( $request->get_file_params()['photos'] ?? array() );
-		$uploaded = MSRWA_Intake::upload( $files, MSRWA_Admin::photo_bytes() );
-		if ( '' !== $uploaded['error'] ) { return new WP_Error( 'msrwa_bad_photo', $uploaded['error'], array( 'status' => 400 ) ); }
-		$images = MSRWA_Intake::images( $uploaded['ids'] );
-		if ( ! $recipes && ! $images ) { return new WP_Error( 'msrwa_no_recipes', __( 'Collez au moins une recette ou ajoutez au moins une photographie.', 'ms-recipes-writer-ai' ), array( 'status' => 400 ) ); }
+		$refused = MSRWA_Intake::check( $files, MSRWA_Admin::photo_bytes() );
+		if ( '' !== $refused ) { return new WP_Error( 'msrwa_bad_photo', $refused, array( 'status' => 400 ) ); }
+		if ( ! $recipes && ! $files ) { return new WP_Error( 'msrwa_no_recipes', __( 'Collez au moins une recette ou ajoutez au moins une photographie.', 'ms-recipes-writer-ai' ), array( 'status' => 400 ) ); }
 
 		// The per-recipe ceiling is the site's unless the person may set it. It
 		// used to be worked out here and then not used, so anybody who could
@@ -98,19 +99,26 @@ final class MSRWA_REST {
 		// lot cannot name a language nobody reviews in or a ceiling of its own.
 		$budget = (float) MSRWA_Settings::get()['per_recipe_budget_usd'];
 		$id = MSRWA_Batch::create(
-			$recipes, $images, $budget,
+			$recipes, $files, $budget,
 			sanitize_key( (string) $request->get_param( 'profile' ) ),
 			sanitize_key( (string) MSRWA_Settings::get()['site_language'] )
 		);
-		if ( is_wp_error( $id ) ) { MSRWA_Intake::discard( $uploaded['ids'] ); return new WP_Error( $id->get_error_code(), $id->get_error_message(), array( 'status' => 400 ) ); }
+		if ( is_wp_error( $id ) ) { return new WP_Error( $id->get_error_code(), $id->get_error_message(), array( 'status' => 400 ) ); }
 		$created = MSRWA_Batch::get( (int) $id );
-		return rest_ensure_response( array( 'id' => (int) $id, 'recipes' => (int) ( $created['recipes'] ?? count( $recipes ) ), 'images' => count( $images ) ) );
+		return rest_ensure_response( array( 'id' => (int) $id, 'recipes' => (int) ( $created['recipes'] ?? count( $recipes ) ), 'images' => (int) ( $created['images'] ?? 0 ) ) );
 	}
 
 	private static function batch( $id ) {
 		$batch = MSRWA_Batch::get( absint( $id ) );
 		if ( ! $batch || ! MSRWA_Batch::may_see( $batch ) ) { return null; }
 		return $batch;
+	}
+
+	/** One of a lot's photographs, to someone who may see the lot. */
+	public static function photo( WP_REST_Request $request ) {
+		$batch = self::batch( $request['id'] );
+		if ( ! $batch || ! MSRWA_Sources::serve( (int) $batch['id'], (string) $request['name'], array_map( 'intval', array_column( MSRWA_Run::for_batch( (int) $batch['id'] ), 'id' ) ) ) ) { return new WP_Error( 'msrwa_not_found', __( 'Photographie introuvable.', 'ms-recipes-writer-ai' ), array( 'status' => 404 ) ); }
+		exit;
 	}
 
 	public static function pairs( WP_REST_Request $request ) {

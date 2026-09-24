@@ -67,39 +67,60 @@ msrwa_test_contains( MSRWA_Intake::refuse( $photo( 'tarte.png', $dir . '/script.
 msrwa_test_contains( MSRWA_Intake::refuse( $photo( 'tarte.png', $dir . '/tarte.png', UPLOAD_ERR_INI_SIZE ) ), 'en entier', 'A file the server cut is refused.' );
 msrwa_test_contains( MSRWA_Intake::refuse( $photo( 'tarte.png', $dir . '/tarte.png' ), 10 ), 'dépasse', 'A photograph over the size limit is refused.' );
 
-// All or nothing: one bad file refuses the lot before anything is added.
-$refused = MSRWA_Intake::upload( array( $photo( 'tarte.png', $dir . '/tarte.png' ), $photo( 'x.png', $dir . '/script.php' ) ) );
-msrwa_test_assert( '' !== $refused['error'] && ! $refused['ids'] && ! $GLOBALS['sideloaded'], 'One file that is not a photograph refuses the lot and adds nothing to the library.' );
-
-$sent = MSRWA_Intake::upload( array( $photo( 'tarte.png', $dir . '/tarte.png' ) ) );
-msrwa_test_assert( '' === $sent['error'] && array( 101 ) === $sent['ids'], 'A sound photograph enters the media library and comes back as an attachment.' );
-
-// A library failure halfway removes what the submission already added.
-$GLOBALS['sideloaded'] = array();
-$half = MSRWA_Intake::upload( array( $photo( 'tarte.png', $dir . '/tarte.png' ), $photo( 'refuse.png', $dir . '/refuse.png' ) ) );
-msrwa_test_assert( '' !== $half['error'] && array( 101 ) === $GLOBALS['deleted'], 'A failed submission leaves no orphan in the library.' );
-
+// All or nothing: one bad file refuses the lot before anything is kept.
+msrwa_test_contains( MSRWA_Intake::check( array( $photo( 'tarte.png', $dir . '/tarte.png' ), $photo( 'x.png', $dir . '/script.php' ) ) ), 'JPEG, PNG ou WebP', 'One file that is not a photograph refuses the lot.' );
+msrwa_test_assert( '' === MSRWA_Intake::check( array( $photo( 'tarte.png', $dir . '/tarte.png' ) ) ), 'A sound photograph is accepted.' );
 $many = array_fill( 0, MSRWA_Intake::MAX_PHOTOS + 1, $photo( 'tarte.png', $dir . '/tarte.png' ) );
-msrwa_test_contains( MSRWA_Intake::upload( $many )['error'], (string) MSRWA_Intake::MAX_PHOTOS, 'A lot carries a bounded number of photographs: each is a paid description.' );
-msrwa_test_assert( ! empty( $GLOBALS['msrwa_test_meta'][101][ MSRWA_Intake::SENT ] ), 'A photograph the plugin added is marked as sent by a writer.' );
+msrwa_test_contains( MSRWA_Intake::check( $many ), (string) MSRWA_Intake::MAX_PHOTOS, 'A lot carries a bounded number of photographs: each is a paid description.' );
 
-// A sent photograph goes to its recipe's draft; one no draft took leaves with
-// its lot. Anything else in the library is never touched, whoever sent it.
-$GLOBALS['updated'] = array();
-function wp_update_post( $post ) { $GLOBALS['updated'][] = $post; $GLOBALS['msrwa_test_posts'][ $post['ID'] ]->post_parent = $post['post_parent']; return $post['ID']; }
+// Kept in the plugin's own folder, never in the media library, which holds
+// only what articles show. Named after their bytes: the same photograph sent
+// twice — in one lot or in two — is one file, never a name that already exists.
+msrwa_test_load( 'db', 'sources' );
+if ( ! function_exists( 'rest_url' ) ) { function rest_url( $path = '' ) { return 'https://example.test/wp-json/' . ltrim( $path, '/' ); } }
+$root = MSRWA_Sources::root();
+msrwa_test_assert( is_file( $root . '/.htaccess' ) && is_file( $root . '/index.php' ), 'The folder is closed to the web.' );
+$kept = MSRWA_Sources::receive( 7, array( $photo( 'Tarte Normande.png', $dir . '/tarte.png' ), $photo( 'copie.png', $dir . '/refuse.png' ) ) );
+msrwa_test_assert( 1 === count( $kept ), 'The same photograph twice in one lot is kept once.' );
+msrwa_test_assert( (bool) preg_match( '/^[a-f0-9]{32}\.png$/', $kept[0]['id'] ) && false !== strpos( $kept[0]['title'], 'Normande' ) && false === strpos( $kept[0]['title'], '.png' ), 'It is named after its bytes and keeps the writer’s title: ' . json_encode( $kept ) );
+msrwa_test_assert( 1 === count( MSRWA_Sources::receive( 8, array( $photo( 'tarte.png', $dir . '/tarte.png' ) ) ) ), 'The same photograph in another lot is accepted again.' );
+msrwa_test_assert( ! $GLOBALS['sideloaded'], 'Nothing enters the media library.' );
+msrwa_test_contains( $kept[0]['url'], 'msrwa/v1/batches/7/photos/', 'The pairing screen shows it through the REST API, behind its checks.' );
+msrwa_test_assert( isset( MSRWA_Sources::read( MSRWA_Sources::lot_dir( 7 ), $kept[0]['id'] )['data'] ), 'It is read back for the vision calls.' );
+msrwa_test_assert( '' === MSRWA_Sources::path( MSRWA_Sources::lot_dir( 7 ), '../8/' . $kept[0]['id'] ), 'A name is never a path.' );
+msrwa_test_assert( '' === MSRWA_Sources::name( '../../wp-config.php' ), 'Anything but a stored name is refused.' );
+
+// Sent: each recipe's photographs move into its run's folder with a record of
+// what the writer provided; the engine's findings and completion join it.
+MSRWA_Sources::hand_over( 7, 41, array( 'title' => 'Tarte', 'text' => 'Pommes.', 'images' => array( array( 'id' => $kept[0]['id'], 'title' => 'Tarte Normande', 'observation' => array( 'colours' => 'doré' ) ) ) ) );
+$record = MSRWA_Sources::manifest( 41 );
+msrwa_test_assert( 'Pommes.' === $record['provided']['text'] && $kept[0]['id'] === $record['provided']['photos'][0]['file'], 'The record says what the writer provided: ' . json_encode( $record ) );
+msrwa_test_assert( is_file( MSRWA_Sources::run_dir( 41 ) . '/' . $kept[0]['id'] ), 'The photograph is in the run’s folder.' );
+$reader = MSRWA_Sources::reader( 41 );
+msrwa_test_assert( isset( $reader( array( 'id' => $kept[0]['id'] ), 1000000 )['data'] ), 'The engine reads it from there.' );
+$keep = MSRWA_Sources::keeper( 41 );
+msrwa_test_assert( ! is_file( MSRWA_Sources::lot_dir( 7 ) . '/' . $kept[0]['id'] ), 'It is moved, not copied: a photograph belongs to one recipe.' );
+$keep( 'https://example.org/tarte.jpg', MSRWA_Sources::read( MSRWA_Sources::run_dir( 41 ), $kept[0]['id'] ) );
+$record = MSRWA_Sources::manifest( 41 );
+msrwa_test_assert( 1 === count( $record['completed']['references'] ) && 'https://example.org/tarte.jpg' === $record['completed']['references'][0]['url'], 'A photograph the engine found is kept and recorded.' );
+MSRWA_Sources::complete( 41, array( 'dish_identity' => array( 'name' => 'Tarte normande' ), 'ingredients' => array( array( 'name' => 'pommes' ) ), 'preparation' => array() ) );
+msrwa_test_assert( 'Tarte normande' === MSRWA_Sources::manifest( 41 )['completed']['recipe']['dish'], 'What the engine completed is recorded beside it.' );
+MSRWA_Sources::forget_lot( 7 );
+MSRWA_Sources::forget_lot( 8 );
+MSRWA_Sources::forget_run( 41 );
+msrwa_test_assert( ! is_dir( MSRWA_Sources::lot_dir( 7 ) ) && ! is_dir( dirname( MSRWA_Sources::run_dir( 41 ) ) ), 'A lot and a run leave nothing behind.' );
+
+// Lots sent before 0.24.0 named library photographs; deleting one still
+// removes only its own photographs that no draft took.
 $attachment = static function ( $id, $parent ) { return (object) array( 'ID' => $id, 'post_type' => 'attachment', 'post_parent' => $parent ); };
 $GLOBALS['msrwa_test_posts'][201] = $attachment( 201, 0 );
 $GLOBALS['msrwa_test_posts'][202] = $attachment( 202, 0 );
 $GLOBALS['msrwa_test_posts'][203] = $attachment( 203, 0 );
 $GLOBALS['msrwa_test_posts'][204] = $attachment( 204, 7 );
 foreach ( array( 201, 202, 204 ) as $id ) { update_post_meta( $id, MSRWA_Intake::SENT, 1 ); }
-MSRWA_Intake::adopt( 90, array( 201, 203, 204 ) );
-msrwa_test_assert( 90 === $GLOBALS['msrwa_test_posts'][201]->post_parent, 'The draft takes its recipe\'s photograph.' );
-msrwa_test_assert( 0 === $GLOBALS['msrwa_test_posts'][203]->post_parent, 'A photograph the plugin did not add is not moved.' );
-msrwa_test_assert( 7 === $GLOBALS['msrwa_test_posts'][204]->post_parent, 'A photograph already attached elsewhere is not moved.' );
 $GLOBALS['deleted'] = array();
 MSRWA_Intake::forget( array( 201, 202, 203, 204 ) );
-msrwa_test_assert( array( 202 ) === $GLOBALS['deleted'], 'A deleted lot removes only its own photographs that no draft took; removed: ' . implode( ',', $GLOBALS['deleted'] ) );
+msrwa_test_assert( array( 201, 202 ) === $GLOBALS['deleted'], 'A deleted lot removes only its own photographs that no draft took; removed: ' . implode( ',', $GLOBALS['deleted'] ) );
 
 array_map( 'unlink', glob( $dir . '/*' ) );
 @rmdir( $dir );

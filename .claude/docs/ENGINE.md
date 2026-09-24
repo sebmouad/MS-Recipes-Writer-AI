@@ -524,6 +524,18 @@ photograph, and otherwise use the photograph without the cost of a search.
     uncertainties, 3 originality notes, one short sentence each) and
     `max_output.research` rises to 16000.
 
+24. **A recipe's photographs are read once, and two are needed.** Owner's
+    request, 2026-09-24. `observe_editor_images()` uses an image's
+    `observation` when the caller gives one, instead of a vision call; the
+    plugin's pairing reads each photograph with the engine's own
+    `vision_instruction` and passes the reading on. `research.min_photographs`
+    (default 2, 1–10): fewer readable editor photographs than that, and the
+    research searches the web as for a text-only brief, the editor's leading
+    the visual references (`with_editor_photographs()`). A `keep_image`
+    option, called by `MSRWA_Engine_Call::observe_images()` with each web
+    photograph it fetched, lets the caller keep what the research was
+    written from.
+
 ### Still open
 
 6. **The engine's `models` list is a second source of truth for prices.** The

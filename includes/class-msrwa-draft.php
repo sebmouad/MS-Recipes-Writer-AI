@@ -80,7 +80,6 @@ final class MSRWA_Draft {
 		self::attach_images( $post_id, $run_id, $artifacts, $title );
 		MSRWA_Stack::write( $post_id, $canonical, $article, (int) get_post_meta( $post_id, self::generated_key( 'facebook' ), true ) );
 		foreach ( array( 'featured', 'facebook' ) as $kind ) { MSRWA_Stack::describe_image( $post_id, (int) get_post_meta( $post_id, self::generated_key( $kind ), true ) ); }
-		MSRWA_Intake::adopt( $post_id, array_column( (array) ( $brief['images'] ?? array() ), 'id' ) );
 
 		global $wpdb;
 		$t = MSRWA_DB::tables();

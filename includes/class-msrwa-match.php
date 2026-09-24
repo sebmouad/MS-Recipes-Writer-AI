@@ -25,12 +25,18 @@ final class MSRWA_Match {
 	 * finished article, and a decision nobody can see the reason for is a
 	 * decision nobody can correct.
 	 */
-	public static function run( array $recipes, array $images, MSRWA_Engine_Config $config ) {
-		$seen = self::describe( $images, $config );
+	public static function run( array $recipes, array $images, MSRWA_Engine_Config $config, $dir = '' ) {
+		$seen = self::describe( $images, $config, $dir );
 		// Text alone has nothing to pair; photographs alone name their own
 		// recipes, one per dish they show.
 		if ( ! $seen['images'] ) {
 			$decision = array( 'pairs' => array(), 'reasoning' => '', 'cost_usd' => 0.0, 'seconds' => 0.0, 'errors' => array() );
+		} elseif ( 1 === count( $recipes ) ) {
+			// One recipe: the writer sent these photographs for it, and there is
+			// nothing for a paid call to decide. A photograph with no dish on it
+			// still waits for the writer, as normalise() promises.
+			$decision = array( 'pairs' => array(), 'reasoning' => '', 'cost_usd' => 0.0, 'seconds' => 0.0, 'errors' => array() );
+			foreach ( array_keys( $seen['images'] ) as $index ) { $decision['pairs'][] = array( 'image' => $index, 'recipe' => 0, 'confidence' => 'haute', 'why' => 'Seule recette du lot.' ); }
 		} elseif ( ! $recipes ) {
 			$decision = self::propose( $seen['images'], $config );
 			$recipes = $decision['recipes'];
@@ -51,8 +57,14 @@ final class MSRWA_Match {
 		);
 	}
 
-	/** What each photograph actually shows, read from its own bytes, all at once. */
-	private static function describe( array $images, MSRWA_Engine_Config $config ) {
+	/**
+	 * What each photograph actually shows, read from its own bytes, all at once.
+	 *
+	 * Read once for everything: the same answer names the dish for the pairing
+	 * and carries the observation the research is written from, in the
+	 * engine's own words, so the engine does not pay to look again.
+	 */
+	private static function describe( array $images, MSRWA_Engine_Config $config, $dir = '' ) {
 		// Reading image bytes is the vision route's job. Asking for the research
 		// route happened to resolve to the same model today and would have
 		// quietly stopped doing so the moment somebody changed one of them.
@@ -64,13 +76,14 @@ final class MSRWA_Match {
 		$plans = array();
 		$requests = array();
 		foreach ( $images as $index => $image ) {
-			$bytes = MSRWA_Intake::read( $image['id'], (int) $config->get( 'limits.max_image_bytes', 10000000 ) );
+			$max = (int) $config->get( 'limits.max_image_bytes', 10000000 );
+			$bytes = is_int( $image['id'] ) ? MSRWA_Intake::read( $image['id'], $max ) : MSRWA_Sources::read( $dir, $image['id'], $max );
 			if ( isset( $bytes['error'] ) ) {
 				$out['errors'][] = $image['file'] . ' : ' . $bytes['error'];
 				$out['images'][ $index ] = array_merge( $image, array( 'describes' => '', 'dish' => '' ) );
 				continue;
 			}
-			$plan = MSRWA_Engine_Call::plan_vision( $route['provider'], $route['model'], $bytes, $image['title'], 400, $wire, self::vision_instruction( self::language( $config ) ) );
+			$plan = MSRWA_Engine_Call::plan_vision( $route['provider'], $route['model'], $bytes, $image['title'], (int) $config->max_output( 'vision' ), $wire, self::vision_instruction( self::language( $config ), (string) $config->get( 'vision_instruction', '' ) ) );
 			if ( isset( $plan['error'] ) ) {
 				$out['errors'][] = $image['file'] . ' : ' . $plan['error'];
 				$out['images'][ $index ] = array_merge( $image, array( 'describes' => '', 'dish' => '' ) );
@@ -86,9 +99,11 @@ final class MSRWA_Match {
 			$cost = $config->price( $route['provider'], $route['model'], (array) ( $answer['usage'] ?? array() ) );
 			$out['cost_usd'] += (float) $cost;
 			$seen = MSRWA_Json::decode( (string) ( $answer['text'] ?? '' ) );
+			$observation = is_array( $seen ) ? array_intersect_key( $seen, array_flip( array( 'observable_details', 'composition', 'colours', 'textures', 'uncertainties' ) ) ) : array();
 			$out['images'][ $index ] = array_merge( $images[ $index ], array(
 				'dish' => is_array( $seen ) ? (string) ( $seen['dish'] ?? '' ) : '',
 				'describes' => is_array( $seen ) ? (string) ( $seen['description'] ?? '' ) : '',
+				'observation' => $observation,
 			) );
 			if ( ! is_array( $seen ) ) { $out['errors'][] = $images[ $index ]['file'] . ' : description illisible'; }
 		}
@@ -221,11 +236,12 @@ final class MSRWA_Match {
 		return implode( "\n", $lines );
 	}
 
-	private static function vision_instruction( $language = 'français' ) {
-		return 'Tu regardes une photographie destinée à illustrer une recette. Réponds en JSON avec exactement deux clés : '
-			. '"dish", le nom du plat tel qu’un cuisinier le reconnaîtrait, en ' . $language . ', ou "" si tu ne peux pas le nommer ; '
-			. '"description", une phrase en ' . $language . ' décrivant ce qui est visible — ingrédients principaux, couleur, cuisson, présentation. '
-			. 'Ne décris que ce qui est visible. N’invente ni ingrédient caché, ni quantité, ni origine.';
+	/** The engine's own observation instruction, and the two keys the pairing needs. */
+	private static function vision_instruction( $language = 'français', $engine = '' ) {
+		return ( '' !== trim( $engine ) ? $engine : MSRWA_Engine_Call::default_vision_instruction() )
+			. ' Add two keys to the same JSON object: "dish", the name of the dish as a cook would recognise it, in ' . $language . ', or "" if you cannot name it; '
+			. '"description", one sentence in ' . $language . ' saying what is visible — main ingredients, colour, doneness, presentation. '
+			. 'Describe only what is visible; never invent a hidden ingredient, a quantity or an origin.';
 	}
 
 	/** What the pairing call is asked, with the recipes and the photographs numbered. */
@@ -305,7 +321,10 @@ final class MSRWA_Match {
 	public static function brief( array $recipe, array $images ) {
 		$attached = array();
 		foreach ( $images as $image ) {
-			$attached[] = array( 'id' => (int) $image['id'], 'url' => (string) $image['url'], 'title' => (string) $image['title'] );
+			$one = array( 'id' => is_int( $image['id'] ) ? (int) $image['id'] : (string) $image['id'], 'url' => (string) $image['url'], 'title' => (string) $image['title'] );
+			// Read at intake already: the engine uses it rather than looking again.
+			if ( ! empty( $image['observation'] ) ) { $one['observation'] = (array) $image['observation']; }
+			$attached[] = $one;
 		}
 		return array(
 			'type' => 'recipe',
