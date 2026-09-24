@@ -191,7 +191,7 @@ run carries.
   lot, offered only when there are two, unknown keys fall back; one collage
   drawn through the new path, lots #51 and #52 created with a valid and an
   unknown key (`tests/test-image-prompt.php`, `tests/test-screens.php`).
-- [~] Six-panel collage and the one-alphabet check, 0.24.5
+- [x] Six-panel collage and the one-alphabet check, 0.24.5
   (`tests/test-stray-script.php`; 328 stored answers scanned, one true hit,
   no false positive; not yet seen retrying in a live run).
 - [ ] A complete lot on Claude — the account has no credit. — the Gemini key's

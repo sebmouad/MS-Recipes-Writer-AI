@@ -60,4 +60,8 @@ msrwa_test_contains( $html, 'Étape prévue, non atteinte', 'A planned step that
 $lab = report_render( array( 'artifacts' => array(), 'steps' => array(), 'events' => array(), 'totals' => array(), 'ok' => false ) );
 foreach ( array( 'Visuels générés', 'Approbation finale', 'Brief du rédacteur', 'Test laboratoire' ) as $section ) { msrwa_test_contains( $lab, $section, 'The lab report keeps ' . $section ); }
 
+msrwa_test_assert( false !== strpos( report_link( 'culinary_practice' ), 'pratique culinaire' ) && false === strpos( report_link( 'brief' ), 'refusé' ), 'The engine’s source words are named, not refused.' );
+msrwa_test_contains( report_link( 'javascript:alert(1)' ), 'schéma refusé', 'Another scheme still is.' );
+msrwa_test_missing( report_link( 'javascript:alert(1)' ), '<a ', 'And is never a link.' );
+
 msrwa_test_done( 'the report tells a job’s whole story, and only what it planned' );

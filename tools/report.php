@@ -105,10 +105,18 @@ function report_value( $value, $depth = 0 ) {
 	return $html . '</dl>';
 }
 
-/** A link, but only to somewhere a reader can safely be sent. */
+/**
+ * A link, but only to somewhere a reader can safely be sent. A source that is
+ * not an address is one of the engine's own words for where a fact came from
+ * — the writer's text, a photograph, established practice — and is named, not
+ * flagged; only an address with another scheme is refused.
+ */
 function report_link( $url ) {
 	$url = trim( (string) $url );
 	if ( '' === $url ) { return '<span class="muted">Non renseigné</span>'; }
+	$named = array( 'brief' => 'texte du rédacteur', 'editor' => 'photographie du rédacteur', 'photograph' => 'photographie du rédacteur', 'culinary_practice' => 'pratique culinaire établie' );
+	if ( isset( $named[ strtolower( $url ) ] ) ) { return '<span>' . report_h( $named[ strtolower( $url ) ] ) . '</span>'; }
+	if ( ! preg_match( '#^[a-z][a-z0-9+.-]*:#i', $url ) ) { return report_h( $url ); }
 	if ( ! preg_match( '#^https?://#i', $url ) ) { return report_h( $url ) . ' <span class="pill warn">schéma refusé</span>'; }
 	return '<a href="' . report_h( $url ) . '" rel="nofollow noopener">' . report_h( $url ) . '</a>';
 }
