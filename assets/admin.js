@@ -433,6 +433,31 @@
     });
   }
 
+  // --- Redrawing a refused image ------------------------------------------
+
+  // A redraw takes half a minute and is paid for: every button is disabled
+  // until it answers, so a second click cannot start a second one.
+  var redraw = document.querySelector('.ms-redraw');
+  if (redraw) {
+    var buttons = redraw.querySelectorAll('button');
+    Array.prototype.forEach.call(buttons, function (button) {
+      button.addEventListener('click', function () {
+        Array.prototype.forEach.call(buttons, function (other) { other.disabled = true; });
+        say(redraw.querySelector('span'), redraw.dataset.busy || '');
+        call('/runs/' + redraw.dataset.run + '/redraw', { method: 'POST', body: JSON.stringify({ kind: button.value }) })
+          .then(function () {
+            var url = new URL(window.location.href);
+            url.searchParams.set('redrawn', '1');
+            window.location.href = url.toString();
+          })
+          .catch(function (error) {
+            say(redraw.querySelector('span'), error.message);
+            Array.prototype.forEach.call(buttons, function (other) { other.disabled = false; });
+          });
+      });
+    });
+  }
+
   // --- Moving one recipe up the queue -------------------------------------
 
   var priority = document.querySelector('.ms-priority');

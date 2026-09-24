@@ -1050,8 +1050,6 @@ msgstr "One recipe in this lot is estimated at %1$s, above its %2$s ceiling: it 
 msgid "Vos recettes passées par le moteur, avec leur état et leur brouillon."
 msgstr "Your recipes that went through the engine, with their state and their draft."
 
-msgid "Vérification des faits"
-msgstr "Fact check"
 
 msgid "Vérification…"
 msgstr "Checking…"
@@ -2113,3 +2111,33 @@ msgstr "Add a collage (JPEG, PNG or WebP, 10 MB at most)"
 
 msgid "Ajouter"
 msgstr "Add"
+
+msgid "Cette image ne peut pas être redessinée."
+msgstr "This image cannot be redrawn."
+
+msgid "Dessin en cours, une trentaine de secondes…"
+msgstr "Drawing, about thirty seconds…"
+
+msgid "Image redessinée d’après les remarques. Elle remplace l’ancienne dans le brouillon ; regardez-la avant de publier."
+msgstr "Image redrawn from the findings. It replaces the old one in the draft; look at it before publishing."
+
+msgid "Le nouveau dessin a échoué. Réessayez plus tard."
+msgstr "The redraw failed. Try again later."
+
+msgid "Le plafond de cette recette est atteint."
+msgstr "This recipe’s ceiling has been reached."
+
+msgid "Redessiner le collage"
+msgstr "Redraw the collage"
+
+msgid "Redessiner l’image à la une"
+msgstr "Redraw the featured image"
+
+msgid "Une image refusée n’est pas redessinée d’office. Si les remarques vous semblent justes, faites-la redessiner : elles sont transmises au dessin, et la nouvelle image remplace l’ancienne dans le brouillon."
+msgstr "A refused image is not redrawn automatically. If the findings seem right to you, have it redrawn: they are passed to the drawing, and the new image replaces the old one in the draft."
+
+msgid "L’image à la une a été redessinée %d fois d’après ces remarques ; la nouvelle n’a pas été rejugée."
+msgstr "The featured image was redrawn %d time(s) from these findings; the new one has not been judged again."
+
+msgid "Le collage a été redessiné %d fois d’après ces remarques ; le nouveau n’a pas été rejugé."
+msgstr "The collage was redrawn %d time(s) from these findings; the new one has not been judged again."

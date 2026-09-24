@@ -560,26 +560,16 @@ final class MSRWA_Engine_Input {
 				. "\nRESEARCH PACKAGE: " . $encode( $text_research )
 				. "\nARTICLE: " . $encode( self::article( $brief ) );
 		}
-		if ( 'fact_check' === $step ) {
-			return $prompt . "\nRESEARCH PACKAGE: " . $encode( $text_research )
-				. "\nCANONICAL RECIPE: " . $encode( $canonical )
-				. "\nARTICLE: " . $encode( self::article( $brief )['content_html'] ?? '' );
-		}
-		if ( 'proofread' === $step ) {
-			return $prompt . "\nRESEARCH PACKAGE: " . $encode( $research )
-				. "\nCANONICAL RECIPE: " . $encode( $canonical )
-				. "\nARTICLE TO CORRECT: " . $encode( self::article( $brief )['content_html'] ?? '' );
-		}
 		if ( 'final_approval' === $step ) {
 			// The images travel beside this text, as bytes. Everything the judge
 			// measures them against has to be in here, or it judges pictures alone:
-			// the recipe it must accept as given, the research behind it, and what
-			// the real photographs of this dish actually showed.
+			// the recipe it must accept as given and what the real photographs of
+			// this dish actually showed. The article and the research are not: the
+			// review has already held the text to them, and sending both again made
+			// this the largest input of the recipe for a judgement of two images.
 			return $prompt . "\n\nCANONICAL RECIPE: " . $encode( $canonical )
-				. "\nRESEARCH PACKAGE: " . $encode( $text_research )
 				. "\n\n" . self::visual_evidence( $research )
-				. "\n" . self::visual_brief( $canonical, $research )
-				. "\nARTICLE: " . $encode( self::article( $brief ) );
+				. "\n" . self::visual_brief( $canonical, $research );
 		}
 		return $prompt;
 	}

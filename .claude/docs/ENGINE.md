@@ -39,14 +39,14 @@ exist may run at once:
 | 1 | research | other |
 | 2 | canonical recipe | article |
 | 3 | **article · featured image · Facebook collage** | article · featured · facebook |
-| 4 | **review · fact check** | article |
+| 4 | **review · final approval** | article · other |
 | 5 | apply corrections *(no model runs)* | article |
-| 6 | proofread | article |
-| 7 | final approval | other |
+| 6 | proofread *(no model runs)* | article |
 
 The images depend on the recipe and the research, not on the article, so they
-are drawn while it is written. The approval judges the proofread text, because
-that is what a reader gets.
+are drawn while it is written. One review reads the article for its findings,
+its facts and its language; the approval judges the two images at the same
+time, since it no longer reads the text.
 
 **A wave's calls go out together.** `limits.concurrency` (4 by default, 1 to
 turn it off) decides how many are in flight at once. Only the first attempt is
@@ -58,27 +58,28 @@ it is no longer doing the same thing as the others. Measured on one recipe:
 
 A step declares a capability and the engine routes on it:
 
-- **text** — research (with web search), the recipe, the article, the two
-  reviews, proofreading. JSON in, JSON out, repaired by `MSRWA_Json` when a
+- **text** — research (with web search), the recipe, the article, the
+  review. JSON in, JSON out, repaired by `MSRWA_Json` when a
   model fences it or leaks a control character.
 - **image_generation** — the two images, written into a workspace the caller
   names.
-- **vision** — the final approval, which reads both images' bytes alongside the
-  article. It is the only point where the three can be checked against each
-  other.
-- **none** — applying the fact check's corrections. It quotes the sentence it
-  objects to verbatim and supplies the replacement, so this is a substitution,
-  not a judgement: no model, no cost, nothing to invent. A correction whose
-  quote cannot be located in the HTML goes to the editor rather than being
-  dropped.
+- **vision** — the final approval, which reads both images' bytes beside the
+  recipe and what real photographs of the dish showed. It is the only point
+  where the two images are checked against each other.
+- **none** — applying the review's corrections, then its language changes.
+  It quotes each sentence verbatim and supplies the replacement, so this is a
+  substitution, not a judgement: no model, no cost, nothing to invent. A
+  correction whose quote cannot be located in the HTML goes to the editor
+  rather than being dropped.
 
-### Retry until approved
+### A refusal goes to the editor
 
-A refused approval does not ask the same question again. It regenerates the
-images the judge blocked, carrying its findings into the prompt as corrections,
-and then asks again — up to `attempts.final_approval`. A malformed verdict is
-not a refusal: the engine re-asks without touching the images, because
-regenerating against a decision nobody made costs money for nothing.
+A refused approval ends the step: its findings go to the editor, who can have
+a refused image redrawn from them (`MSRWA_Run::redraw()`, the run screen's
+button). The engine passes them to the image step as `options['findings']`.
+A malformed verdict is not a refusal: it is asked once more, up to
+`attempts.final_approval` (2). A call whose connection dropped before any
+answer is asked once more whatever its attempts.
 
 ---
 
@@ -207,7 +208,7 @@ the lab's business.
 ```php
 $result->ok          // false as soon as any step fails; a partial run still returns its artifacts
 $result->artifacts   // research, canonical, article, featured, facebook, review,
-                     // fact_check, corrected, proofread, approval, config, brief
+                     // corrected, proofread, approval, config, brief
 $result->steps       // one entry per step attempted, in order: model, seconds,
                      // usage, cost_usd, attempts, passed/total, checks, error
 $result->errors      // every failure, each naming its step
@@ -739,6 +740,34 @@ photograph, and otherwise use the photograph without the cost of a search.
     medium matched high for $0.021 against $0.051 a collage. Three full runs:
     first passes $0.086–0.109 (from about $0.126), each approved after one
     redraw for a real fault, totals $0.114–0.133 with the redraw.
+
+38. **Fewer, smaller calls.** Owner's choice, 2026-09-24 ("A + B + C + D"),
+    against a recipe that cost $0.114–0.133.
+    - *One review for three.* `review.tpl.txt` now returns the review's
+      findings, the fact check's `corrections` and `unsupported`, and the
+      proofread's `changes` in one answer; `fact_check.tpl.txt` and
+      `proofread.tpl.txt` are gone. `corrections` and `proofread` are
+      code-only steps that substitute them. The three calls read the same
+      research and article three times: 32,000 tokens in and 9,000 out, now
+      10,800–11,400 in and 3,100–3,600 out for $0.006.
+    - *The judge sees the images only.* The final approval is sent the
+      recipe, the visual evidence and the visual brief, not the article or
+      the research, and no longer judges the text: 7,200–7,700 tokens in
+      against 16,500. Its sentence repairs (`article_repairs`,
+      `before_retry()`) are gone with it, and it runs in the review's wave.
+    - *One web search.* `limits.web_searches` 1 and `web_tool_calls` 6; the
+      research prompt asks for one search and two or three pages read.
+    - *No automatic redraw.* A refusal is recorded and handed to the editor;
+      `attempts.final_approval` is 2, for a malformed verdict only. Every
+      test recipe had redrawn once, a quarter of its cost.
+    - *A dropped connection is asked again.* One live review came back
+      `HTTP 0` with no reason: `http_many()` read `curl_error()`, which is
+      empty under a multi handle. It now reads each transfer's result from
+      `curl_multi_info_read()`, and `perform()` asks once more a call that
+      never reached an answer.
+    Measured: three lab recipes $0.0702 (review dropped), $0.0768 and $0.0778,
+    all approved first time; on the site, a full lot $0.0736 and an article
+    lot $0.0409 (from $0.050). An editor's redraw of the collage cost $0.020.
 
 ### Still open
 

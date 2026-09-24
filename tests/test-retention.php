@@ -42,7 +42,7 @@ msrwa_test_contains( $log, "r.status NOT IN ('queued','running')", 'A run still 
 $GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
 $GLOBALS['wpdb']->on( 'SELECT a.id', array( 9 ) );
 MSRWA_Retention::artifacts( 30 );
-foreach ( array( 'brief', 'review', 'fact_check', 'approval', 'canonical' ) as $kept ) {
+foreach ( array( 'brief', 'review', 'approval', 'canonical' ) as $kept ) {
 	msrwa_test_contains( $GLOBALS['wpdb']->log(), "'" . $kept . "'", 'The ' . $kept . ' artifact is never swept.' );
 }
 

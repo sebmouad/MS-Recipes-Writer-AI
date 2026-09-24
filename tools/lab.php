@@ -111,7 +111,7 @@ function lab_artifacts( $step, $brief, array $options ) {
 	foreach ( array( 'research', 'canonical', 'article' ) as $key ) {
 		if ( ! empty( $resolved[ $key ] ) ) { $artifacts[ $key ] = $resolved[ $key ]; }
 	}
-	foreach ( array( 'review', 'fact_check', 'corrected', 'proofread' ) as $key ) {
+	foreach ( array( 'review', 'corrected', 'proofread' ) as $key ) {
 		if ( ! empty( $options[ str_replace( '_', '-', $key ) ] ) ) { $artifacts[ $key ] = lab_json_file( $options[ str_replace( '_', '-', $key ) ], $key, $key ); }
 	}
 	foreach ( array( 'featured', 'facebook' ) as $kind ) {

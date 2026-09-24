@@ -1,8 +1,7 @@
 <?php
 // The per-recipe ceiling cannot be exceeded. It was checked between waves only,
-// so a refused final approval could redraw its images and ask again past a
-// budget the run had nearly reached. The network is replaced here: the judge
-// refuses every time, and the budget leaves no room for another round.
+// so a step asked again could cross a budget the run had nearly reached. The
+// network is replaced here: the judge refuses, or answers malformed.
 require __DIR__ . '/bootstrap.php';
 require_once dirname( __DIR__ ) . '/includes/engine/load.php';
 
@@ -14,7 +13,6 @@ file_put_contents( $dir . '/facebook.png', $png );
 
 $refusal = array(
 	'approved' => false,
-	'article' => array( 'verdict' => 'good', 'summary' => 'Conforme.' ),
 	'featured_image' => array( 'verdict' => 'good', 'realism' => 'good', 'summary' => 'Crédible.' ),
 	'facebook_image' => array( 'verdict' => 'bad', 'realism' => 'good', 'panels_counted' => 6, 'summary' => 'Ordre faux.' ),
 	'consistency' => array( 'verdict' => 'good', 'summary' => 'Même plat.' ),
@@ -22,7 +20,7 @@ $refusal = array(
 	'uncertainties' => array( 'Rien d’autre.' ),
 );
 $calls = array();
-MSRWA_Engine_Call::$transport = static function ( $url, $payload ) use ( &$calls, $refusal ) {
+MSRWA_Engine_Call::$transport = static function ( $url, $payload ) use ( &$calls, &$refusal ) {
 	$calls[] = $url;
 	return array( 'status' => 200, 'raw' => json_encode( array(
 		'status' => 'completed',
@@ -43,21 +41,26 @@ $input = array(
 );
 $keys = array( 'settings' => array( 'keys' => array( 'openai' => 'k' ) ) );
 
-// A budget with room for a single approval: the refusal must not be retried.
-$tight = MSRWA_Engine::run_step( 'final_approval', $input, array( 'config' => $keys + array( 'limits' => array( 'budget_usd' => 0.008 ) ) ) );
+// A refusal is the editor's: nothing is redrawn and the judge is not asked again.
+MSRWA_Engine::run_step( 'final_approval', $input, array( 'workspace' => $dir, 'config' => $keys + array( 'limits' => array( 'budget_usd' => 5.0 ) ) ) );
 $images = array_filter( $calls, static function ( $url ) { return false !== strpos( $url, 'images' ); } );
-msrwa_test_assert( 1 === count( $calls ), 'One approval, and nothing after it: another round would cross the budget. Calls made: ' . count( $calls ) );
-msrwa_test_assert( ! $images, 'No image is redrawn past the budget.' );
+msrwa_test_assert( 1 === count( $calls ), 'One approval and nothing after it, whatever the budget. Calls made: ' . count( $calls ) );
+msrwa_test_assert( ! $images, 'No image is redrawn by the engine.' );
+
+// A malformed verdict is asked again — but not past the budget.
+$refusal = array( 'approved' => false );
+$calls = array();
+$tight = MSRWA_Engine::run_step( 'final_approval', $input, array( 'config' => $keys + array( 'limits' => array( 'budget_usd' => 0.008 ) ) ) );
+msrwa_test_assert( 1 === count( $calls ), 'Another attempt would cross the budget, so none is made. Calls made: ' . count( $calls ) );
 $said = implode( "\n", array_column( $tight->events, 'message' ) );
 msrwa_test_contains( $said, 'Not retried', 'The run says why it stopped retrying.' );
 msrwa_test_assert( $tight->totals()['cost_usd'] <= 0.008, 'The ceiling holds; spent ' . $tight->totals()['cost_usd'] );
 
-// With room to spare, the same refusal is retried as before.
 $calls = array();
-MSRWA_Engine::run_step( 'final_approval', $input, array( 'workspace' => $dir, 'config' => $keys + array( 'limits' => array( 'budget_usd' => 5.0 ) ) ) );
-msrwa_test_assert( count( $calls ) > 1, 'Under a roomy budget a refusal is still retried.' );
+MSRWA_Engine::run_step( 'final_approval', $input, array( 'config' => $keys + array( 'limits' => array( 'budget_usd' => 5.0 ) ) ) );
+msrwa_test_assert( 2 === count( $calls ), 'Under a roomy budget a malformed verdict is asked once more.' );
 
 MSRWA_Engine_Call::$transport = null;
 array_map( 'unlink', glob( $dir . '/*' ) );
 @rmdir( $dir );
-msrwa_test_done( 'the ceiling holds through the approval loop' );
+msrwa_test_done( 'the ceiling holds through the approval' );

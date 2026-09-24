@@ -347,12 +347,11 @@ function report_corrections( $corrected ) {
 }
 
 /**
- * The editorial review's findings, and what the proofread did after them.
+ * The editorial review's findings, and the language changes applied after them.
  *
- * The findings travel to the proofread with the article; the engine does not
- * record which change answers which finding, so the page says so, lists the
- * changes the proofread made, and leaves the pairing to the reader — the final
- * approval judged the text that came out.
+ * The review returns its findings beside the language changes; a finding is
+ * advice for the editor and is not applied, so the page lists both and leaves
+ * the pairing to the reader.
  */
 function report_review( $review, $proofread ) {
 	$findings = array_values( array_filter( (array) ( ( is_array( $review ) ? $review : array() )['findings'] ?? array() ), 'is_array' ) );
@@ -365,12 +364,12 @@ function report_review( $review, $proofread ) {
 			. '<p class="finding-head"><span class="pill ' . ( 'minor' === $severity ? 'warn' : 'bad' ) . '">' . report_h( report_label( $severity ) ) . '</span> <strong>' . report_h( $finding['section'] ?? '' ) . '</strong></p>'
 			. '<p>' . report_h( $finding['reason'] ?? '' ) . '</p>'
 			. ( '' !== (string) ( $finding['fix'] ?? '' ) ? '<p class="muted"><strong>Correction proposée :</strong> ' . report_h( $finding['fix'] ) . '</p>' : '' )
-			. '<p class="muted">→ transmis à la relecture finale</p></article>';
+			. '<p class="muted">→ laissé à l’éditeur</p></article>';
 	}
 	$html .= '</div>';
 	$html .= '<p class="muted">' . ( $proofread
-		? sprintf( 'La relecture finale a reçu ces constats et a modifié %d passage(s) ; le moteur ne note pas quel changement répond à quel constat. L’approbation finale a jugé le texte qui en résulte.', count( $changes ) )
-		: 'La relecture finale n’a pas eu lieu : ces constats restent à traiter par l’éditeur.' ) . '</p>';
+		? sprintf( 'La même relecture a corrigé la langue de %d passage(s) ; ces constats-ci ne sont pas appliqués et restent à traiter par l’éditeur.', count( $changes ) )
+		: 'La correction de la langue n’a pas eu lieu : ces constats restent à traiter par l’éditeur.' ) . '</p>';
 	if ( $changes ) {
 		$rows = '';
 		foreach ( $changes as $change ) { $rows .= '<div class="list-item"><p class="muted">' . report_h( $change['type'] ?? '' ) . '</p><p><del>' . report_h( $change['before'] ?? '' ) . '</del></p><p><ins>' . report_h( $change['after'] ?? '' ) . '</ins></p></div>'; }
@@ -677,11 +676,11 @@ function report_render( array $run ) {
 
 		. $section( 'SEO, publication et données éditoriales', $metadata ? report_fold( 'Ouvrir les métadonnées de publication', report_value( $metadata ) ) : '<p class="muted">Aucune métadonnée : l’article n’a pas été écrit, ou sa version de travail a été libérée une fois le brouillon créé.</p>' )
 
-		. ( $wants( 'review' ) || $wants( 'fact_check' ) || $wants( 'proofread' )
-			? $section( 'Revue, vérification des faits et corrections', '<p class="muted">Deux relectures indépendantes, puis ce que le moteur a réellement changé dans le texte.</p>'
+		. ( $wants( 'review' ) || $wants( 'proofread' )
+			? $section( 'Revue, vérification des faits et corrections', '<p class="muted">Une relecture — constats, faits et langue — puis ce que le moteur a réellement changé dans le texte.</p>'
 				. '<h3>Vérification des faits</h3><div class="findings-wrap">' . report_corrections( $corrected ) . '</div>'
 				. '<h3>Revue éditoriale</h3>' . ( $reached( 'review' ) ? report_review( $artifacts['review'] ?? array(), $proofread ) : $not_reached )
-				. ( $artifacts['fact_check'] ?? array() ? report_fold( 'Détail de la vérification des faits', report_value( $artifacts['fact_check'] ) ) : '' ) )
+				. ( ! empty( $artifacts['review']['unsupported'] ) ? report_fold( 'Affirmations qu’aucune source ne couvre', report_value( $artifacts['review']['unsupported'] ) ) : '' ) )
 			: '' )
 
 		. ( $images

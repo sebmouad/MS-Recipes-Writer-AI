@@ -21,7 +21,7 @@ final class MSRWA_Retention {
 
 	/** Artifacts small enough that keeping them forever costs nothing worth counting. */
 	private static function light() {
-		return array( 'brief', 'review', 'fact_check', 'approval', 'canonical' );
+		return array( 'brief', 'review', 'approval', 'canonical' );
 	}
 
 	/**

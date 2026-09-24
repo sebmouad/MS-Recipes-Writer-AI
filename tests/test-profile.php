@@ -20,7 +20,7 @@ msrwa_test_assert( ! in_array( 'facebook_image', $featured, true ), 'The feature
 msrwa_test_assert( in_array( 'featured_image', $featured, true ), 'The featured profile still draws its featured image.' );
 // The judge sees whatever was produced, so one image is still worth judging.
 msrwa_test_assert( in_array( 'final_approval', $featured, true ), 'One image is still judged; only the comparison between two is lost.' );
-foreach ( array( 'review', 'fact_check', 'proofread' ) as $check ) {
+foreach ( array( 'review', 'corrections', 'proofread' ) as $check ) {
 	msrwa_test_assert( in_array( $check, $featured, true ), 'The text checks run in every profile; ' . $check . ' is missing.' );
 }
 

@@ -1062,8 +1062,6 @@ msgstr "تُقدَّر وصفة في هذه الدفعة بـ %1$s، أي فوق
 msgid "Vos recettes passées par le moteur, avec leur état et leur brouillon."
 msgstr "وصفاتك التي مرّت عبر المحرك، مع حالتها ومسودتها."
 
-msgid "Vérification des faits"
-msgstr "التحقق من الحقائق"
 
 msgid "Vérification…"
 msgstr "جارٍ التحقق…"
@@ -2149,3 +2147,33 @@ msgstr "إضافة كولاج (JPEG أو PNG أو WebP، 10 ميغابايت ع�
 
 msgid "Ajouter"
 msgstr "إضافة"
+
+msgid "Cette image ne peut pas être redessinée."
+msgstr "لا يمكن إعادة رسم هذه الصورة."
+
+msgid "Dessin en cours, une trentaine de secondes…"
+msgstr "جارٍ الرسم، نحو ثلاثين ثانية…"
+
+msgid "Image redessinée d’après les remarques. Elle remplace l’ancienne dans le brouillon ; regardez-la avant de publier."
+msgstr "أُعيد رسم الصورة وفق الملاحظات. وهي تحل محل القديمة في المسودة؛ راجعها قبل النشر."
+
+msgid "Le nouveau dessin a échoué. Réessayez plus tard."
+msgstr "فشلت إعادة الرسم. حاول لاحقًا."
+
+msgid "Le plafond de cette recette est atteint."
+msgstr "بلغت هذه الوصفة سقفها."
+
+msgid "Redessiner le collage"
+msgstr "إعادة رسم الكولاج"
+
+msgid "Redessiner l’image à la une"
+msgstr "إعادة رسم الصورة البارزة"
+
+msgid "Une image refusée n’est pas redessinée d’office. Si les remarques vous semblent justes, faites-la redessiner : elles sont transmises au dessin, et la nouvelle image remplace l’ancienne dans le brouillon."
+msgstr "لا تُعاد رسم الصورة المرفوضة تلقائيًا. إذا بدت لك الملاحظات صائبة فاطلب إعادة رسمها: تُنقل الملاحظات إلى الرسم، وتحل الصورة الجديدة محل القديمة في المسودة."
+
+msgid "L’image à la une a été redessinée %d fois d’après ces remarques ; la nouvelle n’a pas été rejugée."
+msgstr "أُعيد رسم الصورة البارزة %d مرة وفق هذه الملاحظات؛ ولم تُحكَّم الصورة الجديدة من جديد."
+
+msgid "Le collage a été redessiné %d fois d’après ces remarques ; le nouveau n’a pas été rejugé."
+msgstr "أُعيد رسم الكولاج %d مرة وفق هذه الملاحظات؛ ولم يُحكَّم الكولاج الجديد من جديد."

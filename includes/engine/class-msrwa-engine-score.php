@@ -108,8 +108,8 @@ final class MSRWA_Engine_Score {
 			$words = (int) ( $quality['metrics']['words'] ?? 0 );
 			// Both ends. Comparing against the minimum alone let a live English
 			// article come back at 5 988 words against a 2 800–3 600 target,
-			// and an over-long article is paid for twice more: review and
-			// proofread each read it whole.
+			// and an over-long article is paid for again: the review reads it
+			// whole.
 			// In the article's own language: Arabic is held to fewer words.
 			$range = MSRWA_Prompt::word_range( $settings );
 			$maximum = $range['max'];
@@ -146,10 +146,12 @@ final class MSRWA_Engine_Score {
 			$checks['fields the plugin needs'] = array( 'pass' => empty( $absent ), 'detail' => $absent ? 'missing: ' . implode( ', ', $absent ) : count( $fields ) . ' fields present' );
 		}
 
-		if ( 'fact_check' === $step ) {
+		if ( 'review' === $step ) {
 			$article = (string) ( MSRWA_Engine_Input::article( $brief )['content_html'] ?? '' );
 			$plain = html_entity_decode( strip_tags( $article ), ENT_QUOTES, 'UTF-8' );
 			$checks['verdict is boolean'] = array( 'pass' => array_key_exists( 'pass', $json ) && is_bool( $json['pass'] ), 'detail' => isset( $json['pass'] ) ? var_export( $json['pass'], true ) : 'missing' );
+			$checks['findings are structured'] = array( 'pass' => isset( $json['findings'] ) && is_array( $json['findings'] ), 'detail' => count( (array) ( $json['findings'] ?? array() ) ) . ' findings' );
+			$checks['language changes listed'] = array( 'pass' => isset( $json['changes'] ) && is_array( $json['changes'] ), 'detail' => count( (array) ( $json['changes'] ?? array() ) ) . ' changes' );
 			$corrections = (array) ( $json['corrections'] ?? array() );
 			$quoted = 0; $invented = 0;
 			foreach ( $corrections as $correction ) {
@@ -182,14 +184,9 @@ final class MSRWA_Engine_Score {
 		// A model writing French once put a Chinese character in the middle of
 		// a word — "润ir les pommes" — and the answer scored 13/13. Letters
 		// from an alphabet the article is not written in are never meant.
-		if ( in_array( $name, array( 'research', 'canonical_recipe', 'article', 'fact_check', 'proofread' ), true ) && $json ) {
+		if ( in_array( $name, array( 'research', 'canonical_recipe', 'article', 'review', 'proofread' ), true ) && $json ) {
 			$stray = self::stray_script( $json, (string) ( $settings['site_language'] ?? 'fr' ) );
 			$checks['one alphabet'] = array( 'pass' => ! $stray, 'detail' => $stray ? 'foreign characters: ' . implode( ' · ', array_slice( $stray, 0, 3 ) ) : 'none' );
-		}
-
-		if ( 'review' === $step ) {
-			$checks['verdict is boolean'] = array( 'pass' => array_key_exists( 'pass', $json ) && is_bool( $json['pass'] ), 'detail' => isset( $json['pass'] ) ? var_export( $json['pass'], true ) : 'missing' );
-			$checks['findings are structured'] = array( 'pass' => isset( $json['findings'] ) && is_array( $json['findings'] ), 'detail' => count( (array) ( $json['findings'] ?? array() ) ) . ' findings' );
 		}
 
 		$passed = 0;
@@ -224,8 +221,8 @@ final class MSRWA_Engine_Score {
 	 * Scores an approval verdict. The risk here is not a missing key but a judge that
 	 * waves everything through, so the checks demand a verdict per artifact, a panel
 	 * count it actually made, and findings precise enough to act on: a blocking
-	 * finding that refuses to approve, and a quote on every article finding, since a
-	 * paraphrase cannot be applied to the text.
+	 * finding that refuses to approve, and a fix on every finding, since an editor
+	 * redraws from it.
 	 */
 	public static function approval( $verdict, $image_count, $expected_panels, $targets = array() ) {
 		$checks = array();
@@ -236,7 +233,7 @@ final class MSRWA_Engine_Score {
 		$checks['approved is a boolean'] = array( 'pass' => isset( $verdict['approved'] ) && is_bool( $verdict['approved'] ), 'detail' => isset( $verdict['approved'] ) ? var_export( $verdict['approved'], true ) : 'missing' );
 
 		$verdicts = array( 'good', 'reservations', 'bad' );
-		$targets = $targets ? array_values( (array) $targets ) : array( 'article', 'featured_image', 'facebook_image', 'consistency' );
+		$targets = $targets ? array_values( (array) $targets ) : array( 'featured_image', 'facebook_image', 'consistency' );
 		$missing = array();
 		foreach ( $targets as $target ) {
 			$value = (string) ( $verdict[ $target ]['verdict'] ?? '' );
@@ -263,16 +260,15 @@ final class MSRWA_Engine_Score {
 
 		$findings = array_values( array_filter( (array) ( $verdict['findings'] ?? array() ), 'is_array' ) );
 		$blocking = 0;
-		$unquoted = 0;
+		$unfixed = 0;
 		$bad_target = 0;
 		foreach ( $findings as $finding ) {
 			if ( 'blocking' === ( $finding['severity'] ?? '' ) ) { $blocking++; }
 			if ( ! in_array( (string) ( $finding['target'] ?? '' ), $targets, true ) ) { $bad_target++; }
-			if ( 'article' === ( $finding['target'] ?? '' ) && '' === trim( (string) ( $finding['quote'] ?? '' ) ) ) { $unquoted++; }
-			if ( '' === trim( (string) ( $finding['fix'] ?? '' ) ) ) { $unquoted++; }
+			if ( '' === trim( (string) ( $finding['fix'] ?? '' ) ) ) { $unfixed++; }
 		}
 		$checks['findings are addressed'] = array( 'pass' => $readable && 0 === $bad_target, 'detail' => $bad_target ? $bad_target . ' with no valid target' : count( $findings ) . ' findings' );
-		$checks['findings are actionable'] = array( 'pass' => $readable && 0 === $unquoted, 'detail' => $unquoted ? $unquoted . ' without a quote or a fix' : 'every finding carries a fix' );
+		$checks['findings are actionable'] = array( 'pass' => $readable && 0 === $unfixed, 'detail' => $unfixed ? $unfixed . ' without a fix' : 'every finding carries a fix' );
 
 		// A refusal nobody can act on is not a verdict.
 		$justified = $readable && ( ! empty( $verdict['approved'] ) || count( $findings ) > 0 );
@@ -337,28 +333,6 @@ final class MSRWA_Engine_Score {
 			if ( $target === ( $finding['target'] ?? '' ) ) { $out[] = $finding; }
 		}
 		return $out;
-	}
-
-	/**
-	 * The sentence-level repairs that would clear every blocking article finding.
-	 *
-	 * The judge quotes the sentence at fault and gives its replacement, so the
-	 * repair needs no model: it is applied in code and judged again. All or
-	 * nothing — one finding without a usable quote means the article needs a
-	 * person, and patching the others would only hide that.
-	 */
-	public static function article_repairs( $verdict, $html ) {
-		if ( ! is_array( $verdict ) || ! empty( $verdict['approved'] ) ) { return array(); }
-		$repairs = array();
-		foreach ( self::findings_for( $verdict, 'article' ) as $finding ) {
-			$quote = trim( (string) ( $finding['quote'] ?? '' ) );
-			if ( '' === $quote || ! array_key_exists( 'replacement', $finding ) || ! is_string( $finding['replacement'] ) ) { return array(); }
-			if ( false === mb_strpos( (string) $html, $quote ) ) { return array(); }
-			$replacement = trim( strip_tags( $finding['replacement'] ) );
-			if ( $replacement === $quote ) { return array(); }
-			$repairs[] = array( 'before' => $quote, 'after' => $replacement, 'reason' => (string) ( $finding['reason'] ?? '' ) );
-		}
-		return $repairs;
 	}
 
 	/**

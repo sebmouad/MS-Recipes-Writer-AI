@@ -8,7 +8,7 @@ TASK: combine the editor brief with current web research. Return the best concis
 
 RULES:
 - Search the web. Prefer culinary schools, established publications, recognised producers, and authoritative food-safety sources over content farms.
-- Each search query is billed; opening and reading a page is not. Run at most three searches, each precise enough to find a complete recipe page from a reliable source, then open and read the best pages they return instead of searching again.
+- Each search query is billed; opening and reading a page is not. Run one search, precise enough to find complete recipe pages from reliable sources, then open and read the best two or three pages it returns instead of searching again.
 - Each textual fact carries its source_url. A fact with no source does not belong in the answer.
 - Keep facts short and actionable: one statement each, retaining useful figures and disagreements.
 - Report disagreement between sources rather than averaging it away.

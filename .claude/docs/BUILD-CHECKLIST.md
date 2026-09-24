@@ -610,6 +610,12 @@ cost) in the task before changing anything.
 - [x] **A40 — Cheaper collage, no packaging (2026-09-24).** Out-of-packaging
   rule, reference shrunk to 768 px, collage at medium. Real: seven dishes
   compared, three full runs. See ENGINE.md §7, item 37.
+- [x] **A41 — Fewer, smaller calls (2026-09-24).** One review for the review,
+  fact check and proofread; the judge on the images alone; one web search; no
+  automatic redraw, an editor's redraw button instead; a dropped connection
+  asked again. Real: three lab recipes, a full and an article lot on the
+  site, one collage redrawn through `POST /runs/{id}/redraw`. See ENGINE.md
+  §7, item 38.
 - [x] **A11 — Model answers that do not parse (found 2026-09-20).** Two of the
   54 matrix cells scored zero for a reason that was ours, not the prompt's:
   Opus 5 wrote "I'll research this dish now." before the object, and Sonnet 5

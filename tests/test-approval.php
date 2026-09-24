@@ -7,13 +7,12 @@ require_once dirname( __DIR__ ) . '/tools/lib/steps.php';
 
 $sound = array(
 	'approved' => false,
-	'article' => array( 'verdict' => 'reservations', 'summary' => 'Les figures concordent.' ),
 	'featured_image' => array( 'verdict' => 'good', 'realism' => 'good', 'summary' => 'Photographie crédible.' ),
 	'facebook_image' => array( 'verdict' => 'bad', 'realism' => 'good', 'panels_counted' => 6, 'summary' => 'Garniture absente.' ),
 	'consistency' => array( 'verdict' => 'bad', 'summary' => 'Le dernier panneau diffère.' ),
 	'findings' => array(
 		array( 'target' => 'facebook_image', 'severity' => 'blocking', 'quote' => '', 'reason' => 'Persil absent de la recette.', 'fix' => 'Retirer la garniture verte.' ),
-		array( 'target' => 'article', 'severity' => 'minor', 'quote' => 'Les pommes de septembre sont les plus sucrées.', 'reason' => 'Non étayé.', 'fix' => 'Supprimer la phrase.' ),
+		array( 'target' => 'featured_image', 'severity' => 'minor', 'reason' => 'Cadrage large.', 'fix' => 'Resserrer.' ),
 	),
 	'uncertainties' => array( 'Ingrédients non visibles non vérifiables.' ),
 );
@@ -29,13 +28,14 @@ msrwa_test_assert( false === lab_score_approval( $contradictory, 2, 6 )['approva
 // No blocker and approved is a legitimate pass.
 $clean = $sound;
 $clean['approved'] = true;
-$clean['findings'] = array( array( 'target' => 'article', 'severity' => 'minor', 'quote' => 'Une phrase.', 'reason' => 'Style.', 'fix' => 'Reformuler.' ) );
+$clean['findings'] = array( array( 'target' => 'facebook_image', 'severity' => 'minor', 'reason' => 'Lumière.', 'fix' => 'Adoucir.' ) );
 msrwa_test_assert( true === lab_score_approval( $clean, 2, 6 )['approval matches findings']['pass'], 'Approving with only minor findings must pass.' );
 
-// An article finding without its exact sentence cannot be applied to the text.
-$unquoted = $sound;
-$unquoted['findings'][1]['quote'] = '';
-msrwa_test_assert( false === lab_score_approval( $unquoted, 2, 6 )['findings are actionable']['pass'], 'An article finding with no quote must fail.' );
+// The text is the review's: a finding filed against the article is a finding
+// against something the judge was never shown.
+$text = $sound;
+$text['findings'][] = array( 'target' => 'article', 'severity' => 'minor', 'reason' => 'Style.', 'fix' => 'Reformuler.' );
+msrwa_test_assert( false === lab_score_approval( $text, 2, 6 )['findings are addressed']['pass'], 'The judge may not file a finding against the article.' );
 
 $unfixable = $sound;
 $unfixable['findings'][0]['fix'] = '';
@@ -80,25 +80,13 @@ msrwa_test_contains( $prompt, 'is BLOCKING, however small', 'An ingredient that 
 msrwa_test_contains( $prompt, 'Do not count either', 'Counting objects in a photograph must not be a defect.' );
 msrwa_test_contains( $prompt, 'nothing inedible is an ingredient', 'Styling props must not be read as ingredients.' );
 msrwa_test_contains( $prompt, 'SEVERITY:', 'Severity must be defined, or everything becomes blocking.' );
-// The leniency is for images only. The article and the recipe are what the
-// reader cooks from, so they are held to the research (owner, 2026-09-21).
-msrwa_test_contains( $prompt, 'applies to the IMAGES ONLY', 'The relaxed judgement must be scoped to images.' );
 msrwa_test_contains( $prompt, 'doubt resolves to minor', 'For images, doubt resolves towards shipping.' );
-msrwa_test_contains( $prompt, 'Doubt resolves to blocking', 'For the text, doubt resolves towards refusing.' );
-
-// The judge takes the canonical recipe as given (owner, 2026-09-21). The recipe
-// step is told to add the staple a method plainly needs even when no source
-// states its quantity; the judge used to block exactly that, so an obedient
-// writer was refused by an obedient judge. Silence in the research is no longer
-// a finding against the recipe — contradiction still is.
-msrwa_test_contains( $prompt, 'you take it as given', 'The judge must take the canonical recipe as the reference.' );
-msrwa_test_contains( $prompt, 'silence in the research is not a finding against the recipe', 'An unstated staple in the recipe must not block.' );
-msrwa_test_contains( $prompt, 'The recipe is allowed to be more complete than its sources', 'The recipe may exceed its sources.' );
-msrwa_test_contains( $prompt, 'that the research directly contradicts', 'A contradicted ingredient or figure must still block.' );
-msrwa_test_contains( $prompt, 'that the recipe omits', 'An essential ingredient the recipe drops must still block.' );
-msrwa_test_contains( $prompt, 'in neither the canonical recipe nor the research', 'The article may not add what neither carries.' );
-msrwa_test_missing( $prompt, 'that no research fact supports', 'The old rule that blocked an unsourced staple must be gone.' );
-msrwa_test_contains( $prompt, 'Never trade one against the other', 'Good images must not excuse an unsupported ingredient.' );
+// The article is held to its sources by the review, before the judge; the
+// judge is sent neither, and must not be asked about them (owner, 2026-09-24).
+msrwa_test_contains( $prompt, 'which you take as given', 'The judge must take the canonical recipe as the reference.' );
+msrwa_test_missing( $prompt, 'THE TEXT IS JUDGED STRICTLY', 'The judge no longer judges the text.' );
+msrwa_test_missing( $prompt, '"article":', 'Nor answers about it.' );
+msrwa_test_contains( $prompt, 'an editor decides whether it is redrawn', 'A refusal goes to the editor, not to an automatic redraw.' );
 
 // A refusal decides what gets regenerated. Getting this wrong wastes an image
 // generation per attempt, which is the expensive half of the retry loop.

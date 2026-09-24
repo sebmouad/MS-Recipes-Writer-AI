@@ -192,20 +192,46 @@ final class MSRWA_Draft {
 	 * an attachment cannot be set.
 	 */
 	private static function attach_images( $post_id, $run_id, array $artifacts, $title ) {
-		foreach ( array( 'featured' => __( 'Image à la une', 'ms-recipes-writer-ai' ), 'facebook' => __( 'Image Facebook', 'ms-recipes-writer-ai' ) ) as $kind => $label ) {
-			$image = (array) ( $artifacts[ $kind ] ?? array() );
-			$path = (string) ( $image['path'] ?? '' );
-			if ( '' === $path || ! is_readable( $path ) ) { continue; }
+		foreach ( array( 'featured', 'facebook' ) as $kind ) { self::attach( $post_id, $kind, (array) ( $artifacts[ $kind ] ?? array() ), $title ); }
+	}
 
-			$attachment = self::sideload( $path, $post_id, $title . ' — ' . $label, (string) ( $image['mime'] ?? 'image/webp' ), self::file_base( $post_id, $title, $kind ) );
-			if ( ! $attachment ) { continue; }
-			// What the photograph is of, which is what a screen reader needs. The
-			// generation prompt is art direction, not a description, so the dish
-			// is the honest answer.
-			update_post_meta( $attachment, '_wp_attachment_image_alt', wp_strip_all_tags( $title ) );
-			if ( 'featured' === $kind ) { set_post_thumbnail( $post_id, $attachment ); MSRWA_Stack::crops( $attachment ); }
-			update_post_meta( $post_id, self::generated_key( $kind ), (int) $attachment );
+	/** One generated image into the library, named as this post's image of that kind. */
+	private static function attach( $post_id, $kind, array $image, $title ) {
+		$labels = array( 'featured' => __( 'Image à la une', 'ms-recipes-writer-ai' ), 'facebook' => __( 'Image Facebook', 'ms-recipes-writer-ai' ) );
+		$path = (string) ( $image['path'] ?? '' );
+		if ( ! isset( $labels[ $kind ] ) || '' === $path || ! is_readable( $path ) ) { return 0; }
+
+		$attachment = self::sideload( $path, $post_id, $title . ' — ' . $labels[ $kind ], (string) ( $image['mime'] ?? 'image/webp' ), self::file_base( $post_id, $title, $kind ) );
+		if ( ! $attachment ) { return 0; }
+		// What the photograph is of, which is what a screen reader needs. The
+		// generation prompt is art direction, not a description, so the dish
+		// is the honest answer.
+		update_post_meta( $attachment, '_wp_attachment_image_alt', wp_strip_all_tags( $title ) );
+		if ( 'featured' === $kind ) { set_post_thumbnail( $post_id, $attachment ); MSRWA_Stack::crops( $attachment ); }
+		update_post_meta( $post_id, self::generated_key( $kind ), (int) $attachment );
+		return (int) $attachment;
+	}
+
+	/**
+	 * A redrawn image in place of the one the draft carries.
+	 *
+	 * The earlier attachment stays in the library: an editor may already have
+	 * placed it somewhere, and it is theirs to delete. The post now points at
+	 * the new one — as its featured image, or as its Facebook image, keeping the
+	 * caption that was written for it.
+	 */
+	public static function replace_image( $post_id, $kind, array $image ) {
+		$post = get_post( absint( $post_id ) );
+		if ( ! $post ) { return 0; }
+		$attachment = self::attach( $post->ID, $kind, $image, (string) $post->post_title );
+		if ( ! $attachment ) { return 0; }
+		if ( 'facebook' === $kind ) {
+			$current = json_decode( (string) get_post_meta( $post->ID, 'fb_images_data', true ), true );
+			$caption = is_array( $current ) ? (string) ( $current[0]['text'] ?? '' ) : '';
+			update_post_meta( $post->ID, 'fb_images_data', wp_slash( MSRWA_Stack::facebook_data( $attachment, $caption ) ) );
 		}
+		MSRWA_Stack::describe_image( $post->ID, $attachment );
+		return $attachment;
 	}
 
 	/**

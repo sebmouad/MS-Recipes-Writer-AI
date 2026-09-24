@@ -52,8 +52,8 @@ msrwa_test_contains( $html, '$0.0010', 'The recipe’s share of the lot’s pair
 msrwa_test_contains( $html, '$0.0310', 'And part of the total.' );
 msrwa_test_contains( $html, 'Identité du plat', 'The engine’s keys are read in French.' );
 msrwa_test_contains( $html, 'JSON valide', 'So are the check names.' );
-msrwa_test_contains( $html, 'transmis à la relecture finale', 'A review finding says where it went.' );
-msrwa_test_contains( $html, 'a modifié 1 passage', 'And what the proofread then changed.' );
+msrwa_test_contains( $html, 'laissé à l’éditeur', 'A review finding says where it went.' );
+msrwa_test_contains( $html, 'corrigé la langue de 1 passage', 'And what the proofread then changed.' );
 msrwa_test_contains( $html, 'Étape prévue, non atteinte', 'A planned step that never ran says so.' );
 
 // A lab run names no plan and keeps every section, as before.

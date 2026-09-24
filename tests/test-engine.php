@@ -55,10 +55,10 @@ msrwa_test_assert( array( 'research' ) === $waves[0], 'Research opens the pipeli
 msrwa_test_assert( array( 'canonical_recipe' ) === $waves[1], 'The recipe follows research alone.' );
 msrwa_test_assert( 3 === count( $waves[2] ), 'The article and both images do not wait on each other.' );
 msrwa_test_assert( in_array( 'featured_image', $waves[2], true ) && in_array( 'article', $waves[2], true ), 'Images need the recipe, not the article.' );
-msrwa_test_assert( array( 'review', 'fact_check' ) === $waves[3], 'The two text reviews are independent of one another.' );
-msrwa_test_assert( array( 'corrections' ) === $waves[4], 'Facts are corrected once both reviews have reported.' );
+msrwa_test_assert( array( 'review', 'final_approval' ) === $waves[3], 'One review reads the text while the judge looks at the images: neither waits on the other.' );
+msrwa_test_assert( array( 'corrections' ) === $waves[4], 'Facts are corrected once the review has reported.' );
 msrwa_test_assert( array( 'proofread' ) === $waves[5], 'Language is corrected last, on the text the facts were fixed in.' );
-msrwa_test_assert( array( 'final_approval' ) === $waves[6], 'Approval is last: it judges the article a reader would get.' );
+msrwa_test_assert( 6 === count( $waves ), 'Six waves, where there were seven.' );
 
 $missing = MSRWA_Engine_Steps::missing( 'article', array( 'research' => true ) );
 msrwa_test_assert( array( 'canonical' ) === $missing, 'A step must say what it is still waiting for.' );
@@ -73,11 +73,10 @@ foreach ( MSRWA_Engine_Steps::all() as $name => $step ) {
 	msrwa_test_assert( is_readable( MSRWA_Engine_Input::prompt_path( $step['prompt'] ) ), $step['prompt'] . ' must exist beside the engine.' );
 }
 
-// The fact check's corrections are applied in code, not by hand and not by a model.
+// The review's corrections are applied in code, not by hand and not by a model.
 $reviewed = MSRWA_Engine::run_step( 'corrections', array( 'title' => 'Tarte', 'artifacts' => array(
 	'article' => array( 'content_html' => '<p>Cuire 45 minutes à 180 °C.</p><p>Reposer 10 minutes.</p>' ),
-	'review' => array( 'pass' => false, 'findings' => array( array( 'severity' => 'minor', 'section' => 'Cuisson', 'reason' => 'Trop court', 'fix' => 'Développer' ) ) ),
-	'fact_check' => array( 'pass' => false, 'corrections' => array(
+	'review' => array( 'pass' => false, 'findings' => array( array( 'severity' => 'minor', 'section' => 'Cuisson', 'reason' => 'Trop court', 'fix' => 'Développer' ) ), 'corrections' => array(
 		array( 'before' => 'Cuire 45 minutes à 180 °C.', 'after' => 'Cuire 40 minutes à 180 °C.', 'source' => 'https://example.org' ),
 		array( 'before' => 'Une phrase que l’article ne contient pas.', 'after' => 'Peu importe.', 'source' => 'https://example.org' ),
 	) ),
@@ -93,8 +92,7 @@ msrwa_test_assert( 0.0 === $reviewed->totals()['cost_usd'], 'Applying a verbatim
 // replacement takes the sentence, its space, and a paragraph left empty.
 $trimmed = MSRWA_Engine::run_step( 'corrections', array( 'title' => 'Souris', 'artifacts' => array(
 	'article' => array( 'content_html' => '<p>Utilisez un bouillon. Le premier est plus neutre.</p><p>Il renforce le goût.</p><p>Servez chaud.</p>' ),
-	'review' => array( 'pass' => true, 'findings' => array() ),
-	'fact_check' => array( 'pass' => false, 'corrections' => array(
+	'review' => array( 'pass' => true, 'findings' => array(), 'corrections' => array(
 		array( 'before' => 'Le premier est plus neutre.', 'after' => '' ),
 		array( 'before' => 'Il renforce le goût.', 'after' => '' ),
 	) ),
@@ -154,10 +152,13 @@ $carries = array(
 	'canonical_recipe' => array( 'EDITOR BRIEF', 'RESEARCH PACKAGE' ),
 	'article' => array( 'Recette canonique', 'RESEARCH PACKAGE' ),
 	'review' => array( 'CANONICAL RECIPE', 'RESEARCH PACKAGE', 'ARTICLE' ),
-	'fact_check' => array( 'RESEARCH PACKAGE', 'CANONICAL RECIPE', 'ARTICLE' ),
-	'proofread' => array( 'RESEARCH PACKAGE', 'CANONICAL RECIPE', 'ARTICLE TO CORRECT' ),
-	'final_approval' => array( 'CANONICAL RECIPE', 'RESEARCH PACKAGE', 'ARTICLE' ),
+	'final_approval' => array( 'CANONICAL RECIPE' ),
 );
+// The judge sees the images, the recipe and what real photographs showed; the
+// text is the review's, and sending it again was most of the judge's input.
+$judge_input = MSRWA_Engine_Input::build( 'final_approval', 'PROMPT', array_merge( array( 'title' => 'Poulet yassa', 'text' => '', 'images' => array() ), $full ) );
+msrwa_test_missing( $judge_input, 'ARTICLE:', 'The judge is not sent the article.' );
+msrwa_test_missing( $judge_input, 'RESEARCH PACKAGE', 'Nor the research package.' );
 foreach ( $carries as $step => $required ) {
 	$built = MSRWA_Engine_Input::build( $step, 'PROMPT', array_merge( array( 'title' => 'Poulet yassa', 'text' => '', 'images' => array() ), $full ) );
 	foreach ( $required as $marker ) {

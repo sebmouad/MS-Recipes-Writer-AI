@@ -25,7 +25,7 @@ $brief = lab_brief( 'tarte-pommes' );
 
 // 3. Every step that describes the dish receives the research, checked by
 //    building the real input rather than by reading the source for a variable.
-foreach ( array( 'canonical_recipe', 'article', 'review', 'fact_check' ) as $step ) {
+foreach ( array( 'canonical_recipe', 'article', 'review' ) as $step ) {
 	$built = MSRWA_Engine_Input::build( $step, 'PROMPT', $brief, array() );
 	msrwa_test_contains( $built, 'RESEARCH', 'The ' . $step . ' step must receive the research package.' );
 	msrwa_test_contains( $built, 'ingredient', 'The ' . $step . ' step must receive the research contents, not an empty shell.' );

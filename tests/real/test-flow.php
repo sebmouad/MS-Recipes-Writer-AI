@@ -182,6 +182,33 @@ if ( $featured ) {
 	msrwa_real_note( 'no featured image: this lot was run on the article-only profile' );
 }
 
+// --- A refused image, redrawn at the editor's request ---------------------
+
+// The engine no longer redraws on its own (0.28.0). An image the judge refused
+// is offered to the editor; one it accepted is not, and asking costs nothing.
+if ( 'article' !== $profile ) {
+	$refused = array();
+	foreach ( array( 'featured', 'facebook' ) as $kind ) {
+		$again = msrwa_real_request( 'POST', '/msrwa/v1/runs/' . (int) $final['id'] . '/redraw', array( 'kind' => $kind ), 180 );
+		if ( 200 === $again['status'] ) {
+			$refused[] = $kind;
+			$after = msrwa_real_request( 'GET', '/msrwa/v1/batches/' . $batch . '/runs' );
+			$cost = (float) ( $after['body']['runs'][0]['cost_usd'] ?? 0 );
+			msrwa_real_assert( $cost > $billed, 'A redraw is recorded on the recipe’s bill.' );
+			msrwa_real_spend( $cost - $billed );
+			msrwa_real_note( 'the refused ' . $kind . ' image was redrawn for $' . number_format( $cost - $billed, 4 ) );
+			$billed = $cost;
+			if ( 'featured' === $kind ) {
+				$redrawn = msrwa_real_request( 'GET', '/wp/v2/posts/' . $post . '?context=edit' );
+				msrwa_real_assert( (int) ( $redrawn['body']['featured_media'] ?? 0 ) !== $featured, 'The redrawn image replaces the draft’s featured image.' );
+			}
+		} else {
+			msrwa_real_assert( 409 === $again['status'], 'An image the judge accepted is not redrawn (got ' . $again['status'] . ').' );
+		}
+	}
+	if ( ! $refused ) { msrwa_real_note( 'the judge accepted both images: nothing to redraw, and asking spent nothing' ); }
+}
+
 // --- What a published article tells search engines ------------------------
 
 // The head tags and the Recipe markup print on published posts only, so the

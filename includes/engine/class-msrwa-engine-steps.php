@@ -61,34 +61,35 @@ final class MSRWA_Engine_Steps {
 				'expects' => 'a panel collage following the recipe order',
 			),
 			'review' => array(
-				'label' => 'Revue éditoriale', 'bucket' => 'article', 'capability' => 'text', 'prompt' => 'review.tpl.txt',
+				// One reading of the article does the three checks that used to be
+				// three calls — the editorial review, the fact check and the
+				// proofread — each of which sent the same research, recipe and
+				// article again and thought about them from scratch.
+				'label' => 'Relecture', 'bucket' => 'article', 'capability' => 'text', 'prompt' => 'review.tpl.txt',
 				'needs' => array( 'research', 'canonical', 'article' ), 'produces' => 'review',
-				'expects' => 'a research-grounded verdict and findings naming the section',
-			),
-			'fact_check' => array(
-				'label' => 'Vérification des faits', 'bucket' => 'article', 'capability' => 'text', 'prompt' => 'fact_check.tpl.txt',
-				'needs' => array( 'research', 'canonical', 'article' ), 'produces' => 'fact_check',
-				'expects' => 'only the passages the sources contradict, quoted verbatim',
+				'expects' => 'a verdict with findings, the passages the sources contradict and the language changes, each quoted verbatim',
 			),
 			'corrections' => array(
-				// No model runs here. The fact check returns the sentence it objects to
+				// No model runs here. The review returns the sentence it objects to
 				// verbatim and the sentence that replaces it, so applying them is a
 				// substitution, not a judgement — free, exact, and recorded either way.
 				'label' => 'Corrections factuelles', 'bucket' => 'article', 'capability' => 'none', 'prompt' => '',
-				'needs' => array( 'article', 'review', 'fact_check' ), 'produces' => 'corrected',
+				'needs' => array( 'article', 'review' ), 'produces' => 'corrected',
 				'expects' => 'the article with every verbatim correction applied, and the rest reported',
 			),
 			'proofread' => array(
-				'label' => 'Correction', 'bucket' => 'article', 'capability' => 'text', 'prompt' => 'proofread.tpl.txt',
-				// Language is corrected last, on the text the facts have already been fixed in.
-				'needs' => array( 'corrected' ), 'produces' => 'proofread',
+				// No model either: the language changes came with the review and are
+				// substituted last, on the text the facts have already been fixed in.
+				'label' => 'Correction', 'bucket' => 'article', 'capability' => 'none', 'prompt' => '',
+				'needs' => array( 'review', 'corrected' ), 'produces' => 'proofread',
 				'expects' => 'the same article with its language corrected and every figure untouched',
 			),
 			'final_approval' => array(
 				'label' => 'Approbation finale', 'bucket' => 'other', 'capability' => 'vision', 'prompt' => 'final_approval.tpl.txt',
-				// The proofread article is what a reader gets, so it is what gets judged.
-				'needs' => array( 'research', 'canonical', 'proofread', 'featured', 'facebook' ), 'produces' => 'approval',
-				'expects' => 'one decision over the article and both images together',
+				// It judges the images alone — the review has held the text to its
+				// sources — so it runs beside the review rather than after it.
+				'needs' => array( 'research', 'canonical', 'featured', 'facebook' ), 'produces' => 'approval',
+				'expects' => 'one decision over both images together',
 			),
 		);
 	}

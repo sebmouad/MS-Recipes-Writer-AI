@@ -145,7 +145,7 @@ text measures editors instead. It also means a run survives its draft being
 deleted.
 
 Everything else has no WordPress home and stays: the research package, the
-review, the fact check, the image prompts.
+review (its findings, corrections and language changes), the image prompts.
 
 ## Permissions
 
@@ -249,10 +249,11 @@ output only what a level above the measured `medium` would add, capped by the
 step's ceiling, so a lower level never makes an estimate read low.
 
 An estimate is two numbers: `cost_usd`, one pass through the profile, and
-`max_usd`, every final-approval attempt refused with both images redrawn. The
+`max_usd`, every allowed search and a second verdict; the engine redraws
+nothing by itself, an editor's redraw is billed when asked for. The
 per-recipe ceiling is checked against the first; screens show both and warn
-when the second is above the ceiling. Research is priced at its measured two
-paid searches; the maximum prices every allowed tool call as one. A later
+when the second is above the ceiling. Research is priced at its one paid
+search; the maximum prices every allowed tool call as one. A later
 version of the article replaces only the fields it filled
 (`MSRWA_Engine::filled()`), in the engine and in the draft alike.
 
@@ -287,7 +288,7 @@ Namespace `msrwa/v1`, WordPress cookies and nonce, every response `no-store`
 (a page cache once served an application-password response to the public).
 
 `GET|POST /batches`, `DELETE /batches/{id}`, `POST /batches/{id}/{pairs|schedule|dispatch}`,
-`GET /batches/{id}/runs`, `POST /runs/bulk`, `POST /runs/{id}/{retry|cancel}`,
+`GET /batches/{id}/runs`, `POST /runs/bulk`, `POST /runs/{id}/{retry|cancel|redraw}`,
 `GET /estimate`, `GET /health`, `GET|POST /queue`, `POST /retention`,
 `POST /keys/check`, `POST /diagnostics/config`.
 

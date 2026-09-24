@@ -99,7 +99,7 @@ Google can show rich results, with no extra recipe plugin required.
 sources, and reads without mistakes.
 
 *Where it stands (0.8.0):* verified on a real site — research, recipe, article
-over two pages, review, fact check with corrections applied, proofreading, and
+over two pages, one review — facts corrected and language proofread in code — and
 a draft carrying its excerpt, tags, SEO title and description. Recipe
 structured data is printed once the article is published. The section list is
 enforced but not yet editable: that needs an engine change you have to approve

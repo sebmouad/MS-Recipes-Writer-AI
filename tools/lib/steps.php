@@ -111,7 +111,7 @@ function lab_article_under_test( $options ) {
 function lab_working_brief( $step, $brief, $options = array() ) {
 	$brief['research'] = lab_research_package( $brief, $options );
 	$brief['canonical'] = lab_canonical_recipe( $brief, $options );
-	if ( in_array( $step, array( 'review', 'fact_check', 'proofread', 'final_approval' ), true ) ) {
+	if ( in_array( $step, array( 'review', 'final_approval' ), true ) ) {
 		$brief['article'] = lab_article_under_test( $options );
 	}
 	$feedback = (string) ( $options['feedback'] ?? '' );

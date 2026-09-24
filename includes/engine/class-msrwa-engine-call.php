@@ -100,7 +100,7 @@ final class MSRWA_Engine_Call {
 	public static function http( $url, $headers, $payload, $timeout = 600, $multipart = false ) {
 		if ( is_callable( self::$transport ) ) {
 			$answer = (array) call_user_func( self::$transport, $url, $payload );
-			return array( 'status' => (int) ( $answer['status'] ?? 200 ), 'raw' => (string) ( $answer['raw'] ?? '' ), 'error' => '', 'seconds' => 0.0 );
+			return array( 'status' => (int) ( $answer['status'] ?? 200 ), 'raw' => (string) ( $answer['raw'] ?? '' ), 'error' => (string) ( $answer['error'] ?? '' ), 'seconds' => 0.0 );
 		}
 		$started = microtime( true );
 		$ch = curl_init( $url );
@@ -175,6 +175,14 @@ final class MSRWA_Engine_Call {
 				if ( $running ) { curl_multi_select( $multi, 1.0 ); }
 			} while ( $running && CURLM_OK === $status );
 
+			// curl_error() is empty for a transfer run by a multi handle: a dropped
+			// connection read as "HTTP 0: " and nothing else. Each transfer's own
+			// result code is read here instead.
+			$failures = array();
+			while ( $info = curl_multi_info_read( $multi ) ) {
+				if ( CURLE_OK !== $info['result'] ) { $failures[ (int) spl_object_id( $info['handle'] ) ] = curl_strerror( $info['result'] ); }
+			}
+
 			foreach ( $handles as $key => $handle ) {
 				// Each call's own time on the wire, not the wave's, so a step still
 				// reports what it took and the totals stay honest.
@@ -182,7 +190,7 @@ final class MSRWA_Engine_Call {
 				$results[ $key ] = array(
 					'status' => (int) curl_getinfo( $handle, CURLINFO_RESPONSE_CODE ),
 					'raw' => (string) curl_multi_getcontent( $handle ),
-					'error' => (string) curl_error( $handle ),
+					'error' => (string) ( $failures[ (int) spl_object_id( $handle ) ] ?? curl_error( $handle ) ),
 					'seconds' => $seconds > 0 ? $seconds : round( microtime( true ) - $started, 1 ),
 				);
 				curl_multi_remove_handle( $multi, $handle );
@@ -306,7 +314,10 @@ final class MSRWA_Engine_Call {
 		$model = $plan['model'];
 		if ( 200 !== $result['status'] ) {
 			$label = in_array( $plan['kind'], array( 'judge', 'vision' ), true ) ? $plan['kind'] . ' ' : '';
-			return array( 'error' => $label . 'HTTP ' . $result['status'] . ': ' . substr( $result['raw'], 0, 240 ), 'seconds' => $result['seconds'], 'usage' => array() );
+			// No status at all is a connection that never answered: the body is
+			// empty, and curl's own words are the only account of what happened.
+			$why = 0 === (int) $result['status'] && '' !== (string) ( $result['error'] ?? '' ) ? (string) $result['error'] : substr( $result['raw'], 0, 240 );
+			return array( 'error' => $label . 'HTTP ' . $result['status'] . ': ' . $why, 'seconds' => $result['seconds'], 'usage' => array() );
 		}
 		$body = json_decode( $result['raw'], true );
 

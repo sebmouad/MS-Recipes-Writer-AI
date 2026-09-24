@@ -99,7 +99,7 @@ $plan = MSRWA_Engine_Call::plan_text( 'openai', 'gpt-5.6-luna', 'x', 4500, true,
 msrwa_test_assert( array( 'effort' => 'low' ) === ( $plan['request']['payload']['reasoning'] ?? null ), 'OpenAI writes at low effort: a full recipe kept every score for $0.1030 against $0.1822.' );
 $judge_wire = $config->provider( 'openai', 'gpt-5.6-luna', 'final_approval' );
 msrwa_test_assert( 'medium' === $judge_wire['thinking_level'], 'The steps that judge keep the measured default.' );
-msrwa_test_assert( 'medium' === $config->thinking( 'fact_check', 'openai' ), 'The fact check too.' );
+msrwa_test_assert( 'medium' === $config->thinking( 'review', 'openai' ), 'The review too: it is the fact check and the proofread as well.' );
 
 // One level per step, spelled the way each provider spells it.
 $tuned = MSRWA_Engine_Config::create( $keys + array( 'thinking' => array( 'default' => 'medium', 'research' => 'high', 'review' => 'minimal' ) ) );

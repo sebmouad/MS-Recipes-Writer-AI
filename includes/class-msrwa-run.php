@@ -623,6 +623,71 @@ final class MSRWA_Run {
 		return true;
 	}
 
+	/** How many times an editor may have one image of one recipe redrawn. */
+	const REDRAWS = 2;
+
+	/** The images of a finished recipe the judge refused, and that may still be redrawn. */
+	public static function redrawable( array $run ) {
+		$post_id = (int) ( $run['draft_post_id'] ?? 0 );
+		if ( ! $post_id || 'done' !== (string) $run['status'] || ! self::may_see( $run ) ) { return array(); }
+		$approval = (array) ( self::artifacts( (int) $run['id'] )['approval'] ?? array() );
+		$out = array();
+		foreach ( MSRWA_Engine_Score::images_to_retry( $approval ) as $kind ) {
+			if ( (int) get_post_meta( $post_id, '_msrwa_' . $kind . '_redrawn', true ) < self::REDRAWS ) { $out[] = $kind; }
+		}
+		return $out;
+	}
+
+	/**
+	 * Draws one image of a finished recipe again, from the judge's findings.
+	 *
+	 * The engine no longer redraws on its own: every refusal cost a second
+	 * image and a second verdict, a quarter of a recipe, whether or not anybody
+	 * minded the finding. The editor reads the findings and decides. The new
+	 * image replaces the draft's, the call is recorded with the recipe's other
+	 * steps, and it is not judged again — the editor is looking at it.
+	 *
+	 * Returns '' on success, or why not, in words a writer may read.
+	 */
+	public static function redraw( $id, $kind ) {
+		$run = self::get( $id );
+		if ( ! $run || ! in_array( $kind, self::redrawable( $run ), true ) ) { return __( 'Cette image ne peut pas être redessinée.', 'ms-recipes-writer-ai' ); }
+		if ( '' !== MSRWA_Budget::refusal() ) { return MSRWA_Budget::refusal(); }
+
+		$id = (int) $run['id'];
+		$state = self::state( $id );
+		$artifacts = (array) $state['artifacts'];
+		$config = MSRWA_Batch::config_for( (int) $run['batch_id'] );
+		$step = $kind . '_image';
+		$budget = (float) ( $config['limits']['budget_usd'] ?? 0 );
+		$last = 0.0;
+		foreach ( (array) $state['steps'] as $done ) { if ( $step === $done['step'] ) { $last = (float) $done['cost_usd']; } }
+		if ( $budget > 0 && (float) $run['cost_usd'] + $last > $budget ) { return __( 'Le plafond de cette recette est atteint.', 'ms-recipes-writer-ai' ); }
+
+		$approval = (array) ( $artifacts['approval'] ?? array() );
+		$findings = MSRWA_Engine_Score::findings_for( $approval, $step );
+		if ( 'facebook' === $kind ) { $findings = array_merge( $findings, MSRWA_Engine_Score::findings_for( $approval, 'consistency' ) ); }
+
+		if ( function_exists( 'set_time_limit' ) ) { @set_time_limit( 0 ); }
+		$brief = (array) json_decode( (string) $run['brief_json'], true );
+		$result = MSRWA_Engine::run_step( $step, array_merge( $brief, array( 'artifacts' => $artifacts ) ), array(
+			'config' => $config, 'workspace' => self::workspace( $id ), 'findings' => $findings,
+			'read_image' => MSRWA_Sources::reader( $id ),
+		) );
+		self::absorb( $id, $state, $result->to_array() );
+		self::remember( $id, $result, (array) ( $config['steps'] ?? array() ) );
+
+		$image = (array) ( $result->artifacts[ $kind ] ?? array() );
+		if ( ! $result->ok || ! $image || ! MSRWA_Draft::replace_image( (int) $run['draft_post_id'], $kind, $image ) ) {
+			return __( 'Le nouveau dessin a échoué. Réessayez plus tard.', 'ms-recipes-writer-ai' );
+		}
+		$post_id = (int) $run['draft_post_id'];
+		update_post_meta( $post_id, '_msrwa_' . $kind . '_redrawn', (int) get_post_meta( $post_id, '_msrwa_' . $kind . '_redrawn', true ) + 1 );
+		// The draft holds the image now; the workspace copy is not needed again.
+		if ( ! empty( $image['path'] ) && is_file( (string) $image['path'] ) ) { wp_delete_file( (string) $image['path'] ); }
+		return '';
+	}
+
 	/**
 	 * Puts a run that lost its worker back in the queue.
 	 *

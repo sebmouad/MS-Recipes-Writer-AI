@@ -43,8 +43,8 @@ foreach ( array( 'research_minimums', 'research_outline_figures', 'article_accen
 // Moving a threshold must actually change the verdict, or it is decoration.
 $thin = json_encode( array( 'pass' => false, 'corrections' => array_fill( 0, 5, array( 'before' => 'x', 'after' => 'y', 'source' => 'https://example.org' ) ) ) );
 $brief = array( 'article' => array( 'content_html' => '<p>x</p>' ) );
-$generous = MSRWA_Engine_Score::step( 'fact_check', $thin, $brief );
-$strict = MSRWA_Engine_Score::step( 'fact_check', $thin, $brief, array( 'fact_check_max_fixes' => 2 ) );
+$generous = MSRWA_Engine_Score::step( 'review', $thin, $brief );
+$strict = MSRWA_Engine_Score::step( 'review', $thin, $brief, array( 'fact_check_max_fixes' => 2 ) );
 msrwa_test_assert( true === $generous['checks']['surgical']['pass'], 'Five corrections pass the shipped ceiling of twelve.' );
 msrwa_test_assert( false === $strict['checks']['surgical']['pass'], 'A caller lowering the ceiling to two must see five corrections fail.' );
 

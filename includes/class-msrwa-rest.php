@@ -27,6 +27,7 @@ final class MSRWA_REST {
 		register_rest_route( 'msrwa/v1', '/catalog/prices', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_manage' ), 'callback' => array( __CLASS__, 'fetch_prices' ) ) );
 		register_rest_route( 'msrwa/v1', '/retention', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_manage' ), 'callback' => array( __CLASS__, 'prune' ) ) );
 		register_rest_route( 'msrwa/v1', '/runs/bulk', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'bulk' ) ) );
+		register_rest_route( 'msrwa/v1', '/runs/(?P<id>\d+)/redraw', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'redraw' ) ) );
 		register_rest_route( 'msrwa/v1', '/runs/(?P<id>\d+)/retry', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'retry' ) ) );
 		register_rest_route( 'msrwa/v1', '/runs/(?P<id>\d+)/cancel', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'cancel' ) ) );
 	}
@@ -310,6 +311,15 @@ final class MSRWA_REST {
 		if ( ! $run || ! MSRWA_Run::may_see( $run ) ) { return new WP_Error( 'msrwa_not_found', __( 'Recette introuvable.', 'ms-recipes-writer-ai' ), array( 'status' => 404 ) ); }
 		if ( ! MSRWA_Run::may_retry( $run ) ) { return new WP_Error( 'msrwa_not_stopped', __( 'Cette recette n’est pas arrêtée.', 'ms-recipes-writer-ai' ), array( 'status' => 409 ) ); }
 		return rest_ensure_response( array( 'retried' => MSRWA_Run::retry( (int) $run['id'] ) ) );
+	}
+
+	/** Draws a refused image of a finished recipe again, from the judge's findings. */
+	public static function redraw( WP_REST_Request $request ) {
+		$run = MSRWA_Run::get( absint( $request['id'] ) );
+		if ( ! $run || ! MSRWA_Run::may_see( $run ) ) { return new WP_Error( 'msrwa_not_found', __( 'Recette introuvable.', 'ms-recipes-writer-ai' ), array( 'status' => 404 ) ); }
+		$refused = MSRWA_Run::redraw( (int) $run['id'], sanitize_key( (string) $request['kind'] ) );
+		if ( '' !== $refused ) { return new WP_Error( 'msrwa_not_redrawn', $refused, array( 'status' => 409 ) ); }
+		return rest_ensure_response( array( 'redrawn' => true ) );
 	}
 
 	public static function cancel( WP_REST_Request $request ) {

@@ -23,7 +23,7 @@ final class MSRWA_Engine {
 	 * Runs a recipe from an editor brief.
 	 *
 	 * Steps run in dependency waves, so the article is written while both images
-	 * are drawn, and the three reviews run together afterwards. A wave's steps
+	 * are drawn, and the review reads the article once they are done. A wave's steps
 	 * are independent by construction — that is what `needs` declares — so a
 	 * caller able to run them concurrently may, and this sequential
 	 * implementation stays correct either way.
@@ -122,9 +122,8 @@ final class MSRWA_Engine {
 	 * Runs one step and records it, retrying while its contract says to.
 	 *
 	 * A step that fails its own scorecard is asked again up to its configured
-	 * attempts, and between two attempts it may change what it is asking about:
-	 * a refused approval regenerates the images the judge blocked, which is what
-	 * makes "retry until approved" converge instead of rolling the dice again.
+	 * attempts. A refused approval is not a failed attempt: the images it blocked
+	 * go to the editor with its findings, and are redrawn only if the editor asks.
 	 */
 	private static function perform( $name, MSRWA_Engine_Config $config, MSRWA_Result $result, array $options, $seed = null ) {
 		$registry = (array) $config->get( 'steps', array() );
@@ -164,79 +163,28 @@ final class MSRWA_Engine {
 				$attempts++;
 				$result->event( 'retry', $name, self::unreadable( $outcome ) ? 'The answer was not readable JSON; asking once more.' : 'Characters from another alphabet in the answer; asking once more.' );
 			}
+			// A connection that dropped before any answer billed nothing and said
+			// nothing about the prompt; one review lost that way ended a live
+			// recipe with its article unchecked. It is asked once more.
+			if ( self::dropped( $outcome ) && ! $extra ) {
+				$extra = true;
+				$attempts = max( $attempts, $attempt + 1 );
+				$outcome['retry'] = 'The connection dropped before an answer; asking once more.';
+				$result->event( 'retry', $name, $outcome['retry'] . ' (' . $outcome['error'] . ')' );
+				continue;
+			}
 			if ( '' === $outcome['retry'] || $attempt >= $attempts ) { break; }
-			// The budget was only checked between waves, so a refused approval
-			// could redraw and ask again past a ceiling the run had nearly
-			// reached. The next round is priced from what this one cost — the
-			// last attempt plus the images it would redraw — and not begun when
-			// it would cross the budget: the verdict so far goes to the editor.
 			$budget = (float) $config->get( 'limits.budget_usd', 0 );
-			if ( $budget > 0 ) {
-				$next = (float) $outcome['cost_usd'] / max( 1, $attempt ) + self::redraw_cost( $outcome, $result );
-				if ( $result->totals()['cost_usd'] + $spent + $next > $budget ) {
-					$result->event( 'decision', $name, sprintf( 'Not retried: another round would cost about $%.4f and cross the $%.4f budget. The verdict so far goes to the editor.', $next, $budget ) );
-					break;
-				}
+			if ( $budget > 0 && $result->totals()['cost_usd'] + $spent + (float) $outcome['cost_usd'] / max( 1, $attempt ) > $budget ) {
+				$result->event( 'decision', $name, sprintf( 'Not retried: another attempt would cross the $%.4f budget.', $budget ) );
+				break;
 			}
 			$result->event( 'retry', $name, $outcome['retry'] );
-			// Recorded as its own step inside before_retry(); not this step's cost.
-			self::before_retry( $name, $outcome, $config, $result, $options );
 		}
 
 		if ( '' === $outcome['error'] && isset( $outcome['artifact'] ) ) { $result->artifact( $step['produces'], $outcome['artifact'] ); }
 		unset( $outcome['artifact'], $outcome['retry'] );
 		return $result->step( $name, $outcome );
-	}
-
-	/**
-	 * What changes between a refusal and the next attempt.
-	 *
-	 * Only the approval step has anything to do here: the images it blocked are
-	 * drawn again with its findings as corrections, so the next verdict is passed
-	 * different images rather than the same ones. Returns what that cost.
-	 */
-	/** What redrawing the images a refusal names cost last time they were drawn. */
-	private static function redraw_cost( array $outcome, MSRWA_Result $result ) {
-		if ( ! is_array( $outcome['artifact'] ?? null ) ) { return 0.0; }
-		$cost = 0.0;
-		foreach ( MSRWA_Engine_Score::images_to_retry( $outcome['artifact'] ) as $kind ) {
-			foreach ( array_reverse( $result->steps ) as $step ) {
-				if ( $kind . '_image' === $step['step'] ) { $cost += (float) $step['cost_usd']; break; }
-			}
-		}
-		return $cost;
-	}
-
-	private static function before_retry( $name, array $outcome, MSRWA_Engine_Config $config, MSRWA_Result $result, array $options ) {
-		if ( 'final_approval' !== $name || ! is_array( $outcome['artifact'] ?? null ) ) { return 0.0; }
-		$verdict = $outcome['artifact'];
-		$spent = 0.0;
-		$judged = self::judged( $result );
-		$repairs = MSRWA_Engine_Score::article_repairs( $verdict, (string) ( $judged['content_html'] ?? '' ) );
-		if ( $repairs ) {
-			$html = (string) $judged['content_html'];
-			foreach ( $repairs as $repair ) { $html = self::substitute( $html, $repair['before'], $repair['after'] ); }
-			$earlier = (array) ( $judged['approval_repairs'] ?? array() );
-			// Written as the proofread article, which is the one the draft is made from.
-			$result->artifact( 'proofread', array_merge( $judged, array( 'content_html' => $html, 'approval_repairs' => array_merge( $earlier, $repairs ) ) ) );
-			$result->event( 'decision', $name, sprintf( 'Corrected %d sentence(s) the approval quoted, in code, before judging again.', count( $repairs ) ), array( 'repairs' => $repairs ) );
-		}
-		foreach ( MSRWA_Engine_Score::images_to_retry( $verdict ) as $kind ) {
-			$findings = MSRWA_Engine_Score::findings_for( $verdict, $kind . '_image' );
-			if ( 'facebook' === $kind ) { $findings = array_merge( $findings, MSRWA_Engine_Score::findings_for( $verdict, 'consistency' ) ); }
-			$redrawn = self::call( $kind . '_image', $config, $result, $options, $findings );
-			$spent += (float) $redrawn['cost_usd'];
-			if ( '' !== $redrawn['error'] ) {
-				$result->fail( $kind . '_image', 'Could not redraw for the approval: ' . $redrawn['error'] );
-				continue;
-			}
-			$result->artifact( $kind, $redrawn['artifact'] );
-			$result->step( $kind . '_image', array_diff_key( $redrawn, array( 'artifact' => 1, 'retry' => 1 ) ) );
-		}
-		// The redraws are steps of their own now, and totals() sums every step. What
-		// this returns is only for the run's budget arithmetic; adding it to the
-		// approval's cost as well charged each redraw twice — 22% of one real run.
-		return $spent;
 	}
 
 	/**
@@ -249,8 +197,9 @@ final class MSRWA_Engine {
 	 */
 	private static function prepare( $name, MSRWA_Engine_Config $config, MSRWA_Result $result, array $options, array $findings = array() ) {
 		$capability = MSRWA_Engine_Steps::capability( $name, (array) $config->get( 'steps', array() ) );
-		if ( 'none' === $capability ) { return self::apply_corrections( $result ); }
-		if ( 'image_generation' === $capability ) { return self::draw( $name, $config, $result, $options, $findings ); }
+		if ( 'none' === $capability ) { return 'proofread' === $name ? self::apply_language( $config, $result ) : self::apply_corrections( $result ); }
+		// A redraw the editor asked for carries the judge's findings in the options.
+		if ( 'image_generation' === $capability ) { return self::draw( $name, $config, $result, $options, $findings ? $findings : array_values( (array) ( $options['findings'] ?? array() ) ) ); }
 		if ( 'vision' === $capability ) { return self::decide( $name, $config, $result, $options ); }
 		return self::write( $name, $config, $result, $options );
 	}
@@ -266,6 +215,11 @@ final class MSRWA_Engine {
 	/** One step, asked and answered. */
 	private static function call( $name, MSRWA_Engine_Config $config, MSRWA_Result $result, array $options, array $findings = array() ) {
 		return self::settle( self::prepare( $name, $config, $result, $options, $findings ) );
+	}
+
+	/** Whether the call never reached an answer: no HTTP status, nothing billed. */
+	private static function dropped( array $outcome ) {
+		return 0 === strpos( (string) ( $outcome['error'] ?? '' ), 'HTTP 0' ) || false !== strpos( (string) ( $outcome['error'] ?? '' ), ' HTTP 0:' );
 	}
 
 	/** Whether the answer could not be read as JSON at all. */
@@ -318,16 +272,17 @@ final class MSRWA_Engine {
 	}
 
 	/**
-	 * Applies the fact check's corrections to the article, in code.
+	 * Applies the review's factual corrections to the article, in code.
 	 *
-	 * The fact check quotes the sentence it objects to verbatim and gives the
+	 * The review quotes the sentence it objects to verbatim and gives the
 	 * sentence that replaces it, so this needs no model and no judgement: either
 	 * the quoted sentence is in the article, and it is replaced exactly, or it is
 	 * not, and the correction is reported for a person to make. Until this
 	 * existed the findings were produced and then applied by hand.
 	 *
 	 * A review finding carries no quote — it is advice about a section — so none
-	 * are applied here. They travel to the editor with the rest.
+	 * are applied here. They travel to the editor with the rest, and the language
+	 * changes wait for the proofread step, which applies them to this text.
 	 */
 	private static function apply_corrections( MSRWA_Result $result ) {
 		$article = (array) ( $result->artifacts['article'] ?? array() );
@@ -335,11 +290,11 @@ final class MSRWA_Engine {
 		$applied = array();
 		$unapplied = array();
 
-		foreach ( (array) ( ( (array) ( $result->artifacts['fact_check'] ?? array() ) )['corrections'] ?? array() ) as $correction ) {
+		foreach ( (array) ( ( (array) ( $result->artifacts['review'] ?? array() ) )['corrections'] ?? array() ) as $correction ) {
 			if ( ! is_array( $correction ) ) { continue; }
 			$before = trim( (string) ( $correction['before'] ?? '' ) );
 			if ( '' === $before || trim( (string) ( $correction['after'] ?? '' ) ) === $before ) { continue; }
-			// The fact check answers in plain sentences while the article is HTML, so a
+			// The review answers in plain sentences while the article is HTML, so a
 			// sentence broken by a tag cannot be substituted. Say so rather than guess.
 			if ( false === mb_strpos( $html, $before ) ) { $unapplied[] = $correction; continue; }
 			$html = self::substitute( $html, $before, (string) ( $correction['after'] ?? '' ) );
@@ -360,21 +315,31 @@ final class MSRWA_Engine {
 	}
 
 	/**
-	 * The proofread article, built in code from the sentences the proofreader
-	 * changed.
+	 * The proofread article, built in code from the sentences the review changed.
 	 *
 	 * Rewriting a whole article to correct a few sentences was the single most
-	 * expensive answer after the research — 6 000 tokens out and fifty seconds —
-	 * and twice it came back with the body missing. The proofreader now returns
-	 * only what it changed, quoted verbatim, and each change is substituted here.
-	 * A change that touches a figure is refused, since the proofread may never
-	 * alter one, and a quote that cannot be found is left for the editor.
+	 * expensive answer after the research, and twice it came back with the body
+	 * missing. The review returns only what it changed, quoted verbatim, and each
+	 * change is substituted here, on the text the facts were already fixed in. A
+	 * change that touches a figure is refused, since the proofread may never alter
+	 * one, and a quote that cannot be found is left for the editor.
 	 */
-	private static function proofread( array $answer, array $brief, MSRWA_Result $result ) {
+	private static function apply_language( MSRWA_Engine_Config $config, MSRWA_Result $result ) {
+		$brief = self::working_set( 'proofread', $result );
+		$answer = self::proofread( (array) ( ( (array) ( $result->artifacts['review'] ?? array() ) )['changes'] ?? array() ), $brief, $result );
+		$scores = MSRWA_Engine_Score::step( 'proofread', (string) json_encode( $answer, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ), $brief, $config->thresholds() );
+		return array(
+			'provider' => '', 'model' => '', 'seconds' => 0, 'usage' => array(), 'cost_usd' => 0.0, 'status' => '',
+			'passed' => $scores['passed'], 'total' => $scores['total'], 'checks' => $scores['checks'], 'error' => '', 'retry' => '',
+			'artifact' => $answer,
+		);
+	}
+
+	private static function proofread( array $changes, array $brief, MSRWA_Result $result ) {
 		$html = (string) ( MSRWA_Engine_Input::article( $brief )['content_html'] ?? '' );
 		$applied = array();
 		$skipped = array();
-		foreach ( (array) ( $answer['changes'] ?? array() ) as $change ) {
+		foreach ( $changes as $change ) {
 			if ( ! is_array( $change ) ) { continue; }
 			$before = trim( (string) ( $change['before'] ?? '' ) );
 			$after = trim( (string) ( $change['after'] ?? '' ) );
@@ -472,10 +437,6 @@ final class MSRWA_Engine {
 
 			if ( 'research' === $name && $answer ) {
 				$answer = $from_photographs ? self::from_editor_photographs( $answer, $brief, $result ) : self::with_editor_photographs( self::observe( $answer, $config, $result, $call['usage'], $options ), $brief );
-				$call['text'] = (string) json_encode( $answer, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
-			}
-			if ( 'proofread' === $name && $answer && ! isset( $answer['content_html'] ) ) {
-				$answer = self::proofread( $answer, $brief, $result );
 				$call['text'] = (string) json_encode( $answer, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
 			}
 
@@ -758,7 +719,7 @@ final class MSRWA_Engine {
 		return array( 'source' => '', 'label' => '', 'image' => null );
 	}
 
-	/** The one step that sees the article and both images at once, and decides. */
+	/** The one step that sees both images at once, and decides on them. */
 	private static function decide( $name, MSRWA_Engine_Config $config, MSRWA_Result $result, array $options ) {
 		$route = $config->model_for( $name );
 		if ( '' === $route['model'] ) { return self::failed( 'No model resolves for route "' . $route['route'] . '".' ); }
@@ -774,7 +735,7 @@ final class MSRWA_Engine {
 		// image that exists and cannot be read is still a failure: that is a
 		// broken run, not a smaller one.
 		$images = array();
-		$targets = array( 'article' );
+		$targets = array();
 		foreach ( array( 'featured' => 'featured_image', 'facebook' => 'facebook_image' ) as $kind => $target ) {
 			if ( empty( $result->artifacts[ $kind ] ) ) { continue; }
 			$image = self::read_image( (array) $result->artifacts[ $kind ] );
@@ -782,8 +743,10 @@ final class MSRWA_Engine {
 			$images[] = $image;
 			$targets[] = $target;
 		}
-		// Three artifacts can disagree with one another; two cannot.
+		// Two images can disagree with one another; one cannot.
 		if ( 2 === count( $images ) ) { $targets[] = 'consistency'; }
+		// The text is the review's: with no image there is nothing left to judge.
+		if ( ! $images ) { return self::failed( 'No image to judge: the final approval judges the images, and none was produced.', 0, $route ); }
 
 		// The judge is told what it has, in the same order the images are
 		// attached, so "the list above is exhaustive" is true rather than a
@@ -797,7 +760,7 @@ final class MSRWA_Engine {
 			$manifest[] = '- the Facebook image, ' . $template['size']
 				. ', a ' . $template['panels'] . '-panel preparation collage;';
 		}
-		$brief['images_received'] = $manifest ? implode( "\n", $manifest ) : '- no image at all: judge the text alone.';
+		$brief['images_received'] = implode( "\n", $manifest );
 
 		$input = MSRWA_Engine_Input::build( $name, $prompt['text'], $brief, $options );
 		$bytes = 0;
@@ -825,24 +788,16 @@ final class MSRWA_Engine {
 			$gate = MSRWA_Engine_Score::accepts( $verdict, $checks );
 			$sound = $gate['sound'];
 			$approved = $gate['approved'];
-			$redraw = $sound && ! $approved ? MSRWA_Engine_Score::images_to_retry( $verdict ) : array();
-			$repairs = $sound && ! $approved ? MSRWA_Engine_Score::article_repairs( $verdict, (string) ( self::judged( $result )['content_html'] ?? '' ) ) : array();
-			$article_blocked = (bool) MSRWA_Engine_Score::findings_for( $verdict, 'article' );
 			$retry = '';
 			if ( ! $sound ) {
-				$retry = sprintf( 'The verdict is malformed (%d/%d contracts); asking again without touching the images.', $passed, count( $checks ) );
-			} elseif ( $article_blocked && ! $repairs ) {
-				// Redrawing images cannot approve an article that stays refused.
-				$result->event( 'decision', $name, 'Refused on the article, which no retry here can change. The findings go to the editor.' );
-			} elseif ( $redraw || $repairs ) {
-				$work = $redraw ? array( 'regenerating ' . implode( ', ', $redraw ) ) : array();
-				if ( $repairs ) { $work[] = sprintf( 'correcting %d sentence(s) of the article', count( $repairs ) ); }
-				$retry = 'Refused; ' . implode( ' and ', $work ) . '.';
+				$retry = sprintf( 'The verdict is malformed (%d/%d contracts); asking again.', $passed, count( $checks ) );
 			} elseif ( ! $approved ) {
-				// A refusal the engine cannot act on is a decision, not a failed attempt.
-				// Asking the same judge the same question about the same artifacts is a
-				// second roll of the dice, and it was costing two calls per run.
-				$result->event( 'decision', $name, 'Refused on the article, which no retry here can change. The findings go to the editor.' );
+				// Every test recipe redrew one image here and was judged again: a
+				// quarter of its cost, spent before anybody decided the finding
+				// mattered. The findings go to the editor, who can have the image
+				// redrawn from them.
+				$redraw = MSRWA_Engine_Score::images_to_retry( $verdict );
+				$result->event( 'decision', $name, 'Refused' . ( $redraw ? ' on ' . implode( ', ', $redraw ) : '' ) . '. The findings go to the editor, who decides whether to redraw.', array( 'redraw' => $redraw ) );
 			}
 
 			return array(
@@ -864,22 +819,13 @@ final class MSRWA_Engine {
 		return array_filter( $version, static function ( $value ) { return is_array( $value ) ? (bool) $value : '' !== trim( (string) $value ); } );
 	}
 
-	/** The article the final approval judges: the latest version of each field. */
-	private static function judged( MSRWA_Result $result ) {
-		$article = (array) ( $result->artifacts['article'] ?? array() );
-		foreach ( array( 'corrected', 'proofread' ) as $source ) {
-			if ( ! empty( $result->artifacts[ $source ] ) ) { $article = array_merge( $article, self::filled( (array) $result->artifacts[ $source ] ) ); }
-		}
-		return $article;
-	}
-
 	/** The artifacts one step reads, under the names its input builder expects. */
 	private static function working_set( $name, MSRWA_Result $result ) {
 		$brief = (array) ( $result->artifacts['brief'] ?? array() );
 		$article = (array) ( $result->artifacts['article'] ?? array() );
 
-		// Each later step reads the latest article there is: the reviews read the
-		// draft they are reviewing, proofreading reads the one the facts were fixed
+		// Each later step reads the latest article there is: the review reads the
+		// draft it is reviewing, proofreading reads the one the facts were fixed
 		// in, and the approval judges what a reader would actually get.
 		// Oldest first, so the newest version is the one that ends up on top.
 		foreach ( array( 'corrected' => array( 'proofread', 'final_approval' ), 'proofread' => array( 'final_approval' ) ) as $source => $steps ) {
@@ -894,7 +840,7 @@ final class MSRWA_Engine {
 
 		// A rewrite carries what the reviews found; a first draft carries nothing.
 		$feedback = array();
-		foreach ( array( 'review', 'fact_check' ) as $source ) {
+		foreach ( array( 'review' ) as $source ) {
 			if ( ! empty( $result->artifacts[ $source ] ) ) { $feedback[ $source ] = $result->artifacts[ $source ]; }
 		}
 

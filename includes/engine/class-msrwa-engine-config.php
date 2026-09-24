@@ -49,8 +49,6 @@ final class MSRWA_Engine_Config {
 				'canonical_recipe' => 'openai:medium',
 				'article'          => 'openai:medium',
 				'review'           => 'openai:medium',
-				'fact_check'       => 'openai:medium',
-				'proofread'        => 'openai:medium',
 				'final_approval'   => 'openai:medium',
 				'vision'           => 'openai:medium',
 				'image'            => 'openai:gpt-image-2.5-flare',
@@ -73,7 +71,7 @@ final class MSRWA_Engine_Config {
 			// without it; it keeps medium too.
 			// Research too: at low it once came back without a single photograph
 			// of the dish (9/14); at medium it scored 14/14 every time measured.
-			'thinking' => array( 'default' => '', 'research' => 'medium', 'fact_check' => 'medium', 'proofread' => 'medium', 'final_approval' => 'medium' ),
+			'thinking' => array( 'default' => '', 'research' => 'medium', 'review' => 'medium', 'final_approval' => 'medium' ),
 
 			// Output ceilings. Every one of these has been too low at least once,
 			// and a truncated answer is billed in full and scores nothing.
@@ -85,25 +83,20 @@ final class MSRWA_Engine_Config {
 				'research'         => 16000,
 				'canonical_recipe' => 4500,
 				'article'          => 14500,
-				// 3000 was too low: a review with a dozen findings stops exactly on it,
-				// is cut mid-object, parses as nothing and is billed in full. That is
-				// the sixth ceiling in this list to have been found that way.
-				'review'           => 6000,
-				// Reasoning counts against it on OpenAI: at 4000 a fact check with a
-				// dozen corrections was cut mid-object and stopped the run. A ceiling
-				// costs nothing until it is used.
-				'fact_check'       => 12000,
-				'proofread'        => 14500,
+				// The review also returns the fact check's corrections and the
+				// proofread's changes: 16,000 is the three old ceilings' answers
+				// together (1,000, 3,500–4,400 and 1,800–2,700 tokens measured,
+				// reasoning included) with the margin each had been given.
+				'review'           => 16000,
 				'final_approval'   => 14000,
 				'vision'           => 1200,
 			),
 
 			// How many times a step may be asked again before the run gives up.
 			'attempts' => array(
-				// A sentence the approval quotes is now corrected in code between two
-				// verdicts, so a round can go to the article rather than the images.
-				// The budget still stops any round that would cross the ceiling.
-				'final_approval' => 4,
+				// A refusal is the editor's to act on, so a second attempt only ever
+				// replaces a malformed verdict. The budget still stops it.
+				'final_approval' => 2,
 				'default'        => 1,
 			),
 
@@ -167,14 +160,16 @@ final class MSRWA_Engine_Config {
 				'concurrency'        => 4,
 				'max_image_bytes'    => 10000000,
 				'observation_phrases'=> 8,
-				// Paid searches one call is expected to run. The research prompt asks
-				// for at most three, and on live runs it used one to four; Claude's
-				// tool is capped here, and the expected estimate prices this many.
-				'web_searches'       => 3,
+				// Paid searches one call is expected to run. Each is billed $0.01 and
+				// live runs used one to three, the heaviest half of a recipe's
+				// research cost: the prompt now asks for one, Claude's tool is capped
+				// here, and the expected estimate prices this many.
+				'web_searches'       => 1,
 				// Every search-tool action one call may take: OpenAI's paid searches
-				// and its free page reads together, sent as max_tool_calls. The
-				// maximum estimate prices them all as searches.
-				'web_tool_calls'     => 10,
+				// and its free page reads together, sent as max_tool_calls. Each page
+				// read is input the call pays for; one search and a few pages is enough.
+				// The maximum estimate prices them all as searches.
+				'web_tool_calls'     => 6,
 			),
 
 			'language' => 'fr',

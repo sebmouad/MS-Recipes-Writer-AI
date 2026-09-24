@@ -43,7 +43,8 @@ final class MSRWA_Screen_Run {
 		}
 
 		self::edited( $state['artifacts'] );
-		self::verdict( $approval );
+		self::redrawn();
+		self::verdict( $approval, $run );
 		if ( MSRWA_Rights::may_read_diagnostics() ) { self::steps( $state['steps'] ); } else { self::progress( $state['steps'] ); }
 
 		if ( MSRWA_Rights::may_read_diagnostics() ) {
@@ -128,7 +129,13 @@ final class MSRWA_Screen_Run {
 	 * It has an opinion about its own output and none whatsoever about whether
 	 * this site should publish it, and the wording here never blurs the two.
 	 */
-	private static function verdict( array $approval ) {
+	/** The redraw the editor just asked for went through. */
+	private static function redrawn() {
+		if ( ! isset( $_GET['redrawn'] ) ) { return; }
+		MSRWA_UI::note( esc_html__( 'Image redessinée d’après les remarques. Elle remplace l’ancienne dans le brouillon ; regardez-la avant de publier.', 'ms-recipes-writer-ai' ), 'good' );
+	}
+
+	private static function verdict( array $approval, array $run = array() ) {
 		if ( ! $approval ) { return; }
 		echo '<section class="ms-card"><h2>' . esc_html__( 'Ce que le juge a relevé', 'ms-recipes-writer-ai' ) . '</h2>';
 		echo '<p>' . esc_html__( 'L’avis du moteur sur sa propre production. Ce n’est pas une validation éditoriale : c’est à vous de décider si l’article part.', 'ms-recipes-writer-ai' ) . '</p>';
@@ -165,7 +172,37 @@ final class MSRWA_Screen_Run {
 			if ( ! empty( $finding['fix'] ) ) { echo '<small><strong>' . esc_html__( 'Correction :', 'ms-recipes-writer-ai' ) . '</strong> ' . esc_html( (string) $finding['fix'] ) . '</small>'; }
 			echo '</td></tr>';
 		}
-		echo '</tbody></table></section>';
+		echo '</tbody></table>';
+		self::redraw_buttons( $run );
+		echo '</section>';
+	}
+
+	/**
+	 * The refused images the editor may have redrawn. The engine does not redraw
+	 * on its own any more: the editor reads the findings and decides.
+	 */
+	private static function redraw_buttons( array $run ) {
+		// The verdict above is about the image as first drawn: say so once it has been replaced.
+		$post_id = (int) ( $run['draft_post_id'] ?? 0 );
+		$notes = array(
+			/* translators: %d is how many times. */
+			'featured' => __( 'L’image à la une a été redessinée %d fois d’après ces remarques ; la nouvelle n’a pas été rejugée.', 'ms-recipes-writer-ai' ),
+			/* translators: %d is how many times. */
+			'facebook' => __( 'Le collage a été redessiné %d fois d’après ces remarques ; le nouveau n’a pas été rejugé.', 'ms-recipes-writer-ai' ),
+		);
+		foreach ( $notes as $kind => $note ) {
+			$times = $post_id ? (int) get_post_meta( $post_id, '_msrwa_' . $kind . '_redrawn', true ) : 0;
+			if ( $times ) { echo '<p class="ms-muted" style="margin-top:14px">' . esc_html( sprintf( $note, $times ) ) . '</p>'; }
+		}
+		$kinds = $run ? MSRWA_Run::redrawable( $run ) : array();
+		if ( ! $kinds ) { return; }
+		$labels = array( 'featured' => __( 'Redessiner l’image à la une', 'ms-recipes-writer-ai' ), 'facebook' => __( 'Redessiner le collage', 'ms-recipes-writer-ai' ) );
+		echo '<p class="ms-muted" style="margin-top:14px">' . esc_html__( 'Une image refusée n’est pas redessinée d’office. Si les remarques vous semblent justes, faites-la redessiner : elles sont transmises au dessin, et la nouvelle image remplace l’ancienne dans le brouillon.', 'ms-recipes-writer-ai' ) . '</p>';
+		echo '<p class="ms-redraw" data-run="' . esc_attr( (string) (int) $run['id'] ) . '" data-busy="' . esc_attr__( 'Dessin en cours, une trentaine de secondes…', 'ms-recipes-writer-ai' ) . '">';
+		foreach ( $kinds as $kind ) {
+			echo '<button type="button" class="button" value="' . esc_attr( $kind ) . '">' . esc_html( $labels[ $kind ] ) . '</button> ';
+		}
+		echo '<span class="ms-muted" aria-live="polite"></span></p>';
 	}
 
 	private static function verdict_word( $verdict ) {

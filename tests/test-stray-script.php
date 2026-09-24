@@ -16,7 +16,7 @@ msrwa_test_assert( array() === MSRWA_Engine_Score::stray_script( array( 'source_
 msrwa_test_assert( array() === MSRWA_Engine_Score::stray_script( array( 'text' => '5 μg de vitamine, Δ de 10 °C' ), 'fr' ), 'Greek letters are units and symbols, not stray.' );
 
 $fixed = json_encode( array( 'changes' => array( array( 'quote' => 'x', 'replace' => '润ir les pommes.' ) ) ), JSON_UNESCAPED_UNICODE );
-$scored = MSRWA_Engine_Score::step( 'fact_check', $fixed, array(), array() );
+$scored = MSRWA_Engine_Score::step( 'review', $fixed, array(), array() );
 msrwa_test_assert( isset( $scored['checks']['one alphabet'] ) && ! $scored['checks']['one alphabet']['pass'], 'A correction that would put one into the article fails its scorecard.' );
 
 // Through the engine: one attempt configured, the stray answer is asked once

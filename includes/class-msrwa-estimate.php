@@ -22,7 +22,7 @@ final class MSRWA_Estimate {
 			// low search context: 23 000–64 000 tokens in, 3 800–6 300 out, and
 			// 1, 4, 1, 1, 1, 1, 1 paid searches. Two searches is the average
 			// rounded up; the maximum prices every tool call as one.
-			'research' => array( 'input' => 45000, 'output' => 5500, 'searches' => 2 ),
+			'research' => array( 'input' => 45000, 'output' => 5500, 'searches' => 1 ),
 			// Written from the editor's photographs: no search, no page read, only
 			// the brief and what the photographs show. Measured on 0.21.1, one live
 			// tart: 2 841 in (the photograph's reading included), 4 014 out, $0.0054
@@ -30,16 +30,15 @@ final class MSRWA_Estimate {
 			'research_photographs' => array( 'input' => 3000, 'output' => 4500 ),
 			'canonical_recipe' => array( 'input' => 4200, 'output' => 3100 ),
 			'article' => array( 'input' => 6900, 'output' => 6600 ),
-			'review' => array( 'input' => 11200, 'output' => 2200 ),
-			// Three live fact checks on 0.18.3 answered 3 990 tokens and twice more
-			// than the old 4 000 ceiling, reasoning included.
-			'fact_check' => array( 'input' => 10400, 'output' => 4500 ),
-			// Measured on 0.19.0, three live recipes: the proofread returns only the
-			// sentences it changes (3 050–3 320 out, reasoning included, against
-			// 6 000 when it returned the article), and the image prompts lost their
-			// repetitions (1 450 and 2 530 tokens in, against 1 800 and 3 750).
-			'proofread' => array( 'input' => 11000, 'output' => 3300 ),
-			'final_approval' => array( 'input' => 18000, 'output' => 2100 ),
+			// One reading now does the review, the fact check and the proofread.
+			// Measured on 0.28.0, three live recipes: 10 778–11 417 in, 3 141–3 571
+			// out, reasoning included, against some 32 000 in and 9 000 out for
+			// the three calls it replaced.
+			'review' => array( 'input' => 11500, 'output' => 4000 ),
+			'proofread' => array( 'input' => 0, 'output' => 0 ),
+			// Images, recipe and photographs only: 7 247–7 707 in, 890–1 270 out on
+			// 0.28.0, against 16 500 in when it read the article and research too.
+			'final_approval' => array( 'input' => 8000, 'output' => 1500 ),
 			'featured_image' => array( 'input' => 1450, 'output' => 440 ),
 			'facebook_image' => array( 'input' => 2550, 'output' => 345 ),
 			'corrections' => array( 'input' => 0, 'output' => 0 ),
@@ -122,14 +121,10 @@ final class MSRWA_Estimate {
 		$buckets = array( 'article' => 0.0, 'featured' => 0.0, 'facebook' => 0.0, 'other' => 0.0 );
 		foreach ( $steps as $step ) { $buckets[ $step['bucket'] ] += $step['cost_usd']; }
 
-		// The final approval may refuse. Each refusal redraws the images it
-		// blocked and asks again, up to `attempts.final_approval`. A real full
-		// recipe was refused twice: the collage was drawn three times and the
-		// approval ran three times, $0.2804 against a one-pass $0.2119. The
-		// expected figure stays one pass; the maximum is every attempt used,
-		// with both images redrawn each time — the most the engine can spend.
 		// Research may search more than it is asked to: at most every tool call
-		// it is allowed, each priced as a paid search.
+		// it is allowed, each priced as a paid search. The final approval may
+		// be asked once more for a malformed verdict; a refusal redraws nothing
+		// by itself, since the editor decides that.
 		$retry = 0.0;
 		foreach ( $steps as $name => $step ) {
 			if ( empty( $step['searches'] ) ) { continue; }
@@ -137,9 +132,7 @@ final class MSRWA_Estimate {
 			$retry += ( $config->web_tool_calls( $provider ) - $step['searches'] ) * (float) $config->get( 'providers.' . $provider . '.web_search_usd', 0 );
 		}
 		if ( isset( $steps['final_approval'] ) ) {
-			$approval = 0.0;
-			foreach ( array( 'featured_image', 'facebook_image', 'final_approval' ) as $again ) { $approval += (float) ( $steps[ $again ]['cost_usd'] ?? 0 ); }
-			$retry += $approval * max( 0, $config->attempts( 'final_approval' ) - 1 );
+			$retry += (float) $steps['final_approval']['cost_usd'] * max( 0, $config->attempts( 'final_approval' ) - 1 );
 		}
 
 		return array(
