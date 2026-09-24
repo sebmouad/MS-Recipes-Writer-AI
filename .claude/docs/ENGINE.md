@@ -601,6 +601,20 @@ photograph, and otherwise use the photograph without the cost of a search.
     panel unasked, the whole one was refused twice out of two, and a redraw
     came back opened and approved.
 
+30. **Photographs, not renders.** Owner's request, 2026-09-24: the collage
+    must look perfectly real. The `collage` prompt's realism and photography
+    now name what gives an AI image away and ask for the opposite: irregular
+    hand-cut pieces, uneven browning, drips, crumbs, fond in a used pan, meat
+    fibres; no waxy or uniform gloss, no identical pieces, no symmetry, no
+    halos, no over-sharpening, no HDR; a full-frame 50 mm at f/2.8 and
+    ISO 400 with natural grain. Measured on `roti-orloff` and
+    `potee-porc-chou`, one collage per variant: the new prompt at medium
+    ($0.025) reads as a photograph where the old one read as a render; high
+    ($0.055) adds the finest texture; `gpt-image-2` ($0.055) is moodier and
+    ended the rôti whole. Medium stays the default. The lab's
+    `--image-model` now takes `provider:model`; Gemini could not be compared
+    because the engine has no Gemini image endpoint.
+
 ### Still open
 
 

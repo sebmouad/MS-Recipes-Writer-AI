@@ -24,6 +24,9 @@ require __DIR__ . '/lib/steps.php';
 
 function lab_die( $message ) { fwrite( STDERR, rtrim( $message ) . "\n" ); exit( 2 ); }
 
+/** --image-model=gpt-image-2 is OpenAI's; --image-model=gemini:gemini-3-pro-image names the provider. */
+function lab_image_route( $model ) { return false === strpos( (string) $model, ':' ) ? 'openai:' . $model : (string) $model; }
+
 /** Flags every command understands, translated into engine configuration. */
 function lab_config( array $options, $step = '' ) {
 	$config = array( 'settings' => lab_settings() );
@@ -36,10 +39,10 @@ function lab_config( array $options, $step = '' ) {
 		// provider, not one step against the rest of the pipeline.
 		$routing = array( 'vision' => $route );
 		foreach ( MSRWA_Engine_Steps::names() as $name ) { $routing[ $name ] = $route; }
-		if ( ! empty( $options['image-model'] ) ) { $routing['image'] = 'openai:' . $options['image-model']; }
+		if ( ! empty( $options['image-model'] ) ) { $routing['image'] = lab_image_route( $options['image-model'] ); }
 		$config['routing'] = $routing;
 	} elseif ( ! empty( $options['image-model'] ) ) {
-		$config['routing'] = array( 'image' => 'openai:' . $options['image-model'] );
+		$config['routing'] = array( 'image' => lab_image_route( $options['image-model'] ) );
 	}
 
 	if ( isset( $options['max-output'] ) && '' !== $step ) { $config['max_output'] = array( $step => (int) $options['max-output'] ); }

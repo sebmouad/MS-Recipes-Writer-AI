@@ -582,6 +582,10 @@ cost) in the task before changing anything.
   approval reports `last_panel_opened` and `MSRWA_Engine_Score::enforce()`
   refuses a whole one. Real: four collages on two new briefs, the whole quiche
   refused 2/2, the redraw approved opened. See ENGINE.md §7, item 29.
+- [x] **A33 — Photographs, not renders (2026-09-24).** The collage prompt names
+  the tells of an AI image and asks for real food's irregularity and a real
+  camera's grain. Compared live on two briefs against the previous prompt,
+  high quality and `gpt-image-2`. See ENGINE.md §7, item 30.
 - [x] **A11 — Model answers that do not parse (found 2026-09-20).** Two of the
   54 matrix cells scored zero for a reason that was ours, not the prompt's:
   Opus 5 wrote "I'll research this dish now." before the object, and Sonnet 5

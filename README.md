@@ -5,9 +5,9 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.26.2
+## État actuel — 0.26.3
 
-La version `0.26.2` rend le visuel Facebook plus chaleureux et plus proche du plat, et le fait toujours finir sur le plat ouvert ; la `0.26.1` retirait les copies des prompts que gardaient les réglages :
+La version `0.26.3` fait ressembler le visuel Facebook à de vraies photographies plutôt qu'à des images de synthèse ; la `0.26.2` rendait le visuel Facebook plus chaleureux et plus proche du plat, et le fait toujours finir sur le plat ouvert ; la `0.26.1` retirait les copies des prompts que gardaient les réglages :
 le moteur exécute ses propres gabarits, et ce qui n’est lu par rien ne se
 périme plus en silence. Le détail de chaque version suit, de la plus récente à
 la plus ancienne.
@@ -76,6 +76,21 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.26.3
+
+**Un visuel Facebook qui ressemble à des photographies.** Le texte qui décrit
+le collage nomme désormais ce qui trahit une image de synthèse et demande
+l'inverse : morceaux coupés à la main et irréguliers, dorure inégale, coulures
+de sauce, miettes, fond de cuisson dans la poêle, fibres de la viande — et
+jamais de surface cireuse ou uniformément brillante, de morceaux identiques,
+de symétrie parfaite ni de halo. L'image est décrite comme prise avec un vrai
+appareil, avec son grain naturel.
+
+Mesuré sur le rôti Orloff et la potée : à qualité moyenne et au même prix
+(environ 0,025 $), le nouveau collage se lit comme une photographie là où
+l'ancien se lisait comme un rendu. La qualité haute ajoute la texture la plus
+fine pour environ 0,055 $ ; la qualité moyenne reste la valeur par défaut.
 
 ## Version 0.26.2
 
