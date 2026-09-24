@@ -82,6 +82,17 @@ final class MSRWA_UI {
 		if ( 'cancelled' === $status ) { return array( 'tone' => '', 'label' => __( 'arrêté', 'ms-recipes-writer-ai' ) ); }
 		if ( 'failed' === $status ) { return array( 'tone' => 'stop', 'label' => __( 'échec', 'ms-recipes-writer-ai' ) ); }
 
+		// Once the post has left the drafts, what WordPress did with it is the
+		// state: "to review" and "to fix" were for the editor, who has decided.
+		$post_id = (int) ( $run['draft_post_id'] ?? 0 );
+		if ( $post_id ) {
+			$post_status = array_key_exists( 'post_status', $run ) ? $run['post_status'] : get_post_status( $post_id );
+			if ( in_array( $post_status, array( 'publish', 'private' ), true ) ) { return array( 'tone' => 'good', 'label' => __( 'publié', 'ms-recipes-writer-ai' ) ); }
+			if ( 'future' === $post_status ) { return array( 'tone' => 'live', 'label' => __( 'programmé', 'ms-recipes-writer-ai' ) ); }
+			if ( 'trash' === $post_status ) { return array( 'tone' => '', 'label' => __( 'à la corbeille', 'ms-recipes-writer-ai' ) ); }
+			if ( null === $post_status || false === $post_status ) { return array( 'tone' => '', 'label' => __( 'supprimé', 'ms-recipes-writer-ai' ) ); }
+		}
+
 		$approved = $run['approved'] ?? null;
 		// A refusal carries its findings, and the editor has to act on them:
 		// that is what the label says, rather than how the check felt.
@@ -226,13 +237,78 @@ final class MSRWA_UI {
 			</div>
 			<div class="ms-ticket-side">
 				<?php echo self::progress( $run['steps_done'], $run['steps_total'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-				<span data-field="state"><?php echo self::state( $run ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
-				<?php if ( (int) ( $run['draft_post_id'] ?? 0 ) ) : ?>
-					<a class="button button-small" href="<?php echo esc_url( (string) get_edit_post_link( (int) $run['draft_post_id'] ) ); ?>"><?php esc_html_e( 'Brouillon', 'ms-recipes-writer-ai' ); ?></a>
-				<?php endif; ?>
+				<?php
+				// Once the post has left the drafts its own state, below, says it;
+				// the same word twice on one row reads as two different facts.
+				$post_id = (int) ( $run['draft_post_id'] ?? 0 );
+				$decided = $post_id && 'done' === ( $run['status'] ?? '' ) && ! in_array( array_key_exists( 'post_status', $run ) ? $run['post_status'] : get_post_status( $post_id ), array( 'draft', 'pending' ), true );
+				?>
+				<?php if ( ! $decided ) : ?><span data-field="state"><?php echo self::state( $run ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span><?php endif; ?>
 			</div>
+			<?php self::post_state( $run ); ?>
 		</article>
 		<?php
+	}
+
+	/**
+	 * What became of the article in WordPress, and what can be done with it.
+	 *
+	 * The run knows the post it wrote; the post's life is WordPress's — it is
+	 * published, scheduled, sent to the bin or deleted there, and renamed on
+	 * the way. So the state is read from the post, never remembered here.
+	 */
+	public static function post_state( array $run ) {
+		$post_id = (int) ( $run['draft_post_id'] ?? 0 );
+		if ( ! $post_id ) { return; }
+		$post = get_post( $post_id );
+		$states = array(
+			'publish' => array( 'good', __( 'Publié', 'ms-recipes-writer-ai' ) ),
+			'private' => array( 'good', __( 'Publié en privé', 'ms-recipes-writer-ai' ) ),
+			'future' => array( 'live', __( 'Programmé', 'ms-recipes-writer-ai' ) ),
+			'pending' => array( 'warn', __( 'En attente de relecture', 'ms-recipes-writer-ai' ) ),
+			'draft' => array( 'idle', __( 'Brouillon', 'ms-recipes-writer-ai' ) ),
+			'trash' => array( 'stop', __( 'Dans la corbeille', 'ms-recipes-writer-ai' ) ),
+		);
+		echo '<div class="ms-ticket-post">';
+		if ( ! $post ) {
+			echo '<span class="ms-state ms-state-stop">' . esc_html__( 'Supprimé de WordPress', 'ms-recipes-writer-ai' ) . '</span>';
+			echo '<small class="ms-muted">' . esc_html__( 'L’article a été supprimé définitivement ; le suivi de la recette reste ici.', 'ms-recipes-writer-ai' ) . '</small></div>';
+			return;
+		}
+		list( $tone, $label ) = $states[ $post->post_status ] ?? $states['draft'];
+		echo '<span class="ms-state ms-state-' . esc_attr( $tone ) . '">' . esc_html( $label ) . '</span>';
+
+		// The date that matters for that state: when it went out, or will.
+		$when = 'publish' === $post->post_status || 'future' === $post->post_status || 'private' === $post->post_status ? $post->post_date_gmt : $post->post_modified_gmt;
+		if ( $when && '0000-00-00 00:00:00' !== $when ) {
+			echo '<small class="ms-muted">' . esc_html( sprintf(
+				/* translators: %s is a date. */
+				'future' === $post->post_status ? __( 'le %s', 'ms-recipes-writer-ai' ) : ( 'draft' === $post->post_status || 'pending' === $post->post_status || 'trash' === $post->post_status ? __( 'modifié le %s', 'ms-recipes-writer-ai' ) : __( 'le %s', 'ms-recipes-writer-ai' ) ),
+				MSRWA_I18N::when( $when )
+			) ) . '</small>';
+		}
+		$title = trim( (string) $post->post_title );
+		if ( '' !== $title && $title !== (string) ( $run['label'] ?? '' ) ) {
+			/* translators: %s is the article's current title in WordPress. */
+			echo '<small class="ms-ticket-post-title">' . esc_html( sprintf( __( 'Intitulé dans WordPress : « %s »', 'ms-recipes-writer-ai' ), $title ) ) . '</small>';
+		}
+
+		$links = array();
+		if ( 'trash' === $post->post_status ) {
+			if ( current_user_can( 'delete_post', $post_id ) ) {
+				$links[] = '<a class="button button-small" href="' . esc_url( wp_nonce_url( admin_url( 'post.php?post=' . $post_id . '&action=untrash' ), 'untrash-post_' . $post_id ) ) . '">' . esc_html__( 'Restaurer', 'ms-recipes-writer-ai' ) . '</a>';
+			}
+		} else {
+			$edit = (string) get_edit_post_link( $post_id );
+			if ( '' !== $edit ) { $links[] = '<a class="button button-small" href="' . esc_url( $edit ) . '">' . esc_html__( 'Modifier', 'ms-recipes-writer-ai' ) . '</a>'; }
+			if ( in_array( $post->post_status, array( 'publish', 'private' ), true ) ) {
+				$links[] = '<a class="button button-small" href="' . esc_url( (string) get_permalink( $post_id ) ) . '" target="_blank" rel="noopener">' . esc_html__( 'Voir', 'ms-recipes-writer-ai' ) . '</a>';
+			} elseif ( '' !== $edit ) {
+				$links[] = '<a class="button button-small" href="' . esc_url( (string) get_preview_post_link( $post ) ) . '" target="_blank" rel="noopener">' . esc_html__( 'Prévisualiser', 'ms-recipes-writer-ai' ) . '</a>';
+			}
+		}
+		if ( $links ) { echo '<span class="ms-ticket-post-links">' . implode( ' ', $links ) . '</span>'; } // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- built from escaped parts above.
+		echo '</div>';
 	}
 
 	/** An empty screen says what to do next, never just that there is nothing. */

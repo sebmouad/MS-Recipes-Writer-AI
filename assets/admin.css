@@ -565,3 +565,27 @@
 .ms-preset-cost { font-family: var(--ms-mono); font-size: 12px; color: var(--ms-ink-soft); }
 .ms-preset-custom { cursor: default; border-style: dashed; color: var(--ms-ink-faint); align-content: center; justify-items: center; }
 .ms-preset-custom.is-active { color: var(--ms-ink); border-style: solid; border-color: var(--ms-lamp); background: var(--ms-lamp-soft); box-shadow: inset 0 0 0 1px var(--ms-lamp); }
+
+/* --- The articles, as WordPress has them ---------------------------------
+   Tabs first, because "what is published, what is not" is the question an
+   editor asks; then, on each recipe, the post's own state and what can be
+   done with it — edit, view, preview, restore. */
+
+.ms-post-tabs { padding: 14px 20px 0; border-block-end: 1px solid var(--ms-line-soft); overflow-x: auto; }
+.ms-post-tabs ul { display: flex; gap: 4px; margin: 0; padding: 0; list-style: none; }
+.ms-post-tabs li { margin: 0; }
+.ms-post-tab { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-block-end: 2px solid transparent; color: var(--ms-ink-soft); text-decoration: none; white-space: nowrap; font-weight: 550; }
+.ms-post-tab:hover { color: var(--ms-ink); }
+.ms-post-tab[aria-current="page"] { color: var(--ms-ink); border-block-end-color: var(--ms-lamp); }
+.ms-post-tab .ms-count { font-family: var(--ms-mono); font-size: 11px; padding: 1px 7px; border-radius: 999px; background: var(--ms-sunk); color: var(--ms-ink-soft); }
+.ms-post-tab[aria-current="page"] .ms-count { background: var(--ms-lamp-soft); color: var(--ms-lamp); }
+.ms-post-tab-trash .ms-count, .ms-post-tab-deleted .ms-count { background: var(--ms-stop-soft); color: var(--ms-stop); }
+
+.ms-ticket-post { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin-block-start: 6px; padding-block-start: 8px; border-block-start: 1px dashed var(--ms-line-soft); }
+.ms-ticket-post small { margin: 0; }
+.ms-ticket-post-title { color: var(--ms-ink-soft); font-style: italic; }
+.ms-ticket-post-links { display: inline-flex; gap: 6px; margin-inline-start: auto; }
+@media (max-width: 782px) {
+	.ms-ticket-post-links { margin-inline-start: 0; flex-basis: 100%; }
+	.ms-post-tabs { padding-inline: 12px; }
+}

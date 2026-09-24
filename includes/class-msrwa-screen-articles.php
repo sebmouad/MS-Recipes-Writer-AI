@@ -19,10 +19,15 @@ final class MSRWA_Screen_Articles {
 			'owner' => isset( $_GET['owner'] ) ? absint( $_GET['owner'] ) : 0,
 			'batch' => isset( $_GET['batch'] ) ? absint( $_GET['batch'] ) : 0,
 			'search' => isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : '',
+			'post' => isset( $_GET['post_state'] ) ? sanitize_key( wp_unslash( $_GET['post_state'] ) ) : '',
 			'page' => isset( $_GET['paged'] ) ? absint( $_GET['paged'] ) : 1,
 			'per_page' => 25,
 		);
 		$found = MSRWA_Ledger::runs( $filters );
+		$counts = MSRWA_Ledger::post_counts( $filters );
+		// One query for every post the page shows, rather than one per row.
+		$ids = array_filter( array_map( 'intval', array_column( $found['runs'], 'draft_post_id' ) ) );
+		if ( $ids && function_exists( '_prime_post_caches' ) ) { _prime_post_caches( $ids, false, false ); }
 
 		echo '<div class="wrap msrwa">';
 		MSRWA_UI::head(
@@ -35,8 +40,10 @@ final class MSRWA_Screen_Articles {
 		);
 		?>
 		<section class="ms-card ms-card-flush">
+			<?php self::tabs( $filters, $counts ); ?>
 			<form class="ms-filters" method="get">
 				<input type="hidden" name="page" value="msrwa-articles">
+				<?php if ( '' !== $filters['post'] ) : ?><input type="hidden" name="post_state" value="<?php echo esc_attr( $filters['post'] ); ?>"><?php endif; ?>
 				<div>
 					<label for="ms-filter-state"><?php esc_html_e( 'État', 'ms-recipes-writer-ai' ); ?></label>
 					<select id="ms-filter-state" name="state">
@@ -66,8 +73,8 @@ final class MSRWA_Screen_Articles {
 			<?php if ( ! $found['runs'] ) : ?>
 				<?php
 				MSRWA_UI::nothing(
-					'' !== $filters['search'] || '' !== $filters['status'] ? __( 'Rien ne correspond', 'ms-recipes-writer-ai' ) : __( 'Aucune recette pour l’instant', 'ms-recipes-writer-ai' ),
-					'' !== $filters['search'] || '' !== $filters['status']
+					'' !== $filters['search'] || '' !== $filters['status'] || '' !== $filters['post'] ? __( 'Rien ne correspond', 'ms-recipes-writer-ai' ) : __( 'Aucune recette pour l’instant', 'ms-recipes-writer-ai' ),
+					'' !== $filters['search'] || '' !== $filters['status'] || '' !== $filters['post']
 						? __( 'Élargissez le filtre, ou repartez de la liste complète.', 'ms-recipes-writer-ai' )
 						: __( 'Déposez des recettes et des photographies pour lancer un premier lot.', 'ms-recipes-writer-ai' ),
 					'<a class="button button-primary" href="' . esc_url( admin_url( 'admin.php?page=msrwa-compose' ) ) . '">' . esc_html__( 'Nouveau lot', 'ms-recipes-writer-ai' ) . '</a>'
@@ -122,6 +129,40 @@ final class MSRWA_Screen_Articles {
 			</div>
 		</div>
 		<?php
+	}
+
+	/**
+	 * What became of the articles in WordPress, as tabs with their counts:
+	 * the question an editor asks first is "what is published, what is not".
+	 */
+	private static function tabs( array $filters, array $counts ) {
+		$labels = array(
+			'' => __( 'Tous', 'ms-recipes-writer-ai' ),
+			'draft' => __( 'Brouillons', 'ms-recipes-writer-ai' ),
+			'future' => __( 'Programmés', 'ms-recipes-writer-ai' ),
+			'publish' => __( 'Publiés', 'ms-recipes-writer-ai' ),
+			'trash' => __( 'Corbeille', 'ms-recipes-writer-ai' ),
+			'deleted' => __( 'Supprimés de WordPress', 'ms-recipes-writer-ai' ),
+			'none' => __( 'Sans article', 'ms-recipes-writer-ai' ),
+		);
+		// The other filters stay as they are; the page goes back to the first.
+		$base = add_query_arg( array_filter( array(
+			'page' => 'msrwa-articles',
+			'state' => $filters['status'],
+			'owner' => $filters['owner'] ? $filters['owner'] : '',
+			's' => $filters['search'],
+		), 'strlen' ), admin_url( 'admin.php' ) );
+		echo '<nav class="ms-post-tabs" aria-label="' . esc_attr__( 'État dans WordPress', 'ms-recipes-writer-ai' ) . '"><ul>';
+		foreach ( $labels as $bucket => $label ) {
+			$count = '' === $bucket ? array_sum( $counts ) : (int) ( $counts[ $bucket ] ?? 0 );
+			// An empty state is not offered, except the one being looked at.
+			if ( '' !== $bucket && ! $count && $filters['post'] !== $bucket ) { continue; }
+			$current = $filters['post'] === $bucket;
+			$url = '' === $bucket ? $base : add_query_arg( 'post_state', $bucket, $base );
+			echo '<li><a href="' . esc_url( $url ) . '"' . ( $current ? ' aria-current="page"' : '' ) . ' class="ms-post-tab ms-post-tab-' . esc_attr( '' === $bucket ? 'all' : $bucket ) . '">'
+				. esc_html( $label ) . ' <span class="ms-count">' . esc_html( number_format_i18n( $count ) ) . '</span></a></li>';
+		}
+		echo '</ul></nav>';
 	}
 
 	private static function states() {

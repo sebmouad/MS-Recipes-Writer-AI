@@ -2076,6 +2076,78 @@ msgstr "≈ %s per recipe"
 msgid "Au-dessus du plafond de %s par recette : les lots seraient refusés tant qu’il n’est pas relevé dans les Réglages."
 msgstr "Above the %s per-recipe ceiling: lots would be refused until it is raised in Settings."
 
+msgid "Brouillons"
+msgstr "Drafts"
+
+msgid "Corbeille"
+msgstr "Bin"
+
+msgid "Dans la corbeille"
+msgstr "In the bin"
+
+msgid "En attente de relecture"
+msgstr "Pending review"
+
+msgid "Intitulé dans WordPress : « %s »"
+msgstr "Title in WordPress: “%s”"
+
+msgid "L’article a été supprimé définitivement ; le suivi de la recette reste ici."
+msgstr "The article was permanently deleted; the recipe’s record stays here."
+
+msgid "Modifier"
+msgstr "Edit"
+
+msgid "Programmé"
+msgstr "Scheduled"
+
+msgid "Programmés"
+msgstr "Scheduled"
+
+msgid "Publié"
+msgstr "Published"
+
+msgid "Publié en privé"
+msgstr "Published privately"
+
+msgid "Publiés"
+msgstr "Published"
+
+msgid "Restaurer"
+msgstr "Restore"
+
+msgid "Sans article"
+msgstr "No article"
+
+msgid "Supprimé de WordPress"
+msgstr "Deleted from WordPress"
+
+msgid "Supprimés de WordPress"
+msgstr "Deleted from WordPress"
+
+msgid "Voir"
+msgstr "View"
+
+msgid "le %s"
+msgstr "on %s"
+
+msgid "modifié le %s"
+msgstr "modified on %s"
+
+msgid "État dans WordPress"
+msgstr "State in WordPress"
+
+msgid "programmé"
+msgstr "scheduled"
+
+msgid "publié"
+msgstr "published"
+
+msgid "supprimé"
+msgstr "deleted"
+
+msgid "à la corbeille"
+msgstr "in the bin"
+
 msgid "aucune page citée"
 msgstr "no page cited"
 

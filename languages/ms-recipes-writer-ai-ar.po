@@ -2104,6 +2104,78 @@ msgstr "≈ %s لكل وصفة"
 msgid "Au-dessus du plafond de %s par recette : les lots seraient refusés tant qu’il n’est pas relevé dans les Réglages."
 msgstr "أعلى من سقف %s لكل وصفة: ستُرفض الدفعات ما لم يُرفع في الإعدادات."
 
+msgid "Brouillons"
+msgstr "المسودات"
+
+msgid "Corbeille"
+msgstr "سلة المهملات"
+
+msgid "Dans la corbeille"
+msgstr "في سلة المهملات"
+
+msgid "En attente de relecture"
+msgstr "بانتظار المراجعة"
+
+msgid "Intitulé dans WordPress : « %s »"
+msgstr "العنوان في ووردبريس: « %s »"
+
+msgid "L’article a été supprimé définitivement ; le suivi de la recette reste ici."
+msgstr "حُذف المقال نهائيًا؛ ويبقى سجل الوصفة هنا."
+
+msgid "Modifier"
+msgstr "تعديل"
+
+msgid "Programmé"
+msgstr "مجدول"
+
+msgid "Programmés"
+msgstr "المجدولة"
+
+msgid "Publié"
+msgstr "منشور"
+
+msgid "Publié en privé"
+msgstr "منشور بشكل خاص"
+
+msgid "Publiés"
+msgstr "المنشورة"
+
+msgid "Restaurer"
+msgstr "استعادة"
+
+msgid "Sans article"
+msgstr "بدون مقال"
+
+msgid "Supprimé de WordPress"
+msgstr "محذوف من ووردبريس"
+
+msgid "Supprimés de WordPress"
+msgstr "المحذوفة من ووردبريس"
+
+msgid "Voir"
+msgstr "عرض"
+
+msgid "le %s"
+msgstr "في %s"
+
+msgid "modifié le %s"
+msgstr "عُدّل في %s"
+
+msgid "État dans WordPress"
+msgstr "الحالة في ووردبريس"
+
+msgid "programmé"
+msgstr "مجدول"
+
+msgid "publié"
+msgstr "منشور"
+
+msgid "supprimé"
+msgstr "محذوف"
+
+msgid "à la corbeille"
+msgstr "في سلة المهملات"
+
 msgid "aucune page citée"
 msgstr "لم تُذكر أي صفحة"
 

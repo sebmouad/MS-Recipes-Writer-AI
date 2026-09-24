@@ -23,14 +23,17 @@ final class MSRWA_Ledger {
 		$t = self::tables();
 		$scope = MSRWA_Rights::scope_sql( 'r.owner_id' );
 
+		// "To read" and "to fix" are about drafts: once an editor has published,
+		// scheduled, binned or deleted the post, the decision has been made.
+		$open = "p.post_status IN ('draft','pending')";
 		$row = $wpdb->get_row(
 			"SELECT
 				SUM(CASE WHEN r.status IN ('queued','running') THEN 1 ELSE 0 END) moving,
-				SUM(CASE WHEN r.status = 'done' AND r.draft_post_id > 0 THEN 1 ELSE 0 END) to_read,
-				SUM(CASE WHEN r.status = 'done' AND r.approved = 0 THEN 1 ELSE 0 END) reserved,
+				SUM(CASE WHEN r.status = 'done' AND {$open} THEN 1 ELSE 0 END) to_read,
+				SUM(CASE WHEN r.status = 'done' AND r.approved = 0 AND {$open} THEN 1 ELSE 0 END) reserved,
 				SUM(CASE WHEN r.status = 'failed' THEN 1 ELSE 0 END) failed,
 				COUNT(*) total
-			FROM {$t['runs']} r WHERE {$scope}", ARRAY_A );
+			FROM {$t['runs']} r LEFT JOIN {$wpdb->posts} p ON p.ID = r.draft_post_id WHERE {$scope}", ARRAY_A );
 
 		return array(
 			'moving' => (int) ( $row['moving'] ?? 0 ),
@@ -255,21 +258,59 @@ final class MSRWA_Ledger {
 	 * Returns the rows and the total, because a list that cannot say how many
 	 * there are cannot be paged.
 	 */
-	public static function runs( array $filters = array() ) {
+	/**
+	 * What became of a recipe's article in WordPress, as one word the screen
+	 * filters on: its post may be a draft, scheduled, published, in the bin,
+	 * deleted outright, or not written yet.
+	 */
+	public static function post_bucket_sql() {
+		return "CASE WHEN r.draft_post_id = 0 THEN 'none' WHEN p.ID IS NULL THEN 'deleted'"
+			. " WHEN p.post_status IN ('publish','private') THEN 'publish' WHEN p.post_status = 'future' THEN 'future'"
+			. " WHEN p.post_status = 'trash' THEN 'trash' ELSE 'draft' END";
+	}
+
+	public static function post_buckets() { return array( 'draft', 'future', 'publish', 'trash', 'deleted', 'none' ); }
+
+	/** The WHERE clause shared by the list and its counts: scope first, then the filters. */
+	private static function run_clause( array $filters, $with_post = true ) {
 		global $wpdb;
-		$t = self::tables();
 		$where = array( MSRWA_Rights::scope_sql( 'r.owner_id' ) );
 
 		$status = (string) ( $filters['status'] ?? '' );
 		if ( 'moving' === $status ) { $where[] = "r.status IN ('queued','running')"; }
-		elseif ( 'attention' === $status ) { $where[] = "(r.status = 'failed' OR (r.status = 'done' AND r.approved = 0))"; }
+		// A refused article stops asking for a decision once its post is
+		// published, scheduled, binned or deleted: somebody decided.
+		elseif ( 'attention' === $status ) { $where[] = "(r.status = 'failed' OR (r.status = 'done' AND r.approved = 0 AND (r.draft_post_id = 0 OR p.post_status IN ('draft','pending'))))"; }
 		elseif ( '' !== $status ) { $where[] = $wpdb->prepare( 'r.status = %s', $status ); }
 
 		if ( ! empty( $filters['batch'] ) ) { $where[] = $wpdb->prepare( 'r.batch_id = %d', (int) $filters['batch'] ); }
 		if ( ! empty( $filters['owner'] ) && MSRWA_Rights::may_see_everything() ) { $where[] = $wpdb->prepare( 'r.owner_id = %d', (int) $filters['owner'] ); }
-		if ( ! empty( $filters['search'] ) ) { $where[] = $wpdb->prepare( 'r.label LIKE %s', '%' . $wpdb->esc_like( (string) $filters['search'] ) . '%' ); }
+		// An editor renames the post; the search finds it by either name.
+		if ( ! empty( $filters['search'] ) ) {
+			$like = '%' . $wpdb->esc_like( (string) $filters['search'] ) . '%';
+			$where[] = $wpdb->prepare( '(r.label LIKE %s OR p.post_title LIKE %s)', $like, $like );
+		}
+		$post = (string) ( $filters['post'] ?? '' );
+		if ( $with_post && in_array( $post, self::post_buckets(), true ) ) { $where[] = $wpdb->prepare( self::post_bucket_sql() . ' = %s', $post ); }
+		return implode( ' AND ', $where );
+	}
 
-		$clause = implode( ' AND ', $where );
+	/** How many of the recipes the reader may see are in each post state, for the tabs. */
+	public static function post_counts( array $filters = array() ) {
+		global $wpdb;
+		$t = self::tables();
+		$clause = self::run_clause( $filters, false );
+		$counts = array_fill_keys( self::post_buckets(), 0 );
+		foreach ( (array) $wpdb->get_results( "SELECT " . self::post_bucket_sql() . " AS bucket, COUNT(*) AS n FROM {$t['runs']} r LEFT JOIN {$wpdb->posts} p ON p.ID = r.draft_post_id WHERE {$clause} GROUP BY bucket", ARRAY_A ) as $row ) {
+			if ( isset( $counts[ $row['bucket'] ] ) ) { $counts[ $row['bucket'] ] = (int) $row['n']; }
+		}
+		return $counts;
+	}
+
+	public static function runs( array $filters = array() ) {
+		global $wpdb;
+		$t = self::tables();
+		$clause = self::run_clause( $filters );
 		$per_page = max( 5, min( 100, (int) ( $filters['per_page'] ?? 25 ) ) );
 		$page = max( 1, (int) ( $filters['page'] ?? 1 ) );
 
@@ -277,16 +318,17 @@ final class MSRWA_Ledger {
 		// money columns are not fetched for them either: a figure that cannot
 		// be displayed has no business crossing the wire, and `SELECT *` on a
 		// table holding longtext is wasteful besides.
-		$columns = 'r.id, r.batch_id, r.owner_id, r.label, r.status, r.step, r.steps_done, r.steps_total, r.approved, r.priority, r.draft_post_id, r.error_message, r.created_at';
+		$columns = 'r.id, r.batch_id, r.owner_id, r.label, r.status, r.step, r.steps_done, r.steps_total, r.approved, r.priority, r.draft_post_id, r.error_message, r.created_at, '
+			. 'p.post_status, p.post_title, p.post_modified_gmt, p.post_date_gmt, ' . self::post_bucket_sql() . ' AS post_bucket';
 		if ( MSRWA_Rights::may_see_money() ) { $columns .= ', r.cost_usd, r.seconds'; }
 
 		$rows = (array) $wpdb->get_results( $wpdb->prepare(
-			"SELECT {$columns} FROM {$t['runs']} r WHERE {$clause} ORDER BY r.id DESC LIMIT %d OFFSET %d",
+			"SELECT {$columns} FROM {$t['runs']} r LEFT JOIN {$wpdb->posts} p ON p.ID = r.draft_post_id WHERE {$clause} ORDER BY r.id DESC LIMIT %d OFFSET %d",
 			$per_page, ( $page - 1 ) * $per_page ), ARRAY_A );
 
 		return array(
 			'runs' => $rows,
-			'total' => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$t['runs']} r WHERE {$clause}" ),
+			'total' => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$t['runs']} r LEFT JOIN {$wpdb->posts} p ON p.ID = r.draft_post_id WHERE {$clause}" ),
 			'page' => $page,
 			'per_page' => $per_page,
 		);
