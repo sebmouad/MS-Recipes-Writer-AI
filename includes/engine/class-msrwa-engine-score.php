@@ -398,6 +398,18 @@ final class MSRWA_Engine_Score {
 				'serving'      => array( 'serv', 'accompan', 'side', 'pair' ),
 				'faq'          => array( 'faq', 'frequently asked', 'question' ),
 			),
+			'es' => array(
+				'ingredientes' => array( 'ingrediente' ),
+				'elección'     => array( 'elegir', 'eleccion', 'seleccion', 'escoger', 'comprar' ),
+				'sustituciones'=> array( 'sustitu', 'reemplaz', 'alternativa', 'cambiar' ),
+				'utensilios'   => array( 'utensilio', 'equipo', 'material', 'herramienta' ),
+				'preparación'  => array( 'preparacion', 'paso', 'elaboracion', 'como hacer' ),
+				'errores'      => array( 'error', 'evitar', 'fallo' ),
+				'conservación' => array( 'conserva', 'guardar', 'recalentar', 'congela' ),
+				'variantes'    => array( 'variante', 'version', 'adaptacion' ),
+				'servir'       => array( 'servir', 'acompan', 'presentacion' ),
+				'faq'          => array( 'faq', 'preguntas frecuentes', 'pregunta' ),
+			),
 			'ar' => array(
 				'المكونات'     => array( 'مكون', 'مكونات' ),
 				'الاختيار'     => array( 'اختيار', 'اختر', 'انتقاء' ),

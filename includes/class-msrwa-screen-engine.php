@@ -52,13 +52,23 @@ final class MSRWA_Screen_Engine {
 			<input type="hidden" name="action" value="msrwa_save_engine">
 			<?php wp_nonce_field( 'msrwa_save_engine' ); ?>
 
-			<section class="ms-card">
-				<h2><?php esc_html_e( 'Langue par défaut', 'ms-recipes-writer-ai' ); ?></h2>
-				<p><?php esc_html_e( 'Celle d’un lot qui n’en choisit pas.', 'ms-recipes-writer-ai' ); ?></p>
-				<p>
-					<input type="text" name="msrwa_engine[language]" value="<?php echo esc_attr( $stored['language'] ?? $defaults['language'] ); ?>" class="small-text ms-key">
-					<span class="ms-muted"><?php echo esc_html( sprintf( /* translators: %s is a language code. */ __( 'défaut du moteur : %s', 'ms-recipes-writer-ai' ), $defaults['language'] ) ); ?></span>
-				</p>
+			<?php
+			// One language for every lot, the site's: a lot no longer picks its
+			// own, and the engine's `language` key was a second answer nobody
+			// read. This saves the same setting as the Réglages screen.
+			$site_language = (string) MSRWA_Settings::get()['site_language'];
+			?>
+			<section class="ms-card ms-language-card">
+				<h2><label for="ms-site-language-engine"><?php esc_html_e( 'Langue des articles', 'ms-recipes-writer-ai' ); ?></label></h2>
+				<p><?php esc_html_e( 'Chaque lot est écrit dans cette langue : recherche, recette, article, contrôles et relecture. Le même réglage figure sur l’écran Réglages.', 'ms-recipes-writer-ai' ); ?></p>
+				<div class="ms-language-pick">
+					<select id="ms-site-language-engine" name="msrwa_site_language">
+						<?php foreach ( MSRWA_Profile::languages() as $code => $name ) : ?>
+							<option value="<?php echo esc_attr( $code ); ?>" <?php selected( $site_language, $code ); ?>><?php echo esc_html( $name ); ?></option>
+						<?php endforeach; ?>
+					</select>
+					<span class="ms-muted"><?php esc_html_e( 'Les sections exigées, le titre de la page deux et la balise de langue suivent ce choix.', 'ms-recipes-writer-ai' ); ?></span>
+				</div>
 			</section>
 
 			<?php self::routing_picker( $stored, $defaults ); ?>

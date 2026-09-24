@@ -57,6 +57,7 @@ final class MSRWA_Profile {
 			'fr' => __( 'Français', 'ms-recipes-writer-ai' ),
 			'en' => __( 'Anglais', 'ms-recipes-writer-ai' ),
 			'ar' => __( 'Arabe', 'ms-recipes-writer-ai' ),
+			'es' => __( 'Espagnol', 'ms-recipes-writer-ai' ),
 		);
 	}
 
@@ -103,6 +104,7 @@ final class MSRWA_Profile {
 			'fr' => 'Préparation de la recette étape par étape',
 			'en' => 'Step-by-step preparation',
 			'ar' => 'طريقة التحضير خطوة بخطوة',
+			'es' => 'Preparación de la receta paso a paso',
 		);
 	}
 

@@ -491,6 +491,16 @@ photograph, and otherwise use the photograph without the cost of a search.
     photograph: research $0.0054 in 30.6 s, 13/13, against $0.022–0.028 and
     42–79 s for the ten searched runs before it; the recipe was approved.
 
+### Applied on 2026-09-24, at the owner's request to add Spanish
+
+21. **A Spanish outline.** `MSRWA_Engine_Score::outlines()` gains `es`, the
+    same ten sections as the others with their Spanish wordings
+    (ingredientes, elección, sustituciones, utensilios, preparación,
+    errores, conservación, variantes, servir, faq), so a Spanish article is
+    held to the same contract and never failed on French headings.
+    `tests/test-engine-language.php` now requires an outline for every
+    language the plugin offers.
+
 ### Still open
 
 6. **The engine's `models` list is a second source of truth for prices.** The

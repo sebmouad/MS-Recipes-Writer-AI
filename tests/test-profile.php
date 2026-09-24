@@ -56,7 +56,8 @@ foreach ( array( MSRWA_Profile::FULL, MSRWA_Profile::FEATURED, MSRWA_Profile::AR
 // The language is the engine's own key, not a translation of it.
 msrwa_test_assert( 'en' === MSRWA_Profile::config( MSRWA_Profile::FULL, 'en' )['language'], 'The chosen language reaches the engine.' );
 msrwa_test_assert( ! isset( MSRWA_Profile::config( MSRWA_Profile::FULL, 'klingon' )['language'] ), 'An unknown language is ignored, not passed on.' );
-msrwa_test_assert( 3 === count( MSRWA_Profile::languages() ), 'Three languages are offered.' );
+msrwa_test_assert( array( 'fr', 'en', 'ar', 'es' ) === array_keys( MSRWA_Profile::languages() ), 'Four languages are offered: French, English, Arabic and Spanish.' );
+msrwa_test_contains( file_get_contents( dirname( __DIR__ ) . '/includes/class-msrwa-settings.php' ), "array( '" . implode( "', '", array_keys( MSRWA_Profile::languages() ) ) . "' )", 'The settings accept exactly the languages offered.' );
 
 // The prompts read the language from settings.site_language; the engine's own
 // `language` key is read by nothing. A lot asked for in English was written in

@@ -12,7 +12,12 @@ require __DIR__ . '/bootstrap.php';
 // --- The outline is matched in the language it was written in ------------
 
 $outlines = MSRWA_Engine_Score::outlines();
-msrwa_test_assert( isset( $outlines['fr'], $outlines['en'], $outlines['ar'] ), 'Every language the plugin ships has an outline.' );
+foreach ( array_keys( MSRWA_Profile::languages() ) as $shipped ) {
+	msrwa_test_assert( isset( $outlines[ $shipped ] ), 'Every language the plugin ships has an outline: ' . $shipped . ' has none.' );
+	msrwa_test_assert( '' !== MSRWA_Profile::page_two_heading( $shipped ) && ( 'fr' === $shipped || MSRWA_Profile::page_two_heading( $shipped ) !== MSRWA_Profile::page_two_heading( 'fr' ) ), 'Page two opens in ' . $shipped . '.' );
+}
+msrwa_test_assert( isset( MSRWA_Engine_Score::required_sections( array( 'site_language' => 'es' ) )['ingredientes'] ), 'A Spanish article is asked for Spanish sections.' );
+msrwa_test_assert( MSRWA_Profile::language_exists( 'es' ) && ! MSRWA_Profile::language_exists( 'de' ), 'Spanish ships; a language nobody reviews in does not.' );
 $french = count( $outlines['fr'] );
 foreach ( $outlines as $language => $sections ) {
 	msrwa_test_assert( count( $sections ) === $french, $language . ' requires the same sections as French: a translation, not a different specification.' );

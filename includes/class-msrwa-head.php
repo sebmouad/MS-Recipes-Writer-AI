@@ -124,7 +124,7 @@ final class MSRWA_Head {
 	private static function locale( $post_id ) {
 		$language = (string) get_post_meta( $post_id, '_msrwa_language', true );
 		if ( '' === $language ) { $language = (string) ( MSRWA_Settings::get()['site_language'] ?? 'fr' ); }
-		$locales = array( 'fr' => 'fr_FR', 'en' => 'en_US', 'ar' => 'ar_AR' );
+		$locales = array( 'fr' => 'fr_FR', 'en' => 'en_US', 'ar' => 'ar_AR', 'es' => 'es_ES' );
 		return $locales[ $language ] ?? str_replace( '-', '_', $language );
 	}
 }

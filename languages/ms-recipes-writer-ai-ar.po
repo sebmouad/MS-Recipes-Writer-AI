@@ -2062,6 +2062,15 @@ msgstr "مُستبعدة"
 msgid "Choisie par vous"
 msgstr "اخترتها أنت"
 
+msgid "Chaque lot est écrit dans cette langue : recherche, recette, article, contrôles et relecture. Le même réglage figure sur l’écran Réglages."
+msgstr "تُكتب كل دفعة بهذه اللغة: البحث والوصفة والمقال والفحوص والتدقيق. الإعداد نفسه موجود في شاشة الإعدادات."
+
+msgid "Espagnol"
+msgstr "الإسبانية"
+
+msgid "Les sections exigées, le titre de la page deux et la balise de langue suivent ce choix."
+msgstr "الأقسام المطلوبة وعنوان الصفحة الثانية ووسم اللغة تتبع هذا الاختيار."
+
 msgid "aucune page citée"
 msgstr "لم تُذكر أي صفحة"
 

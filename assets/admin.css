@@ -550,3 +550,5 @@
 /* A step a model cannot serve: shown, locked, the reason on hover. */
 .ms-grid-step-off { color: var(--ms-ink-faint); text-decoration: line-through; cursor: help; }
 .ms-card-flush > .ms-note { margin-inline: 20px; }
+.ms-language-pick { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+.ms-language-pick select { min-inline-size: 14rem; }

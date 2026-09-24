@@ -500,7 +500,7 @@ FORBIDDEN anywhere: text, letters, numbers, captions, labels, logos, watermark, 
 		if ( $out['quality_max_words'] < $out['quality_min_words'] ) { $out['quality_max_words'] = $out['quality_min_words']; }
 		// These were never read back from a submission, so every save reset them
 		// to what ships: the site language could not be chosen at all.
-		$out['site_language'] = isset( $raw['site_language'] ) && in_array( $raw['site_language'], array( 'fr', 'en', 'ar' ), true ) ? $raw['site_language'] : $defaults['site_language'];
+		$out['site_language'] = isset( $raw['site_language'] ) && in_array( $raw['site_language'], array( 'fr', 'en', 'ar', 'es' ), true ) ? $raw['site_language'] : $defaults['site_language'];
 		$heading = isset( $raw['article_page2_heading'] ) ? trim( sanitize_text_field( (string) $raw['article_page2_heading'] ) ) : '';
 		$out['article_page2_heading'] = '' !== $heading ? mb_substr( $heading, 0, 120 ) : $defaults['article_page2_heading'];
 		$out['facebook_collage_steps'] = isset( $raw['facebook_collage_steps'] ) ? min( 9, max( 2, absint( $raw['facebook_collage_steps'] ) ) ) : $defaults['facebook_collage_steps'];

@@ -2034,6 +2034,15 @@ msgstr "Set aside"
 msgid "Choisie par vous"
 msgstr "Chosen by you"
 
+msgid "Chaque lot est écrit dans cette langue : recherche, recette, article, contrôles et relecture. Le même réglage figure sur l’écran Réglages."
+msgstr "Every lot is written in this language: research, recipe, article, checks and proofreading. The same setting is on the Settings screen."
+
+msgid "Espagnol"
+msgstr "Spanish"
+
+msgid "Les sections exigées, le titre de la page deux et la balise de langue suivent ce choix."
+msgstr "The required sections, the page-two heading and the language tag follow this choice."
+
 msgid "aucune page citée"
 msgstr "no page cited"
 
