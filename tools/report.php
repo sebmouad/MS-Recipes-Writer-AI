@@ -338,7 +338,8 @@ function report_redraws( $steps, $artifacts ) {
 	}
 	$composed = (array) ( $artifacts['facebook_composed'] ?? array() );
 	if ( ! empty( $composed['prompt'] ) ) {
-		$from = array( 'editor' => 'la photographie envoyée par le rédacteur', 'style' => 'le collage de référence' . ( 'facebook-reference.jpg' === ( $composed['reference_file'] ?? '' ) ? ' fourni avec l’extension' : ( ! empty( $composed['reference_file'] ) ? ' du site' : '' ) ) );
+		$style = 'le collage de référence' . ( 'facebook-reference.jpg' === ( $composed['reference_file'] ?? '' ) ? ' fourni avec l’extension' : ( ! empty( $composed['reference_file'] ) ? ' du site' : '' ) );
+		$from = array( 'editor' => 'la photographie envoyée par le rédacteur', 'style' => $style, 'both' => $style . ' pour le rendu, et la photographie du rédacteur pour le plat' );
 		$lines[] = 'La consigne du collage a été rédigée par ' . ( $composed['model'] ?? 'le modèle' ) . ' d’après la recette' . ( isset( $from[ $composed['reference'] ?? '' ] ) ? ' et ' . $from[ $composed['reference'] ] : ', sans image de référence' ) . '.';
 	}
 	if ( ! $lines ) { return ''; }

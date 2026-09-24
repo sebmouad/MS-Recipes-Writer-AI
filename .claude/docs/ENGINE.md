@@ -790,6 +790,17 @@ photograph, and otherwise use the photograph without the cost of a search.
     it. At $0.20 a million input tokens this is a fraction of a cent a recipe:
     $0.0815, $0.0770, $0.0803. The output, not the input, is what is paid for.
 
+40. **The approved collage sets the look, the editor's photograph the dish.**
+    Owner's report, 2026-09-24: a rôti Orloff made on his site from his own
+    dim, flash-lit photograph gave a collage nothing like the ones tested
+    here, because an editor's photograph replaced the style reference
+    outright. `collage_reference()` now keeps both: the prompt's writer sees
+    the approved collage first and the photograph second, told to take the
+    look from the first and only what the dish is from the second; the image
+    is drawn from the approved collage alone. Without a style reference the
+    photograph is the reference, as before. `plan_compose()` takes several
+    images. Measured on his photograph: $0.0201 for the collage.
+
 ### Still open
 
 

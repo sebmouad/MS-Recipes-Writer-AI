@@ -662,7 +662,7 @@ final class MSRWA_Engine {
 			$wire = $config->provider( $route['provider'], $route['model'], 'image_compose' );
 			$instruction = MSRWA_Prompt::compile( trim( (string) file_get_contents( MSRWA_Engine_Input::prompt_path( $template['compose'] ) ) ), MSRWA_Engine_Input::settings() );
 			$message = MSRWA_Engine_Input::collage_brief( $brief, $template['brief'], $reference['source'] );
-			$call = MSRWA_Engine_Call::compose( $route['provider'], $route['model'], $instruction, $message, $reference['image'], $config->max_output( 'image_compose' ), $wire );
+			$call = MSRWA_Engine_Call::compose( $route['provider'], $route['model'], $instruction, $message, $reference['shown'], $config->max_output( 'image_compose' ), $wire );
 			if ( isset( $call['error'] ) ) { return array( 'error' => (string) $call['error'], 'seconds' => (float) ( $call['seconds'] ?? 0 ) ); }
 			self::report_call( $result, $name, $route, $wire['text_endpoint'] ?? '', $call, $config );
 			$spent = array( 'cost_usd' => (float) $config->price( $route['provider'], $route['model'], (array) ( $call['usage'] ?? array() ) ), 'seconds' => (float) ( $call['seconds'] ?? 0 ) );
@@ -705,20 +705,44 @@ final class MSRWA_Engine {
 	}
 
 	/** The image a composed collage is drawn from: the editor's photograph, else a style reference. */
+	/**
+	 * What the collage is composed from: the owner's approved collage for the
+	 * look, and the editor's photograph for the dish. An editor's photograph used
+	 * to replace the approved collage outright, and a dim, flash-lit amateur
+	 * photograph of a rôti Orloff gave a collage that looked nothing like the
+	 * owner's. The photograph now shows the writer of the prompt what the dish
+	 * is; the image is drawn from the approved collage alone. With no approved
+	 * collage, the photograph is the reference, as before.
+	 */
 	private static function collage_reference( MSRWA_Engine_Config $config, array $options, array $brief ) {
-		$found = self::find_reference( $config, $options, $brief );
-		if ( $found['image'] ) { $found['image'] = self::shrink_reference( $found['image'], (int) $config->get( 'limits.reference_pixels', 768 ) ); }
-		return $found;
+		$pixels = (int) $config->get( 'limits.reference_pixels', 768 );
+		$style = self::style_reference( $config );
+		$editor = self::editor_reference( $config, $options, $brief );
+		if ( $style['image'] ) { $style['image'] = self::shrink_reference( $style['image'], $pixels ); }
+		if ( $editor ) { $editor = self::shrink_reference( $editor, $pixels ); }
+		if ( $style['image'] && $editor ) {
+			return array( 'source' => 'both', 'label' => 'a style reference and the editor\'s photograph', 'file' => $style['file'], 'image' => $style['image'], 'shown' => array( $style['image'], $editor ) );
+		}
+		if ( $style['image'] ) { return $style + array( 'shown' => array( $style['image'] ) ); }
+		if ( $editor ) { return array( 'source' => 'editor', 'label' => 'the editor\'s photograph', 'file' => '', 'image' => $editor, 'shown' => array( $editor ) ); }
+		return array( 'source' => '', 'label' => '', 'file' => '', 'image' => null, 'shown' => array() );
 	}
 
-	private static function find_reference( MSRWA_Engine_Config $config, array $options, array $brief ) {
+	/** The editor's first readable photograph of the dish, or null. */
+	private static function editor_reference( MSRWA_Engine_Config $config, array $options, array $brief ) {
 		$max = (int) $config->get( 'limits.max_image_bytes', 10000000 );
 		foreach ( array_slice( array_values( (array) ( $brief['images'] ?? array() ) ), 0, 1 ) as $candidate ) {
 			$image = is_array( $candidate ) && is_callable( $options['read_image'] ?? null ) ? (array) call_user_func( $options['read_image'], $candidate, $max ) : array();
 			$url = is_array( $candidate ) ? (string) ( $candidate['image_url'] ?? $candidate['url'] ?? '' ) : (string) $candidate;
 			if ( ( ! $image || isset( $image['error'] ) ) && preg_match( '#^https://#i', $url ) ) { $image = MSRWA_Engine_Call::fetch_image( $url, $max ); }
-			if ( $image && ! isset( $image['error'] ) && ! empty( $image['data'] ) ) { return array( 'source' => 'editor', 'label' => 'the editor\'s photograph', 'image' => array( 'mime' => (string) $image['mime'], 'data' => (string) $image['data'] ) ); }
+			if ( $image && ! isset( $image['error'] ) && ! empty( $image['data'] ) ) { return array( 'mime' => (string) $image['mime'], 'data' => (string) $image['data'] ); }
 		}
+		return null;
+	}
+
+	/** The owner's first readable style reference. */
+	private static function style_reference( MSRWA_Engine_Config $config ) {
+		$max = (int) $config->get( 'limits.max_image_bytes', 10000000 );
 		foreach ( (array) $config->get( 'images.style_references', array() ) as $path ) {
 			$path = (string) $path;
 			if ( '' === $path || ! is_readable( $path ) || filesize( $path ) > $max ) { continue; }
@@ -727,7 +751,7 @@ final class MSRWA_Engine {
 			if ( ! isset( MSRWA_Engine_Call::TYPES[ $mime ] ) ) { continue; }
 			return array( 'source' => 'style', 'label' => 'a style reference', 'file' => basename( $path ), 'image' => array( 'mime' => $mime, 'data' => base64_encode( (string) file_get_contents( $path ) ) ) );
 		}
-		return array( 'source' => '', 'label' => '', 'image' => null );
+		return array( 'source' => '', 'label' => '', 'file' => '', 'image' => null );
 	}
 
 	/** The one step that sees both images at once, and decides on them. */

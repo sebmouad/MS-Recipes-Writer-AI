@@ -698,18 +698,20 @@ final class MSRWA_Engine_Call {
 		$wire = $wire ? $wire : self::shipped_wire( $provider, $model );
 		$unusable = self::unusable( $provider, $wire );
 		if ( '' !== $unusable ) { return array( 'error' => $unusable ); }
-		$image = is_array( $image ) && ! empty( $image['data'] ) ? $image : null;
+		// One image, or several in the order the brief names them.
+		$images = is_array( $image ) && isset( $image['data'] ) ? array( $image ) : array_values( (array) $image );
+		$images = array_values( array_filter( $images, static function ( $one ) { return is_array( $one ) && ! empty( $one['data'] ); } ) );
 		if ( 'openai' === $provider ) {
 			$content = array( array( 'type' => 'input_text', 'text' => (string) $brief ) );
-			if ( $image ) { $content[] = array( 'type' => 'input_image', 'image_url' => 'data:' . $image['mime'] . ';base64,' . $image['data'] ); }
+			foreach ( $images as $one ) { $content[] = array( 'type' => 'input_image', 'image_url' => 'data:' . $one['mime'] . ';base64,' . $one['data'] ); }
 			$payload = array( 'model' => $model, 'store' => false, 'max_output_tokens' => $max_tokens, 'input' => array( array( 'role' => 'system', 'content' => (string) $instruction ), array( 'role' => 'user', 'content' => $content ) ) );
 		} elseif ( 'gemini' === $provider ) {
 			$parts = array( array( 'text' => (string) $brief ) );
-			if ( $image ) { $parts[] = array( 'inline_data' => array( 'mime_type' => $image['mime'], 'data' => $image['data'] ) ); }
+			foreach ( $images as $one ) { $parts[] = array( 'inline_data' => array( 'mime_type' => $one['mime'], 'data' => $one['data'] ) ); }
 			$payload = array( 'systemInstruction' => array( 'parts' => array( array( 'text' => (string) $instruction ) ) ), 'contents' => array( array( 'role' => 'user', 'parts' => $parts ) ), 'generationConfig' => self::gemini_generation( $wire, $max_tokens ) );
 		} else {
 			$content = array();
-			if ( $image ) { $content[] = array( 'type' => 'image', 'source' => array( 'type' => 'base64', 'media_type' => $image['mime'], 'data' => $image['data'] ) ); }
+			foreach ( $images as $one ) { $content[] = array( 'type' => 'image', 'source' => array( 'type' => 'base64', 'media_type' => $one['mime'], 'data' => $one['data'] ) ); }
 			$content[] = array( 'type' => 'text', 'text' => (string) $brief );
 			$payload = array( 'model' => $model, 'max_tokens' => $max_tokens, 'system' => (string) $instruction, 'messages' => array( array( 'role' => 'user', 'content' => $content ) ) );
 		}

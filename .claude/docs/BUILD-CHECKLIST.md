@@ -626,6 +626,10 @@ cost) in the task before changing anything.
   started at once by a signed loopback to the site itself, three at a time;
   the lot page carries an overdue recipe on when the site cannot call itself.
   Real: `test-parallel.php`, three recipes in 154 s, up to three at once.
+- [x] **A44 — The approved collage keeps the look when a photograph is sent
+  (2026-09-24).** The writer's photograph shows the prompt's writer the dish;
+  the collage is drawn from the style reference. Real: the owner's own rôti
+  photograph, drawn both ways. See ENGINE.md §7, item 40.
 - [x] **A11 — Model answers that do not parse (found 2026-09-20).** Two of the
   54 matrix cells scored zero for a reason that was ours, not the prompt's:
   Opus 5 wrote "I'll research this dish now." before the object, and Sonnet 5

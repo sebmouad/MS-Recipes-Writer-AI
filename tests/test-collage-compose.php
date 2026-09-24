@@ -75,5 +75,27 @@ foreach ( glob( dirname( __DIR__ ) . '/includes/engine/*.php' ) as $file ) {
 	foreach ( $sends[0] as $send ) { msrwa_test_contains( $send, 'multipart', basename( $file ) . ' sends a request without saying whether it is an upload: ' . $send ); }
 }
 
+// With the writer's photograph too: the approved collage still sets the look.
+// A dim, flash-lit photograph of a rôti Orloff once replaced it and gave a
+// collage nothing like the owner's. The photograph now shows the prompt's
+// writer what the dish is; the image is drawn from the approved collage alone.
+$photo = imagecreatetruecolor( 3, 2 );
+ob_start(); imagejpeg( $photo ); $photo_bytes = ob_get_clean();
+$with_photo = $brief;
+$with_photo['images'] = array( array( 'file' => 'roti.jpg' ) );
+$reader = static function () use ( $photo_bytes ) { return array( 'mime' => 'image/jpeg', 'data' => base64_encode( $photo_bytes ) ); };
+$calls = array();
+MSRWA_Engine_Call::$transport = static function ( $url, $payload ) use ( &$calls, $written, $pixel ) {
+	$calls[] = array( 'url' => $url, 'payload' => $payload );
+	if ( false !== strpos( $url, '/images/' ) ) { return array( 'status' => 200, 'raw' => json_encode( array( 'data' => array( array( 'b64_json' => base64_encode( $pixel ) ) ), 'usage' => array() ) ) ); }
+	return array( 'status' => 200, 'raw' => json_encode( array( 'status' => 'completed', 'output' => array( array( 'type' => 'message', 'content' => array( array( 'text' => $written ) ) ) ), 'usage' => array() ) ) );
+};
+MSRWA_Engine::run_step( 'facebook_image', $with_photo, array( 'config' => $config, 'workspace' => sys_get_temp_dir(), 'read_image' => $reader ) );
+MSRWA_Engine_Call::$transport = null;
+$shown = array_values( array_filter( (array) ( $calls[0]['payload']['input'][1]['content'] ?? array() ), static function ( $part ) { return 'input_image' === ( $part['type'] ?? '' ); } ) );
+msrwa_test_assert( 2 === count( $shown ), 'The prompt’s writer sees the approved collage and the writer’s photograph; saw ' . count( $shown ) . '.' );
+msrwa_test_contains( wp_json_encode( $calls[0]['payload'] ), 'never its light, colours, background or framing', 'And is told to take only the dish from the photograph.' );
+msrwa_test_assert( $pixel === ( $calls[1]['payload']['image[]']['file'] ?? '' ), 'The drawing is made from the approved collage, not the photograph.' );
+
 @unlink( $style );
 msrwa_test_done( 'the collage prompt is written from the recipe and the reference, then drawn with it' );
