@@ -592,7 +592,8 @@ final class MSRWA_Engine {
 
 		MSRWA_Engine_Input::use_observation_phrases( (int) $config->get( 'limits.observation_phrases', 8 ) );
 		MSRWA_Engine_Input::use_observation_fields( (array) $config->get( 'observation_fields', array( 'colours', 'textures' ) ) );
-		$choices = array_merge( $options, array( 'collage_panels' => (int) $config->get( 'images.collage_panels', 6 ) ) );
+		$template = $config->facebook_template();
+		$choices = array_merge( $options, array( 'collage_panels' => $template['panels'], 'collage_columns' => $template['columns'], 'collage_rows' => $template['rows'], 'facebook_prompt' => $template['prompt'] ) );
 		$prompt = MSRWA_Engine_Input::image_prompt( $kind, $brief, $choices, $findings );
 		$ceiling = (int) $config->get( 'limits.image_prompt_chars', 30000 );
 		if ( strlen( $prompt ) > $ceiling ) {
@@ -602,7 +603,9 @@ final class MSRWA_Engine {
 		}
 
 		$format = (string) $config->get( 'images.format', 'webp' );
-		$size = MSRWA_Images::native_size( $config->get( 'images.' . $kind . '_ratio', 'featured' === $kind ? '1:1' : '2:3' ), (string) $config->get( 'images.' . $kind . '_size', 'featured' === $kind ? '1024x1024' : '1024x1536' ) );
+		$size = 'facebook' === $kind
+			? MSRWA_Images::native_size( $template['ratio'], $template['size'] )
+			: MSRWA_Images::native_size( $config->get( 'images.featured_ratio', '1:1' ), (string) $config->get( 'images.featured_size', '1024x1024' ) );
 		$quality = (string) $config->get( 'images.' . $kind . '_quality', MSRWA_Images::quality( $settings, $kind ) );
 		$destination = self::workspace( $options ) . '/' . $kind . '-' . gmdate( 'Ymd-His' ) . '-' . substr( md5( $prompt ), 0, 6 ) . '.' . $format;
 
@@ -663,8 +666,9 @@ final class MSRWA_Engine {
 			$manifest[] = '- the featured image, ' . (string) $config->get( 'images.featured_size', '1024x1024' ) . ';';
 		}
 		if ( in_array( 'facebook_image', $targets, true ) ) {
-			$manifest[] = '- the Facebook image, ' . (string) $config->get( 'images.facebook_size', '1024x1536' )
-				. ', a ' . (int) $config->get( 'images.collage_panels', 6 ) . '-panel preparation collage;';
+			$template = $config->facebook_template();
+			$manifest[] = '- the Facebook image, ' . $template['size']
+				. ', a ' . $template['panels'] . '-panel preparation collage;';
 		}
 		$brief['images_received'] = $manifest ? implode( "\n", $manifest ) : '- no image at all: judge the text alone.';
 
@@ -684,7 +688,7 @@ final class MSRWA_Engine {
 			$verdict = MSRWA_Json::decode( $call['text'] );
 			$verdict = is_array( $verdict ) ? $verdict : array();
 			$configured = (array) $config->get( 'approval_targets', array() );
-			$checks = MSRWA_Engine_Score::approval( $verdict, count( $images ), (int) $config->get( 'images.collage_panels', 6 ), $configured ? $configured : $targets );
+			$checks = MSRWA_Engine_Score::approval( $verdict, count( $images ), $config->facebook_template()['panels'], $configured ? $configured : $targets );
 			$passed = count( array_filter( $checks, static function ( $check ) { return ! empty( $check['pass'] ); } ) );
 
 			// A verdict that fails its own structural contract is not a refusal, it is

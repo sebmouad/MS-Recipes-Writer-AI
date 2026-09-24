@@ -187,6 +187,10 @@ run carries.
   released artifacts read back from the history, finished images from the
   draft (`tests/test-report.php`; jobs #43, #44 and #45 rendered, 390 and 1280
   px without overflow).
+- [x] Facebook template slot, 0.24.4: templates in engine config, chosen per
+  lot, offered only when there are two, unknown keys fall back; one collage
+  drawn through the new path, lots #51 and #52 created with a valid and an
+  unknown key (`tests/test-image-prompt.php`, `tests/test-screens.php`).
 - [ ] A complete lot on Claude — the account has no credit. — the Gemini key's
   grounding quota is exhausted, OpenAI is unreachable from the test
   environment and the Claude account has no credit.

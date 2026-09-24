@@ -98,10 +98,16 @@ final class MSRWA_REST {
 		// Language and ceiling are the site's settings, never the request's: a
 		// lot cannot name a language nobody reviews in or a ceiling of its own.
 		$budget = (float) MSRWA_Settings::get()['per_recipe_budget_usd'];
+		// The Facebook template is the lot's to choose, among the site's; an
+		// unknown key is not an error, the site's default serves.
+		$overrides = array();
+		$template = sanitize_key( (string) $request->get_param( 'facebook_template' ) );
+		if ( '' !== $template && isset( MSRWA_Profile::facebook_templates()[ $template ] ) ) { $overrides['images']['facebook_template'] = $template; }
 		$id = MSRWA_Batch::create(
 			$recipes, $files, $budget,
 			sanitize_key( (string) $request->get_param( 'profile' ) ),
-			sanitize_key( (string) MSRWA_Settings::get()['site_language'] )
+			sanitize_key( (string) MSRWA_Settings::get()['site_language'] ),
+			$overrides
 		);
 		if ( is_wp_error( $id ) ) { return new WP_Error( $id->get_error_code(), $id->get_error_message(), array( 'status' => 400 ) ); }
 		$created = MSRWA_Batch::get( (int) $id );

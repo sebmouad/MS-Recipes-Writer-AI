@@ -2203,6 +2203,12 @@ msgstr "النتيجة"
 msgid "Étape de création"
 msgstr "خطوة الإنشاء"
 
+msgid "Le modèle du visuel Facebook de chaque recette de ce lot."
+msgstr "قالب صورة فيسبوك لكل وصفة في هذه الدفعة."
+
+msgid "Visuel Facebook"
+msgstr "صورة فيسبوك"
+
 msgid "aucune page citée"
 msgstr "لم تُذكر أي صفحة"
 

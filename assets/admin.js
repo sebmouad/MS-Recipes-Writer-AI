@@ -236,6 +236,9 @@
       var form = new FormData();
       form.append('recipes', recipes.value);
       form.append('profile', (compose.querySelector('input[name=profile]:checked') || {}).value || '');
+      // Offered only when the site has more than one Facebook template.
+      var template = compose.querySelector('input[name=facebook_template]:checked');
+      if (template) { form.append('facebook_template', template.value); }
       chosen.forEach(function (file) { form.append('photos[]', file, file.name); });
       say(status, chosen.length ? (t.uploading || '') + ' ' + (t.describing || '') : '');
       // No Content-Type of our own: the browser writes the multipart boundary.

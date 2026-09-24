@@ -2175,6 +2175,12 @@ msgstr "Result"
 msgid "Étape de création"
 msgstr "Creation step"
 
+msgid "Le modèle du visuel Facebook de chaque recette de ce lot."
+msgstr "The Facebook image template for every recipe in this lot."
+
+msgid "Visuel Facebook"
+msgstr "Facebook image"
+
 msgid "aucune page citée"
 msgstr "no page cited"
 

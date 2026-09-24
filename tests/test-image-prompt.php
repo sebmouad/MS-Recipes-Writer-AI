@@ -103,6 +103,19 @@ msrwa_test_contains( $short, 'only 3 steps for 6 panels', 'Fewer steps than pane
 msrwa_test_contains( $short, 'Never invent a step', 'The extra panels are filled with visible states, never with invented steps.' );
 msrwa_test_contains( $steps_of( 6 ), 'nothing to select', 'As many steps as panels: one per panel.' );
 
+// A Facebook template names its prompt and may set its own grid. The grid is
+// said from the panel count: a site at four panels was told 2 × 3.
+msrwa_test_contains( MSRWA_Engine_Input::grid( 4, 2 ), '2 columns × 2 rows', 'Four panels are two rows of two.' );
+msrwa_test_contains( MSRWA_Engine_Input::grid( 5, 2 ), 'last row holding 1 panel', 'An odd count says how the last row is filled.' );
+$templated = MSRWA_Engine_Input::image_prompt( 'facebook', $clean, array( 'collage_panels' => 4, 'collage_columns' => 2, 'facebook_prompt' => 'featured_image.tpl.txt' ) );
+msrwa_test_contains( $templated, 'Exactly 4 panels', 'The template’s panel count is the one restated.' );
+msrwa_test_missing( $templated, 'THE SIX MOMENTS', 'The template’s prompt file is the one drawn from, not the shipped collage’s.' );
+$config = MSRWA_Engine_Config::create( array( 'images' => array( 'facebook_template' => 'nowhere' ) ) );
+msrwa_test_assert( 'collage' === $config->facebook_template()['key'] && 6 === $config->facebook_template()['panels'], 'An unknown template falls back to the shipped collage, six panels.' );
+$config = MSRWA_Engine_Config::create( array( 'images' => array( 'facebook_template' => 'hero', 'facebook_templates' => array( 'hero' => array( 'prompt' => 'featured_image.tpl.txt', 'panels' => 1, 'size' => '1024x1024', 'ratio' => '1:1' ) ) ) ) );
+$hero = $config->facebook_template();
+msrwa_test_assert( 'hero' === $hero['key'] && 1 === $hero['panels'] && '1024x1024' === $hero['size'], 'A template sets its own panels and size: ' . json_encode( $hero ) );
+
 // Both images of one dish must be told the same serving presentation, or they
 // disagree — which was three refusals in four before it was written into both.
 $featured_serving = MSRWA_Engine_Input::serving_presentation( $clean['canonical'], $clean['research'], true );

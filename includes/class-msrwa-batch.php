@@ -51,6 +51,7 @@ final class MSRWA_Batch {
 		$images = MSRWA_Sources::receive( $id, $files );
 		MSRWA_History::lot( $id, 'provided', array(
 			'owner' => get_current_user_id(), 'language' => $language, 'profile' => $profile,
+			'facebook_template' => (string) ( $config_overrides['images']['facebook_template'] ?? '' ),
 			'recipes' => $recipes,
 			'photos' => array_map( static function ( $image ) { return array( 'file' => $image['id'], 'name' => $image['file'], 'mime' => $image['mime'] ); }, $images ),
 		) );

@@ -46,6 +46,23 @@ final class MSRWA_Profile {
 
 	public static function exists( $profile ) { return array_key_exists( (string) $profile, self::all() ); }
 
+	/**
+	 * The Facebook templates a lot may pick, key => label, the site's default
+	 * first. Only templates whose prompt file exists are offered; with one,
+	 * there is nothing to pick and no field is shown.
+	 */
+	public static function facebook_templates() {
+		$config = MSRWA_Engine_Config::create( MSRWA_Engine_Settings::stored() );
+		$default = $config->facebook_template()['key'];
+		$out = array();
+		foreach ( array_filter( (array) $config->get( 'images.facebook_templates', array() ), 'is_array' ) as $key => $template ) {
+			if ( '' === (string) ( $template['prompt'] ?? '' ) || ! is_readable( MSRWA_Engine_Input::prompt_path( (string) $template['prompt'] ) ) ) { continue; }
+			$out[ (string) $key ] = (string) ( $template['label'] ?? $key );
+		}
+		if ( isset( $out[ $default ] ) ) { $out = array( $default => $out[ $default ] ) + $out; }
+		return $out;
+	}
+
 	public static function get( $profile ) {
 		$all = self::all();
 		return $all[ self::exists( $profile ) ? $profile : self::FULL ];

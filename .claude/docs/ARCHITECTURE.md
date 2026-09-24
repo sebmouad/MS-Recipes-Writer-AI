@@ -411,3 +411,9 @@ Break these and the plugin misreports itself.
     Rows and files pass through `MSRWA_DB::sanitize()`, follow the artifacts
     retention age (`MSRWA_Retention::history()`), and go with the lot or the
     job.
+
+24. **A lot names its Facebook template, among the site's.** `POST /batches`
+    accepts `facebook_template` only when `MSRWA_Profile::facebook_templates()`
+    offers it — a template whose prompt file exists — and stores it in the
+    lot's engine overrides; anything else leaves the site's default. The
+    compose screen offers the choice only when there is more than one.

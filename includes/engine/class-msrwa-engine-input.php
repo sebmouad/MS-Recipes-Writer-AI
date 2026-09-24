@@ -391,6 +391,20 @@ final class MSRWA_Engine_Input {
 	 * $findings is the list the judge returned for this image; passing it is what
 	 * makes a retry a correction rather than another roll of the dice.
 	 */
+	/**
+	 * The grid a collage of $panels is laid out in, said the way the closing
+	 * rule says it. It used to be "2 columns × 3 rows" whatever the panel
+	 * count, which a site set to four panels was told as well.
+	 */
+	public static function grid( $panels, $columns = 2 ) {
+		$panels = max( 1, (int) $panels );
+		$columns = max( 1, min( $panels, (int) $columns ) );
+		$rows = (int) ceil( $panels / $columns );
+		if ( 1 === $panels ) { return 'one single image, no grid.'; }
+		if ( 0 === $panels % $columns ) { return $columns . ' columns × ' . $rows . ' rows, every cell filled.'; }
+		return $columns . ' columns × ' . $rows . ' rows, every cell filled, the last row holding ' . ( $panels % $columns ) . ' panel(s) spanning its full width.';
+	}
+
 	public static function image_prompt( $kind, $brief, $options = array(), $findings = array() ) {
 		$settings = self::settings();
 		$research = self::research_package( $brief );
@@ -399,7 +413,9 @@ final class MSRWA_Engine_Input {
 		foreach ( (array) ( $canonical['ingredients'] ?? array() ) as $ingredient ) {
 			if ( is_array( $ingredient ) ) { $ingredients[] = self::ingredient_line( $ingredient ); }
 		}
-		$file = self::prompt_path( ( 'featured' === $kind ? 'featured_image' : 'facebook_image' ) . '.tpl.txt' );
+		// The Facebook image is drawn from the run's template; the caller that
+		// names none gets the shipped collage.
+		$file = self::prompt_path( 'featured' === $kind ? 'featured_image.tpl.txt' : (string) ( $options['facebook_prompt'] ?? 'facebook_image.tpl.txt' ) );
 		// The visual brief already distils the observations into constraints. The raw
 		// package used to follow it as well, which repeated the same sentences a
 		// second time — 38% of the featured prompt, and roughly half the cost of the
@@ -469,7 +485,7 @@ final class MSRWA_Engine_Input {
 				// and came back as eight cells three times in four — and before the
 				// panel count, which stays the very last word.
 				? "6. A case baked blind appears as the golden, dry, empty case after its bake — no baking paper, no baking beans or ceramic weights, no foil, not even in a bowl nearby — even when the step names them.\n"
-					. "7. Exactly " . (int) ( $options['collage_panels'] ?? $settings['facebook_collage_steps'] ?? 6 ) . " panels in the recipe's own order, the last one presented as rule 4 says: 2 columns × 3 rows, every cell filled. When the recipe has more moments than panels, merge or leave some out — never add a row.\n"
+					. "7. Exactly " . $panels . " panels in the recipe's own order, the last one presented as rule 4 says: " . self::grid( $panels, (int) ( $options['collage_columns'] ?? 2 ) ) . " When the recipe has more moments than panels, merge or leave some out — never add a row.\n"
 				: "6. One plate, one dish, photographed once. No collage, no before and after.\n" );
 
 		$findings = array_values( array_filter( (array) $findings, 'is_array' ) );

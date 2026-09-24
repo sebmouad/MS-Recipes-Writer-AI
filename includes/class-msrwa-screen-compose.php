@@ -75,6 +75,19 @@ final class MSRWA_Screen_Compose {
 						</label>
 					<?php endforeach; ?>
 				</div>
+				<?php $msrwa_templates = MSRWA_Profile::facebook_templates(); ?>
+				<?php if ( count( $msrwa_templates ) > 1 ) : ?>
+					<h3><?php esc_html_e( 'Visuel Facebook', 'ms-recipes-writer-ai' ); ?></h3>
+					<p><?php esc_html_e( 'Le modèle du visuel Facebook de chaque recette de ce lot.', 'ms-recipes-writer-ai' ); ?></p>
+					<div class="ms-choices">
+						<?php foreach ( $msrwa_templates as $key => $label ) : ?>
+							<label class="ms-choice">
+								<input type="radio" name="facebook_template" value="<?php echo esc_attr( $key ); ?>" <?php checked( array_key_first( $msrwa_templates ), $key ); ?>>
+								<span class="ms-choice-body"><strong><?php echo esc_html( $label ); ?></strong></span>
+							</label>
+						<?php endforeach; ?>
+					</div>
+				<?php endif; ?>
 			</section>
 
 			<?php

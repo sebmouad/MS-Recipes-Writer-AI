@@ -123,6 +123,15 @@ final class MSRWA_Engine_Config {
 				'featured_size'    => '1024x1024',
 				'facebook_size'    => '1024x1536',
 				'collage_panels'   => 6,
+				// The Facebook image is drawn from one of these templates. Each
+				// names its prompt file and may set its own panel count, grid,
+				// ratio and size; what it leaves out comes from the keys above.
+				// Adding a template is an entry here and a prompt file — through
+				// the caller layer as well as here — and a lot picks one by key.
+				'facebook_template'  => 'collage',
+				'facebook_templates' => array(
+					'collage' => array( 'label' => 'Collage de préparation', 'prompt' => 'facebook_image.tpl.txt', 'columns' => 2 ),
+				),
 			),
 
 			// A run stops rather than overspending. Zero means no ceiling.
@@ -501,6 +510,38 @@ final class MSRWA_Engine_Config {
 			$source = 'caller';
 		}
 		return array( 'text' => MSRWA_Prompt::compile( $stored, $this->settings() ), 'source' => $source );
+	}
+
+	/**
+	 * The Facebook template a run draws, complete: its prompt file, panel
+	 * count, grid, ratio and size, each from the template or else from the
+	 * image keys. An unknown key, or a template whose prompt file is missing,
+	 * falls back to the first template that works — a lot never fails on a
+	 * template removed after it was created.
+	 */
+	public function facebook_template() {
+		$templates = array_filter( (array) $this->get( 'images.facebook_templates', array() ), 'is_array' );
+		$wanted = (string) $this->get( 'images.facebook_template', 'collage' );
+		$usable = static function ( $template ) {
+			return '' !== (string) ( $template['prompt'] ?? '' ) && is_readable( MSRWA_Engine_Input::prompt_path( (string) $template['prompt'] ) );
+		};
+		$key = isset( $templates[ $wanted ] ) && $usable( $templates[ $wanted ] ) ? $wanted : '';
+		foreach ( $templates as $name => $template ) {
+			if ( '' === $key && $usable( $template ) ) { $key = (string) $name; }
+		}
+		$template = '' === $key ? array() : $templates[ $key ];
+		$panels = max( 1, min( 12, (int) ( $template['panels'] ?? $this->get( 'images.collage_panels', 6 ) ) ) );
+		$columns = max( 1, min( $panels, (int) ( $template['columns'] ?? 2 ) ) );
+		return array(
+			'key' => '' === $key ? 'collage' : $key,
+			'label' => (string) ( $template['label'] ?? $key ),
+			'prompt' => '' === $key ? 'facebook_image.tpl.txt' : (string) $template['prompt'],
+			'panels' => $panels,
+			'columns' => $columns,
+			'rows' => (int) ceil( $panels / $columns ),
+			'ratio' => (string) ( $template['ratio'] ?? $this->get( 'images.facebook_ratio', '2:3' ) ),
+			'size' => (string) ( $template['size'] ?? $this->get( 'images.facebook_size', '1024x1536' ) ),
+		);
 	}
 
 	/**

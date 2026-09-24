@@ -169,6 +169,20 @@ $GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
 $compose = msrwa_render( array( 'MSRWA_Screen_Compose', 'render' ) )['html'] ?? '';
 msrwa_test_contains( $compose, 'Article en Anglais', 'The site language is the one a lot is written in.' );
 msrwa_test_missing( $compose, 'id="ms-language"', 'A lot does not choose a language of its own.' );
+
+// One Facebook template: nothing to pick, no field. A second, with its prompt
+// file, is offered on the lot; one whose file is missing never is.
+msrwa_test_missing( $compose, 'name="facebook_template"', 'With one Facebook template the lot shows no choice.' );
+$GLOBALS['msrwa_test_options'][ MSRWA_Engine_Settings::OPTION ] = array( 'images' => array( 'facebook_templates' => array(
+	'hero' => array( 'label' => 'Photo héro', 'prompt' => 'featured_image.tpl.txt', 'panels' => 1 ),
+	'ghost' => array( 'label' => 'Fantôme', 'prompt' => 'missing.tpl.txt' ),
+) ) );
+$GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
+$compose = msrwa_render( array( 'MSRWA_Screen_Compose', 'render' ) )['html'] ?? '';
+msrwa_test_contains( $compose, 'value="hero"', 'A second template is offered on the lot.' );
+msrwa_test_assert( (bool) preg_match( '/value="collage"\s+checked/', $compose ) && strpos( $compose, 'value="collage"' ) < strpos( $compose, 'value="hero"' ), 'The site’s default comes first, checked.' );
+msrwa_test_missing( $compose, 'value="ghost"', 'A template without its prompt file is never offered.' );
+unset( $GLOBALS['msrwa_test_options'][ MSRWA_Engine_Settings::OPTION ] );
 unset( $GLOBALS['msrwa_test_options'][ MSRWA_Settings::OPTION ] );
 
 // --- A writer reads a sentence, not a stack trace ----------------------------
