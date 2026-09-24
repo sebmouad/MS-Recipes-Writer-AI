@@ -65,6 +65,11 @@ msrwa_test_assert( (int) $step['passed'] === (int) $step['total'], 'A package wr
 msrwa_test_assert( 5100 === (int) ( $step['usage']['input_tokens'] ?? 0 ), 'Reading the photograph is billed to the research: ' . json_encode( $step['usage'] ) );
 msrwa_test_assert( 0 === (int) ( $step['usage']['web_searches'] ?? 0 ), 'No search is billed.' );
 
+// Without a search to bound it, a research from photographs wrote 17,000
+// characters of lists and stopped on its ceiling, unparsed. Its lists are capped.
+msrwa_test_contains( json_encode( $asks[0], JSON_UNESCAPED_UNICODE ), 'At most 4 substitutions', 'The research from photographs caps its lists.' );
+msrwa_test_assert( 16000 <= (int) MSRWA_Engine_Config::create( array() )->get( 'max_output.research' ), 'And keeps a margin over the 12,413 tokens that were cut.' );
+
 // Set to search always, the research searches as it did.
 $sent = array();
 $reader_asked = array();

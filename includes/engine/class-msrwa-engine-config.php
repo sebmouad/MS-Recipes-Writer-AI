@@ -76,7 +76,10 @@ final class MSRWA_Engine_Config {
 			// Output ceilings. Every one of these has been too low at least once,
 			// and a truncated answer is billed in full and scores nothing.
 			'max_output' => array(
-				'research'         => 12000,
+				// 12000 stopped a research written from photographs: with no search to
+				// bound it, it wrote 17,000 characters of lists and never closed its
+				// object. The lists are capped in the prompt; the ceiling is the margin.
+				'research'         => 16000,
 				'canonical_recipe' => 4500,
 				'article'          => 14500,
 				// 3000 was too low: a review with a dozen findings stops exactly on it,

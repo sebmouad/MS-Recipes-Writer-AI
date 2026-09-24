@@ -517,6 +517,13 @@ photograph, and otherwise use the photograph without the cost of a search.
     beads 0 of 10 draws, grid right in 9 of 10 at seven steps and 1 of 1 at
     four.
 
+23. **The research is bounded.** Owner's request, 2026-09-24: a research from
+    photographs stopped on its 12,000-token ceiling at 12,413 out, 17,673
+    characters, unparsed, 0/13. Both research prompts cap every list (4
+    substitutions, 4 accompaniments, 5 failures, 3 storage, 3 food safety, 4
+    uncertainties, 3 originality notes, one short sentence each) and
+    `max_output.research` rises to 16000.
+
 ### Still open
 
 6. **The engine's `models` list is a second source of truth for prices.** The

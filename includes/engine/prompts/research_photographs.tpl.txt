@@ -12,7 +12,7 @@ RULES:
 - Keep facts short and actionable: one statement each, retaining useful figures.
 - Food safety and storage follow the recognised guidance for the ingredients involved; when unsure, the more cautious figure.
 - Do not write the article or output a finished recipe text.
-- At most 10 ingredient facts and 12 preparation facts.
+- At most 10 ingredient facts and 12 preparation facts. At most 4 substitutions, 4 accompaniments, 5 common failures, 3 storage facts, 3 food safety facts, 4 uncertainties and 3 originality notes; every value one short sentence. The whole package fits in about 2,500 words: the recipe step builds on it, it is not the article.
 - THE RECIPE ITSELF. The ingredients with their quantities, the steps in the order they are performed, the times and temperatures, the yield. This is the material the canonical recipe is built from, so a gap here becomes an invention later. Mark an ingredient essential when the dish is not itself without it. Give each step the visible sign that it is done, because that sign is what a cook and a photograph both need — and make the signs of the last steps agree with what the photographs show.
 - Return references, visual_references and visual_observations as empty arrays: the engine fills the last two from the editor's own photographs.
 
