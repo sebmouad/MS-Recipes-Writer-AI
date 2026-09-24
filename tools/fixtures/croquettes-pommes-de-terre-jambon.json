@@ -1,0 +1,564 @@
+{
+  "title": "Croquettes de pommes de terre au jambon et fromage",
+  "text": "Croquettes de pommes de terre maison : purée ferme, dés de jambon, fromage râpé fondant au cœur, panure et friture dorée. Préciser la texture de la purée, la panure, la température de l’huile et les erreurs fréquentes.",
+  "editor_input": {
+    "type": "article",
+    "title": "Croquettes de pommes de terre au jambon et fromage",
+    "text": "Croquettes de pommes de terre maison : purée ferme, dés de jambon, fromage râpé fondant au cœur, panure et friture dorée. Préciser la texture de la purée, la panure, la température de l’huile et les erreurs fréquentes.",
+    "images": []
+  },
+  "research": {
+    "dish_identity": {
+      "name": "Croquettes de pommes de terre au jambon et fromage",
+      "confidence": "élevée",
+      "evidence": "Le titre éditorial correspond à plusieurs recettes documentées combinant pommes de terre, jambon, fromage, œuf et panure, avec cuisson poêlée, frite ou au four."
+    },
+    "recipe_outline": {
+      "servings": 4,
+      "prep_minutes": 20,
+      "cook_minutes": 20,
+      "total_minutes": 40,
+      "category": "entrée, apéritif ou plat léger",
+      "cuisine": "française, d’inspiration familiale",
+      "difficulty": "facile à intermédiaire",
+      "source_url": "https://recettes.newsgeet.com/croquettes-de-jambon-et-pommes-de-terre-au-fromage/"
+    },
+    "ingredients": [
+      {
+        "name": "pommes de terre cuites et écrasées",
+        "quantity": "500",
+        "unit": "g",
+        "role": "base moelleuse et liant principal",
+        "essential": true,
+        "source_url": "https://recettes.newsgeet.com/croquettes-de-jambon-et-pommes-de-terre-au-fromage/"
+      },
+      {
+        "name": "jambon",
+        "quantity": "100 à 150",
+        "unit": "g",
+        "role": "garniture salée et mâche",
+        "essential": true,
+        "source_url": "https://recettes.newsgeet.com/croquettes-de-jambon-et-fromage/"
+      },
+      {
+        "name": "fromage râpé fondant",
+        "quantity": "100",
+        "unit": "g",
+        "role": "saveur et fondant",
+        "essential": true,
+        "source_url": "https://recettes.newsgeet.com/croquettes-de-jambon-et-pommes-de-terre-au-fromage/"
+      },
+      {
+        "name": "œuf",
+        "quantity": "1",
+        "unit": "pièce",
+        "role": "liaison de la préparation",
+        "essential": true,
+        "source_url": "https://recettes.newsgeet.com/croquettes-de-jambon-et-pommes-de-terre-au-fromage/"
+      },
+      {
+        "name": "chapelure fine",
+        "quantity": "2 à 4",
+        "unit": "cuillères à soupe",
+        "role": "ajustement de la tenue",
+        "essential": false,
+        "source_url": "https://recettes.newsgeet.com/croquettes-de-jambon-et-pommes-de-terre-au-fromage/"
+      },
+      {
+        "name": "chapelure",
+        "quantity": "100 à 150",
+        "unit": "g",
+        "role": "enrobage croustillant",
+        "essential": true,
+        "source_url": "https://recettes.newsgeet.com/croquettes-de-jambon-et-pommes-de-terre-au-fromage/"
+      },
+      {
+        "name": "farine",
+        "quantity": "1 à 2",
+        "unit": "cuillères à soupe",
+        "role": "raffermissement ou première couche de panure",
+        "essential": false,
+        "source_url": "https://recettes.newsgeet.com/croquettes-de-jambon-et-pommes-de-terre-au-fromage/"
+      },
+      {
+        "name": "sel et poivre",
+        "quantity": "à convenance",
+        "unit": "",
+        "role": "assaisonnement",
+        "essential": false,
+        "source_url": "https://www.cuisine-etudiant.fr/recette/11652-croquettes-de-pommes-de-terre-au-jambon-et-fromage"
+      },
+      {
+        "name": "huile neutre",
+        "quantity": "suffisante pour la friture",
+        "unit": "",
+        "role": "cuisson et coloration",
+        "essential": true,
+        "source_url": "https://smithfield.sfdbrands.com/en-us/recipes/fried-ham-potato-and-swiss-croquettes/"
+      }
+    ],
+    "preparation": [
+      {
+        "step": 1,
+        "action": "Cuire les pommes de terre dans l’eau salée jusqu’à ce qu’elles soient très tendres.",
+        "cue": "La lame ou la fourchette pénètre facilement.",
+        "minutes": 20,
+        "temperature_c": null,
+        "source_url": "https://recettes.newsgeet.com/croquettes-pommes-de-terre-jambon-fromage-coeur-fondant/"
+      },
+      {
+        "step": 2,
+        "action": "Égoutter les pommes de terre puis les réduire finement en purée.",
+        "cue": "La purée est homogène et ne contient pas de morceaux durs.",
+        "minutes": null,
+        "temperature_c": null,
+        "source_url": "https://recettes.newsgeet.com/croquettes-de-jambon-et-pommes-de-terre-au-fromage/"
+      },
+      {
+        "step": 3,
+        "action": "Laisser tiédir la purée avant de la travailler.",
+        "cue": "La masse est manipulable à la main sans être chaude ni coulante.",
+        "minutes": 10,
+        "temperature_c": null,
+        "source_url": "https://recettes.newsgeet.com/croquettes-pommes-de-terre-jambon-fromage-coeur-fondant/"
+      },
+      {
+        "step": 4,
+        "action": "Mélanger la purée avec le jambon, le fromage râpé, l’œuf, le sel et le poivre.",
+        "cue": "Le mélange est réparti régulièrement et forme une masse cohésive.",
+        "minutes": null,
+        "temperature_c": null,
+        "source_url": "https://recettes.newsgeet.com/croquettes-de-jambon-et-pommes-de-terre-au-fromage/"
+      },
+      {
+        "step": 5,
+        "action": "Ajouter progressivement la chapelure fine ou la farine si la préparation colle.",
+        "cue": "Une portion se façonne sans s’affaisser ni coller fortement aux mains.",
+        "minutes": null,
+        "temperature_c": null,
+        "source_url": "https://recettes.newsgeet.com/croquettes-de-jambon-et-pommes-de-terre-au-fromage/"
+      },
+      {
+        "step": 6,
+        "action": "Former des croquettes rondes, ovales ou cylindriques de taille régulière.",
+        "cue": "Chaque pièce garde sa forme lorsqu’elle est déposée sur une assiette.",
+        "minutes": null,
+        "temperature_c": null,
+        "source_url": "https://smithfield.sfdbrands.com/en-us/recipes/fried-ham-potato-and-swiss-croquettes/"
+      },
+      {
+        "step": 7,
+        "action": "Enrober les croquettes de farine, d’œuf battu puis de chapelure.",
+        "cue": "Toute la surface est couverte d’une couche régulière sans zone nue.",
+        "minutes": null,
+        "temperature_c": null,
+        "source_url": "https://smithfield.sfdbrands.com/en-us/recipes/fried-ham-potato-and-swiss-croquettes/"
+      },
+      {
+        "step": 8,
+        "action": "Chauffer l’huile à 350 °F, soit environ 177 °C.",
+        "cue": "L’huile atteint la température mesurée avant l’ajout des croquettes.",
+        "minutes": null,
+        "temperature_c": 177,
+        "source_url": "https://smithfield.sfdbrands.com/en-us/recipes/fried-ham-potato-and-swiss-croquettes/"
+      },
+      {
+        "step": 9,
+        "action": "Frire les croquettes par petites quantités jusqu’à ce qu’elles soient dorées et chaudes à cœur.",
+        "cue": "La panure est uniformément dorée et l’intérieur est chaud.",
+        "minutes": 6,
+        "temperature_c": 177,
+        "source_url": "https://smithfield.sfdbrands.com/en-us/recipes/fried-ham-potato-and-swiss-croquettes/"
+      },
+      {
+        "step": 10,
+        "action": "Pour une cuisson poêlée, dorer les croquettes dans un fond d’huile en les retournant.",
+        "cue": "Les deux faces sont brun doré et la croûte est croustillante.",
+        "minutes": 8,
+        "temperature_c": null,
+        "source_url": "https://recettes.newsgeet.com/croquettes-de-jambon-et-pommes-de-terre-au-fromage/"
+      },
+      {
+        "step": 11,
+        "action": "Égoutter les croquettes sur du papier absorbant.",
+        "cue": "L’excédent d’huile ne s’accumule plus à la surface.",
+        "minutes": null,
+        "temperature_c": null,
+        "source_url": "https://www.cuisine-etudiant.fr/recette/11652-croquettes-de-pommes-de-terre-au-jambon-et-fromage"
+      },
+      {
+        "step": 12,
+        "action": "Servir immédiatement.",
+        "cue": "La panure est encore croustillante et le centre reste moelleux.",
+        "minutes": null,
+        "temperature_c": null,
+        "source_url": "https://smithfield.sfdbrands.com/en-us/recipes/fried-ham-potato-and-swiss-croquettes/"
+      }
+    ],
+    "substitutions": [
+      {
+        "ingredient": "jambon",
+        "replacement": "légumes grillés comme poivrons ou courgettes",
+        "note": "La substitution est proposée pour une version végétarienne.",
+        "source_url": "https://www.cuisine-etudiant.fr/recette/11652-croquettes-de-pommes-de-terre-au-jambon-et-fromage"
+      },
+      {
+        "ingredient": "jambon",
+        "replacement": "jambon fumé ou petites lanières de volaille cuite",
+        "note": "Le remplacement est documenté comme variante de garniture.",
+        "source_url": "https://recettes.newsgeet.com/croquettes-de-jambon-et-pommes-de-terre-au-fromage/"
+      },
+      {
+        "ingredient": "fromage fondant",
+        "replacement": "emmental, comté, gruyère, cheddar ou fromage bleu",
+        "note": "Les sources recommandent un fromage qui fond correctement; le fromage bleu donne une version plus marquée.",
+        "source_url": "https://www.cuisine-etudiant.fr/recette/11652-croquettes-de-pommes-de-terre-au-jambon-et-fromage"
+      },
+      {
+        "ingredient": "chapelure classique",
+        "replacement": "chapelure sans gluten",
+        "note": "Cette substitution est proposée pour une version sans gluten.",
+        "source_url": "https://www.cuisine-etudiant.fr/recette/11652-croquettes-de-pommes-de-terre-au-jambon-et-fromage"
+      }
+    ],
+    "accompaniments": [
+      {
+        "name": "salade verte",
+        "note": "La recette française la propose comme accompagnement frais.",
+        "source_url": "https://www.cuisine-etudiant.fr/recette/11652-croquettes-de-pommes-de-terre-au-jambon-et-fromage"
+      },
+      {
+        "name": "légumes grillés",
+        "note": "Ils sont proposés avec les croquettes ou comme garniture d’une variante.",
+        "source_url": "https://www.cuisine-etudiant.fr/recette/11652-croquettes-de-pommes-de-terre-au-jambon-et-fromage"
+      },
+      {
+        "name": "sauce tomate maison",
+        "note": "La sauce tomate est indiquée comme accompagnement possible.",
+        "source_url": "https://www.cuisine-etudiant.fr/recette/11652-croquettes-de-pommes-de-terre-au-jambon-et-fromage"
+      },
+      {
+        "name": "ketchup doux, moutarde à l’ancienne ou sauce yaourt-citron",
+        "note": "Ces sauces sont proposées pour servir les croquettes.",
+        "source_url": "https://recettes.newsgeet.com/croquettes-de-jambon-et-pommes-de-terre-au-fromage/"
+      }
+    ],
+    "common_failures": [
+      {
+        "problem": "La préparation s’affaisse ou colle.",
+        "cause": "La purée contient trop d’eau ou reste trop souple.",
+        "remedy": "Bien égoutter les pommes de terre puis ajouter progressivement de la chapelure fine ou de la farine.",
+        "source_url": "https://recettes.newsgeet.com/croquettes-de-jambon-et-pommes-de-terre-au-fromage/"
+      },
+      {
+        "problem": "Les croquettes se désagrègent dans la poêle.",
+        "cause": "La masse ou l’enrobage ne sont pas assez fermes.",
+        "remedy": "Façonner des pièces régulières, les paner complètement et, si nécessaire, les raffermir au froid avant cuisson.",
+        "source_url": "https://cuisine.journaldesfemmes.fr/recette/316293-croquettes-de-jambon"
+      },
+      {
+        "problem": "La panure devient molle.",
+        "cause": "Le réchauffage au micro-ondes ramollit la croûte.",
+        "remedy": "Réchauffer au four plutôt qu’au micro-ondes.",
+        "source_url": "https://www.cuisine-etudiant.fr/recette/11652-croquettes-de-pommes-de-terre-au-jambon-et-fromage"
+      },
+      {
+        "problem": "La surface brunit avant que le centre soit chaud.",
+        "cause": "L’huile est trop chaude ou les croquettes sont trop épaisses.",
+        "remedy": "Maintenir environ 177 °C et former des pièces de taille régulière.",
+        "source_url": "https://smithfield.sfdbrands.com/en-us/recipes/fried-ham-potato-and-swiss-croquettes/"
+      },
+      {
+        "problem": "La croquette est grasse.",
+        "cause": "La température de friture est insuffisante ou la poêle est trop chargée.",
+        "remedy": "Frire par petites quantités dans une huile préchauffée.",
+        "source_url": "https://smithfield.sfdbrands.com/en-us/recipes/fried-ham-potato-and-swiss-croquettes/"
+      }
+    ],
+    "storage": [
+      {
+        "method": "Réfrigérateur",
+        "duration": "jusqu’à 2 jours",
+        "note": "Conserver les croquettes préparées dans un récipient hermétique et les réchauffer au four.",
+        "source_url": "https://www.cuisine-etudiant.fr/recette/11652-croquettes-de-pommes-de-terre-au-jambon-et-fromage"
+      },
+      {
+        "method": "Réfrigérateur",
+        "duration": "jusqu’à 3 jours",
+        "note": "Une autre source indique trois jours dans une boîte hermétique; cette durée est donc en conflit avec la limite de deux jours.",
+        "source_url": "https://recettes.newsgeet.com/croquettes-pommes-de-terre-jambon-fromage-coeur-fondant/"
+      },
+      {
+        "method": "Congélateur",
+        "duration": "jusqu’à 2 mois",
+        "note": "Congeler les croquettes formées et panées sur une plaque avant de les regrouper dans un sac.",
+        "source_url": "https://recettes.newsgeet.com/croquettes-pommes-de-terre-jambon-fromage-coeur-fondant/"
+      }
+    ],
+    "food_safety": [
+      {
+        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/leftovers-and-food-safety",
+        "text": "Réfrigérer les restes rapidement et ne pas les laisser plus de deux heures à température ambiante."
+      },
+      {
+        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/leftovers-and-food-safety",
+        "text": "Réchauffer les croquettes jusqu’à ce que le centre soit bien chaud; la référence USDA pour les restes est 165 °F, soit environ 74 °C."
+      },
+      {
+        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/food-safety-during-power-outage",
+        "text": "Jeter les préparations restées trop longtemps hors réfrigération ou présentant une odeur ou une apparence anormale."
+      }
+    ],
+    "references": [
+      {
+        "url": "https://www.cuisine-etudiant.fr/recette/11652-croquettes-de-pommes-de-terre-au-jambon-et-fromage",
+        "title": "Recette croquettes de pommes de terre au jambon et fromage facile",
+        "publisher": "Cuisine Étudiant"
+      },
+      {
+        "url": "https://smithfield.sfdbrands.com/en-us/recipes/fried-ham-potato-and-swiss-croquettes/",
+        "title": "Fried Ham, Potato and Swiss Croquettes",
+        "publisher": "Smithfield"
+      },
+      {
+        "url": "https://www.weightwatchers.com/us/recipe/ham-cheese-croquettes/62b9b73d82dcd627136dd0d4",
+        "title": "Ham & Cheese Croquettes",
+        "publisher": "WeightWatchers"
+      },
+      {
+        "url": "https://www.ossau-iraty.fr/wp-content/uploads/2017/02/Croquettes-Basquaises.pdf",
+        "title": "Croquette basquaise à l’Ossau-Iraty",
+        "publisher": "Ossau-Iraty"
+      },
+      {
+        "url": "https://cuisine.journaldesfemmes.fr/recette/316293-croquettes-de-jambon",
+        "title": "Croquettes de pommes de terre et jambon : la recette facile",
+        "publisher": "Journal des Femmes Cuisine"
+      },
+      {
+        "url": "https://www.fsis.usda.gov/food-safety",
+        "title": "Food Safety",
+        "publisher": "USDA Food Safety and Inspection Service"
+      }
+    ],
+    "visual_references": [
+      {
+        "image_url": "https://cdn.cuisine-etudiant.fr/2026-09/croquettes-de-pommes-de-terre-au-jambon-et-fromage-dxf-1200.webp",
+        "source_url": "https://www.cuisine-etudiant.fr/recette/11652-croquettes-de-pommes-de-terre-au-jambon-et-fromage",
+        "title": "Croquettes de pommes de terre au jambon et fromage",
+        "tier": 1
+      },
+      {
+        "image_url": "https://assets-us-01.kc-usercontent.com/0aba5e4b-3a57-0042-244b-f7dbdf0cc00d/c7281010-23a4-44d4-9ce4-514c937c2a17/ELE_SMITHFIELD_HOLIDAY_2022_1651.jpg?auto=format&w=1280",
+        "source_url": "https://smithfield.sfdbrands.com/en-us/recipes/fried-ham-potato-and-swiss-croquettes/",
+        "title": "Fried Ham, Potato and Swiss Croquettes",
+        "tier": 1
+      },
+      {
+        "image_url": "https://recettes.newsgeet.com/wp-content/uploads/2026/08/croquettes-de-jambon-et-pommes-de-terre-au-fromage-660x660.webp",
+        "source_url": "https://recettes.newsgeet.com/croquettes-de-jambon-et-pommes-de-terre-au-fromage/",
+        "title": "Croquettes de jambon et pommes de terre au fromage",
+        "tier": 1
+      }
+    ],
+    "visual_observations": [
+      {
+        "image_url": "https://cdn.cuisine-etudiant.fr/2026-09/croquettes-de-pommes-de-terre-au-jambon-et-fromage-dxf-1200.webp",
+        "source_url": "https://www.cuisine-etudiant.fr/recette/11652-croquettes-de-pommes-de-terre-au-jambon-et-fromage",
+        "observable_details": "Le plat présente plusieurs croquettes de pomme de terre panées, dont deux sont ouvertes et montrent une garniture intérieure claire avec des morceaux rosés et des zones fondantes. Une croquette entière est visible à l’arrière. La panure est dorée à brun clair, irrégulière et croustillante en apparence. L’intérieur paraît cuit et moelleux, tandis que la surface extérieure semble bien frite.",
+        "composition": "Les croquettes sont regroupées au premier plan sur un support plat de présentation, avec une disposition rapprochée. Deux croquettes coupées exposent leur intérieur, et une croquette intacte se trouve derrière. La prise de vue est rapprochée, à hauteur légèrement plongeante.",
+        "couleurs": "Dominance de tons dorés, jaune pâle et brun clair sur la panure et la partie intérieure. Des marques rosées et quelques petits points plus foncés sont visibles dans la garniture.",
+        "textures": "La panure paraît granuleuse, friable et irrégulière. Les surfaces coupées semblent lisses et moelleuses, avec des zones visiblement fondues et légèrement filantes.",
+        "incertainties": "La nature exacte des éléments rosés et des petits points foncés n’est pas identifiable avec certitude. Le niveau précis de croustillant ne peut pas être confirmé à partir de l’image seule.",
+        "lumiere": "L’éclairage est diffus et assez lumineux, avec des reflets doux sur les zones fondantes et quelques ombres légères sous les croquettes."
+      }
+    ],
+    "uncertainties": [
+      "Les sources ne s’accordent pas sur la méthode: certaines mélangent le fromage dans la masse, tandis que le brief demande explicitement un cœur fromagé.",
+      "La durée de conservation réfrigérée varie de deux à trois jours selon les sources.",
+      "La cuisson varie d’une friture à environ 177 °C à une cuisson poêlée sans température chiffrée.",
+      "Le rendement exact varie selon la taille; les sources indiquent quatre portions, six portions ou huit croquettes."
+    ],
+    "originality_notes": [
+      "Le package synthétise des données sourcées sans reprendre la formulation des pages.",
+      "Aucun cœur de fromage séparé n’est présenté comme certain lorsque la source indique seulement du fromage mélangé à la purée.",
+      "Les observations visuelles sont laissées vides afin que le laboratoire les produise à partir des fichiers image téléchargés."
+    ]
+  },
+  "canonical": {
+    "title": "Croquettes de pommes de terre au jambon et fromage",
+    "description": "Ces croquettes dorées offrent une panure croustillante, une purée moelleuse et un cœur de fromage fondant, à servir en entrée ou pour un repas léger.",
+    "servings": 4,
+    "prep_minutes": 20,
+    "cook_minutes": 20,
+    "total_minutes": 40,
+    "cuisine": "Française, d’inspiration familiale",
+    "recipe_category": "entrée",
+    "difficulty": "facile à intermédiaire",
+    "calories_estimate": 510,
+    "ingredients": [
+      {
+        "name": "pommes de terre",
+        "quantity": 500,
+        "unit": "g"
+      },
+      {
+        "name": "eau",
+        "quantity": 1.5,
+        "unit": "l"
+      },
+      {
+        "name": "sel pour la cuisson des pommes de terre",
+        "quantity": 5,
+        "unit": "g"
+      },
+      {
+        "name": "jambon en petits dés",
+        "quantity": 125,
+        "unit": "g"
+      },
+      {
+        "name": "fromage râpé fondant",
+        "quantity": 100,
+        "unit": "g"
+      },
+      {
+        "name": "œufs",
+        "quantity": 2,
+        "unit": "pièces"
+      },
+      {
+        "name": "chapelure fine",
+        "quantity": 30,
+        "unit": "g"
+      },
+      {
+        "name": "farine",
+        "quantity": 30,
+        "unit": "g"
+      },
+      {
+        "name": "chapelure",
+        "quantity": 120,
+        "unit": "g"
+      },
+      {
+        "name": "sel pour l’assaisonnement",
+        "quantity": 3,
+        "unit": "g"
+      },
+      {
+        "name": "poivre",
+        "quantity": 1,
+        "unit": "g"
+      },
+      {
+        "name": "huile neutre",
+        "quantity": 1,
+        "unit": "l"
+      }
+    ],
+    "steps": [
+      {
+        "text": "Cuire les pommes de terre dans l’eau salée pendant environ 20 minutes. Elles sont prêtes lorsqu’une lame ou une fourchette les traverse facilement."
+      },
+      {
+        "text": "Égoutter les pommes de terre. Elles ne rendent plus d’eau au fond de la passoire."
+      },
+      {
+        "text": "Écraser les pommes de terre en purée fine. La purée est homogène et sans morceau dur."
+      },
+      {
+        "text": "Laisser tiédir la purée pendant 10 minutes. Elle est manipulable sans être chaude ni coulante."
+      },
+      {
+        "text": "Mélanger la purée avec le jambon, la chapelure fine, un œuf, le sel d’assaisonnement et le poivre. La préparation forme une masse cohésive."
+      },
+      {
+        "text": "Prélever une portion de préparation et l’aplatir dans la main. Le disque ne se fissure pas."
+      },
+      {
+        "text": "Déposer une petite portion de fromage râpé au centre du disque. Le fromage reste entouré de purée."
+      },
+      {
+        "text": "Refermer la purée autour du fromage et former une croquette régulière. Aucune zone de fromage n’est visible."
+      },
+      {
+        "text": "Paner chaque croquette dans la farine, puis dans le second œuf battu, puis dans la chapelure. Toute la surface est couverte sans zone nue."
+      },
+      {
+        "text": "Chauffer l’huile neutre à 177 °C dans une friteuse ou une casserole adaptée. La température est mesurée avant l’ajout des croquettes."
+      },
+      {
+        "text": "Frire les croquettes par petites quantités pendant environ 6 minutes à 177 °C. La panure est dorée de façon régulière et le centre est chaud."
+      },
+      {
+        "text": "Égoutter les croquettes sur du papier absorbant. L’excédent d’huile ne s’accumule plus à la surface."
+      },
+      {
+        "text": "Servir immédiatement. La panure est croustillante et le centre reste moelleux avec un fromage fondant."
+      }
+    ],
+    "equipment": [
+      "casserole",
+      "passoire",
+      "presse-purée ou fourchette",
+      "saladier",
+      "balance de cuisine",
+      "trois assiettes creuses pour la panure",
+      "friteuse ou casserole profonde",
+      "thermomètre de cuisson",
+      "écumoire",
+      "papier absorbant"
+    ],
+    "notes": [
+      "La purée doit être ferme et bien égouttée ; une purée trop humide donne des croquettes qui collent ou s’affaissent.",
+      "Ajoutez la chapelure fine prévue dans la préparation avant de former les croquettes ; la farine sert ici à la première couche de panure.",
+      "Formez des croquettes de taille régulière afin que la panure dore sans que le centre reste froid.",
+      "Ne surchargez pas le bain d’huile : une température qui chute donne une croquette grasse.",
+      "Pour les conserver, placez les croquettes cuites dans un récipient hermétique au réfrigérateur pendant deux jours au maximum et réchauffez-les au four plutôt qu’au micro-ondes.",
+      "Les croquettes crues, formées et panées, peuvent être congelées sur une plaque puis regroupées dans un sac pendant deux mois.",
+      "Servez avec une salade verte, des légumes grillés, une sauce tomate, du ketchup doux, de la moutarde à l’ancienne ou une sauce yaourt-citron."
+    ],
+    "faq": [
+      {
+        "question": "Pourquoi les croquettes se désagrègent-elles pendant la cuisson ?",
+        "answer": "La purée est probablement trop humide ou la panure incomplète. Égouttez bien les pommes de terre, raffermissez la préparation avec la chapelure fine et couvrez toute la surface."
+      },
+      {
+        "question": "Comment éviter une panure molle ?",
+        "answer": "Servez les croquettes dès qu’elles sont égouttées et réchauffez les restes au four plutôt qu’au micro-ondes."
+      },
+      {
+        "question": "Pourquoi la surface brunit-elle avant que le centre soit chaud ?",
+        "answer": "L’huile est trop chaude ou les croquettes sont trop épaisses. Maintenez 177 °C et formez des pièces de taille régulière."
+      },
+      {
+        "question": "Peut-on les cuire à la poêle ?",
+        "answer": "Oui, faites-les dorer dans un fond d’huile en les retournant jusqu’à ce que les deux faces soient brun doré et croustillantes."
+      }
+    ],
+    "keywords": [
+      "croquettes de pommes de terre",
+      "jambon",
+      "fromage fondu",
+      "panure",
+      "friture",
+      "entrée française",
+      "purée de pommes de terre"
+    ],
+    "food_safety": [
+      "Ne laissez pas les croquettes ou la préparation contenant l’œuf plus de deux heures à température ambiante.",
+      "Réfrigérez rapidement les restes dans un récipient hermétique.",
+      "Réchauffez les croquettes jusqu’à atteindre environ 74 °C à cœur.",
+      "Jetez toute préparation restée trop longtemps hors du réfrigérateur ou présentant une odeur ou une apparence anormale.",
+      "Cette recette contient des œufs, du lait dans le fromage et du gluten dans la farine et la chapelure."
+    ],
+    "uncertainties": [
+      "Les sources indiquent un œuf, mais la méthode nécessite un œuf pour lier la préparation et un autre pour la panure ; deux œufs sont retenus pour permettre ces deux usages sans approximation.",
+      "Les sources divergent entre deux et trois jours de conservation réfrigérée ; la limite la plus prudente de deux jours est retenue.",
+      "La friture à environ 177 °C est retenue comme méthode principale, bien qu’une cuisson poêlée soit également documentée.",
+      "Le rendement dépend de la taille des croquettes ; les quantités sont calibrées pour quatre portions."
+    ]
+  }
+}

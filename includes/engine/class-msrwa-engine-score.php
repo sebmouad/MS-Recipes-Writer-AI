@@ -356,6 +356,27 @@ final class MSRWA_Engine_Score {
 	 * photograph of the finished dish and the collage is the piece that has to agree
 	 * with it, and measurement put every consistency break on the collage's side.
 	 */
+	/**
+	 * A rule the judge reports on but has been seen to wave through: a collage
+	 * ending on a whole, uncut dish. What it answers about the last panel decides,
+	 * not whether it remembered to call that blocking.
+	 */
+	public static function enforce( $verdict, $language = 'fr' ) {
+		if ( ! is_array( $verdict ) || false !== ( $verdict['facebook_image']['last_panel_opened'] ?? null ) ) { return $verdict; }
+		$verdict['approved'] = false;
+		$verdict['findings'] = array_values( (array) ( $verdict['findings'] ?? array() ) );
+		// The judge usually says so itself; one finding is enough to redraw.
+		if ( self::findings_for( $verdict, 'facebook_image' ) ) { return $verdict; }
+		// Editors read the findings, so they are in the site's language.
+		$french = 'fr' === substr( (string) $language, 0, 2 );
+		$verdict['findings'][] = array(
+			'target' => 'facebook_image', 'severity' => 'blocking', 'quote' => '', 'replacement' => '',
+			'reason' => $french ? 'Le dernier panneau montre le plat entier : on n’en voit jamais l’intérieur.' : 'The last panel shows the finished dish whole: its inside is never seen.',
+			'fix' => $french ? 'Montrer le plat ouvert dans le dernier panneau : une part soulevée, un morceau rompu ou une cuillerée.' : 'Show the finished dish opened in the last panel: a slice lifted out, a piece broken in two or a spoonful raised.',
+		);
+		return $verdict;
+	}
+
 	public static function images_to_retry( $verdict ) {
 		if ( ! is_array( $verdict ) || ! empty( $verdict['approved'] ) ) { return array(); }
 		$retry = array();

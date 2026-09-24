@@ -163,4 +163,25 @@ foreach ( array( 'Foncer le moule', 'Éplucher les pommes', 'Disposer les pommes
 }
 msrwa_test_assert( $position['Foncer le moule'] < $position['Battre les œufs'], 'Lining the case must be asked for before beating the custard.' );
 
+// A collage that ends on a whole dish is refused whatever the judge concluded,
+// and the refusal redraws the collage with a fix it can follow.
+$whole = $sound;
+$whole['approved'] = true;
+$whole['findings'] = array();
+$whole['facebook_image']['last_panel_opened'] = false;
+$enforced = MSRWA_Engine_Score::enforce( $whole );
+msrwa_test_assert( false === $enforced['approved'], 'A whole last panel must refuse the collage.' );
+msrwa_test_assert( array( 'facebook' ) === MSRWA_Engine_Score::images_to_retry( $enforced ), 'A whole last panel must redraw the collage and nothing else.' );
+msrwa_test_assert( true === lab_score_approval( $enforced, 2, 6 )['approval matches findings']['pass'], 'The enforced refusal must be coherent with its findings.' );
+$opened = $whole;
+$opened['facebook_image']['last_panel_opened'] = true;
+msrwa_test_assert( true === MSRWA_Engine_Score::enforce( $opened )['approved'], 'An opened last panel changes nothing.' );
+unset( $opened['facebook_image']['last_panel_opened'] );
+msrwa_test_assert( $opened === MSRWA_Engine_Score::enforce( $opened ), 'A verdict that does not answer is left as it is.' );
+$said = $whole;
+$said['findings'] = array( array( 'target' => 'facebook_image', 'severity' => 'blocking', 'quote' => '', 'reason' => 'Quiche entière.', 'fix' => 'Couper une part.' ) );
+msrwa_test_assert( 1 === count( MSRWA_Engine_Score::enforce( $said )['findings'] ), 'The judge’s own finding is not repeated.' );
+msrwa_test_contains( MSRWA_Engine_Score::enforce( $whole, 'fr' )['findings'][0]['reason'], 'dernier panneau', 'The finding is in the site’s language.' );
+msrwa_test_contains( MSRWA_Engine_Score::enforce( $whole, 'en' )['findings'][0]['reason'], 'last panel', 'The finding is in the site’s language.' );
+
 msrwa_test_done( 'approval' );

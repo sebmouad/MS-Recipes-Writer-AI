@@ -576,6 +576,12 @@ cost) in the task before changing anything.
   research package directly. Real photographs guide only visible appearance;
   the canonical recipe controls identity, ingredients and steps. References
   are never copied or reused as assets. Awaiting live visual validation.
+- [x] **A32 — A warmer, closer collage that ends opened (2026-09-24).** Owner's
+  comparison with collages he preferred. Close-up in every panel, warm and
+  richer colour, one home-kitchen setting, last panel always opened; the final
+  approval reports `last_panel_opened` and `MSRWA_Engine_Score::enforce()`
+  refuses a whole one. Real: four collages on two new briefs, the whole quiche
+  refused 2/2, the redraw approved opened. See ENGINE.md §7, item 29.
 - [x] **A11 — Model answers that do not parse (found 2026-09-20).** Two of the
   54 matrix cells scored zero for a reason that was ours, not the prompt's:
   Opus 5 wrote "I'll research this dish now." before the object, and Sonnet 5

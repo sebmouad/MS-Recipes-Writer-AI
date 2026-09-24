@@ -704,7 +704,7 @@ final class MSRWA_Engine {
 			self::report_call( $result, $name, $route, $wire['text_endpoint'] ?? '', $call, $config );
 
 			$verdict = MSRWA_Json::decode( $call['text'] );
-			$verdict = is_array( $verdict ) ? $verdict : array();
+			$verdict = MSRWA_Engine_Score::enforce( is_array( $verdict ) ? $verdict : array(), (string) ( $config->get( 'settings', array() )['site_language'] ?? 'fr' ) );
 			$configured = (array) $config->get( 'approval_targets', array() );
 			$checks = MSRWA_Engine_Score::approval( $verdict, count( $images ), $config->facebook_template()['panels'], $configured ? $configured : $targets );
 			$passed = count( array_filter( $checks, static function ( $check ) { return ! empty( $check['pass'] ); } ) );

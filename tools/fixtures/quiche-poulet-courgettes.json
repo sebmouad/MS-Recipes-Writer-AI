@@ -1,0 +1,535 @@
+{
+  "title": "Quiche au poulet et aux courgettes",
+  "text": "Quiche au poulet et aux courgettes : pâte brisée, courgettes râpées et oignon revenus avec des dés de poulet, appareil aux œufs et à la crème, fromage râpé gratiné. Préciser comment éviter une quiche détrempée, la cuisson et la conservation.",
+  "editor_input": {
+    "type": "article",
+    "title": "Quiche au poulet et aux courgettes",
+    "text": "Quiche au poulet et aux courgettes : pâte brisée, courgettes râpées et oignon revenus avec des dés de poulet, appareil aux œufs et à la crème, fromage râpé gratiné. Préciser comment éviter une quiche détrempée, la cuisson et la conservation.",
+    "images": []
+  },
+  "research": {
+    "dish_identity": {
+      "name": "Quiche au poulet et aux courgettes",
+      "confidence": "élevée",
+      "evidence": "Le titre éditorial, la pâte brisée, le poulet, les courgettes, l'appareil aux œufs et le fromage correspondent aux recettes documentées par 750g et Journal des Femmes Cuisine : https://www.750g.com/tarte-poulet-courgettes-ultra-simple-r87271.htm ; https://cuisine.journaldesfemmes.fr/recette/3113451-quiche-au-poulet-courgette-et-curry"
+    },
+    "recipe_outline": {
+      "servings": 8,
+      "prep_minutes": 20,
+      "cook_minutes": 35,
+      "total_minutes": 55,
+      "category": "quiche salée",
+      "cuisine": "française",
+      "difficulty": "facile",
+      "source_url": "https://www.750g.com/tarte-poulet-courgettes-ultra-simple-r87271.htm"
+    },
+    "ingredients": [
+      {
+        "name": "pâte brisée",
+        "quantity": "1",
+        "unit": "unité",
+        "role": "support de la quiche",
+        "essential": true,
+        "source_url": "https://www.750g.com/tarte-poulet-courgettes-ultra-simple-r87271.htm"
+      },
+      {
+        "name": "poulet cuit",
+        "quantity": "150",
+        "unit": "g",
+        "role": "garniture protéinée",
+        "essential": true,
+        "source_url": "https://www.750g.com/tarte-poulet-courgettes-ultra-simple-r87271.htm"
+      },
+      {
+        "name": "courgettes",
+        "quantity": "2",
+        "unit": "unités",
+        "role": "garniture végétale",
+        "essential": true,
+        "source_url": "https://www.750g.com/tarte-poulet-courgettes-ultra-simple-r87271.htm"
+      },
+      {
+        "name": "oignon",
+        "quantity": "1",
+        "unit": "unité",
+        "role": "base aromatique",
+        "essential": false,
+        "source_url": "https://cuisine.journaldesfemmes.fr/recette/3113451-quiche-au-poulet-courgette-et-curry"
+      },
+      {
+        "name": "œufs",
+        "quantity": "3",
+        "unit": "unités",
+        "role": "liant de l'appareil",
+        "essential": true,
+        "source_url": "https://www.750g.com/tarte-poulet-courgettes-ultra-simple-r87271.htm"
+      },
+      {
+        "name": "crème liquide",
+        "quantity": "20",
+        "unit": "cl",
+        "role": "onctuosité de l'appareil",
+        "essential": false,
+        "source_url": "https://www.750g.com/tarte-poulet-courgettes-ultra-simple-r87271.htm"
+      },
+      {
+        "name": "lait",
+        "quantity": "1",
+        "unit": "grand verre",
+        "role": "fluidité de l'appareil",
+        "essential": false,
+        "source_url": "https://www.750g.com/tarte-poulet-courgettes-ultra-simple-r87271.htm"
+      },
+      {
+        "name": "gruyère râpé",
+        "quantity": "50",
+        "unit": "g",
+        "role": "surface gratinée",
+        "essential": false,
+        "source_url": "https://www.750g.com/tarte-poulet-courgettes-ultra-simple-r87271.htm"
+      },
+      {
+        "name": "huile d'olive",
+        "quantity": "un filet",
+        "unit": null,
+        "role": "cuisson des garnitures",
+        "essential": false,
+        "source_url": "https://www.750g.com/tarte-poulet-courgettes-ultra-simple-r87271.htm"
+      },
+      {
+        "name": "sel et poivre",
+        "quantity": "à convenance",
+        "unit": null,
+        "role": "assaisonnement",
+        "essential": false,
+        "source_url": "https://www.750g.com/tarte-poulet-courgettes-ultra-simple-r87271.htm"
+      }
+    ],
+    "preparation": [
+      {
+        "step": 1,
+        "action": "Préchauffer le four à 200 °C et foncer la pâte brisée dans le moule.",
+        "cue": "La pâte est répartie dans le moule et prête à recevoir la garniture.",
+        "minutes": null,
+        "temperature_c": 200,
+        "source_url": "https://www.750g.com/tarte-poulet-courgettes-ultra-simple-r87271.htm"
+      },
+      {
+        "step": 2,
+        "action": "Découper les courgettes en tranches fines.",
+        "cue": "Les tranches sont fines et régulières.",
+        "minutes": null,
+        "temperature_c": null,
+        "source_url": "https://www.750g.com/tarte-poulet-courgettes-ultra-simple-r87271.htm"
+      },
+      {
+        "step": 3,
+        "action": "Faire revenir les courgettes dans l'huile à feu doux, puis saler et poivrer.",
+        "cue": "Les courgettes sont tendres.",
+        "minutes": null,
+        "temperature_c": null,
+        "source_url": "https://www.750g.com/tarte-poulet-courgettes-ultra-simple-r87271.htm"
+      },
+      {
+        "step": 4,
+        "action": "Émincer le poulet cuit et le faire revenir brièvement à la poêle.",
+        "cue": "Le poulet est chaud et légèrement revenu.",
+        "minutes": null,
+        "temperature_c": null,
+        "source_url": "https://www.750g.com/tarte-poulet-courgettes-ultra-simple-r87271.htm"
+      },
+      {
+        "step": 5,
+        "action": "Ajouter la crème au poulet et la faire réduire.",
+        "cue": "La préparation a réduit après cinq minutes.",
+        "minutes": 5,
+        "temperature_c": null,
+        "source_url": "https://www.750g.com/tarte-poulet-courgettes-ultra-simple-r87271.htm"
+      },
+      {
+        "step": 6,
+        "action": "Battre les œufs avec le lait, puis saler et poivrer.",
+        "cue": "L'appareil est homogène.",
+        "minutes": null,
+        "temperature_c": null,
+        "source_url": "https://www.750g.com/tarte-poulet-courgettes-ultra-simple-r87271.htm"
+      },
+      {
+        "step": 7,
+        "action": "Répartir le poulet crémé puis les courgettes sur la pâte.",
+        "cue": "La garniture couvre régulièrement le fond.",
+        "minutes": null,
+        "temperature_c": null,
+        "source_url": "https://www.750g.com/tarte-poulet-courgettes-ultra-simple-r87271.htm"
+      },
+      {
+        "step": 8,
+        "action": "Verser l'appareil aux œufs et au lait, puis saupoudrer de gruyère.",
+        "cue": "Le fromage couvre la surface.",
+        "minutes": null,
+        "temperature_c": null,
+        "source_url": "https://www.750g.com/tarte-poulet-courgettes-ultra-simple-r87271.htm"
+      },
+      {
+        "step": 9,
+        "action": "Cuire la quiche au four.",
+        "cue": "La quiche est cuite et le dessus est doré.",
+        "minutes": 35,
+        "temperature_c": 200,
+        "source_url": "https://www.750g.com/tarte-poulet-courgettes-ultra-simple-r87271.htm"
+      },
+      {
+        "step": 10,
+        "action": "Pour limiter le risque de fond détrempé, précuire séparément la pâte piquée avant de la garnir.",
+        "cue": "Le fond est partiellement cuit avant l'ajout de l'appareil.",
+        "minutes": 10,
+        "temperature_c": 180,
+        "source_url": "https://cuisine.journaldesfemmes.fr/recette/3113451-quiche-au-poulet-courgette-et-curry"
+      }
+    ],
+    "substitutions": [
+      {
+        "ingredient": "poulet cru",
+        "replacement": "reste de poulet rôti ou poulet cuit",
+        "note": "La recette au curry indique explicitement que le blanc de poulet peut être remplacé par un reste de poulet rôti.",
+        "source_url": "https://cuisine.journaldesfemmes.fr/recette/3113451-quiche-au-poulet-courgette-et-curry"
+      },
+      {
+        "ingredient": "gruyère râpé",
+        "replacement": "fromage de chèvre",
+        "note": "Une recette de quiche aux légumes indique que le gruyère peut être remplacé par du chèvre.",
+        "source_url": "https://www.750g.com/quiche-aux-legumes-r25850.htm"
+      },
+      {
+        "ingredient": "appareil aux œufs et à la crème",
+        "replacement": "œufs et fromage blanc",
+        "note": "Une version allégée utilise 200 g de fromage blanc à la place de la crème.",
+        "source_url": "https://cuisine.journaldesfemmes.fr/recette/3113451-quiche-au-poulet-courgette-et-curry"
+      }
+    ],
+    "accompaniments": [
+      {
+        "name": "salade verte",
+        "note": "La quiche est proposée chaude ou froide avec une belle salade.",
+        "source_url": "https://cuisine.journaldesfemmes.fr/recette/3113451-quiche-au-poulet-courgette-et-curry"
+      },
+      {
+        "name": "salade",
+        "note": "Une autre recette indique qu'elle peut être servie chaude ou froide avec une salade.",
+        "source_url": "https://www.750g.com/quiche-avec-restes-de-poulet-r52748.htm"
+      }
+    ],
+    "common_failures": [
+      {
+        "problem": "Fond détrempé",
+        "cause": "La pâte n'est pas précuite avant l'ajout d'une garniture humide.",
+        "remedy": "Piquer puis précuire la pâte à blanc pendant 10 minutes.",
+        "source_url": "https://cuisine.journaldesfemmes.fr/recette/3113451-quiche-au-poulet-courgette-et-curry"
+      },
+      {
+        "problem": "Courgettes insuffisamment cuites",
+        "cause": "Elles sont ajoutées sans cuisson préalable.",
+        "remedy": "Les faire revenir jusqu'à ce qu'elles soient tendres.",
+        "source_url": "https://www.750g.com/tarte-poulet-courgettes-ultra-simple-r87271.htm"
+      },
+      {
+        "problem": "Garniture trop liquide",
+        "cause": "La crème ajoutée au poulet n'a pas suffisamment réduit.",
+        "remedy": "Faire réduire la préparation pendant cinq minutes.",
+        "source_url": "https://www.750g.com/tarte-poulet-courgettes-ultra-simple-r87271.htm"
+      },
+      {
+        "problem": "Quiche peu gratinée",
+        "cause": "La surface n'a pas atteint une coloration dorée.",
+        "remedy": "Poursuivre la cuisson jusqu'à ce que le dessus soit doré.",
+        "source_url": "https://www.750g.com/tarte-poulet-courgettes-ultra-simple-r87271.htm"
+      }
+    ],
+    "storage": [
+      {
+        "method": "Réfrigérateur",
+        "duration": "3 à 4 jours",
+        "note": "Conserver la quiche cuite et refroidie dans un récipient couvert ou emballée au réfrigérateur.",
+        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/leftovers-and-food-safety"
+      },
+      {
+        "method": "Congélation",
+        "duration": "non documentée par les sources retenues",
+        "note": "Aucune source retenue ne fournit une durée de congélation spécifique pour cette quiche.",
+        "source_url": "https://www.750g.com/tarte-poulet-courgettes-ultra-simple-r87271.htm"
+      },
+      {
+        "method": "Service",
+        "duration": "non documentée",
+        "note": "Les sources indiquent seulement qu'elle peut être dégustée chaude ou froide.",
+        "source_url": "https://cuisine.journaldesfemmes.fr/recette/3113451-quiche-au-poulet-courgette-et-curry"
+      }
+    ],
+    "food_safety": [
+      {
+        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/leftovers-and-food-safety",
+        "text": "Réfrigérer les restes rapidement et les consommer dans les 3 à 4 jours."
+      },
+      {
+        "source_url": "https://www.anses.fr/en/system/files/NUT2017SA0141.pdf",
+        "text": "La volaille doit atteindre une cuisson suffisante, supérieure à 70 °C à cœur."
+      },
+      {
+        "source_url": "https://www.anses.fr/en/system/files/NUT2017SA0141.pdf",
+        "text": "Nettoyer les ustensiles ayant touché la volaille crue avant de les utiliser pour des aliments cuits."
+      }
+    ],
+    "references": [
+      {
+        "url": "https://www.750g.com/tarte-poulet-courgettes-ultra-simple-r87271.htm",
+        "title": "Tarte poulet courgettes ultra simple",
+        "publisher": "750g"
+      },
+      {
+        "url": "https://cuisine.journaldesfemmes.fr/recette/3113451-quiche-au-poulet-courgette-et-curry",
+        "title": "Quiche au poulet, courgette et curry",
+        "publisher": "Journal des Femmes Cuisine"
+      },
+      {
+        "url": "https://www.750g.com/quiche-avec-restes-de-poulet-r52748.htm",
+        "title": "Quiche avec restes de poulet",
+        "publisher": "750g"
+      },
+      {
+        "url": "https://www.750g.com/quiche-aux-legumes-r25850.htm",
+        "title": "Quiche aux légumes",
+        "publisher": "750g"
+      },
+      {
+        "url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/leftovers-and-food-safety",
+        "title": "Leftovers and Food Safety",
+        "publisher": "USDA Food Safety and Inspection Service"
+      },
+      {
+        "url": "https://www.anses.fr/en/system/files/NUT2017SA0141.pdf",
+        "title": "Recommandations de sécurité alimentaire",
+        "publisher": "Anses"
+      }
+    ],
+    "visual_references": [
+      {
+        "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Quiche%20Lorraine.jpg",
+        "source_url": "https://commons.wikimedia.org/wiki/File:Quiche_Lorraine.jpg",
+        "title": "Quiche lorraine, variante proche",
+        "tier": 2
+      },
+      {
+        "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Quiche.jpg",
+        "source_url": "https://commons.wikimedia.org/wiki/File:Quiche.jpg",
+        "title": "Quiche, variante proche",
+        "tier": 2
+      }
+    ],
+    "visual_observations": [],
+    "uncertainties": [
+      "Les sources divergent sur l'appareil : crème et lait dans la recette 750g, fromage blanc dans la version allégée du Journal des Femmes.",
+      "Les sources divergent sur la pâte : la recette ciblée utilise une pâte brisée, tandis qu'une variante de restes de poulet utilise une pâte feuilletée.",
+      "La quantité d'oignon, présente dans la version au curry, n'est pas indiquée dans la recette 750g retenue comme base principale.",
+      "Aucune source retenue ne fournit une quantité précise de sel, de poivre ou d'huile.",
+      "Image non analysée : image HTTP 301"
+    ],
+    "originality_notes": [
+      "Le package reformule les méthodes et ne reproduit pas la prose des sources.",
+      "Les quantités, températures, durées, substitutions et accompagnements sont conservés uniquement lorsqu'une source les documente.",
+      "Les observations visuelles sont volontairement laissées vides jusqu'à l'analyse des fichiers image réels."
+    ]
+  },
+  "canonical": {
+    "title": "Quiche au poulet et aux courgettes",
+    "description": "Cette quiche associe une pâte croustillante, une garniture fondante de poulet et de courgettes, puis un appareil crémeux gratiné, à servir chaude ou froide.",
+    "servings": 8,
+    "prep_minutes": 20,
+    "cook_minutes": 45,
+    "total_minutes": 65,
+    "cuisine": "française",
+    "recipe_category": "plat principal",
+    "difficulty": "facile",
+    "calories_estimate": 300,
+    "ingredients": [
+      {
+        "name": "pâte brisée",
+        "quantity": 1,
+        "unit": "unité"
+      },
+      {
+        "name": "poulet cuit",
+        "quantity": 150,
+        "unit": "g"
+      },
+      {
+        "name": "courgettes",
+        "quantity": 2,
+        "unit": "unités"
+      },
+      {
+        "name": "oignon",
+        "quantity": 1,
+        "unit": "unité"
+      },
+      {
+        "name": "œufs",
+        "quantity": 3,
+        "unit": "unités"
+      },
+      {
+        "name": "crème liquide",
+        "quantity": 20,
+        "unit": "cl"
+      },
+      {
+        "name": "lait",
+        "quantity": 20,
+        "unit": "cl"
+      },
+      {
+        "name": "gruyère râpé",
+        "quantity": 50,
+        "unit": "g"
+      },
+      {
+        "name": "huile d'olive",
+        "quantity": 15,
+        "unit": "ml"
+      },
+      {
+        "name": "sel",
+        "quantity": 5,
+        "unit": "g"
+      },
+      {
+        "name": "poivre",
+        "quantity": 1,
+        "unit": "g"
+      }
+    ],
+    "steps": [
+      {
+        "text": "Préchauffer le four à 200 °C en mode chaleur statique."
+      },
+      {
+        "text": "Foncer la pâte brisée dans un moule à tarte."
+      },
+      {
+        "text": "Piquer le fond de pâte avec une fourchette."
+      },
+      {
+        "text": "Précuire la pâte à blanc pendant 10 minutes à 180 °C en mode chaleur statique ; le fond est partiellement cuit."
+      },
+      {
+        "text": "Émincer l'oignon ; il est coupé finement."
+      },
+      {
+        "text": "Découper les courgettes en tranches fines et régulières."
+      },
+      {
+        "text": "Faire chauffer l'huile d'olive dans une poêle."
+      },
+      {
+        "text": "Faire revenir l'oignon dans l'huile ; il devient tendre."
+      },
+      {
+        "text": "Ajouter les courgettes dans la poêle."
+      },
+      {
+        "text": "Faire revenir les courgettes à feu doux ; elles sont tendres."
+      },
+      {
+        "text": "Assaisonner les courgettes avec la moitié du sel et du poivre."
+      },
+      {
+        "text": "Émincer le poulet cuit ; les morceaux sont réguliers."
+      },
+      {
+        "text": "Faire revenir brièvement le poulet dans une poêle ; il est chaud et légèrement doré."
+      },
+      {
+        "text": "Ajouter la crème liquide au poulet."
+      },
+      {
+        "text": "Faire réduire le poulet crémé pendant 5 minutes ; la préparation est moins liquide."
+      },
+      {
+        "text": "Battre les œufs avec le lait dans un récipient ; l'appareil est homogène."
+      },
+      {
+        "text": "Ajouter le reste du sel et du poivre à l'appareil."
+      },
+      {
+        "text": "Répartir le poulet crémé sur le fond de pâte précuit ; la garniture couvre régulièrement le fond."
+      },
+      {
+        "text": "Répartir les courgettes sur le poulet."
+      },
+      {
+        "text": "Verser l'appareil aux œufs et au lait sur la garniture."
+      },
+      {
+        "text": "Saupoudrer le gruyère râpé sur la surface."
+      },
+      {
+        "text": "Cuire la quiche pendant 35 minutes à 200 °C en mode chaleur statique ; le centre est pris et le dessus est doré."
+      }
+    ],
+    "equipment": [
+      "moule à tarte",
+      "four",
+      "fourchette",
+      "poêle",
+      "récipient",
+      "fouet"
+    ],
+    "notes": [
+      "La précuisson de la pâte et la réduction de la crème limitent le risque de fond détrempé.",
+      "Laisser tiédir la quiche avant de la découper pour obtenir des parts plus nettes.",
+      "La quiche peut être servie chaude ou froide, notamment avec une salade verte.",
+      "Conserver la quiche cuite et refroidie dans un récipient couvert ou emballée au réfrigérateur pendant 3 à 4 jours."
+    ],
+    "faq": [
+      {
+        "question": "Comment éviter une quiche détrempée ?",
+        "answer": "Piquez puis précuisez la pâte à blanc pendant 10 minutes, faites revenir les courgettes et laissez réduire la crème avec le poulet pendant 5 minutes."
+      },
+      {
+        "question": "Comment savoir si la quiche est cuite ?",
+        "answer": "Le centre doit être pris et le dessus doré après environ 35 minutes à 200 °C."
+      },
+      {
+        "question": "La quiche se mange-t-elle chaude ou froide ?",
+        "answer": "Elle peut être servie chaude ou froide, avec une salade verte."
+      },
+      {
+        "question": "Combien de temps conserver cette quiche ?",
+        "answer": "Conservez-la au réfrigérateur, couverte ou emballée, pendant 3 à 4 jours."
+      }
+    ],
+    "keywords": [
+      "quiche",
+      "poulet",
+      "courgettes",
+      "pâte brisée",
+      "œufs",
+      "gruyère",
+      "quiche française",
+      "plat principal"
+    ],
+    "food_safety": [
+      "Utiliser du poulet déjà cuit et le réchauffer complètement dans la garniture.",
+      "Si du poulet cru est utilisé à la place du poulet cuit, le cuire à plus de 70 °C à cœur avant de l'incorporer.",
+      "Nettoyer les ustensiles et les surfaces ayant touché de la volaille crue avant de les réutiliser.",
+      "Réfrigérer rapidement la quiche cuite et la consommer dans les 3 à 4 jours.",
+      "La recette contient des allergènes : gluten dans la pâte brisée, œufs, lait et produits laitiers."
+    ],
+    "uncertainties": [
+      "La recette de base documentée indique 20 minutes de préparation et 35 minutes de cuisson, mais la précuisson recommandée ajoute 10 minutes ; le temps total retenu est donc de 65 minutes.",
+      "La quantité de lait est convertie en 20 cl à partir de la mention « grand verre ».",
+      "La quantité d'oignon n'est pas précisée dans la recette principale ; une unité est retenue d'après la variante documentée.",
+      "Les quantités de sel, de poivre et d'huile ne sont pas chiffrées dans les sources ; des mesures pratiques sont indiquées pour permettre la réalisation.",
+      "Aucune durée de congélation spécifique n'est documentée."
+    ]
+  }
+}

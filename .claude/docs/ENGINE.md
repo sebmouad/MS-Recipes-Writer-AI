@@ -581,6 +581,26 @@ photograph, and otherwise use the photograph without the cost of a search.
     the French settings (`LENGTH_FACTORS`, Arabic 0.85), and the prompt, the
     `words` check and the quality contract all read it.
 
+29. **A warmer, closer collage that ends opened.** Owner's request,
+    2026-09-24, after comparing our collages with ones he preferred: tighter,
+    warmer, richer, and a last panel that shows the inside. The `collage`
+    prompt now asks for a close-up in every panel, the first included (the
+    food fills 85–95% of the cell, vessels may leave it, no empty surface);
+    warm side light with more contrast and true, rich colour, browning as deep
+    as the cooking makes it (the observed colour still wins when a real
+    photograph recorded one); one warm home-kitchen setting — wood, linen or
+    gingham, herbs out of focus behind the food; and a last panel always
+    opened — a slice lifted, a piece broken, a spoonful raised. The final
+    approval reports `facebook_image.last_panel_opened`, and a whole last
+    panel is blocking. The judge was seen to approve a whole quiche anyway, so
+    `MSRWA_Engine_Score::enforce()` turns `false` into a refusal with a
+    finding (in the site's language, unless the judge wrote one), which
+    redraws the collage. Measured the same day on two new briefs,
+    `croquettes-pommes-de-terre-jambon` and `quiche-poulet-courgettes`: four
+    collages at medium quality, about $0.024 each; three opened their last
+    panel unasked, the whole one was refused twice out of two, and a redraw
+    came back opened and approved.
+
 ### Still open
 
 

@@ -5,9 +5,9 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.26.1
+## État actuel — 0.26.2
 
-La version `0.26.1` retire les copies des prompts que gardaient les réglages :
+La version `0.26.2` rend le visuel Facebook plus chaleureux et plus proche du plat, et le fait toujours finir sur le plat ouvert ; la `0.26.1` retirait les copies des prompts que gardaient les réglages :
 le moteur exécute ses propres gabarits, et ce qui n’est lu par rien ne se
 périme plus en silence. Le détail de chaque version suit, de la plus récente à
 la plus ancienne.
@@ -76,6 +76,31 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.26.2
+
+**Un visuel Facebook plus appétissant.** À la demande du propriétaire, après
+comparaison avec des collages qu'il préférait :
+
+- **Plus près du plat.** Chaque panneau, le premier compris, est un gros plan :
+  le plat occupe presque tout le cadre, les bols et les poêles peuvent en
+  sortir, plus de plan de travail vide autour.
+- **Des couleurs plus vraies et plus chaudes.** Lumière chaude de fenêtre, plus
+  de contraste, croûtes dorées comme la cuisson les dore — sans filtre ni
+  teinte orangée. Quand une vraie photographie du plat existe, sa couleur
+  reste la référence.
+- **Une vraie cuisine.** Planche ou table en bois, torchon de lin ou vichy,
+  herbes floues à l'arrière-plan — le même décor dans les six panneaux.
+- **Le dernier panneau montre l'intérieur** : une part soulevée, une croquette
+  rompue, une cuillerée. La vérification finale refuse désormais un collage
+  qui finit sur le plat entier, et le fait redessiner.
+
+Vérifié en conditions réelles sur les deux plats comparés — croquettes de
+pommes de terre au jambon et quiche au poulet et aux courgettes : quatre
+collages, environ 0,024 $ chacun en qualité moyenne. Le collage qui finissait
+sur une quiche entière a été refusé deux fois sur deux, et celui qui l'a
+remplacé est arrivé ouvert et approuvé. Une recette complète est revenue à
+0,09–0,13 $.
 
 ## Version 0.26.1
 
