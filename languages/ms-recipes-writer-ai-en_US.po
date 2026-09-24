@@ -1371,8 +1371,10 @@ msgstr "the server"
 msgid "à regarder"
 msgstr "to look at"
 
-msgid " et %d autres"
-msgstr " and %d others"
+msgid " et %d autre"
+msgid_plural " et %d autres"
+msgstr[0] " and %d other"
+msgstr[1] " and %d others"
 
 msgid "Aucune recette dans ce qui a été fourni."
 msgstr "No recipe in what was provided."

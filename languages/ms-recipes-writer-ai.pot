@@ -8,8 +8,10 @@ msgstr ""
 "X-Generator: tools/i18n.php\n"
 
 #: class-msrwa-batch.php:89
-msgid " et %d autres"
-msgstr ""
+msgid " et %d autre"
+msgid_plural " et %d autres"
+msgstr[0] ""
+msgstr[1] ""
 
 #: class-msrwa-screen-engine.php:250
 msgid "$%1$s entrée / $%2$s sortie par million de jetons"

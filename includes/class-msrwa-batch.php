@@ -86,7 +86,7 @@ final class MSRWA_Batch {
 
 	/** A lot is known by its first recipe, and how many follow. */
 	private static function label( array $recipes ) {
-		return mb_substr( (string) $recipes[0]['title'], 0, 190 ) . ( count( $recipes ) > 1 ? sprintf( /* translators: %d is how many further recipes the lot carries. */ __( ' et %d autres', 'ms-recipes-writer-ai' ), count( $recipes ) - 1 ) : '' );
+		return mb_substr( (string) $recipes[0]['title'], 0, 190 ) . ( count( $recipes ) > 1 ? sprintf( /* translators: %d is how many further recipes the lot carries. */ _n( ' et %d autre', ' et %d autres', count( $recipes ) - 1, 'ms-recipes-writer-ai' ), count( $recipes ) - 1 ) : '' );
 	}
 
 	public static function get( $id ) {
