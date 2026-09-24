@@ -160,7 +160,8 @@ final class MSRWA_Screen_Batch {
 					<p class="ms-pair-dish"><?php echo esc_html( $dish ); ?></p>
 					<p class="ms-pair-says"><?php echo esc_html( (string) ( $image['describes'] ?? __( 'Non décrite.', 'ms-recipes-writer-ai' ) ) ); ?></p>
 					<p class="ms-pair-why"><span class="ms-state ms-state-<?php echo esc_attr( $tone ); ?> ms-pair-badge"><?php echo esc_html( $pending ? __( 'À décider', 'ms-recipes-writer-ai' ) : ( $aside ? __( 'Mise de côté', 'ms-recipes-writer-ai' ) : ( ! empty( $pair['new_recipe'] ) && ! $mine ? __( 'Nouvelle recette', 'ms-recipes-writer-ai' ) : ( $mine ? __( 'Choisie par vous', 'ms-recipes-writer-ai' ) : self::confidence( (string) $pair['confidence'] ) ) ) ) ); ?></span>
-						<?php if ( '' !== (string) $pair['why'] && 'Confirmé par le rédacteur.' !== (string) $pair['why'] ) : ?><span class="ms-pair-reason"><?php echo esc_html( $pair['why'] ); ?></span><?php endif; ?></p>
+						<?php $why = self::reason( $pair ); ?>
+						<?php if ( '' !== $why ) : ?><span class="ms-pair-reason"><?php echo esc_html( $why ); ?></span><?php endif; ?></p>
 					<p class="ms-pair-file"><?php echo esc_html( $image['file'] ); ?></p>
 				</div>
 				<div class="ms-pair-pick">
@@ -189,6 +190,27 @@ final class MSRWA_Screen_Batch {
 
 		self::actions( $settling, $recipe_count, $scheduled );
 		echo '</section>';
+	}
+
+	/**
+	 * Why a photograph is where it is. The plugin's own reasons are codes said
+	 * in the reader's language; a model's reason is shown as it wrote it.
+	 */
+	private static function reason( array $pair ) {
+		$own = array(
+			'only_recipe' => __( 'Seule recette du lot.', 'ms-recipes-writer-ai' ),
+			'new_recipe' => __( 'Plat absent du texte : une recette de plus, d’après la photographie.', 'ms-recipes-writer-ai' ),
+			'no_dish' => __( 'Aucun plat reconnu sur la photographie : associez-la, faites-en une recette ou écartez-la.', 'ms-recipes-writer-ai' ),
+			'not_mentioned' => __( 'Non mentionnée par l’appariement.', 'ms-recipes-writer-ai' ),
+		);
+		if ( isset( $own[ (string) ( $pair['reason'] ?? '' ) ] ) ) { return $own[ $pair['reason'] ]; }
+		$why = (string) ( $pair['why'] ?? '' );
+		// Lots paired before the codes existed carry the same sentences in French.
+		foreach ( array( 'Seule recette du lot.' => 'only_recipe', 'Non mentionnée par l’appariement.' => 'not_mentioned' ) as $sentence => $code ) {
+			if ( $sentence === $why ) { return $own[ $code ]; }
+		}
+		if ( 0 === strpos( $why, 'Aucun plat reconnu sur la photographie' ) ) { return $own['no_dish']; }
+		return 'Confirmé par le rédacteur.' === $why ? '' : $why;
 	}
 
 	/** How sure the model was, said in words rather than as a bare label. */

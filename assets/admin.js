@@ -317,11 +317,17 @@
       note.hidden = !loose;
       note.textContent = loose === 1 ? note.dataset.one : (note.dataset.many || '').replace('%d', loose);
     }
-    // Nothing leaves while a photograph waits for a decision.
+    // Nothing leaves while a photograph waits for a decision, and the reason
+    // is said beside the buttons it disables, not only at the top of the list.
     ['ms-dispatch', 'ms-schedule'].forEach(function (id) {
       var button = document.getElementById(id);
       if (button) { button.disabled = loose > 0; }
     });
+    var status = document.getElementById('ms-batch-status');
+    if (status && note) {
+      if (loose) { status.textContent = note.textContent; status.dataset.pending = '1'; }
+      else if (status.dataset.pending) { status.textContent = ''; delete status.dataset.pending; }
+    }
   }
 
   document.querySelectorAll('.ms-pair-choice').forEach(function (select) {

@@ -2221,6 +2221,18 @@ msgstr[1] "%d photographs need your decision: pair them with a recipe, make reci
 msgid "Ne sera pas écrite : sa photographie est écartée"
 msgstr "Will not be written: its photograph is set aside"
 
+msgid "Aucun plat reconnu sur la photographie : associez-la, faites-en une recette ou écartez-la."
+msgstr "No dish recognised in the photograph: pair it, make it a recipe, or set it aside."
+
+msgid "Non mentionnée par l’appariement."
+msgstr "Not mentioned by the pairing."
+
+msgid "Plat absent du texte : une recette de plus, d’après la photographie."
+msgstr "A dish the text does not name: one more recipe, from the photograph."
+
+msgid "Seule recette du lot."
+msgstr "The only recipe in the lot."
+
 msgid "aucune page citée"
 msgstr "no page cited"
 

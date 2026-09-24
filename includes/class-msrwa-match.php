@@ -36,7 +36,7 @@ final class MSRWA_Match {
 			// nothing for a paid call to decide. A photograph with no dish on it
 			// still waits for the writer, as normalise() promises.
 			$decision = array( 'pairs' => array(), 'reasoning' => '', 'cost_usd' => 0.0, 'seconds' => 0.0, 'errors' => array() );
-			foreach ( array_keys( $seen['images'] ) as $index ) { $decision['pairs'][] = array( 'image' => $index, 'recipe' => 0, 'confidence' => 'haute', 'why' => 'Seule recette du lot.' ); }
+			foreach ( array_keys( $seen['images'] ) as $index ) { $decision['pairs'][] = array( 'image' => $index, 'recipe' => 0, 'confidence' => 'haute', 'why' => 'Seule recette du lot.', 'reason' => 'only_recipe' ); }
 		} elseif ( ! $recipes ) {
 			$decision = self::propose( $seen['images'], $config );
 			$recipes = $decision['recipes'];
@@ -174,7 +174,7 @@ final class MSRWA_Match {
 			if ( ! is_array( $pair ) || ! isset( $pair['image'], $pair['recipe'], $loose[ (int) $pair['image'] ] ) || null === $pair['recipe'] ) { continue; }
 			$moved[ $loose[ (int) $pair['image'] ] ] = array(
 				'image' => $loose[ (int) $pair['image'] ], 'recipe' => $offset + (int) $pair['recipe'],
-				'confidence' => 'moyenne', 'why' => 'Plat absent du texte : une recette de plus, d’après la photographie.', 'new_recipe' => true,
+				'confidence' => 'moyenne', 'why' => 'Plat absent du texte : une recette de plus, d’après la photographie.', 'reason' => 'new_recipe', 'new_recipe' => true,
 			);
 		}
 		foreach ( $pairs as $key => $pair ) {
@@ -353,6 +353,10 @@ final class MSRWA_Match {
 			if ( null !== $recipe && ( $recipe < 0 || $recipe >= (int) $recipe_count ) ) { $recipe = null; }
 			$confidence = in_array( (string) ( $pair['confidence'] ?? '' ), array( 'haute', 'moyenne', 'basse' ), true ) ? (string) $pair['confidence'] : 'basse';
 			$why = mb_substr( (string) ( $pair['why'] ?? '' ), 0, 300 );
+			// A reason the plugin gives itself travels as a code, so the screen
+			// can say it in the reader's language; the model's own reasons are
+			// written in the lot's.
+			$reason = in_array( (string) ( $pair['reason'] ?? '' ), array( 'only_recipe', 'new_recipe', 'no_dish', 'not_mentioned' ), true ) ? (string) $pair['reason'] : '';
 			// "In doubt, do not pair" is a promise on screen, so it is kept here
 			// and not left to the model: a live pairing gave a plain brown square
 			// to a tart "with confidence" while saying no dish was visible. A
@@ -361,9 +365,12 @@ final class MSRWA_Match {
 				$recipe = null;
 				$confidence = 'basse';
 				$why = 'Aucun plat reconnu sur la photographie : associez-la, faites-en une recette ou écartez-la.';
+				$reason = 'no_dish';
 			}
 			$taken[ $image ] = true;
 			$one = array( 'image' => $image, 'recipe' => $recipe, 'confidence' => $confidence, 'why' => $why );
+			if ( null === $recipe && '' === trim( (string) ( $images[ $image ]['dish'] ?? 'x' ) ) ) { $reason = 'no_dish'; }
+			if ( '' !== $reason ) { $one['reason'] = $reason; }
 			if ( ! empty( $pair['new_recipe'] ) ) { $one['new_recipe'] = true; }
 			// A photograph no recipe took is the writer's to decide — none is
 			// dropped without them — and the lot does not leave until they have.
@@ -372,7 +379,7 @@ final class MSRWA_Match {
 		}
 		// A photograph the answer never mentioned is unassigned, not missing.
 		foreach ( array_keys( $images ) as $image ) {
-			if ( ! isset( $taken[ $image ] ) ) { $out[] = array( 'image' => (int) $image, 'recipe' => null, 'confidence' => 'basse', 'why' => 'Non mentionnée par l’appariement.', 'pending' => true ); }
+			if ( ! isset( $taken[ $image ] ) ) { $out[] = array( 'image' => (int) $image, 'recipe' => null, 'confidence' => 'basse', 'why' => 'Non mentionnée par l’appariement.', 'reason' => 'not_mentioned', 'pending' => true ); }
 		}
 		return $out;
 	}

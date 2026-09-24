@@ -2257,6 +2257,18 @@ msgstr[5] "%d صورة بانتظار قرارك: اربطها بوصفة، أو
 msgid "Ne sera pas écrite : sa photographie est écartée"
 msgstr "لن تُكتب: صورتها مستبعدة"
 
+msgid "Aucun plat reconnu sur la photographie : associez-la, faites-en une recette ou écartez-la."
+msgstr "لم يُتعرَّف على أي طبق في الصورة: اربطها بوصفة، أو اجعلها وصفة، أو استبعدها."
+
+msgid "Non mentionnée par l’appariement."
+msgstr "لم يذكرها الربط."
+
+msgid "Plat absent du texte : une recette de plus, d’après la photographie."
+msgstr "طبق لا يذكره النص: وصفة إضافية انطلاقًا من الصورة."
+
+msgid "Seule recette du lot."
+msgstr "الوصفة الوحيدة في الدفعة."
+
 msgid "aucune page citée"
 msgstr "لم تُذكر أي صفحة"
 

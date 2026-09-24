@@ -348,7 +348,12 @@
 	.ms-pairing > p, .ms-pairing > .ms-note { margin-inline: 14px; }
 	.ms-launch { padding: 12px 14px; }
 	.ms-launch #ms-dispatch { flex: 1 1 100%; justify-content: center; text-align: center; }
-	.ms-later-body { inset-inline-end: auto; inset-inline-start: 0; }
+	/* A pop-over anchored to a button near the edge runs off a phone: it
+	   opens in the flow instead, under the button, as wide as the card. */
+	.ms-later { flex: 1 1 100%; }
+	.ms-later > summary { inline-size: 100%; text-align: center; }
+	.ms-later-body { position: static; min-inline-size: 0; margin-block-start: 8px; box-shadow: none; }
+	.ms-later-body input { inline-size: 100%; }
 }
 
 /* --- Timeline ---------------------------------------------------------- */
