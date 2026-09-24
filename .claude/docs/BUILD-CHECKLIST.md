@@ -746,6 +746,9 @@ own once there is room. Nothing is killed in flight and nothing is marked
 failed, but the site no longer spends past its ceiling to finish a lot that was
 cheap when it was dispatched.
 
+Amended 2026-09-24: the article is **2400 words minimum, 3200 maximum** by
+default (split about 1270/1130), the owner's choice; both stay settings.
+
 Agreed 2026-09-20: 2800 words split 1500/1300 · one quality contract, no modes ·
 editable enforced outline · own meta plus Recipe JSON-LD · research, gate,
 review, fact check, always-on proofreading · four cost buckets with min/max

@@ -34,14 +34,14 @@ final class MSRWA_Settings {
 			'internal_links_max'     => 3,
 			'prompt_internal_links' => 'Intègre les liens naturellement sur plusieurs mots ou expressions pertinents dans les paragraphes de content_html. Chaque ancre doit décrire la recette cible et faire partie de la phrase. Répartis les liens dans le texte, sans répétition de cible, sans liste de liens ni section À découvrir, À lire aussi ou équivalente. Retourne dans internal_links les mêmes ancres exactes et URLs. Si aucun lien ne convient au contexte, omets-le plutôt que forcer une recommandation.',
 			'quality_min_score'        => 90,
-			'quality_min_words'   => 2800,
+			'quality_min_words'   => 2400,
 			'site_language'       => 'fr',
 			'recipe_schema'       => 1,
 			'seo_meta'            => 1,
 			'article_page2_heading' => 'Préparation de la recette étape par étape',
 			'required_sections'   => array(),
 
-			'quality_max_words'        => 3600,
+			'quality_max_words'        => 3200,
 			'quality_min_headings'     => 10,
 			'quality_min_paragraphs'   => 24,
 			'quality_min_ingredients'  => 6,
@@ -137,7 +137,7 @@ LANGUAGE AND TYPOGRAPHY — mandatory:
 - Correct, fully accented French: é, è, ê, à, â, ù, û, ô, ç, œ. Text without accents is rejected.
 - Typographic apostrophes ’. No spelling, agreement or conjugation errors.
 
-LENGTH: 2800 words minimum in total, 3600 maximum. At least 1484 words before the page break and at least 1316 after. No padding: if you run short of material, go deeper on a useful technique rather than paraphrasing.
+LENGTH: 2400 words minimum in total, 3200 maximum. At least 1272 words before the page break and at least 1128 after. No padding: if you run short of material, go deeper on a useful technique rather than paraphrasing.
 
 REQUIRED PLAN — 14 sections, in this order, each under an h2 heading phrased the way people search on Google. At least 10 headings and 24 paragraphs across the article.
 1. Introduction : la promesse du plat, sa texture, le moment de le servir

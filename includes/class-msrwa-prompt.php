@@ -19,7 +19,7 @@ final class MSRWA_Prompt {
 	/** Every value a template may use, derived from the settings. */
 	public static function variables( $settings = null ) {
 		$s = is_array( $settings ) ? $settings : MSRWA_Settings::get();
-		$total = max( 300, (int) ( $s['quality_min_words'] ?? 2800 ) );
+		$total = max( 300, (int) ( $s['quality_min_words'] ?? 2400 ) );
 		$two_pages = ! empty( $s['article_pagination_enabled'] );
 		$page1 = $two_pages ? (int) round( $total * 0.53 ) : 0;
 		$page2 = $two_pages ? $total - $page1 : 0;

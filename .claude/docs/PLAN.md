@@ -83,7 +83,7 @@ answer.
 
 ### ◐ 4. Articles that are complete and correct
 
-2800 words minimum, split over two pages (about 1500 then 1300, page two
+2400 words minimum, split over two pages (about 1270 then 1130, page two
 starting at the preparation). A fixed list of sections you can edit, which the
 plugin refuses to publish without: ingredients and how to choose them,
 substitutions, equipment, detailed steps, mistakes to avoid, storage,
