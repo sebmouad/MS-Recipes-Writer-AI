@@ -417,3 +417,13 @@ Break these and the plugin misreports itself.
     offers it — a template whose prompt file exists — and stores it in the
     lot's engine overrides; anything else leaves the site's default. The
     compose screen offers the choice only when there is more than one.
+
+25. **No photograph is dropped without the writer.** A photograph of a dish
+    the text does not name becomes a recipe of its own (`MSRWA_Match::strays()`,
+    grouped by one call like a lot with no text, one recipe per dish name if
+    that call fails), marked `from_photographs`. Any photograph no recipe took
+    — no dish recognised, or not mentioned — is `pending`, and
+    `MSRWA_Batch::dispatch()` and `MSRWA_Schedule::when()` refuse the lot
+    until the writer pairs it, names a new recipe for it or sets it aside
+    (`set_aside`). A recipe named after photographs that were all set aside is
+    not sent.

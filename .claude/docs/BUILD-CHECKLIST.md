@@ -194,6 +194,10 @@ run carries.
 - [x] Six-panel collage and the one-alphabet check, 0.24.5
   (`tests/test-stray-script.php`; 328 stored answers scanned, one true hit,
   no false positive; not yet seen retrying in a live run).
+- [x] No photograph dropped without the writer, 0.25.0: a dish the text does
+  not name becomes a recipe, an unrecognised photograph holds the lot until
+  decided, new recipe and set-aside from the screen (`tests/test-match.php`,
+  `tests/test-pairing.php`; live lot #56 in Chromium).
 - [ ] A complete lot on Claude — the account has no credit. — the Gemini key's
   grounding quota is exhausted, OpenAI is unreachable from the test
   environment and the Claude account has no credit.

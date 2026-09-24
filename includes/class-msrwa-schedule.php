@@ -27,6 +27,9 @@ final class MSRWA_Schedule {
 			$wpdb->update( MSRWA_DB::tables()['batches'], array( 'dispatch_at' => null, 'updated_at' => current_time( 'mysql', true ) ), array( 'id' => absint( $batch_id ) ) );
 			return 0;
 		}
+		// A lot that would be refused at its hour is refused now, while the
+		// writer is still looking at it.
+		if ( MSRWA_Batch::undecided( $batch_id ) ) { return new WP_Error( 'msrwa_undecided', __( 'Décidez d’abord du sort de chaque photographie.', 'ms-recipes-writer-ai' ) ); }
 
 		// The form speaks the site's timezone; the column is UTC, like every
 		// other time this plugin stores. Converting on the way in means nothing

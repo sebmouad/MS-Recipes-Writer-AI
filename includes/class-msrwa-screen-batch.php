@@ -85,7 +85,7 @@ final class MSRWA_Screen_Batch {
 		if ( $named ) {
 			echo '<p class="ms-note ms-note-live">' . esc_html( sprintf(
 				/* translators: %s lists the dish names read from the photographs. */
-				__( 'Aucun texte fourni : ces recettes ont été nommées d’après les photographies — %s. Chacune sera établie d’après les sources ; vérifiez-les avant de lancer.', 'ms-recipes-writer-ai' ),
+				__( 'Nommées d’après vos photographies, sans texte pour elles : %s. Chacune sera établie d’après ses photographies ; écartez une photographie pour ne pas en faire un article.', 'ms-recipes-writer-ai' ),
 				implode( ', ', array_map( static function ( $recipe ) { return (string) $recipe['title']; }, $named ) )
 			) ) . '</p>';
 		}
@@ -95,7 +95,10 @@ final class MSRWA_Screen_Batch {
 		echo '<ol class="ms-dishes" id="ms-dishes">';
 		foreach ( $recipes as $recipe_index => $recipe ) {
 			$mine = array_keys( array_filter( $chosen, static function ( $pair ) use ( $recipe_index ) { return null !== $pair['recipe'] && (int) $pair['recipe'] === (int) $recipe_index; } ) );
-			echo '<li class="ms-dish' . ( $mine ? ' has-photos' : '' ) . '" data-recipe="' . esc_attr( $recipe_index ) . '">';
+			// A recipe named after photographs has nothing to be written from
+			// once they are all set aside, and is not sent.
+			$dropped = ! $mine && ! empty( $recipe['from_photographs'] );
+			echo '<li class="ms-dish' . ( $mine ? ' has-photos' : '' ) . ( $dropped ? ' is-dropped' : '' ) . '" data-recipe="' . esc_attr( $recipe_index ) . '"' . ( empty( $recipe['from_photographs'] ) ? '' : ' data-from-photographs="1"' ) . '>';
 			echo '<strong class="ms-dish-title">' . esc_html( (string) $recipe['title'] ) . '</strong>';
 			echo '<span class="ms-dish-thumbs">';
 			foreach ( $mine as $image_index ) {
@@ -104,7 +107,7 @@ final class MSRWA_Screen_Batch {
 			echo '</span>';
 			echo '<small class="ms-dish-with">' . esc_html( $mine
 				? sprintf( /* translators: %d is a number of photographs. */ _n( '%d photographie — écrite d’après elle', '%d photographies — écrite d’après elles', count( $mine ), 'ms-recipes-writer-ai' ), count( $mine ) )
-				: __( 'Sans photographie — références cherchées sur le web', 'ms-recipes-writer-ai' ) ) . '</small>';
+				: ( $dropped ? __( 'Ne sera pas écrite : sa photographie est écartée', 'ms-recipes-writer-ai' ) : __( 'Sans photographie — références cherchées sur le web', 'ms-recipes-writer-ai' ) ) ) . '</small>';
 			echo '</li>';
 		}
 		echo '</ol>';
@@ -120,17 +123,26 @@ final class MSRWA_Screen_Batch {
 		}
 
 		echo '<h3 class="ms-pairing-sub">' . esc_html__( 'Vos photographies', 'ms-recipes-writer-ai' ) . '</h3>';
-		$loose = count( array_filter( $chosen, static function ( $pair ) { return null === $pair['recipe']; } ) );
-		echo '<p class="ms-note ms-note-warn ms-loose" id="ms-loose"' . ( $loose ? '' : ' hidden' ) . ' data-one="' . esc_attr__( 'Une photographie ne va avec aucune recette : elle ne sera pas utilisée.', 'ms-recipes-writer-ai' ) . '" data-many="' . esc_attr__( '%d photographies ne vont avec aucune recette : elles ne seront pas utilisées.', 'ms-recipes-writer-ai' ) . '">'
-			. esc_html( 1 === $loose ? __( 'Une photographie ne va avec aucune recette : elle ne sera pas utilisée.', 'ms-recipes-writer-ai' ) : sprintf( /* translators: %d is a number of photographs. */ __( '%d photographies ne vont avec aucune recette : elles ne seront pas utilisées.', 'ms-recipes-writer-ai' ), $loose ) ) . '</p>';
+		// A photograph no recipe took waits for the writer: none is dropped
+		// without them, and the lot does not leave until each is decided.
+		$loose = count( array_filter( $chosen, static function ( $pair ) { return ! empty( $pair['pending'] ); } ) );
+		echo '<p class="ms-note ms-note-warn ms-loose" id="ms-loose"' . ( $loose ? '' : ' hidden' )
+			/* translators: %d is a number of photographs. */
+			. ' data-one="' . esc_attr( _n( 'Une photographie attend votre décision : associez-la à une recette, faites-en une recette ou écartez-la.', '%d photographies attendent votre décision : associez-les à une recette, faites-en des recettes ou écartez-les.', 1, 'ms-recipes-writer-ai' ) ) . '"'
+			/* translators: %d is a number of photographs. */
+			. ' data-many="' . esc_attr( _n( 'Une photographie attend votre décision : associez-la à une recette, faites-en une recette ou écartez-la.', '%d photographies attendent votre décision : associez-les à une recette, faites-en des recettes ou écartez-les.', 2, 'ms-recipes-writer-ai' ) ) . '">'
+			/* translators: %d is a number of photographs. */
+			. esc_html( sprintf( _n( 'Une photographie attend votre décision : associez-la à une recette, faites-en une recette ou écartez-la.', '%d photographies attendent votre décision : associez-les à une recette, faites-en des recettes ou écartez-les.', max( 1, $loose ), 'ms-recipes-writer-ai' ), $loose ) ) . '</p>';
 
 		echo '<ul class="ms-pairs">';
 		foreach ( $images as $index => $image ) {
 			$pair = $chosen[ $index ];
-			// A photograph set aside is not a match, however sure the model was.
-			$aside = null === $pair['recipe'];
+			// A photograph set aside is not a match, however sure the model was;
+			// one nobody has decided on is the thing to look at.
+			$pending = ! empty( $pair['pending'] );
+			$aside = null === $pair['recipe'] && ! $pending;
 			$mine = ! empty( $pair['by_writer'] );
-			$tone = $aside ? 'idle' : ( $mine ? 'good' : ( array( 'haute' => 'good', 'moyenne' => 'warn' )[ (string) $pair['confidence'] ] ?? 'stop' ) );
+			$tone = $pending ? 'stop' : ( $aside ? 'idle' : ( $mine ? 'good' : ( array( 'haute' => 'good', 'moyenne' => 'warn' )[ (string) $pair['confidence'] ] ?? 'stop' ) ) );
 			$dish = (string) ( $image['dish'] ?? '' );
 			$dish = '' !== $dish ? mb_strtoupper( mb_substr( $dish, 0, 1 ) ) . mb_substr( $dish, 1 ) : __( 'Plat non reconnu', 'ms-recipes-writer-ai' );
 			$label = sprintf(
@@ -147,7 +159,7 @@ final class MSRWA_Screen_Batch {
 				<div class="ms-pair-body">
 					<p class="ms-pair-dish"><?php echo esc_html( $dish ); ?></p>
 					<p class="ms-pair-says"><?php echo esc_html( (string) ( $image['describes'] ?? __( 'Non décrite.', 'ms-recipes-writer-ai' ) ) ); ?></p>
-					<p class="ms-pair-why"><span class="ms-state ms-state-<?php echo esc_attr( $tone ); ?> ms-pair-badge"><?php echo esc_html( $aside ? __( 'Mise de côté', 'ms-recipes-writer-ai' ) : ( $mine ? __( 'Choisie par vous', 'ms-recipes-writer-ai' ) : self::confidence( (string) $pair['confidence'] ) ) ); ?></span>
+					<p class="ms-pair-why"><span class="ms-state ms-state-<?php echo esc_attr( $tone ); ?> ms-pair-badge"><?php echo esc_html( $pending ? __( 'À décider', 'ms-recipes-writer-ai' ) : ( $aside ? __( 'Mise de côté', 'ms-recipes-writer-ai' ) : ( ! empty( $pair['new_recipe'] ) && ! $mine ? __( 'Nouvelle recette', 'ms-recipes-writer-ai' ) : ( $mine ? __( 'Choisie par vous', 'ms-recipes-writer-ai' ) : self::confidence( (string) $pair['confidence'] ) ) ) ) ); ?></span>
 						<?php if ( '' !== (string) $pair['why'] && 'Confirmé par le rédacteur.' !== (string) $pair['why'] ) : ?><span class="ms-pair-reason"><?php echo esc_html( $pair['why'] ); ?></span><?php endif; ?></p>
 					<p class="ms-pair-file"><?php echo esc_html( $image['file'] ); ?></p>
 				</div>
@@ -155,13 +167,19 @@ final class MSRWA_Screen_Batch {
 					<?php if ( $settling ) : ?>
 						<label for="ms-pair-<?php echo esc_attr( $index ); ?>"><span class="screen-reader-text"><?php echo esc_html( $label ); ?></span><span aria-hidden="true"><?php esc_html_e( 'Va avec', 'ms-recipes-writer-ai' ); ?></span></label>
 						<select id="ms-pair-<?php echo esc_attr( $index ); ?>" class="ms-pair-choice" data-image="<?php echo esc_attr( $index ); ?>" data-url="<?php echo esc_url( (string) ( $image['url'] ?? '' ) ); ?>">
-							<option value=""><?php esc_html_e( 'aucune recette', 'ms-recipes-writer-ai' ); ?></option>
+							<?php if ( $pending ) : ?><option value="" selected><?php esc_html_e( '— à décider —', 'ms-recipes-writer-ai' ); ?></option><?php endif; ?>
 							<?php foreach ( $recipes as $recipe_index => $recipe ) : ?>
 								<option value="<?php echo esc_attr( $recipe_index ); ?>" <?php selected( null !== $pair['recipe'] && (int) $recipe_index === (int) $pair['recipe'] ); ?>><?php echo esc_html( $recipe['title'] ); ?></option>
 							<?php endforeach; ?>
+							<option value="new"><?php esc_html_e( 'Nouvelle recette…', 'ms-recipes-writer-ai' ); ?></option>
+							<option value="aside" <?php selected( $aside ); ?>><?php esc_html_e( 'Écarter cette photographie', 'ms-recipes-writer-ai' ); ?></option>
 						</select>
+						<span class="ms-pair-new" hidden>
+							<input type="text" class="ms-pair-title" maxlength="180" placeholder="<?php esc_attr_e( 'Nom de la recette', 'ms-recipes-writer-ai' ); ?>" value="<?php echo esc_attr( ucfirst( (string) ( $image['dish'] ?? '' ) ) ); ?>" aria-label="<?php esc_attr_e( 'Nom de la recette', 'ms-recipes-writer-ai' ); ?>">
+							<button type="button" class="button ms-pair-create"><?php esc_html_e( 'Créer', 'ms-recipes-writer-ai' ); ?></button>
+						</span>
 					<?php else : ?>
-						<span class="ms-pair-fixed"><?php echo esc_html( '' !== $current ? $current : __( 'aucune recette', 'ms-recipes-writer-ai' ) ); ?></span>
+						<span class="ms-pair-fixed"><?php echo esc_html( '' !== $current ? $current : __( 'écartée', 'ms-recipes-writer-ai' ) ); ?></span>
 					<?php endif; ?>
 				</div>
 			</li>

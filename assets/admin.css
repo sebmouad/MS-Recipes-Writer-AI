@@ -300,6 +300,8 @@
 .ms-dishes { list-style: none; margin: 0 20px 6px; padding: 0; display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); }
 .ms-dish { margin: 0; padding: 14px 16px; display: grid; gap: 8px; align-content: start; background: var(--ms-raised); border: 1px solid var(--ms-line); border-inline-start: var(--ms-rail) solid var(--ms-line); border-radius: var(--ms-radius); }
 .ms-dish.has-photos { border-inline-start-color: var(--ms-good); }
+.ms-dish.is-dropped { opacity: .55; }
+.ms-dish.is-dropped .ms-dish-title { text-decoration: line-through; }
 .ms-dish-title { font-size: 14px; line-height: 1.35; }
 .ms-dish-thumbs { display: flex; flex-wrap: wrap; gap: 6px; min-block-size: 0; }
 .ms-dish-thumbs:empty { display: none; }

@@ -147,17 +147,48 @@ final class MSRWA_Batch {
 		foreach ( $pairs as $pair ) {
 			$image = isset( $pair['image'] ) ? (int) $pair['image'] : -1;
 			if ( $image < 0 || $image >= count( (array) $matching['images'] ) || isset( $taken[ $image ] ) ) { continue; }
-			$recipe = isset( $pair['recipe'] ) && '' !== $pair['recipe'] && null !== $pair['recipe'] ? (int) $pair['recipe'] : null;
-			if ( null !== $recipe && ( $recipe < 0 || $recipe >= count( (array) $matching['recipes'] ) ) ) { $recipe = null; }
+			$choice = (string) ( $pair['recipe'] ?? '' );
 			$taken[ $image ] = true;
 			$was = $before[ $image ] ?? null;
-			$kept = $was && ( null === $recipe ? null === ( $was['recipe'] ?? null ) : null !== ( $was['recipe'] ?? null ) && (int) $was['recipe'] === $recipe );
+			// Three choices beside a recipe: set the photograph aside, make it a
+			// recipe of its own under a name the writer gives, or leave it
+			// undecided — which holds the lot back.
+			if ( 'aside' === $choice ) {
+				$clean[] = array( 'image' => $image, 'recipe' => null, 'confidence' => 'haute', 'why' => '', 'by_writer' => true, 'set_aside' => true );
+				continue;
+			}
+			if ( 'new' === $choice ) {
+				$recipe = MSRWA_Match::named( (string) ( $pair['title'] ?? '' ), (array) $matching['images'][ $image ] );
+				if ( $recipe ) {
+					$matching['recipes'][] = $recipe;
+					$clean[] = array( 'image' => $image, 'recipe' => count( $matching['recipes'] ) - 1, 'confidence' => 'haute', 'why' => '', 'by_writer' => true, 'new_recipe' => true );
+					continue;
+				}
+				$choice = '';
+			}
+			$recipe = '' !== $choice && ctype_digit( $choice ) ? (int) $choice : null;
+			if ( null !== $recipe && $recipe >= count( (array) $matching['recipes'] ) ) { $recipe = null; }
+			if ( null === $recipe ) {
+				$clean[] = array( 'image' => $image, 'recipe' => null, 'confidence' => 'basse', 'why' => (string) ( $was['why'] ?? '' ), 'pending' => true );
+				continue;
+			}
+			$kept = $was && null !== ( $was['recipe'] ?? null ) && (int) $was['recipe'] === $recipe;
 			$clean[] = $kept ? array_merge( $was, array( 'image' => $image, 'recipe' => $recipe ) ) : array( 'image' => $image, 'recipe' => $recipe, 'confidence' => 'haute', 'why' => '', 'by_writer' => true );
 		}
 		$matching['pairs'] = $clean;
-		$wpdb->update( self::table(), array( 'matching_json' => wp_json_encode( $matching ), 'updated_at' => current_time( 'mysql', true ) ), array( 'id' => absint( $id ) ) );
+		$wpdb->update( self::table(), array(
+			'matching_json' => wp_json_encode( $matching ),
+			'recipes' => count( (array) $matching['recipes'] ),
+			'label' => self::label( (array) $matching['recipes'] ),
+			'updated_at' => current_time( 'mysql', true ),
+		), array( 'id' => absint( $id ) ) );
 		MSRWA_History::lot( $id, 'pairing', array( 'by' => get_current_user_id(), 'pairs' => $clean ) );
 		return true;
+	}
+
+	/** How many of a lot's photographs still wait for the writer's decision. */
+	public static function undecided( $id ) {
+		return count( array_filter( (array) ( self::matching( $id )['pairs'] ?? array() ), static function ( $pair ) { return is_array( $pair ) && ! empty( $pair['pending'] ); } ) );
 	}
 
 	/**
@@ -172,6 +203,11 @@ final class MSRWA_Batch {
 		$batch = self::get( $id );
 		if ( ! $batch ) { return new WP_Error( 'msrwa_no_batch', __( 'Lot introuvable.', 'ms-recipes-writer-ai' ) ); }
 		if ( 'ready' !== $batch['status'] ) { return new WP_Error( 'msrwa_not_ready', __( 'Ce lot a déjà été lancé.', 'ms-recipes-writer-ai' ) ); }
+		$undecided = self::undecided( $id );
+		if ( $undecided ) {
+			/* translators: %d is a number of photographs. */
+			return new WP_Error( 'msrwa_undecided', sprintf( _n( 'Une photographie attend votre décision : associez-la à une recette, faites-en une recette ou écartez-la.', '%d photographies attendent votre décision : associez-les à une recette, faites-en des recettes ou écartez-les.', $undecided, 'ms-recipes-writer-ai' ), $undecided ) );
+		}
 
 		// Refusing to start is free; stopping halfway is not. The estimate is
 		// what the site is about to commit, so the ceiling is checked against
@@ -211,6 +247,9 @@ final class MSRWA_Batch {
 					$images[] = $matching['images'][ $pair['image'] ];
 				}
 			}
+			// A recipe named after photographs the writer then set aside has
+			// nothing left to be written from.
+			if ( ! empty( $recipe['from_photographs'] ) && ! $images ) { continue; }
 			$brief = MSRWA_Match::brief( $recipe, $images );
 			$run = MSRWA_Run::create( (int) $id, (int) $batch['owner_id'], $brief, $config, MSRWA_Profile::steps( $batch['profile'], (array) ( $config['steps'] ?? array() ) ) );
 			if ( $run ) {

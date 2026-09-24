@@ -265,17 +265,23 @@
   var batchStatus = document.getElementById('ms-batch-status');
   var timer = null;
 
-  function pairs() {
+  // A recipe index, "aside", or nothing yet: a photograph whose new recipe
+  // has no name is still undecided.
+  function pairs(creating) {
     return Array.prototype.map.call(document.querySelectorAll('.ms-pair-choice'), function (select) {
-      return { image: parseInt(select.dataset.image, 10), recipe: '' === select.value ? null : parseInt(select.value, 10) };
+      var image = parseInt(select.dataset.image, 10);
+      if (creating && creating.image === image) { return { image: image, recipe: 'new', title: creating.title }; }
+      if ('aside' === select.value) { return { image: image, recipe: 'aside' }; }
+      if ('' === select.value || 'new' === select.value) { return { image: image, recipe: null }; }
+      return { image: image, recipe: parseInt(select.value, 10) };
     });
   }
 
   // Every change is saved at once: a pairing somebody corrected and then
   // walked away from used to be lost, with a button nobody had pressed.
   var pairTimer = null;
-  function savePairs() {
-    return call('/batches/' + batch + '/pairs', { method: 'POST', body: JSON.stringify({ pairs: pairs() }) });
+  function savePairs(creating) {
+    return call('/batches/' + batch + '/pairs', { method: 'POST', body: JSON.stringify({ pairs: pairs(creating) }) });
   }
 
   // The recipe cards follow the choices: which photographs each will carry,
@@ -285,7 +291,8 @@
     var loose = 0;
     var byRecipe = {};
     document.querySelectorAll('.ms-pair-choice').forEach(function (select) {
-      if ('' === select.value) { loose++; return; }
+      if ('' === select.value || 'new' === select.value) { loose++; return; }
+      if ('aside' === select.value) { return; }
       (byRecipe[select.value] = byRecipe[select.value] || []).push(select.dataset.url || '');
     });
     dishes.forEach(function (dish) {
@@ -298,28 +305,56 @@
         img.src = url; img.alt = ''; img.loading = 'lazy';
         thumbs.appendChild(img);
       });
+      var dropped = !photos.length && dish.dataset.fromPhotographs === '1';
       dish.classList.toggle('has-photos', photos.length > 0);
+      dish.classList.toggle('is-dropped', dropped);
       dish.querySelector('.ms-dish-with').textContent = photos.length
         ? (photos.length === 1 ? t.dishOnePhoto : (t.dishPhotos || '').replace('%d', photos.length))
-        : (t.dishNoPhoto || '');
+        : (dropped ? (t.dishDropped || '') : (t.dishNoPhoto || ''));
     });
     var note = document.getElementById('ms-loose');
     if (note) {
       note.hidden = !loose;
       note.textContent = loose === 1 ? note.dataset.one : (note.dataset.many || '').replace('%d', loose);
     }
+    // Nothing leaves while a photograph waits for a decision.
+    ['ms-dispatch', 'ms-schedule'].forEach(function (id) {
+      var button = document.getElementById(id);
+      if (button) { button.disabled = loose > 0; }
+    });
   }
 
   document.querySelectorAll('.ms-pair-choice').forEach(function (select) {
+    var row = select.closest('.ms-pair');
+    var naming = row && row.querySelector('.ms-pair-new');
+    if (naming) {
+      var create = function () {
+        var title = naming.querySelector('.ms-pair-title').value.trim();
+        if (!title) { naming.querySelector('.ms-pair-title').focus(); return; }
+        window.clearTimeout(pairTimer);
+        say(batchStatus, t.saving || '');
+        // A new recipe changes the list every select offers: the page is
+        // drawn again from what was saved.
+        savePairs({ image: parseInt(select.dataset.image, 10), title: title })
+          .then(function () { window.location.reload(); })
+          .catch(function (error) { say(batchStatus, error.message); });
+      };
+      naming.querySelector('.ms-pair-create').addEventListener('click', create);
+      naming.querySelector('.ms-pair-title').addEventListener('keydown', function (event) { if ('Enter' === event.key) { event.preventDefault(); create(); } });
+    }
     select.addEventListener('change', function () {
+      if (naming) {
+        naming.hidden = 'new' !== select.value;
+        if ('new' === select.value) { naming.querySelector('.ms-pair-title').focus(); refreshDishes(); return; }
+      }
       // The writer's choice replaces the model's confidence on screen.
-      var row = select.closest('.ms-pair');
       var badge = row && row.querySelector('.ms-pair-badge');
       if (row && badge) {
-        var tone = '' === select.value ? 'idle' : 'good';
+        var aside = 'aside' === select.value;
+        var tone = '' === select.value ? 'stop' : (aside ? 'idle' : 'good');
         row.className = row.className.replace(/\bms-pair-(good|warn|stop|idle)\b/, 'ms-pair-' + tone);
         badge.className = badge.className.replace(/\bms-state-(good|warn|stop|idle)\b/, 'ms-state-' + tone);
-        badge.textContent = '' === select.value ? (t.pairAside || '') : (t.pairChosen || '');
+        badge.textContent = aside ? (t.pairAside || '') : (t.pairChosen || '');
         var reason = row.querySelector('.ms-pair-reason');
         if (reason) { reason.remove(); }
       }
@@ -333,6 +368,9 @@
       }, 300);
     });
   });
+
+  // The page opens in the state it was saved in, undecided photographs included.
+  if (document.querySelector('.ms-pair-choice')) { refreshDishes(); }
 
   var schedule = document.getElementById('ms-schedule');
   if (schedule) {

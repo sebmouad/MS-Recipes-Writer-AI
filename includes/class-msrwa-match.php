@@ -41,7 +41,8 @@ final class MSRWA_Match {
 			$decision = self::propose( $seen['images'], $config );
 			$recipes = $decision['recipes'];
 		} else {
-			$decision = self::pair( $recipes, $seen['images'], $config );
+			$decision = self::strays( $recipes, $seen['images'], self::pair( $recipes, $seen['images'], $config ), $config );
+			$recipes = $decision['recipes'];
 		}
 
 		return array(
@@ -134,6 +135,60 @@ final class MSRWA_Match {
 	}
 
 	/**
+	 * A photograph of a dish the text does not name is not thrown away: it
+	 * becomes a recipe of its own, as it would in a lot with no text, and the
+	 * writer can still set it aside. The owner's rule, 2026-09-24: a live lot
+	 * sent a tart with a yassa and a clafoutis, and the tart was left out.
+	 * Photographs of one dish become one recipe; a photograph with no dish on
+	 * it is not a recipe anyone can name, and waits for the writer.
+	 */
+	private static function strays( array $recipes, array $images, array $decision, MSRWA_Engine_Config $config ) {
+		$pairs = self::normalise( $decision['pairs'], count( $recipes ), $images );
+		$loose = array();
+		foreach ( $pairs as $pair ) {
+			if ( null === $pair['recipe'] && '' !== trim( (string) ( $images[ $pair['image'] ]['dish'] ?? '' ) ) ) { $loose[] = (int) $pair['image']; }
+		}
+		$decision['recipes'] = $recipes;
+		if ( ! $loose ) { return $decision; }
+
+		$subset = array();
+		foreach ( $loose as $index ) { $subset[] = $images[ $index ]; }
+		$grouped = self::propose( $subset, $config );
+		// No grouping came back: one recipe per dish name, so none is lost.
+		if ( ! $grouped['recipes'] ) {
+			$grouped['pairs'] = array();
+			$titles = array();
+			foreach ( $subset as $key => $image ) {
+				$title = mb_substr( trim( wp_strip_all_tags( (string) $image['dish'] ) ), 0, 180 );
+				$fold = MSRWA_Engine_Score::fold( $title );
+				if ( ! isset( $titles[ $fold ] ) ) { $titles[ $fold ] = count( $grouped['recipes'] ); $grouped['recipes'][] = null; }
+				$grouped['pairs'][] = array( 'image' => $key, 'recipe' => $titles[ $fold ], 'confidence' => 'moyenne', 'why' => '' );
+				$grouped['recipes'][ $titles[ $fold ] ] = $title;
+			}
+			foreach ( $grouped['recipes'] as $index => $title ) { $grouped['recipes'][ $index ] = self::from_photographs( $title, $subset, $grouped['pairs'], $index, true ); }
+		}
+
+		$offset = count( $recipes );
+		$moved = array();
+		foreach ( (array) $grouped['pairs'] as $pair ) {
+			if ( ! is_array( $pair ) || ! isset( $pair['image'], $pair['recipe'], $loose[ (int) $pair['image'] ] ) || null === $pair['recipe'] ) { continue; }
+			$moved[ $loose[ (int) $pair['image'] ] ] = array(
+				'image' => $loose[ (int) $pair['image'] ], 'recipe' => $offset + (int) $pair['recipe'],
+				'confidence' => 'moyenne', 'why' => 'Plat absent du texte : une recette de plus, d’après la photographie.', 'new_recipe' => true,
+			);
+		}
+		foreach ( $pairs as $key => $pair ) {
+			if ( isset( $moved[ $pair['image'] ] ) ) { $pairs[ $key ] = $moved[ $pair['image'] ]; }
+		}
+		$decision['recipes'] = array_merge( $recipes, array_values( (array) $grouped['recipes'] ) );
+		$decision['pairs'] = $pairs;
+		$decision['cost_usd'] = (float) $decision['cost_usd'] + (float) $grouped['cost_usd'];
+		$decision['seconds'] = (float) $decision['seconds'] + (float) $grouped['seconds'];
+		$decision['errors'] = array_merge( $decision['errors'], $grouped['errors'] );
+		return $decision;
+	}
+
+	/**
 	 * Recipes out of photographs alone: one per distinct dish, with the
 	 * photographs of it. Two shots of one tart are one recipe, which a
 	 * grouping on the recognised names could not tell — "tarte aux pommes"
@@ -185,6 +240,12 @@ final class MSRWA_Match {
 			if ( isset( $pair['recipe'] ) && null !== $pair['recipe'] ) { $pairs[ $key ]['recipe'] = $shift[ (int) $pair['recipe'] ] ?? null; }
 		}
 		return array( 'recipes' => $recipes, 'pairs' => $pairs, 'reasoning' => (string) ( $decoded['reasoning'] ?? '' ) );
+	}
+
+	/** A recipe the writer named for a photograph, on the pairing screen. */
+	public static function named( $title, array $image ) {
+		$title = mb_substr( trim( wp_strip_all_tags( (string) $title ) ), 0, 180 );
+		return '' === $title ? null : self::from_photographs( $title, array( $image ), array( array( 'image' => 0, 'recipe' => 0 ) ), 0, true );
 	}
 
 	/** A recipe the writer did not type: the dish's name, and what its photographs show. */
@@ -299,14 +360,19 @@ final class MSRWA_Match {
 			if ( null !== $recipe && array_key_exists( 'dish', (array) $images[ $image ] ) && '' === trim( (string) $images[ $image ]['dish'] ) ) {
 				$recipe = null;
 				$confidence = 'basse';
-				$why = 'Aucun plat reconnu sur la photographie : à associer à la main si elle appartient à une recette.';
+				$why = 'Aucun plat reconnu sur la photographie : associez-la, faites-en une recette ou écartez-la.';
 			}
 			$taken[ $image ] = true;
-			$out[] = array( 'image' => $image, 'recipe' => $recipe, 'confidence' => $confidence, 'why' => $why );
+			$one = array( 'image' => $image, 'recipe' => $recipe, 'confidence' => $confidence, 'why' => $why );
+			if ( ! empty( $pair['new_recipe'] ) ) { $one['new_recipe'] = true; }
+			// A photograph no recipe took is the writer's to decide — none is
+			// dropped without them — and the lot does not leave until they have.
+			if ( null === $recipe ) { $one['pending'] = true; }
+			$out[] = $one;
 		}
 		// A photograph the answer never mentioned is unassigned, not missing.
 		foreach ( array_keys( $images ) as $image ) {
-			if ( ! isset( $taken[ $image ] ) ) { $out[] = array( 'image' => (int) $image, 'recipe' => null, 'confidence' => 'basse', 'why' => 'Non mentionnée par l’appariement.' ); }
+			if ( ! isset( $taken[ $image ] ) ) { $out[] = array( 'image' => (int) $image, 'recipe' => null, 'confidence' => 'basse', 'why' => 'Non mentionnée par l’appariement.', 'pending' => true ); }
 		}
 		return $out;
 	}

@@ -2215,6 +2215,48 @@ msgstr "قالب صورة فيسبوك لكل وصفة في هذه الدفعة.
 msgid "Visuel Facebook"
 msgstr "صورة فيسبوك"
 
+msgid "Créer"
+msgstr "إنشاء"
+
+msgid "Décidez d’abord du sort de chaque photographie."
+msgstr "قرّر أولًا مصير كل صورة."
+
+msgid "Nom de la recette"
+msgstr "اسم الوصفة"
+
+msgid "Nommées d’après vos photographies, sans texte pour elles : %s. Chacune sera établie d’après ses photographies ; écartez une photographie pour ne pas en faire un article."
+msgstr "سُمّيت انطلاقًا من صورك، دون نص خاص بها: %s. ستُكتب كل واحدة انطلاقًا من صورها؛ استبعد صورة كي لا تصبح مقالًا."
+
+msgid "Nouvelle recette"
+msgstr "وصفة جديدة"
+
+msgid "Nouvelle recette…"
+msgstr "وصفة جديدة…"
+
+msgid "À décider"
+msgstr "بانتظار قرارك"
+
+msgid "Écarter cette photographie"
+msgstr "استبعاد هذه الصورة"
+
+msgid "écartée"
+msgstr "مستبعدة"
+
+msgid "— à décider —"
+msgstr "— بانتظار قرارك —"
+
+msgid "Une photographie attend votre décision : associez-la à une recette, faites-en une recette ou écartez-la."
+msgid_plural "%d photographies attendent votre décision : associez-les à une recette, faites-en des recettes ou écartez-les."
+msgstr[0] "لا صورة بانتظار قرارك."
+msgstr[1] "صورة واحدة بانتظار قرارك: اربطها بوصفة، أو اجعلها وصفة، أو استبعدها."
+msgstr[2] "صورتان بانتظار قرارك: اربطهما بوصفة، أو اجعلهما وصفتين، أو استبعدهما."
+msgstr[3] "%d صور بانتظار قرارك: اربطها بوصفة، أو اجعلها وصفات، أو استبعدها."
+msgstr[4] "%d صورة بانتظار قرارك: اربطها بوصفة، أو اجعلها وصفات، أو استبعدها."
+msgstr[5] "%d صورة بانتظار قرارك: اربطها بوصفة، أو اجعلها وصفات، أو استبعدها."
+
+msgid "Ne sera pas écrite : sa photographie est écartée"
+msgstr "لن تُكتب: صورتها مستبعدة"
+
 msgid "aucune page citée"
 msgstr "لم تُذكر أي صفحة"
 

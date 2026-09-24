@@ -169,6 +169,7 @@ final class MSRWA_Admin {
 				'pairAside' => __( 'Mise de côté', 'ms-recipes-writer-ai' ),
 				'pairChosen' => __( 'Choisie par vous', 'ms-recipes-writer-ai' ),
 				'dishNoPhoto' => __( 'Sans photographie — références cherchées sur le web', 'ms-recipes-writer-ai' ),
+				'dishDropped' => __( 'Ne sera pas écrite : sa photographie est écartée', 'ms-recipes-writer-ai' ),
 				'sending' => __( 'Envoi au moteur…', 'ms-recipes-writer-ai' ),
 				'retrying' => __( 'Reprise…', 'ms-recipes-writer-ai' ),
 				/* translators: %s is a comma-separated list of step names. */

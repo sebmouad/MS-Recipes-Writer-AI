@@ -2183,6 +2183,44 @@ msgstr "The Facebook image template for every recipe in this lot."
 msgid "Visuel Facebook"
 msgstr "Facebook image"
 
+msgid "Créer"
+msgstr "Create"
+
+msgid "Décidez d’abord du sort de chaque photographie."
+msgstr "First decide what happens to each photograph."
+
+msgid "Nom de la recette"
+msgstr "Recipe name"
+
+msgid "Nommées d’après vos photographies, sans texte pour elles : %s. Chacune sera établie d’après ses photographies ; écartez une photographie pour ne pas en faire un article."
+msgstr "Named after your photographs, with no text of their own: %s. Each will be written from its photographs; set a photograph aside to leave it out."
+
+msgid "Nouvelle recette"
+msgstr "New recipe"
+
+msgid "Nouvelle recette…"
+msgstr "New recipe…"
+
+msgid "À décider"
+msgstr "To decide"
+
+msgid "Écarter cette photographie"
+msgstr "Set this photograph aside"
+
+msgid "écartée"
+msgstr "set aside"
+
+msgid "— à décider —"
+msgstr "— to decide —"
+
+msgid "Une photographie attend votre décision : associez-la à une recette, faites-en une recette ou écartez-la."
+msgid_plural "%d photographies attendent votre décision : associez-les à une recette, faites-en des recettes ou écartez-les."
+msgstr[0] "One photograph needs your decision: pair it with a recipe, make it a recipe, or set it aside."
+msgstr[1] "%d photographs need your decision: pair them with a recipe, make recipes of them, or set them aside."
+
+msgid "Ne sera pas écrite : sa photographie est écartée"
+msgstr "Will not be written: its photograph is set aside"
+
 msgid "aucune page citée"
 msgstr "no page cited"
 

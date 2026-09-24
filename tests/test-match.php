@@ -107,6 +107,43 @@ $proposal_prompt = new ReflectionMethod( MSRWA_Match::class, 'proposal_prompt' )
 $proposal_prompt->setAccessible( true );
 msrwa_test_missing( $proposal_prompt->invoke( null, $shots, 'espagnol' ), 'en français', 'Nor are the titles or the reasons French on a Spanish site.' );
 
+// --- A photograph of a dish the text does not name ---------------------
+// The owner's rule: it is not thrown away. It becomes a recipe of its own, as
+// in a lot with no text; photographs of one dish become one recipe; one with
+// no dish on it waits for the writer.
+$strays = new ReflectionMethod( MSRWA_Match::class, 'strays' );
+$strays->setAccessible( true );
+$shots = array(
+	array( 'file' => 'yassa.jpg', 'dish' => 'Poulet yassa', 'describes' => 'Poulet aux oignons.' ),
+	array( 'file' => 'tarte.jpg', 'dish' => 'Tarte aux pommes', 'describes' => 'Une tarte dorée.' ),
+	array( 'file' => 'tarte-2.jpg', 'dish' => 'tarte normande', 'describes' => 'Une part de tarte.' ),
+	array( 'file' => 'flou.jpg', 'dish' => '', 'describes' => 'Image floue.' ),
+);
+$asked = array();
+MSRWA_Engine_Call::$transport = static function ( $url, $payload ) use ( &$asked ) {
+	$asked[] = $payload;
+	$answer = array( 'recipes' => array( array( 'title' => 'Tarte aux pommes' ) ), 'pairs' => array( array( 'image' => 0, 'recipe' => 0 ), array( 'image' => 1, 'recipe' => 0 ) ), 'reasoning' => 'Deux vues d’une même tarte.' );
+	return array( 'status' => 200, 'raw' => json_encode( array( 'status' => 'completed', 'output' => array( array( 'type' => 'message', 'content' => array( array( 'text' => json_encode( $answer ) ) ) ) ), 'usage' => array( 'input_tokens' => 300, 'output_tokens' => 60 ) ) ) );
+};
+$decision = array( 'pairs' => array( array( 'image' => 0, 'recipe' => 0, 'confidence' => 'haute' ), array( 'image' => 1, 'recipe' => null ), array( 'image' => 2, 'recipe' => null ), array( 'image' => 3, 'recipe' => null ) ), 'reasoning' => '', 'cost_usd' => 0.001, 'seconds' => 1, 'errors' => array() );
+$config = MSRWA_Engine_Config::create( array( 'settings' => array( 'keys' => array( 'openai' => 'k' ) ) ) );
+$out = $strays->invoke( null, array( array( 'title' => 'Poulet yassa', 'text' => 'Poulet, oignons.' ) ), $shots, $decision, $config );
+MSRWA_Engine_Call::$transport = null;
+$by = array();
+foreach ( $out['pairs'] as $pair ) { $by[ $pair['image'] ] = $pair; }
+msrwa_test_assert( 2 === count( $out['recipes'] ) && 'Tarte aux pommes' === $out['recipes'][1]['title'] && ! empty( $out['recipes'][1]['from_photographs'] ), 'The tart the text did not name becomes a recipe of its own: ' . json_encode( array_column( $out['recipes'], 'title' ), JSON_UNESCAPED_UNICODE ) );
+msrwa_test_assert( 1 === $by[1]['recipe'] && 1 === $by[2]['recipe'] && ! empty( $by[1]['new_recipe'] ), 'Both photographs of it go with it, marked as a new recipe.' );
+msrwa_test_assert( 0 === $by[0]['recipe'], 'The yassa stays with the yassa.' );
+msrwa_test_assert( null === $by[3]['recipe'] && ! empty( $by[3]['pending'] ), 'The photograph nobody can name waits for the writer.' );
+msrwa_test_assert( 1 === count( $asked ) && false === strpos( json_encode( $asked[0], JSON_UNESCAPED_UNICODE ), 'flou.jpg' ), 'One grouping call, about the named strays only.' );
+msrwa_test_assert( $out['cost_usd'] > 0.001, 'And its cost is counted with the pairing.' );
+
+// No grouping answer: one recipe per dish name, so none is lost.
+MSRWA_Engine_Call::$transport = static function () { return array( 'status' => 500, 'raw' => '' ); };
+$out = $strays->invoke( null, array( array( 'title' => 'Poulet yassa', 'text' => 'x' ) ), $shots, $decision, $config );
+MSRWA_Engine_Call::$transport = null;
+msrwa_test_assert( 3 === count( $out['recipes'] ), 'Without the grouping, each dish name is a recipe: ' . json_encode( array_column( $out['recipes'], 'title' ), JSON_UNESCAPED_UNICODE ) );
+
 // --- The brief handed to the engine -------------------------------------
 
 $brief = MSRWA_Match::brief(
