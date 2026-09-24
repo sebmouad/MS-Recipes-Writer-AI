@@ -28,7 +28,7 @@ $GLOBALS['msrwa_test_meta'] = array(
 		'_msrwa_seo_title' => 'Tarte aux pommes normande : la recette au calvados',
 		'_msrwa_seo_description' => 'La tarte normande à la crème et au calvados, cuite 45 minutes à 180 °C.',
 		'_msrwa_facebook_caption' => 'Le dimanche, une tarte normande et rien d’autre.',
-		'_msrwa_facebook_image_id' => 15,
+		'_msrwa_facebook_generated' => 15,
 		'_msrwa_language' => 'fr',
 	),
 	15 => array( '_wp_attachment_image_alt' => 'Tarte aux pommes normande' ),

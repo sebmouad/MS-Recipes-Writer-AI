@@ -49,7 +49,7 @@ $GLOBALS['msrwa_test_posts'][77] = (object) array( 'ID' => 77, 'post_title' => '
 $GLOBALS['msrwa_test_meta'][77] = array(
 	'_msrwa_recipe' => wp_json_encode( array( 'title' => 'Tarte', 'ingredients' => array() ) ),
 	'_msrwa_judge_report' => wp_json_encode( array( 'approved' => true ) ),
-	'_msrwa_featured_image_id' => 91,
+	'_msrwa_featured_generated' => 91,
 );
 
 $GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();

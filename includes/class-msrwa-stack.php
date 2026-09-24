@@ -35,6 +35,13 @@ final class MSRWA_Stack {
 	const RATIOS = array( 'msrwa-4x3' => array( 4, 3 ), 'msrwa-16x9' => array( 16, 9 ) );
 
 	public static function hooks() {
+		// MS Image Optimizer refuses to touch an image when PHP allows less than
+		// 45 seconds, and a host's 30-second default is common: every featured
+		// image this plugin generated failed there with "execution_limit_too_low".
+		// Its own workers are given the time they ask for, and nothing else is.
+		foreach ( array( 'msimg_image_queue_cron', 'msimg_post_discovery_cron', 'msimg_recovery_cron', 'wp_ajax_msimg_async_post_discovery', 'wp_ajax_nopriv_msimg_async_post_discovery' ) as $hook ) {
+			add_action( $hook, array( __CLASS__, 'room_for_images' ), 0 );
+		}
 		// The theme applies both filters to one graph, MS SEO Plus the second:
 		// enriching is idempotent, so being called twice changes nothing.
 		add_filter( 'ms_recipes_seo_structured_data', array( __CLASS__, 'enrich' ), 20, 2 );
@@ -42,6 +49,38 @@ final class MSRWA_Stack {
 	}
 
 	/** The MS Recipes theme is printing canonical, Open Graph and Recipe markup. */
+	/**
+	 * The attachment details of a generated image: alternative text and title
+	 * from the SEO title, caption and description from the SEO description,
+	 * each capped as MS Image Optimizer caps them. It is that plugin's own
+	 * mapping for every image role, so it finds nothing to rewrite, and a site
+	 * without it still gets all four fields filled.
+	 */
+	public static function describe_image( $post_id, $attachment_id ) {
+		$attachment_id = absint( $attachment_id );
+		if ( ! $attachment_id || 'attachment' !== get_post_type( $attachment_id ) ) { return false; }
+		$post = get_post( absint( $post_id ) );
+		if ( ! $post ) { return false; }
+		$title = self::text( (string) get_post_meta( $post->ID, '_seo_title', true ) );
+		if ( '' === $title ) { $title = self::text( (string) $post->post_title ); }
+		$description = self::text( (string) get_post_meta( $post->ID, '_seo_description', true ) );
+		if ( '' === $description ) { $description = self::text( (string) $post->post_excerpt ); }
+		// Cut exactly as the optimizer cuts, or it would see a difference to fix.
+		$title = mb_substr( $title, 0, 125 );
+		$description = mb_substr( $description, 0, 160 );
+		if ( '' === $title ) { return false; }
+		update_post_meta( $attachment_id, '_wp_attachment_image_alt', $title );
+		wp_update_post( array( 'ID' => $attachment_id, 'post_title' => $title, 'post_excerpt' => $description, 'post_content' => $description ) );
+		return true;
+	}
+
+	/** Raises the PHP time limit for MS Image Optimizer's worker, when it is set and too low. */
+	public static function room_for_images() {
+		$want = (int) apply_filters( 'msrwa_image_optimizer_seconds', 180 );
+		$limit = (int) ini_get( 'max_execution_time' );
+		if ( $want > 0 && $limit > 0 && $limit < $want && function_exists( 'set_time_limit' ) ) { @set_time_limit( $want ); }
+	}
+
 	public static function theme_owns_seo() {
 		return function_exists( 'ms_recipes_seo_plugin_active' ) && function_exists( 'ms_recipes_seo_singular_schema' ) && ! ms_recipes_seo_plugin_active();
 	}

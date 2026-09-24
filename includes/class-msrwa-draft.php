@@ -60,7 +60,8 @@ final class MSRWA_Draft {
 		$batch = MSRWA_Batch::get( (int) $run['batch_id'] );
 		if ( $batch && '' !== (string) $batch['language'] ) { update_post_meta( $post_id, '_msrwa_language', sanitize_key( (string) $batch['language'] ) ); }
 		self::attach_images( $post_id, $run_id, $artifacts, $title );
-		MSRWA_Stack::write( $post_id, $canonical, $article, (int) get_post_meta( $post_id, '_msrwa_facebook_image_id', true ) );
+		MSRWA_Stack::write( $post_id, $canonical, $article, (int) get_post_meta( $post_id, self::generated_key( 'facebook' ), true ) );
+		foreach ( array( 'featured', 'facebook' ) as $kind ) { MSRWA_Stack::describe_image( $post_id, (int) get_post_meta( $post_id, self::generated_key( $kind ), true ) ); }
 		MSRWA_Intake::adopt( $post_id, array_column( (array) ( $brief['images'] ?? array() ), 'id' ) );
 
 		global $wpdb;
@@ -186,9 +187,19 @@ final class MSRWA_Draft {
 			// is the honest answer.
 			update_post_meta( $attachment, '_wp_attachment_image_alt', wp_strip_all_tags( $title ) );
 			if ( 'featured' === $kind ) { set_post_thumbnail( $post_id, $attachment ); MSRWA_Stack::crops( $attachment ); }
-			update_post_meta( $post_id, '_msrwa_' . $kind . '_image_id', (int) $attachment );
+			update_post_meta( $post_id, self::generated_key( $kind ), (int) $attachment );
 		}
 	}
+
+	/**
+	 * The post meta naming the attachment a generated image became.
+	 *
+	 * Never a key with "image" in it: MS Image Optimizer reads any such meta on
+	 * a post as a page-builder reference to content, so the collage named in
+	 * `_msrwa_facebook_image_id` counted as used in the article, the optimizer
+	 * saw a conflict with its Facebook role, and never renamed or resized it.
+	 */
+	public static function generated_key( $kind ) { return '_msrwa_' . sanitize_key( (string) $kind ) . '_generated'; }
 
 	/** Copies one generated file into the uploads directory as an attachment. */
 	private static function sideload( $path, $post_id, $title, $mime ) {

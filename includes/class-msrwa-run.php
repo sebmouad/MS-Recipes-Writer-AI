@@ -404,7 +404,7 @@ final class MSRWA_Run {
 		}
 		foreach ( array( 'featured', 'facebook' ) as $kind ) {
 			if ( ! isset( $artifacts[ $kind ] ) ) { continue; }
-			$attachment = (int) get_post_meta( $post_id, '_msrwa_' . $kind . '_image_id', true );
+			$attachment = (int) get_post_meta( $post_id, MSRWA_Draft::generated_key( $kind ), true );
 			if ( ! $attachment ) { continue; }
 			// The generated file was removed once the media library had it, so
 			// anything reading a path is pointed at the library's copy.
@@ -436,7 +436,7 @@ final class MSRWA_Run {
 		// copied it into the media library. Two files, one of which nothing will
 		// ever open again.
 		foreach ( array( 'featured', 'facebook' ) as $kind ) {
-			if ( ! get_post_meta( (int) $run['draft_post_id'], '_msrwa_' . $kind . '_image_id', true ) ) { continue; }
+			if ( ! get_post_meta( (int) $run['draft_post_id'], MSRWA_Draft::generated_key( $kind ), true ) ) { continue; }
 			$stored = self::artifact_path( $id, $kind );
 			if ( '' !== $stored && is_file( $stored ) ) { wp_delete_file( $stored ); }
 		}

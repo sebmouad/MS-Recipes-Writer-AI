@@ -98,7 +98,7 @@ final class MSRWA_Head {
 
 		// The sharing image if the engine drew one — it is already the 1200x630
 		// Facebook asks for — and the featured image otherwise.
-		$image = (int) get_post_meta( $post_id, '_msrwa_facebook_image_id', true );
+		$image = (int) get_post_meta( $post_id, MSRWA_Draft::generated_key( 'facebook' ), true );
 		if ( ! $image ) { $image = (int) get_post_thumbnail_id( $post_id ); }
 		$url = $image ? wp_get_attachment_image_url( $image, 'full' ) : '';
 		if ( $url ) {

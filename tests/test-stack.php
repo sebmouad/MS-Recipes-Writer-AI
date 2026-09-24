@@ -5,7 +5,7 @@
 // JSON of the ingredient list as the ingredient list.
 require __DIR__ . '/bootstrap.php';
 require_once dirname( __DIR__ ) . '/includes/engine/load.php';
-msrwa_test_load( 'stack' );
+msrwa_test_load( 'stack', 'draft' );
 
 $canonical = array(
 	'title' => 'Daube de bœuf provençale', 'servings' => 4, 'prep_minutes' => 30, 'cook_minutes' => 180, 'total_minutes' => 210,
@@ -63,5 +63,42 @@ if ( true ) {
 	function ms_recipes_seo_singular_schema() {}
 }
 msrwa_test_assert( MSRWA_Stack::owns_head(), 'With the MS Recipes theme owning SEO, the plugin only feeds it.' );
+
+// --- The generated images, described as MS Image Optimizer describes them --
+// Alternative text and title from the SEO title, caption and description from
+// the SEO description: its own mapping for every role, so it has nothing to
+// rewrite, and all four fields are filled on a site without it.
+if ( true ) {
+	if ( ! function_exists( 'get_post_type' ) ) { function get_post_type( $id = 0 ) { return (string) ( $GLOBALS['msrwa_test_posts'][ (int) $id ]->post_type ?? '' ); } }
+	if ( ! function_exists( 'wp_update_post' ) ) { function wp_update_post( $data ) { foreach ( (array) $data as $key => $value ) { if ( 'ID' !== $key ) { $GLOBALS['msrwa_test_posts'][ (int) $data['ID'] ]->$key = $value; } } return (int) $data['ID']; } }
+}
+$GLOBALS['msrwa_test_posts'][50] = (object) array( 'ID' => 50, 'post_type' => 'post', 'post_title' => 'Daube', 'post_excerpt' => 'Extrait.' );
+$GLOBALS['msrwa_test_posts'][51] = (object) array( 'ID' => 51, 'post_type' => 'attachment', 'post_title' => 'Daube — Facebook image', 'post_excerpt' => '', 'post_content' => '' );
+$GLOBALS['msrwa_test_meta'][50] = array( '_seo_title' => 'Daube de bœuf provençale au vin rouge', '_seo_description' => 'La daube de bœuf mijotée trois heures au vin rouge, comme en Provence.' );
+msrwa_test_assert( MSRWA_Stack::describe_image( 50, 51 ), 'The collage is described.' );
+$collage = $GLOBALS['msrwa_test_posts'][51];
+msrwa_test_assert( 'Daube de bœuf provençale au vin rouge' === $collage->post_title && 'Daube de bœuf provençale au vin rouge' === get_post_meta( 51, '_wp_attachment_image_alt', true ), 'Title and alternative text are the SEO title.' );
+msrwa_test_assert( 'La daube de bœuf mijotée trois heures au vin rouge, comme en Provence.' === $collage->post_excerpt && $collage->post_excerpt === $collage->post_content, 'Caption and description are the SEO description.' );
+msrwa_test_assert( ! MSRWA_Stack::describe_image( 50, 50 ), 'Only an attachment is described.' );
+
+// The generated images are named on keys MS Image Optimizer does not read as
+// content: any meta key with "image" in it made the collage look used in the
+// article, and the optimizer left it untouched.
+foreach ( array( 'featured', 'facebook' ) as $kind ) {
+	msrwa_test_assert( ! preg_match( '/(?:attachment|image|thumbnail|gallery|media|logo|icon|photo|picture)/i', MSRWA_Draft::generated_key( $kind ) ), 'The ' . $kind . ' key is not one the optimizer scans: ' . MSRWA_Draft::generated_key( $kind ) );
+}
+$source = '';
+foreach ( glob( dirname( __DIR__ ) . '/includes/*.php' ) as $file ) { $source .= file_get_contents( $file ); }
+msrwa_test_missing( preg_replace( '/\*.*_image_id.*\n/', '', $source ), "_image_id', true )", 'Nothing reads the old keys any more.' );
+
+// MS Image Optimizer's workers are given the time they need, and only they.
+// A 30-second host limit made every featured image fail "execution_limit_too_low".
+msrwa_test_contains( file_get_contents( dirname( __DIR__ ) . '/includes/class-msrwa-stack.php' ), "'msimg_image_queue_cron', 'msimg_post_discovery_cron'", 'The optimizer’s workers are the ones given more time.' );
+set_time_limit( 30 );
+MSRWA_Stack::room_for_images();
+msrwa_test_assert( 180 === (int) ini_get( 'max_execution_time' ), 'A 30-second limit is raised to 180 for the optimizer; got ' . ini_get( 'max_execution_time' ) );
+set_time_limit( 0 );
+MSRWA_Stack::room_for_images();
+msrwa_test_assert( 0 === (int) ini_get( 'max_execution_time' ), 'No limit is never turned into one.' );
 
 msrwa_test_done( 'the MS stack reads what the draft wrote' );

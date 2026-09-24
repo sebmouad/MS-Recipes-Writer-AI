@@ -101,6 +101,7 @@ final class MSRWA_DB {
 		}
 
 		self::reclaim_duplicates();
+		self::rename_generated_keys();
 		// Seeded once, then the owner's. A site that has already corrected a
 		// rate must not have it overwritten by the shipped one on every update.
 		MSRWA_Catalog::seed();
@@ -153,6 +154,18 @@ final class MSRWA_DB {
 	 * on somebody's live site and must not be the thing that exhausts its
 	 * memory limit.
 	 */
+	/**
+	 * Moves the generated images' attachment ids off meta keys MS Image
+	 * Optimizer reads as content references (see MSRWA_Draft::generated_key()).
+	 * One statement per key, idempotent: a second run finds nothing to move.
+	 */
+	private static function rename_generated_keys() {
+		global $wpdb;
+		foreach ( array( 'featured', 'facebook' ) as $kind ) {
+			$wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->postmeta} SET meta_key = %s WHERE meta_key = %s", MSRWA_Draft::generated_key( $kind ), '_msrwa_' . $kind . '_image_id' ) );
+		}
+	}
+
 	private static function backfill_check_counts() {
 		global $wpdb;
 		$t = self::tables();
