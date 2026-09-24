@@ -596,3 +596,10 @@
 	.ms-ticket-post-links { margin-inline-start: 0; flex-basis: 100%; }
 	.ms-post-tabs { padding-inline: 12px; }
 }
+
+/* Titles, descriptions and reasons are often a model's words, in the lot's
+   language rather than the screen's: each block takes its direction from its
+   own text, so an Arabic dish name reads right to left on a French screen and
+   a French one left to right on an Arabic screen. */
+.wrap.msrwa :is(p, li, td, th, dd, dt, h1, h2, h3, h4, strong, small, .ms-pair-says, .ms-pair-reason, .ms-dish-title) { unicode-bidi: plaintext; }
+.wrap.msrwa :is(p, li, dd, dt, h1, h2, h3, h4) { text-align: start; }

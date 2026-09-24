@@ -72,3 +72,7 @@ details.fold:focus-within{outline:2px solid var(--accent2);outline-offset:2px}
   td:first-child{font-weight:700;color:#713823}
   .hero h1,h2,h3{overflow-wrap:anywhere}
 }
+
+/* Each block takes its direction from its own text, so an Arabic article reads
+   right to left inside a French report, full stops on the correct side. */
+p, li, dd, dt, h1, h2, h3, h4, td, th, figcaption, blockquote, summary { unicode-bidi: plaintext; text-align: start; }
