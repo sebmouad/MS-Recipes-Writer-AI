@@ -118,7 +118,6 @@ function lab_working_brief( $step, $brief, $options = array() ) {
 	if ( '' !== $feedback ) { $brief['feedback'] = lab_json_file( $feedback, 'review feedback' ); }
 	return $brief;
 }
-function lab_research_for_text( $research ) { return MSRWA_Engine_Input::research_for_text( $research ); }
 function lab_image_prompt( $kind, $brief, $options = array(), $findings = array() ) {
 	$prompt = MSRWA_Engine_Input::image_prompt( $kind, lab_working_brief( $kind . '_image', $brief, $options ), $options, $findings );
 	// The provider refuses anything over 32000 characters, and did once the
@@ -130,7 +129,5 @@ function lab_image_prompt( $kind, $brief, $options = array(), $findings = array(
 	return $prompt;
 }
 function lab_build_input( $step, $prompt, $brief, $options ) { return MSRWA_Engine_Input::build( $step, $prompt, lab_working_brief( $step, $brief, $options ), $options ); }
-function lab_score( $step, $text, $brief, $options = array() ) { return MSRWA_Engine_Score::step( $step, $text, lab_working_brief( $step, $brief, $options ) ); }
 function lab_score_approval( $verdict, $images, $panels ) { return MSRWA_Engine_Score::approval( $verdict, $images, $panels ); }
-function lab_findings_for( $verdict, $target ) { return MSRWA_Engine_Score::findings_for( $verdict, $target ); }
 function lab_images_to_retry( $verdict ) { return MSRWA_Engine_Score::images_to_retry( $verdict ); }

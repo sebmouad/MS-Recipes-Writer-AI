@@ -21,6 +21,13 @@ msrwa_test_assert( 'test-openai-replacement' === $keys['openai'], 'Replacement k
 msrwa_test_assert( 'test-gemini-original' === $keys['gemini'] && 'test-claude-original' === $keys['claude'], 'Omitted providers are preserved.' );
 msrwa_test_assert( 3000 === MSRWA_Settings::get()['quality_min_words'], 'Credential-only save preserves unrelated settings.' );
 
+// A setting a later version retired is still in the option until the next save;
+// it must not reach the engine meanwhile, and that save drops it.
+$GLOBALS['settings_options'][ MSRWA_Settings::OPTION ]['prompt_article'] = 'retired prompt text';
+msrwa_test_assert( ! isset( MSRWA_Settings::engine_settings()['prompt_article'] ), 'A retired setting never reaches the engine.' );
+MSRWA_Settings::save( array() );
+msrwa_test_assert( ! isset( get_option( MSRWA_Settings::OPTION )['prompt_article'] ), 'The next save drops a retired setting.' );
+
 // A key handed to the engine under a name it does not configure is a key it
 // never reads: a stored Claude key once reached the engine as `anthropic` and
 // every Claude step failed with "No API key for claude".

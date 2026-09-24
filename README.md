@@ -5,22 +5,23 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.26.0
+## État actuel — 0.26.1
 
-La version `0.26.0` retire le code et les réglages que plus rien n’utilisait ; la `0.25.9` donnait à l’article arabe sa propre longueur ; la `0.25.8` affichait l’arabe de droite à gauche dans le rapport et les écrans en français ; la `0.25.7` reconnaissait les titres arabes avec ou sans voyelles ; la `0.25.6` appliquait aussi aux lots d’une seule recette la règle « aucune photographie ignorée » ; la `0.25.5` faisait le ménage dans le code et les traductions ; la `0.25.4` faisait partir les photographies sources avec l’historique qu’elles illustrent ; la `0.25.3` corrigeait ce que les tests de cas limites ont trouvé sur l’appariement ; la `0.25.2` corrigeait l’écran d’appariement sur téléphone et dans les autres langues ; la `0.25.1` ramenait l’article par défaut à 2 400 mots ; la `0.25.0` ne laissait plus aucune photographie de côté sans le rédacteur : celle d’un plat absent du texte devient une recette ; la `0.24.7` nommait la source de chaque correction du rapport au lieu de la signaler comme refusée ; la `0.24.6` accordait le nom d’un lot au nombre de ses recettes ; la `0.24.5` fixait le collage à six panneaux et fait redemander toute réponse contenant des lettres d’un autre alphabet ; la `0.24.4` préparait un second modèle de visuel Facebook, choisi par lot ; la `0.24.3` refaisait le rapport de tâche autour de son historique et ne montre plus que ce que la tâche avait prévu ; la `0.24.2` gardait l’historique complet de chaque tâche, de ce que le rédacteur a fourni jusqu’au brouillon ; la `0.24.1` se contentait d’une photographie par recette et, sans photographie, n’en lit qu’une sur le web ; la `0.24.0` gardait les photographies des rédacteurs hors de la médiathèque, dans un dossier propre à l’extension, avec pour chaque recette ce qui a été fourni et ce que le moteur a complété, et ne lit plus chaque photographie qu’une fois ; la `0.23.5` bornait les listes de la recherche pour qu’elle ne s’arrête plus sur son plafond ; la `0.23.4` dessinait la cuisson à blanc d’un collage par son fond doré, sans billes ni papier, tient la grille à six cases quel que soit le nombre d’étapes et fait refuser par la vérification finale un panneau d’ustensiles ou une case vide ; la `0.23.3` corrigeait ce qu’un audit complet a trouvé — argent visible d’un rédacteur, pluriels arabes, droits, désinstallation ; la `0.23.2` créait articles et images par les chemins natifs de WordPress, au nom du rédacteur ; la `0.23.1` attribuait les images générées à l’auteur de leur article ; la `0.23.0` faisait traiter les images par MS Image Optimizer (compression, redimensionnement, champs SEO), écrit en espagnol, propose des préréglages de qualité, suit chaque article dans WordPress et répare les actions groupées ; la `0.22.0` écrivait la recherche d’après les photographies du rédacteur quand il en a fourni, sans recherche sur le web, et refait l’écran d’appariement ; la `0.21.0` acceptait un lot fait de texte, de photographies ou des deux, et fait lire aux écrans Modèles et Moteur la même règle ; la `0.20.2` rendait l’écran Moteur lisible sur ordinateur comme sur téléphone et distingue le modèle de la réflexion ; la `0.20.1` ne laissait confier une étape qu’à un modèle capable de la faire ; la `0.20.0` remplissait chaque brouillon comme le lisent le thème MS Recipes, MS SEO Plus, MS FB Posts et MS Image Optimizer ; la `0.19.0` ramenait une recette approuvée du premier coup à 0,09–0,10 $ sans perte mesurée ; la `0.18.9` reprenait chaque écran après une revue complète dans le navigateur ; la `0.18.8` réservait l’extension, renommée « MS Recipes AI » dans le menu, à ceux qui peuvent téléverser des fichiers ; la `0.18.7` disait juste ce que fait le plafond par recette ; la `0.18.6` rangeait les photographies envoyées avec le brouillon qu’elles ont servi à écrire ; la `0.18.5` faisait passer un lot de trois recettes en 8 minutes pour 0,125 $ la recette, toutes approuvées ; la `0.18.4` faisait envoyer les photographies d’un lot depuis l’ordinateur du rédacteur ; la `0.18.3` faisait approuver les trois recettes d’un lot réel aux réglages par défaut — image à la une en `low`, collage en `medium` — pour 0,132 $ en moyenne ; la `0.18.2` permettait de choisir le modèle et la qualité de chaque image
-séparément ; la `0.18.1` fait tenir le plafond par recette jusque dans les reprises
-de l’approbation finale ; la `0.18.0` ramène une recette complète à environ 0,11 $ réels —
-recherche web comprise — sans perte de qualité mesurée ; la `0.17.0` faisait
-tenir l’estimation face à la facture ; la `0.16.0` permettait de régler la
-réflexion de chaque étape et d’en tenir compte dans les estimations ; la `0.15.0` faisait
-arriver jusqu’au moteur chaque tarif relevé ou corrigé et chiffrait la
-simulation ; la `0.14.0` corrigeait ce que coûte réellement un appel et ce que
-le catalogue garde. Voir ci-dessous ce
-qui a été vérifié en conditions réelles et ce qui ne l’a pas été. La `0.13.0` était installable et vérifiée de bout en bout sur un vrai
-WordPress (7.1.1) : un lot part, le cron le fait avancer vague par vague, et un
-brouillon arrive **en blocs**, avec son article, sa recette, son extrait, son
-identifiant d’URL, ses étiquettes, ses images attachées et décrites, ses
-métadonnées SEO, ses données structurées Recipe et son aperçu de partage.
+La version `0.26.1` retire les copies des prompts que gardaient les réglages :
+le moteur exécute ses propres gabarits, et ce qui n’est lu par rien ne se
+périme plus en silence. Le détail de chaque version suit, de la plus récente à
+la plus ancienne.
+
+Vérifié de bout en bout sur un vrai WordPress : un rédacteur dépose un lot de
+texte, de photographies ou des deux ; chaque photographie est lue une fois et
+associée à sa recette — celle d’un plat absent du texte devient une recette,
+celle qu’on ne reconnaît pas attend la décision du rédacteur ; le cron fait
+avancer le lot vague par vague, et chaque recette arrive en **brouillon**, en
+blocs, avec son article (2 400 mots par défaut), sa recette structurée, ses
+métadonnées SEO, son image à la une et son collage Facebook de six panneaux.
+Une recette complète approuvée coûte environ 0,07 à 0,10 $ d’après les
+estimations. Les photographies sources restent hors de la médiathèque, dans un
+dossier propre à l’extension, avec l’historique complet de chaque tâche.
 
 | Rôle | Ce qu’il voit |
 | --- | --- |
@@ -28,8 +29,8 @@ métadonnées SEO, ses données structurées Recipe et son aperçu de partage.
 | Administrateur (`msrwa_manage`) | tout : coûts, plafonds, modèles, diagnostics, moteur, réglages |
 
 Ce qui fonctionne : lots multi-recettes avec appariement des photos, trois
-sorties (article seul, article et image à la une, chaîne complète), trois
-langues d’article (français, anglais, arabe), estimation avant dépense et refus
+sorties (article seul, article et image à la une, chaîne complète), quatre
+langues d’article (français, anglais, espagnol, arabe), estimation avant dépense et refus
 gratuit d’un lot qui dépasserait son plafond, plafonds par recette, par jour et
 sur trente jours, file suspendable, reprise d’une recette arrêtée sans repayer
 ce qui a réussi, lots programmés, export CSV, rétention réglable, vérification
@@ -43,10 +44,11 @@ texte est validé éditorialement.
 ### Installation
 
 1. Copier le dossier dans `wp-content/plugins/` et activer l’extension.
-2. *MS Recipes Writer → Réglages* : enregistrer au moins une clé d’API, puis
+2. *MS Recipes AI → Réglages* : enregistrer au moins une clé d’API, puis
    **Vérifier les clés**.
 3. *Moteur* : choisir quel fournisseur sert chaque étape (OpenAI par défaut).
-4. *Nouveau lot* : coller une ou plusieurs recettes, séparées par `---`.
+4. *Nouveau lot* : coller une ou plusieurs recettes, séparées par une ligne
+   `---`, déposer des photographies, ou les deux.
 
 Le travail avance par le cron de WordPress. Si `DISABLE_WP_CRON` est actif, un
 cron serveur doit appeler `wp-cron.php` toutes les cinq minutes.
@@ -74,6 +76,31 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.26.1
+
+**Une seule copie des prompts : celle que le moteur exécute.** Les réglages
+gardaient aussi une version compilée de huit prompts, qu’un
+outil recopiait et qu’un test comparait aux gabarits. Aucun écran ne les
+montrait et le moteur ne les lisait pas : il compile ses propres gabarits à
+chaque tâche. Ils sont retirés, avec l’outil qui les recopiait et la commande
+`lab.php prompts` qui faisait la même chose.
+
+- Un réglage retiré qu’un site a encore en base n’est plus transmis au moteur,
+  et le prochain enregistrement des réglages le supprime. Le site de test en
+  avait deux (des prompts d’article et de correction d’une ancienne version) :
+  ignorés, puis supprimés à l’enregistrement.
+- Retirés aussi : deux fichiers d’aide du laboratoire et une expérience de
+  mesure dont le résultat est consigné, qui ne s’exécutait plus, et trois
+  fonctions du laboratoire que rien n’appelait.
+- La première section de ce fichier dit maintenant ce que fait l’extension
+  aujourd’hui, au lieu d’énumérer toutes les versions ; le menu y porte son nom
+  actuel, *MS Recipes AI*, et l’espagnol figure parmi les langues.
+
+Vérifié : tests hors ligne verts ; sur le site de test, les réglages
+s’enregistrent depuis leur écran sans perdre une valeur, les clés sont
+acceptées, et chaque écran s’ouvre sans erreur en administrateur et en
+rédacteur.
 
 ## Version 0.26.0
 

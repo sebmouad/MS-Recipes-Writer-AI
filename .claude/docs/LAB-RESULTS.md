@@ -8,7 +8,7 @@ ignored, 4 MB and regenerable); this table is the record. Regenerate a row with:
 php tools/lab.php step <step> --brief=<fixture> --provider=<openai|gemini|claude> --tier=<low|medium|high>
 ```
 
-Measured 2026-09-20. Prices from `tools/lib/pricing.php`, verified the same day.
+Measured 2026-09-20. Prices from the engine's configuration, verified the same day.
 
 ## The whole engine, end to end — measured 2026-09-21
 

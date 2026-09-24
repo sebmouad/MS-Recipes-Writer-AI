@@ -5,11 +5,9 @@
 require __DIR__ . '/bootstrap.php';
 msrwa_test_load( 'images', 'prompt', 'json' );
 
-// MSRWA_Settings is a double offline, so the shipped default is read from the
-// file that seeds the prompts table.
-$source = file_get_contents( dirname( __DIR__ ) . '/includes/class-msrwa-settings.php' );
-msrwa_test_assert( 1 === preg_match( "/'prompt_research'\s*=>\s*'(.*?)',\n/s", $source, $match ), 'The shipped research prompt must be readable.' );
-$research = str_replace( array( "\\'", '\\\\' ), array( "'", '\\' ), $match[1] );
+require_once dirname( __DIR__ ) . '/tools/lib/steps.php';
+// The research prompt as the engine runs it: its template, compiled from the shipped settings.
+$research = MSRWA_Prompt::compile( (string) file_get_contents( dirname( __DIR__ ) . '/includes/engine/prompts/research.tpl.txt' ), lab_settings() );
 
 // 1. Research must ask for provenance, and for observations of the real bytes.
 foreach ( array( 'visual_references', 'visual_observations', 'image_url', 'source_url' ) as $key ) {
@@ -23,7 +21,6 @@ msrwa_test_missing( $research, '{{', 'The shipped prompt must be compiled, with 
 //    downloads a cited image to look at it; it does not hand it to the reader.
 msrwa_test_contains( $research, 'Do not copy a source', 'Research must not reuse a source\'s work.' );
 
-require_once dirname( __DIR__ ) . '/tools/lib/steps.php';
 $brief = lab_brief( 'tarte-pommes' );
 
 // 3. Every step that describes the dish receives the research, checked by

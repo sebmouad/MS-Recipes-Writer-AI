@@ -1,7 +1,7 @@
 <?php
-// Every prompt is a template compiled from the settings, and the settings ship
-// the compiled result. A prompt that hardcodes what a setting controls silently
-// ignores the administrator (owner directive, 2026-09-20).
+// Every prompt is a template compiled from the settings. A prompt that
+// hardcodes what a setting controls silently ignores the administrator (owner
+// directive, 2026-09-20).
 require __DIR__ . '/bootstrap.php';
 msrwa_test_load( 'images', 'prompt' );
 require_once dirname( __DIR__ ) . '/tools/lib/steps.php';
@@ -34,20 +34,5 @@ foreach ( $templates as $path ) {
 	msrwa_test_contains( MSRWA_Prompt::compile( $raw, $spanish ), 'Spanish', basename( $path ) . ' must follow the configured language.' );
 }
 msrwa_test_assert( $touched >= 6, 'Most prompts must take their language from the settings; only ' . $touched . ' do.' );
-
-// What ships must be what the lab measured, compiled.
-$source = file_get_contents( dirname( __DIR__ ) . '/includes/class-msrwa-settings.php' );
-$shipped = array(
-	'research.tpl.txt' => 'prompt_research', 'canonical_recipe.tpl.txt' => 'prompt_recipe',
-	'article.tpl.txt' => 'prompt_article', 'review.tpl.txt' => 'prompt_review',
-	'proofread.tpl.txt' => 'prompt_correction', 'featured_image.tpl.txt' => 'prompt_image',
-	'facebook_image.tpl.txt' => 'prompt_facebook_image', 'final_approval.tpl.txt' => 'prompt_final_approval',
-);
-foreach ( $shipped as $template => $key ) {
-	msrwa_test_assert( 1 === preg_match( "/'" . $key . "'\s*=>\s*'(.*?)',\n/s", $source, $match ), $key . ' must ship a default.' );
-	$default = str_replace( array( "\\'", '\\\\' ), array( "'", '\\' ), $match[1] );
-	$compiled = MSRWA_Prompt::compile( file_get_contents( dirname( __DIR__ ) . '/includes/engine/prompts/' . $template ), lab_settings() );
-	msrwa_test_assert( $default === $compiled, $key . ' must ship exactly what ' . $template . ' compiles to; run tools/promote.' );
-}
 
 msrwa_test_done( 'prompt templates' );

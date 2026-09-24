@@ -7,7 +7,6 @@
  *   php tools/lab.php step   featured_image --brief=tarte-pommes --canonical=<run>.json
  *   php tools/lab.php judge  --brief=… --draws=5 --article=<run>.json --featured=… --facebook=…
  *   php tools/lab.php report --run=tools/runs/<run>.json [--output=out.html]
- *   php tools/lab.php prompts
  *   php tools/lab.php prune  [--dry-run]
  *
  * Common flags: --provider --tier --model --budget --only --attempts --quality --thinking
@@ -22,8 +21,6 @@
  */
 define( 'MSRWA_LAB', true );
 require __DIR__ . '/lib/steps.php';
-require __DIR__ . '/lib/providers.php';
-require __DIR__ . '/lib/pricing.php';
 
 function lab_die( $message ) { fwrite( STDERR, rtrim( $message ) . "\n" ); exit( 2 ); }
 
@@ -212,40 +209,6 @@ if ( 'report' === $command ) {
 }
 
 /**
- * Compiles every prompt template against the shipped settings and writes the
- * result into the defaults that seed the prompts table.
- *
- * The lab measures templates; the plugin runs what is in the database. Without
- * this the two drift, and the plugin quietly runs a prompt nobody proved.
- * tests/test-prompt-templates.php fails when they differ, so run it after
- * editing any template.
- */
-if ( 'prompts' === $command ) {
-	$map = array(
-		'research.tpl.txt'         => 'prompt_research',
-		'canonical_recipe.tpl.txt' => 'prompt_recipe',
-		'article.tpl.txt'          => 'prompt_article',
-		'review.tpl.txt'           => 'prompt_review',
-		'proofread.tpl.txt'        => 'prompt_correction',
-		'featured_image.tpl.txt'   => 'prompt_image',
-		'facebook_image.tpl.txt'   => 'prompt_facebook_image',
-		'final_approval.tpl.txt'   => 'prompt_final_approval',
-	);
-	$file = dirname( __DIR__ ) . '/includes/class-msrwa-settings.php';
-	$source = (string) file_get_contents( $file );
-	foreach ( $map as $template => $key ) {
-		$compiled = MSRWA_Prompt::compile( trim( (string) file_get_contents( MSRWA_Engine_Input::prompt_path( $template ) ) ), lab_settings() );
-		if ( false !== strpos( $compiled, '{{' ) ) { lab_die( "Unresolved placeholder in {$template}" ); }
-		$pattern = "/('" . $key . "'\s*=>\s*)'.*?',\n/s";
-		if ( ! preg_match( $pattern, $source ) ) { fwrite( STDERR, "No setting {$key}\n" ); continue; }
-		$source = preg_replace( $pattern, '$1' . str_replace( '$', '\\$', var_export( $compiled, true ) ) . ",\n", $source, 1 );
-		printf( "%-26s -> %-24s %d chars\n", $template, $key, strlen( $compiled ) );
-	}
-	file_put_contents( $file, $source );
-	exit( 0 );
-}
-
-/**
  * The owner's retention policy over tools/runs.
  *
  * Keep the last article and the last canonical recipe per brief, the last
@@ -328,5 +291,5 @@ if ( 'prune' === $command ) {
 	exit( 0 );
 }
 
-fwrite( STDERR, "php tools/lab.php <run|step|judge|report|prompts|prune> [subject] [--flags]\n" );
+fwrite( STDERR, "php tools/lab.php <run|step|judge|report|prune> [subject] [--flags]\n" );
 exit( 2 );

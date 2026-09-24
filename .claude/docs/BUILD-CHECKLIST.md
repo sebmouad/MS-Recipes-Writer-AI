@@ -248,8 +248,8 @@ Three layers, described in [`TESTING.md`](TESTING.md).
 
 Nothing in phase B is built on an unproven prompt. Each task means: measure the
 shipped prompt, write variants that change one thing, keep the one that passes
-every check on **at least three different briefs**, then promote it into the
-defaults in `includes/class-msrwa-settings.php`, which seed the `prompts` table.
+every check on **at least three different briefs**, then keep it as the
+engine's template in `includes/engine/prompts/`, which is what the plugin runs.
 
 Needs `OPENAI_API_KEY` in the environment. Record the baseline (score, seconds,
 cost) in the task before changing anything.
@@ -391,9 +391,9 @@ cost) in the task before changing anything.
 - [x] **A9 — Prompt templates (closed 2026-09-21).** All nine prompts are
   templates compiled from the settings; none hardcodes what a setting controls.
   The output language came from five prompts saying "French" and now comes from
-  `site_language`. `tools/promote.php` compiles them into the shipped
-  defaults and `tests/test-prompt-templates.php` asserts the defaults equal the
-  compiled templates, so the plugin cannot run a prompt the lab never measured.
+  `site_language`. The engine compiles them itself at run time, so the plugin
+  cannot run a prompt the lab never measured. (A compiled copy once shipped in
+  the settings defaults; nothing ran it, and 0.26.1 removed it.)
 - [ ] *(superseded)* **A20 — The fixtures carry invented observations.** `tarte-pommes` and
   `poulet-yassa` cite `https://example.test/...`. Every measurement that depends
   on observed appearance is therefore measuring a stub. Re-run `research` with
@@ -496,7 +496,7 @@ cost) in the task before changing anything.
   Measured 14/14 on the lamb: 10 ingredients all sourced, 10 steps all cued,
   3 tier-1 references. `research_max_output_tokens` 7 000 → 12 000.
 - [x] **A31 — Exchange format and caching, measured (2026-09-21).**
-  `tools/format-cost.php` reads the provider's own input_tokens for several
+  A one-off script (removed in 0.26.1, its answer being recorded here) read the provider's own input_tokens for several
   renderings of one package. Pipe-delimited records beat compact JSON by 1.6%,
   indented lines are worse than JSON, and pretty JSON costs 13% more — a saving
   already taken. **Changing format is not worth the loss of a format everyone can

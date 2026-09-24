@@ -22,7 +22,7 @@ failure is a value, not an exception.**
 | `class-msrwa-engine-score.php` | Whether an answer satisfied its step's contract | 278 |
 | `class-msrwa-engine-call.php` | Every provider call, normalized across three providers | 288 |
 | `class-msrwa-result.php` | What comes back, and the progress report while it runs | 107 |
-| `prompts/*.tpl.txt` | The nine prompts. Engine data: it runs them, it carries them | — |
+| `prompts/*.tpl.txt` | The ten prompts. Engine data: it runs them, it carries them | — |
 | `load.php` | Loads the shared plugin classes, then the engine | — |
 
 `MSRWA_Prompt`, `MSRWA_Quality`, `MSRWA_Recipe`, `MSRWA_Images` and `MSRWA_Json`

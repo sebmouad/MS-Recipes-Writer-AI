@@ -30,14 +30,12 @@ about how a dish looks are replaced rather than trusted.
 - `lab.php`: the only command. Everything else is the engine.
 - `report.php` and `report.css`: the human HTML report, rendered from one run.
 - `lib/steps.php`: reading fixtures and saved runs off disk — the lab's own job.
-- `lib/providers.php`, `lib/pricing.php`: what the format experiment still calls.
 - `fixtures/`: briefs across different cuisines, for offline and live comparison.
-- `experiments/`: measurements whose question is answered, kept so the answer
-  can be re-measured rather than re-argued.
 - `runs/`: generated runs and images. Ignored by Git.
 
 The prompts live with the engine, in `includes/engine/prompts/`. They are its
-data: it executes them, it carries them.
+data: it executes them, it carries them. There is no second copy to keep in
+step: what the lab measures is what the plugin runs.
 
 ## Workflow
 
@@ -66,7 +64,6 @@ php tools/lab.php judge --brief=tarte-pommes --draws=5 \
 php tools/lab.php report --run=tools/runs/tarte-pommes-....json --output=/tmp/tarte.html
 
 # Housekeeping.
-php tools/lab.php prompts          # compile the templates into the shipped defaults
 php tools/lab.php prune --dry-run  # apply the retention policy to tools/runs
 ```
 
