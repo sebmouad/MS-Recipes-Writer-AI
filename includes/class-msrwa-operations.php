@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
 final class MSRWA_Operations {
 	/** Resolve unsaved settings without saving, calling providers or spending. */
 	public static function preview( $request ) {
-		if ( ! current_user_can( 'manage_options' ) ) { return new WP_Error( 'forbidden', __( 'Accès refusé.', 'ms-recipes-writer-ai' ), array( 'status' => 403 ) ); }
+		if ( ! MSRWA_Rights::may_manage() ) { return new WP_Error( 'forbidden', __( 'Accès refusé.', 'ms-recipes-writer-ai' ), array( 'status' => 403 ) ); }
 		$raw = $request->get_param( 'config' );
 		if ( ! is_array( $raw ) ) { return new WP_Error( 'invalid_config', __( 'Configuration attendue.', 'ms-recipes-writer-ai' ), array( 'status' => 400 ) ); }
 		$parsed = MSRWA_Engine_Settings::parse( $raw );
@@ -117,7 +117,7 @@ final class MSRWA_Operations {
 		// tokens and amounts, none of which a writer may be shown. The scope
 		// check stands beside it because an administrator without
 		// `msrwa_view_all` still only sees their own lots.
-		if ( ! current_user_can( 'manage_options' ) ) { wp_die( esc_html__( 'Accès refusé.', 'ms-recipes-writer-ai' ) ); }
+		if ( ! MSRWA_Rights::may_manage() ) { wp_die( esc_html__( 'Accès refusé.', 'ms-recipes-writer-ai' ) ); }
 		if ( ! $run || ! MSRWA_Run::may_see( $run ) ) { wp_die( esc_html__( 'Accès refusé.', 'ms-recipes-writer-ai' ) ); }
 		$state = MSRWA_Run::state( $id );
 		$state['artifacts']['brief'] = (array) json_decode( (string) $run['brief_json'], true );

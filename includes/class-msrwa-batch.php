@@ -94,14 +94,14 @@ final class MSRWA_Batch {
 		$columns = 'id, owner_id, label, recipes, images, profile, language, dispatch_at, created_at';
 		$order = 'ORDER BY (dispatch_at IS NULL), dispatch_at ASC, id DESC LIMIT %d';
 
-		if ( current_user_can( 'manage_options' ) ) {
+		if ( MSRWA_Rights::may_see_everything() ) {
 			return (array) $wpdb->get_results( $wpdb->prepare( "SELECT {$columns} FROM " . self::table() . " WHERE status = 'ready' {$order}", $limit ), ARRAY_A );
 		}
 		return (array) $wpdb->get_results( $wpdb->prepare( "SELECT {$columns} FROM " . self::table() . " WHERE status = 'ready' AND owner_id = %d {$order}", get_current_user_id(), $limit ), ARRAY_A );
 	}
 
 	public static function may_see( array $batch ) {
-		return (int) $batch['owner_id'] === get_current_user_id() || current_user_can( 'manage_options' );
+		return MSRWA_Rights::may_see( (int) $batch['owner_id'] );
 	}
 
 	public static function matching( $id ) {

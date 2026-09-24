@@ -44,7 +44,9 @@ final class MSRWA_REST {
 	}
 
 	public static function can_create() { return MSRWA_Rights::may_write(); }
-	public static function can_manage() { return current_user_can( 'manage_options' ); }
+	// The screens open on msrwa_manage; the routes behind their buttons have to
+	// agree, or someone given the capability sees buttons that answer 403.
+	public static function can_manage() { return MSRWA_Rights::may_manage(); }
 
 	/**
 	 * What a lot would cost, from the configuration that will actually run it.
@@ -149,7 +151,7 @@ final class MSRWA_REST {
 				'approved' => null === $run['approved'] ? null : (bool) $run['approved'],
 				'draft_post_id' => (int) $run['draft_post_id'],
 			);
-			if ( ! current_user_can( 'manage_options' ) ) {
+			if ( ! MSRWA_Rights::may_see_money() ) {
 				$last = count( $out ) - 1;
 				unset( $out[ $last ]['step'], $out[ $last ]['steps_done'], $out[ $last ]['steps_total'], $out[ $last ]['cost_usd'], $out[ $last ]['seconds'] );
 			}
@@ -161,7 +163,11 @@ final class MSRWA_REST {
 	public static function queue() {
 		$state = MSRWA_Queue::state();
 		$state['stalled'] = MSRWA_Queue::stalled();
-		$state['budget'] = MSRWA_Budget::state();
+		// Ceilings and spend are money: a writer may reach this route and is told
+		// only whether the site can still spend, never how much.
+		$state['budget'] = MSRWA_Rights::may_see_money()
+			? MSRWA_Budget::state()
+			: array_map( static function ( $budget ) { return array( 'exceeded' => (bool) $budget['exceeded'] ); }, MSRWA_Budget::state() );
 		return rest_ensure_response( $state );
 	}
 

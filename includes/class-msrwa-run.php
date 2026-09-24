@@ -70,7 +70,7 @@ final class MSRWA_Run {
 	}
 
 	public static function may_see( array $run ) {
-		return (int) $run['owner_id'] === get_current_user_id() || current_user_can( 'manage_options' );
+		return MSRWA_Rights::may_see( (int) $run['owner_id'] );
 	}
 
 	public static function cancel( $id ) {
