@@ -194,6 +194,17 @@ final class MSRWA_Intake {
 	}
 
 	/** One image as the engine's vision call wants it: a media type and base64 bytes. */
+	/**
+	 * One of a brief's photographs, for the engine: read by its attachment id,
+	 * and only if it is a photograph a writer sent — a brief can name nothing
+	 * else on this site's disk.
+	 */
+	public static function engine_image( $image, $max_bytes = 10000000 ) {
+		$id = absint( is_array( $image ) ? ( $image['id'] ?? 0 ) : 0 );
+		if ( ! $id || ! get_post_meta( $id, self::SENT, true ) ) { return array( 'error' => 'not a photograph sent with the lot' ); }
+		return self::read( $id, $max_bytes );
+	}
+
 	public static function read( $attachment_id, $max_bytes = 10000000 ) {
 		$path = get_attached_file( absint( $attachment_id ) );
 		if ( ! $path || ! is_readable( $path ) ) { return array( 'error' => 'fichier introuvable' ); }

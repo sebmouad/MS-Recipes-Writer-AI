@@ -386,13 +386,26 @@ final class MSRWA_Engine {
 		$route = $config->model_for( $name );
 		if ( '' === $route['model'] ) { return self::failed( 'No model resolves for route "' . $route['route'] . '".' ); }
 
-		$prompt = $config->prompt( $name );
-		if ( '' === $prompt['text'] ) { return self::failed( 'No prompt for ' . $name . ' (' . $prompt['source'] . ').' ); }
-
 		$brief = self::working_set( $name, $result );
-		if ( 'research' === $name && $brief['images'] ) { $brief['image_observations'] = self::observe_editor_images( $brief['images'], $config, $result ); }
+		// The editor's own photographs are the visual evidence when there are
+		// any: the research is then written from them and the editor's text,
+		// without a web search or the downloads of other people's photographs —
+		// the three searches and their pages were most of a recipe's research
+		// cost. `research.web_search` set to `always` searches regardless.
+		$from_photographs = 'research' === $name && $brief['images'] && 'always' !== (string) $config->get( 'research.web_search', 'without_images' );
+		$editor_usage = array( 'input_tokens' => 0, 'output_tokens' => 0 );
+		if ( 'research' === $name && $brief['images'] ) { $brief['image_observations'] = self::observe_editor_images( $brief['images'], $config, $result, $editor_usage, $options ); }
+		// Photographs that could not be read are no evidence: search after all.
+		if ( $from_photographs && ! array_filter( (array) ( $brief['image_observations'] ?? array() ), static function ( $observation ) { return array( 'image_url', 'uncertainties' ) !== array_keys( (array) $observation ); } ) ) {
+			$from_photographs = false;
+			$result->event( 'warning', 'research', 'No editor photograph could be read; searching the web instead.' );
+		}
+		if ( $from_photographs ) { $brief['research_mode'] = 'photographs'; }
+
+		$prompt = $config->prompt( $from_photographs ? 'research_photographs' : $name );
+		if ( '' === $prompt['text'] ) { return self::failed( 'No prompt for ' . $name . ' (' . $prompt['source'] . ').' ); }
 		$input = MSRWA_Engine_Input::build( $name, $prompt['text'], $brief, $options );
-		$web_search = 'web_search' === MSRWA_Engine_Steps::capability( $name, (array) $config->get( 'steps', array() ) );
+		$web_search = ! $from_photographs && 'web_search' === MSRWA_Engine_Steps::capability( $name, (array) $config->get( 'steps', array() ) );
 		$ceiling = $config->max_output( $name );
 
 		$attached = self::attached( $brief );
@@ -406,8 +419,11 @@ final class MSRWA_Engine {
 		$plan = MSRWA_Engine_Call::plan_text( $route['provider'], $route['model'], $input, $ceiling, true, $web_search, $wire );
 		if ( isset( $plan['error'] ) ) { return self::failed( $plan['error'], 0, $route ); }
 
-		return array( 'plan' => $plan, 'finish' => static function ( $call ) use ( $name, $route, $wire, $config, $result, $brief, $prompt, $input, $ceiling ) {
+		return array( 'plan' => $plan, 'finish' => static function ( $call ) use ( $name, $route, $wire, $config, $result, $brief, $prompt, $input, $ceiling, $from_photographs, $editor_usage ) {
 			if ( isset( $call['error'] ) ) { return self::failed( $call['error'], $call['seconds'] ?? 0, $route ); }
+			// Reading the editor's photographs is part of the research and billed to it.
+			$call['usage']['input_tokens'] = (int) ( $call['usage']['input_tokens'] ?? 0 ) + $editor_usage['input_tokens'];
+			$call['usage']['output_tokens'] = (int) ( $call['usage']['output_tokens'] ?? 0 ) + $editor_usage['output_tokens'];
 			self::report_call( $result, $name, $route, $wire['text_endpoint'] ?? '', $call, $config );
 
 			// Each provider also says so outright; Gemini stops a few tokens short
@@ -429,7 +445,7 @@ final class MSRWA_Engine {
 			}
 
 			if ( 'research' === $name && $answer ) {
-				$answer = self::observe( $answer, $config, $result, $call['usage'] );
+				$answer = $from_photographs ? self::from_editor_photographs( $answer, $brief, $result ) : self::observe( $answer, $config, $result, $call['usage'] );
 				$call['text'] = (string) json_encode( $answer, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
 			}
 			if ( 'proofread' === $name && $answer && ! isset( $answer['content_html'] ) ) {
@@ -472,25 +488,54 @@ final class MSRWA_Engine {
 	}
 
 	/**
+	 * The editor's photographs as the package's visual evidence: they are the
+	 * references and their readings the observations, in the shape the web
+	 * package gives, so every later step reads them the same way.
+	 */
+	private static function from_editor_photographs( array $package, array $brief, MSRWA_Result $result ) {
+		$package['references'] = array();
+		$package['visual_references'] = array();
+		$package['visual_observations'] = array();
+		foreach ( (array) ( $brief['image_observations'] ?? array() ) as $observation ) {
+			$url = (string) ( $observation['image_url'] ?? '' );
+			// A photograph that could not be read is not evidence of anything.
+			if ( '' === $url || array( 'image_url', 'uncertainties' ) === array_keys( $observation ) ) { continue; }
+			$package['visual_references'][] = array( 'image_url' => $url, 'source_url' => 'editor', 'title' => 'Photographie fournie par l’éditeur', 'tier' => 1 );
+			$package['visual_observations'][] = array_merge( $observation, array( 'image_url' => $url, 'source_url' => 'editor', 'tier' => 1 ) );
+		}
+		$result->event( 'observe', 'research', sprintf( 'Written from %d editor photograph(s) without a web search.', count( $package['visual_observations'] ) ) );
+		return $package;
+	}
+
+	/**
 	 * What the editor's own images show, read from their bytes.
 	 *
 	 * An editor who attaches photographs is saying something about the dish that
 	 * the title does not. Research is told what is in them rather than that they
 	 * exist. Recorded on the run so a retry does not pay for the same look twice.
 	 */
-	private static function observe_editor_images( array $images, MSRWA_Engine_Config $config, MSRWA_Result $result ) {
+	private static function observe_editor_images( array $images, MSRWA_Engine_Config $config, MSRWA_Result $result, array &$usage = array(), array $options = array() ) {
 		if ( isset( $result->artifacts['editor_observations'] ) ) { return (array) $result->artifacts['editor_observations']; }
 		$route = $config->model_for( 'vision' );
 		$observed = array();
+		$max = (int) $config->get( 'limits.max_image_bytes', 10000000 );
 		foreach ( array_slice( $images, 0, (int) $config->get( 'limits.images_inspected', 3 ) ) as $candidate ) {
-			$url = is_array( $candidate ) ? (string) ( $candidate['image_url'] ?? '' ) : (string) $candidate;
-			$image = MSRWA_Engine_Call::fetch_image( $url, (int) $config->get( 'limits.max_image_bytes', 10000000 ) );
+			// The caller's own files are read the caller's way: an editor's upload
+			// sits on the caller's disk, and its address need not be public or
+			// HTTPS. Only an image the caller cannot read is fetched over HTTPS.
+			// The plugin names it `url`; the engine's own shape is `image_url`.
+			$url = is_array( $candidate ) ? (string) ( $candidate['image_url'] ?? $candidate['url'] ?? '' ) : (string) $candidate;
+			$image = is_array( $candidate ) && is_callable( $options['read_image'] ?? null ) ? (array) call_user_func( $options['read_image'], $candidate, $max ) : array();
+			if ( ! $image || isset( $image['error'] ) && '' !== $url && preg_match( '#^https://#i', $url ) ) { $image = MSRWA_Engine_Call::fetch_image( $url, $max ); }
 			if ( isset( $image['error'] ) ) { $observed[] = array( 'image_url' => $url, 'uncertainties' => $image['error'] ); continue; }
 			$vision = MSRWA_Engine_Call::vision( $route['provider'], $route['model'], $image, 'Image fournie par l’éditeur', (int) $config->max_output( 'vision' ), $config->provider( $route['provider'], $route['model'], 'vision' ), (string) $config->get( 'vision_instruction', '' ) );
+			$usage['input_tokens'] = (int) ( $usage['input_tokens'] ?? 0 ) + (int) ( $vision['usage']['input_tokens'] ?? 0 );
+			$usage['output_tokens'] = (int) ( $usage['output_tokens'] ?? 0 ) + (int) ( $vision['usage']['output_tokens'] ?? 0 );
 			$decoded = MSRWA_Json::decode( (string) ( $vision['text'] ?? '' ) );
 			$observed[] = is_array( $decoded ) ? array_merge( array( 'image_url' => $url ), $decoded ) : array( 'image_url' => $url, 'uncertainties' => 'Analyse visuelle non structurée.' );
 		}
-		$result->event( 'observe', 'research', count( $observed ) . ' editor-supplied image(s) read before searching.' );
+		$read = count( array_filter( $observed, static function ( $one ) { return array( 'image_url', 'uncertainties' ) !== array_keys( $one ); } ) );
+		$result->event( $read ? 'observe' : 'warning', 'research', sprintf( '%d of %d editor-supplied image(s) read from their bytes.', $read, count( $observed ) ) );
 		$result->artifact( 'editor_observations', $observed );
 		return $observed;
 	}

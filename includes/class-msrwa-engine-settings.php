@@ -27,6 +27,7 @@ final class MSRWA_Engine_Settings {
 			'limits'     => __( 'Délais, concurrence, taille des images inspectées. Le budget vient du lot.', 'ms-recipes-writer-ai' ),
 			'images'     => __( 'Format, qualité, dimensions et nombre de panneaux du collage.', 'ms-recipes-writer-ai' ),
 			'thresholds' => __( 'Les seuils au-dessus desquels une étape est considérée réussie.', 'ms-recipes-writer-ai' ),
+			'research'   => __( 'Recherche sur le web : `without_images` ne cherche que si le rédacteur n’a fourni aucune photographie — sinon la recherche est écrite d’après ses photographies et son texte, sans coût de recherche ; `always` cherche toujours.', 'ms-recipes-writer-ai' ),
 		);
 	}
 

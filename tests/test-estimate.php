@@ -100,8 +100,8 @@ msrwa_test_assert( 0.0 === $article['buckets']['featured'], 'Nothing is charged 
 $lot = MSRWA_Estimate::lot( MSRWA_Profile::FULL, 4, 6 );
 msrwa_test_assert( $lot['matching_usd'] > 0, 'Pairing six photographs is not free.' );
 msrwa_test_assert(
-	abs( $lot['cost_usd'] - ( $full['cost_usd'] * 4 + $lot['matching_usd'] ) ) < 0.000001,
-	'A lot is its recipes plus its pairing; got ' . $lot['cost_usd']
+	abs( $lot['cost_usd'] - ( $lot['per_recipe_pictured_usd'] * 4 + $lot['matching_usd'] ) ) < 0.000001,
+	'A lot is its recipes — each with a photograph, so researched from it — plus its pairing; got ' . $lot['cost_usd']
 );
 
 // A model with no published rate is unknown, never free — the distinction the

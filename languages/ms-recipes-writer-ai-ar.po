@@ -1996,6 +1996,72 @@ msgstr "اختياري مع الصور"
 msgid "facultatif avec du texte"
 msgstr "اختياري مع النص"
 
+msgid "Recherche sur le web : `without_images` ne cherche que si le rédacteur n’a fourni aucune photographie — sinon la recherche est écrite d’après ses photographies et son texte, sans coût de recherche ; `always` cherche toujours."
+msgstr "البحث في الويب: `without_images` لا يبحث إلا إذا لم يقدّم المحرر أي صورة — وإلا تُكتب المعلومات انطلاقًا من صوره ونصه دون تكلفة بحث؛ `always` يبحث دائمًا."
+
+msgid "%d photographie — écrite d’après elle"
+msgid_plural "%d photographies — écrite d’après elles"
+msgstr[0] "لا صور"
+msgstr[1] "صورة واحدة — تُكتب انطلاقًا منها"
+msgstr[2] "صورتان — تُكتب انطلاقًا منهما"
+msgstr[3] "%d صور — تُكتب انطلاقًا منها"
+msgstr[4] "%d صورة — تُكتب انطلاقًا منها"
+msgstr[5] "%d صورة — تُكتب انطلاقًا منها"
+
+msgid "%d photographies ne vont avec aucune recette : elles ne seront pas utilisées."
+msgstr "%d صور لا تنتمي إلى أي وصفة: لن تُستخدم."
+
+msgid "%d photographies — écrite d’après elles"
+msgstr "%d صور — تُكتب انطلاقًا منها"
+
+msgid "1 photographie — écrite d’après elle"
+msgstr "صورة واحدة — تُكتب انطلاقًا منها"
+
+msgid "Ce qui sera écrit"
+msgstr "ما سيُكتب"
+
+msgid "Les recettes seront écrites d’après les références trouvées sur le web."
+msgstr "ستُكتب الوصفات انطلاقًا من مراجع يُعثر عليها في الويب."
+
+msgid "L’appariement de ce lot est arrêté : il est parti avec ce qui suit."
+msgstr "اقتران هذه الدفعة نهائي: انطلقت بما يلي."
+
+msgid "Partir le"
+msgstr "الانطلاق في"
+
+msgid "Plat non reconnu"
+msgstr "طبق غير معروف"
+
+msgid "Plus tard…"
+msgstr "لاحقًا…"
+
+msgid "Sans photographie — références cherchées sur le web"
+msgstr "بدون صورة — يُبحث عن المراجع في الويب"
+
+msgid "Une photographie ne va avec aucune recette : elle ne sera pas utilisée."
+msgstr "صورة واحدة لا تنتمي إلى أي وصفة: لن تُستخدم."
+
+msgid "Va avec"
+msgstr "تنتمي إلى"
+
+msgid "Voir en grand"
+msgstr "عرض بالحجم الكامل"
+
+msgid "Vos photographies"
+msgstr "صورك"
+
+msgid "Vérifiez à quelle recette va chaque photographie, puis lancez. Une recette illustrée par vos photographies est écrite d’après elles ; sans photographie, ses références sont cherchées sur le web."
+msgstr "تحقق من الوصفة التي تنتمي إليها كل صورة، ثم أطلق. الوصفة المصحوبة بصورك تُكتب انطلاقًا منها؛ وبدون صورة يُبحث عن مراجعها في الويب."
+
+msgid "aucune recette"
+msgstr "لا وصفة"
+
+msgid "Mise de côté"
+msgstr "مُستبعدة"
+
+msgid "Choisie par vous"
+msgstr "اخترتها أنت"
+
 msgid "aucune page citée"
 msgstr "لم تُذكر أي صفحة"
 

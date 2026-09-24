@@ -183,7 +183,9 @@ final class MSRWA_Run {
 
 		$result = MSRWA_Engine::run(
 			array_merge( $brief, array( 'artifacts' => $artifacts ) ),
-			array( 'config' => $config, 'only' => $wave, 'workspace' => $workspace )
+			// The writer's photographs are read from the site's own files: their
+			// address is the site's, which need not be public or HTTPS.
+			array( 'config' => $config, 'only' => $wave, 'workspace' => $workspace, 'read_image' => array( 'MSRWA_Intake', 'engine_image' ) )
 		);
 
 		self::absorb( $id, $state, $result->to_array() );

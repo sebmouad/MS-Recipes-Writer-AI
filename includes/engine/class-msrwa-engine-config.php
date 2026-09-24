@@ -101,6 +101,13 @@ final class MSRWA_Engine_Config {
 				'default'        => 1,
 			),
 
+			// Whether the research searches the web when the editor supplied
+			// photographs of the dish: `without_images` (the default) writes it
+			// from those photographs and the editor's text, `always` searches.
+			'research' => array(
+				'web_search' => 'without_images',
+			),
+
 			'images' => array(
 				// The lowest quality the final approval passes: a featured image is
 				// judged good at every tier, and `low` costs $0.014 against $0.021.
@@ -322,6 +329,7 @@ final class MSRWA_Engine_Config {
 		foreach ( (array) ( $values['attempts'] ?? array() ) as $step => $times ) {
 			$values['attempts'][ $step ] = max( 1, min( 6, (int) $times ) );
 		}
+		$values['research']['web_search'] = 'always' === (string) ( $values['research']['web_search'] ?? '' ) ? 'always' : 'without_images';
 		$values['limits']['budget_usd'] = max( 0.0, (float) ( $values['limits']['budget_usd'] ?? 0 ) );
 		$values['limits']['images_inspected'] = max( 0, min( 20, (int) ( $values['limits']['images_inspected'] ?? 3 ) ) );
 		$values['limits']['http_timeout'] = max( 5, min( 3600, (int) ( $values['limits']['http_timeout'] ?? 600 ) ) );

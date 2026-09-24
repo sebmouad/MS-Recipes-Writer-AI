@@ -41,7 +41,7 @@ require_once dirname( __DIR__ ) . '/tools/lib/steps.php';
 $engine_steps = array_keys( MSRWA_Engine_Steps::all() );
 msrwa_test_assert( array( 'research', 'canonical_recipe', 'article', 'featured_image', 'facebook_image', 'review', 'fact_check', 'corrections', 'proofread', 'final_approval' ) === $engine_steps, 'The engine must expose the whole pipeline, in order; got ' . implode( ', ', $engine_steps ) );
 $lab_prompts = glob( dirname( __DIR__ ) . '/includes/engine/prompts/*.txt' );
-msrwa_test_assert( 9 === count( $lab_prompts ), 'One maintained prompt per step that calls a model: six text stages, two image stages and the final approval.' );
+msrwa_test_assert( 10 === count( $lab_prompts ), 'One maintained prompt per step that calls a model — six text stages, two image stages and the final approval — plus the research written from the editor’s photographs.' );
 $brief = lab_brief( 'tarte-pommes' );
 $article_template = MSRWA_Prompt::compile( trim( file_get_contents( MSRWA_Engine_Input::prompt_path( 'article.tpl.txt' ) ) ), lab_settings() );
 $article_input = lab_build_input( 'article', $article_template, $brief, array() );

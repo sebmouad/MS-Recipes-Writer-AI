@@ -458,6 +458,39 @@ here, approved, and are in. `tests/test-engine-language.php` holds them.
     collage input 3 750 → 2 530 tokens, featured 1 800 → 1 450, every image
     approved as good and realistic.
 
+### Applied on 2026-09-24, at the owner's request to cut research cost
+
+The owner asked that the research search the web only when the writer sent no
+photograph, and otherwise use the photograph without the cost of a search.
+`tests/test-engine-research-photographs.php` holds it.
+
+19. **The writer’s photographs never reached the research.** The plugin
+    hands each brief image as `{id, url, title}`; `observe_editor_images()`
+    read `image_url`, got nothing, and fetched ''. On a site served over plain
+    http the fetch would have been refused anyway, since only public HTTPS is
+    downloaded. Every run with a photograph recorded
+    `{"image_url":"","uncertainties":"image URL is not HTTPS"}` under an event
+    saying the image had been read. The engine now reads `url` too, and asks
+    the caller first through `$options['read_image']` — a callable given the
+    brief image and the byte limit, returning `{mime, data}` or `{error}`.
+    The plugin passes `MSRWA_Intake::engine_image()`, which reads only an
+    attachment marked as sent by a writer. The event now counts what was read.
+
+20. **Research from the writer’s photographs, without a search.** A new
+    top-level group, `research.web_search`: `without_images` (the default)
+    or `always`. With the default and at least one readable photograph, the
+    research runs `prompts/research_photographs.tpl.txt` with no web search
+    tool; facts cite `brief`, `photograph` or `culinary_practice`; the
+    photographs become the package's `visual_references` (source `editor`,
+    tier 1) and `visual_observations`, so every later step reads them as it
+    read the web's. The research contract drops the two web-only checks —
+    references with a URL, HTTPS provenance — and checks the editor's
+    photographs instead. With no readable photograph it searches, and says so.
+    The vision calls on the writer's photographs are now billed to the
+    research step; they were not counted before. Live, one tart with its
+    photograph: research $0.0054 in 30.6 s, 13/13, against $0.022–0.028 and
+    42–79 s for the ten searched runs before it; the recipe was approved.
+
 ### Still open
 
 6. **The engine's `models` list is a second source of truth for prices.** The

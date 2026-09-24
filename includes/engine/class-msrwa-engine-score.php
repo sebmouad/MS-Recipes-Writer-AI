@@ -38,18 +38,22 @@ final class MSRWA_Engine_Score {
 			// An empty array is not evidence. Every one of these keys passing on zero
 			// entries is how a package with no facts and no sources scored 7/10.
 			$required = (array) $limits['research_minimums'];
+			// Written from the editor's photographs, the package cites no web page:
+			// the photographs are its evidence, and they are checked instead.
+			$from_photographs = 'photographs' === (string) ( $brief['research_mode'] ?? '' );
+			if ( $from_photographs ) { $required['references'] = 0; }
 			foreach ( $required as $key => $minimum ) {
 				$count = isset( $json[ $key ] ) && is_array( $json[ $key ] ) ? count( $json[ $key ] ) : -1;
 				$checks[ $key ] = array( 'pass' => $count >= $minimum, 'detail' => $count < 0 ? 'missing' : $count . ' entries, ' . $minimum . ' minimum' );
 			}
 			$sourced = 0;
 			foreach ( (array) ( $json['references'] ?? array() ) as $reference ) { if ( ! empty( $reference['url'] ) ) { $sourced++; } }
-			$checks['references carry a URL'] = array( 'pass' => $sourced > 0, 'detail' => $sourced . ' with a URL' );
+			if ( ! $from_photographs ) { $checks['references carry a URL'] = array( 'pass' => $sourced > 0, 'detail' => $sourced . ' with a URL' ); }
 			$real_images = 0;
 			foreach ( (array) ( $json['visual_references'] ?? array() ) as $reference ) {
-				if ( preg_match( '#^https://#i', (string) ( $reference['image_url'] ?? '' ) ) && preg_match( '#^https://#i', (string) ( $reference['source_url'] ?? '' ) ) ) { $real_images++; }
+				if ( $from_photographs ? 'editor' === ( $reference['source_url'] ?? '' ) && '' !== (string) ( $reference['image_url'] ?? '' ) : preg_match( '#^https://#i', (string) ( $reference['image_url'] ?? '' ) ) && preg_match( '#^https://#i', (string) ( $reference['source_url'] ?? '' ) ) ) { $real_images++; }
 			}
-			$checks['real image provenance'] = array( 'pass' => $real_images > 0, 'detail' => $real_images . ' image references with HTTPS image and source URLs' );
+			$checks['real image provenance'] = array( 'pass' => $real_images > 0, 'detail' => $real_images . ( $from_photographs ? ' editor photographs read' : ' image references with HTTPS image and source URLs' ) );
 			$observed = count( (array) ( $json['visual_observations'] ?? array() ) );
 			$checks['images inspected'] = array( 'pass' => $observed > 0, 'detail' => $observed . ' visual observations extracted from image bytes' );
 

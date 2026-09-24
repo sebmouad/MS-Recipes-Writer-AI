@@ -1972,6 +1972,68 @@ msgstr "optional with photographs"
 msgid "facultatif avec du texte"
 msgstr "optional with text"
 
+msgid "Recherche sur le web : `without_images` ne cherche que si le rédacteur n’a fourni aucune photographie — sinon la recherche est écrite d’après ses photographies et son texte, sans coût de recherche ; `always` cherche toujours."
+msgstr "Web search: `without_images` searches only when the writer sent no photograph — otherwise the research is written from their photographs and text, with no search cost; `always` always searches."
+
+msgid "%d photographie — écrite d’après elle"
+msgid_plural "%d photographies — écrite d’après elles"
+msgstr[0] "%d photograph — written from it"
+msgstr[1] "%d photographs — written from them"
+
+msgid "%d photographies ne vont avec aucune recette : elles ne seront pas utilisées."
+msgstr "%d photographs go with no recipe: they will not be used."
+
+msgid "%d photographies — écrite d’après elles"
+msgstr "%d photographs — written from them"
+
+msgid "1 photographie — écrite d’après elle"
+msgstr "1 photograph — written from it"
+
+msgid "Ce qui sera écrit"
+msgstr "What will be written"
+
+msgid "Les recettes seront écrites d’après les références trouvées sur le web."
+msgstr "The recipes will be written from references found on the web."
+
+msgid "L’appariement de ce lot est arrêté : il est parti avec ce qui suit."
+msgstr "This lot’s pairing is settled: it left with what follows."
+
+msgid "Partir le"
+msgstr "Start on"
+
+msgid "Plat non reconnu"
+msgstr "Dish not recognised"
+
+msgid "Plus tard…"
+msgstr "Later…"
+
+msgid "Sans photographie — références cherchées sur le web"
+msgstr "No photograph — references searched on the web"
+
+msgid "Une photographie ne va avec aucune recette : elle ne sera pas utilisée."
+msgstr "One photograph goes with no recipe: it will not be used."
+
+msgid "Va avec"
+msgstr "Goes with"
+
+msgid "Voir en grand"
+msgstr "View full size"
+
+msgid "Vos photographies"
+msgstr "Your photographs"
+
+msgid "Vérifiez à quelle recette va chaque photographie, puis lancez. Une recette illustrée par vos photographies est écrite d’après elles ; sans photographie, ses références sont cherchées sur le web."
+msgstr "Check which recipe each photograph goes with, then start. A recipe illustrated by your photographs is written from them; without a photograph, its references are searched on the web."
+
+msgid "aucune recette"
+msgstr "no recipe"
+
+msgid "Mise de côté"
+msgstr "Set aside"
+
+msgid "Choisie par vous"
+msgstr "Chosen by you"
+
 msgid "aucune page citée"
 msgstr "no page cited"
 

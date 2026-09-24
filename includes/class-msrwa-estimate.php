@@ -23,6 +23,11 @@ final class MSRWA_Estimate {
 			// 1, 4, 1, 1, 1, 1, 1 paid searches. Two searches is the average
 			// rounded up; the maximum prices every tool call as one.
 			'research' => array( 'input' => 45000, 'output' => 5500, 'searches' => 2 ),
+			// Written from the editor's photographs: no search, no page read, only
+			// the brief and what the photographs show. Measured on 0.21.1, one live
+			// tart: 2 841 in (the photograph's reading included), 4 014 out, $0.0054
+			// against $0.022–0.028 for the ten searched runs before it.
+			'research_photographs' => array( 'input' => 3000, 'output' => 4500 ),
 			'canonical_recipe' => array( 'input' => 4200, 'output' => 3100 ),
 			'article' => array( 'input' => 6900, 'output' => 6600 ),
 			'review' => array( 'input' => 11200, 'output' => 2200 ),
@@ -48,12 +53,17 @@ final class MSRWA_Estimate {
 	 * than as free — the same distinction the ledger keeps — so an estimate that
 	 * cannot be completed says so instead of reading low.
 	 */
-	public static function recipe( $profile, array $overrides = array() ) {
-		return self::recipe_on( MSRWA_Engine_Config::create( MSRWA_Engine_Settings::merge( MSRWA_Engine_Settings::stored(), $overrides ) ), $profile );
+	public static function recipe( $profile, array $overrides = array(), $with_photographs = false ) {
+		return self::recipe_on( MSRWA_Engine_Config::create( MSRWA_Engine_Settings::merge( MSRWA_Engine_Settings::stored(), $overrides ) ), $profile, $with_photographs );
 	}
 
-	/** The same, on a configuration already resolved — the Moteur preview's, say. */
-	public static function recipe_on( MSRWA_Engine_Config $config, $profile ) {
+	/**
+	 * The same, on a configuration already resolved — the Moteur preview's, say.
+	 * A recipe the writer sent photographs with is researched from them, with
+	 * no web search, unless `research.web_search` is `always`.
+	 */
+	public static function recipe_on( MSRWA_Engine_Config $config, $profile, $with_photographs = false ) {
+		$from_photographs = $with_photographs && 'always' !== (string) $config->get( 'research.web_search', 'without_images' );
 		$registry = (array) $config->get( 'steps', array() );
 		$shape = self::shape();
 
@@ -69,7 +79,7 @@ final class MSRWA_Estimate {
 			// the text model and priced a collage at a twenty-fifth of what it
 			// really costs.
 			$route = $config->model_for( self::route_for( $name, $capability, $config ) );
-			$usage = $shape[ $name ] ?? array( 'input' => 5000, 'output' => 2000 );
+			$usage = $shape[ 'research' === $name && $from_photographs ? 'research_photographs' : $name ] ?? array( 'input' => 5000, 'output' => 2000 );
 			// The ceiling is what the caller will be billed for if the model
 			// runs long, so an estimate uses the smaller of the two rather than
 			// promising an output nobody guaranteed.
@@ -83,16 +93,19 @@ final class MSRWA_Estimate {
 			}
 			$usage['output'] = min( max( (int) ( $usage['output'] / 2 ), (int) $usage['output'] + MSRWA_Engine_Config::thinking_allowance( $thinking ) ), $config->max_output( $name ) );
 
-			$searches = 'web_search' === $capability ? min( (int) ( $usage['searches'] ?? 2 ), $config->web_searches( $route['provider'] ) ) : 0;
+			$searches = 'web_search' === $capability && ! $from_photographs ? min( (int) ( $usage['searches'] ?? 2 ), $config->web_searches( $route['provider'] ) ) : 0;
 			$cost = $config->price( $route['provider'], $route['model'], array( 'input_tokens' => $usage['input'], 'output_tokens' => $usage['output'], 'web_searches' => $searches ) );
 			if ( null === $cost ) { $unknown[] = $name; continue; }
 
 			// Research also reads up to `limits.images_inspected` of the photographs
 			// it cites, one vision call each: $0.0021 on a real run, and missing.
+			// From the editor's photographs it reads those instead — one, on the
+			// usual lot of one photograph per recipe.
 			if ( 'web_search' === $capability ) {
 				$vision = $config->model_for( 'vision' );
 				$look = $config->price( $vision['provider'], $vision['model'], self::vision_usage( $config, $vision['provider'] ) );
-				$cost += null === $look ? 0.0 : (float) $look * max( 0, (int) $config->get( 'limits.images_inspected', 3 ) );
+				$looks = $from_photographs ? 1 : max( 0, (int) $config->get( 'limits.images_inspected', 3 ) );
+				$cost += null === $look ? 0.0 : (float) $look * $looks;
 			}
 
 			$total += (float) $cost;
@@ -160,6 +173,10 @@ final class MSRWA_Estimate {
 	 */
 	public static function lot( $profile, $recipes, $images, array $overrides = array() ) {
 		$recipe = self::recipe( $profile, $overrides );
+		// A recipe with a photograph is researched from it: as many recipes as
+		// there are photographs, at most, are priced that way; the rest search.
+		$pictured = self::recipe( $profile, $overrides, true );
+		$with = min( max( 0, (int) $recipes ), max( 0, (int) $images ) );
 		$config = MSRWA_Engine_Config::create( MSRWA_Engine_Settings::merge( MSRWA_Engine_Settings::stored(), $overrides ) );
 		// The pairing reads image bytes, so it is priced on the vision route the
 		// matcher actually uses.
@@ -175,8 +192,9 @@ final class MSRWA_Estimate {
 			'per_recipe_usd' => $recipe['cost_usd'],
 			'per_recipe_max_usd' => $recipe['max_usd'],
 			'matching_usd' => $matching,
-			'cost_usd' => round( $recipe['cost_usd'] * $recipes + (float) $matching, 6 ),
-			'max_usd' => round( $recipe['max_usd'] * $recipes + (float) $matching, 6 ),
+			'per_recipe_pictured_usd' => $pictured['cost_usd'],
+			'cost_usd' => round( $pictured['cost_usd'] * $with + $recipe['cost_usd'] * ( $recipes - $with ) + (float) $matching, 6 ),
+			'max_usd' => round( $pictured['max_usd'] * $with + $recipe['max_usd'] * ( $recipes - $with ) + (float) $matching, 6 ),
 			'buckets' => $recipe['buckets'],
 			'unpriced' => $recipe['unpriced'],
 			'matching_unpriced' => null === $matching,
