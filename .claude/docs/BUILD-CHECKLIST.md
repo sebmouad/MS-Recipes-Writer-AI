@@ -182,6 +182,11 @@ run carries.
   brief, each step and the result, as rows and numbered files, secret-free,
   on the artifacts age (`tests/test-intake.php`, `tests/test-pairing.php`;
   live lot #50 from one photograph).
+- [x] The job report, 0.24.3: history first, only planned sections, writer
+  photographs shown and labelled, pairing share in the cost, French labels,
+  released artifacts read back from the history, finished images from the
+  draft (`tests/test-report.php`; jobs #43, #44 and #45 rendered, 390 and 1280
+  px without overflow).
 - [ ] A complete lot on Claude — the account has no credit. — the Gemini key's
   grounding quota is exhausted, OpenAI is unreachable from the test
   environment and the Claude account has no credit.
