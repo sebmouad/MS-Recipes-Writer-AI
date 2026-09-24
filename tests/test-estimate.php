@@ -39,7 +39,7 @@ msrwa_test_assert( $full['max_usd'] >= 0.1839, 'The maximum covers the real run 
 // The shipped per-recipe ceiling lets a full recipe through with room for a
 // redrawn collage; the engine stops retrying before crossing it.
 $ceiling = (float) MSRWA_Settings_Defaults_For_Test::ceiling();
-msrwa_test_assert( 0.30 === $ceiling, 'The shipped per-recipe ceiling is $0.30.' );
+msrwa_test_assert( 0.20 === $ceiling, 'The shipped per-recipe ceiling is $0.20.' );
 msrwa_test_assert( MSRWA_Estimate::fits( $full['cost_usd'], $ceiling ), 'A full recipe fits under the shipped ceiling; estimated ' . $full['cost_usd'] );
 msrwa_test_assert( $full['cost_usd'] + 0.035 < $ceiling, 'With room for one redrawn collage and approval.' );
 msrwa_test_assert( $full['max_usd'] > $full['cost_usd'], 'A recipe that can be refused has a maximum above its expected cost.' );
