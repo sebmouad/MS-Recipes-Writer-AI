@@ -98,6 +98,42 @@ msrwa_test_assert( 'daube-provencale-fb-1' === MSRWA_Draft::file_base( 60, 'Daub
 $GLOBALS['msrwa_test_posts'][61] = (object) array( 'ID' => 61, 'post_type' => 'post', 'post_name' => '' );
 msrwa_test_assert( 'poulet-yassa' === MSRWA_Draft::file_base( 61, 'Poulet yassa', 'featured' ), 'A draft with no slug yet is named from its title.' );
 
+// The image model answers in lossless WebP, which WordPress keeps lossless on
+// every later encoding, so the optimizer's quality was ignored: stored lossy
+// once, the image is compressed like any photograph.
+if ( true ) {
+	if ( ! function_exists( 'wp_get_webp_info' ) ) { function wp_get_webp_info( $file ) { $chunk = (string) file_get_contents( $file, false, null, 12, 4 ); return array( 'type' => 'VP8L' === $chunk ? 'lossless' : ( 'VP8 ' === $chunk ? 'lossy' : '' ) ); } }
+}
+if ( function_exists( 'imagewebp' ) ) {
+	$canvas = imagecreatetruecolor( 512, 512 );
+	// Noise, like a photograph's grain: what lossless keeps and lossy does not.
+	mt_srand( 7 );
+	for ( $x = 0; $x < 512; $x += 2 ) { for ( $y = 0; $y < 512; $y += 2 ) { imagefilledrectangle( $canvas, $x, $y, $x + 1, $y + 1, imagecolorallocate( $canvas, 120 + mt_rand( 0, 90 ), 80 + mt_rand( 0, 60 ), 40 + mt_rand( 0, 50 ) ) ); } }
+	$lossless = sys_get_temp_dir() . '/msrwa-lossless-' . getmypid() . '.webp';
+	imagewebp( $canvas, $lossless, 101 );
+	msrwa_test_assert( 'lossless' === wp_get_webp_info( $lossless )['type'], 'The fixture is a lossless WebP, as the image model sends.' );
+	$stored = MSRWA_Draft::lossy( $lossless, 'image/webp' );
+	msrwa_test_assert( 'VP8 ' === substr( $stored, 12, 4 ) && strlen( $stored ) < filesize( $lossless ), sprintf( 'A lossless WebP is stored lossy and lighter: %d bytes from %d.', strlen( $stored ), filesize( $lossless ) ) );
+	file_put_contents( $lossless, $stored );
+	msrwa_test_assert( $stored === MSRWA_Draft::lossy( $lossless, 'image/webp' ), 'A lossy WebP is stored as it came, never encoded twice.' );
+	msrwa_test_assert( 'x' !== MSRWA_Draft::lossy( $lossless, 'image/png' ) && file_get_contents( $lossless ) === MSRWA_Draft::lossy( $lossless, 'image/png' ), 'Another format is left alone.' );
+	@unlink( $lossless );
+}
+
+// Recipe figures, this plugin's records and the image-size settings hold
+// numbers the optimizer took for attachment ids: a collage that was
+// attachment 150 was never compressed because a recipe cooks 150 minutes.
+$GLOBALS['wpdb'] = (object) array( 'postmeta' => 'wp_postmeta', 'options' => 'wp_options', 'termmeta' => 'wp_termmeta' );
+$narrowed = MSRWA_Stack::not_references( array(
+	array( 'table' => 'wp_postmeta', 'where' => "meta_key NOT IN ('_thumbnail_id')" ),
+	array( 'table' => 'wp_options', 'where' => '' ),
+	array( 'table' => 'wp_termmeta', 'where' => '' ),
+) );
+msrwa_test_contains( $narrowed[0]['where'], "meta_key NOT IN ('_thumbnail_id') AND meta_key NOT LIKE '\\_recipe\\_%'", 'Recipe figures are not searched for attachment ids, and the optimizer’s own exclusions stay.' );
+msrwa_test_contains( $narrowed[0]['where'], '_msrwa', 'Nor are this plugin’s records.' );
+msrwa_test_contains( $narrowed[1]['where'], "'thumbnail_size_w'", 'Nor the image-size settings.' );
+msrwa_test_assert( '' === $narrowed[2]['where'], 'Anything else is searched as before.' );
+
 // MS Image Optimizer's workers are given the time they need, and only they.
 // A 30-second host limit made every featured image fail "execution_limit_too_low".
 msrwa_test_contains( file_get_contents( dirname( __DIR__ ) . '/includes/class-msrwa-stack.php' ), "'msimg_image_queue_cron', 'msimg_post_discovery_cron'", 'The optimizer’s workers are the ones given more time.' );

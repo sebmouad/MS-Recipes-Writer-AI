@@ -215,11 +215,35 @@ final class MSRWA_Draft {
 		return 'facebook' === $kind ? $slug . '-fb-1' : $slug;
 	}
 
+	/**
+	 * The bytes to store for a generated image: a lossless WebP re-encoded once,
+	 * at a quality that looks the same.
+	 *
+	 * The image model answers in lossless WebP, and WordPress keeps a lossless
+	 * source lossless on every later encoding — so MS Image Optimizer's quality
+	 * setting was silently ignored, and a 1024×1024 featured image stayed at
+	 * 1.1 MB where quality 78 makes it 81 KB. Stored lossy, it is compressed
+	 * and resized like any photograph.
+	 */
+	public static function lossy( $path, $mime ) {
+		$bytes = (string) file_get_contents( $path );
+		if ( 'image/webp' !== $mime || ! function_exists( 'wp_get_webp_info' ) || ! function_exists( 'imagecreatefromwebp' ) ) { return $bytes; }
+		$info = wp_get_webp_info( $path );
+		if ( 'lossless' !== ( $info['type'] ?? '' ) ) { return $bytes; }
+		$image = @imagecreatefromwebp( $path );
+		if ( ! $image ) { return $bytes; }
+		ob_start();
+		$written = imagewebp( $image, null, max( 1, min( 100, (int) apply_filters( 'msrwa_generated_webp_quality', 90 ) ) ) );
+		$lossy = (string) ob_get_clean();
+		imagedestroy( $image );
+		return $written && '' !== $lossy && strlen( $lossy ) < strlen( $bytes ) ? $lossy : $bytes;
+	}
+
 	/** Copies one generated file into the uploads directory as an attachment. */
 	private static function sideload( $path, $post_id, $title, $mime, $base = '' ) {
 		$extension = strtolower( (string) pathinfo( $path, PATHINFO_EXTENSION ) );
 		$name = '' !== $base ? $base . ( '' !== $extension ? '.' . $extension : '' ) : basename( $path );
-		$uploaded = wp_upload_bits( sanitize_file_name( $name ), null, (string) file_get_contents( $path ) );
+		$uploaded = wp_upload_bits( sanitize_file_name( $name ), null, self::lossy( $path, $mime ) );
 		if ( ! empty( $uploaded['error'] ) ) { return 0; }
 
 		$attachment = wp_insert_attachment( array(

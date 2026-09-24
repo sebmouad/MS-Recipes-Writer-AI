@@ -39,6 +39,7 @@ final class MSRWA_Stack {
 		// 45 seconds, and a host's 30-second default is common: every featured
 		// image this plugin generated failed there with "execution_limit_too_low".
 		// Its own workers are given the time they ask for, and nothing else is.
+		add_filter( 'msimg_reference_structured_sources', array( __CLASS__, 'not_references' ), 10, 1 );
 		foreach ( array( 'msimg_image_queue_cron', 'msimg_post_discovery_cron', 'msimg_recovery_cron', 'wp_ajax_msimg_async_post_discovery', 'wp_ajax_nopriv_msimg_async_post_discovery' ) as $hook ) {
 			add_action( $hook, array( __CLASS__, 'room_for_images' ), 0 );
 		}
@@ -72,6 +73,30 @@ final class MSRWA_Stack {
 		update_post_meta( $attachment_id, '_wp_attachment_image_alt', $title );
 		wp_update_post( array( 'ID' => $attachment_id, 'post_title' => $title, 'post_excerpt' => $description, 'post_content' => $description ) );
 		return true;
+	}
+
+	/**
+	 * Tells MS Image Optimizer which stored numbers are not attachment ids.
+	 *
+	 * Before it edits an image it searches every post meta and option for the
+	 * attachment's id, and a match anywhere marks the image as shared and
+	 * leaves it alone. A collage that happened to be attachment 150 was never
+	 * compressed because a recipe cooks for 150 minutes (`_recipe_cook_time`)
+	 * and WordPress's thumbnails are 150 pixels wide (`thumbnail_size_w`).
+	 * Recipe figures, this plugin's own records and the image-size settings
+	 * hold numbers, never attachment ids.
+	 */
+	public static function not_references( $sources ) {
+		global $wpdb;
+		foreach ( (array) $sources as $index => $source ) {
+			$table = (string) ( $source['table'] ?? '' );
+			if ( $table === $wpdb->postmeta ) {
+				$sources[ $index ]['where'] = trim( (string) ( $source['where'] ?? '' ) . ( '' !== trim( (string) ( $source['where'] ?? '' ) ) ? ' AND ' : '' ) . "meta_key NOT LIKE '\\_recipe\\_%' AND meta_key NOT LIKE '\\_msrwa\\_%'" );
+			} elseif ( $table === $wpdb->options ) {
+				$sources[ $index ]['where'] = trim( (string) ( $source['where'] ?? '' ) . ( '' !== trim( (string) ( $source['where'] ?? '' ) ) ? ' AND ' : '' ) . "option_name NOT IN ('thumbnail_size_w','thumbnail_size_h','medium_size_w','medium_size_h','medium_large_size_w','medium_large_size_h','large_size_w','large_size_h','posts_per_page','posts_per_rss','page_on_front','page_for_posts','msrwa_settings')" );
+			}
+		}
+		return $sources;
 	}
 
 	/** Raises the PHP time limit for MS Image Optimizer's worker, when it is set and too low. */
