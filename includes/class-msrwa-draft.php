@@ -22,6 +22,22 @@ final class MSRWA_Draft {
 		$run = MSRWA_Run::get( $run_id );
 		if ( ! $run || (int) $run['draft_post_id'] ) { return 0; }
 
+		// Written as the writer would write it: the draft is made by a cron
+		// tick, where nobody is logged in, and every hook WordPress and the
+		// site's plugins run on a save or an upload — author, "last edited
+		// by", revisions, upload filters — saw nobody. For the length of the
+		// creation, the writer is the current user; then whoever was is back.
+		$previous = get_current_user_id();
+		$owner = (int) $run['owner_id'];
+		if ( $owner && get_userdata( $owner ) ) { wp_set_current_user( $owner ); }
+		try {
+			return self::build( $run_id, $run );
+		} finally {
+			wp_set_current_user( $previous );
+		}
+	}
+
+	private static function build( $run_id, array $run ) {
 		$artifacts = MSRWA_Run::artifacts( $run_id );
 		// The latest text there is — proofread if it ran, otherwise corrected,
 		// otherwise the draft as first written — over the article's own
@@ -54,6 +70,8 @@ final class MSRWA_Draft {
 		if ( '' !== $slug ) { $post['post_name'] = $slug; }
 		$post_id = wp_insert_post( $post, true );
 		if ( is_wp_error( $post_id ) || ! $post_id ) { return 0; }
+		// What the editor records on every save of a post.
+		update_post_meta( $post_id, '_edit_last', (int) $run['owner_id'] );
 
 		self::remember( $post_id, $run_id, $canonical, (array) ( $artifacts['approval'] ?? array() ) );
 		self::describe( $post_id, $article, $canonical );
@@ -240,24 +258,36 @@ final class MSRWA_Draft {
 	}
 
 	/** Copies one generated file into the uploads directory as an attachment. */
+	/**
+	 * Adds one generated image to the media library the way WordPress adds a
+	 * file from elsewhere: media_handle_sideload(), which runs the upload
+	 * filters (wp_handle_upload_prefilter, wp_handle_upload) that offload,
+	 * optimisation and WebP plugins hook into, names and moves the file,
+	 * builds its sizes and credits the current user — the writer.
+	 */
 	private static function sideload( $path, $post_id, $title, $mime, $base = '' ) {
-		$extension = strtolower( (string) pathinfo( $path, PATHINFO_EXTENSION ) );
-		$name = '' !== $base ? $base . ( '' !== $extension ? '.' . $extension : '' ) : basename( $path );
-		$uploaded = wp_upload_bits( sanitize_file_name( $name ), null, self::lossy( $path, $mime ) );
-		if ( ! empty( $uploaded['error'] ) ) { return 0; }
-
-		$attachment = wp_insert_attachment( array(
-			'post_mime_type' => $mime, 'post_title' => wp_strip_all_tags( $title ),
-			'post_content' => '', 'post_status' => 'inherit',
-			'post_name' => '' !== $base ? $base : '',
-			// The draft is written by cron, where nobody is logged in: without
-			// this the media library listed the images with no author at all.
-			'post_author' => (int) get_post_field( 'post_author', $post_id ),
-		), $uploaded['file'], $post_id, true );
-		if ( is_wp_error( $attachment ) || ! $attachment ) { return 0; }
-
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+		require_once ABSPATH . 'wp-admin/includes/media.php';
 		require_once ABSPATH . 'wp-admin/includes/image.php';
-		wp_update_attachment_metadata( $attachment, wp_generate_attachment_metadata( $attachment, $uploaded['file'] ) );
+
+		$extension = strtolower( (string) pathinfo( $path, PATHINFO_EXTENSION ) );
+		$name = sanitize_file_name( '' !== $base ? $base . ( '' !== $extension ? '.' . $extension : '' ) : basename( $path ) );
+		// The upload path moves the file it is given, so it is given a copy:
+		// the engine's own file stays until the run releases it.
+		$copy = wp_tempnam( $name );
+		if ( ! $copy || false === file_put_contents( $copy, self::lossy( $path, $mime ) ) ) { return 0; }
+
+		$attachment = media_handle_sideload(
+			array( 'name' => $name, 'tmp_name' => $copy ),
+			$post_id,
+			wp_strip_all_tags( $title ),
+			array_filter( array(
+				'post_name' => '' !== $base ? $base : '',
+				'post_author' => (int) get_post_field( 'post_author', $post_id ),
+			) )
+		);
+		if ( is_file( $copy ) ) { wp_delete_file( $copy ); }
+		if ( is_wp_error( $attachment ) || ! $attachment ) { return 0; }
 		return (int) $attachment;
 	}
 }
