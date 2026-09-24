@@ -85,8 +85,22 @@ final class MSRWA_Batch {
 	}
 
 	/** A lot is known by its first recipe, and how many follow. */
+	/**
+	 * What is stored: the first recipe's title alone. The "and N others" is
+	 * said at display, in the reader's language — stored, it came out in
+	 * whichever language saved the lot last, English on an Arabic screen.
+	 */
 	private static function label( array $recipes ) {
-		return mb_substr( (string) $recipes[0]['title'], 0, 190 ) . ( count( $recipes ) > 1 ? sprintf( /* translators: %d is how many further recipes the lot carries. */ _n( ' et %d autre', ' et %d autres', count( $recipes ) - 1, 'ms-recipes-writer-ai' ), count( $recipes ) - 1 ) : '' );
+		return mb_substr( (string) ( $recipes[0]['title'] ?? '' ), 0, 190 );
+	}
+
+	/** A lot's name as a reader sees it: its first recipe, and how many follow. */
+	public static function title( array $batch ) {
+		// Lots named before 0.25.3 carry the count in their stored label.
+		$first = (string) preg_replace( '/\\s+(?:et|and)\\s+\\d+\\s+(?:autres?|others?)$|\\s+و\\S*(?:\\s+\\S+)?\\s+أخر\\S*$/u', '', (string) ( $batch['label'] ?? '' ) );
+		$more = max( 0, (int) ( $batch['recipes'] ?? 1 ) - 1 );
+		if ( '' === $first ) { return ''; }
+		return $first . ( $more ? sprintf( /* translators: %d is how many further recipes the lot carries. */ _n( ' et %d autre', ' et %d autres', $more, 'ms-recipes-writer-ai' ), $more ) : '' );
 	}
 
 	public static function get( $id ) {
@@ -175,6 +189,12 @@ final class MSRWA_Batch {
 			$kept = $was && null !== ( $was['recipe'] ?? null ) && (int) $was['recipe'] === $recipe;
 			$clean[] = $kept ? array_merge( $was, array( 'image' => $image, 'recipe' => $recipe ) ) : array( 'image' => $image, 'recipe' => $recipe, 'confidence' => 'haute', 'why' => '', 'by_writer' => true );
 		}
+		// A photograph the request did not mention keeps where it was: a save
+		// that names one photograph must not drop the others from the pairing.
+		foreach ( $before as $image => $was ) {
+			if ( ! isset( $taken[ $image ] ) && $image < count( (array) $matching['images'] ) ) { $clean[] = $was; }
+		}
+		usort( $clean, static function ( $a, $b ) { return (int) $a['image'] - (int) $b['image']; } );
 		$matching['pairs'] = $clean;
 		$wpdb->update( self::table(), array(
 			'matching_json' => wp_json_encode( $matching ),
@@ -188,7 +208,24 @@ final class MSRWA_Batch {
 
 	/** How many of a lot's photographs still wait for the writer's decision. */
 	public static function undecided( $id ) {
-		return count( array_filter( (array) ( self::matching( $id )['pairs'] ?? array() ), static function ( $pair ) { return is_array( $pair ) && ! empty( $pair['pending'] ); } ) );
+		$matching = self::matching( $id );
+		$decided = array();
+		$waiting = 0;
+		foreach ( (array) ( $matching['pairs'] ?? array() ) as $pair ) {
+			if ( ! is_array( $pair ) || ! isset( $pair['image'] ) ) { continue; }
+			if ( ! empty( $pair['pending'] ) ) { $waiting++; continue; }
+			$decided[ (int) $pair['image'] ] = true;
+		}
+		// A photograph the pairing does not mention at all waits too.
+		foreach ( array_keys( (array) ( $matching['images'] ?? array() ) ) as $image ) {
+			if ( ! isset( $decided[ (int) $image ] ) && ! self::mentioned( $matching, (int) $image ) ) { $waiting++; }
+		}
+		return $waiting;
+	}
+
+	private static function mentioned( array $matching, $image ) {
+		foreach ( (array) ( $matching['pairs'] ?? array() ) as $pair ) { if ( is_array( $pair ) && (int) ( $pair['image'] ?? -1 ) === $image ) { return true; } }
+		return false;
 	}
 
 	/**

@@ -114,6 +114,16 @@ final class MSRWA_REST {
 		return rest_ensure_response( array( 'id' => (int) $id, 'recipes' => (int) ( $created['recipes'] ?? count( $recipes ) ), 'images' => (int) ( $created['images'] ?? 0 ) ) );
 	}
 
+	/**
+	 * A refusal the writer can act on, not a server failure. Without a status
+	 * the REST API answered 500 to "a photograph waits for your decision".
+	 */
+	private static function refused( WP_Error $error ) {
+		$data = (array) $error->get_error_data();
+		if ( empty( $data['status'] ) ) { $error->add_data( array_merge( $data, array( 'status' => 409 ) ) ); }
+		return $error;
+	}
+
 	private static function batch( $id ) {
 		$batch = MSRWA_Batch::get( absint( $id ) );
 		if ( ! $batch || ! MSRWA_Batch::may_see( $batch ) ) { return null; }
@@ -140,7 +150,7 @@ final class MSRWA_REST {
 		$batch = self::batch( $request['id'] );
 		if ( ! $batch ) { return new WP_Error( 'msrwa_not_found', __( 'Lot introuvable.', 'ms-recipes-writer-ai' ), array( 'status' => 404 ) ); }
 		$when = MSRWA_Schedule::when( (int) $batch['id'], sanitize_text_field( (string) $request->get_param( 'at' ) ) );
-		if ( is_wp_error( $when ) ) { return $when; }
+		if ( is_wp_error( $when ) ) { return self::refused( $when ); }
 		return rest_ensure_response( array( 'at' => $when ? gmdate( 'c', $when ) : null ) );
 	}
 
@@ -148,7 +158,7 @@ final class MSRWA_REST {
 		$batch = self::batch( $request['id'] );
 		if ( ! $batch ) { return new WP_Error( 'msrwa_not_found', __( 'Lot introuvable.', 'ms-recipes-writer-ai' ), array( 'status' => 404 ) ); }
 		$started = MSRWA_Batch::dispatch( (int) $batch['id'] );
-		if ( is_wp_error( $started ) ) { return $started; }
+		if ( is_wp_error( $started ) ) { return self::refused( $started ); }
 		return rest_ensure_response( array( 'started' => (int) $started ) );
 	}
 

@@ -27,7 +27,7 @@ final class MSRWA_Screen_Batch {
 		MSRWA_UI::head(
 			/* translators: %d is the lot's number. */
 			sprintf( __( 'Lot %d', 'ms-recipes-writer-ai' ), (int) $batch['id'] ),
-			$batch['label'],
+			MSRWA_Batch::title( $batch ),
 			array_filter( array(
 				__( 'recettes', 'ms-recipes-writer-ai' ) => number_format_i18n( $batch['recipes'] ),
 				__( 'photographies', 'ms-recipes-writer-ai' ) => number_format_i18n( $batch['images'] ),
@@ -70,7 +70,8 @@ final class MSRWA_Screen_Batch {
 		unset( $image );
 		$recipes = (array) ( $matching['recipes'] ?? array() );
 		$chosen = array();
-		foreach ( array_keys( $images ) as $index ) { $chosen[ $index ] = array( 'recipe' => null, 'confidence' => 'basse', 'why' => '' ); }
+		// A photograph the pairing does not mention is undecided, never quietly aside.
+		foreach ( array_keys( $images ) as $index ) { $chosen[ $index ] = array( 'recipe' => null, 'confidence' => 'basse', 'why' => '', 'pending' => true ); }
 		foreach ( (array) ( $matching['pairs'] ?? array() ) as $pair ) {
 			if ( isset( $chosen[ (int) $pair['image'] ] ) ) { $chosen[ (int) $pair['image'] ] = $pair; }
 		}
@@ -98,6 +99,7 @@ final class MSRWA_Screen_Batch {
 			// A recipe named after photographs has nothing to be written from
 			// once they are all set aside, and is not sent.
 			$dropped = ! $mine && ! empty( $recipe['from_photographs'] );
+			if ( $dropped ) { $recipe_count--; }
 			echo '<li class="ms-dish' . ( $mine ? ' has-photos' : '' ) . ( $dropped ? ' is-dropped' : '' ) . '" data-recipe="' . esc_attr( $recipe_index ) . '"' . ( empty( $recipe['from_photographs'] ) ? '' : ' data-from-photographs="1"' ) . '>';
 			echo '<strong class="ms-dish-title">' . esc_html( (string) $recipe['title'] ) . '</strong>';
 			echo '<span class="ms-dish-thumbs">';
@@ -257,7 +259,11 @@ final class MSRWA_Screen_Batch {
 					<button type="button" class="button" id="ms-schedule"><?php esc_html_e( 'Programmer', 'ms-recipes-writer-ai' ); ?></button>
 				</div>
 			</details>
-			<button type="button" class="button button-primary button-hero" id="ms-dispatch"><?php echo esc_html( sprintf(
+			<?php
+			// The count follows the pairing on screen: a recipe whose photographs
+			// were all set aside is not launched, and is not counted.
+			?>
+			<button type="button" class="button button-primary button-hero" id="ms-dispatch" data-one="<?php echo esc_attr( sprintf( _n( 'Lancer %d recette', 'Lancer %d recettes', 1, 'ms-recipes-writer-ai' ), 1 ) ); ?>" data-many="<?php echo esc_attr( _n( 'Lancer %d recette', 'Lancer %d recettes', 2, 'ms-recipes-writer-ai' ) ); ?>"><?php echo esc_html( sprintf(
 				/* translators: %d is a number of recipes. */
 				_n( 'Lancer %d recette', 'Lancer %d recettes', (int) $recipe_count, 'ms-recipes-writer-ai' ),
 				(int) $recipe_count

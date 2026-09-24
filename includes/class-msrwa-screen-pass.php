@@ -175,7 +175,7 @@ final class MSRWA_Screen_Pass {
 		foreach ( $batches as $batch ) {
 			$url = admin_url( 'admin.php?page=msrwa-batch&batch_id=' . (int) $batch['id'] );
 			echo '<tr><td><strong>#' . esc_html( $batch['id'] ) . '</strong>'
-				. ( '' !== (string) $batch['label'] ? ' ' . esc_html( $batch['label'] ) : '' )
+				. ( '' !== (string) $batch['label'] ? ' ' . esc_html( MSRWA_Batch::title( $batch ) ) : '' )
 				. '<small>' . esc_html( (string) MSRWA_Profile::get( (string) $batch['profile'] )['label'] ) . '</small></td>'
 				. '<td class="ms-num">' . esc_html( number_format_i18n( (int) $batch['recipes'] ) ) . '</td>'
 				. '<td>' . ( empty( $batch['dispatch_at'] )

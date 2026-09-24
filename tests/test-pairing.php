@@ -40,7 +40,8 @@ $GLOBALS['wpdb']->on( 'WHERE id = 7', array( array( 'id' => 7, 'owner_id' => 1, 
 MSRWA_Batch::repair( 7, array( array( 'image' => 9, 'recipe' => 0 ), array( 'image' => 0, 'recipe' => 5 ), array( 'image' => 0, 'recipe' => 1 ) ) );
 $update = $GLOBALS['wpdb']->matching( 'UPDATE ' );
 $saved = json_decode( json_decode( substr( $update[0], strpos( $update[0], '{' ) ), true )['matching_json'], true );
-msrwa_test_assert( 1 === count( $saved['pairs'] ) && null === $saved['pairs'][0]['recipe'], 'Out of range goes nowhere, and the first claim on a photograph stands.' );
+msrwa_test_assert( 3 === count( $saved['pairs'] ) && null === $saved['pairs'][0]['recipe'] && ! empty( $saved['pairs'][0]['pending'] ), 'Out of range goes nowhere — the photograph waits — and the first claim on a photograph stands.' );
+msrwa_test_assert( 1 === $saved['pairs'][2]['recipe'] && 'Rien de net.' === $saved['pairs'][2]['why'], 'A photograph the save did not mention keeps where it was.' );
 
 // A photograph the writer makes a recipe of, under the name they give: the
 // lot gains a recipe, named, written from that photograph.
@@ -51,7 +52,8 @@ $update = $GLOBALS['wpdb']->matching( 'UPDATE ' );
 $row = json_decode( substr( $update[0], strpos( $update[0], '{' ) ), true );
 $saved = json_decode( $row['matching_json'], true );
 msrwa_test_assert( 3 === count( $saved['recipes'] ) && 'Souris d’agneau confite' === $saved['recipes'][2]['title'] && ! empty( $saved['recipes'][2]['from_photographs'] ), 'The writer’s new recipe is added, its name plain text.' );
-msrwa_test_assert( 2 === $saved['pairs'][0]['recipe'] && 3 === (int) $row['recipes'], 'The photograph goes with it, and the lot counts three recipes.' );
+$by = array_column( $saved['pairs'], null, 'image' );
+msrwa_test_assert( 2 === $by[1]['recipe'] && 3 === (int) $row['recipes'] && 3 === count( $saved['pairs'] ), 'The photograph goes with it, the others stay, and the lot counts three recipes.' );
 
 // Undecided photographs hold the lot: it cannot be sent, nor given an hour.
 $GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
@@ -59,7 +61,21 @@ $waiting = $matching;
 $waiting['pairs'][1]['pending'] = true;
 $GLOBALS['wpdb']->on( 'WHERE id = 7', array( array( 'id' => 7, 'owner_id' => 1, 'status' => 'ready', 'budget_usd' => 1, 'profile' => 'full', 'language' => 'fr', 'config_json' => '[]', 'matching_json' => wp_json_encode( $waiting ) ) ) );
 msrwa_test_assert( 1 === MSRWA_Batch::undecided( 7 ), 'One photograph is counted as undecided.' );
+$GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
+$unmentioned = $matching;
+unset( $unmentioned['pairs'][0] );
+$GLOBALS['wpdb']->on( 'WHERE id = 7', array( array( 'id' => 7, 'owner_id' => 1, 'status' => 'ready', 'matching_json' => wp_json_encode( $unmentioned ) ) ) );
+msrwa_test_assert( 1 === MSRWA_Batch::undecided( 7 ), 'A photograph the pairing does not mention waits too.' );
+$GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
+$GLOBALS['wpdb']->on( 'WHERE id = 7', array( array( 'id' => 7, 'owner_id' => 1, 'status' => 'ready', 'budget_usd' => 1, 'profile' => 'full', 'language' => 'fr', 'config_json' => '[]', 'matching_json' => wp_json_encode( $waiting ) ) ) );
 $sent = MSRWA_Batch::dispatch( 7 );
 msrwa_test_assert( is_wp_error( $sent ) && 'msrwa_undecided' === $sent->get_error_code(), 'A lot with an undecided photograph is not sent.' );
+
+// A lot's name is said at display, in the reader's language; labels stored
+// with their count before 0.25.3 are read without it.
+msrwa_test_assert( 'Poulet yassa et 2 autres' === MSRWA_Batch::title( array( 'label' => 'Poulet yassa', 'recipes' => 3 ) ), 'The count follows the recipes: ' . MSRWA_Batch::title( array( 'label' => 'Poulet yassa', 'recipes' => 3 ) ) );
+msrwa_test_assert( 'Poulet yassa et 1 autre' === MSRWA_Batch::title( array( 'label' => 'Poulet yassa and 1 others', 'recipes' => 2 ) ), 'An old English suffix is replaced, in the singular.' );
+msrwa_test_assert( 'Poulet yassa' === MSRWA_Batch::title( array( 'label' => 'Poulet yassa ووصفة أخرى', 'recipes' => 1 ) ), 'An old Arabic one too.' );
+msrwa_test_assert( 'Tarte et crème' === MSRWA_Batch::title( array( 'label' => 'Tarte et crème', 'recipes' => 1 ) ), 'A title with "et" in it is left alone.' );
 
 msrwa_test_done( 'the pairing keeps the model’s word on what the writer did not change' );

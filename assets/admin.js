@@ -312,6 +312,11 @@
         ? (photos.length === 1 ? t.dishOnePhoto : (t.dishPhotos || '').replace('%d', photos.length))
         : (dropped ? (t.dishDropped || '') : (t.dishNoPhoto || ''));
     });
+    var launch = document.getElementById('ms-dispatch');
+    if (launch && launch.dataset.many) {
+      var written = document.querySelectorAll('.ms-dish:not(.is-dropped)').length;
+      launch.textContent = written === 1 ? launch.dataset.one : launch.dataset.many.replace('%d', written);
+    }
     var note = document.getElementById('ms-loose');
     if (note) {
       note.hidden = !loose;
