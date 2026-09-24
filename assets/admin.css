@@ -603,3 +603,8 @@
    a French one left to right on an Arabic screen. */
 .wrap.msrwa :is(p, li, td, th, dd, dt, h1, h2, h3, h4, strong, small, .ms-pair-says, .ms-pair-reason, .ms-dish-title) { unicode-bidi: plaintext; }
 .wrap.msrwa :is(p, li, dd, dt, h1, h2, h3, h4) { text-align: start; }
+
+/* The Facebook collage's style references: small previews side by side. */
+.ms-style-list { display: flex; flex-wrap: wrap; gap: 16px; margin: 8px 0 12px; }
+.ms-style-item img { display: block; max-width: 100%; height: auto; border: 1px solid var(--ms-line); border-radius: var(--ms-radius); }
+.ms-style-item p { margin: 6px 0 0; }

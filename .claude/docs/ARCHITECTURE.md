@@ -191,7 +191,7 @@ act, never a model name or an HTTP status.
 | Analyse | manager | cost by step, by model, by day; failing checks; CSV export |
 | Moteur | manager | every engine parameter, and where each step would route |
 | Diagnostic | manager | the eight things that must be true for a recipe to finish, each with its remedy, and a report to paste into a request for help |
-| Réglages | manager | keys and a free check that each one works, ceilings, the article (language, length, pages, JSON-LD), retention, and whether the machinery is running |
+| Réglages | manager | keys and a free check that each one works, ceilings, the article (language, length, pages, JSON-LD), the Facebook collage's style references (`uploads/msrwa/style/`, up to three, the first used), retention, and whether the machinery is running |
 
 Plus the verdict on the post editor, because a writer opens the article, not
 this plugin, and a warning on a dashboard nobody opened has warned nobody. It

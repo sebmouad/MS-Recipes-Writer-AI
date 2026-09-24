@@ -180,6 +180,57 @@ final class MSRWA_Sources {
 		) );
 	}
 
+	/** How many style references are kept: the engine draws from the first. */
+	const STYLE_MAX = 3;
+
+	/**
+	 * The owner's own collages, whose look a Facebook collage keeps when the
+	 * writer sent no photograph of the dish. Kept here, closed to the web, and
+	 * handed to the engine as paths.
+	 */
+	public static function style_dir() { return self::root() . '/style'; }
+
+	/** The stored style references, oldest first: the first is the one drawn from. */
+	public static function style_paths() {
+		$paths = array();
+		foreach ( (array) glob( self::style_dir() . '/*' ) as $path ) {
+			if ( '' !== self::name( basename( (string) $path ) ) && is_file( $path ) ) { $paths[ (string) $path ] = (int) filemtime( $path ); }
+		}
+		asort( $paths );
+		return array_slice( array_keys( $paths ), 0, self::STYLE_MAX );
+	}
+
+	/** Keeps one uploaded image as a style reference. Returns '' or why it was refused. */
+	public static function add_style( array $file ) {
+		$tmp = (string) ( $file['tmp_name'] ?? '' );
+		if ( '' === $tmp || ! is_uploaded_file( $tmp ) && ! is_file( $tmp ) ) { return __( 'Aucune image reçue.', 'ms-recipes-writer-ai' ); }
+		if ( count( self::style_paths() ) >= self::STYLE_MAX ) { return __( 'Trois références au plus : retirez-en une d’abord.', 'ms-recipes-writer-ai' ); }
+		if ( filesize( $tmp ) > 10000000 ) { return __( 'Image trop lourde : 10 Mo au plus.', 'ms-recipes-writer-ai' ); }
+		$size = @getimagesize( $tmp ); // phpcs:ignore WordPress.PHP.NoSilencedErrors
+		$ext = self::TYPES[ $size['mime'] ?? '' ] ?? '';
+		if ( '' === $ext ) { return __( 'Seules les images JPEG, PNG et WebP sont acceptées.', 'ms-recipes-writer-ai' ); }
+		wp_mkdir_p( self::style_dir() );
+		$target = self::style_dir() . '/' . substr( (string) hash_file( 'sha256', $tmp ), 0, 32 ) . '.' . $ext;
+		if ( ! is_file( $target ) && ! @copy( $tmp, $target ) ) { return __( 'L’image n’a pas pu être enregistrée.', 'ms-recipes-writer-ai' ); } // phpcs:ignore WordPress.PHP.NoSilencedErrors
+		return '';
+	}
+
+	public static function remove_style( $name ) {
+		$path = self::path( self::style_dir(), $name );
+		if ( '' !== $path ) { @unlink( $path ); } // phpcs:ignore WordPress.PHP.NoSilencedErrors
+	}
+
+	/** A small preview of a stored reference, for the settings screen: the folder is closed to the web. */
+	public static function style_preview( $path, $width = 180 ) {
+		if ( ! function_exists( 'imagecreatefromstring' ) ) { return ''; }
+		$image = @imagecreatefromstring( (string) file_get_contents( $path ) ); // phpcs:ignore WordPress.PHP.NoSilencedErrors
+		if ( ! $image ) { return ''; }
+		$small = imagescale( $image, $width );
+		ob_start();
+		imagejpeg( $small, null, 80 );
+		return 'data:image/jpeg;base64,' . base64_encode( (string) ob_get_clean() );
+	}
+
 	/** Removes one directory under uploads/msrwa and everything in it, and nothing outside. */
 	private static function remove( $dir ) {
 		$root = realpath( self::root() );

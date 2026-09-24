@@ -40,6 +40,8 @@ final class MSRWA_Compat {
 		// takes images in but cannot describe them.
 		if ( 'vision' === $step ) { return array( 'text', 'vision' ); }
 		if ( 'final_approval' === $step ) { return array( 'text', 'vision' ); }
+		// It looks at the reference image while it writes.
+		if ( 'image_compose' === $step ) { return array( 'text', 'vision' ); }
 		return array( 'text' );
 	}
 
@@ -135,6 +137,8 @@ final class MSRWA_Compat {
 			if ( 'none' !== (string) ( $step['capability'] ?? 'text' ) ) { $steps[] = (string) $name; }
 		}
 		$steps[] = 'vision';
+		// The model that writes the collage's prompt before it is drawn.
+		if ( '' !== $config->facebook_template()['compose'] ) { $steps[] = 'image_compose'; }
 		return array_values( array_unique( $steps ) );
 	}
 

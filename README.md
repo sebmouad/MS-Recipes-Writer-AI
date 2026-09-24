@@ -5,9 +5,9 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.26.8
+## État actuel — 0.27.0
 
-La version `0.26.8` dessine le visuel Facebook d'après la consigne que le propriétaire utilise lui-même ; la `0.26.7` faisait suivre à la recette le plat que décrit le rédacteur et relève le plafond par recette à 0,25 $ ; la `0.26.6` dessinait le visuel Facebook en qualité haute et ne fait plus redessiner un collage pour un aromate montré une étape trop tôt ; la `0.26.5` permettait au moteur de dessiner avec les modèles d'image de Gemini, au bon prix ; la `0.26.4` donnait au visuel Facebook le style des collages de référence du propriétaire : lumineux, net, cadré serré ; la `0.26.3` faisait ressembler le visuel Facebook à de vraies photographies plutôt qu'à des images de synthèse ; la `0.26.2` rendait le visuel Facebook plus chaleureux et plus proche du plat, et le fait toujours finir sur le plat ouvert ; la `0.26.1` retirait les copies des prompts que gardaient les réglages :
+La version `0.27.0` dessine le visuel Facebook comme ChatGPT le fait pour le propriétaire : la consigne est d'abord rédigée à partir de la recette et d'une image de référence, puis le collage est dessiné avec cette référence ; la `0.26.8` dessinait le visuel Facebook d'après la consigne que le propriétaire utilise lui-même ; la `0.26.7` faisait suivre à la recette le plat que décrit le rédacteur et relève le plafond par recette à 0,25 $ ; la `0.26.6` dessinait le visuel Facebook en qualité haute et ne fait plus redessiner un collage pour un aromate montré une étape trop tôt ; la `0.26.5` permettait au moteur de dessiner avec les modèles d'image de Gemini, au bon prix ; la `0.26.4` donnait au visuel Facebook le style des collages de référence du propriétaire : lumineux, net, cadré serré ; la `0.26.3` faisait ressembler le visuel Facebook à de vraies photographies plutôt qu'à des images de synthèse ; la `0.26.2` rendait le visuel Facebook plus chaleureux et plus proche du plat, et le fait toujours finir sur le plat ouvert ; la `0.26.1` retirait les copies des prompts que gardaient les réglages :
 le moteur exécute ses propres gabarits, et ce qui n’est lu par rien ne se
 périme plus en silence. Le détail de chaque version suit, de la plus récente à
 la plus ancienne.
@@ -76,6 +76,36 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.27.0
+
+**Le visuel Facebook dessiné comme dans ChatGPT.** Après une journée de
+comparaisons avec les collages que le propriétaire obtient dans ChatGPT, la
+méthode qui les reproduit — rendu et ordre des étapes — est celle de ChatGPT
+lui-même, en deux temps :
+
+1. **La consigne est rédigée d'abord.** Un modèle de texte lit la consigne du
+   propriétaire (sa consigne ChatGPT, mot pour mot, avec le nom du plat), ses
+   préférences, la recette — ingrédients, étapes, service — et l'image de
+   référence, puis écrit la consigne détaillée des six images : ingrédients
+   crus et séparés, étapes dans l'ordre de la recette, ustensiles de la
+   recette (poêle pour la friture, plaque pour les feuilletés), plat ouvert à
+   la fin.
+2. **Le collage est dessiné avec la référence**, par GPT Image 2.5 Flare en
+   qualité haute.
+
+**La référence** est la photographie du plat envoyée par le rédacteur quand il
+y en a une. Sinon, c'est un collage du propriétaire, dont seul le style est
+repris : lumière, couleurs, cadrage, plan de travail — jamais le plat.
+**Réglages → Style du collage Facebook** accueille jusqu'à trois collages ; le
+premier sert. Sans référence, le collage est dessiné à partir du texte seul.
+
+La vérification finale ne change pas et fait toujours redessiner un collage
+fautif, avec la même consigne complétée de ce qui a été refusé. Si la
+rédaction de la consigne échoue, l'ancienne consigne dessine le collage.
+
+Coût : environ 0,002 $ pour rédiger la consigne, en plus du collage (environ
+0,055 $). Une recette complète est revenue à 0,13 $ dans les essais.
 
 ## Version 0.26.8
 

@@ -137,6 +137,7 @@ final class MSRWA_Screen_Settings {
 			<div class="ms-card ms-save"><?php submit_button( __( 'Enregistrer', 'ms-recipes-writer-ai' ), 'primary', 'submit', false ); ?></div>
 		</form>
 
+		<?php self::style_references(); ?>
 		<?php self::budget(); ?>
 		<?php
 		self::health();
@@ -209,6 +210,46 @@ final class MSRWA_Screen_Settings {
 		echo '</section>';
 
 		self::retention();
+	}
+
+	/**
+	 * The owner's collages whose look the Facebook collage keeps. The first is
+	 * the one drawn from; a writer's own photograph of the dish comes before it.
+	 */
+	private static function style_references() {
+		$paths = MSRWA_Sources::style_paths();
+		$refused = get_transient( 'msrwa_style_refused_' . get_current_user_id() );
+		if ( false !== $refused ) { delete_transient( 'msrwa_style_refused_' . get_current_user_id() ); }
+		echo '<section class="ms-card" id="ms-style"><h2>' . esc_html__( 'Style du collage Facebook', 'ms-recipes-writer-ai' ) . '</h2>';
+		echo '<p>' . esc_html__( 'Un de vos collages dont le rendu doit être repris : lumière, couleurs, cadrage, plan de travail. Seul son style est repris, jamais son plat. Quand le rédacteur a envoyé une photographie du plat, c’est elle qui sert de référence.', 'ms-recipes-writer-ai' ) . '</p>';
+		if ( false !== $refused ) { MSRWA_UI::note( esc_html( (string) $refused ), 'warn' ); }
+		if ( ! $paths ) {
+			echo '<p class="ms-muted">' . esc_html__( 'Aucune référence : le collage est dessiné à partir du texte seul.', 'ms-recipes-writer-ai' ) . '</p>';
+		} else {
+			echo '<div class="ms-style-list">';
+			foreach ( $paths as $index => $path ) {
+				$preview = MSRWA_Sources::style_preview( $path );
+				echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="ms-style-item">';
+				echo '<input type="hidden" name="action" value="msrwa_style">';
+				wp_nonce_field( 'msrwa_style' );
+				echo '<input type="hidden" name="remove" value="' . esc_attr( basename( $path ) ) . '">';
+				if ( '' !== $preview ) { echo '<img src="' . esc_attr( $preview ) . '" alt="" width="180">'; }
+				echo '<p>' . ( 0 === $index ? '<strong>' . esc_html__( 'Utilisée', 'ms-recipes-writer-ai' ) . '</strong>' : esc_html__( 'En réserve', 'ms-recipes-writer-ai' ) ) . ' ';
+				submit_button( __( 'Retirer', 'ms-recipes-writer-ai' ), 'link-delete', 'submit', false );
+				echo '</p></form>';
+			}
+			echo '</div>';
+		}
+		if ( count( $paths ) < MSRWA_Sources::STYLE_MAX ) {
+			echo '<form method="post" enctype="multipart/form-data" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
+			echo '<input type="hidden" name="action" value="msrwa_style">';
+			wp_nonce_field( 'msrwa_style' );
+			echo '<p><label for="ms-style-file">' . esc_html__( 'Ajouter un collage (JPEG, PNG ou WebP, 10 Mo au plus)', 'ms-recipes-writer-ai' ) . '</label><br>';
+			echo '<input type="file" id="ms-style-file" name="style" accept="image/jpeg,image/png,image/webp" required> ';
+			submit_button( __( 'Ajouter', 'ms-recipes-writer-ai' ), 'secondary', 'submit', false );
+			echo '</p></form>';
+		}
+		echo '</section>';
 	}
 
 	/**

@@ -696,6 +696,37 @@ photograph, and otherwise use the photograph without the cost of a search.
     collages at high on the dishes of his references, then one round to crop
     tighter and deepen colour.
 
+36. **The collage is composed, then drawn from a reference.** Owner's
+    decision, 2026-09-24, after a day of side-by-side tests against his
+    ChatGPT collages: a single call with any prompt missed his look or the
+    recipe's order; what ChatGPT does — a chat model writes the image prompt
+    from the user's message, memory and image, then the image tool draws it —
+    reproduced both. The `collage` template now names `compose`
+    (`facebook_compose.tpl.txt`: the writing instruction, his saved
+    preferences, the look he approves, the panel rules) and `brief`
+    (`facebook_brief.tpl.txt`: his ChatGPT prompt word for word, `[DISH]`
+    replaced by the title). `draw()` calls `compose_collage()`: route
+    `image_compose` (default `openai:medium`, `max_output.image_compose`
+    3000) is sent the instruction, `MSRWA_Engine_Input::collage_brief()` (his
+    brief, the recipe's ingredients, steps and serving, and what the reference
+    is) and the reference image, and answers in plain text
+    (`MSRWA_Engine_Call::plan_compose()`). The reference is the editor's first
+    photograph of the dish when there is one, otherwise the first readable
+    path in `images.style_references` (the caller's; the plugin hands the
+    owner's uploaded collages). The image is drawn with that reference
+    attached: on OpenAI through `image_edit_endpoint`
+    (`/v1/images/edits`, multipart, one reference), on Gemini as an inline
+    part. The prompt is written once per run and stored as the
+    `facebook_composed` artifact; a redraw reuses it with the refusal's
+    findings. The writing is billed with the image. If the writing fails, the
+    template's own `prompt` draws, with a warning. The final approval is
+    unchanged. Measured: the rôti Orloff, croquettes, cod gratin and
+    turnovers, two draws each, matched his collages in look and order; full
+    runs about $0.13 a recipe, the collage about $0.055 plus $0.002 of
+    writing. Found on the first full run: the single-call path (redraws) sent
+    the upload as a form and got HTTP 400; every send now passes the upload
+    flag, and a test reads the source to keep it so.
+
 ### Still open
 
 

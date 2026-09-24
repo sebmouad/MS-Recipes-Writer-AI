@@ -60,6 +60,15 @@ msrwa_real_note( 'lot #' . $batch );
 // --- Dispatch and wait ----------------------------------------------------
 
 $dispatched = msrwa_real_request( 'POST', '/msrwa/v1/batches/' . $batch . '/dispatch' );
+// A photograph the pairing could not recognise waits for the writer (0.25.0)
+// and holds the lot back: the drawn one is set aside, as the writer would on
+// the pairing screen, and the lot is sent again.
+if ( 409 === $dispatched['status'] && $photo ) {
+	$aside = msrwa_real_request( 'POST', '/msrwa/v1/batches/' . $batch . '/pairs', array( 'pairs' => array( array( 'image' => 0, 'recipe' => 'aside' ) ) ) );
+	msrwa_real_assert( 200 === $aside['status'], 'An undecided photograph can be set aside (got ' . $aside['status'] . ').' );
+	msrwa_real_note( 'the unrecognised photograph was set aside' );
+	$dispatched = msrwa_real_request( 'POST', '/msrwa/v1/batches/' . $batch . '/dispatch' );
+}
 msrwa_real_assert( 200 === $dispatched['status'], 'The lot must dispatch (got ' . $dispatched['status'] . ').' );
 msrwa_real_assert( 1 === (int) ( $dispatched['body']['started'] ?? 0 ), 'One recipe must have started.' );
 

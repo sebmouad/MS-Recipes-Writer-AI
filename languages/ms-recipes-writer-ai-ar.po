@@ -2107,3 +2107,45 @@ msgstr "عدّل الشبكة في صفحة النماذج، أو وجّه هذ�
 
 msgid "Comptée pour le français. Un article en arabe, qui dit la même chose en moins de mots, vise %1$s à %2$s mots."
 msgstr "محسوبة للفرنسية. يستهدف المقال العربي، الذي يقول الشيء نفسه بكلمات أقل، من %1$s إلى %2$s كلمة."
+
+msgid "Consigne du collage"
+msgstr "تعليمات الكولاج"
+
+msgid "Aucune image reçue."
+msgstr "لم تُستلم أي صورة."
+
+msgid "Trois références au plus : retirez-en une d’abord."
+msgstr "ثلاثة مراجع على الأكثر: احذف واحدًا أولًا."
+
+msgid "Image trop lourde : 10 Mo au plus."
+msgstr "الصورة كبيرة جدًا: 10 ميغابايت على الأكثر."
+
+msgid "Seules les images JPEG, PNG et WebP sont acceptées."
+msgstr "لا تُقبل إلا صور JPEG وPNG وWebP."
+
+msgid "L’image n’a pas pu être enregistrée."
+msgstr "تعذّر حفظ الصورة."
+
+msgid "Style du collage Facebook"
+msgstr "أسلوب كولاج فيسبوك"
+
+msgid "Un de vos collages dont le rendu doit être repris : lumière, couleurs, cadrage, plan de travail. Seul son style est repris, jamais son plat. Quand le rédacteur a envoyé une photographie du plat, c’est elle qui sert de référence."
+msgstr "أحد كولاجاتك الذي يُراد استنساخ مظهره: الإضاءة والألوان والتأطير وسطح العمل. يُؤخذ أسلوبه فقط، لا طبقه أبدًا. وحين يرسل المحرر صورة للطبق، تكون تلك الصورة هي المرجع."
+
+msgid "Aucune référence : le collage est dessiné à partir du texte seul."
+msgstr "لا مرجع: يُرسم الكولاج من النص وحده."
+
+msgid "Utilisée"
+msgstr "مستخدمة"
+
+msgid "En réserve"
+msgstr "احتياطية"
+
+msgid "Retirer"
+msgstr "إزالة"
+
+msgid "Ajouter un collage (JPEG, PNG ou WebP, 10 Mo au plus)"
+msgstr "إضافة كولاج (JPEG أو PNG أو WebP، 10 ميغابايت على الأكثر)"
+
+msgid "Ajouter"
+msgstr "إضافة"

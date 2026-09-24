@@ -9,7 +9,7 @@
  *   php tools/lab.php report --run=tools/runs/<run>.json [--output=out.html]
  *   php tools/lab.php prune  [--dry-run]
  *
- * Common flags: --provider --tier --model --budget --only --attempts --quality --thinking
+ * Common flags: --provider --tier --model --budget --only --attempts --quality --thinking --style-reference
  *               --searches --search-context
  * Saved artifacts: --research= --canonical= --article= --featured= --facebook=
  *
@@ -52,6 +52,8 @@ function lab_config( array $options, $step = '' ) {
 	if ( isset( $options['budget'] ) ) { $config['limits']['budget_usd'] = (float) $options['budget']; }
 	if ( isset( $options['attempts'] ) ) { $config['attempts'] = array( 'default' => (int) $options['attempts'], 'final_approval' => (int) $options['attempts'] ); }
 	if ( isset( $options['quality'] ) ) { $config['images'] = array( 'featured_quality' => $options['quality'], 'facebook_quality' => $options['quality'] ); }
+	// A collage whose look the composed Facebook image keeps: --style-reference=path.
+	if ( ! empty( $options['style-reference'] ) ) { $config['images'] = array_merge( (array) ( $config['images'] ?? array() ), array( 'style_references' => array( realpath( (string) $options['style-reference'] ) ) ) ); }
 	return $config;
 }
 

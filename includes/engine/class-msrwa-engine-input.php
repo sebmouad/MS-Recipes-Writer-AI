@@ -405,6 +405,39 @@ final class MSRWA_Engine_Input {
 		return $columns . ' columns × ' . $rows . ' rows, every cell filled, the last row holding ' . ( $panels % $columns ) . ' panel(s) spanning its full width.';
 	}
 
+	/**
+	 * What the composing model is sent for a collage: the owner's own brief with
+	 * the dish named, the recipe it must follow, how the dish is served, and what
+	 * the attached reference is — a photograph of this dish, or a collage of
+	 * another whose look alone is to be kept.
+	 *
+	 * $reference is 'editor', 'style' or ''.
+	 */
+	public static function collage_brief( $brief, $template_file, $reference = '' ) {
+		$settings = self::settings();
+		$canonical = self::canonical_recipe( $brief );
+		$title = (string) ( $canonical['title'] ?? ( $brief['title'] ?? '' ) );
+		$text = str_replace( '[DISH]', $title, MSRWA_Prompt::compile( trim( (string) file_get_contents( self::prompt_path( $template_file ) ) ), $settings ) );
+		$ingredients = array();
+		foreach ( (array) ( $canonical['ingredients'] ?? array() ) as $ingredient ) {
+			if ( is_array( $ingredient ) ) { $ingredients[] = '- ' . self::ingredient_line( $ingredient ); }
+		}
+		$steps = array();
+		foreach ( array_values( (array) ( $canonical['steps'] ?? array() ) ) as $index => $step ) {
+			$steps[] = ( $index + 1 ) . '. ' . trim( (string) ( is_array( $step ) ? ( $step['text'] ?? '' ) : $step ) );
+		}
+		$text .= "\n\nTHE RECIPE — follow its ingredients, its cooking method and its order; add nothing it does not use:\n" . $title
+			. "\nIngredients:\n" . implode( "\n", $ingredients )
+			. "\nSteps:\n" . implode( "\n", $steps )
+			. "\nServed: " . self::serving_presentation( $canonical, self::research_package( $brief ), true );
+		if ( 'editor' === $reference ) {
+			$text .= "\n\nThe attached image is a photograph of this dish supplied by the editor.";
+		} elseif ( 'style' === $reference ) {
+			$text .= "\n\nThe attached image is my own approved collage of another dish: keep its look, never its food, its steps or its cookware.";
+		}
+		return $text;
+	}
+
 	public static function image_prompt( $kind, $brief, $options = array(), $findings = array() ) {
 		$settings = self::settings();
 		$research = self::research_package( $brief );

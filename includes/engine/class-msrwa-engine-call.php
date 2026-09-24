@@ -18,6 +18,9 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
  */
 final class MSRWA_Engine_Call {
 
+	/** File extensions for the image types a reference may be. */
+	const TYPES = array( 'image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp' );
+
 	/**
 	 * Reads .env.local for API keys when the environment does not already carry
 	 * them. Only the three key names are accepted and an existing value always
@@ -94,7 +97,7 @@ final class MSRWA_Engine_Call {
 	 */
 	public static $transport = null;
 
-	public static function http( $url, $headers, $payload, $timeout = 600 ) {
+	public static function http( $url, $headers, $payload, $timeout = 600, $multipart = false ) {
 		if ( is_callable( self::$transport ) ) {
 			$answer = (array) call_user_func( self::$transport, $url, $payload );
 			return array( 'status' => (int) ( $answer['status'] ?? 200 ), 'raw' => (string) ( $answer['raw'] ?? '' ), 'error' => '', 'seconds' => 0.0 );
@@ -104,13 +107,28 @@ final class MSRWA_Engine_Call {
 		curl_setopt_array( $ch, array(
 			CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true,
 			CURLOPT_HTTPHEADER => $headers,
-			CURLOPT_POSTFIELDS => json_encode( $payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ),
+			CURLOPT_POSTFIELDS => self::body( $payload, $multipart ),
 			CURLOPT_TIMEOUT => $timeout,
 		) );
 		$raw = curl_exec( $ch );
 		$status = (int) curl_getinfo( $ch, CURLINFO_RESPONSE_CODE );
 		$error = curl_error( $ch );
 		return array( 'status' => $status, 'raw' => (string) $raw, 'error' => $error, 'seconds' => round( microtime( true ) - $started, 1 ) );
+	}
+
+	/**
+	 * A request body: JSON, or the fields of a multipart upload, where a field
+	 * given as array( 'file', 'mime', 'name' ) is sent as a file from memory.
+	 */
+	private static function body( $payload, $multipart ) {
+		if ( ! $multipart ) { return json_encode( $payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ); }
+		$fields = array();
+		foreach ( (array) $payload as $name => $value ) {
+			$fields[ (string) $name ] = is_array( $value ) && isset( $value['file'] )
+				? new CURLStringFile( (string) $value['file'], (string) ( $value['name'] ?? 'image' ), (string) ( $value['mime'] ?? 'application/octet-stream' ) )
+				: (string) $value;
+		}
+		return $fields;
 	}
 
 	/**
@@ -130,7 +148,7 @@ final class MSRWA_Engine_Call {
 		if ( 1 === count( $requests ) || $limit < 2 || is_callable( self::$transport ) ) {
 			$out = array();
 			foreach ( $requests as $key => $request ) {
-				$out[ $key ] = self::http( $request['url'], $request['headers'], $request['payload'], (int) ( $request['timeout'] ?? 600 ) );
+				$out[ $key ] = self::http( $request['url'], $request['headers'], $request['payload'], (int) ( $request['timeout'] ?? 600 ), ! empty( $request['multipart'] ) );
 			}
 			return $out;
 		}
@@ -145,7 +163,7 @@ final class MSRWA_Engine_Call {
 				curl_setopt_array( $handle, array(
 					CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true,
 					CURLOPT_HTTPHEADER => $request['headers'],
-					CURLOPT_POSTFIELDS => json_encode( $request['payload'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ),
+					CURLOPT_POSTFIELDS => self::body( $request['payload'], ! empty( $request['multipart'] ) ),
 					CURLOPT_TIMEOUT => (int) ( $request['timeout'] ?? 600 ),
 				) );
 				curl_multi_add_handle( $multi, $handle );
@@ -185,7 +203,7 @@ final class MSRWA_Engine_Call {
 		$plan = self::plan_text( $provider, $model, $input, $max_tokens, $json_output, $web_search, $wire );
 		if ( isset( $plan['error'] ) ) { return array( 'error' => $plan['error'], 'seconds' => 0, 'usage' => array() ); }
 		$request = $plan['request'];
-		return self::read( $plan, self::http( $request['url'], $request['headers'], $request['payload'], (int) $request['timeout'] ) );
+		return self::read( $plan, self::http( $request['url'], $request['headers'], $request['payload'], (int) $request['timeout'], ! empty( $request['multipart'] ) ) );
 	}
 
 	/**
@@ -316,6 +334,7 @@ final class MSRWA_Engine_Call {
 		if ( 'image' === $plan['kind'] ) {
 			$binary = base64_decode( (string) ( $body['data'][0]['b64_json'] ?? '' ), true );
 			if ( false === $binary || '' === $binary ) { return array( 'error' => 'no image payload returned', 'seconds' => $result['seconds'] ); }
+			if ( ! empty( $plan['format'] ) ) { $binary = self::convert_image( $binary, (string) $plan['format'] ); }
 			file_put_contents( $plan['destination'], $binary );
 			return array( 'path' => $plan['destination'], 'bytes' => strlen( $binary ), 'seconds' => $result['seconds'], 'usage' => $body['usage'] ?? array(), 'model' => $body['model'] ?? $model );
 		}
@@ -394,29 +413,50 @@ final class MSRWA_Engine_Call {
 
 
 	/** Generates one image, OpenAI's or Gemini's, and writes it where the caller asked. */
-	public static function image( $prompt, $model, $size, $quality, $output_format, $destination, $wire = array(), $provider = 'openai' ) {
-		$plan = self::plan_image( $prompt, $model, $size, $quality, $output_format, $destination, $wire, $provider );
+	public static function image( $prompt, $model, $size, $quality, $output_format, $destination, $wire = array(), $provider = 'openai', array $references = array() ) {
+		$plan = self::plan_image( $prompt, $model, $size, $quality, $output_format, $destination, $wire, $provider, $references );
 		if ( isset( $plan['error'] ) ) { return array( 'error' => $plan['error'], 'seconds' => 0, 'usage' => array() ); }
 		$request = $plan['request'];
-		return self::read( $plan, self::http( $request['url'], $request['headers'], $request['payload'], (int) $request['timeout'] ) );
+		return self::read( $plan, self::http( $request['url'], $request['headers'], $request['payload'], (int) $request['timeout'], ! empty( $request['multipart'] ) ) );
 	}
 
 	/** Everything one image generation needs, without making it. */
-	public static function plan_image( $prompt, $model, $size, $quality, $output_format, $destination, $wire = array(), $provider = 'openai' ) {
+	public static function plan_image( $prompt, $model, $size, $quality, $output_format, $destination, $wire = array(), $provider = 'openai', array $references = array() ) {
 		$wire = $wire ? $wire : self::shipped_wire( $provider, $model );
 		$unusable = self::unusable( $provider, $wire );
 		if ( '' !== $unusable ) { return array( 'error' => $unusable ); }
 		if ( '' === (string) ( $wire['image_endpoint'] ?? '' ) ) { return array( 'error' => $provider . ' has no image endpoint configured.' ); }
+		// Reference images: each array( 'mime' => …, 'data' => base64 ).
+		$references = array_values( array_filter( $references, static function ( $one ) { return is_array( $one ) && ! empty( $one['data'] ); } ) );
 		if ( 'gemini' === $provider ) {
+			$parts = array();
+			foreach ( $references as $one ) { $parts[] = array( 'inlineData' => array( 'mimeType' => (string) ( $one['mime'] ?? 'image/jpeg' ), 'data' => (string) $one['data'] ) ); }
+			$parts[] = array( 'text' => (string) $prompt );
 			return array(
 				'kind' => 'image', 'provider' => $provider, 'model' => $model, 'destination' => $destination, 'format' => $output_format,
 				'request' => array(
 					'url' => $wire['image_endpoint'], 'headers' => $wire['headers'], 'timeout' => (int) ( $wire['timeout'] ?? 600 ),
 					'payload' => array(
-						'contents' => array( array( 'parts' => array( array( 'text' => (string) $prompt ) ) ) ),
+						'contents' => array( array( 'parts' => $parts ) ),
 						'generationConfig' => array( 'responseModalities' => array( 'IMAGE' ), 'imageConfig' => self::gemini_image_config( $model, $size, $quality ) ),
 					),
 				),
+			);
+		}
+		if ( $references ) {
+			// OpenAI draws from references on its edits endpoint, as a multipart
+			// upload: the same model, given images to look at.
+			if ( '' === (string) ( $wire['image_edit_endpoint'] ?? '' ) ) { return array( 'error' => $provider . ' has no image edit endpoint configured.' ); }
+			// One reference: a multipart body cannot repeat a field name from PHP.
+			$mime = (string) ( $references[0]['mime'] ?? 'image/jpeg' );
+			$fields = array(
+				'model' => $model, 'prompt' => (string) $prompt, 'size' => $size, 'quality' => $quality, 'output_format' => $output_format, 'n' => '1',
+				'image[]' => array( 'file' => (string) base64_decode( (string) $references[0]['data'] ), 'mime' => $mime, 'name' => 'reference.' . ( self::TYPES[ $mime ] ?? 'jpg' ) ),
+			);
+			$headers = array_values( array_filter( (array) $wire['headers'], static function ( $header ) { return 0 !== stripos( (string) $header, 'content-type:' ); } ) );
+			return array(
+				'kind' => 'image', 'provider' => $provider, 'model' => $model, 'destination' => $destination, 'format' => $output_format,
+				'request' => array( 'url' => $wire['image_edit_endpoint'], 'headers' => $headers, 'timeout' => (int) ( $wire['timeout'] ?? 600 ), 'payload' => $fields, 'multipart' => true ),
 			);
 		}
 		return array(
@@ -570,7 +610,7 @@ final class MSRWA_Engine_Call {
 		$plan = self::plan_vision( $provider, $model, $image, $context, $max_tokens, $wire, $instruction );
 		if ( isset( $plan['error'] ) ) { return array( 'error' => $plan['error'], 'seconds' => 0, 'usage' => array() ); }
 		$request = $plan['request'];
-		return self::read( $plan, self::http( $request['url'], $request['headers'], $request['payload'], (int) $request['timeout'] ) );
+		return self::read( $plan, self::http( $request['url'], $request['headers'], $request['payload'], (int) $request['timeout'], ! empty( $request['multipart'] ) ) );
 	}
 
 	/** Everything one image observation needs, without asking yet, so a set of them can go out together. */
@@ -596,6 +636,45 @@ final class MSRWA_Engine_Call {
 	}
 
 	/**
+	 * Writes an image prompt the way a chat assistant does before it draws: an
+	 * instruction, the user's own brief, and optionally the reference image the
+	 * drawing will be given. The answer is plain text, not JSON.
+	 */
+	public static function plan_compose( $provider, $model, $instruction, $brief, $image = null, $max_tokens = 3000, $wire = array() ) {
+		$wire = $wire ? $wire : self::shipped_wire( $provider, $model );
+		$unusable = self::unusable( $provider, $wire );
+		if ( '' !== $unusable ) { return array( 'error' => $unusable ); }
+		$image = is_array( $image ) && ! empty( $image['data'] ) ? $image : null;
+		if ( 'openai' === $provider ) {
+			$content = array( array( 'type' => 'input_text', 'text' => (string) $brief ) );
+			if ( $image ) { $content[] = array( 'type' => 'input_image', 'image_url' => 'data:' . $image['mime'] . ';base64,' . $image['data'] ); }
+			$payload = array( 'model' => $model, 'store' => false, 'max_output_tokens' => $max_tokens, 'input' => array( array( 'role' => 'system', 'content' => (string) $instruction ), array( 'role' => 'user', 'content' => $content ) ) );
+		} elseif ( 'gemini' === $provider ) {
+			$parts = array( array( 'text' => (string) $brief ) );
+			if ( $image ) { $parts[] = array( 'inline_data' => array( 'mime_type' => $image['mime'], 'data' => $image['data'] ) ); }
+			$payload = array( 'systemInstruction' => array( 'parts' => array( array( 'text' => (string) $instruction ) ) ), 'contents' => array( array( 'role' => 'user', 'parts' => $parts ) ), 'generationConfig' => self::gemini_generation( $wire, $max_tokens ) );
+		} else {
+			$content = array();
+			if ( $image ) { $content[] = array( 'type' => 'image', 'source' => array( 'type' => 'base64', 'media_type' => $image['mime'], 'data' => $image['data'] ) ); }
+			$content[] = array( 'type' => 'text', 'text' => (string) $brief );
+			$payload = array( 'model' => $model, 'max_tokens' => $max_tokens, 'system' => (string) $instruction, 'messages' => array( array( 'role' => 'user', 'content' => $content ) ) );
+		}
+		$payload = self::think( $provider, $model, $payload, $wire );
+		return array(
+			'kind' => 'compose', 'provider' => $provider, 'model' => $model,
+			'request' => array( 'url' => $wire['text_endpoint'], 'headers' => $wire['headers'], 'payload' => $payload, 'timeout' => (int) ( $wire['timeout'] ?? 600 ) ),
+		);
+	}
+
+	/** One composing call, asked and read. */
+	public static function compose( $provider, $model, $instruction, $brief, $image = null, $max_tokens = 3000, $wire = array() ) {
+		$plan = self::plan_compose( $provider, $model, $instruction, $brief, $image, $max_tokens, $wire );
+		if ( isset( $plan['error'] ) ) { return array( 'error' => $plan['error'], 'seconds' => 0, 'usage' => array() ); }
+		$request = $plan['request'];
+		return self::read( $plan, self::http( $request['url'], $request['headers'], $request['payload'], (int) $request['timeout'], ! empty( $request['multipart'] ) ) );
+	}
+
+	/**
 	 * Judges several images against one instruction in a single call. Separate from
 	 * lab_call_vision because the jobs differ: that one observes one source photo as
 	 * untrusted evidence, this one compares the finished artifacts to each other, and
@@ -608,7 +687,7 @@ final class MSRWA_Engine_Call {
 		$plan = self::plan_judge( $provider, $model, $instruction, $images, $max_tokens, $wire );
 		if ( isset( $plan['error'] ) ) { return array( 'error' => $plan['error'], 'seconds' => 0, 'usage' => array() ); }
 		$request = $plan['request'];
-		return self::read( $plan, self::http( $request['url'], $request['headers'], $request['payload'], (int) $request['timeout'] ) );
+		return self::read( $plan, self::http( $request['url'], $request['headers'], $request['payload'], (int) $request['timeout'], ! empty( $request['multipart'] ) ) );
 	}
 
 	/** Everything the judge needs to see the article and both images at once, without asking yet. */

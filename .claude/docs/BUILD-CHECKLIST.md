@@ -601,6 +601,12 @@ cost) in the task before changing anything.
 - [x] **A38 — The owner's collage prompt (2026-09-24).** Rebuilt on his ChatGPT
   prompt and style notes; tried live at high on five of his dishes. See
   ENGINE.md §7, item 35.
+- [x] **A39 — Composed collage drawn from a reference (2026-09-24).** A text
+  model writes the image prompt from the owner's brief, the recipe and a
+  reference (the writer's photograph, else the owner's style collage uploaded
+  in Réglages); the image is drawn with that reference. Real: lab runs on
+  four dishes, and a full lot through the plugin with the uploaded reference.
+  See ENGINE.md §7, item 36.
 - [x] **A11 — Model answers that do not parse (found 2026-09-20).** Two of the
   54 matrix cells scored zero for a reason that was ours, not the prompt's:
   Opus 5 wrote "I'll research this dish now." before the object, and Sonnet 5

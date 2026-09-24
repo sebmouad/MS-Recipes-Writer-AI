@@ -2071,3 +2071,45 @@ msgstr "Change the grid under Models, or route these steps elsewhere."
 
 msgid "Comptée pour le français. Un article en arabe, qui dit la même chose en moins de mots, vise %1$s à %2$s mots."
 msgstr "Counted for French. An article in Arabic, which says the same in fewer words, aims for %1$s to %2$s words."
+
+msgid "Consigne du collage"
+msgstr "Collage prompt"
+
+msgid "Aucune image reçue."
+msgstr "No image received."
+
+msgid "Trois références au plus : retirez-en une d’abord."
+msgstr "Three references at most: remove one first."
+
+msgid "Image trop lourde : 10 Mo au plus."
+msgstr "Image too large: 10 MB at most."
+
+msgid "Seules les images JPEG, PNG et WebP sont acceptées."
+msgstr "Only JPEG, PNG and WebP images are accepted."
+
+msgid "L’image n’a pas pu être enregistrée."
+msgstr "The image could not be saved."
+
+msgid "Style du collage Facebook"
+msgstr "Facebook collage style"
+
+msgid "Un de vos collages dont le rendu doit être repris : lumière, couleurs, cadrage, plan de travail. Seul son style est repris, jamais son plat. Quand le rédacteur a envoyé une photographie du plat, c’est elle qui sert de référence."
+msgstr "One of your collages whose look should be reproduced: light, colours, framing, work surface. Only its style is taken, never its dish. When the writer has sent a photograph of the dish, that photograph is the reference instead."
+
+msgid "Aucune référence : le collage est dessiné à partir du texte seul."
+msgstr "No reference: the collage is drawn from the text alone."
+
+msgid "Utilisée"
+msgstr "In use"
+
+msgid "En réserve"
+msgstr "Spare"
+
+msgid "Retirer"
+msgstr "Remove"
+
+msgid "Ajouter un collage (JPEG, PNG ou WebP, 10 Mo au plus)"
+msgstr "Add a collage (JPEG, PNG or WebP, 10 MB at most)"
+
+msgid "Ajouter"
+msgstr "Add"

@@ -13,6 +13,7 @@ final class MSRWA_Admin {
 		add_action( 'admin_menu', array( __CLASS__, 'menu' ), 30 );
 		add_action( 'admin_post_msrwa_save_settings', array( __CLASS__, 'save_settings' ) );
 		add_action( 'admin_post_msrwa_save_engine', array( __CLASS__, 'save_engine' ) );
+		add_action( 'admin_post_msrwa_style', array( __CLASS__, 'save_style' ) );
 		add_action( 'admin_post_msrwa_save_models', array( 'MSRWA_Screen_Models', 'save' ) );
 		add_action( 'admin_post_msrwa_report', array( 'MSRWA_Operations', 'report' ) );
 		add_action( 'admin_post_msrwa_export', array( 'MSRWA_Export', 'send' ) );
@@ -214,6 +215,24 @@ final class MSRWA_Admin {
 		check_admin_referer( 'msrwa_save_settings' );
 		MSRWA_Settings::save( isset( $_POST['msrwa_settings'] ) ? wp_unslash( $_POST['msrwa_settings'] ) : array() );
 		wp_safe_redirect( admin_url( 'admin.php?page=msrwa-settings&saved=1' ) );
+		exit;
+	}
+
+	/** Adds or removes one of the Facebook collage's style references. */
+	public static function save_style() {
+		if ( ! MSRWA_Rights::may_manage() ) { wp_die( esc_html__( 'Vous n’avez pas accès à cet écran.', 'ms-recipes-writer-ai' ) ); }
+		check_admin_referer( 'msrwa_style' );
+		$refused = '';
+		$remove = isset( $_POST['remove'] ) ? sanitize_file_name( wp_unslash( $_POST['remove'] ) ) : '';
+		if ( '' !== $remove ) {
+			MSRWA_Sources::remove_style( $remove );
+		} elseif ( ! empty( $_FILES['style']['tmp_name'] ) ) {
+			$refused = MSRWA_Sources::add_style( array( 'tmp_name' => (string) $_FILES['style']['tmp_name'] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+		} else {
+			$refused = __( 'Aucune image reçue.', 'ms-recipes-writer-ai' );
+		}
+		if ( '' !== $refused ) { set_transient( 'msrwa_style_refused_' . get_current_user_id(), $refused, MINUTE_IN_SECONDS ); }
+		wp_safe_redirect( admin_url( 'admin.php?page=msrwa-settings&style=' . ( '' === $refused ? '1' : '0' ) . '#ms-style' ) );
 		exit;
 	}
 

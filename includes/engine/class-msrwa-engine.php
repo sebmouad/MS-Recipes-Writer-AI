@@ -259,7 +259,7 @@ final class MSRWA_Engine {
 	private static function settle( array $prepared ) {
 		if ( ! isset( $prepared['plan'] ) ) { return $prepared; }
 		$request = $prepared['plan']['request'];
-		$raw = MSRWA_Engine_Call::http( $request['url'], $request['headers'], $request['payload'], (int) $request['timeout'] );
+		$raw = MSRWA_Engine_Call::http( $request['url'], $request['headers'], $request['payload'], (int) $request['timeout'], ! empty( $request['multipart'] ) );
 		return call_user_func( $prepared['finish'], MSRWA_Engine_Call::read( $prepared['plan'], $raw ) );
 	}
 
@@ -620,6 +620,20 @@ final class MSRWA_Engine {
 		$template = $config->facebook_template();
 		$choices = array_merge( $options, array( 'collage_panels' => $template['panels'], 'collage_columns' => $template['columns'], 'collage_rows' => $template['rows'], 'facebook_prompt' => $template['prompt'] ) );
 		$prompt = MSRWA_Engine_Input::image_prompt( $kind, $brief, $choices, $findings );
+		$references = array();
+		$composed = array( 'cost_usd' => 0.0, 'seconds' => 0.0 );
+		if ( 'facebook' === $kind && '' !== $template['compose'] && '' !== $template['brief'] ) {
+			$composed = self::compose_collage( $name, $config, $result, $options, $brief, $template, $findings );
+			if ( isset( $composed['error'] ) ) {
+				// The written prompt is the better drawing, not the only one: the
+				// template's own prompt still draws a sound collage.
+				$result->event( 'warning', $name, 'Could not write the collage prompt (' . $composed['error'] . '); drawing from the template instead.' );
+				$composed = array( 'cost_usd' => (float) ( $composed['cost_usd'] ?? 0 ), 'seconds' => (float) ( $composed['seconds'] ?? 0 ) );
+			} else {
+				$prompt = $composed['prompt'];
+				$references = $composed['references'];
+			}
+		}
 		$ceiling = (int) $config->get( 'limits.image_prompt_chars', 30000 );
 		if ( strlen( $prompt ) > $ceiling ) {
 			// The provider refuses anything over 32000 characters, and did once the
@@ -637,15 +651,17 @@ final class MSRWA_Engine {
 		$result->event( 'input', $name, sprintf( '%s prompt, %s characters, %s at %s quality%s.', ucfirst( $kind ), number_format( strlen( $prompt ) ), $size, $quality, $findings ? ', correcting ' . count( $findings ) . ' finding(s)' : '' ), array( 'prompt_chars' => strlen( $prompt ), 'size' => $size, 'quality' => $quality, 'format' => $format, 'corrections' => count( $findings ), 'route' => $route ) );
 
 		$wire = $config->provider( $route['provider'], $route['model'] );
-		$plan = MSRWA_Engine_Call::plan_image( $prompt, $route['model'], $size, $quality, $format, $destination, $wire, $route['provider'] );
+		$plan = MSRWA_Engine_Call::plan_image( $prompt, $route['model'], $size, $quality, $format, $destination, $wire, $route['provider'], $references );
 		if ( isset( $plan['error'] ) ) { return self::failed( $plan['error'], 0, $route ); }
 
-		return array( 'plan' => $plan, 'finish' => static function ( $call ) use ( $name, $kind, $route, $wire, $config, $result, $prompt, $size, $quality, $format, $findings ) {
+		return array( 'plan' => $plan, 'finish' => static function ( $call ) use ( $name, $kind, $route, $wire, $config, $result, $prompt, $size, $quality, $format, $findings, $composed, $references ) {
 			if ( isset( $call['error'] ) ) { return self::failed( $call['error'], $call['seconds'] ?? 0, $route ); }
-			self::report_call( $result, $name, $route, $wire['image_endpoint'] ?? '', $call, $config );
+			self::report_call( $result, $name, $route, $references ? ( $wire['image_edit_endpoint'] ?? '' ) : ( $wire['image_endpoint'] ?? '' ), $call, $config );
+			$cost = $config->price( $route['provider'], $route['model'], $call['usage'] );
 			return array(
-				'step' => $name, 'provider' => $route['provider'], 'model' => $route['model'], 'tier' => $route['tier'], 'seconds' => $call['seconds'],
-				'usage' => $call['usage'], 'cost_usd' => $config->price( $route['provider'], $route['model'], $call['usage'] ),
+				'step' => $name, 'provider' => $route['provider'], 'model' => $route['model'], 'tier' => $route['tier'], 'seconds' => round( $call['seconds'] + (float) $composed['seconds'], 1 ),
+				// Writing the prompt is part of drawing this image, and billed with it.
+				'usage' => $call['usage'], 'cost_usd' => null === $cost ? null : $cost + (float) $composed['cost_usd'],
 				'status' => '', 'passed' => null, 'total' => null, 'checks' => array(), 'error' => '', 'retry' => '',
 				'artifact' => array(
 					'kind' => $kind, 'path' => $call['path'], 'bytes' => $call['bytes'], 'mime' => 'image/' . $format,
@@ -654,6 +670,65 @@ final class MSRWA_Engine {
 				),
 			);
 		} );
+	}
+
+	/**
+	 * Writes the collage's image prompt the way the owner's ChatGPT does: a text
+	 * model reads his brief, the recipe and the reference image, and plans the
+	 * panels. Written once per run; a redraw reuses it with the refusal's
+	 * findings added, so a correction changes only what was refused.
+	 *
+	 * The reference is the editor's own photograph of the dish when there is
+	 * one, otherwise the first readable style reference the caller configured.
+	 */
+	private static function compose_collage( $name, MSRWA_Engine_Config $config, MSRWA_Result $result, array $options, array $brief, array $template, array $findings ) {
+		$reference = self::collage_reference( $config, $options, $brief );
+		$written = (array) ( $result->artifacts['facebook_composed'] ?? array() );
+		$spent = array( 'cost_usd' => 0.0, 'seconds' => 0.0 );
+		if ( empty( $written['prompt'] ) ) {
+			$route = $config->model_for( 'image_compose' );
+			$wire = $config->provider( $route['provider'], $route['model'], 'image_compose' );
+			$instruction = MSRWA_Prompt::compile( trim( (string) file_get_contents( MSRWA_Engine_Input::prompt_path( $template['compose'] ) ) ), MSRWA_Engine_Input::settings() );
+			$message = MSRWA_Engine_Input::collage_brief( $brief, $template['brief'], $reference['source'] );
+			$call = MSRWA_Engine_Call::compose( $route['provider'], $route['model'], $instruction, $message, $reference['image'], $config->max_output( 'image_compose' ), $wire );
+			if ( isset( $call['error'] ) ) { return array( 'error' => (string) $call['error'], 'seconds' => (float) ( $call['seconds'] ?? 0 ) ); }
+			self::report_call( $result, $name, $route, $wire['text_endpoint'] ?? '', $call, $config );
+			$spent = array( 'cost_usd' => (float) $config->price( $route['provider'], $route['model'], (array) ( $call['usage'] ?? array() ) ), 'seconds' => (float) ( $call['seconds'] ?? 0 ) );
+			$text = trim( (string) ( $call['text'] ?? '' ) );
+			if ( strlen( $text ) < 200 ) { return array( 'error' => 'the answer was too short to be a prompt', 'cost_usd' => $spent['cost_usd'], 'seconds' => $spent['seconds'] ); }
+			$written = array( 'prompt' => $text, 'reference' => $reference['source'], 'reference_label' => $reference['label'], 'model' => $route['model'] );
+			$result->artifact( 'facebook_composed', $written );
+			$result->event( 'input', $name, sprintf( 'Collage prompt written by %s from the recipe%s: %s characters.', $route['model'], '' !== $reference['source'] ? ' and ' . $reference['label'] : '', number_format( strlen( $text ) ) ) );
+		}
+		$prompt = (string) $written['prompt'];
+		$findings = array_values( array_filter( $findings, 'is_array' ) );
+		if ( $findings ) {
+			$prompt .= "\n\nTHIS IMAGE WAS REFUSED. An independent editor inspected the previous attempt and listed what is wrong with it. Produce the same image with each of these corrected, and change nothing else:\n";
+			foreach ( $findings as $index => $finding ) {
+				$prompt .= ( $index + 1 ) . '. ' . trim( (string) ( $finding['reason'] ?? '' ) ) . ' — ' . trim( (string) ( $finding['fix'] ?? '' ) ) . "\n";
+			}
+		}
+		return array( 'prompt' => $prompt, 'references' => $reference['image'] ? array( $reference['image'] ) : array() ) + $spent;
+	}
+
+	/** The image a composed collage is drawn from: the editor's photograph, else a style reference. */
+	private static function collage_reference( MSRWA_Engine_Config $config, array $options, array $brief ) {
+		$max = (int) $config->get( 'limits.max_image_bytes', 10000000 );
+		foreach ( array_slice( array_values( (array) ( $brief['images'] ?? array() ) ), 0, 1 ) as $candidate ) {
+			$image = is_array( $candidate ) && is_callable( $options['read_image'] ?? null ) ? (array) call_user_func( $options['read_image'], $candidate, $max ) : array();
+			$url = is_array( $candidate ) ? (string) ( $candidate['image_url'] ?? $candidate['url'] ?? '' ) : (string) $candidate;
+			if ( ( ! $image || isset( $image['error'] ) ) && preg_match( '#^https://#i', $url ) ) { $image = MSRWA_Engine_Call::fetch_image( $url, $max ); }
+			if ( $image && ! isset( $image['error'] ) && ! empty( $image['data'] ) ) { return array( 'source' => 'editor', 'label' => 'the editor\'s photograph', 'image' => array( 'mime' => (string) $image['mime'], 'data' => (string) $image['data'] ) ); }
+		}
+		foreach ( (array) $config->get( 'images.style_references', array() ) as $path ) {
+			$path = (string) $path;
+			if ( '' === $path || ! is_readable( $path ) || filesize( $path ) > $max ) { continue; }
+			$size = @getimagesize( $path ); // phpcs:ignore WordPress.PHP.NoSilencedErrors
+			$mime = (string) ( $size['mime'] ?? '' );
+			if ( ! isset( MSRWA_Engine_Call::TYPES[ $mime ] ) ) { continue; }
+			return array( 'source' => 'style', 'label' => 'a style reference', 'image' => array( 'mime' => $mime, 'data' => base64_encode( (string) file_get_contents( $path ) ) ) );
+		}
+		return array( 'source' => '', 'label' => '', 'image' => null );
 	}
 
 	/** The one step that sees the article and both images at once, and decides. */

@@ -54,6 +54,8 @@ final class MSRWA_Engine_Config {
 				'final_approval'   => 'openai:medium',
 				'vision'           => 'openai:medium',
 				'image'            => 'openai:gpt-image-2.5-flare',
+				// Writes the collage's image prompt from the recipe and the reference.
+				'image_compose'    => 'openai:medium',
 			),
 
 			/*
@@ -79,6 +81,7 @@ final class MSRWA_Engine_Config {
 				// 12000 stopped a research written from photographs: with no search to
 				// bound it, it wrote 17,000 characters of lists and never closed its
 				// object. The lists are capped in the prompt; the ceiling is the margin.
+				'image_compose'    => 3000,
 				'research'         => 16000,
 				'canonical_recipe' => 4500,
 				'article'          => 14500,
@@ -124,6 +127,9 @@ final class MSRWA_Engine_Config {
 				'featured_size'    => '1024x1024',
 				'facebook_size'    => '1024x1536',
 				'collage_panels'   => 6,
+				// Images whose look a composed collage reproduces when the editor sent
+				// no photograph of the dish: absolute paths the caller can read.
+				'style_references' => array(),
 				// The Facebook image is drawn from one of these templates. Each
 				// names its prompt file and may set its own panel count, grid,
 				// ratio and size; what it leaves out comes from the keys above.
@@ -134,7 +140,11 @@ final class MSRWA_Engine_Config {
 					// Six moments in a 2 × 3 grid is what its prompt is written for,
 					// so the template fixes it; `collage_panels` serves templates
 					// that name no count of their own.
-					'collage' => array( 'label' => 'Collage de préparation', 'prompt' => 'facebook_image.tpl.txt', 'panels' => 6, 'columns' => 2 ),
+					// The owner's own method, 2026-09-24: a text model writes the
+					// image prompt from his brief, the recipe and a reference image,
+					// the way ChatGPT does before it draws; the image is then drawn
+					// with that reference attached. `prompt` stays the fallback.
+					'collage' => array( 'label' => 'Collage de préparation', 'prompt' => 'facebook_image.tpl.txt', 'panels' => 6, 'columns' => 2, 'compose' => 'facebook_compose.tpl.txt', 'brief' => 'facebook_brief.tpl.txt' ),
 				),
 			),
 
@@ -183,6 +193,8 @@ final class MSRWA_Engine_Config {
 				'openai' => array(
 					'text_endpoint'   => 'https://api.openai.com/v1/responses',
 					'image_endpoint'  => 'https://api.openai.com/v1/images/generations',
+					// Drawing from reference images is a different endpoint on OpenAI.
+					'image_edit_endpoint' => 'https://api.openai.com/v1/images/edits',
 					'headers'         => array( 'Content-Type: application/json', 'Authorization: Bearer {{key}}' ),
 					'key_env'         => array( 'OPENAI_API_KEY', 'MSRWA_OPENAI_KEY' ),
 					// `low` hands the model less of each result page. Measured on two
@@ -442,6 +454,7 @@ final class MSRWA_Engine_Config {
 		$replace = static function ( $text ) use ( $model, $key ) { return str_replace( array( '{{model}}', '{{key}}' ), array( rawurlencode( (string) $model ), $key ), (string) $text ); };
 		$provider['text_endpoint'] = $replace( $provider['text_endpoint'] ?? '' );
 		$provider['image_endpoint'] = $replace( $provider['image_endpoint'] ?? '' );
+		$provider['image_edit_endpoint'] = $replace( $provider['image_edit_endpoint'] ?? '' );
 		$provider['headers'] = array_map( $replace, (array) ( $provider['headers'] ?? array() ) );
 		$provider['timeout'] = (int) $this->get( 'limits.http_timeout', 600 );
 		$provider['has_key'] = '' !== $key;
@@ -552,7 +565,15 @@ final class MSRWA_Engine_Config {
 			'rows' => (int) ceil( $panels / $columns ),
 			'ratio' => (string) ( $template['ratio'] ?? $this->get( 'images.facebook_ratio', '2:3' ) ),
 			'size' => (string) ( $template['size'] ?? $this->get( 'images.facebook_size', '1024x1536' ) ),
+			// A template that composes its prompt names the instruction and the brief.
+			'compose' => self::prompt_file( (string) ( $template['compose'] ?? '' ) ),
+			'brief' => self::prompt_file( (string) ( $template['brief'] ?? '' ) ),
 		);
+	}
+
+	/** A prompt file under prompts/ when it exists there, else ''. */
+	private static function prompt_file( $name ) {
+		return '' !== $name && is_readable( MSRWA_Engine_Input::prompt_path( $name ) ) ? $name : '';
 	}
 
 	/**
@@ -596,7 +617,7 @@ final class MSRWA_Engine_Config {
 				);
 			}
 		}
-		foreach ( array( 'text_endpoint', 'image_endpoint' ) as $key ) {
+		foreach ( array( 'text_endpoint', 'image_endpoint', 'image_edit_endpoint' ) as $key ) {
 			$provider[ $key ] = self::redact_url( (string) ( $provider[ $key ] ?? '' ) );
 		}
 		return $provider;
