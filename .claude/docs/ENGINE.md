@@ -569,6 +569,16 @@ photograph, and otherwise use the photograph without the cost of a search.
     research. Across 328 stored answers the check fires once, on the
     "润ir les pommes" that prompted it.
 
+28. **Arabic headings are matched with or without their vowel marks.**
+    Found on the first live Arabic lot, 2026-09-24: its article had the
+    section on choosing the ingredients, "كيف تختار…", and was marked as
+    missing it, because the outline knew only "اختيار" and "اختر".
+    `MSRWA_Engine_Score::fold()` now drops Arabic short vowels and the
+    tatweel, and the choosing section also accepts "تختار", "يختار" and
+    "انتق". The same lot came back with 2,033 words against a 2,400 target:
+    Arabic says the same in fewer words. *Proposal:* a per-language length
+    factor (Arabic about 0.85); awaiting the owner.
+
 ### Still open
 
 

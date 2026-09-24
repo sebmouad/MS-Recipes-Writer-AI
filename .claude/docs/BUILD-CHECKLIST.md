@@ -698,7 +698,7 @@ Measured on the live site: 293s of provider work inside a 10-minute wall clock,
 
 ## B7 — Site language
 
-- [~] *(site language and per-lot language reach the prompts; English verified live, Arabic offline only)* **T6.1 — One language per site**, applied to prompts, the quality
+- [x] *(site language and per-lot language reach the prompts; English, Spanish and Arabic verified live — Arabic lot #63, 0.25.7)* **T6.1 — One language per site**, applied to prompts, the quality
   contract and proofreading. Three shipped.
 
 ## B8 — First complete version sweep
@@ -733,7 +733,6 @@ Measured on the live site: 293s of provider work inside a 10-minute wall clock,
 - **T1.1 / T1.2 / T1.3** — cost engine. The article-only estimate landed within
   4 % of the bill on a real run; the image buckets need an image provider
   reachable from the test machine.
-- **T6.1** — an Arabic lot, live.
 - **B1.5 / C3** — timing with images.
 - Everything under *Verified on a real site* that is still unticked.
 

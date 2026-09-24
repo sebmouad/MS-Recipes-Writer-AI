@@ -116,4 +116,15 @@ msrwa_test_contains( $long['detail'], 'maximum', 'The detail says which end it f
 // whole article again to shed fifty words costs more than the fifty words.
 msrwa_test_assert( ! empty( msrwa_words_check( 3700 )['pass'] ), 'A little over the maximum is tolerated.' );
 
+// A live Arabic article was marked as missing its "choosing" section while
+// it had one: "كيف تختار الدجاج…" uses the verb, and vowel marks such as
+// "يُقدَّم" must not hide a word either.
+$ar = MSRWA_Engine_Score::outlines()['ar'];
+$found = static function ( $heading, $section ) use ( $ar ) {
+	foreach ( $ar[ $section ] as $word ) { if ( false !== strpos( MSRWA_Engine_Score::fold( $heading ), $word ) ) { return true; } }
+	return false;
+};
+msrwa_test_assert( $found( 'كيف تختار الدجاج والليمون والزيتون للطاجين؟', 'الاختيار' ), 'The verb "to choose" names the choosing section.' );
+msrwa_test_assert( $found( 'مع ماذا يُقدَّم طاجين الدجاج؟', 'التقديم' ), 'Vowel marks do not hide a word.' );
+
 msrwa_test_done( 'the engine in three languages' );

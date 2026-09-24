@@ -13,7 +13,9 @@ final class MSRWA_Engine_Score {
 	public static function fold( $text ) {
 		$text = mb_strtolower( (string) $text, 'UTF-8' );
 		$map = array( 'á'=>'a','à'=>'a','â'=>'a','ä'=>'a','é'=>'e','è'=>'e','ê'=>'e','ë'=>'e','í'=>'i','ì'=>'i','î'=>'i','ï'=>'i','ó'=>'o','ò'=>'o','ô'=>'o','ö'=>'o','ú'=>'u','ù'=>'u','û'=>'u','ü'=>'u','ç'=>'c','œ'=>'oe','æ'=>'ae' );
-		return strtr( $text, $map );
+		// Arabic is written with or without its short vowels and the tatweel:
+		// "يُقدَّم" and "يقدم" are one word, and a heading must match either way.
+		return (string) preg_replace( '/[\x{064B}-\x{065F}\x{0670}\x{0640}]/u', '', strtr( $text, $map ) );
 	}
 
 	/**
@@ -445,7 +447,7 @@ final class MSRWA_Engine_Score {
 			),
 			'ar' => array(
 				'المكونات'     => array( 'مكون', 'مكونات' ),
-				'الاختيار'     => array( 'اختيار', 'اختر', 'انتقاء' ),
+				'الاختيار'     => array( 'اختيار', 'اختر', 'تختار', 'يختار', 'انتقاء', 'انتق' ),
 				'البدائل'      => array( 'بديل', 'بدائل', 'استبدال' ),
 				'الأدوات'      => array( 'أدوات', 'معدات', 'أواني' ),
 				'الطريقة'      => array( 'طريقة', 'خطوات', 'تحضير' ),
