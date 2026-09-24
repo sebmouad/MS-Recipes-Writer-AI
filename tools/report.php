@@ -336,6 +336,8 @@ function report_redraws( $steps, $artifacts ) {
 	foreach ( array( 'featured_image' => 'L’image à la une', 'facebook_image' => 'Le collage' ) as $name => $label ) {
 		if ( $counts[ $name ] > 1 ) { $lines[] = sprintf( '%s a été dessiné %d fois : les dessins suivants reprennent les remarques du juge, et le dernier n’a pas été rejugé.', $label, $counts[ $name ] ); }
 	}
+	$featured = (string) ( $artifacts['featured']['reference'] ?? '' );
+	if ( '' !== $featured ) { $lines[] = 'L’image à la une a été dessinée d’après la consigne et ' . ( 'editor' === $featured ? 'la photographie envoyée par le rédacteur' : 'une photographie trouvée par la recherche' ) . ', pour le plat seulement.'; }
 	$composed = (array) ( $artifacts['facebook_composed'] ?? array() );
 	if ( ! empty( $composed['prompt'] ) ) {
 		$style = 'le collage de référence' . ( 'facebook-reference.jpg' === ( $composed['reference_file'] ?? '' ) ? ' fourni avec l’extension' : ( ! empty( $composed['reference_file'] ) ? ' du site' : '' ) );

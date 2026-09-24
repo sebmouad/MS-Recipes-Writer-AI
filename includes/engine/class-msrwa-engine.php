@@ -606,6 +606,18 @@ final class MSRWA_Engine {
 				$references = $composed['references'];
 			}
 		}
+		$reference = '';
+		if ( 'featured' === $kind ) {
+			// The owner asked (2026-09-24) that the featured image, like the
+			// collage, be drawn from a photograph of the dish: the writer's, or
+			// else one the research found. The prompt still sets the look.
+			$dish = self::dish_reference( $config, $options, $brief, $result );
+			if ( $dish ) {
+				$references = array( $dish['image'] );
+				$reference = $dish['from'];
+				$prompt .= "\n\nREFERENCE IMAGE: a photograph of this dish" . ( 'editor' === $reference ? ' sent by the writer' : ' found by the research' ) . ". Follow what the dish looks like — shape, filling, layering, doneness, crust and colour of the food — and nothing else: not its light, background, plate, props or framing, which this prompt sets. Never reproduce the photograph itself, its flaws or anything written on it.";
+			}
+		}
 		$ceiling = (int) $config->get( 'limits.image_prompt_chars', 30000 );
 		if ( strlen( $prompt ) > $ceiling ) {
 			// The provider refuses anything over 32000 characters, and did once the
@@ -626,7 +638,7 @@ final class MSRWA_Engine {
 		$plan = MSRWA_Engine_Call::plan_image( $prompt, $route['model'], $size, $quality, $format, $destination, $wire, $route['provider'], $references );
 		if ( isset( $plan['error'] ) ) { return self::failed( $plan['error'], 0, $route ); }
 
-		return array( 'plan' => $plan, 'finish' => static function ( $call ) use ( $name, $kind, $route, $wire, $config, $result, $prompt, $size, $quality, $format, $findings, $composed, $references ) {
+		return array( 'plan' => $plan, 'finish' => static function ( $call ) use ( $name, $kind, $route, $wire, $config, $result, $prompt, $size, $quality, $format, $findings, $composed, $references, $reference ) {
 			if ( isset( $call['error'] ) ) { return self::failed( $call['error'], $call['seconds'] ?? 0, $route ); }
 			self::report_call( $result, $name, $route, $references ? ( $wire['image_edit_endpoint'] ?? '' ) : ( $wire['image_endpoint'] ?? '' ), $call, $config );
 			$cost = $config->price( $route['provider'], $route['model'], $call['usage'] );
@@ -639,7 +651,7 @@ final class MSRWA_Engine {
 					'kind' => $kind, 'path' => $call['path'], 'bytes' => $call['bytes'], 'mime' => 'image/' . $format,
 					'size' => $size, 'quality' => $quality, 'format' => $format,
 					'corrections' => array_values( $findings ), 'prompt' => $prompt,
-				),
+				) + ( '' !== $reference ? array( 'reference' => $reference ) : array() ),
 			);
 		} );
 	}
@@ -654,7 +666,7 @@ final class MSRWA_Engine {
 	 * one, otherwise the first readable style reference the caller configured.
 	 */
 	private static function compose_collage( $name, MSRWA_Engine_Config $config, MSRWA_Result $result, array $options, array $brief, array $template, array $findings ) {
-		$reference = self::collage_reference( $config, $options, $brief );
+		$reference = self::collage_reference( $config, $options, $brief, $result );
 		$written = (array) ( $result->artifacts['facebook_composed'] ?? array() );
 		$spent = array( 'cost_usd' => 0.0, 'seconds' => 0.0 );
 		if ( empty( $written['prompt'] ) ) {
@@ -709,7 +721,6 @@ final class MSRWA_Engine {
 		return '' === $bytes ? $image : array( 'mime' => 'image/jpeg', 'data' => base64_encode( $bytes ) );
 	}
 
-	/** The image a composed collage is drawn from: the editor's photograph, else a style reference. */
 	/**
 	 * What the collage is composed and drawn from, as the owner asked
 	 * (2026-09-24): his approved collage for the look, the prompt, and a
@@ -719,14 +730,13 @@ final class MSRWA_Engine {
 	 * like the owner's. Both images now go to the prompt's writer and to the
 	 * image model, the approved collage first, each told what to take from it.
 	 */
-	private static function collage_reference( MSRWA_Engine_Config $config, array $options, array $brief ) {
+	private static function collage_reference( MSRWA_Engine_Config $config, array $options, array $brief, MSRWA_Result $result = null ) {
 		$pixels = (int) $config->get( 'limits.reference_pixels', 768 );
 		$style = self::style_reference( $config );
-		$dish = self::editor_reference( $config, $options, $brief );
-		$from = $dish ? 'editor' : '';
-		if ( ! $dish ) { $dish = self::research_reference( $config, $brief ); $from = $dish ? 'research' : ''; }
+		$found = self::dish_reference( $config, $options, $brief, $result );
+		$dish = $found ? $found['image'] : null;
+		$from = $found ? $found['from'] : '';
 		if ( $style['image'] ) { $style['image'] = self::shrink_reference( $style['image'], $pixels ); }
-		if ( $dish ) { $dish = self::shrink_reference( $dish, $pixels ); }
 		$labels = array( 'editor' => 'the editor\'s photograph', 'research' => 'a photograph the research found' );
 		if ( $style['image'] && $dish ) {
 			return array( 'source' => 'style+' . $from, 'label' => 'a style reference and ' . $labels[ $from ], 'file' => $style['file'], 'image' => $style['image'], 'shown' => array( $style['image'], $dish ) );
@@ -734,6 +744,21 @@ final class MSRWA_Engine {
 		if ( $style['image'] ) { return $style + array( 'shown' => array( $style['image'] ) ); }
 		if ( $dish ) { return array( 'source' => $from, 'label' => $labels[ $from ], 'file' => '', 'image' => $dish, 'shown' => array( $dish ) ); }
 		return array( 'source' => '', 'label' => '', 'file' => '', 'image' => null, 'shown' => array() );
+	}
+
+	/** Photographs already fetched, per run: the collage and the featured image share one. */
+	private static $dishes = array();
+
+	/** The writer's photograph of the dish, else the research's, made small; null when neither reads. */
+	private static function dish_reference( MSRWA_Engine_Config $config, array $options, array $brief, MSRWA_Result $result = null ) {
+		$key = $result ? spl_object_hash( $result ) : '';
+		if ( '' !== $key && array_key_exists( $key, self::$dishes ) ) { return self::$dishes[ $key ]; }
+		$image = self::editor_reference( $config, $options, $brief );
+		$from = $image ? 'editor' : '';
+		if ( ! $image ) { $image = self::research_reference( $config, $brief ); $from = $image ? 'research' : ''; }
+		$found = $image ? array( 'from' => $from, 'image' => self::shrink_reference( $image, (int) $config->get( 'limits.reference_pixels', 768 ) ) ) : null;
+		if ( '' !== $key ) { self::$dishes = array( $key => $found ); }
+		return $found;
 	}
 
 	/**

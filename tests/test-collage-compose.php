@@ -70,6 +70,25 @@ msrwa_test_assert( ! empty( $fallback->artifacts['facebook']['path'] ), 'A faile
 msrwa_test_contains( implode( "\n", array_column( $fallback->events, 'message' ) ), 'drawing from the template instead', 'And says so.' );
 msrwa_test_contains( (string) end( $calls )['payload']['prompt'], 'Act as a professional food photographer', 'The template prompt is the one drawn.' );
 
+// The featured image is drawn from the writer's photograph when there is one:
+// the dish only, the prompt still sets the look.
+$calls = array();
+MSRWA_Engine_Call::$transport = static function ( $url, $payload ) use ( &$calls, $pixel ) {
+	$calls[] = array( 'url' => $url, 'payload' => $payload );
+	return array( 'status' => 200, 'raw' => json_encode( array( 'data' => array( array( 'b64_json' => base64_encode( $pixel ) ) ), 'usage' => array() ) ) );
+};
+$with_photo = $brief;
+$with_photo['images'] = array( array( 'url' => 'https://example.test/rôti.jpg' ) );
+$read = static function () use ( $pixel ) { return array( 'mime' => 'image/png', 'data' => base64_encode( $pixel ) ); };
+$featured = MSRWA_Engine::run_step( 'featured_image', $with_photo, array( 'config' => $config, 'workspace' => sys_get_temp_dir(), 'read_image' => $read ) );
+msrwa_test_assert( 1 === count( $calls ) && false !== strpos( $calls[0]['url'], '/images/edits' ), 'The featured image is drawn from the photograph on the edits endpoint.' );
+msrwa_test_contains( (string) $calls[0]['payload']['prompt'], 'REFERENCE IMAGE: a photograph of this dish sent by the writer', 'The model is told what to take from it.' );
+msrwa_test_assert( 'editor' === ( $featured->artifacts['featured']['reference'] ?? '' ), 'The artifact says which photograph was used.' );
+$calls = array();
+$bare = MSRWA_Engine::run_step( 'featured_image', $brief, array( 'config' => $config, 'workspace' => sys_get_temp_dir() ) );
+msrwa_test_assert( false !== strpos( $calls[0]['url'], '/images/generations' ) && ! isset( $bare->artifacts['featured']['reference'] ), 'Without any photograph it is drawn from the prompt alone.' );
+MSRWA_Engine_Call::$transport = null;
+
 // A redraw goes out through the single-call path, which once dropped the upload
 // flag and sent the reference as a form: HTTP 400 on every redraw. Every place
 // that sends a planned request must pass the flag on.

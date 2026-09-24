@@ -810,6 +810,12 @@ photograph, and otherwise use the photograph without the cost of a search.
     files; PHP cannot repeat a field name, so `body()` writes that multipart
     body by hand, with its boundary in the header. Measured: the owner's rôti
     photograph $0.026, croquettes from a research photograph $0.024.
+42. **Featured image: prompt + a photograph of the dish.** Owner's direction,
+    2026-09-24: the featured image is drawn on the edits endpoint with the
+    writer's photograph, else the research's, and a REFERENCE IMAGE note that
+    it shows the dish only. `dish_reference()` fetches it once per run for
+    both images; the artifact records `reference` (editor or research).
+    Offline test only so far: `tests/test-collage-compose.php`.
 
 ### Still open
 
