@@ -31,10 +31,13 @@ final class MSRWA_Match {
 		// recipes, one per dish they show.
 		if ( ! $seen['images'] ) {
 			$decision = array( 'pairs' => array(), 'reasoning' => '', 'cost_usd' => 0.0, 'seconds' => 0.0, 'errors' => array() );
-		} elseif ( 1 === count( $recipes ) ) {
-			// One recipe: the writer sent these photographs for it, and there is
-			// nothing for a paid call to decide. A photograph with no dish on it
-			// still waits for the writer, as normalise() promises.
+		} elseif ( 1 === count( $recipes ) && self::all_of( $recipes[0], $seen['images'] ) ) {
+			// One recipe, and every photograph shows a dish that shares a word
+			// with its title: the writer sent them for it, and there is nothing
+			// for a paid call to decide. A photograph with no dish on it still
+			// waits for the writer, as normalise() promises. A photograph of
+			// something else goes through the pairing below, and becomes a
+			// recipe of its own rather than illustrate the wrong one.
 			$decision = array( 'pairs' => array(), 'reasoning' => '', 'cost_usd' => 0.0, 'seconds' => 0.0, 'errors' => array() );
 			foreach ( array_keys( $seen['images'] ) as $index ) { $decision['pairs'][] = array( 'image' => $index, 'recipe' => 0, 'confidence' => 'haute', 'why' => 'Seule recette du lot.', 'reason' => 'only_recipe' ); }
 		} elseif ( ! $recipes ) {
@@ -132,6 +135,27 @@ final class MSRWA_Match {
 			'seconds' => round( microtime( true ) - $started, 1 ),
 			'errors' => is_array( $decoded ) ? array() : array( 'Appariement illisible : ' . mb_substr( (string) ( $answer['error'] ?? $answer['text'] ?? '' ), 0, 200 ) ),
 		);
+	}
+
+	/**
+	 * Whether every recognised photograph plainly shows this recipe: each word
+	 * of four letters or more in its dish name is in the title, accents and
+	 * case aside. "Yassa au poulet" is a "Poulet yassa"; a "Poulet yassa" is
+	 * not a "Tajine de poulet", however much chicken they share. Anything
+	 * less certain goes to the pairing call, which costs a fraction of a cent.
+	 */
+	private static function all_of( array $recipe, array $images ) {
+		$words = static function ( $text ) {
+			return array_filter( preg_split( '/[^\p{L}\p{N}]+/u', MSRWA_Engine_Score::fold( (string) $text ) ), static function ( $word ) { return mb_strlen( $word ) >= 4; } );
+		};
+		$title = $words( ( $recipe['title'] ?? '' ) . ' ' . strtok( (string) ( $recipe['text'] ?? '' ), "\n" ) );
+		foreach ( $images as $image ) {
+			$dish = (string) ( $image['dish'] ?? '' );
+			if ( '' === trim( $dish ) ) { continue; }
+			$named = $words( $dish );
+			if ( ! $named || array_diff( $named, $title ) ) { return false; }
+		}
+		return true;
 	}
 
 	/**

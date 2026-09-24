@@ -144,6 +144,15 @@ $out = $strays->invoke( null, array( array( 'title' => 'Poulet yassa', 'text' =>
 MSRWA_Engine_Call::$transport = null;
 msrwa_test_assert( 3 === count( $out['recipes'] ), 'Without the grouping, each dish name is a recipe: ' . json_encode( array_column( $out['recipes'], 'title' ), JSON_UNESCAPED_UNICODE ) );
 
+// One recipe skips the pairing call only when every photograph plainly shows
+// it; a photograph of another dish must reach the pairing, where it becomes a
+// recipe of its own instead of illustrating the wrong one.
+$all_of = new ReflectionMethod( MSRWA_Match::class, 'all_of' );
+$all_of->setAccessible( true );
+msrwa_test_assert( true === $all_of->invoke( null, array( 'title' => 'Poulet yassa' ), array( array( 'dish' => 'Yassa au poulet' ), array( 'dish' => '' ) ) ), 'The same dish in other words needs no call; an unrecognised photograph does not decide.' );
+msrwa_test_assert( false === $all_of->invoke( null, array( 'title' => 'Tajine de poulet' ), array( array( 'dish' => 'Poulet yassa' ) ) ), 'Sharing an ingredient is not being the dish.' );
+msrwa_test_assert( false === $all_of->invoke( null, array( 'title' => 'Poulet yassa' ), array( array( 'dish' => 'Poulet yassa' ), array( 'dish' => 'Tarte aux pommes' ) ) ), 'One photograph of something else is enough to ask.' );
+
 // --- The brief handed to the engine -------------------------------------
 
 $brief = MSRWA_Match::brief(
