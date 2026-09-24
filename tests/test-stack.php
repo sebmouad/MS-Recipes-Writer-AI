@@ -91,6 +91,13 @@ $source = '';
 foreach ( glob( dirname( __DIR__ ) . '/includes/*.php' ) as $file ) { $source .= file_get_contents( $file ); }
 msrwa_test_missing( preg_replace( '/\*.*_image_id.*\n/', '', $source ), "_image_id', true )", 'Nothing reads the old keys any more.' );
 
+// Named from the post's slug, as the optimizer's profiles and MS Cook Writer name them.
+$GLOBALS['msrwa_test_posts'][60] = (object) array( 'ID' => 60, 'post_type' => 'post', 'post_name' => 'daube-provencale' );
+msrwa_test_assert( 'daube-provencale' === MSRWA_Draft::file_base( 60, 'Daube', 'featured' ), 'The featured image is named {post-slug}.' );
+msrwa_test_assert( 'daube-provencale-fb-1' === MSRWA_Draft::file_base( 60, 'Daube', 'facebook' ), 'The collage is named {post-slug}-fb-1.' );
+$GLOBALS['msrwa_test_posts'][61] = (object) array( 'ID' => 61, 'post_type' => 'post', 'post_name' => '' );
+msrwa_test_assert( 'poulet-yassa' === MSRWA_Draft::file_base( 61, 'Poulet yassa', 'featured' ), 'A draft with no slug yet is named from its title.' );
+
 // MS Image Optimizer's workers are given the time they need, and only they.
 // A 30-second host limit made every featured image fail "execution_limit_too_low".
 msrwa_test_contains( file_get_contents( dirname( __DIR__ ) . '/includes/class-msrwa-stack.php' ), "'msimg_image_queue_cron', 'msimg_post_discovery_cron'", 'The optimizer’s workers are the ones given more time.' );

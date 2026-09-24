@@ -180,7 +180,7 @@ final class MSRWA_Draft {
 			$path = (string) ( $image['path'] ?? '' );
 			if ( '' === $path || ! is_readable( $path ) ) { continue; }
 
-			$attachment = self::sideload( $path, $post_id, $title . ' — ' . $label, (string) ( $image['mime'] ?? 'image/webp' ) );
+			$attachment = self::sideload( $path, $post_id, $title . ' — ' . $label, (string) ( $image['mime'] ?? 'image/webp' ), self::file_base( $post_id, $title, $kind ) );
 			if ( ! $attachment ) { continue; }
 			// What the photograph is of, which is what a screen reader needs. The
 			// generation prompt is art direction, not a description, so the dish
@@ -201,14 +201,31 @@ final class MSRWA_Draft {
 	 */
 	public static function generated_key( $kind ) { return '_msrwa_' . sanitize_key( (string) $kind ) . '_generated'; }
 
+	/**
+	 * The file name a generated image is given: the post's slug, as MS Image
+	 * Optimizer's profiles name them — `{post-slug}` for the featured image,
+	 * `{post-slug}-fb-1` for the collage — and as MS Cook Writer names its
+	 * own. The names are right from the start, where the optimizer does not
+	 * run, and there is nothing for it to rename where it does.
+	 */
+	public static function file_base( $post_id, $title, $kind ) {
+		$slug = (string) get_post_field( 'post_name', $post_id );
+		if ( '' === $slug ) { $slug = sanitize_title( function_exists( 'remove_accents' ) ? remove_accents( (string) $title ) : (string) $title ); }
+		if ( '' === $slug ) { $slug = 'recette'; }
+		return 'facebook' === $kind ? $slug . '-fb-1' : $slug;
+	}
+
 	/** Copies one generated file into the uploads directory as an attachment. */
-	private static function sideload( $path, $post_id, $title, $mime ) {
-		$uploaded = wp_upload_bits( sanitize_file_name( basename( $path ) ), null, (string) file_get_contents( $path ) );
+	private static function sideload( $path, $post_id, $title, $mime, $base = '' ) {
+		$extension = strtolower( (string) pathinfo( $path, PATHINFO_EXTENSION ) );
+		$name = '' !== $base ? $base . ( '' !== $extension ? '.' . $extension : '' ) : basename( $path );
+		$uploaded = wp_upload_bits( sanitize_file_name( $name ), null, (string) file_get_contents( $path ) );
 		if ( ! empty( $uploaded['error'] ) ) { return 0; }
 
 		$attachment = wp_insert_attachment( array(
 			'post_mime_type' => $mime, 'post_title' => wp_strip_all_tags( $title ),
 			'post_content' => '', 'post_status' => 'inherit',
+			'post_name' => '' !== $base ? $base : '',
 		), $uploaded['file'], $post_id, true );
 		if ( is_wp_error( $attachment ) || ! $attachment ) { return 0; }
 
