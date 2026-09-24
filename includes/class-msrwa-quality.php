@@ -5,7 +5,7 @@ final class MSRWA_Quality {
 	public static function benchmark( $settings = null ) {
 		$settings = is_array( $settings ) ? $settings : MSRWA_Settings::get();
 		return array(
-			'words'      => absint( $settings['quality_min_words'] ?? 2000 ),
+			'words'      => class_exists( 'MSRWA_Prompt' ) ? MSRWA_Prompt::word_range( $settings )['min'] : absint( $settings['quality_min_words'] ?? 2000 ),
 			'headings'   => absint( $settings['quality_min_headings'] ?? 12 ),
 			'paragraphs' => absint( $settings['quality_min_paragraphs'] ?? 28 ),
 			'ingredients'=> absint( $settings['quality_min_ingredients'] ?? 6 ),
@@ -17,7 +17,7 @@ final class MSRWA_Quality {
 	public static function prompt_contract( $settings = null ) {
 		$settings = is_array( $settings ) ? $settings : MSRWA_Settings::get();
 		$benchmark = self::benchmark( $settings );
-		return "\nCONTRAT QUALITÉ MESURABLE : rédige entre " . (int) $benchmark['words'] . ' et ' . (int) ( $settings['quality_max_words'] ?? 4200 ) . ' mots utiles, avec au moins ' . (int) $benchmark['headings'] . ' titres h2/h3, ' . (int) $benchmark['paragraphs'] . ' paragraphes, ' . (int) $benchmark['ingredients'] . ' ingrédients lorsque la recette le justifie et ' . (int) $benchmark['steps'] . " étapes. Évite le remplissage, les répétitions et les promesses non étayées. Le JSON doit respecter exactement le schéma demandé et content_html doit être du HTML valide. Inclure choix des ingrédients, substitutions sûres, méthode détaillée, erreurs à éviter, conservation, variantes, service, FAQ et conclusion utile. Retourne recipe_meta comme objet vide : les métadonnées sont reprises directement de la recette canonique par le moteur. Respecte 35–70 caractères pour seo_title, 120–170 pour seo_description et 120–260 pour excerpt. Préfère le bas de la plage de longueur sans passer sous le minimum.";
+		return "\nCONTRAT QUALITÉ MESURABLE : rédige entre " . (int) $benchmark['words'] . ' et ' . (int) ( class_exists( 'MSRWA_Prompt' ) ? MSRWA_Prompt::word_range( $settings )['max'] : ( $settings['quality_max_words'] ?? 4200 ) ) . ' mots utiles, avec au moins ' . (int) $benchmark['headings'] . ' titres h2/h3, ' . (int) $benchmark['paragraphs'] . ' paragraphes, ' . (int) $benchmark['ingredients'] . ' ingrédients lorsque la recette le justifie et ' . (int) $benchmark['steps'] . " étapes. Évite le remplissage, les répétitions et les promesses non étayées. Le JSON doit respecter exactement le schéma demandé et content_html doit être du HTML valide. Inclure choix des ingrédients, substitutions sûres, méthode détaillée, erreurs à éviter, conservation, variantes, service, FAQ et conclusion utile. Retourne recipe_meta comme objet vide : les métadonnées sont reprises directement de la recette canonique par le moteur. Respecte 35–70 caractères pour seo_title, 120–170 pour seo_description et 120–260 pour excerpt. Préfère le bas de la plage de longueur sans passer sous le minimum.";
 	}
 
 	public static function evaluate( $article, $canonical, $settings = null ) {

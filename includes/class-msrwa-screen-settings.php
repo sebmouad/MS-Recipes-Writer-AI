@@ -100,6 +100,12 @@ final class MSRWA_Screen_Settings {
 					<input type="number" id="ms-max-words" name="msrwa_settings[quality_max_words]" value="<?php echo esc_attr( (int) $settings['quality_max_words'] ); ?>" step="100" min="500" max="10000" class="small-text ms-num" aria-label="<?php esc_attr_e( 'Nombre de mots maximal', 'ms-recipes-writer-ai' ); ?>">
 					<?php esc_html_e( 'mots', 'ms-recipes-writer-ai' ); ?>
 					<br><small class="ms-muted"><?php esc_html_e( 'Le minimum est une exigence : un article plus court échoue à son contrôle. Plus de mots coûtent plus cher à écrire et à relire.', 'ms-recipes-writer-ai' ); ?></small>
+					<?php $msrwa_range = MSRWA_Prompt::word_range( array_merge( $settings, array( 'site_language' => 'ar' ) ) ); ?>
+					<br><small class="ms-muted"><?php echo esc_html( sprintf(
+						/* translators: 1: minimum words, 2: maximum words. */
+						__( 'Comptée pour le français. Un article en arabe, qui dit la même chose en moins de mots, vise %1$s à %2$s mots.', 'ms-recipes-writer-ai' ),
+						number_format_i18n( $msrwa_range['min'] ), number_format_i18n( $msrwa_range['max'] )
+					) ); ?></small>
 				</p>
 				<p>
 					<input type="hidden" name="msrwa_settings[article_pagination_enabled]" value="0">

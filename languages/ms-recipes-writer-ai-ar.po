@@ -2128,3 +2128,6 @@ msgstr "تعمل هذه الخطوات على نموذج لم تسمح لها ب
 
 msgid "Modifiez la grille dans Modèles, ou routez ces étapes autrement."
 msgstr "عدّل الشبكة في صفحة النماذج، أو وجّه هذه الخطوات إلى غيره."
+
+msgid "Comptée pour le français. Un article en arabe, qui dit la même chose en moins de mots, vise %1$s à %2$s mots."
+msgstr "محسوبة للفرنسية. يستهدف المقال العربي، الذي يقول الشيء نفسه بكلمات أقل، من %1$s إلى %2$s كلمة."

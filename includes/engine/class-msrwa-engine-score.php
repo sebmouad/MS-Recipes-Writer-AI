@@ -99,14 +99,16 @@ final class MSRWA_Engine_Score {
 			// article come back at 5 988 words against a 2 800–3 600 target,
 			// and an over-long article is paid for twice more: review and
 			// proofread each read it whole.
-			$maximum = (int) ( $settings['quality_max_words'] ?? 0 );
+			// In the article's own language: Arabic is held to fewer words.
+			$range = MSRWA_Prompt::word_range( $settings );
+			$maximum = $range['max'];
 			$ceiling = $maximum > 0 ? (int) round( $maximum * 1.15 ) : 0;
 			$too_long = $ceiling > 0 && $words > $ceiling;
 			$checks['words'] = array(
-				'pass' => $words >= (int) $settings['quality_min_words'] && ! $too_long,
+				'pass' => $words >= $range['min'] && ! $too_long,
 				'detail' => $too_long
 					? $words . ' / ' . $maximum . ' maximum'
-					: $words . ' / ' . (int) $settings['quality_min_words'],
+					: $words . ' / ' . $range['min'],
 			);
 			$checks['headings'] = array( 'pass' => (int) ( $quality['metrics']['headings'] ?? 0 ) >= (int) $settings['quality_min_headings'], 'detail' => (int) ( $quality['metrics']['headings'] ?? 0 ) . ' / ' . (int) $settings['quality_min_headings'] );
 			$content = (string) ( $json['content_html'] ?? '' );

@@ -2092,3 +2092,6 @@ msgstr "These steps run on a model you have not allowed them on: %s."
 
 msgid "Modifiez la grille dans Modèles, ou routez ces étapes autrement."
 msgstr "Change the grid under Models, or route these steps elsewhere."
+
+msgid "Comptée pour le français. Un article en arabe, qui dit la même chose en moins de mots, vise %1$s à %2$s mots."
+msgstr "Counted for French. An article in Arabic, which says the same in fewer words, aims for %1$s to %2$s words."

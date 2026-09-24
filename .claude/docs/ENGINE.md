@@ -576,8 +576,10 @@ photograph, and otherwise use the photograph without the cost of a search.
     `MSRWA_Engine_Score::fold()` now drops Arabic short vowels and the
     tatweel, and the choosing section also accepts "تختار", "يختار" and
     "انتق". The same lot came back with 2,033 words against a 2,400 target:
-    Arabic says the same in fewer words. *Proposal:* a per-language length
-    factor (Arabic about 0.85); awaiting the owner.
+    Arabic says the same in fewer words. Approved by the owner the same day:
+    `MSRWA_Prompt::word_range()` holds each language to its equivalent of
+    the French settings (`LENGTH_FACTORS`, Arabic 0.85), and the prompt, the
+    `words` check and the quality contract all read it.
 
 ### Still open
 

@@ -16,10 +16,32 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
  *   {{#unless name}} … {{/unless}} the opposite
  */
 final class MSRWA_Prompt {
+	/**
+	 * How a language's word count compares with French for the same article.
+	 * The first live Arabic article said everything asked of it in 2 033
+	 * words against a 2 400 target: Arabic joins articles, prepositions and
+	 * pronouns to the word, and counts fewer words for the same text. The
+	 * owner's decision, 2026-09-24.
+	 */
+	const LENGTH_FACTORS = array( 'ar' => 0.85 );
+
+	/**
+	 * The article's word range in its own language: the settings are written
+	 * for French and every other language is held to its equivalent.
+	 */
+	public static function word_range( $settings = null ) {
+		$s = is_array( $settings ) ? $settings : MSRWA_Settings::get();
+		$factor = self::LENGTH_FACTORS[ (string) ( $s['site_language'] ?? 'fr' ) ] ?? 1.0;
+		$min = max( 300, (int) round( (int) ( $s['quality_min_words'] ?? 2400 ) * $factor ) );
+		$max = (int) ( $s['quality_max_words'] ?? 0 );
+		return array( 'min' => $min, 'max' => $max > 0 ? max( $min, (int) round( $max * $factor ) ) : 0, 'factor' => $factor );
+	}
+
 	/** Every value a template may use, derived from the settings. */
 	public static function variables( $settings = null ) {
 		$s = is_array( $settings ) ? $settings : MSRWA_Settings::get();
-		$total = max( 300, (int) ( $s['quality_min_words'] ?? 2400 ) );
+		$range = self::word_range( $s );
+		$total = $range['min'];
 		$two_pages = ! empty( $s['article_pagination_enabled'] );
 		$page1 = $two_pages ? (int) round( $total * 0.53 ) : 0;
 		$page2 = $two_pages ? $total - $page1 : 0;
@@ -32,7 +54,7 @@ final class MSRWA_Prompt {
 			// a check it could never pass.
 			'french'               => 'fr' === (string) ( $s['site_language'] ?? 'fr' ),
 			'words_total'          => $total,
-			'words_maximum'        => max( $total, (int) ( $s['quality_max_words'] ?? $total + 1400 ) ),
+			'words_maximum'        => $range['max'] > 0 ? $range['max'] : $total + 800,
 			'two_pages'            => $two_pages,
 			'words_page1'          => $page1,
 			'words_page2'          => $page2,

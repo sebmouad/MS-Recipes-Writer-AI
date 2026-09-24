@@ -57,4 +57,12 @@ msrwa_test_contains( $facebook_prompt, 'The finished dish at peak texture', 'The
 msrwa_test_contains( $facebook_prompt, 'no two panels show the same stage', 'A live collage showed the cherries going into the dish twice, in panels two and three.' );
 msrwa_test_contains( $facebook_prompt, 'do not sample mechanically', 'The Facebook storyboard must select visual transformations instead of evenly spaced steps.' );
 
+// The length is written for French; an Arabic article says the same in
+// fewer words and is held to its equivalent, in the prompt and the check.
+$ar = MSRWA_Prompt::word_range( array( 'site_language' => 'ar', 'quality_min_words' => 2400, 'quality_max_words' => 3200 ) );
+msrwa_test_assert( 2040 === $ar['min'] && 2720 === $ar['max'], 'Arabic is held to 85 %: ' . json_encode( $ar ) );
+$fr = MSRWA_Prompt::word_range( array( 'site_language' => 'fr', 'quality_min_words' => 2400, 'quality_max_words' => 3200 ) );
+msrwa_test_assert( 2400 === $fr['min'] && 3200 === $fr['max'], 'French is held to the settings as written.' );
+msrwa_test_assert( 2040 === MSRWA_Prompt::variables( array( 'site_language' => 'ar', 'quality_min_words' => 2400, 'quality_max_words' => 3200 ) )['words_total'], 'The Arabic prompt asks for its own length.' );
+
 msrwa_test_done( 'MSRWA prompt compiler contracts' );
