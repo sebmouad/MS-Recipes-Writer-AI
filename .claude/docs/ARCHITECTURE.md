@@ -376,3 +376,14 @@ Break these and the plugin misreports itself.
     photograph from disk only when it is marked as sent by a writer; the
     engine never fetches a writer's photograph over the network. Saving the
     pairing keeps the model's confidence on rows the writer left alone.
+
+21. **Generated images are left for MS Image Optimizer to finish.** They are
+    stored lossy, named after the post slug, with alt, title, caption and
+    description from the SEO title and description; their attachment ids
+    live on `_msrwa_{kind}_generated`, never on a key containing "image",
+    which the optimizer reads as article content.
+
+22. **An article's state after it leaves the drafts is WordPress's.** The
+    Articles screen, the pass and its counters read the post's status; a
+    "to review" or "to fix" flag holds only while the post is a draft or
+    pending review.

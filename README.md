@@ -5,9 +5,9 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.22.0
+## État actuel — 0.23.0
 
-La version `0.22.0` écrit la recherche d’après les photographies du rédacteur quand il en a fourni, sans recherche sur le web, et refait l’écran d’appariement ; la `0.21.0` acceptait un lot fait de texte, de photographies ou des deux, et fait lire aux écrans Modèles et Moteur la même règle ; la `0.20.2` rendait l’écran Moteur lisible sur ordinateur comme sur téléphone et distingue le modèle de la réflexion ; la `0.20.1` ne laissait confier une étape qu’à un modèle capable de la faire ; la `0.20.0` remplissait chaque brouillon comme le lisent le thème MS Recipes, MS SEO Plus, MS FB Posts et MS Image Optimizer ; la `0.19.0` ramenait une recette approuvée du premier coup à 0,09–0,10 $ sans perte mesurée ; la `0.18.9` reprenait chaque écran après une revue complète dans le navigateur ; la `0.18.8` réservait l’extension, renommée « MS Recipes AI » dans le menu, à ceux qui peuvent téléverser des fichiers ; la `0.18.7` disait juste ce que fait le plafond par recette ; la `0.18.6` rangeait les photographies envoyées avec le brouillon qu’elles ont servi à écrire ; la `0.18.5` faisait passer un lot de trois recettes en 8 minutes pour 0,125 $ la recette, toutes approuvées ; la `0.18.4` faisait envoyer les photographies d’un lot depuis l’ordinateur du rédacteur ; la `0.18.3` faisait approuver les trois recettes d’un lot réel aux réglages par défaut — image à la une en `low`, collage en `medium` — pour 0,132 $ en moyenne ; la `0.18.2` permettait de choisir le modèle et la qualité de chaque image
+La version `0.23.0` fait traiter les images par MS Image Optimizer (compression, redimensionnement, champs SEO), écrit en espagnol, propose des préréglages de qualité, suit chaque article dans WordPress et répare les actions groupées ; la `0.22.0` écrivait la recherche d’après les photographies du rédacteur quand il en a fourni, sans recherche sur le web, et refait l’écran d’appariement ; la `0.21.0` acceptait un lot fait de texte, de photographies ou des deux, et fait lire aux écrans Modèles et Moteur la même règle ; la `0.20.2` rendait l’écran Moteur lisible sur ordinateur comme sur téléphone et distingue le modèle de la réflexion ; la `0.20.1` ne laissait confier une étape qu’à un modèle capable de la faire ; la `0.20.0` remplissait chaque brouillon comme le lisent le thème MS Recipes, MS SEO Plus, MS FB Posts et MS Image Optimizer ; la `0.19.0` ramenait une recette approuvée du premier coup à 0,09–0,10 $ sans perte mesurée ; la `0.18.9` reprenait chaque écran après une revue complète dans le navigateur ; la `0.18.8` réservait l’extension, renommée « MS Recipes AI » dans le menu, à ceux qui peuvent téléverser des fichiers ; la `0.18.7` disait juste ce que fait le plafond par recette ; la `0.18.6` rangeait les photographies envoyées avec le brouillon qu’elles ont servi à écrire ; la `0.18.5` faisait passer un lot de trois recettes en 8 minutes pour 0,125 $ la recette, toutes approuvées ; la `0.18.4` faisait envoyer les photographies d’un lot depuis l’ordinateur du rédacteur ; la `0.18.3` faisait approuver les trois recettes d’un lot réel aux réglages par défaut — image à la une en `low`, collage en `medium` — pour 0,132 $ en moyenne ; la `0.18.2` permettait de choisir le modèle et la qualité de chaque image
 séparément ; la `0.18.1` fait tenir le plafond par recette jusque dans les reprises
 de l’approbation finale ; la `0.18.0` ramène une recette complète à environ 0,11 $ réels —
 recherche web comprise — sans perte de qualité mesurée ; la `0.17.0` faisait
@@ -74,6 +74,67 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.23.0
+
+**MS Image Optimizer traite enfin les images générées — compression et
+redimensionnement compris.** Quatre causes, trouvées sur le site de test :
+
+- L’identifiant du collage était rangé sous `_msrwa_facebook_image_id`.
+  L’optimiseur lit toute méta contenant « image » comme un contenu d’article :
+  il créait des tâches « contenu », puis les sautait avec « Image is no longer
+  assigned to this role ». Les clés deviennent `_msrwa_{type}_generated` ; la
+  migration les renomme et rend les articles concernés à l’optimiseur.
+- L’optimiseur refuse de toucher une image quand PHP accorde moins de
+  45 secondes ; 30 est courant. Ses propres tâches reçoivent désormais
+  180 secondes (filtre `msrwa_image_optimizer_seconds`), rien d’autre.
+- Le modèle d’image répond en WebP **sans perte**, et WordPress garde un WebP
+  sans perte sans perte à chaque réencodage : la qualité 78 de l’optimiseur
+  était ignorée, l’image à la une restait à 1,1 Mo. Elle est désormais
+  enregistrée avec perte, qualité 90 (filtre `msrwa_generated_webp_quality`) ;
+  les images déjà générées sont converties une fois par la migration.
+- Avant de modifier une image, l’optimiseur cherche son identifiant dans toutes
+  les métas et options ; un collage qui était la pièce jointe 150 était pris
+  pour partagé parce qu’une recette cuit 150 minutes. Les chiffres de recette,
+  les métas de l’extension et les tailles d’image ne sont plus cherchés.
+
+Mesuré, recette complète en espagnol : image à la une 82 Ko après
+l’optimiseur (contre 1,1 Mo), collage 462 Ko à la qualité Facebook de
+l’optimiseur (100), fichiers nommés `{slug}.webp` et `{slug}-fb-1.webp` comme
+chez MS Cook Writer.
+
+**Les deux images portent leurs quatre champs** : texte alternatif et titre
+d’après le titre SEO, légende et description d’après la description SEO —
+la correspondance même de l’optimiseur, qui n’a donc rien à réécrire.
+
+**Espagnol.** Quatrième langue d’article : sections exigées en espagnol, titre
+de la page deux, `og:locale` `es_ES`. Mesuré : « Tarta de manzana normanda »,
+article 10/10, approuvée au premier contrôle, 0,0695 $ en 210 s. Sur l’écran
+Moteur, la « langue par défaut » était un champ libre que plus aucun lot ne
+lisait ; c’est désormais une liste des quatre langues qui enregistre le
+réglage même de l’écran Réglages.
+
+**Préréglages de qualité sur l’écran Moteur** : Économique (≈ 0,081 $ la
+recette), Standard (≈ 0,110 $, la configuration livrée), Premium (≈ 1,091 $).
+Chacun règle d’un coup le modèle, la réflexion et la qualité d’image de chaque
+étape, avec les mêmes refus que le tableau ; toute modification à la main
+affiche « Personnalisé ». Un préréglage au-dessus du plafond le signale.
+
+**Plafond par recette par défaut : 0,20 $.** Un site qui a déjà réglé le sien
+le garde.
+
+**L’écran Articles suit chaque article dans WordPress.** Onglets avec leurs
+nombres — brouillons, programmés, publiés, corbeille, supprimés de WordPress,
+sans article — et, sur chaque recette, l’état et la date du billet, son titre
+s’il a été renommé, et les actions : modifier, voir ou prévisualiser,
+restaurer. La recherche trouve un billet sous ses deux noms.
+
+**Un article publié n’est plus « à relire » ni « à corriger ».** Une fois le
+billet publié, programmé, mis à la corbeille ou supprimé, il quitte « Demande
+une décision » et les compteurs du pass : l’éditeur a décidé.
+
+**Les actions groupées de l’écran Articles fonctionnent de nouveau** : aucune
+case ne se cochait, une variable du script en écrasant une autre.
 
 ## Version 0.22.0
 

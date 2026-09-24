@@ -147,6 +147,18 @@ run carries.
 - [x] The pairing screen: recipe cards, confidence badges, autosave that keeps
   the model's word on untouched rows, launch bar, phone layout, checked in
   Chromium at 390 and 1280 px (`tests/test-pairing.php`).
+- [x] MS Image Optimizer processes the generated images, live under a
+  30-second PHP limit: renamed to the post slug, compressed (featured
+  82 KB from 1.1 MB), all four attachment fields filled; posts from before
+  the fix handed back by the migration (`tests/test-stack.php`,
+  `tests/real/test-flow.php`).
+- [x] Spanish articles, live: 10/10, approved first pass, $0.0695
+  (`tests/test-engine-language.php`, `tests/real/test-flow.php`).
+- [x] Engine quality presets and the $0.20 default ceiling
+  (`tests/test-screens.php`, `tests/test-estimate.php`, Chromium).
+- [x] The Articles screen follows each post into WordPress, drops the review
+  flag once published, and its bulk actions work (`tests/test-articles.php`,
+  Chromium at 390 and 1280 px, live bulk delete).
 - [ ] A complete lot on Claude — the account has no credit. — the Gemini key's
   grounding quota is exhausted, OpenAI is unreachable from the test
   environment and the Claude account has no credit.
