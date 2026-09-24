@@ -5,9 +5,9 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.28.3
+## État actuel — 0.28.4
 
-La version `0.28.3` garde le rendu du collage de référence même quand le rédacteur envoie sa photographie ; la `0.28.2` faisait tourner les recettes d'un lot en parallèle sans attendre le cron du site ; la `0.28.1` abaissait le plafond par recette à 0,15 $, fournit le collage de référence avec l'extension et met les consignes en cache ; la `0.28.0` réduisait le coût d'une recette complète d'environ 38 % — une relecture au lieu de trois, un contrôle final qui ne regarde que les images, une seule recherche web et plus de nouveau dessin automatique, remplacé par un bouton pour l'éditeur ; la `0.27.1` réduisait le coût du collage Facebook de plus de moitié et n'y montrait plus d'emballage ; la `0.27.0` dessinait le visuel Facebook comme ChatGPT le fait pour le propriétaire : la consigne est d'abord rédigée à partir de la recette et d'une image de référence, puis le collage est dessiné avec cette référence ; la `0.26.8` dessinait le visuel Facebook d'après la consigne que le propriétaire utilise lui-même ; la `0.26.7` faisait suivre à la recette le plat que décrit le rédacteur et relève le plafond par recette à 0,25 $ ; la `0.26.6` dessinait le visuel Facebook en qualité haute et ne fait plus redessiner un collage pour un aromate montré une étape trop tôt ; la `0.26.5` permettait au moteur de dessiner avec les modèles d'image de Gemini, au bon prix ; la `0.26.4` donnait au visuel Facebook le style des collages de référence du propriétaire : lumineux, net, cadré serré ; la `0.26.3` faisait ressembler le visuel Facebook à de vraies photographies plutôt qu'à des images de synthèse ; la `0.26.2` rendait le visuel Facebook plus chaleureux et plus proche du plat, et le fait toujours finir sur le plat ouvert ; la `0.26.1` retirait les copies des prompts que gardaient les réglages :
+La version `0.28.4` dessine le collage à partir de votre collage de référence et d'une photographie du plat — celle du rédacteur, sinon celle trouvée par la recherche ; la `0.28.3` gardait le rendu du collage de référence même quand le rédacteur envoie sa photographie ; la `0.28.2` faisait tourner les recettes d'un lot en parallèle sans attendre le cron du site ; la `0.28.1` abaissait le plafond par recette à 0,15 $, fournit le collage de référence avec l'extension et met les consignes en cache ; la `0.28.0` réduisait le coût d'une recette complète d'environ 38 % — une relecture au lieu de trois, un contrôle final qui ne regarde que les images, une seule recherche web et plus de nouveau dessin automatique, remplacé par un bouton pour l'éditeur ; la `0.27.1` réduisait le coût du collage Facebook de plus de moitié et n'y montrait plus d'emballage ; la `0.27.0` dessinait le visuel Facebook comme ChatGPT le fait pour le propriétaire : la consigne est d'abord rédigée à partir de la recette et d'une image de référence, puis le collage est dessiné avec cette référence ; la `0.26.8` dessinait le visuel Facebook d'après la consigne que le propriétaire utilise lui-même ; la `0.26.7` faisait suivre à la recette le plat que décrit le rédacteur et relève le plafond par recette à 0,25 $ ; la `0.26.6` dessinait le visuel Facebook en qualité haute et ne fait plus redessiner un collage pour un aromate montré une étape trop tôt ; la `0.26.5` permettait au moteur de dessiner avec les modèles d'image de Gemini, au bon prix ; la `0.26.4` donnait au visuel Facebook le style des collages de référence du propriétaire : lumineux, net, cadré serré ; la `0.26.3` faisait ressembler le visuel Facebook à de vraies photographies plutôt qu'à des images de synthèse ; la `0.26.2` rendait le visuel Facebook plus chaleureux et plus proche du plat, et le fait toujours finir sur le plat ouvert ; la `0.26.1` retirait les copies des prompts que gardaient les réglages :
 le moteur exécute ses propres gabarits, et ce qui n’est lu par rien ne se
 périme plus en silence. Le détail de chaque version suit, de la plus récente à
 la plus ancienne.
@@ -76,6 +76,16 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.28.4
+
+- **Collage de référence + consigne + photographie du plat.** Le dessin reçoit
+  désormais deux images : votre collage de référence, pour le rendu, et une
+  photographie du plat — celle du rédacteur, ou à défaut celle trouvée par la
+  recherche — pour sa forme, sa garniture et sa cuisson. La consigne dit au
+  modèle ce qu'il prend de chacune.
+- Mesuré : le rôti Orloff depuis la photographie du propriétaire, 0,026 $ ;
+  des croquettes depuis une photographie de la recherche, 0,024 $.
 
 ## Version 0.28.3
 

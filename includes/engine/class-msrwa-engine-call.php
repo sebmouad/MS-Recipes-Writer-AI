@@ -106,7 +106,7 @@ final class MSRWA_Engine_Call {
 		$ch = curl_init( $url );
 		curl_setopt_array( $ch, array(
 			CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true,
-			CURLOPT_HTTPHEADER => $headers,
+			CURLOPT_HTTPHEADER => self::headers( $headers, $payload, $multipart ),
 			CURLOPT_POSTFIELDS => self::body( $payload, $multipart ),
 			CURLOPT_TIMEOUT => $timeout,
 		) );
@@ -122,6 +122,23 @@ final class MSRWA_Engine_Call {
 	 */
 	private static function body( $payload, $multipart ) {
 		if ( ! $multipart ) { return json_encode( $payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ); }
+		// Several files under one name — OpenAI's `image[]` — cannot be sent
+		// from a PHP array, whose keys are unique: the body is written by hand.
+		if ( self::repeats( $payload ) ) {
+			$boundary = self::boundary( $payload );
+			$body = '';
+			foreach ( (array) $payload as $name => $value ) {
+				$files = is_array( $value ) && isset( $value[0]['file'] ) ? $value : ( is_array( $value ) && isset( $value['file'] ) ? array( $value ) : null );
+				if ( null === $files ) {
+					$body .= '--' . $boundary . "\r\nContent-Disposition: form-data; name=\"" . $name . "\"\r\n\r\n" . (string) $value . "\r\n";
+					continue;
+				}
+				foreach ( $files as $file ) {
+					$body .= '--' . $boundary . "\r\nContent-Disposition: form-data; name=\"" . $name . '"; filename="' . (string) ( $file['name'] ?? 'image' ) . "\"\r\nContent-Type: " . (string) ( $file['mime'] ?? 'application/octet-stream' ) . "\r\n\r\n" . (string) $file['file'] . "\r\n";
+				}
+			}
+			return $body . '--' . $boundary . "--\r\n";
+		}
 		$fields = array();
 		foreach ( (array) $payload as $name => $value ) {
 			$fields[ (string) $name ] = is_array( $value ) && isset( $value['file'] )
@@ -162,7 +179,7 @@ final class MSRWA_Engine_Call {
 				$handle = curl_init( $request['url'] );
 				curl_setopt_array( $handle, array(
 					CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true,
-					CURLOPT_HTTPHEADER => $request['headers'],
+					CURLOPT_HTTPHEADER => self::headers( $request['headers'], $request['payload'], ! empty( $request['multipart'] ) ),
 					CURLOPT_POSTFIELDS => self::body( $request['payload'], ! empty( $request['multipart'] ) ),
 					CURLOPT_TIMEOUT => (int) ( $request['timeout'] ?? 600 ),
 				) );
@@ -273,6 +290,25 @@ final class MSRWA_Engine_Call {
 			'kind' => 'text', 'provider' => $provider, 'model' => $model,
 			'request' => array( 'url' => $wire['text_endpoint'], 'headers' => $wire['headers'], 'payload' => $payload, 'timeout' => (int) ( $wire['timeout'] ?? 600 ) ),
 		);
+	}
+
+	/** Whether a multipart payload sends several files under one name. */
+	private static function repeats( $payload ) {
+		foreach ( (array) $payload as $value ) { if ( is_array( $value ) && isset( $value[0]['file'] ) ) { return true; } }
+		return false;
+	}
+
+	/** A boundary no file in the payload contains, the same for the body and its header. */
+	private static function boundary( $payload ) {
+		$files = '';
+		foreach ( (array) $payload as $value ) { if ( is_array( $value ) && isset( $value[0]['file'] ) ) { foreach ( $value as $file ) { $files .= md5( (string) $file['file'] ); } } }
+		return 'msrwa' . md5( $files );
+	}
+
+	/** The request's headers, with the boundary of a body written by hand. */
+	private static function headers( $headers, $payload, $multipart ) {
+		if ( ! $multipart || ! self::repeats( $payload ) ) { return $headers; }
+		return array_merge( (array) $headers, array( 'Content-Type: multipart/form-data; boundary=' . self::boundary( $payload ) ) );
 	}
 
 	/**
@@ -501,11 +537,15 @@ final class MSRWA_Engine_Call {
 			// OpenAI draws from references on its edits endpoint, as a multipart
 			// upload: the same model, given images to look at.
 			if ( '' === (string) ( $wire['image_edit_endpoint'] ?? '' ) ) { return array( 'error' => $provider . ' has no image edit endpoint configured.' ); }
-			// One reference: a multipart body cannot repeat a field name from PHP.
-			$mime = (string) ( $references[0]['mime'] ?? 'image/jpeg' );
+			$files = array();
+			foreach ( $references as $index => $one ) {
+				$mime = (string) ( $one['mime'] ?? 'image/jpeg' );
+				$files[] = array( 'file' => (string) base64_decode( (string) $one['data'] ), 'mime' => $mime, 'name' => 'reference-' . ( $index + 1 ) . '.' . ( self::TYPES[ $mime ] ?? 'jpg' ) );
+			}
 			$fields = array(
 				'model' => $model, 'prompt' => (string) $prompt, 'size' => $size, 'quality' => $quality, 'output_format' => $output_format, 'n' => '1',
-				'image[]' => array( 'file' => (string) base64_decode( (string) $references[0]['data'] ), 'mime' => $mime, 'name' => 'reference.' . ( self::TYPES[ $mime ] ?? 'jpg' ) ),
+				// One reference as before; several in the order the prompt names them.
+				'image[]' => 1 === count( $files ) ? $files[0] : $files,
 			);
 			$headers = array_values( array_filter( (array) $wire['headers'], static function ( $header ) { return 0 !== stripos( (string) $header, 'content-type:' ); } ) );
 			return array(

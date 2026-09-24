@@ -9,6 +9,9 @@ require_once dirname( __DIR__ ) . '/includes/engine/load.php';
 require_once dirname( __DIR__ ) . '/tools/lib/steps.php';
 
 $fixture = lab_brief( 'croquettes-pommes-de-terre-jambon' );
+// No web photograph: offline, nothing is downloaded. The research's own
+// photograph is the fallback when the writer sent none, measured live.
+$fixture['research']['visual_references'] = array();
 $brief = array( 'title' => $fixture['title'], 'text' => $fixture['text'], 'images' => array(), 'artifacts' => array( 'research' => $fixture['research'], 'canonical' => $fixture['canonical'] ) );
 $pixel = base64_decode( 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==' );
 $style = sys_get_temp_dir() . '/msrwa-style-' . getmypid() . '.png';
@@ -95,7 +98,9 @@ MSRWA_Engine_Call::$transport = null;
 $shown = array_values( array_filter( (array) ( $calls[0]['payload']['input'][1]['content'] ?? array() ), static function ( $part ) { return 'input_image' === ( $part['type'] ?? '' ); } ) );
 msrwa_test_assert( 2 === count( $shown ), 'The prompt’s writer sees the approved collage and the writer’s photograph; saw ' . count( $shown ) . '.' );
 msrwa_test_contains( wp_json_encode( $calls[0]['payload'] ), 'never its light, colours, background or framing', 'And is told to take only the dish from the photograph.' );
-msrwa_test_assert( $pixel === ( $calls[1]['payload']['image[]']['file'] ?? '' ), 'The drawing is made from the approved collage, not the photograph.' );
+$drawn = (array) ( $calls[1]['payload']['image[]'] ?? array() );
+msrwa_test_assert( 2 === count( $drawn ) && isset( $drawn[0]['file'], $drawn[1]['file'] ), 'The image model is given both, the approved collage first.' );
+msrwa_test_contains( (string) $calls[1]['payload']['prompt'], 'REFERENCE IMAGES: the first is the approved collage', 'And told which is which.' );
 
 @unlink( $style );
 msrwa_test_done( 'the collage prompt is written from the recipe and the reference, then drawn with it' );

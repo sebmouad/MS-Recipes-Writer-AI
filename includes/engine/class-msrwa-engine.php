@@ -680,7 +680,12 @@ final class MSRWA_Engine {
 				$prompt .= ( $index + 1 ) . '. ' . trim( (string) ( $finding['reason'] ?? '' ) ) . ' — ' . trim( (string) ( $finding['fix'] ?? '' ) ) . "\n";
 			}
 		}
-		return array( 'prompt' => $prompt, 'references' => $reference['image'] ? array( $reference['image'] ) : array() ) + $spent;
+		// With two references the image model is told which is which, since the
+		// prompt it was written for describes the dish, not the images.
+		if ( 2 === count( (array) ( $reference['shown'] ?? array() ) ) ) {
+			$prompt .= "\n\nREFERENCE IMAGES: the first is the approved collage — reproduce its photographic look exactly (light, colour, white balance, wood surface, tight framing) and nothing of its food. The second is a photograph of this dish — follow what the dish looks like (shape, filling, layering, doneness) and nothing else: not its light, colours, background, dish or framing.";
+		}
+		return array( 'prompt' => $prompt, 'references' => (array) ( $reference['shown'] ?? array() ) ) + $spent;
 	}
 
 	/**
@@ -706,26 +711,46 @@ final class MSRWA_Engine {
 
 	/** The image a composed collage is drawn from: the editor's photograph, else a style reference. */
 	/**
-	 * What the collage is composed from: the owner's approved collage for the
-	 * look, and the editor's photograph for the dish. An editor's photograph used
-	 * to replace the approved collage outright, and a dim, flash-lit amateur
-	 * photograph of a rôti Orloff gave a collage that looked nothing like the
-	 * owner's. The photograph now shows the writer of the prompt what the dish
-	 * is; the image is drawn from the approved collage alone. With no approved
-	 * collage, the photograph is the reference, as before.
+	 * What the collage is composed and drawn from, as the owner asked
+	 * (2026-09-24): his approved collage for the look, the prompt, and a
+	 * photograph of the dish — the writer's own, or else one the research found.
+	 * A writer's photograph used to replace the approved collage outright, and a
+	 * dim, flash-lit amateur photograph of a rôti Orloff gave a collage nothing
+	 * like the owner's. Both images now go to the prompt's writer and to the
+	 * image model, the approved collage first, each told what to take from it.
 	 */
 	private static function collage_reference( MSRWA_Engine_Config $config, array $options, array $brief ) {
 		$pixels = (int) $config->get( 'limits.reference_pixels', 768 );
 		$style = self::style_reference( $config );
-		$editor = self::editor_reference( $config, $options, $brief );
+		$dish = self::editor_reference( $config, $options, $brief );
+		$from = $dish ? 'editor' : '';
+		if ( ! $dish ) { $dish = self::research_reference( $config, $brief ); $from = $dish ? 'research' : ''; }
 		if ( $style['image'] ) { $style['image'] = self::shrink_reference( $style['image'], $pixels ); }
-		if ( $editor ) { $editor = self::shrink_reference( $editor, $pixels ); }
-		if ( $style['image'] && $editor ) {
-			return array( 'source' => 'both', 'label' => 'a style reference and the editor\'s photograph', 'file' => $style['file'], 'image' => $style['image'], 'shown' => array( $style['image'], $editor ) );
+		if ( $dish ) { $dish = self::shrink_reference( $dish, $pixels ); }
+		$labels = array( 'editor' => 'the editor\'s photograph', 'research' => 'a photograph the research found' );
+		if ( $style['image'] && $dish ) {
+			return array( 'source' => 'style+' . $from, 'label' => 'a style reference and ' . $labels[ $from ], 'file' => $style['file'], 'image' => $style['image'], 'shown' => array( $style['image'], $dish ) );
 		}
 		if ( $style['image'] ) { return $style + array( 'shown' => array( $style['image'] ) ); }
-		if ( $editor ) { return array( 'source' => 'editor', 'label' => 'the editor\'s photograph', 'file' => '', 'image' => $editor, 'shown' => array( $editor ) ); }
+		if ( $dish ) { return array( 'source' => $from, 'label' => $labels[ $from ], 'file' => '', 'image' => $dish, 'shown' => array( $dish ) ); }
 		return array( 'source' => '', 'label' => '', 'file' => '', 'image' => null, 'shown' => array() );
+	}
+
+	/**
+	 * The first photograph the research cited that can still be downloaded. The
+	 * research already read it for its observations; here it only shows the
+	 * dish, and nothing of its framing, props or light is taken.
+	 */
+	private static function research_reference( MSRWA_Engine_Config $config, array $brief ) {
+		$max = (int) $config->get( 'limits.max_image_bytes', 10000000 );
+		$research = MSRWA_Engine_Input::research_package( $brief );
+		foreach ( array_slice( (array) ( $research['visual_references'] ?? array() ), 0, 2 ) as $reference ) {
+			$url = is_array( $reference ) ? (string) ( $reference['image_url'] ?? '' ) : '';
+			if ( ! preg_match( '#^https://#i', $url ) ) { continue; }
+			$image = MSRWA_Engine_Call::fetch_image( $url, $max );
+			if ( $image && ! isset( $image['error'] ) && ! empty( $image['data'] ) ) { return array( 'mime' => (string) $image['mime'], 'data' => (string) $image['data'] ); }
+		}
+		return null;
 	}
 
 	/** The editor's first readable photograph of the dish, or null. */

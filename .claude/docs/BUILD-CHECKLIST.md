@@ -630,6 +630,10 @@ cost) in the task before changing anything.
   (2026-09-24).** The writer's photograph shows the prompt's writer the dish;
   the collage is drawn from the style reference. Real: the owner's own rôti
   photograph, drawn both ways. See ENGINE.md §7, item 40.
+- [x] **A45 — Style collage + prompt + dish photograph (2026-09-24).** The
+  writer's photograph, or the research's, goes to both models beside the
+  approved collage. Real: the owner's rôti photograph and croquettes from a
+  research photograph. See ENGINE.md §7, item 41.
 - [x] **A11 — Model answers that do not parse (found 2026-09-20).** Two of the
   54 matrix cells scored zero for a reason that was ours, not the prompt's:
   Opus 5 wrote "I'll research this dish now." before the object, and Sonnet 5

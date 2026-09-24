@@ -801,6 +801,16 @@ photograph, and otherwise use the photograph without the cost of a search.
     photograph is the reference, as before. `plan_compose()` takes several
     images. Measured on his photograph: $0.0201 for the collage.
 
+41. **Style collage + prompt + a photograph of the dish, to both models.**
+    Owner's direction, 2026-09-24: the writer's photograph, or else the first
+    photograph the research found that still downloads, goes with the approved
+    collage to the prompt's writer and to the image model. The drawing prompt
+    ends with REFERENCE IMAGES, saying the first sets the look and the second
+    only what the dish is. OpenAI's edits endpoint takes several `image[]`
+    files; PHP cannot repeat a field name, so `body()` writes that multipart
+    body by hand, with its boundary in the header. Measured: the owner's rôti
+    photograph $0.026, croquettes from a research photograph $0.024.
+
 ### Still open
 
 

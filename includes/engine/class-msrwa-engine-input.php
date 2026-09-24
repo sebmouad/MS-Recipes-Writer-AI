@@ -430,10 +430,10 @@ final class MSRWA_Engine_Input {
 			. "\nIngredients:\n" . implode( "\n", $ingredients )
 			. "\nSteps:\n" . implode( "\n", $steps )
 			. "\nServed: " . self::serving_presentation( $canonical, self::research_package( $brief ), true );
-		if ( 'both' === $reference ) {
-			$text .= "\n\nThe first attached image is my own approved collage of another dish: keep its look, never its food, its steps or its cookware. The second is the editor's photograph of this dish: take what the dish is from it, never its light, colours, background or framing.";
-		} elseif ( 'editor' === $reference ) {
-			$text .= "\n\nThe attached image is a photograph of this dish supplied by the editor.";
+		if ( 0 === strpos( (string) $reference, 'style+' ) ) {
+			$text .= "\n\nThe first attached image is my own approved collage of another dish: keep its look, never its food, its steps or its cookware. The second is " . ( 'style+editor' === $reference ? "the editor's photograph of this dish" : 'a photograph of this dish from a recipe site' ) . ": take what the dish is from it, never its light, colours, background or framing.";
+		} elseif ( 'editor' === $reference || 'research' === $reference ) {
+			$text .= "\n\nThe attached image is a photograph of this dish " . ( 'editor' === $reference ? 'supplied by the editor.' : 'from a recipe site.' );
 		} elseif ( 'style' === $reference ) {
 			$text .= "\n\nThe attached image is my own approved collage of another dish: keep its look, never its food, its steps or its cookware.";
 		}
