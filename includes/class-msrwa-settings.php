@@ -14,7 +14,7 @@ final class MSRWA_Settings {
 			'openai_key'          => '',
 			'gemini_key'          => '',
 			'claude_key'          => '',
-			'per_recipe_budget_usd' => 0.25,
+			'per_recipe_budget_usd' => 0.15,
 			'daily_budget_usd'    => 0,
 			'monthly_budget_usd'  => 0,
 			'retention_events_days' => 90,

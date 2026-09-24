@@ -43,14 +43,14 @@ msrwa_test_assert( $article_only['cost_usd'] >= 0.0418 && $article_only['cost_us
 // The maximum is every search the research may run and a second verdict; a
 // refusal no longer redraws anything by itself.
 msrwa_test_assert( $full['max_usd'] > $full['cost_usd'] && $full['max_usd'] < $full['cost_usd'] + 0.08, 'The maximum is the expected figure plus every search and a second verdict; got ' . $full['max_usd'] );
-// The shipped per-recipe ceiling lets a full recipe through with room for a
-// redrawn collage; the engine stops retrying before crossing it. At high
-// quality one redraw billed $0.192, so $0.20 left no room for a second.
+// The shipped per-recipe ceiling (owner, 2026-09-24): a full recipe billed
+// $0.0736 on the site, and each redraw an editor asks for $0.020. $0.15 lets
+// the recipe, its two allowed collage redraws and the estimate's maximum through.
 $ceiling = (float) MSRWA_Settings_Defaults_For_Test::ceiling();
-msrwa_test_assert( 0.25 === $ceiling, 'The shipped per-recipe ceiling is $0.25.' );
-msrwa_test_assert( $ceiling >= 0.192 + 0.057, 'The ceiling leaves room for a second collage after one redraw.' );
+msrwa_test_assert( 0.15 === $ceiling, 'The shipped per-recipe ceiling is $0.15.' );
 msrwa_test_assert( MSRWA_Estimate::fits( $full['cost_usd'], $ceiling ), 'A full recipe fits under the shipped ceiling; estimated ' . $full['cost_usd'] );
-msrwa_test_assert( $full['cost_usd'] + 0.035 < $ceiling, 'With room for one redrawn collage and approval.' );
+msrwa_test_assert( $full['max_usd'] < $ceiling, 'So does its maximum; got ' . $full['max_usd'] );
+msrwa_test_assert( 0.0736 + 2 * 0.020 < $ceiling, 'With room for the two redraws an editor may ask for.' );
 msrwa_test_assert( $full['max_usd'] > $full['cost_usd'], 'A recipe that can be refused has a maximum above its expected cost.' );
 // Without a final approval nothing is redrawn; what remains between the two
 // figures is research spending every tool call it is allowed on paid searches.

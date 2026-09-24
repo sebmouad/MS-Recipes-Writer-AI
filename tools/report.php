@@ -305,9 +305,12 @@ function report_approval_cards( $verdict ) {
 	$approved = true === ( $verdict['approved'] ?? null );
 	$malformed = array_key_exists( 'approved', $verdict ) && ! is_bool( $verdict['approved'] );
 	$cards = '';
-	$labels = array( 'article' => 'Article', 'featured_image' => 'Image à la une', 'facebook_image' => 'Collage Facebook', 'consistency' => 'Cohérence des trois' );
+	// Since 0.28.0 the judge sees the images alone; an earlier verdict still
+	// carries its article card. Only what it judged is shown.
+	$labels = array( 'article' => 'Article', 'featured_image' => 'Image à la une', 'facebook_image' => 'Collage Facebook', 'consistency' => 'Cohérence des deux images' );
 	foreach ( $labels as $key => $label ) {
-		$part = isset( $verdict[ $key ] ) && is_array( $verdict[ $key ] ) ? $verdict[ $key ] : array();
+		if ( empty( $verdict[ $key ] ) || ! is_array( $verdict[ $key ] ) ) { continue; }
+		$part = $verdict[ $key ];
 		$mark = (string) ( $part['verdict'] ?? '—' );
 		$words = array( 'good' => 'Conforme', 'reservations' => 'Réserves', 'bad' => 'Non conforme' );
 		$realism = isset( $part['realism'] ) ? '<p class="muted">Réalisme photographique : <strong>' . report_h( $words[ (string) $part['realism'] ] ?? $part['realism'] ) . '</strong></p>' : '';
@@ -317,6 +320,31 @@ function report_approval_cards( $verdict ) {
 	return '<p class="decision ' . ( $approved ? 'ok' : 'warn' ) . '">' . report_h( $label ) . '</p>'
 		. ( $malformed ? '<p class="muted">Le champ « approved » n’est pas un booléen ; ce verdict ne vaut pas approbation.</p>' : '' )
 		. '<div class="summary-grid">' . $cards . '</div>';
+}
+
+/**
+ * How each image came to be: drawn once, or again from the judge's findings,
+ * and what the collage's prompt was written from.
+ */
+function report_redraws( $steps, $artifacts ) {
+	$counts = array( 'featured_image' => 0, 'facebook_image' => 0 );
+	foreach ( (array) $steps as $step ) {
+		$name = (string) ( $step['step'] ?? '' );
+		if ( isset( $counts[ $name ] ) && '' === (string) ( $step['error'] ?? '' ) ) { $counts[ $name ]++; }
+	}
+	$lines = array();
+	foreach ( array( 'featured_image' => 'L’image à la une', 'facebook_image' => 'Le collage' ) as $name => $label ) {
+		if ( $counts[ $name ] > 1 ) { $lines[] = sprintf( '%s a été dessiné %d fois : les dessins suivants reprennent les remarques du juge, et le dernier n’a pas été rejugé.', $label, $counts[ $name ] ); }
+	}
+	$composed = (array) ( $artifacts['facebook_composed'] ?? array() );
+	if ( ! empty( $composed['prompt'] ) ) {
+		$from = array( 'editor' => 'la photographie envoyée par le rédacteur', 'style' => 'le collage de référence' . ( 'facebook-reference.jpg' === ( $composed['reference_file'] ?? '' ) ? ' fourni avec l’extension' : ( ! empty( $composed['reference_file'] ) ? ' du site' : '' ) ) );
+		$lines[] = 'La consigne du collage a été rédigée par ' . ( $composed['model'] ?? 'le modèle' ) . ' d’après la recette' . ( isset( $from[ $composed['reference'] ?? '' ] ) ? ' et ' . $from[ $composed['reference'] ] : ', sans image de référence' ) . '.';
+	}
+	if ( ! $lines ) { return ''; }
+	$html = '';
+	foreach ( $lines as $line ) { $html .= '<p class="muted">' . report_h( $line ) . '</p>'; }
+	return $html . ( ! empty( $composed['prompt'] ) ? report_fold( 'Consigne du collage', '<pre>' . report_h( $composed['prompt'] ) . '</pre>' ) : '' );
 }
 
 /** Corrections the engine applied to the text, and the ones only a person can make. */
@@ -610,6 +638,12 @@ function report_render( array $run ) {
 	$share = round( $matching / $recipes_in_lot, 6 );
 	$total = (float) ( $totals['cost_usd'] ?? 0 ) + $share;
 
+	// Input the provider served from its cache, billed at a fraction of the rate.
+	$cached_total = 0;
+	foreach ( (array) ( $run['events'] ?? array() ) as $event ) {
+		if ( 'call' === ( $event['kind'] ?? '' ) ) { $cached_total += (int) ( $event['data']['usage']['cached_input_tokens'] ?? 0 ); }
+	}
+
 	$buckets = (array) ( $totals['buckets'] ?? array() );
 	$bucket_cards = '';
 	foreach ( array( 'article' => array( 'Texte', 'article' ), 'featured' => array( 'Image à la une', 'featured_image' ), 'facebook' => array( 'Collage', 'facebook_image' ), 'other' => array( 'Recherche et contrôles', 'research' ) ) as $key => $bucket ) {
@@ -626,7 +660,7 @@ function report_render( array $run ) {
 	}
 
 	$raw = '';
-	foreach ( array( 'Recherche' => $research, 'Recette canonique' => $canonical, 'Métadonnées article' => $metadata, 'Corrections factuelles' => $corrected, 'Relecture finale' => array_diff_key( $proofread, array( 'content_html' => 1 ) ), 'Revue éditoriale' => $artifacts['review'] ?? array(), 'Vérification des faits' => $artifacts['fact_check'] ?? array(), 'Approbation finale' => $approval, 'Configuration effective' => $artifacts['config'] ?? array() ) as $label => $data ) {
+	foreach ( array( 'Recherche' => $research, 'Recette canonique' => $canonical, 'Métadonnées article' => $metadata, 'Corrections factuelles' => $corrected, 'Correction de la langue' => array_diff_key( $proofread, array( 'content_html' => 1 ) ), 'Revue éditoriale' => $artifacts['review'] ?? array(), 'Vérification des faits' => $artifacts['fact_check'] ?? array(), 'Approbation finale' => $approval, 'Configuration effective' => $artifacts['config'] ?? array() ) as $label => $data ) {
 		if ( ! $data ) { continue; }
 		$raw .= '<details><summary>' . report_h( $label ) . ' — JSON complet</summary><pre>' . report_h( json_encode( $data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) ) . '</pre></details>';
 	}
@@ -651,7 +685,7 @@ function report_render( array $run ) {
 		. '<section class="section"><h2>Résumé de l’exécution</h2><div class="summary-grid">'
 		. '<div class="card"><div class="muted">Temps cumulé</div><div class="kpi">' . number_format( (float) ( $totals['seconds'] ?? 0 ), 1 ) . ' s</div></div>'
 		. '<div class="card"><div class="muted">Coût cumulé</div><div class="kpi">$' . number_format( $total, 4 ) . '</div></div>'
-		. '<div class="card"><div class="muted">Jetons</div><div class="kpi">' . number_format( (int) ( $totals['input_tokens'] ?? 0 ) + (int) ( $totals['output_tokens'] ?? 0 ) ) . '</div><div class="muted">' . number_format( (int) ( $totals['input_tokens'] ?? 0 ) ) . ' entrée · ' . number_format( (int) ( $totals['output_tokens'] ?? 0 ) ) . ' sortie</div></div>'
+		. '<div class="card"><div class="muted">Jetons</div><div class="kpi">' . number_format( (int) ( $totals['input_tokens'] ?? 0 ) + (int) ( $totals['output_tokens'] ?? 0 ) ) . '</div><div class="muted">' . number_format( (int) ( $totals['input_tokens'] ?? 0 ) ) . ' entrée · ' . number_format( (int) ( $totals['output_tokens'] ?? 0 ) ) . ' sortie' . ( $cached_total ? ' · ' . number_format( $cached_total ) . ' relus depuis le cache' : '' ) . '</div></div>'
 		. '<div class="card"><div class="muted">Issue</div><div class="kpi"><span class="pill ' . ( empty( $run['ok'] ) ? 'warn' : 'ok' ) . '">' . ( empty( $run['ok'] ) ? 'Avec erreurs' : 'Complet' ) . '</span></div></div>'
 		. '</div>'
 		. '<h3>Où va l’argent</h3><div class="summary-grid">' . $bucket_cards . '</div>'
@@ -692,9 +726,10 @@ function report_render( array $run ) {
 
 		. ( $wants( 'final_approval' )
 			? $section( 'Approbation finale', $reached( 'final_approval' ) || $approval
-				? '<p class="muted">Un seul appel voit l’article et les images ensemble, le seul moment où ils peuvent être confrontés. Le réalisme photographique et les ingrédients principaux décident pour les images ; la recette et l’article sont tenus à ce que la recherche documente. Une approbation n’est pas une validation éditoriale.</p>'
+				? '<p class="muted">Un appel regarde les deux images ensemble, face à la recette et aux photographies de référence : le réalisme photographique et les ingrédients principaux décident. Le texte a déjà été tenu à la recherche par la relecture. Une image refusée n’est pas redessinée d’office : l’éditeur la fait redessiner s’il le juge utile. Une approbation n’est pas une validation éditoriale.</p>'
 					. report_approval_cards( $approval )
 					. '<div class="findings-wrap">' . report_findings( $approval ) . '</div>'
+					. report_redraws( $run['steps'] ?? array(), $artifacts )
 				: $not_reached )
 			: '' )
 

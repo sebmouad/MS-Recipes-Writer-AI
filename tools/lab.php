@@ -52,8 +52,11 @@ function lab_config( array $options, $step = '' ) {
 	if ( isset( $options['budget'] ) ) { $config['limits']['budget_usd'] = (float) $options['budget']; }
 	if ( isset( $options['attempts'] ) ) { $config['attempts'] = array( 'default' => (int) $options['attempts'], 'final_approval' => (int) $options['attempts'] ); }
 	if ( isset( $options['quality'] ) ) { $config['images'] = array( 'featured_quality' => $options['quality'], 'facebook_quality' => $options['quality'] ); }
-	// A collage whose look the composed Facebook image keeps: --style-reference=path.
-	if ( ! empty( $options['style-reference'] ) ) { $config['images'] = array_merge( (array) ( $config['images'] ?? array() ), array( 'style_references' => array( realpath( (string) $options['style-reference'] ) ) ) ); }
+	// A collage whose look the composed Facebook image keeps: --style-reference=path,
+	// or the one the plugin ships, as a site that uploaded none draws from;
+	// --style-reference=none draws from the text alone.
+	$style = (string) ( $options['style-reference'] ?? dirname( __DIR__ ) . '/assets/style/facebook-reference.jpg' );
+	if ( 'none' !== $style && is_file( $style ) ) { $config['images'] = array_merge( (array) ( $config['images'] ?? array() ), array( 'style_references' => array( realpath( $style ) ) ) ); }
 	return $config;
 }
 

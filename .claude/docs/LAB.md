@@ -9,11 +9,14 @@ editor brief (title, article or images)
   -> sourced research package (text facts + observations read from real images)
   -> canonical recipe
   -> article, featured image and Facebook collage, together
-  -> review and fact check, together
-  -> factual corrections applied in code
-  -> language correction
-  -> final approval over the article and both images at once
+  -> one review (findings, fact corrections, language changes) and the final
+     approval over both images, together
+  -> factual corrections, then language changes, applied in code
 ```
+
+The collage is drawn from the style reference the plugin ships
+(`assets/style/facebook-reference.jpg`), as a site with none uploaded draws it;
+`--style-reference=path` uses another, `--style-reference=none` the text alone.
 
 Every later step receives the same research package. Visual references must
 give both the direct real-image URL and its source page; observations may

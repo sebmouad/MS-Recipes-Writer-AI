@@ -334,8 +334,8 @@ final class MSRWA_Batch {
 			$config['limits']['budget_usd'] = (float) $batch['budget_usd'];
 		}
 		$config['settings'] = array_merge( MSRWA_Settings::engine_settings(), (array) ( $config['settings'] ?? array() ) );
-		// The owner's style references, when the writer sent no photograph of the dish.
-		if ( class_exists( 'MSRWA_Sources' ) ) { $config['images']['style_references'] = MSRWA_Sources::style_paths(); }
+		// The owner's style references, or the shipped one, when the writer sent no photograph of the dish.
+		if ( class_exists( 'MSRWA_Sources' ) ) { $config['images']['style_references'] = MSRWA_Sources::style_in_use(); }
 		return $config;
 	}
 

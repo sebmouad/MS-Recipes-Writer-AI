@@ -47,7 +47,10 @@ msrwa_test_assert( empty( $silent['collage panels counted']['pass'] ), 'A collag
 // And the prompt must carry the placeholder the step fills in, or the judge is
 // told nothing about what it holds.
 $template = file_get_contents( dirname( __DIR__ ) . '/includes/engine/prompts/final_approval.tpl.txt' );
-msrwa_test_contains( $template, '{{images_received}}', 'The judge’s prompt has a place for the manifest.' );
+msrwa_test_contains( $template, 'IMAGES RECEIVED', 'The judge’s prompt points at the manifest.' );
+msrwa_test_missing( $template, '{{images_received}}', 'Not through a placeholder: the prompt is compiled before the images exist, and it was emptied every time.' );
+$built = MSRWA_Engine_Input::build( 'final_approval', 'PROMPT', array( 'title' => 'Tarte', 'images_received' => '- the Facebook image, 1024x1536, a 6-panel preparation collage;' ) );
+msrwa_test_contains( $built, "IMAGES RECEIVED:\n- the Facebook image", 'The manifest reaches the judge with the data.' );
 msrwa_test_contains( $template, 'WHAT YOU WERE NOT SENT', 'And it is told not to judge what it was not sent.' );
 
 msrwa_test_done( 'the judge is asked only about what it saw' );

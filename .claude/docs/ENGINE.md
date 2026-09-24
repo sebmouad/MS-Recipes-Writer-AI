@@ -769,6 +769,27 @@ photograph, and otherwise use the photograph without the cost of a search.
     all approved first time; on the site, a full lot $0.0736 and an article
     lot $0.0409 (from $0.050). An editor's redraw of the collage cost $0.020.
 
+39. **Prompt caching, and the judge's missing manifest.** Owner's request,
+    2026-09-24.
+    - The recipe, the article and the review open on the same bytes — the
+      research package, then the recipe (`MSRWA_Engine_Input::shared_context`)
+      — and carry one `prompt_cache_key`; Claude gets a cache breakpoint after
+      each shared part, and its cache writes are priced at 1.25 times the
+      input rate (`cache_write_ratio`), its reads at a tenth.
+    - OpenAI served nothing of a prefix sent inside the input, even for the
+      same request twice, and serves the `instructions` once it has seen them
+      a few times. Every text step and the judge now send their own prompt
+      as `instructions` and the recipe's data as the input (which must still
+      say "json" for JSON mode, or the call is refused).
+    - `{{images_received}}` in the judge's prompt was compiled before the
+      images existed and emptied on every run: the judge was never told what
+      it had been sent. The list now travels with the data, under IMAGES
+      RECEIVED, and the prompt is the same on every recipe.
+    Measured on three recipes in a row: research read 5,775 tokens from the
+    cache, the judge 2,228 from the second recipe on, a repeated review all of
+    it. At $0.20 a million input tokens this is a fraction of a cent a recipe:
+    $0.0815, $0.0770, $0.0803. The output, not the input, is what is paid for.
+
 ### Still open
 
 

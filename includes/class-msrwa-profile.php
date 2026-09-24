@@ -28,12 +28,12 @@ final class MSRWA_Profile {
 		return array(
 			self::FULL => array(
 				'label' => __( 'Article, image à la une et collage Facebook', 'ms-recipes-writer-ai' ),
-				'description' => __( 'La chaîne complète, jugement final compris : c’est le seul moment où le texte et les deux images sont confrontés.', 'ms-recipes-writer-ai' ),
+				'description' => __( 'La chaîne complète : le texte relu et vérifié, puis les deux images jugées ensemble, face à la recette. Une image refusée vous est signalée, et vous décidez de la faire redessiner.', 'ms-recipes-writer-ai' ),
 				'drop' => array(),
 			),
 			self::FEATURED => array(
 				'label' => __( 'Article et image à la une', 'ms-recipes-writer-ai' ),
-				'description' => __( 'Pas de collage. Le jugement final s’exécute quand même et confronte le texte à l’image produite ; il n’a simplement pas de collage à comparer.', 'ms-recipes-writer-ai' ),
+				'description' => __( 'Pas de collage. Le texte est relu et vérifié, et l’image à la une est jugée face à la recette.', 'ms-recipes-writer-ai' ),
 				'drop' => array( 'facebook_image' ),
 			),
 			self::ARTICLE => array(

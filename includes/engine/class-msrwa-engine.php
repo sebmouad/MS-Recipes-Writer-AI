@@ -407,6 +407,17 @@ final class MSRWA_Engine {
 		), array( 'prompt_source' => $prompt['source'], 'prompt_chars' => strlen( $prompt['text'] ), 'input_chars' => strlen( $input ), 'attached' => $attached, 'ceiling' => $ceiling, 'web_search' => $web_search, 'route' => $route ) );
 
 		$wire = $config->provider( $route['provider'], $route['model'], $name );
+		// What a provider can cache: the step's own prompt, the same on every
+		// recipe, and the opening the recipe, the article and the review share —
+		// one cache key for them, and a breakpoint after the research and after
+		// the recipe for the provider that needs them marked.
+		$wire['instructions'] = (string) $prompt['text'];
+		if ( in_array( $name, array( 'canonical_recipe', 'article', 'review' ), true ) ) {
+			$research = MSRWA_Engine_Input::shared_context( $brief );
+			$recipe = MSRWA_Engine_Input::shared_context( $brief, true );
+			$wire['cache_key'] = 'msrwa-' . substr( md5( $research ), 0, 24 );
+			$wire['cache_breaks'] = array_values( array_filter( array( strlen( rtrim( $research ) ), 'canonical_recipe' === $name ? 0 : strlen( rtrim( $recipe ) ) ), static function ( $at ) use ( $input, $research ) { return $at > 0 && 0 === strpos( $input, rtrim( $research ) ); } ) );
+		}
 		$plan = MSRWA_Engine_Call::plan_text( $route['provider'], $route['model'], $input, $ceiling, true, $web_search, $wire );
 		if ( isset( $plan['error'] ) ) { return self::failed( $plan['error'], 0, $route ); }
 
@@ -657,7 +668,7 @@ final class MSRWA_Engine {
 			$spent = array( 'cost_usd' => (float) $config->price( $route['provider'], $route['model'], (array) ( $call['usage'] ?? array() ) ), 'seconds' => (float) ( $call['seconds'] ?? 0 ) );
 			$text = trim( (string) ( $call['text'] ?? '' ) );
 			if ( strlen( $text ) < 200 ) { return array( 'error' => 'the answer was too short to be a prompt', 'cost_usd' => $spent['cost_usd'], 'seconds' => $spent['seconds'] ); }
-			$written = array( 'prompt' => $text, 'reference' => $reference['source'], 'reference_label' => $reference['label'], 'model' => $route['model'] );
+			$written = array( 'prompt' => $text, 'reference' => $reference['source'], 'reference_label' => $reference['label'], 'reference_file' => (string) ( $reference['file'] ?? '' ), 'model' => $route['model'] );
 			$result->artifact( 'facebook_composed', $written );
 			$result->event( 'input', $name, sprintf( 'Collage prompt written by %s from the recipe%s: %s characters.', $route['model'], '' !== $reference['source'] ? ' and ' . $reference['label'] : '', number_format( strlen( $text ) ) ) );
 		}
@@ -714,7 +725,7 @@ final class MSRWA_Engine {
 			$size = @getimagesize( $path ); // phpcs:ignore WordPress.PHP.NoSilencedErrors
 			$mime = (string) ( $size['mime'] ?? '' );
 			if ( ! isset( MSRWA_Engine_Call::TYPES[ $mime ] ) ) { continue; }
-			return array( 'source' => 'style', 'label' => 'a style reference', 'image' => array( 'mime' => $mime, 'data' => base64_encode( (string) file_get_contents( $path ) ) ) );
+			return array( 'source' => 'style', 'label' => 'a style reference', 'file' => basename( $path ), 'image' => array( 'mime' => $mime, 'data' => base64_encode( (string) file_get_contents( $path ) ) ) );
 		}
 		return array( 'source' => '', 'label' => '', 'image' => null );
 	}
@@ -768,6 +779,8 @@ final class MSRWA_Engine {
 		$result->event( 'input', $name, sprintf( 'Prompt from %s, %s characters and %d image(s) totalling %s KB.', $prompt['source'], number_format( strlen( $input ) ), count( $images ), number_format( $bytes / 1024, 1 ) ), array( 'prompt_source' => $prompt['source'], 'input_chars' => strlen( $input ), 'images' => count( $images ), 'image_bytes' => $bytes, 'attached' => self::attached( $brief ), 'route' => $route ) );
 
 		$wire = $config->provider( $route['provider'], $route['model'], $name );
+		// The judge's prompt is the same on every recipe: a provider may cache it.
+		$wire['instructions'] = (string) $prompt['text'];
 		$plan = MSRWA_Engine_Call::plan_judge( $route['provider'], $route['model'], $input, $images, $config->max_output( $name ), $wire );
 		if ( isset( $plan['error'] ) ) { return self::failed( $plan['error'], 0, $route ); }
 

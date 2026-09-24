@@ -531,6 +531,20 @@ final class MSRWA_Engine_Input {
 		return $prompt;
 	}
 
+	/**
+	 * The opening every text step after the research shares, byte for byte:
+	 * the research package, then the canonical recipe when the step reads it.
+	 * Providers cache a repeated prefix and bill it at a fraction of the input
+	 * rate; with the research after each step's own instructions, no two calls
+	 * of a recipe began alike and nothing was ever reused.
+	 */
+	public static function shared_context( $brief, $with_recipe = false ) {
+		$encode = static function ( $value ) { return json_encode( $value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ); };
+		return 'RESEARCH PACKAGE: ' . $encode( self::research_for_text( self::research_package( $brief ) ) ) . "\n"
+			. ( $with_recipe ? 'CANONICAL RECIPE: ' . $encode( self::canonical_recipe( $brief ) ) . "\n" : '' )
+			. "\n";
+	}
+
 	/** Assembles the input one step is sent, from the artifacts already produced. */
 	public static function build( $step, $prompt, $brief, $options = array() ) {
 		$settings = self::settings();
@@ -542,22 +556,23 @@ final class MSRWA_Engine_Input {
 		if ( 'research' === $step ) {
 			return $prompt . "\nEDITOR BRIEF: " . $encode( $editor );
 		}
+		// The recipe, the article and the review open on the same bytes — the
+		// research package, then the recipe once there is one — so the provider
+		// bills the part it has already read at its cached rate. Their own
+		// instructions come after the shared part, never before it.
 		if ( 'canonical_recipe' === $step ) {
-			return $prompt . "\nEDITOR BRIEF: " . $encode( $editor ) . "\nRESEARCH PACKAGE: " . $encode( $text_research )
+			return self::shared_context( $brief ) . $prompt . "\nEDITOR BRIEF: " . $encode( $editor )
 				. "\n" . self::observed_appearance( $research );
 		}
 		if ( 'article' === $step ) {
 			// A rewrite carries the findings the reviews raised; a first draft carries none.
 			$feedback = is_array( $brief['feedback'] ?? null ) ? $brief['feedback'] : array();
-			return $prompt . MSRWA_Quality::prompt_contract( $settings )
-				. "\nRecette canonique : " . $encode( $canonical )
-				. "\nRESEARCH PACKAGE: " . $encode( $text_research )
+			return self::shared_context( $brief, true ) . $prompt . MSRWA_Quality::prompt_contract( $settings )
 				. "\n" . self::visual_brief( $canonical, $research )
 				. ( $feedback ? "\nREVIEW FINDINGS TO CORRECT IN THE COMPLETE RETURNED ARTICLE: " . $encode( $feedback ) : '' );
 		}
 		if ( 'review' === $step ) {
-			return $prompt . "\nCANONICAL RECIPE: " . $encode( $canonical )
-				. "\nRESEARCH PACKAGE: " . $encode( $text_research )
+			return self::shared_context( $brief, true ) . $prompt
 				. "\nARTICLE: " . $encode( self::article( $brief ) );
 		}
 		if ( 'final_approval' === $step ) {
@@ -567,7 +582,12 @@ final class MSRWA_Engine_Input {
 			// this dish actually showed. The article and the research are not: the
 			// review has already held the text to them, and sending both again made
 			// this the largest input of the recipe for a judgement of two images.
-			return $prompt . "\n\nCANONICAL RECIPE: " . $encode( $canonical )
+			// The list of what was attached travels with the data, not inside the
+			// prompt: the prompt is compiled before the images exist, and its
+			// placeholder was emptied every time — the judge never saw the list.
+			$received = trim( (string) ( $brief['images_received'] ?? '' ) );
+			return $prompt . "\n\nIMAGES RECEIVED:\n" . ( '' !== $received ? $received : '- none.' )
+				. "\n\nCANONICAL RECIPE: " . $encode( $canonical )
 				. "\n\n" . self::visual_evidence( $research )
 				. "\n" . self::visual_brief( $canonical, $research );
 		}

@@ -150,7 +150,7 @@ $full = array(
 );
 $carries = array(
 	'canonical_recipe' => array( 'EDITOR BRIEF', 'RESEARCH PACKAGE' ),
-	'article' => array( 'Recette canonique', 'RESEARCH PACKAGE' ),
+	'article' => array( 'CANONICAL RECIPE', 'RESEARCH PACKAGE' ),
 	'review' => array( 'CANONICAL RECIPE', 'RESEARCH PACKAGE', 'ARTICLE' ),
 	'final_approval' => array( 'CANONICAL RECIPE' ),
 );

@@ -200,6 +200,23 @@ final class MSRWA_Sources {
 		return array_slice( array_keys( $paths ), 0, self::STYLE_MAX );
 	}
 
+	/**
+	 * The collage every test was drawn from — the owner's own rôti Orloff —
+	 * shipped with the plugin, so a site that uploaded nothing still gets the
+	 * approved look instead of a collage drawn from the text alone.
+	 */
+	public static function default_style() {
+		$path = ( defined( 'MSRWA_DIR' ) ? MSRWA_DIR : dirname( __DIR__ ) . '/' ) . 'assets/style/facebook-reference.jpg';
+		return is_file( $path ) ? $path : '';
+	}
+
+	/** What the engine draws from: the site's own references, or the shipped one. */
+	public static function style_in_use() {
+		$paths = self::style_paths();
+		if ( ! $paths && '' !== self::default_style() ) { $paths = array( self::default_style() ); }
+		return $paths;
+	}
+
 	/** Keeps one uploaded image as a style reference. Returns '' or why it was refused. */
 	public static function add_style( array $file ) {
 		$tmp = (string) ( $file['tmp_name'] ?? '' );

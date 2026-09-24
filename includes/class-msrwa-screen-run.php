@@ -157,17 +157,17 @@ final class MSRWA_Screen_Run {
 		$findings = (array) ( $approval['findings'] ?? array() );
 		if ( ! $findings ) { echo '<p class="ms-muted" style="margin-top:14px">' . esc_html__( 'Aucune remarque.', 'ms-recipes-writer-ai' ) . '</p></section>'; return; }
 
-		echo '<table class="ms-table" style="margin-top:16px"><thead><tr>'
+		echo '<table class="ms-table ms-stack ms-findings" style="margin-top:16px"><thead><tr>'
 			. '<th>' . esc_html__( 'Gravité', 'ms-recipes-writer-ai' ) . '</th>'
 			. '<th>' . esc_html__( 'Porte sur', 'ms-recipes-writer-ai' ) . '</th>'
 			. '<th>' . esc_html__( 'Ce qui ne va pas', 'ms-recipes-writer-ai' ) . '</th>'
 			. '</tr></thead><tbody>';
 		foreach ( $findings as $finding ) {
 			$blocking = 'blocking' === ( $finding['severity'] ?? '' );
-			echo '<tr><td><span class="ms-state ms-state-' . ( $blocking ? 'stop' : 'warn' ) . '">'
+			echo '<tr><td data-label="' . esc_attr__( 'Gravité', 'ms-recipes-writer-ai' ) . '"><span class="ms-state ms-state-' . ( $blocking ? 'stop' : 'warn' ) . '">'
 				. esc_html( $blocking ? __( 'bloquante', 'ms-recipes-writer-ai' ) : __( 'mineure', 'ms-recipes-writer-ai' ) ) . '</span></td>'
-				. '<td>' . esc_html( $targets[ (string) ( $finding['target'] ?? '' ) ] ?? (string) ( $finding['target'] ?? '' ) ) . '</td>'
-				. '<td>' . esc_html( (string) ( $finding['reason'] ?? '' ) );
+				. '<td data-label="' . esc_attr__( 'Porte sur', 'ms-recipes-writer-ai' ) . '">' . esc_html( $targets[ (string) ( $finding['target'] ?? '' ) ] ?? (string) ( $finding['target'] ?? '' ) ) . '</td>'
+				. '<td data-label="' . esc_attr__( 'Ce qui ne va pas', 'ms-recipes-writer-ai' ) . '">' . esc_html( (string) ( $finding['reason'] ?? '' ) );
 			if ( ! empty( $finding['quote'] ) ) { echo '<small>« ' . esc_html( (string) $finding['quote'] ) . ' »</small>'; }
 			if ( ! empty( $finding['fix'] ) ) { echo '<small><strong>' . esc_html__( 'Correction :', 'ms-recipes-writer-ai' ) . '</strong> ' . esc_html( (string) $finding['fix'] ) . '</small>'; }
 			echo '</td></tr>';

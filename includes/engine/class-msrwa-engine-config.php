@@ -222,6 +222,10 @@ final class MSRWA_Engine_Config {
 					'key_env'         => array( 'ANTHROPIC_API_KEY', 'MSRWA_CLAUDE_KEY' ),
 					'web_search_tool' => array( 'type' => 'web_search_20250305', 'name' => 'web_search', 'max_uses' => 3 ),
 					'web_search_usd'  => 0.01,
+					// Anthropic's prompt caching: a read at a tenth of the input rate,
+					// a five-minute write at 1.25 times it.
+					'cached_input_ratio' => 0.1,
+					'cache_write_ratio'  => 1.25,
 				),
 			),
 
@@ -501,10 +505,14 @@ final class MSRWA_Engine_Config {
 		$input = (int) ( $usage['input_tokens'] ?? 0 );
 		$cached = min( $input, (int) ( $usage['cached_input_tokens'] ?? 0 ) );
 		$ratio = min( 1.0, max( 0.0, (float) $this->get( 'providers.' . $provider . '.cached_input_ratio', 1.0 ) ) );
+		// Writing to the cache costs more than reading on Claude: a quarter above
+		// the input rate for the part it stores.
+		$written = min( $input - $cached, (int) ( $usage['cache_write_tokens'] ?? 0 ) );
+		$write_ratio = max( 1.0, (float) $this->get( 'providers.' . $provider . '.cache_write_ratio', 1.0 ) );
 		// A third rate prices the image tokens of the output; the rest of it is text.
 		$output = (int) ( $usage['output_tokens'] ?? 0 );
 		$image = isset( $rate[2] ) ? min( $output, (int) ( $usage['image_tokens'] ?? 0 ) ) : 0;
-		return ( ( $input - $cached + $cached * $ratio ) * (float) $rate[0] + ( $output - $image ) * (float) $rate[1] + $image * (float) ( $rate[2] ?? 0 ) ) / 1000000 + $searches;
+		return ( ( $input - $cached + $cached * $ratio + $written * ( $write_ratio - 1 ) ) * (float) $rate[0] + ( $output - $image ) * (float) $rate[1] + $image * (float) ( $rate[2] ?? 0 ) ) / 1000000 + $searches;
 	}
 
 	public function max_output( $step ) { return (int) $this->get( 'max_output.' . $step, 4000 ); }

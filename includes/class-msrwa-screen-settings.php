@@ -223,7 +223,13 @@ final class MSRWA_Screen_Settings {
 		echo '<section class="ms-card" id="ms-style"><h2>' . esc_html__( 'Style du collage Facebook', 'ms-recipes-writer-ai' ) . '</h2>';
 		echo '<p>' . esc_html__( 'Un de vos collages dont le rendu doit être repris : lumière, couleurs, cadrage, plan de travail. Seul son style est repris, jamais son plat. Quand le rédacteur a envoyé une photographie du plat, c’est elle qui sert de référence.', 'ms-recipes-writer-ai' ) . '</p>';
 		if ( false !== $refused ) { MSRWA_UI::note( esc_html( (string) $refused ), 'warn' ); }
-		if ( ! $paths ) {
+		if ( ! $paths && '' !== MSRWA_Sources::default_style() ) {
+			$preview = MSRWA_Sources::style_preview( MSRWA_Sources::default_style() );
+			echo '<div class="ms-style-list"><div class="ms-style-item">';
+			if ( '' !== $preview ) { echo '<img src="' . esc_attr( $preview ) . '" alt="" width="180">'; }
+			echo '<p><strong>' . esc_html__( 'Utilisée', 'ms-recipes-writer-ai' ) . '</strong> · ' . esc_html__( 'référence fournie avec l’extension', 'ms-recipes-writer-ai' ) . '</p></div></div>';
+			echo '<p class="ms-muted">' . esc_html__( 'Ajoutez votre propre collage pour la remplacer ; retirez-le pour y revenir.', 'ms-recipes-writer-ai' ) . '</p>';
+		} elseif ( ! $paths ) {
 			echo '<p class="ms-muted">' . esc_html__( 'Aucune référence : le collage est dessiné à partir du texte seul.', 'ms-recipes-writer-ai' ) . '</p>';
 		} else {
 			echo '<div class="ms-style-list">';

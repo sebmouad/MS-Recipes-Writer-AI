@@ -229,11 +229,25 @@ final class MSRWA_Engine_Call {
 
 		if ( 'openai' === $provider ) {
 			$payload = array( 'model' => $model, 'input' => (string) $input, 'store' => false, 'max_output_tokens' => max( 16, (int) $max_tokens ) );
+			// OpenAI reused nothing sent inside the input — 0 cached of 4 536
+			// tokens, even for the same request twice — and serves a prefix sent
+			// as the instructions once it has seen it a few times. A step's own
+			// prompt is the same on every recipe of the day, so it goes there; the
+			// recipe's data stays the input.
+			$fixed = (string) ( $wire['instructions'] ?? '' );
+			$at = '' !== $fixed ? strpos( (string) $input, $fixed ) : false;
+			if ( false !== $at ) {
+				$payload['instructions'] = $fixed;
+				$payload['input'] = self::json_asked( trim( substr_replace( (string) $input, '', $at, strlen( $fixed ) ) ), $json_output );
+			}
 			if ( $tools ) { $payload['tools'] = array( $tools ); }
 			// Caps every action of the search tool, paid searches and free page
 			// reads alike: OpenAI offers no cap on searches alone.
 			if ( $tools && ! empty( $wire['web_tool_calls'] ) ) { $payload['max_tool_calls'] = (int) $wire['web_tool_calls']; }
 			if ( $json_output && ! $tools ) { $payload['text'] = array( 'format' => array( 'type' => 'json_object' ) ); }
+			// OpenAI caches a repeated prefix by itself; the key sends the calls
+			// that share one to the same cache, so they find it.
+			if ( ! empty( $wire['cache_key'] ) ) { $payload['prompt_cache_key'] = (string) $wire['cache_key']; }
 		} elseif ( 'gemini' === $provider ) {
 			$payload = array(
 				'contents' => array( array( 'role' => 'user', 'parts' => array( array( 'text' => (string) $input ) ) ) ),
@@ -246,7 +260,7 @@ final class MSRWA_Engine_Call {
 			$instruction = $json_output ? "\n\nReturn only a valid JSON object, with no Markdown fence and no commentary." : '';
 			$payload = array(
 				'model' => $model, 'max_tokens' => max( 16, (int) $max_tokens ),
-				'messages' => array( array( 'role' => 'user', 'content' => (string) $input . $instruction ) ),
+				'messages' => array( array( 'role' => 'user', 'content' => self::claude_blocks( (string) $input . $instruction, (array) ( $wire['cache_breaks'] ?? array() ) ) ) ),
 			);
 			if ( $tools && ! empty( $wire['web_searches'] ) ) { $tools['max_uses'] = (int) $wire['web_searches']; }
 			if ( $tools ) { $payload['tools'] = array( $tools ); }
@@ -259,6 +273,33 @@ final class MSRWA_Engine_Call {
 			'kind' => 'text', 'provider' => $provider, 'model' => $model,
 			'request' => array( 'url' => $wire['text_endpoint'], 'headers' => $wire['headers'], 'payload' => $payload, 'timeout' => (int) ( $wire['timeout'] ?? 600 ) ),
 		);
+	}
+
+	/**
+	 * OpenAI refuses JSON mode unless the input itself says "json"; the
+	 * instructions saying so is not enough (HTTP 400 on a live run).
+	 */
+	private static function json_asked( $input, $json_output ) {
+		return $json_output && false === stripos( (string) $input, 'json' ) ? $input . "\n\nAnswer with the JSON object described in the instructions." : $input;
+	}
+
+	/**
+	 * The prompt as Claude's content blocks, with a cache breakpoint at the end
+	 * of each shared part. Claude caches nothing unless asked, and only up to a
+	 * marked block; with no break given the prompt is sent as one string.
+	 */
+	private static function claude_blocks( $input, array $breaks ) {
+		$breaks = array_values( array_unique( array_filter( array_map( 'intval', $breaks ), static function ( $at ) use ( $input ) { return $at > 0 && $at < strlen( $input ); } ) ) );
+		sort( $breaks );
+		if ( ! $breaks ) { return $input; }
+		$blocks = array();
+		$from = 0;
+		foreach ( array_slice( $breaks, 0, 3 ) as $at ) {
+			$blocks[] = array( 'type' => 'text', 'text' => substr( $input, $from, $at - $from ), 'cache_control' => array( 'type' => 'ephemeral' ) );
+			$from = $at;
+		}
+		$blocks[] = array( 'type' => 'text', 'text' => substr( $input, $from ) );
+		return $blocks;
 	}
 
 	private static function gemini_generation( array $wire, $max_tokens ) { return array( 'maxOutputTokens' => (int) $max_tokens ); }
@@ -398,11 +439,13 @@ final class MSRWA_Engine_Call {
 			if ( 'text' === $plan['kind'] ) { $text = preg_replace( '/^```(?:json)?\s*|\s*```$/m', '', trim( $text ) ); }
 			// Cache writes and reads are input too; Anthropic reports them apart.
 			$cached = (int) ( $body['usage']['cache_read_input_tokens'] ?? 0 );
+			$written = (int) ( $body['usage']['cache_creation_input_tokens'] ?? 0 );
 			$usage = array(
-				'input_tokens' => (int) ( $body['usage']['input_tokens'] ?? 0 ) + (int) ( $body['usage']['cache_creation_input_tokens'] ?? 0 ) + $cached,
+				'input_tokens' => (int) ( $body['usage']['input_tokens'] ?? 0 ) + $written + $cached,
 				'output_tokens' => (int) ( $body['usage']['output_tokens'] ?? 0 ),
 			);
 			if ( $cached ) { $usage['cached_input_tokens'] = $cached; }
+			if ( $written ) { $usage['cache_write_tokens'] = $written; }
 			$searches = (int) ( $body['usage']['server_tool_use']['web_search_requests'] ?? 0 );
 			if ( $searches ) { $usage['web_searches'] = $searches; }
 			$status = $body['stop_reason'] ?? '';
@@ -708,12 +751,17 @@ final class MSRWA_Engine_Call {
 		if ( '' !== $unusable ) { return array( 'error' => $unusable ); }
 
 		if ( 'openai' === $provider ) {
-			$content = array( array( 'type' => 'input_text', 'text' => $instruction ) );
+			// The fixed prompt as the instructions, as for text calls, so OpenAI
+			// can serve it from its cache; the recipe and the images are the input.
+			$fixed = (string) ( $wire['instructions'] ?? '' );
+			$at = '' !== $fixed ? strpos( (string) $instruction, $fixed ) : false;
+			$content = array( array( 'type' => 'input_text', 'text' => false !== $at ? self::json_asked( trim( substr_replace( (string) $instruction, '', $at, strlen( $fixed ) ) ), true ) : $instruction ) );
 			foreach ( $images as $image ) {
 				$content[] = array( 'type' => 'input_text', 'text' => 'IMAGE — ' . $image['label'] );
 				$content[] = array( 'type' => 'input_image', 'image_url' => 'data:' . $image['mime'] . ';base64,' . $image['data'] );
 			}
 			$payload = array( 'model' => $model, 'store' => false, 'max_output_tokens' => $max_tokens, 'input' => array( array( 'role' => 'user', 'content' => $content ) ), 'text' => array( 'format' => array( 'type' => 'json_object' ) ) );
+			if ( false !== $at ) { $payload['instructions'] = $fixed; }
 		} elseif ( 'gemini' === $provider ) {
 			$parts = array( array( 'text' => $instruction ) );
 			foreach ( $images as $image ) {

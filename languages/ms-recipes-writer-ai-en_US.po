@@ -168,8 +168,6 @@ msgstr "Filter"
 msgid "Français"
 msgstr "French"
 
-msgid "La chaîne complète, jugement final compris : c’est le seul moment où le texte et les deux images sont confrontés."
-msgstr "The whole chain, final judgement included: the only point where the text and both images are checked against one another."
 
 msgid "Le juge"
 msgstr "The judge"
@@ -621,8 +619,6 @@ msgstr "to fix before publishing."
 msgid "étapes"
 msgstr "steps"
 
-msgid "Pas de collage. Le jugement final s’exécute quand même et confronte le texte à l’image produite ; il n’a simplement pas de collage à comparer."
-msgstr "No collage. The final judgement still runs and checks the text against the image produced; it simply has no collage to compare."
 
 msgid "Texte uniquement, relu et vérifié. Aucune image n’est générée, et le jugement final n’aurait rien à regarder."
 msgstr "Text only, proofread and checked. No image is generated, and the final judgement would have nothing to look at."
@@ -1023,8 +1019,6 @@ msgstr "Reference recipe"
 msgid "Recherche"
 msgstr "Research"
 
-msgid "Relecture éditoriale"
-msgstr "Editorial review"
 
 msgid "Rédaction"
 msgstr "Writing"
@@ -2141,3 +2135,18 @@ msgstr "The featured image was redrawn %d time(s) from these findings; the new o
 
 msgid "Le collage a été redessiné %d fois d’après ces remarques ; le nouveau n’a pas été rejugé."
 msgstr "The collage was redrawn %d time(s) from these findings; the new one has not been judged again."
+
+msgid "Ajoutez votre propre collage pour la remplacer ; retirez-le pour y revenir."
+msgstr "Add your own collage to replace it; remove it to go back."
+
+msgid "La chaîne complète : le texte relu et vérifié, puis les deux images jugées ensemble, face à la recette. Une image refusée vous est signalée, et vous décidez de la faire redessiner."
+msgstr "The full chain: the text reviewed and fact-checked, then both images judged together against the recipe. A refused image is flagged to you, and you decide whether to have it redrawn."
+
+msgid "Pas de collage. Le texte est relu et vérifié, et l’image à la une est jugée face à la recette."
+msgstr "No collage. The text is reviewed and fact-checked, and the featured image is judged against the recipe."
+
+msgid "référence fournie avec l’extension"
+msgstr "reference shipped with the plugin"
+
+msgid "Relecture, faits et langue"
+msgstr "Review, facts and language"

@@ -154,8 +154,13 @@ final class MSRWA_Screen_Batch {
 			);
 			$current = null === $pair['recipe'] ? '' : (string) ( $recipes[ (int) $pair['recipe'] ]['title'] ?? '' );
 			?>
-			<li class="ms-pair ms-pair-<?php echo esc_attr( $tone ); ?><?php echo empty( $image['url'] ) ? ' ms-pair-blind' : ''; ?>">
-				<?php if ( ! empty( $image['url'] ) ) : ?>
+			<?php
+			// A photograph set aside is deleted once the lot is sent: no recipe
+			// took it. Its thumbnail would be a broken image from then on.
+			$shown = ! empty( $image['url'] ) && ( $settling || ! $aside );
+			?>
+			<li class="ms-pair ms-pair-<?php echo esc_attr( $tone ); ?><?php echo $shown ? '' : ' ms-pair-blind'; ?>">
+				<?php if ( $shown ) : ?>
 					<a class="ms-pair-photo" href="<?php echo esc_url( $image['url'] ); ?>" target="_blank" rel="noopener noreferrer" title="<?php esc_attr_e( 'Voir en grand', 'ms-recipes-writer-ai' ); ?>"><img src="<?php echo esc_url( $image['url'] ); ?>" alt="<?php echo esc_attr( (string) ( $image['dish'] ?? '' ) ); ?>" loading="lazy"></a>
 				<?php endif; ?>
 				<div class="ms-pair-body">

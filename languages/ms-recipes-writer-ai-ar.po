@@ -168,8 +168,6 @@ msgstr "تصفية"
 msgid "Français"
 msgstr "الفرنسية"
 
-msgid "La chaîne complète, jugement final compris : c’est le seul moment où le texte et les deux images sont confrontés."
-msgstr "السلسلة كاملة بما فيها الحكم النهائي: وهي اللحظة الوحيدة التي يُقارن فيها النص بالصورتين معاً."
 
 msgid "Le juge"
 msgstr "الحَكَم"
@@ -621,8 +619,6 @@ msgstr "للتصحيح قبل النشر."
 msgid "étapes"
 msgstr "خطوات"
 
-msgid "Pas de collage. Le jugement final s’exécute quand même et confronte le texte à l’image produite ; il n’a simplement pas de collage à comparer."
-msgstr "بلا ملصق. يُنفَّذ الحكم النهائي مع ذلك ويقارن النص بالصورة المنتجة؛ لكن لا ملصق لديه ليقارنه."
 
 msgid "Texte uniquement, relu et vérifié. Aucune image n’est générée, et le jugement final n’aurait rien à regarder."
 msgstr "نص فقط، مُدقَّق ومُتحقَّق منه. لا تُولَّد أي صورة، ولن يكون لدى الحكم النهائي ما ينظر إليه."
@@ -1035,8 +1031,6 @@ msgstr "الوصفة المرجعية"
 msgid "Recherche"
 msgstr "البحث"
 
-msgid "Relecture éditoriale"
-msgstr "المراجعة التحريرية"
 
 msgid "Rédaction"
 msgstr "التحرير"
@@ -2177,3 +2171,18 @@ msgstr "أُعيد رسم الصورة البارزة %d مرة وفق هذه ا
 
 msgid "Le collage a été redessiné %d fois d’après ces remarques ; le nouveau n’a pas été rejugé."
 msgstr "أُعيد رسم الكولاج %d مرة وفق هذه الملاحظات؛ ولم يُحكَّم الكولاج الجديد من جديد."
+
+msgid "Ajoutez votre propre collage pour la remplacer ; retirez-le pour y revenir."
+msgstr "أضف الكولاج الخاص بك ليحل محلها؛ واحذفه للعودة إليها."
+
+msgid "La chaîne complète : le texte relu et vérifié, puis les deux images jugées ensemble, face à la recette. Une image refusée vous est signalée, et vous décidez de la faire redessiner."
+msgstr "السلسلة الكاملة: نص مراجَع ومدقَّق، ثم تُحكَّم الصورتان معًا مقارنةً بالوصفة. تُنبَّه إلى الصورة المرفوضة، وتقرر أنت إعادة رسمها."
+
+msgid "Pas de collage. Le texte est relu et vérifié, et l’image à la une est jugée face à la recette."
+msgstr "بلا كولاج. يُراجَع النص ويُدقَّق، وتُحكَّم الصورة البارزة مقارنةً بالوصفة."
+
+msgid "référence fournie avec l’extension"
+msgstr "مرجع مرفق مع الإضافة"
+
+msgid "Relecture, faits et langue"
+msgstr "المراجعة والحقائق واللغة"
