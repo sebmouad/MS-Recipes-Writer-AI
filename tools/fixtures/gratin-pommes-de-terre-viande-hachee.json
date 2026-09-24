@@ -1,0 +1,527 @@
+{
+  "title": "Gratin de pommes de terre à la viande hachée",
+  "text": "Gratin familial : viande de bœuf hachée revenue avec oignon et ail, recouverte de fines rondelles de pommes de terre, nappée de béchamel, parsemée de fromage râpé et de thym, gratinée au four. Préciser la cuisson des pommes de terre, la béchamel et le service.",
+  "editor_input": {
+    "type": "article",
+    "title": "Gratin de pommes de terre à la viande hachée",
+    "text": "Gratin familial : viande de bœuf hachée revenue avec oignon et ail, recouverte de fines rondelles de pommes de terre, nappée de béchamel, parsemée de fromage râpé et de thym, gratinée au four. Préciser la cuisson des pommes de terre, la béchamel et le service.",
+    "images": []
+  },
+  "research": {
+    "dish_identity": {
+      "name": "Gratin de pommes de terre à la viande hachée",
+      "confidence": "élevée",
+      "evidence": "Le brief fixe un gratin familial composé de bœuf haché revenu avec oignon et ail, de pommes de terre en rondelles, de béchamel, de fromage râpé et de thym; les sources consultées confirment l’association viande hachée-pommes de terre-béchamel-fromage et le gratinage au four.",
+      "source_url": "https://www.750g.com/gratin-de-puree-a-la-viande-hachee-r44564.htm"
+    },
+    "recipe_outline": {
+      "servings": 4,
+      "prep_minutes": 25,
+      "cook_minutes": 15,
+      "total_minutes": 40,
+      "category": "plat familial gratiné",
+      "cuisine": "française familiale",
+      "difficulty": "facile",
+      "source_url": "https://www.750g.com/gratin-de-puree-a-la-viande-hachee-r44564.htm"
+    },
+    "ingredients": [
+      {
+        "name": "pommes de terre",
+        "quantity": "800",
+        "unit": "g",
+        "role": "couche principale du gratin",
+        "essential": true,
+        "source_url": "https://www.750g.com/viande-hachee-et-pommes-de-terre-a-la-poele-r34396.htm"
+      },
+      {
+        "name": "bœuf haché",
+        "quantity": "400",
+        "unit": "g",
+        "role": "garniture carnée",
+        "essential": true,
+        "source_url": "https://www.750g.com/viande-hachee-et-pommes-de-terre-a-la-poele-r34396.htm"
+      },
+      {
+        "name": "oignon",
+        "quantity": "1",
+        "unit": "gros",
+        "role": "base aromatique de la viande",
+        "essential": true,
+        "source_url": "https://www.750g.com/viande-hachee-et-pommes-de-terre-a-la-poele-r34396.htm"
+      },
+      {
+        "name": "ail",
+        "quantity": "2",
+        "unit": "gousses",
+        "role": "aromatisation de la viande",
+        "essential": true,
+        "source_url": "https://www.750g.com/pommes-de-terres-farcies-r22850.htm"
+      },
+      {
+        "name": "beurre",
+        "quantity": "40",
+        "unit": "g",
+        "role": "base du roux de la béchamel",
+        "essential": true,
+        "source_url": "https://www.750g.com/viande-hachee-et-pommes-de-terre-a-la-poele-r34396.htm"
+      },
+      {
+        "name": "farine",
+        "quantity": "40",
+        "unit": "g",
+        "role": "épaississant de la béchamel",
+        "essential": true,
+        "source_url": "https://www.750g.com/viande-hachee-et-pommes-de-terre-a-la-poele-r34396.htm"
+      },
+      {
+        "name": "lait et bouillon de légumes",
+        "quantity": "20 cl + 30 cl",
+        "unit": "",
+        "role": "liquide de la sauce blanche",
+        "essential": false,
+        "source_url": "https://www.750g.com/viande-hachee-et-pommes-de-terre-a-la-poele-r34396.htm"
+      },
+      {
+        "name": "fromage râpé",
+        "quantity": "75",
+        "unit": "g",
+        "role": "couche gratinée",
+        "essential": true,
+        "source_url": "https://www.750g.com/viande-hachee-et-pommes-de-terre-a-la-poele-r34396.htm"
+      },
+      {
+        "name": "thym frais",
+        "quantity": "1",
+        "unit": "branche",
+        "role": "herbe aromatique",
+        "essential": true,
+        "source_url": "https://www.750g.com/viande-hachee-et-pommes-de-terre-a-la-poele-r34396.htm"
+      },
+      {
+        "name": "huile",
+        "quantity": "2",
+        "unit": "cuillères à soupe",
+        "role": "cuisson de l'oignon et de la viande",
+        "essential": false,
+        "source_url": "https://www.750g.com/viande-hachee-et-pommes-de-terre-a-la-poele-r34396.htm"
+      }
+    ],
+    "preparation": [
+      {
+        "step": 1,
+        "action": "Éplucher les pommes de terre et les couper en rondelles fines.",
+        "cue": "Les rondelles ont une épaisseur régulière.",
+        "minutes": null,
+        "temperature_c": null,
+        "source_url": "https://www.750g.com/tourte-de-pommes-de-terre-r40057.htm"
+      },
+      {
+        "step": 2,
+        "action": "Faire suer l'oignon dans une cuillère à soupe d'huile, puis ajouter l'ail.",
+        "cue": "L'oignon est tendre et légèrement doré.",
+        "minutes": null,
+        "temperature_c": null,
+        "source_url": "https://www.750g.com/pommes-de-terres-farcies-r22850.htm"
+      },
+      {
+        "step": 3,
+        "action": "Ajouter le bœuf haché, l'émietter et le cuire avec le thym, le sel et le poivre.",
+        "cue": "La viande est cuite et ne forme plus de gros amas.",
+        "minutes": 5,
+        "temperature_c": null,
+        "source_url": "https://www.750g.com/viande-hachee-et-pommes-de-terre-a-la-poele-r34396.htm"
+      },
+      {
+        "step": 4,
+        "action": "Faire fondre le beurre, incorporer la farine et cuire le roux en remuant.",
+        "cue": "Le mélange est homogène et sans grumeaux secs.",
+        "minutes": null,
+        "temperature_c": null,
+        "source_url": "https://www.750g.com/viande-hachee-et-pommes-de-terre-a-la-poele-r34396.htm"
+      },
+      {
+        "step": 5,
+        "action": "Verser progressivement le lait et le bouillon, puis laisser mijoter la sauce en remuant.",
+        "cue": "La sauce a épaissi et n'est pas liquide.",
+        "minutes": 5,
+        "temperature_c": null,
+        "source_url": "https://www.750g.com/viande-hachee-et-pommes-de-terre-a-la-poele-r34396.htm"
+      },
+      {
+        "step": 6,
+        "action": "Préchauffer le four et beurrer un plat à gratin.",
+        "cue": "Le four atteint 180 °C et le plat est uniformément graissé.",
+        "minutes": null,
+        "temperature_c": 180,
+        "source_url": "https://www.750g.com/pommes-de-terres-farcies-r22850.htm"
+      },
+      {
+        "step": 7,
+        "action": "Répartir la viande dans le plat, couvrir de rondelles de pommes de terre, napper de béchamel et parsemer de fromage râpé et de thym.",
+        "cue": "Les pommes de terre sont couvertes et le fromage forme une couche régulière.",
+        "minutes": null,
+        "temperature_c": null,
+        "source_url": "https://www.750g.com/gratin-de-puree-a-la-viande-hachee-r44564.htm"
+      },
+      {
+        "step": 8,
+        "action": "Cuire jusqu'à ce que les pommes de terre soient tendres et la croûte dorée.",
+        "cue": "La croûte est bien dorée et la lame s'enfonce facilement dans les pommes de terre.",
+        "minutes": 15,
+        "temperature_c": 180,
+        "source_url": "https://www.750g.com/pommes-de-terres-farcies-r22850.htm"
+      }
+    ],
+    "substitutions": [
+      {
+        "ingredient": "bouillon de légumes",
+        "replacement": "marinade de viande",
+        "note": "Une source indique que la marinade peut remplacer le bouillon de légumes dans la sauce.",
+        "source_url": "https://www.750g.com/viande-hachee-et-pommes-de-terre-a-la-poele-r34396.htm"
+      },
+      {
+        "ingredient": "fromage râpé",
+        "replacement": "comté râpé",
+        "note": "Le comté est utilisé comme fromage râpé dans une version proche de la sauce aux pommes de terre et à la viande.",
+        "source_url": "https://www.750g.com/viande-hachee-et-pommes-de-terre-a-la-poele-r34396.htm"
+      },
+      {
+        "ingredient": "fromage râpé",
+        "replacement": "gruyère ou parmesan",
+        "note": "Une recette proche propose du gruyère et/ou du parmesan pour gratiner.",
+        "source_url": "https://www.750g.com/pommes-de-terres-farcies-a-la-bolognaise-r71609.htm"
+      }
+    ],
+    "accompaniments": [
+      {
+        "name": "salade vinaigrée",
+        "note": "Une source recommande de servir la préparation avec une petite salade vinaigrée.",
+        "source_url": "https://www.750g.com/pommes-de-terres-farcies-r22850.htm"
+      },
+      {
+        "name": "salade verte",
+        "note": "Une salade verte est indiquée comme accompagnement d'un gratin proche à la viande et à la béchamel.",
+        "source_url": "https://www.750g.com/lasagnes-a-la-sauce-bolognaise-faite-maison-r96989.htm"
+      }
+    ],
+    "common_failures": [
+      {
+        "problem": "Béchamel trop liquide",
+        "cause": "La sauce n'a pas suffisamment épaissi pendant la cuisson.",
+        "remedy": "Poursuivre le mijotage en remuant jusqu'à obtenir une sauce épaissie.",
+        "source_url": "https://www.750g.com/viande-hachee-et-pommes-de-terre-a-la-poele-r34396.htm"
+      },
+      {
+        "problem": "Purée ou couche de pommes de terre qui ne tient pas",
+        "cause": "La préparation de pommes de terre est trop liquide.",
+        "remedy": "Éviter une texture liquide afin que le gratin se tienne après cuisson.",
+        "source_url": "https://www.750g.com/gratin-de-puree-a-la-viande-hachee-r44564.htm"
+      },
+      {
+        "problem": "Pommes de terre encore fermes",
+        "cause": "Les rondelles sont trop épaisses ou le gratinage est trop court.",
+        "remedy": "Utiliser des rondelles fines et prolonger la cuisson jusqu'à ce qu'une lame les traverse facilement.",
+        "source_url": "https://www.750g.com/tourte-de-pommes-de-terre-r40057.htm"
+      },
+      {
+        "problem": "Viande en bloc",
+        "cause": "La viande hachée n'a pas été suffisamment émiettée pendant la cuisson.",
+        "remedy": "La casser à la spatule dès son ajout dans la poêle.",
+        "source_url": "https://www.750g.com/viande-hachee-et-pommes-de-terre-a-la-poele-r34396.htm"
+      }
+    ],
+    "storage": [
+      {
+        "method": "réfrigération",
+        "duration": "3 à 4 jours",
+        "note": "Conserver le gratin cuit dans un récipient couvert au réfrigérateur.",
+        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/leftovers-and-food-safety"
+      },
+      {
+        "method": "congélation",
+        "duration": "2 à 3 mois",
+        "note": "Congeler en portions hermétiques et décongeler au réfrigérateur avant réchauffage.",
+        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/leftovers-and-food-safety"
+      },
+      {
+        "method": "réchauffage",
+        "duration": "jusqu'à cœur chaud",
+        "note": "Réchauffer jusqu'à 74 °C au centre pour une portion déjà cuite.",
+        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/leftovers-and-food-safety"
+      }
+    ],
+    "food_safety": [
+      {
+        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/meat/ground-beef",
+        "text": "Cuire le bœuf haché à une température interne minimale de 71 °C."
+      },
+      {
+        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/leftovers-and-food-safety",
+        "text": "Réfrigérer les restes dans les deux heures suivant la cuisson, ou dans l'heure si la température ambiante dépasse 32 °C."
+      },
+      {
+        "source_url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/leftovers-and-food-safety",
+        "text": "Réchauffer les restes jusqu'à 74 °C au centre."
+      }
+    ],
+    "references": [
+      {
+        "url": "https://www.750g.com/gratin-de-puree-a-la-viande-hachee-r44564.htm",
+        "title": "Gratin de purée à la viande hachée",
+        "publisher": "750g"
+      },
+      {
+        "url": "https://www.750g.com/viande-hachee-et-pommes-de-terre-a-la-poele-r34396.htm",
+        "title": "Viande hachée et pommes de terre à la poêle",
+        "publisher": "750g"
+      },
+      {
+        "url": "https://www.750g.com/pommes-de-terres-farcies-r22850.htm",
+        "title": "Pommes de terres farcies",
+        "publisher": "750g"
+      },
+      {
+        "url": "https://www.750g.com/tourte-de-pommes-de-terre-r40057.htm",
+        "title": "Tourte de pommes de terre",
+        "publisher": "750g"
+      },
+      {
+        "url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/meat/ground-beef",
+        "title": "Ground Beef and Food Safety",
+        "publisher": "USDA Food Safety and Inspection Service"
+      },
+      {
+        "url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/leftovers-and-food-safety",
+        "title": "Leftovers and Food Safety",
+        "publisher": "USDA Food Safety and Inspection Service"
+      }
+    ],
+    "visual_references": [
+      {
+        "image_url": "https://static.750g.com/images/160-100/d392289d12a93c2eecc4a05942ec398d/hachis-parmentier.jpg",
+        "source_url": "https://www.750g.com/gratin-de-puree-a-la-viande-hachee-r44564.htm",
+        "title": "Hachis parmentier gratiné",
+        "tier": 2
+      },
+      {
+        "image_url": "https://static.750g.com/images/160-100/9b919fd9c86cab494895edc299652fa2/hachis-parmentier-au-fromage-rape-sublime-filante-giovanni-ferrari.jpeg",
+        "source_url": "https://www.750g.com/gratin-de-puree-a-la-viande-hachee-r44564.htm",
+        "title": "Hachis parmentier au fromage râpé",
+        "tier": 2
+      },
+      {
+        "image_url": "https://static.750g.com/images/160-100/2251b18d00275585ba3a8b0f053b92ee/hachis-parmentier.png",
+        "source_url": "https://www.750g.com/gratin-de-puree-a-la-viande-hachee-r44564.htm",
+        "title": "Hachis parmentier gratiné en plat",
+        "tier": 2
+      }
+    ],
+    "visual_observations": [
+      {
+        "image_url": "https://static.750g.com/images/160-100/d392289d12a93c2eecc4a05942ec398d/hachis-parmentier.jpg",
+        "source_url": "https://www.750g.com/gratin-de-puree-a-la-viande-hachee-r44564.htm",
+        "observable_details": "Préparation cuite présentée directement dans un plat rectangulaire en céramique claire. La surface supérieure est recouverte d’une couche dorée et irrégulièrement brunie. Une portion à l’avant laisse voir une garniture compacte brun foncé sous la couche supérieure.",
+        "composition": "Vue rapprochée en légère plongée oblique. La préparation occupe presque toute la surface visible du plat et est servie dans le même récipient de cuisson.",
+        "couleurs": "Couche supérieure crème à jaune doré, avec des zones brun doré. Garniture visible brun foncé. Plat de couleur claire.",
+        "textures": "Surface supérieure granuleuse, émiettée et légèrement croustillante en apparence, avec des zones plus lisses. Garniture intérieure dense et irrégulière, semblant plus humide que la surface.",
+        "incertainties": "La nature exacte de la couche supérieure et de la garniture n’est pas identifiable avec certitude à partir de l’image seule. Le degré précis de croustillant et la température ne peuvent pas être confirmés."
+      }
+    ],
+    "uncertainties": [
+      "Aucune source consultée ne donne une recette complète exactement sous la forme du brief avec pommes de terre crues en rondelles, béchamel, bœuf, ail, oignon, thym et fromage.",
+      "Les quantités de pommes de terre et de bœuf proviennent d'une préparation proche à la poêle, tandis que l'assemblage en gratin provient de recettes apparentées.",
+      "La durée de cuisson au four varie selon les sources entre 10 et 15 minutes après précuisson ou cuisson des éléments; une durée exacte pour des rondelles crues n'est pas documentée.",
+      "Les photographies tierces du plat exact n'ont pas été trouvées dans les résultats consultés; les trois images proposées sont des variantes de hachis parmentier et ne prouvent pas l'apparence exacte du gratin du brief."
+    ],
+    "originality_notes": [
+      "Le brief a été traité comme l'autorité pour la forme du plat et ses ingrédients principaux; les composants absents du brief n'ont pas été ajoutés à la recette.",
+      "Les sources de hachis parmentier, de pommes de terre farcies et de préparation à la poêle ont été utilisées uniquement pour documenter des techniques, proportions ou signes de cuisson compatibles.",
+      "Aucun ingrédient, temps ou détail visuel non documenté n'a été présenté comme une certitude pour le plat exact."
+    ]
+  },
+  "canonical": {
+    "title": "Gratin de pommes de terre à la viande hachée",
+    "description": "Ce gratin familial associe des pommes de terre fondantes, une viande de bœuf moelleuse et une béchamel crémeuse sous une croûte dorée, servi chaud au déjeuner ou au dîner.",
+    "servings": 4,
+    "prep_minutes": 25,
+    "cook_minutes": 15,
+    "total_minutes": 40,
+    "cuisine": "française familiale",
+    "recipe_category": "plat principal",
+    "difficulty": "facile",
+    "calories_estimate": 650,
+    "ingredients": [
+      {
+        "name": "pommes de terre",
+        "quantity": 800,
+        "unit": "g"
+      },
+      {
+        "name": "bœuf haché",
+        "quantity": 400,
+        "unit": "g"
+      },
+      {
+        "name": "oignon",
+        "quantity": 1,
+        "unit": "gros"
+      },
+      {
+        "name": "ail",
+        "quantity": 2,
+        "unit": "gousses"
+      },
+      {
+        "name": "beurre",
+        "quantity": 40,
+        "unit": "g"
+      },
+      {
+        "name": "farine",
+        "quantity": 40,
+        "unit": "g"
+      },
+      {
+        "name": "lait",
+        "quantity": 20,
+        "unit": "cl"
+      },
+      {
+        "name": "bouillon de légumes",
+        "quantity": 30,
+        "unit": "cl"
+      },
+      {
+        "name": "fromage râpé",
+        "quantity": 75,
+        "unit": "g"
+      },
+      {
+        "name": "thym frais",
+        "quantity": 1,
+        "unit": "branche"
+      },
+      {
+        "name": "huile",
+        "quantity": 2,
+        "unit": "cuillères à soupe"
+      },
+      {
+        "name": "sel",
+        "quantity": 5,
+        "unit": "g"
+      },
+      {
+        "name": "poivre",
+        "quantity": 1,
+        "unit": "g"
+      }
+    ],
+    "steps": [
+      {
+        "text": "Éplucher les pommes de terre et les couper en rondelles fines et régulières."
+      },
+      {
+        "text": "Faire chauffer l’huile dans une poêle et y faire suer l’oignon émincé jusqu’à ce qu’il soit tendre et légèrement doré."
+      },
+      {
+        "text": "Ajouter l’ail haché et le faire revenir brièvement sans le brûler."
+      },
+      {
+        "text": "Ajouter le bœuf haché, l’émietter à la spatule, puis incorporer la moitié du thym, le sel et le poivre."
+      },
+      {
+        "text": "Cuire la viande pendant 5 minutes, jusqu’à ce qu’elle soit cuite à cœur et ne forme plus de gros amas."
+      },
+      {
+        "text": "Faire fondre le beurre dans une casserole, ajouter la farine et remuer jusqu’à obtenir un roux homogène."
+      },
+      {
+        "text": "Verser progressivement le lait et le bouillon de légumes dans le roux en fouettant."
+      },
+      {
+        "text": "Laisser mijoter la béchamel en remuant pendant 5 minutes, jusqu’à ce qu’elle soit épaissie et non liquide."
+      },
+      {
+        "text": "Préchauffer le four à 180 °C en mode traditionnel."
+      },
+      {
+        "text": "Beurrer uniformément un plat à gratin avec une partie du beurre déjà prévu."
+      },
+      {
+        "text": "Répartir la viande dans le fond du plat."
+      },
+      {
+        "text": "Couvrir la viande avec les rondelles de pommes de terre en les disposant en couche régulière."
+      },
+      {
+        "text": "Napper les pommes de terre avec la béchamel."
+      },
+      {
+        "text": "Parsemer le fromage râpé et le reste du thym sur toute la surface."
+      },
+      {
+        "text": "Cuire le gratin à 180 °C pendant 15 minutes, jusqu’à ce que la croûte soit dorée et qu’une lame s’enfonce facilement dans les pommes de terre."
+      }
+    ],
+    "equipment": [
+      "éplucheur",
+      "couteau",
+      "planche à découper",
+      "poêle",
+      "spatule",
+      "casserole",
+      "fouet",
+      "plat à gratin",
+      "four"
+    ],
+    "notes": [
+      "Utiliser des rondelles de pommes de terre fines et régulières pour qu’elles deviennent tendres dans le temps de cuisson prévu.",
+      "La béchamel doit être suffisamment épaisse pour napper les pommes de terre sans couler au fond du plat.",
+      "Servir chaud directement dans le plat de cuisson, éventuellement avec une salade verte vinaigrée.",
+      "Laisser reposer quelques minutes après la sortie du four afin que les couches se tiennent mieux."
+    ],
+    "faq": [
+      {
+        "question": "Comment savoir si les pommes de terre sont cuites ?",
+        "answer": "Une lame doit s’enfoncer facilement au centre du gratin, sans rencontrer de résistance."
+      },
+      {
+        "question": "Que faire si la béchamel est trop liquide ?",
+        "answer": "La remettre à mijoter en remuant jusqu’à ce qu’elle épaississe avant de l’utiliser."
+      },
+      {
+        "question": "Comment éviter que la viande forme un bloc ?",
+        "answer": "L’émietter continuellement à la spatule dès son ajout dans la poêle."
+      },
+      {
+        "question": "Peut-on conserver ce gratin ?",
+        "answer": "Oui, le conserver couvert au réfrigérateur pendant 3 à 4 jours ou le congeler en portions hermétiques pendant 2 à 3 mois."
+      }
+    ],
+    "keywords": [
+      "gratin de pommes de terre",
+      "viande hachée",
+      "bœuf",
+      "béchamel",
+      "gratin familial",
+      "cuisine française",
+      "plat au four",
+      "fromage râpé",
+      "thym"
+    ],
+    "food_safety": [
+      "Cuire le bœuf haché jusqu’à une température interne minimale de 71 °C.",
+      "Le lait, le beurre et le fromage sont des allergènes laitiers ; la farine contient du gluten.",
+      "Réfrigérer les restes dans les deux heures suivant la cuisson, ou dans l’heure si la température ambiante dépasse 32 °C.",
+      "Conserver les restes cuits couverts au réfrigérateur pendant 3 à 4 jours.",
+      "Décongeler les portions congelées au réfrigérateur, puis les réchauffer jusqu’à 74 °C au centre."
+    ],
+    "uncertainties": [
+      "Aucune source ne documente exactement cette version avec des pommes de terre crues en rondelles, une béchamel, du bœuf, de l’ail, de l’oignon, du thym et du fromage.",
+      "Les quantités de pommes de terre et de bœuf proviennent d’une préparation proche, tandis que l’assemblage en gratin provient de recettes apparentées.",
+      "La durée de cuisson de 15 minutes est issue des sources, mais des rondelles crues peuvent nécessiter davantage de temps selon leur épaisseur et le plat utilisé.",
+      "Le beurre prévu sert à la béchamel et au graissage du plat ; en utiliser seulement la quantité nécessaire à chaque usage."
+    ]
+  }
+}

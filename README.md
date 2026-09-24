@@ -5,9 +5,9 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.26.7
+## État actuel — 0.26.8
 
-La version `0.26.7` fait suivre à la recette le plat que décrit le rédacteur et relève le plafond par recette à 0,25 $ ; la `0.26.6` dessinait le visuel Facebook en qualité haute et ne fait plus redessiner un collage pour un aromate montré une étape trop tôt ; la `0.26.5` permettait au moteur de dessiner avec les modèles d'image de Gemini, au bon prix ; la `0.26.4` donnait au visuel Facebook le style des collages de référence du propriétaire : lumineux, net, cadré serré ; la `0.26.3` faisait ressembler le visuel Facebook à de vraies photographies plutôt qu'à des images de synthèse ; la `0.26.2` rendait le visuel Facebook plus chaleureux et plus proche du plat, et le fait toujours finir sur le plat ouvert ; la `0.26.1` retirait les copies des prompts que gardaient les réglages :
+La version `0.26.8` dessine le visuel Facebook d'après la consigne que le propriétaire utilise lui-même ; la `0.26.7` faisait suivre à la recette le plat que décrit le rédacteur et relève le plafond par recette à 0,25 $ ; la `0.26.6` dessinait le visuel Facebook en qualité haute et ne fait plus redessiner un collage pour un aromate montré une étape trop tôt ; la `0.26.5` permettait au moteur de dessiner avec les modèles d'image de Gemini, au bon prix ; la `0.26.4` donnait au visuel Facebook le style des collages de référence du propriétaire : lumineux, net, cadré serré ; la `0.26.3` faisait ressembler le visuel Facebook à de vraies photographies plutôt qu'à des images de synthèse ; la `0.26.2` rendait le visuel Facebook plus chaleureux et plus proche du plat, et le fait toujours finir sur le plat ouvert ; la `0.26.1` retirait les copies des prompts que gardaient les réglages :
 le moteur exécute ses propres gabarits, et ce qui n’est lu par rien ne se
 périme plus en silence. Le détail de chaque version suit, de la plus récente à
 la plus ancienne.
@@ -76,6 +76,25 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.26.8
+
+**Le visuel Facebook suit la consigne du propriétaire.** Le texte qui décrit le
+collage reprend la consigne ChatGPT du propriétaire et ses préférences :
+photographie ultra réaliste comme un plat cuisiné à la maison, lumière
+naturelle, cuisine moderne aux tons clairs, ombres douces, angle légèrement
+vu du dessus, composition Pinterest, six images carrées en 2 × 3, mêmes
+ustensiles d'une image à l'autre, progression logique jusqu'au plat tranché ou
+ouvert, aucun texte, jamais l'air d'une image d'IA. Les six images vont à ce
+que le lecteur veut voir — la garniture, le montage, le résultat doré,
+l'intérieur — et plus à une béchamel montrée deux fois ou un bol d'œuf battu.
+Un torchon vichy et quelques herbes floues au bord redeviennent permis, comme
+dans ses propres collages. L'ordre de la recette et les états de cuisson
+restent vérifiés.
+
+Essayé en qualité haute sur les plats de ses collages de référence — gratin de
+cabillaud, chaussons, croquettes, quiche et gratin de pommes de terre à la
+viande hachée.
 
 ## Version 0.26.7
 

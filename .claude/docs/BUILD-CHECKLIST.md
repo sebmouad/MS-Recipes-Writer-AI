@@ -598,6 +598,9 @@ cost) in the task before changing anything.
 - [x] **A37 — The brief defines the dish (2026-09-24).** Research and recipe keep
   the brief's form and principal ingredients; ingredients listed once; an
   unreadable answer asked again; ceiling $0.25. See ENGINE.md §7, item 34.
+- [x] **A38 — The owner's collage prompt (2026-09-24).** Rebuilt on his ChatGPT
+  prompt and style notes; tried live at high on five of his dishes. See
+  ENGINE.md §7, item 35.
 - [x] **A11 — Model answers that do not parse (found 2026-09-20).** Two of the
   54 matrix cells scored zero for a reason that was ours, not the prompt's:
   Opus 5 wrote "I'll research this dish now." before the object, and Sonnet 5

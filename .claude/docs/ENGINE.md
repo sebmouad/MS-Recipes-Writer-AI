@@ -680,6 +680,22 @@ photograph, and otherwise use the photograph without the cost of a search.
     already were. The plugin's shipped per-recipe ceiling rises to $0.25, which
     leaves room for a second collage after one redraw at high.
 
+35. **The collage prompt is the owner's own.** 2026-09-24: the owner shared
+    the ChatGPT prompt that produces the collages he holds up, and the style
+    notes his assistant keeps about him — ultra-realistic like a dish cooked
+    at home, bright natural light, a clean modern kitchen in light tones,
+    soft shadows, a slight top-down angle, Pinterest composition, six square
+    images in 2 × 3, the same utensils throughout, a logical progression, a
+    last image sliced or opened, no text, and never the look of AI. The
+    `collage` prompt is rebuilt on it, in his order: style, layout, the six
+    images (ingredients, filling or sauce, first and second assembly,
+    topping, the finished dish opened), food details, text. Kept from the
+    engine's lessons: the recipe's order and states, one stage per panel,
+    no passive moments, no packaging or baking beans. Item 31's ban on props
+    goes: his own references carry a gingham cloth and blurred herbs. Five
+    collages at high on the dishes of his references, then one round to crop
+    tighter and deepen colour.
+
 ### Still open
 
 

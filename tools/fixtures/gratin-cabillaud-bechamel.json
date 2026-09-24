@@ -11,245 +11,264 @@
     "dish_identity": {
       "name": "Gratin de cabillaud à la béchamel",
       "confidence": "élevée",
-      "evidence": "Le brief décrit un filet de cabillaud nappé de béchamel et gratiné au fromage; une recette 750g documente une variante avec cabillaud, béchamel, gruyère et garniture de pommes de terre, artichauts et champignons. Source: https://www.750g.com/mini-gratin-de-la-mer-avec-son-coeur-dartichaut-champignons-et-sa-sauce-bechamel-r31277.htm"
+      "evidence": "Le brief fixe des filets de cabillaud nappés de béchamel, couverts de fromage râpé et gratinés au four; une source décrit précisément cette combinaison. "
     },
     "recipe_outline": {
-      "servings": 2,
-      "prep_minutes": 30,
-      "cook_minutes": 15,
-      "total_minutes": 45,
-      "category": "Plat gratiné",
-      "cuisine": "Française",
-      "difficulty": "Facile",
-      "source_url": "https://www.750g.com/mini-gratin-de-la-mer-avec-son-coeur-dartichaut-champignons-et-sa-sauce-bechamel-r31277.htm"
+      "servings": 4,
+      "prep_minutes": null,
+      "cook_minutes": 20,
+      "total_minutes": 35,
+      "category": "plat principal, gratin de poisson",
+      "cuisine": "non précisée par la source",
+      "difficulty": "facile",
+      "source_url": "https://bacalalo.com/en/blogs/bacalao/bacalao-gratinado-receta-horno-alioli-bechamel"
     },
     "ingredients": [
       {
-        "name": "Dos de cabillaud frais",
-        "quantity": "2, environ 140",
-        "unit": "g par personne",
-        "role": "Poisson principal",
+        "name": "filets de cabillaud dessalé",
+        "quantity": "4",
+        "unit": "filets",
+        "role": "élément principal du gratin",
         "essential": true,
-        "source_url": "https://www.750g.com/mini-gratin-de-la-mer-avec-son-coeur-dartichaut-champignons-et-sa-sauce-bechamel-r31277.htm"
+        "source_url": "https://bacalalo.com/en/blogs/bacalao/bacalao-gratinado-receta-horno-alioli-bechamel"
       },
       {
-        "name": "Pommes de terre cuites à la vapeur",
-        "quantity": "3",
-        "unit": "pièces",
-        "role": "Base du gratin",
-        "essential": false,
-        "source_url": "https://www.750g.com/mini-gratin-de-la-mer-avec-son-coeur-dartichaut-champignons-et-sa-sauce-bechamel-r31277.htm"
-      },
-      {
-        "name": "Cœurs d’artichaut",
-        "quantity": "1",
-        "unit": "boîte",
-        "role": "Garniture végétale",
-        "essential": false,
-        "source_url": "https://www.750g.com/mini-gratin-de-la-mer-avec-son-coeur-dartichaut-champignons-et-sa-sauce-bechamel-r31277.htm"
-      },
-      {
-        "name": "Champignons de Paris",
-        "quantity": "100",
+        "name": "beurre",
+        "quantity": 30,
         "unit": "g",
-        "role": "Garniture et texture",
-        "essential": false,
-        "source_url": "https://www.750g.com/mini-gratin-de-la-mer-avec-son-coeur-dartichaut-champignons-et-sa-sauce-bechamel-r31277.htm"
+        "role": "matière grasse du roux",
+        "essential": true,
+        "source_url": "https://bacalalo.com/en/blogs/bacalao/bacalao-gratinado-receta-horno-alioli-bechamel"
       },
       {
-        "name": "Beurre demi-sel",
-        "quantity": "30",
+        "name": "farine de blé",
+        "quantity": 30,
         "unit": "g",
-        "role": "Matière grasse du roux",
+        "role": "épaississant de la béchamel",
         "essential": true,
-        "source_url": "https://www.750g.com/mini-gratin-de-la-mer-avec-son-coeur-dartichaut-champignons-et-sa-sauce-bechamel-r31277.htm"
+        "source_url": "https://bacalalo.com/en/blogs/bacalao/bacalao-gratinado-receta-horno-alioli-bechamel"
       },
       {
-        "name": "Farine",
-        "quantity": "30",
+        "name": "lait entier",
+        "quantity": 400,
+        "unit": "ml",
+        "role": "base liquide de la béchamel",
+        "essential": true,
+        "source_url": "https://bacalalo.com/en/blogs/bacalao/bacalao-gratinado-receta-horno-alioli-bechamel"
+      },
+      {
+        "name": "fromage râpé",
+        "quantity": 80,
         "unit": "g",
-        "role": "Épaississant de la béchamel",
+        "role": "couverture gratinée",
         "essential": true,
-        "source_url": "https://www.750g.com/mini-gratin-de-la-mer-avec-son-coeur-dartichaut-champignons-et-sa-sauce-bechamel-r31277.htm"
+        "source_url": "https://bacalalo.com/en/blogs/bacalao/bacalao-gratinado-receta-horno-alioli-bechamel"
       },
       {
-        "name": "Lait",
-        "quantity": "0,5",
-        "unit": "l",
-        "role": "Liquide de la béchamel",
-        "essential": true,
-        "source_url": "https://www.750g.com/mini-gratin-de-la-mer-avec-son-coeur-dartichaut-champignons-et-sa-sauce-bechamel-r31277.htm"
-      },
-      {
-        "name": "Gruyère râpé",
-        "quantity": "200",
-        "unit": "g",
-        "role": "Couverture gratinée",
-        "essential": true,
-        "source_url": "https://www.750g.com/mini-gratin-de-la-mer-avec-son-coeur-dartichaut-champignons-et-sa-sauce-bechamel-r31277.htm"
-      },
-      {
-        "name": "Noix de muscade",
-        "quantity": "au goût",
+        "name": "noix de muscade fraîchement râpée",
+        "quantity": "non précisée",
         "unit": null,
-        "role": "Assaisonnement de la sauce",
+        "role": "assaisonnement de la béchamel",
         "essential": false,
-        "source_url": "https://www.750g.com/mini-gratin-de-la-mer-avec-son-coeur-dartichaut-champignons-et-sa-sauce-bechamel-r31277.htm"
+        "source_url": "https://bacalalo.com/en/blogs/bacalao/bacalao-gratinado-receta-horno-alioli-bechamel"
       },
       {
-        "name": "Sel et poivre noir",
-        "quantity": "au goût",
+        "name": "sel",
+        "quantity": "non précisée",
         "unit": null,
-        "role": "Assaisonnement",
+        "role": "assaisonnement",
         "essential": false,
-        "source_url": "https://www.750g.com/mini-gratin-de-la-mer-avec-son-coeur-dartichaut-champignons-et-sa-sauce-bechamel-r31277.htm"
+        "source_url": "https://bacalalo.com/en/blogs/bacalao/bacalao-gratinado-receta-horno-alioli-bechamel"
+      },
+      {
+        "name": "poivre blanc",
+        "quantity": "non précisée",
+        "unit": null,
+        "role": "assaisonnement",
+        "essential": false,
+        "source_url": "https://bacalalo.com/en/blogs/bacalao/bacalao-gratinado-receta-horno-alioli-bechamel"
       }
     ],
     "preparation": [
       {
         "step": 1,
-        "action": "Porter le lait à ébullition; faire fondre le beurre, ajouter la farine et cuire le roux quelques minutes sans le colorer. Verser le lait chaud, fouetter et cuire jusqu’à épaississement.",
-        "cue": "Le roux reste blanc et la béchamel devient épaisse.",
-        "minutes": null,
+        "action": "Faire fondre le beurre à feu moyen, ajouter la farine et cuire le roux en remuant.",
+        "cue": "Le mélange forme une pâte homogène après environ deux minutes.",
+        "minutes": 2,
         "temperature_c": null,
-        "source_url": "https://www.750g.com/mini-gratin-de-la-mer-avec-son-coeur-dartichaut-champignons-et-sa-sauce-bechamel-r31277.htm"
+        "source_url": "https://bacalalo.com/en/blogs/bacalao/bacalao-gratinado-receta-horno-alioli-bechamel"
       },
       {
         "step": 2,
-        "action": "Laver, émincer puis faire dorer les champignons dans une poêle chaude avec une noix de beurre.",
-        "cue": "Les champignons sont dorés.",
+        "action": "Verser immédiatement le lait froid en fouettant constamment, puis cuire la béchamel.",
+        "cue": "La sauce épaissit et devient lisse après huit à dix minutes.",
         "minutes": 10,
         "temperature_c": null,
-        "source_url": "https://www.750g.com/mini-gratin-de-la-mer-avec-son-coeur-dartichaut-champignons-et-sa-sauce-bechamel-r31277.htm"
+        "source_url": "https://bacalalo.com/en/blogs/bacalao/bacalao-gratinado-receta-horno-alioli-bechamel"
       },
       {
         "step": 3,
-        "action": "Couper les pommes de terre en rondelles et les répartir en une seule couche dans les plats à gratin.",
-        "cue": "Le fond des plats est couvert d’une couche régulière.",
+        "action": "Assaisonner la béchamel avec la muscade, le sel et le poivre blanc.",
+        "cue": "L’assaisonnement est incorporé à une sauce épaisse et homogène.",
         "minutes": null,
         "temperature_c": null,
-        "source_url": "https://www.750g.com/mini-gratin-de-la-mer-avec-son-coeur-dartichaut-champignons-et-sa-sauce-bechamel-r31277.htm"
+        "source_url": "https://bacalalo.com/en/blogs/bacalao/bacalao-gratinado-receta-horno-alioli-bechamel"
       },
       {
         "step": 4,
-        "action": "Ajouter les cœurs d’artichaut en morceaux, déposer les dos de cabillaud désarêtés, puis couvrir de béchamel et de champignons.",
-        "cue": "Le poisson est au centre et entièrement nappé de sauce.",
+        "action": "Placer les filets de cabillaud dans un plat à gratin, directement ou sur une base de pommes de terre précuites proposée en variante.",
+        "cue": "Les filets sont disposés à plat et séparés dans le plat.",
         "minutes": null,
         "temperature_c": null,
-        "source_url": "https://www.750g.com/mini-gratin-de-la-mer-avec-son-coeur-dartichaut-champignons-et-sa-sauce-bechamel-r31277.htm"
+        "source_url": "https://bacalalo.com/en/blogs/bacalao/bacalao-gratinado-receta-horno-alioli-bechamel"
       },
       {
         "step": 5,
-        "action": "Parsemer de gruyère râpé et cuire au four.",
-        "cue": "Le dessus est gratiné et le plat est servi chaud.",
-        "minutes": 15,
-        "temperature_c": 180,
-        "source_url": "https://www.750g.com/mini-gratin-de-la-mer-avec-son-coeur-dartichaut-champignons-et-sa-sauce-bechamel-r31277.htm"
+        "action": "Napper complètement chaque filet avec la béchamel chaude.",
+        "cue": "Le poisson est entièrement recouvert de sauce.",
+        "minutes": null,
+        "temperature_c": null,
+        "source_url": "https://bacalalo.com/en/blogs/bacalao/bacalao-gratinado-receta-horno-alioli-bechamel"
+      },
+      {
+        "step": 6,
+        "action": "Répartir le fromage râpé sur la béchamel.",
+        "cue": "La surface est couverte d’une couche régulière de fromage.",
+        "minutes": null,
+        "temperature_c": null,
+        "source_url": "https://bacalalo.com/en/blogs/bacalao/bacalao-gratinado-receta-horno-alioli-bechamel"
+      },
+      {
+        "step": 7,
+        "action": "Cuire dans un four préchauffé.",
+        "cue": "Le fromage est doré et la béchamel bouillonne sur les bords.",
+        "minutes": 20,
+        "temperature_c": 200,
+        "source_url": "https://bacalalo.com/en/blogs/bacalao/bacalao-gratinado-receta-horno-alioli-bechamel"
+      },
+      {
+        "step": 8,
+        "action": "Laisser reposer brièvement avant de servir.",
+        "cue": "La croûte se raffermit et le jus se redistribue.",
+        "minutes": 3,
+        "temperature_c": null,
+        "source_url": "https://bacalalo.com/en/blogs/bacalao/bacalao-gratinado-receta-horno-alioli-bechamel"
       }
     ],
     "substitutions": [
       {
-        "ingredient": "Cabillaud",
-        "replacement": "Autre poisson blanc",
-        "note": "Une recette 750g indique que d’autres filets de poisson blanc peuvent convenir.",
-        "source_url": "https://www.750g.com/parmentier-de-cabillaud-r22942.htm"
+        "ingredient": "fromage râpé",
+        "replacement": "Gruyère ou emmental",
+        "note": "La source donne indifféremment du Gruyère ou de l’emmental.",
+        "source_url": "https://bacalalo.com/en/blogs/bacalao/bacalao-gratinado-receta-horno-alioli-bechamel"
       },
       {
-        "ingredient": "Gruyère râpé",
-        "replacement": "Parmesan râpé",
-        "note": "Une recette 750g cite le gruyère ou le parmesan pour gratiner.",
-        "source_url": "https://www.750g.com/parmentier-de-cabillaud-facile-r48653.htm"
+        "ingredient": "cabillaud dessalé",
+        "replacement": "cabillaud frais",
+        "note": "La source indique que le cabillaud frais est possible, avec une texture plus délicate et un temps de cuisson réduit de trois à quatre minutes.",
+        "source_url": "https://bacalalo.com/en/blogs/bacalao/bacalao-gratinado-receta-horno-alioli-bechamel"
       },
       {
-        "ingredient": "Pommes de terre",
-        "replacement": "Purée de pommes de terre et courgettes",
-        "note": "Cette substitution est documentée pour un gratin de cabillaud de type parmentier.",
-        "source_url": "https://www.750g.com/parmentier-de-cabillaud-facile-r48653.htm"
+        "ingredient": "cabillaud",
+        "replacement": "merlu, lotte, bar, daurade ou saumon",
+        "note": "La source documente ces poissons comme alternatives, avec un temps adapté à leur épaisseur.",
+        "source_url": "https://bacalalo.com/en/blogs/bacalao/bacalao-gratinado-receta-horno-alioli-bechamel"
       },
       {
-        "ingredient": "Pommes de terre",
-        "replacement": "Purée de céleri, de fenouil ou de panais",
-        "note": "Ces purées sont également proposées comme variantes dans la même recette.",
-        "source_url": "https://www.750g.com/parmentier-de-cabillaud-facile-r48653.htm"
+        "ingredient": "base directe de cabillaud",
+        "replacement": "deux pommes de terre moyennes précuites et finement tranchées",
+        "note": "La source présente les pommes de terre comme une option pour transformer le gratin en plat complet.",
+        "source_url": "https://bacalalo.com/en/blogs/bacalao/bacalao-gratinado-receta-horno-alioli-bechamel"
       }
     ],
     "accompaniments": [
       {
-        "name": "Vin blanc",
-        "note": "La recette indique de servir le gratin chaud avec un verre de vin blanc.",
-        "source_url": "https://www.750g.com/mini-gratin-de-la-mer-avec-son-coeur-dartichaut-champignons-et-sa-sauce-bechamel-r31277.htm"
+        "name": "salade verte avec vinaigrette au citron",
+        "note": "La source la recommande pour contrebalancer la richesse du gratin.",
+        "source_url": "https://bacalalo.com/en/blogs/bacalao/bacalao-gratinado-receta-horno-alioli-bechamel"
       },
       {
-        "name": "Persil",
-        "note": "Du persil peut décorer le gratin avant le service.",
-        "source_url": "https://www.750g.com/mini-gratin-de-la-mer-avec-son-coeur-dartichaut-champignons-et-sa-sauce-bechamel-r31277.htm"
+        "name": "pommes de terre rôties ou bouillies",
+        "note": "La source les cite comme accompagnement adapté au gratin de cabillaud.",
+        "source_url": "https://bacalalo.com/en/blogs/bacalao/bacalao-gratinado-receta-horno-alioli-bechamel"
+      },
+      {
+        "name": "pain",
+        "note": "La source le recommande notamment pour une version déjà complète ou pour recueillir la sauce.",
+        "source_url": "https://bacalalo.com/en/blogs/bacalao/bacalao-gratinado-receta-horno-alioli-bechamel"
       }
     ],
     "common_failures": [
       {
-        "problem": "Béchamel brunie",
-        "cause": "Le roux a trop coloré pendant sa cuisson.",
-        "remedy": "Cuire le roux seulement quelques minutes et ne pas le laisser brunir.",
-        "source_url": "https://www.750g.com/mini-gratin-de-la-mer-avec-son-coeur-dartichaut-champignons-et-sa-sauce-bechamel-r31277.htm"
-      },
-      {
         "problem": "Poisson sec",
-        "cause": "Le cabillaud continue de cuire dans le gratin.",
-        "remedy": "Éviter de prolonger la cuisson au-delà du temps indiqué et vérifier la cuisson à cœur.",
-        "source_url": "https://www.750g.com/cassolettes-de-moules-et-cabillaud-r100254.htm"
+        "cause": "Cuisson prolongée au-delà du temps nécessaire.",
+        "remedy": "Retirer le plat dès que le poisson se détache en feuillets et que la garniture est dorée.",
+        "source_url": "https://bacalalo.com/en/blogs/bacalao/bacalao-gratinado-receta-horno-alioli-bechamel"
       },
       {
-        "problem": "Béchamel trop liquide",
-        "cause": "La sauce n’a pas suffisamment épaissi après l’ajout du lait.",
-        "remedy": "La laisser cuire encore quelques minutes en fouettant constamment jusqu’à consistance épaisse.",
-        "source_url": "https://www.750g.com/mini-gratin-de-la-mer-avec-son-coeur-dartichaut-champignons-et-sa-sauce-bechamel-r31277.htm"
+        "problem": "Dessus brûlé avant que le centre soit cuit",
+        "cause": "Filets trop épais ou chaleur supérieure trop forte.",
+        "remedy": "Utiliser environ 190 °C pour des filets de 3 à 3,5 cm et couvrir temporairement de papier aluminium si la surface brunit trop vite.",
+        "source_url": "https://bacalalo.com/en/blogs/bacalao/bacalao-gratinado-receta-horno-alioli-bechamel"
       },
       {
-        "problem": "Gratin aqueux",
-        "cause": "Les champignons ou les garnitures n’ont pas été suffisamment préparés avant le montage.",
-        "remedy": "Faire dorer les champignons avant de les réserver et de les incorporer.",
-        "source_url": "https://www.750g.com/mini-gratin-de-la-mer-avec-son-coeur-dartichaut-champignons-et-sa-sauce-bechamel-r31277.htm"
+        "problem": "Gratin détrempé",
+        "cause": "Cabillaud congelé cuit directement, qui relâche beaucoup d’eau.",
+        "remedy": "Décongeler au réfrigérateur, égoutter et sécher soigneusement le poisson avant le montage.",
+        "source_url": "https://bacalalo.com/en/blogs/bacalao/bacalao-gratinado-receta-horno-alioli-bechamel"
+      },
+      {
+        "problem": "Béchamel grumeleuse",
+        "cause": "Lait ajouté sans fouetter constamment.",
+        "remedy": "Ajouter le lait froid immédiatement au roux en fouettant sans interruption.",
+        "source_url": "https://bacalalo.com/en/blogs/bacalao/bacalao-gratinado-receta-horno-alioli-bechamel"
+      },
+      {
+        "problem": "Surface qui ne gratine pas correctement",
+        "cause": "Four non préchauffé ou plat placé trop bas.",
+        "remedy": "Enfourner dans un four déjà chaud et placer le plat dans la partie moyenne-haute.",
+        "source_url": "https://bacalalo.com/en/blogs/bacalao/bacalao-gratinado-receta-horno-alioli-bechamel"
       }
     ],
     "storage": [
       {
-        "method": "Préparation à l’avance",
-        "duration": "La veille",
-        "note": "La recette peut être préparée la veille puis cuite au four au moment du service.",
-        "source_url": "https://www.750g.com/mini-gratin-de-la-mer-avec-son-coeur-dartichaut-champignons-et-sa-sauce-bechamel-r31277.htm"
+        "method": "Réfrigération avant cuisson",
+        "duration": "jusqu’à 8 heures",
+        "note": "Le gratin monté peut être couvert et conservé au réfrigérateur; le sortir quinze à vingt minutes avant cuisson et prévoir trois à cinq minutes supplémentaires.",
+        "source_url": "https://bacalalo.com/en/blogs/bacalao/bacalao-gratinado-receta-horno-alioli-bechamel"
       },
       {
-        "method": "Réfrigération",
-        "duration": "À 4 °C",
-        "note": "Réfrigérer rapidement les aliments cuits et éviter de les laisser refroidir longtemps à température ambiante.",
-        "source_url": "https://www.anses.fr/fr/system/files/BIORISK2012sa0118Ra-01.pdf"
+        "method": "Réfrigération du plat cuit",
+        "duration": "dans les deux heures suivant la cuisson",
+        "note": "Les aliments périssables doivent être réfrigérés rapidement; utiliser des contenants peu profonds pour accélérer le refroidissement.",
+        "source_url": "https://www.fda.gov/food/buy-store-serve-safe-food/safe-food-handling"
       },
       {
-        "method": "Consommation des restes",
-        "duration": "Dans les 48 heures",
-        "note": "L’Anses recommande une consommation rapide des aliments cuits réfrigérés.",
-        "source_url": "https://www.anses.fr/fr/system/files/BIORISK2012sa0118Ra-01.pdf"
+        "method": "Réchauffage au four",
+        "duration": "8 à 10 minutes",
+        "note": "Réchauffer à 180 °C; le micro-ondes ramollit la croûte et peut dessécher le poisson.",
+        "source_url": "https://bacalalo.com/en/blogs/bacalao/bacalao-gratinado-receta-horno-alioli-bechamel"
       }
     ],
     "food_safety": [
       {
-        "source_url": "https://www.anses.fr/fr/system/files/BIORISK2012sa0118Ra-01.pdf",
-        "text": "Pour une cuisson de sécurité, l’Anses indique une cuisson à cœur du poisson à 65 °C."
+        "source_url": "https://www.fda.gov/food/buy-store-serve-safe-food/safe-food-handling",
+        "text": "Cuire le poisson à 63 °C à cœur, ou jusqu’à ce que sa chair soit opaque et se détache facilement à la fourchette."
       },
       {
-        "source_url": "https://www.anses.fr/fr/portails/1807/content/155559",
-        "text": "Maintenir le poisson au froid, le mettre rapidement au réfrigérateur ou le congeler et ne jamais recongeler un poisson décongelé."
+        "source_url": "https://www.fda.gov/food/buy-store-serve-safe-food/safe-food-handling",
+        "text": "Réfrigérer le poisson et les restes dans les deux heures, ou dans l’heure si la température ambiante dépasse 32 °C."
       },
       {
-        "source_url": "https://www.anses.fr/fr/system/files/MIC2000sa0006Fi.pdf",
-        "text": "Ne pas laisser un plat cuit plus de deux heures à température ambiante avant réfrigération."
+        "source_url": "https://www.fda.gov/food/buy-store-serve-safe-food/safe-food-handling",
+        "text": "Décongeler le poisson au réfrigérateur, dans l’eau froide ou au micro-ondes, jamais à température ambiante."
       }
     ],
     "references": [
       {
-        "url": "https://www.750g.com/mini-gratin-de-la-mer-avec-son-coeur-dartichaut-champignons-et-sa-sauce-bechamel-r31277.htm",
-        "title": "Mini Gratin de la Mer avec son cœur d’artichaut, champignons et sa sauce béchamel",
-        "publisher": "750g"
+        "url": "https://bacalalo.com/en/blogs/bacalao/bacalao-gratinado-receta-horno-alioli-bechamel",
+        "title": "Cod Gratin: 4 Irresistible Oven Recipes",
+        "publisher": "Bacalalo"
       },
       {
         "url": "https://www.750g.com/gratins-de-cabillaud-aux-epinards-r41688.htm",
@@ -257,268 +276,187 @@
         "publisher": "750g"
       },
       {
-        "url": "https://www.750g.com/parmentier-de-cabillaud-r22942.htm",
-        "title": "Parmentier de Cabillaud",
-        "publisher": "750g"
+        "url": "https://www.fda.gov/food/buy-store-serve-safe-food/safe-food-handling",
+        "title": "Safe Food Handling",
+        "publisher": "U.S. Food and Drug Administration"
       },
       {
-        "url": "https://www.750g.com/cassolettes-de-moules-et-cabillaud-r100254.htm",
-        "title": "Cassolettes de moules et cabillaud",
-        "publisher": "750g"
-      },
-      {
-        "url": "https://www.anses.fr/fr/portails/1807/content/155559",
-        "title": "Qu’est-ce que l’histamine et comment éviter les intoxications ?",
-        "publisher": "Anses"
-      },
-      {
-        "url": "https://www.anses.fr/fr/system/files/BIORISK2012sa0118Ra-01.pdf",
-        "title": "Recommandations de maîtrise des risques biologiques",
-        "publisher": "Anses"
+        "url": "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/food-thermometers",
+        "title": "Food Thermometers",
+        "publisher": "U.S. Department of Agriculture"
       }
     ],
     "visual_references": [
       {
-        "image_url": "https://static.750g.com/images/640-400/b3aa02bef14b23d5853b32c528963e72/mini-gratin-de-la-mer-avec-son-coeur-d-artichaut-champignons-et-sa-sauce-bechamel.png",
-        "source_url": "https://www.750g.com/mini-gratin-de-la-mer-avec-son-coeur-dartichaut-champignons-et-sa-sauce-bechamel-r31277.htm",
-        "title": "Mini Gratin de la Mer avec son cœur d’artichaut, champignons et sa sauce béchamel",
+        "image_url": "https://bacalalo.com/cdn/shop/articles/bacalao-gratinado-4-recetas-al-horno-irresistibles-5991291.png?v=1772448412&width=480",
+        "source_url": "https://bacalalo.com/en/blogs/bacalao/bacalao-gratinado-receta-horno-alioli-bechamel",
+        "title": "Cod Gratin: 4 Irresistible Oven Recipes",
         "tier": 1
-      },
-      {
-        "image_url": "https://media-cdn2.greatbritishchefs.com/media/mlsezoxd/img60152.whqc_768x512q90.jpg",
-        "source_url": "https://www.greatbritishchefs.com/recipes/baked-cod-loin-recipe-gratin",
-        "title": "Braised fennel and cucumber with sourdough crumbs, smoked pancetta and baked cod loin",
-        "tier": 2
       }
     ],
     "visual_observations": [
       {
-        "image_url": "https://static.750g.com/images/640-400/b3aa02bef14b23d5853b32c528963e72/mini-gratin-de-la-mer-avec-son-coeur-d-artichaut-champignons-et-sa-sauce-bechamel.png",
-        "source_url": "https://www.750g.com/mini-gratin-de-la-mer-avec-son-coeur-dartichaut-champignons-et-sa-sauce-bechamel-r31277.htm",
-        "observable_details": "Un gratin individuel est présenté dans un petit récipient creux à rebord clair. La surface est irrégulière et couverte d’une couche fondue, brillante et dorée par endroits, avec des zones plus pâles et crémeuses. Certaines parties paraissent légèrement gratinées et brunies, tandis que d’autres restent moelleuses et luisantes. Une portion visible au sommet semble souple et nappée de matière fondue. La lumière est vive, probablement naturelle, avec des reflets marqués sur la surface. La prise de vue est rapprochée, depuis un angle légèrement plongeant.",
-        "composition": "Le plat occupe presque tout le champ et est servi directement dans un récipient individuel. La présentation est compacte, avec une superposition visible de matière gratinée et fondue.",
-        "colours": [
-          "doré",
-          "jaune pâle",
-          "crème",
-          "brun clair",
-          "blanc cassé"
-        ],
-        "textures": [
-          "surface fondue",
-          "zones crémeuses",
-          "parties légèrement gratinées",
-          "reflets luisants",
-          "irrégularités et bords ramollis"
-        ],
-        "uncertainties": [
-          "La partie centrale du plat est partiellement masquée, ce qui empêche d’observer toute sa composition.",
-          "Les éléments visibles ne permettent pas d’identifier avec certitude les ingrédients ni de distinguer précisément les différentes couches.",
-          "Le degré de cuisson exact ne peut être évalué qu’en surface."
-        ]
+        "image_url": "https://bacalalo.com/cdn/shop/articles/bacalao-gratinado-4-recetas-al-horno-irresistibles-5991291.png?v=1772448412&width=480",
+        "source_url": "https://bacalalo.com/en/blogs/bacalao/bacalao-gratinado-receta-horno-alioli-bechamel",
+        "observable_details": "Un gratin de cabillaud visible dans un plat individuel allant au four. La surface est recouverte d'une couche claire, crémeuse en apparence, avec de nombreuses zones dorées à brun foncé et quelques marques plus fortement roussies. Le dessus paraît cuit et gratiné, tandis que les bords montrent une matière plus épaisse et irrégulière.",
+        "composition": "Le plat est présenté dans un récipient en céramique claire à rebord ondulé, posé sur un support textile plié. La prise de vue est rapprochée, légèrement en plongée, avec le plat occupant la majeure partie de l'image.",
+        "couleurs": "Dominance de tons crème, jaune doré, brun clair et brun foncé sur la surface du gratin. Le récipient est de couleur claire.",
+        "textures": "Surface supérieure irrégulière, luisante par endroits, avec des zones boursouflées et des taches de gratinage. Les bords paraissent plus moelleux et épais. Une vapeur visible s'élève au-dessus du plat.",
+        "incertainties": "La composition exacte du gratin et la nature précise de la couche supérieure ne peuvent pas être déterminées avec certitude. La température et le degré de cuisson à cœur ne sont pas observables. L'éclairage est chaud et latéral, avec des reflets marqués sur la surface et des ombres douces autour du récipient."
       }
     ],
     "uncertainties": [
-      "La recette la plus complète trouvée inclut pommes de terre, artichauts et champignons, alors que le brief ne mentionne que cabillaud, béchamel et fromage.",
-      "La quantité de fromage n’est pas donnée dans la recette de cabillaud aux épinards; la quantité de 200 g provient d’une autre variante de gratin.",
-      "La recette principale ne donne pas de température interne ni de signe détaillé de cuisson nacrée; la température de 65 °C vient d’une recommandation de sécurité de l’Anses.",
-      "Les sources consultées ne fournissent pas trois photographies du même plat provenant de trois domaines distincts."
+      "Le brief demande un cabillaud pouvant rester nacré, tandis que la recommandation de sécurité de la FDA demande 63 °C à cœur ou une chair opaque; ces critères ne sont pas parfaitement équivalents.",
+      "La source principale donne quatre filets mais ne précise pas leur poids dans la version béchamel.",
+      "La source principale ne précise pas la quantité de sel, de poivre ni de muscade.",
+      "Une seule photographie exploitable et directement reliée au plat a été trouvée dans les pages consultées; les autres images accessibles concernaient des ingrédients ou des variantes."
     ],
     "originality_notes": [
-      "Le package reformule les informations sourcées sans reprendre la prose originale des recettes.",
-      "Les ingrédients et garnitures non mentionnés dans le brief sont signalés comme issus d’une variante documentée, et non comme une déduction à partir du titre.",
-      "Aucune observation visuelle n’est fournie: le laboratoire doit analyser les fichiers image réels avant toute description d’apparence."
+      "Le brief a déterminé la forme, le cabillaud, la béchamel, le fromage et le gratinage; les pommes de terre et autres légumes n’ont pas été intégrés à la recette principale.",
+      "Les quantités et les temps proviennent des sources; aucune quantité manquante n’a été inventée.",
+      "Les observations visuelles restent volontairement vides conformément au protocole demandé; aucune caractéristique cachée n’a été déduite de l’image."
     ]
   },
   "canonical": {
     "title": "Gratin de cabillaud à la béchamel",
-    "description": "Ce gratin de cabillaud associe un poisson nacré, une béchamel crémeuse et une croûte de fromage dorée, servi chaud en plat principal avec un accompagnement léger.",
-    "servings": 2,
-    "prep_minutes": 30,
-    "cook_minutes": 15,
-    "total_minutes": 45,
-    "cuisine": "Française",
+    "description": "Des filets de cabillaud nacrés sous une béchamel crémeuse et une croûte de fromage dorée, servis comme plat principal avec une salade ou des pommes de terre.",
+    "servings": 4,
+    "prep_minutes": 15,
+    "cook_minutes": 20,
+    "total_minutes": 35,
+    "cuisine": "Non précisée",
     "recipe_category": "plat principal",
-    "difficulty": "Facile",
-    "calories_estimate": 950,
+    "difficulty": "facile",
+    "calories_estimate": 550,
     "ingredients": [
       {
-        "name": "Dos de cabillaud frais",
-        "quantity": 2,
-        "unit": "pièces d’environ 140 g"
+        "name": "filets de cabillaud dessalé",
+        "quantity": 4,
+        "unit": "filets"
       },
       {
-        "name": "Pommes de terre cuites à la vapeur",
-        "quantity": 3,
-        "unit": "pièces"
+        "name": "beurre",
+        "quantity": 30,
+        "unit": "g"
       },
       {
-        "name": "Cœurs d’artichaut",
+        "name": "farine de blé",
+        "quantity": 30,
+        "unit": "g"
+      },
+      {
+        "name": "lait entier",
+        "quantity": 400,
+        "unit": "ml"
+      },
+      {
+        "name": "fromage râpé",
+        "quantity": 80,
+        "unit": "g"
+      },
+      {
+        "name": "noix de muscade fraîchement râpée",
         "quantity": 1,
-        "unit": "boîte"
-      },
-      {
-        "name": "Champignons de Paris",
-        "quantity": 100,
         "unit": "g"
       },
       {
-        "name": "Beurre demi-sel",
-        "quantity": 30,
+        "name": "sel",
+        "quantity": 4,
         "unit": "g"
       },
       {
-        "name": "Beurre demi-sel",
-        "quantity": 10,
+        "name": "poivre blanc",
+        "quantity": 1,
         "unit": "g"
-      },
-      {
-        "name": "Farine",
-        "quantity": 30,
-        "unit": "g"
-      },
-      {
-        "name": "Lait",
-        "quantity": 0.5,
-        "unit": "l"
-      },
-      {
-        "name": "Gruyère râpé",
-        "quantity": 200,
-        "unit": "g"
-      },
-      {
-        "name": "Noix de muscade",
-        "quantity": "au goût",
-        "unit": null
-      },
-      {
-        "name": "Sel",
-        "quantity": "au goût",
-        "unit": null
-      },
-      {
-        "name": "Poivre noir",
-        "quantity": "au goût",
-        "unit": null
       }
     ],
     "steps": [
       {
-        "text": "Préchauffer le four à 180 °C en mode traditionnel."
+        "text": "Préchauffer le four à 200 °C en mode chaleur traditionnelle; il est chaud avant l’enfournement."
       },
       {
-        "text": "Porter le lait à ébullition dans une casserole."
+        "text": "Faire fondre le beurre dans une casserole à feu moyen; il est liquide sans être coloré."
       },
       {
-        "text": "Faire fondre 30 g de beurre demi-sel dans une casserole."
+        "text": "Ajouter la farine et remuer pendant environ 2 minutes; le roux forme une pâte homogène."
       },
       {
-        "text": "Ajouter la farine au beurre fondu et cuire quelques minutes sans colorer le roux."
+        "text": "Verser immédiatement le lait froid en fouettant constamment; le mélange reste sans grumeaux."
       },
       {
-        "text": "Verser progressivement le lait chaud sur le roux en fouettant."
+        "text": "Cuire la béchamel pendant 8 à 10 minutes en fouettant; elle est épaisse et lisse."
       },
       {
-        "text": "Cuire la béchamel en fouettant jusqu’à ce qu’elle soit épaisse."
+        "text": "Assaisonner la béchamel avec la muscade, le sel et le poivre blanc; l’assaisonnement est uniformément incorporé."
       },
       {
-        "text": "Assaisonner la béchamel avec la noix de muscade, le sel et le poivre noir."
+        "text": "Disposer les filets de cabillaud dans un plat à gratin; les filets sont séparés et posés à plat."
       },
       {
-        "text": "Nettoyer et émincer les champignons de Paris."
+        "text": "Napper chaque filet avec la béchamel chaude; le poisson est complètement recouvert."
       },
       {
-        "text": "Faire fondre 10 g de beurre demi-sel dans une poêle chaude."
+        "text": "Répartir le fromage râpé sur la béchamel; la surface est couverte d’une couche régulière."
       },
       {
-        "text": "Faire dorer les champignons dans le beurre fondu pendant 10 minutes."
+        "text": "Cuire le gratin dans la partie moyenne-haute du four pendant 20 minutes; le fromage est doré, la béchamel bouillonne sur les bords et le poisson atteint 63 °C à cœur."
       },
       {
-        "text": "Couper les pommes de terre en rondelles."
-      },
-      {
-        "text": "Répartir les rondelles de pommes de terre en une seule couche dans deux plats à gratin."
-      },
-      {
-        "text": "Couper les cœurs d’artichaut en morceaux."
-      },
-      {
-        "text": "Répartir les morceaux de cœurs d’artichaut sur les pommes de terre."
-      },
-      {
-        "text": "Déposer un dos de cabillaud désarêté dans chaque plat."
-      },
-      {
-        "text": "Napper entièrement le cabillaud de béchamel."
-      },
-      {
-        "text": "Répartir les champignons dorés sur la béchamel."
-      },
-      {
-        "text": "Parsemer chaque plat de gruyère râpé."
-      },
-      {
-        "text": "Cuire les gratins à 180 °C pendant 15 minutes, jusqu’à ce que le fromage soit fondu et doré par endroits et que le cabillaud atteigne 65 °C à cœur."
+        "text": "Laisser reposer le gratin 3 minutes hors du four; la croûte se raffermit et le jus se redistribue."
       }
     ],
     "equipment": [
-      "Four",
-      "Deux plats à gratin individuels",
       "Casserole",
       "Fouet",
-      "Poêle",
-      "Couteau",
-      "Planche à découper",
-      "Thermomètre de cuisson"
+      "Plat à gratin",
+      "Balance de cuisine",
+      "Thermomètre alimentaire"
     ],
     "notes": [
-      "Servir le gratin chaud, directement dans les plats individuels.",
-      "La surface doit être fondue, brillante et dorée par endroits, tandis que le cabillaud reste nacré et moelleux.",
-      "Un verre de vin blanc peut accompagner le gratin.",
-      "Du persil peut décorer le plat au moment du service.",
-      "Le gratin peut être préparé la veille, conservé au réfrigérateur, puis cuit au moment du service."
+      "Sécher soigneusement le cabillaud décongelé avant le montage pour éviter un gratin détrempé.",
+      "Pour des filets de 3 à 3,5 cm d’épaisseur, cuire à environ 190 °C et surveiller la température à cœur.",
+      "Si le dessus brunit trop vite, le couvrir temporairement de papier aluminium.",
+      "Servir avec une salade verte à la vinaigrette au citron, des pommes de terre rôties ou bouillies, ou du pain.",
+      "Le temps total de 35 minutes comprend les 3 minutes de repos après cuisson."
     ],
     "faq": [
       {
-        "question": "Comment éviter une béchamel brunie ?",
-        "answer": "Cuisez le roux seulement quelques minutes et retirez-le du feu avant toute coloration."
+        "question": "Comment éviter une béchamel grumeleuse ?",
+        "answer": "Verser le lait froid immédiatement sur le roux en fouettant sans interruption, puis poursuivre la cuisson jusqu’à épaississement."
       },
       {
-        "question": "Comment savoir si la béchamel est assez épaisse ?",
-        "answer": "Elle doit napper la cuillère et rester suffisamment consistante pour couvrir le poisson sans couler immédiatement."
+        "question": "Peut-on préparer le gratin à l’avance ?",
+        "answer": "Oui. Couvrir le gratin monté et le conserver jusqu’à 8 heures au réfrigérateur, puis le sortir 15 à 20 minutes avant la cuisson et ajouter 3 à 5 minutes au four."
       },
       {
-        "question": "Comment éviter que le cabillaud soit sec ?",
-        "answer": "Respectez les 15 minutes de cuisson et vérifiez la température à cœur afin de ne pas prolonger inutilement la cuisson."
+        "question": "Peut-on utiliser du cabillaud frais ?",
+        "answer": "Oui, mais sa texture est plus délicate et la cuisson peut être réduite de 3 à 4 minutes."
       },
       {
-        "question": "Peut-on remplacer le cabillaud ?",
-        "answer": "Un autre poisson blanc peut convenir, en adaptant la cuisson à son épaisseur."
+        "question": "Quel fromage utiliser ?",
+        "answer": "Le gruyère ou l’emmental conviennent comme fromages râpés pour gratiner la béchamel."
       }
     ],
     "keywords": [
-      "gratin de cabillaud",
+      "cabillaud",
+      "gratin de poisson",
       "béchamel",
-      "poisson au four",
-      "gruyère râpé",
-      "cuisine française",
+      "fromage râpé",
       "plat principal",
-      "artichauts",
-      "champignons"
+      "cuisine au four"
     ],
     "food_safety": [
-      "Conserver le cabillaud au réfrigérateur jusqu’à sa préparation et ne jamais recongeler un poisson décongelé.",
-      "Cuire le poisson à 65 °C à cœur pour atteindre une cuisson de sécurité.",
-      "Réfrigérer rapidement le gratin cuit et ne pas le laisser plus de deux heures à température ambiante.",
-      "Consommer les restes réfrigérés dans les 48 heures et les réchauffer jusqu’à ce qu’ils soient bien chauds à cœur.",
-      "Le plat contient du poisson, du lait et du gluten issu de la farine."
+      "Cuire le cabillaud à 63 °C à cœur; à défaut, sa chair doit être opaque et se détacher facilement à la fourchette.",
+      "Décongeler le poisson au réfrigérateur, dans l’eau froide ou au micro-ondes, jamais à température ambiante.",
+      "Réfrigérer le gratin cuit dans les deux heures suivant la cuisson, ou dans l’heure si la température ambiante dépasse 32 °C.",
+      "Réchauffer les restes à 180 °C pendant 8 à 10 minutes et vérifier qu’ils sont bien chauds à cœur.",
+      "Ce plat contient du poisson, du lait et du gluten; le fromage et le lait rendent la béchamel impropre aux personnes allergiques aux produits laitiers."
     ],
     "uncertainties": [
-      "La recette documentée inclut les pommes de terre, les artichauts et les champignons, alors que le brief mentionne principalement le cabillaud, la béchamel et le fromage.",
-      "La quantité de 200 g de gruyère provient d’une variante de gratin et peut donner une couverture particulièrement généreuse.",
-      "La température interne de 65 °C provient de la recommandation de sécurité de l’Anses, tandis que la source de recette ne donne pas de température à cœur.",
-      "Les 10 g de beurre destinés aux champignons correspondent à la noix de beurre indiquée dans la méthode, dont la quantité exacte n’est pas précisée dans la source."
+      "La source ne précise pas le poids ni l’épaisseur des quatre filets; le temps de cuisson doit donc être ajusté à leur épaisseur.",
+      "Le brief demande un poisson restant nacré, tandis que la recommandation de sécurité de 63 °C à cœur correspond à une chair opaque; la sécurité prime.",
+      "Les quantités de sel, de poivre blanc et de muscade n’étaient pas précisées dans la source et sont des repères éditoriaux pour quatre portions.",
+      "Le temps total de la source est de 35 minutes, tandis que les étapes mentionnent 3 minutes de repos; ce repos est compris dans le temps de préparation indiqué."
     ]
   }
 }
