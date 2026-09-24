@@ -5,9 +5,9 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.28.1
+## État actuel — 0.28.2
 
-La version `0.28.1` abaisse le plafond par recette à 0,15 $, fournit le collage de référence avec l'extension et met les consignes en cache ; la `0.28.0` réduisait le coût d'une recette complète d'environ 38 % — une relecture au lieu de trois, un contrôle final qui ne regarde que les images, une seule recherche web et plus de nouveau dessin automatique, remplacé par un bouton pour l'éditeur ; la `0.27.1` réduisait le coût du collage Facebook de plus de moitié et n'y montrait plus d'emballage ; la `0.27.0` dessinait le visuel Facebook comme ChatGPT le fait pour le propriétaire : la consigne est d'abord rédigée à partir de la recette et d'une image de référence, puis le collage est dessiné avec cette référence ; la `0.26.8` dessinait le visuel Facebook d'après la consigne que le propriétaire utilise lui-même ; la `0.26.7` faisait suivre à la recette le plat que décrit le rédacteur et relève le plafond par recette à 0,25 $ ; la `0.26.6` dessinait le visuel Facebook en qualité haute et ne fait plus redessiner un collage pour un aromate montré une étape trop tôt ; la `0.26.5` permettait au moteur de dessiner avec les modèles d'image de Gemini, au bon prix ; la `0.26.4` donnait au visuel Facebook le style des collages de référence du propriétaire : lumineux, net, cadré serré ; la `0.26.3` faisait ressembler le visuel Facebook à de vraies photographies plutôt qu'à des images de synthèse ; la `0.26.2` rendait le visuel Facebook plus chaleureux et plus proche du plat, et le fait toujours finir sur le plat ouvert ; la `0.26.1` retirait les copies des prompts que gardaient les réglages :
+La version `0.28.2` fait tourner les recettes d'un lot en parallèle sans attendre le cron du site ; la `0.28.1` abaissait le plafond par recette à 0,15 $, fournit le collage de référence avec l'extension et met les consignes en cache ; la `0.28.0` réduisait le coût d'une recette complète d'environ 38 % — une relecture au lieu de trois, un contrôle final qui ne regarde que les images, une seule recherche web et plus de nouveau dessin automatique, remplacé par un bouton pour l'éditeur ; la `0.27.1` réduisait le coût du collage Facebook de plus de moitié et n'y montrait plus d'emballage ; la `0.27.0` dessinait le visuel Facebook comme ChatGPT le fait pour le propriétaire : la consigne est d'abord rédigée à partir de la recette et d'une image de référence, puis le collage est dessiné avec cette référence ; la `0.26.8` dessinait le visuel Facebook d'après la consigne que le propriétaire utilise lui-même ; la `0.26.7` faisait suivre à la recette le plat que décrit le rédacteur et relève le plafond par recette à 0,25 $ ; la `0.26.6` dessinait le visuel Facebook en qualité haute et ne fait plus redessiner un collage pour un aromate montré une étape trop tôt ; la `0.26.5` permettait au moteur de dessiner avec les modèles d'image de Gemini, au bon prix ; la `0.26.4` donnait au visuel Facebook le style des collages de référence du propriétaire : lumineux, net, cadré serré ; la `0.26.3` faisait ressembler le visuel Facebook à de vraies photographies plutôt qu'à des images de synthèse ; la `0.26.2` rendait le visuel Facebook plus chaleureux et plus proche du plat, et le fait toujours finir sur le plat ouvert ; la `0.26.1` retirait les copies des prompts que gardaient les réglages :
 le moteur exécute ses propres gabarits, et ce qui n’est lu par rien ne se
 périme plus en silence. Le détail de chaque version suit, de la plus récente à
 la plus ancienne.
@@ -77,7 +77,21 @@ développement, humain ou agent.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
 
-## Version 0.28.1
+## Version 0.28.2
+
+**Plus d'attente : les recettes d'un lot tournent en parallèle, tout de suite.**
+
+- Le cron de WordPress ne se déclenche qu'à la visite du site, et traite ses
+  tâches l'une après l'autre : les recettes d'un lot passaient une par une,
+  et chacune attendait une visite entre deux étapes — sur un site peu visité,
+  elles restaient « en attente ».
+- Désormais le site se relance lui-même dès qu'une recette est en file, trois
+  recettes à la fois. Mesuré : trois recettes en 154 s, à peine plus que la
+  plus longue seule (144 s), au lieu de plus de sept minutes à la suite.
+- Si le site ne peut pas s'appeler lui-même (hébergement qui bloque ces
+  appels), la page du lot, laissée ouverte, relance une recette en retard.
+  Le cron reste en place derrière les deux.
+
 
 - **Plafond par recette à 0,15 $** par défaut : une recette complète coûte
   environ 0,08 $, et il reste la place pour deux collages redessinés à la

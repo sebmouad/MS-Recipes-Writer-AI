@@ -1082,8 +1082,25 @@
     return 'queued' === run.status || 'running' === run.status;
   }
 
+  // WordPress cron fires only when it can call the site back. Where it cannot —
+  // cron disabled with no server cron, a page cache, blocked loopbacks — the
+  // lot waited forever; while this page is open, it carries the lot on itself,
+  // one wave at a time.
+  // Up to three at once, as the site's own worker runs them: each call takes
+  // the next overdue recipe, and a recipe already taken is not taken twice.
+  var nudging = 0;
+  function nudge(overdue) {
+    while (nudging < Math.min(3, overdue)) {
+      nudging++;
+      call('/batches/' + batch + '/nudge', { method: 'POST' })
+        .catch(function () {})
+        .then(function () { nudging--; });
+    }
+  }
+
   function refresh() {
     return call('/batches/' + batch + '/runs').then(function (data) {
+      if (data.stalled) nudge(Number(data.stalled));
       var moving = data.runs.map(paint).some(Boolean);
       if (moving && !timer) { timer = window.setInterval(refresh, 5000); }
       // A settled batch has drafts that were not there when the page loaded,

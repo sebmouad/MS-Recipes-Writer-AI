@@ -26,6 +26,7 @@ final class MSRWA_REST {
 		register_rest_route( 'msrwa/v1', '/catalog/models', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_manage' ), 'callback' => array( __CLASS__, 'fetch_models' ) ) );
 		register_rest_route( 'msrwa/v1', '/catalog/prices', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_manage' ), 'callback' => array( __CLASS__, 'fetch_prices' ) ) );
 		register_rest_route( 'msrwa/v1', '/retention', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_manage' ), 'callback' => array( __CLASS__, 'prune' ) ) );
+		register_rest_route( 'msrwa/v1', '/batches/(?P<id>\d+)/nudge', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'nudge' ) ) );
 		register_rest_route( 'msrwa/v1', '/runs/bulk', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'bulk' ) ) );
 		register_rest_route( 'msrwa/v1', '/runs/(?P<id>\d+)/redraw', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'redraw' ) ) );
 		register_rest_route( 'msrwa/v1', '/runs/(?P<id>\d+)/retry', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'retry' ) ) );
@@ -168,7 +169,9 @@ final class MSRWA_REST {
 		$batch = self::batch( $request['id'] );
 		if ( ! $batch ) { return new WP_Error( 'msrwa_not_found', __( 'Lot introuvable.', 'ms-recipes-writer-ai' ), array( 'status' => 404 ) ); }
 		$out = array();
+		$stalled = 0;
 		foreach ( MSRWA_Run::for_batch( (int) $batch['id'] ) as $run ) {
+			$stalled += MSRWA_Run::overdue( $run ) ? 1 : 0;
 			$out[] = array(
 				'id' => (int) $run['id'], 'label' => (string) $run['label'], 'status' => (string) $run['status'],
 				'step' => (string) $run['step'], 'steps_done' => (int) $run['steps_done'], 'steps_total' => (int) $run['steps_total'],
@@ -184,7 +187,7 @@ final class MSRWA_REST {
 				unset( $out[ $last ]['step'], $out[ $last ]['cost_usd'], $out[ $last ]['seconds'] );
 			}
 		}
-		return rest_ensure_response( array( 'status' => (string) $batch['status'], 'runs' => $out ) );
+		return rest_ensure_response( array( 'status' => (string) $batch['status'], 'runs' => $out, 'stalled' => $stalled ) );
 	}
 
 	/** What the queue is doing, for the screen that watches it. */
@@ -303,6 +306,13 @@ final class MSRWA_REST {
 		}
 
 		return rest_ensure_response( array( 'done' => $done, 'skipped' => array_values( $skipped ) ) );
+	}
+
+	/** Runs an overdue recipe's next wave from the page that watches it, when cron did not. */
+	public static function nudge( WP_REST_Request $request ) {
+		$batch = self::batch( $request['id'] );
+		if ( ! $batch ) { return new WP_Error( 'msrwa_not_found', __( 'Lot introuvable.', 'ms-recipes-writer-ai' ), array( 'status' => 404 ) ); }
+		return rest_ensure_response( array( 'moved' => MSRWA_Run::nudge( (int) $batch['id'] ) ) );
 	}
 
 	/** Picks a stopped run back up, without paying again for what succeeded. */

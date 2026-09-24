@@ -451,8 +451,6 @@ msgstr "The keys, and the state of what moves the work along."
 msgid "Les photographies sont en cours de description. Rechargez dans un instant."
 msgstr "The photographs are being described. Reload in a moment."
 
-msgid "Les recettes avancent ensemble, une vague par tick de cron. Vous pouvez fermer cet onglet."
-msgstr "The recipes advance together, one wave per cron tick. You can close this tab."
 
 msgid "Lot %d"
 msgstr "Lot %d"
@@ -2150,3 +2148,6 @@ msgstr "reference shipped with the plugin"
 
 msgid "Relecture, faits et langue"
 msgstr "Review, facts and language"
+
+msgid "Les recettes avancent en parallèle, trois à la fois, sans attendre une visite du site. Vous pouvez fermer cet onglet ; laissé ouvert, il relance aussi une recette que le cron du site aurait oubliée."
+msgstr "Recipes move forward side by side, three at a time, without waiting for a visit to the site. You may close this tab; left open, it also restarts a recipe the site's cron missed."

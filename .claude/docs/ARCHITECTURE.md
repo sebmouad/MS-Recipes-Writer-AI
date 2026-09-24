@@ -48,6 +48,16 @@ renewing its lease before each: WordPress's cron fires only on a visit, and a
 recipe that handed every wave back waited for a visitor seven times. Each wave
 is still written down before the next begins.
 
+A tick does not wait for cron to start. `MSRWA_Run::queue()` schedules the
+cron event as a safety net and asks `MSRWA_Worker` to run the tick now: a
+non-blocking, HMAC-signed call to the site's own `admin-ajax.php`
+(`msrwa_worker`), three recipes at a time. wp-cron.php runs due events one
+after another, so a lot used to go through one recipe at a time, each waiting
+on a visit between ticks; three article recipes now take 154 s against the
+longest one's 144 s. Where the site cannot call itself either, the lot page
+reads `stalled` from its poll and calls `POST /batches/{id}/nudge`, which runs
+an overdue recipe's tick in that request (`MSRWA_Run::nudge()`).
+
 Between two ticks a run is `running` with no lease, and only its cron event
 carries it on. WordPress keeps every event in one option, so workers finishing
 together can overwrite each other's next event — two of three recipes in a
@@ -288,7 +298,7 @@ Namespace `msrwa/v1`, WordPress cookies and nonce, every response `no-store`
 (a page cache once served an application-password response to the public).
 
 `GET|POST /batches`, `DELETE /batches/{id}`, `POST /batches/{id}/{pairs|schedule|dispatch}`,
-`GET /batches/{id}/runs`, `POST /runs/bulk`, `POST /runs/{id}/{retry|cancel|redraw}`,
+`GET /batches/{id}/runs`, `POST /batches/{id}/nudge`, `POST /runs/bulk`, `POST /runs/{id}/{retry|cancel|redraw}`,
 `GET /estimate`, `GET /health`, `GET|POST /queue`, `POST /retention`,
 `POST /keys/check`, `POST /diagnostics/config`.
 

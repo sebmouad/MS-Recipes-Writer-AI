@@ -143,6 +143,7 @@ Real, `php tests/real/run.php`:
 | File | Spends | Proves |
 | --- | --- | --- |
 | `test-site.php` | nothing | schema and migration, capabilities per role, cron armed, uploads writable, an estimate exists, every key opens its provider, a lot over its ceiling is refused, nothing answers anonymously |
+| `test-parallel.php` | three article-only recipes | the lot runs side by side on the site's own worker (at least two at once, about as long as its longest recipe), and the page's fallback moves nothing when nothing is waiting |
 | `test-flow.php` | one article-only recipe | submit as the form does, with a photograph → dispatch → cron → draft carrying that photograph, cost within the ceiling and near the estimate, the draft carries its excerpt, slug and tags |
 | `test-upload.php` | one photograph, described once | a lot with photographs sent from disk as a browser form does: a file that is not a photograph refuses the lot and leaves the media library untouched, a real one becomes the writer's attachment, and leaves with its lot when that lot is deleted unused |
 

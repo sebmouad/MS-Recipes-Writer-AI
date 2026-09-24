@@ -285,7 +285,7 @@ final class MSRWA_Screen_Batch {
 			MSRWA_UI::ticket( $run, admin_url( 'admin.php?page=msrwa-run&run_id=' . (int) $run['id'] ) );
 		}
 		echo '</div>';
-		echo '<p class="ms-muted" style="padding:14px 20px">' . esc_html__( 'Les recettes avancent ensemble, une vague par tick de cron. Vous pouvez fermer cet onglet.', 'ms-recipes-writer-ai' ) . '</p>';
+		echo '<p class="ms-muted" style="padding:14px 20px">' . esc_html__( 'Les recettes avancent en parallèle, trois à la fois, sans attendre une visite du site. Vous pouvez fermer cet onglet ; laissé ouvert, il relance aussi une recette que le cron du site aurait oubliée.', 'ms-recipes-writer-ai' ) . '</p>';
 		echo '</section>';
 	}
 }

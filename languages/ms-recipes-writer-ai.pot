@@ -197,7 +197,7 @@ msgstr ""
 msgid "Action"
 msgstr ""
 
-#: class-msrwa-rest.php:207 class-msrwa-rest.php:266
+#: class-msrwa-rest.php:210 class-msrwa-rest.php:269
 msgid "Action inconnue."
 msgstr ""
 
@@ -253,7 +253,7 @@ msgstr ""
 msgid "Arrêter"
 msgstr ""
 
-#: class-msrwa-rest.php:334
+#: class-msrwa-rest.php:344
 msgid "Arrêtez les recettes avant de supprimer le lot."
 msgstr ""
 
@@ -437,7 +437,7 @@ msgstr ""
 msgid "Ce lot dépasse le plafond par recette fixé pour le site et sera refusé au lancement. Choisissez une sortie plus légère, ou demandez à un administrateur de relever le plafond."
 msgstr ""
 
-#: class-msrwa-rest.php:144
+#: class-msrwa-rest.php:145
 msgid "Ce lot est déjà lancé ; son appariement ne change plus."
 msgstr ""
 
@@ -529,11 +529,11 @@ msgstr ""
 msgid "Cette heure est déjà passée."
 msgstr ""
 
-#: class-msrwa-run.php:654
+#: class-msrwa-run.php:691
 msgid "Cette image ne peut pas être redessinée."
 msgstr ""
 
-#: class-msrwa-rest.php:312
+#: class-msrwa-rest.php:322
 msgid "Cette recette n’est pas arrêtée."
 msgstr ""
 
@@ -605,7 +605,7 @@ msgstr ""
 msgid "Collage Facebook"
 msgstr ""
 
-#: class-msrwa-admin.php:154 class-msrwa-batch.php:30 class-msrwa-rest.php:94
+#: class-msrwa-admin.php:154 class-msrwa-batch.php:30 class-msrwa-rest.php:95
 msgid "Collez au moins une recette ou ajoutez au moins une photographie."
 msgstr ""
 
@@ -845,7 +845,7 @@ msgstr ""
 msgid "En attente : la file est suspendue par un administrateur. Elle repartira d’elle-même quand la file reprendra."
 msgstr ""
 
-#: class-msrwa-run.php:170
+#: class-msrwa-run.php:207
 msgid "En attente de : %s, qui n’est jamais arrivé."
 msgstr ""
 
@@ -1061,7 +1061,7 @@ msgstr ""
 msgid "La recette s’est arrêtée à l’étape « %s ». La reprendre relance seulement ce qui a échoué."
 msgstr ""
 
-#: class-msrwa-rest.php:274
+#: class-msrwa-rest.php:277
 msgid "La suppression est réservée aux administrateurs."
 msgstr ""
 
@@ -1151,7 +1151,7 @@ msgstr ""
 msgid "Le nettoyage n’a encore jamais tourné."
 msgstr ""
 
-#: class-msrwa-run.php:682
+#: class-msrwa-run.php:719
 msgid "Le nouveau dessin a échoué. Réessayez plus tard."
 msgstr ""
 
@@ -1163,7 +1163,7 @@ msgstr ""
 msgid "Le pass → « Reprendre la file » quand vous voulez qu’elles repartent."
 msgstr ""
 
-#: class-msrwa-run.php:665
+#: class-msrwa-run.php:702
 msgid "Le plafond de cette recette est atteint."
 msgstr ""
 
@@ -1280,7 +1280,7 @@ msgid "Les recettes"
 msgstr ""
 
 #: class-msrwa-screen-batch.php:288
-msgid "Les recettes avancent ensemble, une vague par tick de cron. Vous pouvez fermer cet onglet."
+msgid "Les recettes avancent en parallèle, trois à la fois, sans attendre une visite du site. Vous pouvez fermer cet onglet ; laissé ouvert, il relance aussi une recette que le cron du site aurait oubliée."
 msgstr ""
 
 #: class-msrwa-screen-batch.php:120
@@ -1319,7 +1319,7 @@ msgstr ""
 msgid "Lot %d"
 msgstr ""
 
-#: class-msrwa-batch.php:241 class-msrwa-rest.php:143 class-msrwa-rest.php:152 class-msrwa-rest.php:160 class-msrwa-rest.php:169 class-msrwa-rest.php:333 class-msrwa-schedule.php:22 class-msrwa-screen-batch.php:19
+#: class-msrwa-batch.php:241 class-msrwa-rest.php:144 class-msrwa-rest.php:153 class-msrwa-rest.php:161 class-msrwa-rest.php:170 class-msrwa-rest.php:314 class-msrwa-rest.php:343 class-msrwa-schedule.php:22 class-msrwa-screen-batch.php:19
 msgid "Lot introuvable."
 msgstr ""
 
@@ -1351,7 +1351,7 @@ msgstr ""
 msgid "L’image à la une a été redessinée %d fois d’après ces remarques ; la nouvelle n’a pas été rejugée."
 msgstr ""
 
-#: class-msrwa-rest.php:271
+#: class-msrwa-rest.php:274
 msgid "L’ordre de la file est réservé aux administrateurs."
 msgstr ""
 
@@ -1543,7 +1543,7 @@ msgstr ""
 msgid "Peu sûr — à confirmer"
 msgstr ""
 
-#: class-msrwa-rest.php:137
+#: class-msrwa-rest.php:138
 msgid "Photographie introuvable."
 msgstr ""
 
@@ -1699,7 +1699,7 @@ msgstr ""
 msgid "Recette de référence"
 msgstr ""
 
-#: class-msrwa-rest.php:311 class-msrwa-rest.php:319 class-msrwa-screen-run.php:18
+#: class-msrwa-rest.php:321 class-msrwa-rest.php:329 class-msrwa-screen-run.php:18
 msgid "Recette introuvable."
 msgstr ""
 
@@ -1843,7 +1843,7 @@ msgstr ""
 msgid "Routez ces étapes vers un modèle listé dans Moteur → Modèles et tarifs."
 msgstr ""
 
-#: class-msrwa-rest.php:327
+#: class-msrwa-rest.php:337
 msgid "Run introuvable."
 msgstr ""
 

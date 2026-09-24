@@ -451,8 +451,6 @@ msgstr "المفاتيح، وحال ما يدفع العمل إلى الأمام
 msgid "Les photographies sont en cours de description. Rechargez dans un instant."
 msgstr "يجري وصف الصور. أعد التحميل بعد لحظات."
 
-msgid "Les recettes avancent ensemble, une vague par tick de cron. Vous pouvez fermer cet onglet."
-msgstr "تتقدّم الوصفات معاً، موجة في كل نبضة كرون. يمكنك إغلاق هذا اللسان."
 
 msgid "Lot %d"
 msgstr "دفعة %d"
@@ -2186,3 +2184,6 @@ msgstr "مرجع مرفق مع الإضافة"
 
 msgid "Relecture, faits et langue"
 msgstr "المراجعة والحقائق واللغة"
+
+msgid "Les recettes avancent en parallèle, trois à la fois, sans attendre une visite du site. Vous pouvez fermer cet onglet ; laissé ouvert, il relance aussi une recette que le cron du site aurait oubliée."
+msgstr "تتقدم الوصفات بالتوازي، ثلاثًا في كل مرة، دون انتظار زيارة للموقع. يمكنك إغلاق هذا التبويب؛ وإن بقي مفتوحًا فإنه يعيد تشغيل أي وصفة أغفلها cron الموقع."

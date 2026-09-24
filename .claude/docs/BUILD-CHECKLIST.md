@@ -622,6 +622,10 @@ cost) in the task before changing anything.
   judge is told which images it received; the owner's collage ships as the
   default style reference; the report tells redraws and the collage's
   reference. Real: three lab recipes in a row. See ENGINE.md §7, item 39.
+- [x] **A43 — No more waiting on cron (2026-09-24).** A queued recipe is
+  started at once by a signed loopback to the site itself, three at a time;
+  the lot page carries an overdue recipe on when the site cannot call itself.
+  Real: `test-parallel.php`, three recipes in 154 s, up to three at once.
 - [x] **A11 — Model answers that do not parse (found 2026-09-20).** Two of the
   54 matrix cells scored zero for a reason that was ours, not the prompt's:
   Opus 5 wrote "I'll research this dish now." before the object, and Sonnet 5

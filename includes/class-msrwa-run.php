@@ -54,8 +54,45 @@ final class MSRWA_Run {
 	}
 
 	public static function queue( $id, $delay = 5 ) {
-		if ( wp_next_scheduled( 'msrwa_run_step', array( absint( $id ) ) ) ) { return; }
-		wp_schedule_single_event( time() + max( 1, (int) $delay ), 'msrwa_run_step', array( absint( $id ) ) );
+		// The event is the safety net; the worker is what runs it now.
+		if ( ! wp_next_scheduled( 'msrwa_run_step', array( absint( $id ) ) ) ) {
+			wp_schedule_single_event( time() + max( 1, (int) $delay ), 'msrwa_run_step', array( absint( $id ) ) );
+		}
+		if ( class_exists( 'MSRWA_Worker' ) ) { MSRWA_Worker::kick( $id ); }
+	}
+
+	/**
+	 * Whether cron has let a recipe down: it is waiting, and its tick is gone
+	 * or half a minute late. WordPress cron fires only when a request reaches
+	 * WordPress and it can call itself back; with DISABLE_WP_CRON and no server
+	 * cron, a page cache in front of every visit, or loopback requests blocked,
+	 * a queued recipe waited forever.
+	 */
+	public static function overdue( array $run ) {
+		if ( 'queued' !== (string) ( $run['status'] ?? '' ) ) { return false; }
+		$next = wp_next_scheduled( 'msrwa_run_step', array( absint( $run['id'] ) ) );
+		return ! $next || $next < time() - 30;
+	}
+
+	/**
+	 * Carries a lot on from the page watching it, when cron does not.
+	 *
+	 * The lot page asks for this while a recipe is overdue. It runs that
+	 * recipe's tick in the request — a wave, bounded as cron's are — and the
+	 * lease tick() takes means two tabs cannot run the same step twice.
+	 * Returns the run it moved, or 0.
+	 */
+	public static function nudge( $batch_id ) {
+		if ( MSRWA_Queue::held() || '' !== MSRWA_Budget::refusal() ) { return 0; }
+		// A recipe left `running` by a killed request is the watchdog's, and the
+		// watchdog is cron too.
+		self::recover_expired();
+		foreach ( self::for_batch( $batch_id ) as $run ) {
+			if ( ! self::may_see( $run ) || ! self::overdue( $run ) ) { continue; }
+			self::tick( (int) $run['id'] );
+			return (int) $run['id'];
+		}
+		return 0;
 	}
 
 	public static function get( $id ) {
