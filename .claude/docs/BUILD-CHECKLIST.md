@@ -159,6 +159,8 @@ run carries.
 - [x] The Articles screen follows each post into WordPress, drops the review
   flag once published, and its bulk actions work (`tests/test-articles.php`,
   Chromium at 390 and 1280 px, live bulk delete).
+- [x] Generated images carry their article's author, earlier ones credited
+  on installation, checked live (`tests/test-media-author.php`).
 - [ ] A complete lot on Claude — the account has no credit. — the Gemini key's
   grounding quota is exhausted, OpenAI is unreachable from the test
   environment and the Claude account has no credit.

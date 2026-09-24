@@ -102,6 +102,7 @@ final class MSRWA_DB {
 
 		self::reclaim_duplicates();
 		self::rename_generated_keys();
+		self::credit_generated_images();
 		// Seeded once, then the owner's. A site that has already corrected a
 		// rate must not have it overwritten by the shipped one on every update.
 		MSRWA_Catalog::seed();
@@ -174,6 +175,23 @@ final class MSRWA_DB {
 			foreach ( array( 'featured', 'facebook' ) as $kind ) { MSRWA_Stack::make_lossy( (int) get_post_meta( $post_id, MSRWA_Draft::generated_key( $kind ), true ) ); }
 		}
 		if ( $touched ) { MSRWA_Stack::reoptimize( $touched ); }
+	}
+
+	/**
+	 * Gives the images generated before 0.23.1 their article's author: they
+	 * were created by cron with nobody logged in, and showed no author in the
+	 * media library. Bounded, and idempotent — only authorless ones are read.
+	 */
+	private static function credit_generated_images() {
+		global $wpdb;
+		$rows = (array) $wpdb->get_results(
+			"SELECT a.ID AS attachment, p.post_author AS author FROM {$wpdb->postmeta} m
+			 INNER JOIN {$wpdb->posts} a ON a.ID = m.meta_value AND a.post_type = 'attachment' AND a.post_author = 0
+			 INNER JOIN {$wpdb->posts} p ON p.ID = m.post_id
+			 WHERE m.meta_key IN ('_msrwa_featured_generated','_msrwa_facebook_generated') LIMIT 500", ARRAY_A );
+		foreach ( $rows as $row ) {
+			if ( (int) $row['author'] > 0 ) { $wpdb->update( $wpdb->posts, array( 'post_author' => (int) $row['author'] ), array( 'ID' => (int) $row['attachment'] ) ); clean_post_cache( (int) $row['attachment'] ); }
+		}
 	}
 
 	private static function backfill_check_counts() {

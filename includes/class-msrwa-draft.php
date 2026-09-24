@@ -250,6 +250,9 @@ final class MSRWA_Draft {
 			'post_mime_type' => $mime, 'post_title' => wp_strip_all_tags( $title ),
 			'post_content' => '', 'post_status' => 'inherit',
 			'post_name' => '' !== $base ? $base : '',
+			// The draft is written by cron, where nobody is logged in: without
+			// this the media library listed the images with no author at all.
+			'post_author' => (int) get_post_field( 'post_author', $post_id ),
 		), $uploaded['file'], $post_id, true );
 		if ( is_wp_error( $attachment ) || ! $attachment ) { return 0; }
 
