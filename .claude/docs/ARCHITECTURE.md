@@ -340,9 +340,9 @@ Break these and the plugin misreports itself.
     and served only by `GET /batches/<id>/photos/<name>` to someone who may see
     the lot — named after their bytes, so the same file sent twice is one file.
     `lots/<lot>/` holds them while the lot is paired; dispatch moves each into
-    its run's `<run>/sources/` with `source.json` (what the writer provided;
-    what the engine completed and the web photographs it read, in
-    `references/`) and drops the rest. Deleting a lot or a run, retention and
+    its run's `<run>/sources/`, beside the web photographs the research read
+    (`references/`), and drops the rest; what happened to them is the job's
+    history (invariant 23). Deleting a lot or a run, retention and
     uninstall remove its folder. The media library holds only an article's
     generated images. Lots sent before 0.24.0 still name library attachments
     marked `_msrwa_sent_by_writer`; `MSRWA_Intake::forget()` and

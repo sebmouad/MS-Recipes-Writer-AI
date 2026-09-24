@@ -111,12 +111,6 @@ msgstr "ما يجري تنفيذه، وما ينتظر المراجعة، وما
 msgid "Ce qu’il faut produire"
 msgstr "ما المطلوب إنتاجه"
 
-msgid "Choisir dans la médiathèque"
-msgstr "اختر من مكتبة الوسائط"
-
-msgid "Collez vos recettes et ajoutez les photographies. Elles seront décrites puis associées ; vous confirmez l’appariement avant que quoi que ce soit ne soit généré."
-msgstr "الصق وصفاتك وأضف الصور. ستُوصَف ثم تُقرن؛ وأنت تؤكّد الاقتران قبل توليد أي شيء."
-
 msgid "Contrôle"
 msgstr "الفحص"
 
@@ -174,17 +168,8 @@ msgstr "تصفية"
 msgid "Français"
 msgstr "الفرنسية"
 
-msgid "Il n’y a aucune recette dans ce texte."
-msgstr "لا توجد وصفة في هذا النص."
-
 msgid "La chaîne complète, jugement final compris : c’est le seul moment où le texte et les deux images sont confrontés."
 msgstr "السلسلة كاملة بما فيها الحكم النهائي: وهي اللحظة الوحيدة التي يُقارن فيها النص بالصورتين معاً."
-
-msgid "La langue de l’article, qui n’est pas celle de cette interface. Le plafond s’applique à chaque recette : au-delà, le run s’arrête plutôt que de dépenser."
-msgstr "لغة المقال، وهي غير لغة هذه الواجهة. السقف يسري على كل وصفة: وبتجاوزه يتوقف التنفيذ بدل الإنفاق."
-
-msgid "La langue et le plafond"
-msgstr "اللغة والسقف"
 
 msgid "Le juge"
 msgstr "الحَكَم"
@@ -228,12 +213,6 @@ msgstr "حسب النموذج"
 msgid "Par étape"
 msgstr "حسب الخطوة"
 
-msgid "Photographies des recettes"
-msgstr "صور الوصفات"
-
-msgid "Plafond par recette"
-msgstr "السقف لكل وصفة"
-
 msgid "Recette"
 msgstr "وصفة"
 
@@ -246,9 +225,6 @@ msgstr "لا شيء مطابق"
 msgid "Rien ne tourne."
 msgstr "لا شيء قيد التنفيذ."
 
-msgid "Rien n’est écrit à cette étape : seules les photographies sont décrites. Vous verrez l’appariement avant de lancer quoi que ce soit."
-msgstr "لا يُكتب شيء في هذه المرحلة: تُوصف الصور فقط. وسترى الاقتران قبل إطلاق أي شيء."
-
 msgid "Rien à analyser"
 msgstr "لا شيء للتحليل"
 
@@ -257,9 +233,6 @@ msgstr "المحرِّر"
 
 msgid "Réglages"
 msgstr "الإعدادات"
-
-msgid "Sans dire lesquelles vont avec quoi : chacune sera décrite depuis ses propres pixels, puis associée à une recette. Une photographie est facturée une fois, même si vous corrigez ensuite l’association."
-msgstr "دون بيان أيّها لأيّ: ستُوصف كل صورة من وحدات بكسلها ثم تُقرن بوصفة. وتُحتسب كلفة الصورة مرة واحدة، حتى لو صحّحت الاقتران بعدها."
 
 msgid "Sans tarif"
 msgstr "بلا تسعيرة"
@@ -305,9 +278,6 @@ msgstr "فحص يفشل مرة من ست هو ضجيج؛ وستاً من ست ف
 
 msgid "Une erreur est survenue."
 msgstr "حدث خطأ."
-
-msgid "Une ligne de trois tirets ou plus sépare deux recettes. La première ligne de chaque bloc en devient le titre."
-msgstr "سطر من ثلاث شرطات أو أكثر يفصل وصفتين. والسطر الأول من كل كتلة يصير عنوانها."
 
 msgid "Verdicts"
 msgstr "الأحكام"
@@ -363,9 +333,6 @@ msgstr "وصفات"
 msgid "remarques"
 msgstr "ملاحظات"
 
-msgid "réserves du juge"
-msgstr "تحفّظات الحَكَم"
-
 msgid "résultats"
 msgstr "النتائج"
 
@@ -390,17 +357,11 @@ msgstr "إخفاق"
 msgid "échecs"
 msgstr "إخفاقات"
 
-msgid "Langue de l’article"
-msgstr "لغة المقال"
-
 msgid "Tarte aux pommes normande\nPâte brisée, pommes, crème, calvados…\n\n---\n\nPoulet yassa\nPoulet, oignons, citron…"
 msgstr "تارت التفاح النورماندية\nعجينة مفتّتة، تفاح، قشدة، كالفادوس…\n\n---\n\nدجاج ياسا\nدجاج، بصل، ليمون…"
 
 msgid "%d étape(s) ont tourné sur un modèle sans tarif publié. Le coût de cette recette est incomplet, pas exact."
 msgstr "‏%d خطوة جرت على نموذج بلا تسعيرة منشورة. كلفة هذه الوصفة ناقصة لا دقيقة."
-
-msgid "Appariement"
-msgstr "الاقتران"
 
 msgid "Association probable — vérifiez"
 msgstr "اقتران مرجّح — تحقّق"
@@ -410,9 +371,6 @@ msgstr "اقتران مؤكّد"
 
 msgid "Aucun jugement final n’a été rendu pour cet article — le profil choisi ne l’exécutait pas, ou la recette s’est arrêtée avant."
 msgstr "لم يصدر حكم نهائي لهذا المقال — إما أن النمط المختار لا ينفّذه، أو أن الوصفة توقفت قبله."
-
-msgid "Aucune donnée."
-msgstr "لا بيانات."
 
 msgid "Aucune photographie"
 msgstr "لا صور"
@@ -435,26 +393,17 @@ msgstr "ما يُسلَّم فعلاً إلى المحرك"
 msgid "Ce qui ne va pas"
 msgstr "ما الخلل"
 
-msgid "Celle d’un lot qui n’en choisit pas."
-msgstr "لدفعة لا تختار لغة."
-
 msgid "Cet article a été généré. Les contrôles ci-dessous portent sur ce que la machine a produit ; ils ne remplacent pas votre relecture, et rien ici ne vaut approbation."
 msgstr "هذا المقال مولَّد. والفحوص أدناه تخصّ ما أنتجته الآلة؛ وهي لا تغني عن مراجعتك، ولا شيء هنا يعدّ إجازة."
 
 msgid "Cette recette n’est pas arrêtée."
 msgstr "هذه الوصفة ليست موقوفة."
 
-msgid "Chaque photographie a été décrite depuis ses propres pixels, puis rapprochée d’une recette. Dans le doute, le modèle n’associe pas : une photographie laissée de côté coûte moins cher qu’une photographie attribuée au mauvais plat."
-msgstr "وُصفت كل صورة من وحدات بكسلها ثم قُرنت بوصفة. وعند الشك لا يقرن النموذج: فصورة تُترك جانباً أقل كلفة من صورة تُنسب إلى الطبق الخطأ."
-
 msgid "Chiffrées à l’enregistrement et jamais réaffichées. Un champ laissé vide conserve la clé enregistrée ; il ne l’efface pas."
 msgstr "تُشفَّر عند الحفظ ولا تُعرض ثانية. والحقل الفارغ يبقي المفتاح المحفوظ ولا يمحوه."
 
 msgid "Clés d’API"
 msgstr "مفاتيح الواجهة البرمجية"
-
-msgid "Contrôle local uniquement, sans aucun appel facturé : la présence d’une clé ne prouve pas qu’elle est valide, seulement qu’un appel serait tenté."
-msgstr "فحص محلي فقط دون أي استدعاء مفوتر: وجود المفتاح لا يثبت صلاحيته، بل يثبت أن الاستدعاء سيُحاوَل."
 
 msgid "Contrôles non satisfaits"
 msgstr "فحوص غير مستوفاة"
@@ -483,9 +432,6 @@ msgstr "المسار"
 msgid "Enregistrer"
 msgstr "حفظ"
 
-msgid "Enregistrer l’appariement"
-msgstr "حفظ الاقتران"
-
 msgid "Enregistré."
 msgstr "حُفظ."
 
@@ -494,9 +440,6 @@ msgstr "الخطورة"
 
 msgid "JSON invalide, donc ignoré pour : %s. Le reste a bien été enregistré, et ces groupes gardent leur valeur précédente."
 msgstr "‏JSON غير صالح، فتُجوهل لـ: %s. أما الباقي فحُفظ، وتحتفظ هذه المجموعات بقيمها السابقة."
-
-msgid "Langue par défaut"
-msgstr "اللغة الافتراضية"
 
 msgid "Le dossier des téléversements n’est pas accessible en écriture : aucune image générée ne pourra être enregistrée."
 msgstr "مجلد الرفع غير قابل للكتابة: لن تُحفظ أي صورة مولَّدة."
@@ -512,9 +455,6 @@ msgstr "يجري وصف الصور. أعد التحميل بعد لحظات."
 
 msgid "Les recettes avancent ensemble, une vague par tick de cron. Vous pouvez fermer cet onglet."
 msgstr "تتقدّم الوصفات معاً، موجة في كل نبضة كرون. يمكنك إغلاق هذا اللسان."
-
-msgid "Les recettes seront générées sans photographie fournie : le moteur cherchera ses propres références."
-msgstr "ستُولَّد الوصفات دون صورة مُقدَّمة: وسيبحث المحرك عن مراجعه الخاصة."
 
 msgid "Lot %d"
 msgstr "دفعة %d"
@@ -539,9 +479,6 @@ msgstr "تعذّر التحقق:"
 
 msgid "Ouvrir le brouillon"
 msgstr "افتح المسودة"
-
-msgid "Où irait chaque étape"
-msgstr "إلى أين تذهب كل خطوة"
 
 msgid "Peu sûr — à confirmer"
 msgstr "غير مؤكّد — للتأكيد"
@@ -630,9 +567,6 @@ msgstr "كرون"
 msgid "durée"
 msgstr "المدة"
 
-msgid "défaut du moteur : %s"
-msgstr "افتراضي المحرك: %s"
-
 msgid "groupes modifiés"
 msgstr "مجموعات معدّلة"
 
@@ -686,9 +620,6 @@ msgstr "للتصحيح قبل النشر."
 
 msgid "étapes"
 msgstr "خطوات"
-
-msgid "— aucune —"
-msgstr "— لا شيء —"
 
 msgid "Pas de collage. Le jugement final s’exécute quand même et confronte le texte à l’image produite ; il n’a simplement pas de collage à comparer."
 msgstr "بلا ملصق. يُنفَّذ الحكم النهائي مع ذلك ويقارن النص بالصورة المنتجة؛ لكن لا ملصق لديه ليقارنه."
@@ -749,9 +680,6 @@ msgstr "ترتيب الصف مقصور على المديرين."
 
 msgid "La suppression est réservée aux administrateurs."
 msgstr "الحذف مقصور على المديرين."
-
-msgid "Plus tard"
-msgstr "لاحقاً"
 
 msgid "Programmer"
 msgstr "جدولة"
@@ -972,15 +900,6 @@ msgstr "حذف هذه الدفعة وكل ما أبلغ عنه المحرّك ب
 msgid "Supprimer le lot"
 msgstr "حذف الدفعة"
 
-msgid "La langue"
-msgstr "اللغة"
-
-msgid "La langue de l’article, qui n’est pas celle de cette interface."
-msgstr "لغة المقال، وهي ليست لغة هذه الواجهة."
-
-msgid "La valeur proposée sur un nouveau lot, et celle qui s’applique à un lot déposé par quelqu’un qui ne voit pas les montants."
-msgstr "القيمة المقترحة على أي دفعة جديدة، وهي نفسها التي تُطبَّق على دفعة يودعها شخص لا تُعرض عليه المبالغ."
-
 msgid "Par recette"
 msgstr "لكل وصفة"
 
@@ -1016,9 +935,6 @@ msgstr "أُوقفت بطلب. يمكن استئنافها من حيث توقف�
 
 msgid "Attention : une recette est estimée à %1$s, au-dessus du plafond de %2$s. Elle s’arrêterait en route ; le lot sera refusé au lancement. Relevez le plafond ou choisissez une sortie plus légère."
 msgstr "تنبيه: تُقدَّر الوصفة الواحدة بـ %1$s، أي فوق السقف البالغ %2$s. ستتوقف في منتصف الطريق، لذا سيُرفض الدفعة عند الإطلاق. ارفع السقف أو اختر مخرجًا أخف."
-
-msgid "Avec le routage actuel, une recette complète est estimée à %s. Un plafond en dessous refuse le lot au lancement ; laissez de la marge pour les reprises."
-msgstr "بحسب التوجيه الحالي، تُقدَّر الوصفة الكاملة بـ %s. أي سقف أدنى يرفض الدفعة عند الإطلاق؛ اترك هامشًا لإعادة المحاولات."
 
 msgid "Ce lot dépasse le plafond par recette fixé pour le site : il s’arrêterait en route. Choisissez une sortie plus légère, ou demandez à un administrateur de relever le plafond."
 msgstr "تتجاوز هذه الدفعة سقف الوصفة المحدد للموقع وستتوقف في منتصف الطريق. اختر مخرجًا أخف، أو اطلب من المسؤول رفع السقف."
@@ -1110,9 +1026,6 @@ msgstr "الوصف التعريفي"
 msgid "Nombre de mots maximal"
 msgstr "الحد الأقصى لعدد الكلمات"
 
-msgid "Proposée par défaut sur chaque nouveau lot. Un lot peut toujours en demander une autre."
-msgstr "مقترحة افتراضيًا لكل دفعة جديدة. يمكن لأي دفعة طلب لغة أخرى."
-
 msgid "Publier la recette en données structurées (Recipe JSON-LD)"
 msgstr "نشر الوصفة كبيانات منظَّمة (Recipe JSON-LD)"
 
@@ -1191,32 +1104,14 @@ msgstr "إلى"
 msgid "Le compte du service d’écriture n’a plus de crédit. Un administrateur doit le recharger, puis reprendre la recette : rien de ce qui est fait n’est perdu."
 msgstr "نفد رصيد حساب خدمة الكتابة. على المسؤول إعادة شحنه ثم استئناف الوصفة: لا يضيع شيء مما أُنجز."
 
-msgid "Anthropic Claude"
-msgstr "أنثروبيك كلود"
-
 msgid "Clé présente"
 msgstr "المفتاح موجود"
-
-msgid "Google Gemini"
-msgstr "جوجل جيميني"
-
-msgid "Génération d’image (à la une et collage Facebook)"
-msgstr "توليد الصور (الصورة البارزة ولوحة فيسبوك)"
-
-msgid "La façon courante de changer une route : un fournisseur, un niveau. Ceci réécrit le champ « routing » plus bas à chaque changement ; ce qui y est modifié à la main reste possible et prévaut en cas de désaccord entre les deux après un chargement de page."
-msgstr "الطريقة المعتادة لتغيير مسار: مزوّد واحد، ومستوى واحد. هذا يعيد كتابة حقل «routing» أدناه عند كل تغيير؛ تعديله يدويًا يبقى ممكنًا ويُرجَّح عند الاختلاف بين الاثنين بعد إعادة تحميل الصفحة."
-
-msgid "Lecture des photographies (appariement, observation avant génération)"
-msgstr "قراءة الصور (المطابقة، والملاحظة قبل التوليد)"
 
 msgid "Modèle par étape"
 msgstr "النموذج لكل خطوة"
 
 msgid "Nécessite JavaScript ; sans cela, utilisez directement le champ « routing » ci-dessous."
 msgstr "يتطلب JavaScript؛ بدونه، استخدم حقل «routing» أدناه مباشرة."
-
-msgid "OpenAI"
-msgstr "أوبن إيه آي"
 
 msgid "Prévisualiser"
 msgstr "معاينة"
@@ -1392,12 +1287,6 @@ msgstr[3] " و%d وصفات أخرى"
 msgstr[4] " و%d وصفة أخرى"
 msgstr[5] " و%d وصفة أخرى"
 
-msgid "Aucune recette dans ce qui a été fourni."
-msgstr "لا وصفة فيما قُدِّم."
-
-msgid "Aucune recette lisible dans ce texte."
-msgstr "لا وصفة مقروءة في هذا النص."
-
 msgid "Ce lot est déjà lancé ; son appariement ne change plus."
 msgstr "هذه الدفعة انطلقت بالفعل؛ لم تعد مطابقتها تتغيّر."
 
@@ -1494,9 +1383,6 @@ msgstr "المفتاح صالح، لكن حصة الحساب استُنفدت: �
 msgid "$%1$s entrée / $%2$s sortie par million de jetons"
 msgstr "%1$s دولار للإدخال / %2$s دولار للإخراج لكل مليون رمز"
 
-msgid "%1$d modèle(s) servis d’après le fournisseur, relevés le %2$s."
-msgstr "%1$d نموذج/نماذج يخدمها المزوّد، حسب قائمة %2$s."
-
 msgid "Le profil complet en compte %s. Une étape part dès que tout ce dont elle dépend est prêt : c’est ce qui découpe une recette en vagues, et ce qui fait qu’une reprise ne repaie pas ce qui a réussi."
 msgstr "يضم الملف الكامل %s منها. تنطلق الخطوة فور جهوز كل ما تعتمد عليه: هذا ما يقسّم الوصفة إلى موجات، وما يجعل الاستئناف لا يدفع ثانيةً ثمن ما نجح."
 
@@ -1506,23 +1392,8 @@ msgstr "ينتظر"
 msgid "Ce que fait le moteur, étape par étape"
 msgstr "ما يفعله المحرّك، خطوة بخطوة"
 
-msgid "Entrée / sortie par million"
-msgstr "إدخال / إخراج لكل مليون"
-
-msgid "Fournisseur et niveau"
-msgstr "المزوّد والمستوى"
-
-msgid "Jamais interrogé. « Vérifier les clés », dans les réglages, relève la liste sans rien dépenser."
-msgstr "لم يُسأل قط. «تحقّق من المفاتيح» في الإعدادات يجلب القائمة دون أي إنفاق."
-
 msgid "Le fournisseur ne sert pas ces modèles : %s. L’étape concernée échouera, après avoir payé celles d’avant."
 msgstr "لا يخدم المزوّد هذه النماذج: %s. ستفشل الخطوة المعنية بعد دفع ثمن ما سبقها."
-
-msgid "Les tarifs sont saisis à la main d’après la page de chaque fournisseur : aucune API ne les donne, et une estimation ne vaut que ce qu’ils valent. La liste des identifiants, elle, vient du fournisseur lui-même et se met à jour à chaque « Vérifier les clés »."
-msgstr "تُدخَل الأسعار يدويًا من صفحة كل مزوّد: لا تتيحها أي واجهة برمجية، ولا يساوي التقدير إلا ما تساويه. أما قائمة المعرّفات فتأتي من المزوّد نفسه وتُحدَّث مع كل «تحقّق من المفاتيح»."
-
-msgid "Modèle qui tournera"
-msgstr "النموذج الذي سيعمل"
 
 msgid "Modèles et tarifs"
 msgstr "النماذج والأسعار"
@@ -1533,44 +1404,14 @@ msgstr "يُنتج"
 msgid "Routez ces étapes vers un modèle listé dans Moteur → Modèles et tarifs."
 msgstr "وجّه هذه الخطوات إلى نموذج مدرج في المحرّك ← النماذج والأسعار."
 
-msgid "Sait faire"
-msgstr "يستطيع"
-
-msgid "Servi"
-msgstr "مخدوم"
-
-msgid "Tout ce que le fournisseur sert"
-msgstr "كل ما يخدمه المزوّد"
-
 msgid "aucun tarif connu — le coût de cette étape ne peut pas être estimé"
 msgstr "لا سعر معروف — يتعذّر تقدير تكلفة هذه الخطوة"
-
-msgid "génération d’image"
-msgstr "توليد الصور"
 
 msgid "jamais vérifié auprès du fournisseur"
 msgstr "لم يُتحقَّق منه لدى المزوّد"
 
 msgid "le fournisseur ne sert pas ce nom : l’étape échouera"
 msgstr "لا يخدم المزوّد هذا الاسم: ستفشل الخطوة"
-
-msgid "non"
-msgstr "لا"
-
-msgid "non vérifié"
-msgstr "غير مُتحقَّق"
-
-msgid "oui"
-msgstr "نعم"
-
-msgid "recherche web"
-msgstr "البحث على الويب"
-
-msgid "texte"
-msgstr "نص"
-
-msgid "vision"
-msgstr "الرؤية"
 
 msgid "La couche appelante, telle quelle : ce qui a été saisi ici, plus les modèles et les niveaux que la page Modèles engendre. Vide signifie que tout suit le moteur."
 msgstr "الطبقة المُستدعية كما هي: ما أُدخل هنا، إضافةً إلى النماذج والمستويات التي تولّدها صفحة النماذج. الفراغ يعني أن كل شيء يتبع المحرّك."
@@ -1607,9 +1448,6 @@ msgstr "يُولَّد من هذا الجدول ثم يُسلَّم إلى ال�
 
 msgid "Entrée $/M"
 msgstr "إدخال $/م"
-
-msgid "Gratuit. Demande à chaque fournisseur la liste de ce qu’il sert, et ce qu’il en dit : capacités, limites. Aucun fournisseur ne publie ses tarifs par API, donc aucun tarif n’est touché ici."
-msgstr "مجاني. يسأل كل مزوّد عن قائمة ما يخدمه وما يقوله عنه: القدرات والحدود. لا ينشر أي مزوّد أسعاره عبر واجهة برمجية، لذا لا يُمسّ أي سعر هنا."
 
 msgid "Interrogation des fournisseurs…"
 msgstr "جارٍ سؤال المزوّدين…"
@@ -1674,17 +1512,6 @@ msgstr "تُقدَّر الوصفة الكاملة بـ %s — تقدير، ول
 
 msgid "Réflexion"
 msgstr "التفكير"
-
-msgid "par défaut"
-msgstr "افتراضي"
-
-#, php-format
-msgid "Avec le routage actuel, une recette complète est estimée à %1$s, et jusqu’à %2$s si l’approbation finale refuse à chaque tentative. Un plafond sous la première valeur refuse le lot au lancement ; sous la seconde, il peut arrêter une recette avant la fin."
-msgstr "بالتوجيه الحالي، تُقدَّر الوصفة الكاملة بـ %1$s، وقد تصل إلى %2$s إذا رفضت الموافقة النهائية في كل محاولة. الحد الأدنى من القيمة الأولى يرفض الدفعة عند الإطلاق؛ وما دون الثانية قد يوقف وصفة قبل نهايتها."
-
-#, php-format
-msgid "C’est plus que le plafond par recette : elle serait alors arrêtée avant la fin."
-msgstr "هذا أكثر من الحد لكل وصفة: ستتوقف حينها قبل النهاية."
 
 #, php-format
 msgid "Si l’approbation finale refuse à chaque tentative et fait redessiner les images, une recette peut coûter jusqu’à %s."
@@ -1966,9 +1793,6 @@ msgstr "لم يُتعرَّف على أي طبق في هذه الصور. أضف 
 msgid "Aucun texte : chaque plat reconnu sur les photographies deviendra une recette (%d au plus)."
 msgstr "لا نص: كل طبق يُتعرَّف عليه في الصور سيصبح وصفة (%d على الأكثر)."
 
-msgid "Aucun texte fourni : ces recettes ont été nommées d’après les photographies — %s. Chacune sera établie d’après les sources ; vérifiez-les avant de lancer."
-msgstr "لم يُقدَّم نص: سُمّيت هذه الوصفات انطلاقًا من الصور — %s. ستُعدّ كل واحدة منها اعتمادًا على المصادر؛ تحقق منها قبل الإطلاق."
-
 msgid "Collez au moins une recette ou ajoutez au moins une photographie."
 msgstr "الصق وصفة واحدة على الأقل أو أضف صورة واحدة على الأقل."
 
@@ -2014,9 +1838,6 @@ msgstr[3] "%d صور — تُكتب انطلاقًا منها"
 msgstr[4] "%d صورة — تُكتب انطلاقًا منها"
 msgstr[5] "%d صورة — تُكتب انطلاقًا منها"
 
-msgid "%d photographies ne vont avec aucune recette : elles ne seront pas utilisées."
-msgstr "%d صور لا تنتمي إلى أي وصفة: لن تُستخدم."
-
 msgid "%d photographies — écrite d’après elles"
 msgstr "%d صور — تُكتب انطلاقًا منها"
 
@@ -2044,9 +1865,6 @@ msgstr "لاحقًا…"
 msgid "Sans photographie — références cherchées sur le web"
 msgstr "بدون صورة — يُبحث عن المراجع في الويب"
 
-msgid "Une photographie ne va avec aucune recette : elle ne sera pas utilisée."
-msgstr "صورة واحدة لا تنتمي إلى أي وصفة: لن تُستخدم."
-
 msgid "Va avec"
 msgstr "تنتمي إلى"
 
@@ -2058,9 +1876,6 @@ msgstr "صورك"
 
 msgid "Vérifiez à quelle recette va chaque photographie, puis lancez. Une recette illustrée par vos photographies est écrite d’après elles ; sans photographie, ses références sont cherchées sur le web."
 msgstr "تحقق من الوصفة التي تنتمي إليها كل صورة، ثم أطلق. الوصفة المصحوبة بصورك تُكتب انطلاقًا منها؛ وبدون صورة يُبحث عن مراجعها في الويب."
-
-msgid "aucune recette"
-msgstr "لا وصفة"
 
 msgid "Mise de côté"
 msgstr "مُستبعدة"

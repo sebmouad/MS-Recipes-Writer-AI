@@ -33,11 +33,11 @@ msrwa_test_assert( null === $state['monthly']['left'] || 60.0 === $state['monthl
 msrwa_test_assert( '' === MSRWA_Budget::refusal( 0.5 ), 'A lot that fits under every ceiling is not refused.' );
 $refusal = MSRWA_Budget::refusal( 2.0 );
 msrwa_test_contains( $refusal, 'ne reste que', 'A lot that would cross a ceiling is refused before it starts.' );
-msrwa_test_assert( MSRWA_Budget::may_continue(), 'A run in flight continues while the ceilings hold.' );
+msrwa_test_assert( '' === MSRWA_Budget::refusal(), 'Nothing is refused while the ceilings hold.' );
 
 msrwa_test_settings( array( 'daily_budget_usd' => 4, 'monthly_budget_usd' => 100 ) );
 msrwa_test_contains( MSRWA_Budget::refusal(), 'plafond du jour', 'A ceiling already reached refuses with no lot at all.' );
-msrwa_test_assert( ! MSRWA_Budget::may_continue(), 'A run in flight stops paying once a ceiling is reached.' );
+msrwa_test_assert( '' !== MSRWA_Budget::refusal(), 'Once a ceiling is reached, nothing more is paid for.' );
 
 msrwa_test_settings( array( 'daily_budget_usd' => 0, 'monthly_budget_usd' => 40 ) );
 msrwa_test_contains( MSRWA_Budget::refusal(), 'trente derniers jours', 'The monthly ceiling refuses on its own.' );

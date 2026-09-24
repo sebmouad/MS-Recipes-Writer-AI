@@ -198,12 +198,18 @@ final class MSRWA_Operations {
 		foreach ( (array) $files as $file ) {
 			$path = MSRWA_Sources::path( $dir, basename( (string) $file ) );
 			if ( '' === $path ) { continue; }
+			// Decoding costs about four bytes a pixel: a 40-megapixel photograph
+			// would take the report past a typical memory limit. It is shown by
+			// its name alone rather than bring the page down.
+			$size = @getimagesize( $path ); // phpcs:ignore WordPress.PHP.NoSilencedErrors
+			if ( ! $size || (int) $size[0] * (int) $size[1] > 25000000 ) { continue; }
 			$image = function_exists( 'imagecreatefromstring' ) ? @imagecreatefromstring( (string) file_get_contents( $path ) ) : false; // phpcs:ignore WordPress.PHP.NoSilencedErrors
 			if ( $image ) {
 				$small = imagescale( $image, min( 480, imagesx( $image ) ) );
 				ob_start();
 				imagejpeg( $small ? $small : $image, null, 70 );
 				$out[ basename( $path ) ] = 'data:image/jpeg;base64,' . base64_encode( (string) ob_get_clean() );
+				imagedestroy( $image );
 				continue;
 			}
 			// No GD: the file itself, when it is small enough to embed.

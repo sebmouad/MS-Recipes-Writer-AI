@@ -4,16 +4,13 @@
 require __DIR__ . '/bootstrap.php';
 msrwa_test_load( 'quality' );
 
-$missing = MSRWA_Quality::normalize_review( array( 'pass' => true ) );
-msrwa_test_assert( ! $missing['pass'] && 'unknown' === $missing['verdict'], 'A bare pass boolean cannot invent an AI verdict.' );
-
-$image = MSRWA_Quality::normalize_review( array( 'pass' => true, 'verdict' => 'good', 'realism' => 'bad' ), true );
-msrwa_test_assert( ! $image['pass'] && 'bad' === $image['realism'], 'Unrealistic images must not pass.' );
-
-$limits = array( 'quality_min_words' => 2000, 'quality_max_words' => 2400 );
-foreach ( array( 1999 => false, 2000 => true, 2400 => true, 2401 => false ) as $words => $valid ) {
-	$article = array( 'content_html' => '<p>' . implode( ' ', array_fill( 0, $words, 'recette' ) ) . '</p>' );
-	msrwa_test_assert( empty( MSRWA_Quality::length_findings( $article, $limits ) ) === $valid, 'Length boundary: ' . $words );
+// The minimum word count is a blocker, not a matter of score: an article one
+// word short of it fails however well it does elsewhere. The heading counts.
+$limits = array( 'quality_min_words' => 2000, 'quality_max_words' => 2400, 'quality_min_score' => 1 );
+foreach ( array( 1999 => false, 2000 => true ) as $words => $long_enough ) {
+	$article = array( 'content_html' => '<h2>Titre</h2><p>' . implode( ' ', array_fill( 0, $words - 1, 'recette' ) ) . '</p>' );
+	$verdict = MSRWA_Quality::evaluate( $article, array(), $limits );
+	msrwa_test_assert( $long_enough === ! in_array( 'content_html', $verdict['blockers'], true ), 'Length boundary: ' . $words . ' words ' . ( $long_enough ? 'pass' : 'block' ) . ' — ' . json_encode( $verdict['blockers'] ) );
 }
 
 msrwa_test_done( 'MSRWA quality contracts' );

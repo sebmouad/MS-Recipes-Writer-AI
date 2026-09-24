@@ -111,12 +111,6 @@ msgstr "What is running, what is waiting to be read, and what stopped."
 msgid "Ce qu’il faut produire"
 msgstr "What to produce"
 
-msgid "Choisir dans la médiathèque"
-msgstr "Choose from the media library"
-
-msgid "Collez vos recettes et ajoutez les photographies. Elles seront décrites puis associées ; vous confirmez l’appariement avant que quoi que ce soit ne soit généré."
-msgstr "Paste your recipes and add the photographs. They will be described and paired; you confirm the pairing before anything is generated."
-
 msgid "Contrôle"
 msgstr "Check"
 
@@ -174,17 +168,8 @@ msgstr "Filter"
 msgid "Français"
 msgstr "French"
 
-msgid "Il n’y a aucune recette dans ce texte."
-msgstr "There is no recipe in this text."
-
 msgid "La chaîne complète, jugement final compris : c’est le seul moment où le texte et les deux images sont confrontés."
 msgstr "The whole chain, final judgement included: the only point where the text and both images are checked against one another."
-
-msgid "La langue de l’article, qui n’est pas celle de cette interface. Le plafond s’applique à chaque recette : au-delà, le run s’arrête plutôt que de dépenser."
-msgstr "The article's language, which is not this interface's. The ceiling applies per recipe: beyond it, the run stops rather than spend."
-
-msgid "La langue et le plafond"
-msgstr "Language and ceiling"
 
 msgid "Le juge"
 msgstr "The judge"
@@ -228,12 +213,6 @@ msgstr "By model"
 msgid "Par étape"
 msgstr "By step"
 
-msgid "Photographies des recettes"
-msgstr "Recipe photographs"
-
-msgid "Plafond par recette"
-msgstr "Ceiling per recipe"
-
 msgid "Recette"
 msgstr "Recipe"
 
@@ -246,9 +225,6 @@ msgstr "Nothing matches"
 msgid "Rien ne tourne."
 msgstr "Nothing is running."
 
-msgid "Rien n’est écrit à cette étape : seules les photographies sont décrites. Vous verrez l’appariement avant de lancer quoi que ce soit."
-msgstr "Nothing is written at this stage: only the photographs are described. You will see the pairing before anything starts."
-
 msgid "Rien à analyser"
 msgstr "Nothing to analyse"
 
@@ -257,9 +233,6 @@ msgstr "Writer"
 
 msgid "Réglages"
 msgstr "Settings"
-
-msgid "Sans dire lesquelles vont avec quoi : chacune sera décrite depuis ses propres pixels, puis associée à une recette. Une photographie est facturée une fois, même si vous corrigez ensuite l’association."
-msgstr "Without saying which goes with what: each will be described from its own pixels, then paired with a recipe. A photograph is billed once, even if you correct the pairing afterwards."
 
 msgid "Sans tarif"
 msgstr "Unpriced"
@@ -305,9 +278,6 @@ msgstr "A check that fails once in six is noise; six times in six is a contract 
 
 msgid "Une erreur est survenue."
 msgstr "Something went wrong."
-
-msgid "Une ligne de trois tirets ou plus sépare deux recettes. La première ligne de chaque bloc en devient le titre."
-msgstr "A line of three or more dashes separates two recipes. The first line of each block becomes its title."
 
 msgid "Verdicts"
 msgstr "Verdicts"
@@ -363,9 +333,6 @@ msgstr "recipes"
 msgid "remarques"
 msgstr "findings"
 
-msgid "réserves du juge"
-msgstr "judge has reservations"
-
 msgid "résultats"
 msgstr "results"
 
@@ -390,17 +357,11 @@ msgstr "failed"
 msgid "échecs"
 msgstr "failures"
 
-msgid "Langue de l’article"
-msgstr "Article language"
-
 msgid "Tarte aux pommes normande\nPâte brisée, pommes, crème, calvados…\n\n---\n\nPoulet yassa\nPoulet, oignons, citron…"
 msgstr "Normandy apple tart\nShortcrust, apples, cream, calvados…\n\n---\n\nChicken yassa\nChicken, onions, lemon…"
 
 msgid "%d étape(s) ont tourné sur un modèle sans tarif publié. Le coût de cette recette est incomplet, pas exact."
 msgstr "%d step(s) ran on a model with no published rate. This recipe's cost is incomplete, not exact."
-
-msgid "Appariement"
-msgstr "Pairing"
 
 msgid "Association probable — vérifiez"
 msgstr "Probable match — check it"
@@ -410,9 +371,6 @@ msgstr "Confident match"
 
 msgid "Aucun jugement final n’a été rendu pour cet article — le profil choisi ne l’exécutait pas, ou la recette s’est arrêtée avant."
 msgstr "No final judgement was made for this article — the chosen profile did not run it, or the recipe stopped first."
-
-msgid "Aucune donnée."
-msgstr "No data."
 
 msgid "Aucune photographie"
 msgstr "No photographs"
@@ -435,26 +393,17 @@ msgstr "What is actually handed to the engine"
 msgid "Ce qui ne va pas"
 msgstr "What is wrong"
 
-msgid "Celle d’un lot qui n’en choisit pas."
-msgstr "For a lot that does not choose one."
-
 msgid "Cet article a été généré. Les contrôles ci-dessous portent sur ce que la machine a produit ; ils ne remplacent pas votre relecture, et rien ici ne vaut approbation."
 msgstr "This article was generated. The checks below are about what the machine produced; they do not replace your reading, and nothing here counts as approval."
 
 msgid "Cette recette n’est pas arrêtée."
 msgstr "This recipe is not stopped."
 
-msgid "Chaque photographie a été décrite depuis ses propres pixels, puis rapprochée d’une recette. Dans le doute, le modèle n’associe pas : une photographie laissée de côté coûte moins cher qu’une photographie attribuée au mauvais plat."
-msgstr "Each photograph was described from its own pixels, then matched to a recipe. In doubt the model does not pair: a photograph left aside costs less than one attached to the wrong dish."
-
 msgid "Chiffrées à l’enregistrement et jamais réaffichées. Un champ laissé vide conserve la clé enregistrée ; il ne l’efface pas."
 msgstr "Encrypted when saved and never shown again. An empty field keeps the stored key; it does not clear it."
 
 msgid "Clés d’API"
 msgstr "API keys"
-
-msgid "Contrôle local uniquement, sans aucun appel facturé : la présence d’une clé ne prouve pas qu’elle est valide, seulement qu’un appel serait tenté."
-msgstr "Local check only, with nothing billed: a key being present does not prove it works, only that a call would be attempted."
 
 msgid "Contrôles non satisfaits"
 msgstr "Unmet checks"
@@ -483,9 +432,6 @@ msgstr "Timeline"
 msgid "Enregistrer"
 msgstr "Save"
 
-msgid "Enregistrer l’appariement"
-msgstr "Save the pairing"
-
 msgid "Enregistré."
 msgstr "Saved."
 
@@ -494,9 +440,6 @@ msgstr "Severity"
 
 msgid "JSON invalide, donc ignoré pour : %s. Le reste a bien été enregistré, et ces groupes gardent leur valeur précédente."
 msgstr "Invalid JSON, so ignored for: %s. The rest was saved, and those groups keep their previous value."
-
-msgid "Langue par défaut"
-msgstr "Default language"
 
 msgid "Le dossier des téléversements n’est pas accessible en écriture : aucune image générée ne pourra être enregistrée."
 msgstr "The uploads directory is not writable: no generated image can be saved."
@@ -512,9 +455,6 @@ msgstr "The photographs are being described. Reload in a moment."
 
 msgid "Les recettes avancent ensemble, une vague par tick de cron. Vous pouvez fermer cet onglet."
 msgstr "The recipes advance together, one wave per cron tick. You can close this tab."
-
-msgid "Les recettes seront générées sans photographie fournie : le moteur cherchera ses propres références."
-msgstr "The recipes will be generated with no supplied photograph: the engine will find its own references."
 
 msgid "Lot %d"
 msgstr "Lot %d"
@@ -539,9 +479,6 @@ msgstr "Could not verify:"
 
 msgid "Ouvrir le brouillon"
 msgstr "Open the draft"
-
-msgid "Où irait chaque étape"
-msgstr "Where each step would go"
 
 msgid "Peu sûr — à confirmer"
 msgstr "Unsure — confirm it"
@@ -630,9 +567,6 @@ msgstr "cron"
 msgid "durée"
 msgstr "time"
 
-msgid "défaut du moteur : %s"
-msgstr "engine default: %s"
-
 msgid "groupes modifiés"
 msgstr "groups changed"
 
@@ -686,9 +620,6 @@ msgstr "to fix before publishing."
 
 msgid "étapes"
 msgstr "steps"
-
-msgid "— aucune —"
-msgstr "— none —"
 
 msgid "Pas de collage. Le jugement final s’exécute quand même et confronte le texte à l’image produite ; il n’a simplement pas de collage à comparer."
 msgstr "No collage. The final judgement still runs and checks the text against the image produced; it simply has no collage to compare."
@@ -749,9 +680,6 @@ msgstr "The order of the queue is for administrators only."
 
 msgid "La suppression est réservée aux administrateurs."
 msgstr "Deleting is for administrators only."
-
-msgid "Plus tard"
-msgstr "Later"
 
 msgid "Programmer"
 msgstr "Schedule"
@@ -972,15 +900,6 @@ msgstr "Delete this lot and everything the engine reported about it? Any drafts 
 msgid "Supprimer le lot"
 msgstr "Delete the lot"
 
-msgid "La langue"
-msgstr "The language"
-
-msgid "La langue de l’article, qui n’est pas celle de cette interface."
-msgstr "The article’s language, which is not this interface’s."
-
-msgid "La valeur proposée sur un nouveau lot, et celle qui s’applique à un lot déposé par quelqu’un qui ne voit pas les montants."
-msgstr "The figure offered on a new lot, and the one that applies to a lot submitted by somebody who is not shown money."
-
 msgid "Par recette"
 msgstr "Per recipe"
 
@@ -1004,9 +923,6 @@ msgstr "Stopped on request. It can be resumed where it left off."
 
 msgid "Attention : une recette est estimée à %1$s, au-dessus du plafond de %2$s. Elle s’arrêterait en route ; le lot sera refusé au lancement. Relevez le plafond ou choisissez une sortie plus légère."
 msgstr "Careful: one recipe is estimated at %1$s, above the %2$s ceiling. It would stop part way, so the lot will be refused when sent. Raise the ceiling or choose a lighter output."
-
-msgid "Avec le routage actuel, une recette complète est estimée à %s. Un plafond en dessous refuse le lot au lancement ; laissez de la marge pour les reprises."
-msgstr "With the current routing, one complete recipe is estimated at %s. A lower ceiling refuses the lot when it is sent; leave room for retries."
 
 msgid "Ce lot dépasse le plafond par recette fixé pour le site : il s’arrêterait en route. Choisissez une sortie plus légère, ou demandez à un administrateur de relever le plafond."
 msgstr "This lot is over the site’s per-recipe ceiling and would stop part way. Choose a lighter output, or ask an administrator to raise the ceiling."
@@ -1098,9 +1014,6 @@ msgstr "Meta description"
 msgid "Nombre de mots maximal"
 msgstr "Maximum number of words"
 
-msgid "Proposée par défaut sur chaque nouveau lot. Un lot peut toujours en demander une autre."
-msgstr "Offered by default on every new lot. A lot can always ask for another."
-
 msgid "Publier la recette en données structurées (Recipe JSON-LD)"
 msgstr "Publish the recipe as structured data (Recipe JSON-LD)"
 
@@ -1179,32 +1092,14 @@ msgstr "to"
 msgid "Le compte du service d’écriture n’a plus de crédit. Un administrateur doit le recharger, puis reprendre la recette : rien de ce qui est fait n’est perdu."
 msgstr "The writing service’s account has run out of credit. An administrator must top it up, then resume the recipe: nothing already done is lost."
 
-msgid "Anthropic Claude"
-msgstr "Anthropic Claude"
-
 msgid "Clé présente"
 msgstr "Key present"
-
-msgid "Google Gemini"
-msgstr "Google Gemini"
-
-msgid "Génération d’image (à la une et collage Facebook)"
-msgstr "Image generation (featured image and Facebook collage)"
-
-msgid "La façon courante de changer une route : un fournisseur, un niveau. Ceci réécrit le champ « routing » plus bas à chaque changement ; ce qui y est modifié à la main reste possible et prévaut en cas de désaccord entre les deux après un chargement de page."
-msgstr "The usual way to change a route: a provider, a tier. This rewrites the “routing” field below on every change; editing it by hand remains possible, and wins if the two disagree after a page load."
-
-msgid "Lecture des photographies (appariement, observation avant génération)"
-msgstr "Reading photographs (pairing, observation before generation)"
 
 msgid "Modèle par étape"
 msgstr "Model per step"
 
 msgid "Nécessite JavaScript ; sans cela, utilisez directement le champ « routing » ci-dessous."
 msgstr "Requires JavaScript; without it, use the “routing” field below directly."
-
-msgid "OpenAI"
-msgstr "OpenAI"
 
 msgid "Prévisualiser"
 msgstr "Preview"
@@ -1376,12 +1271,6 @@ msgid_plural " et %d autres"
 msgstr[0] " and %d other"
 msgstr[1] " and %d others"
 
-msgid "Aucune recette dans ce qui a été fourni."
-msgstr "No recipe in what was provided."
-
-msgid "Aucune recette lisible dans ce texte."
-msgstr "No readable recipe in this text."
-
 msgid "Ce lot est déjà lancé ; son appariement ne change plus."
 msgstr "This lot has already left; its pairing no longer changes."
 
@@ -1474,9 +1363,6 @@ msgstr "key valid, but the account quota is exhausted: the last real call was re
 msgid "$%1$s entrée / $%2$s sortie par million de jetons"
 msgstr "$%1$s in / $%2$s out per million tokens"
 
-msgid "%1$d modèle(s) servis d’après le fournisseur, relevés le %2$s."
-msgstr "%1$d model(s) served according to the provider, listed on %2$s."
-
 msgid "Le profil complet en compte %s. Une étape part dès que tout ce dont elle dépend est prêt : c’est ce qui découpe une recette en vagues, et ce qui fait qu’une reprise ne repaie pas ce qui a réussi."
 msgstr "The full profile has %s of them. A step starts as soon as everything it depends on is ready: that is what cuts a recipe into waves, and what makes a resume avoid paying again for what succeeded."
 
@@ -1486,23 +1372,8 @@ msgstr "Waits for"
 msgid "Ce que fait le moteur, étape par étape"
 msgstr "What the engine does, step by step"
 
-msgid "Entrée / sortie par million"
-msgstr "In / out per million"
-
-msgid "Fournisseur et niveau"
-msgstr "Provider and level"
-
-msgid "Jamais interrogé. « Vérifier les clés », dans les réglages, relève la liste sans rien dépenser."
-msgstr "Never asked. \"Check the keys\", in the settings, fetches the list without spending anything."
-
 msgid "Le fournisseur ne sert pas ces modèles : %s. L’étape concernée échouera, après avoir payé celles d’avant."
 msgstr "The provider does not serve these models: %s. The step concerned will fail, after paying for the ones before it."
-
-msgid "Les tarifs sont saisis à la main d’après la page de chaque fournisseur : aucune API ne les donne, et une estimation ne vaut que ce qu’ils valent. La liste des identifiants, elle, vient du fournisseur lui-même et se met à jour à chaque « Vérifier les clés »."
-msgstr "Prices are entered by hand from each provider’s own page: no API gives them, and an estimate is only worth what they are worth. The list of identifiers, on the other hand, comes from the provider itself and is refreshed by every \"Check the keys\"."
-
-msgid "Modèle qui tournera"
-msgstr "The model that will run"
 
 msgid "Modèles et tarifs"
 msgstr "Models and prices"
@@ -1513,44 +1384,14 @@ msgstr "Produces"
 msgid "Routez ces étapes vers un modèle listé dans Moteur → Modèles et tarifs."
 msgstr "Route these steps to a model listed under Engine → Models and prices."
 
-msgid "Sait faire"
-msgstr "Can do"
-
-msgid "Servi"
-msgstr "Served"
-
-msgid "Tout ce que le fournisseur sert"
-msgstr "Everything the provider serves"
-
 msgid "aucun tarif connu — le coût de cette étape ne peut pas être estimé"
 msgstr "no known price — the cost of this step cannot be estimated"
-
-msgid "génération d’image"
-msgstr "image generation"
 
 msgid "jamais vérifié auprès du fournisseur"
 msgstr "never checked against the provider"
 
 msgid "le fournisseur ne sert pas ce nom : l’étape échouera"
 msgstr "the provider does not serve this name: the step will fail"
-
-msgid "non"
-msgstr "no"
-
-msgid "non vérifié"
-msgstr "not checked"
-
-msgid "oui"
-msgstr "yes"
-
-msgid "recherche web"
-msgstr "web search"
-
-msgid "texte"
-msgstr "text"
-
-msgid "vision"
-msgstr "vision"
 
 msgid "La couche appelante, telle quelle : ce qui a été saisi ici, plus les modèles et les niveaux que la page Modèles engendre. Vide signifie que tout suit le moteur."
 msgstr "The caller layer, as it is: what was typed here, plus the models and levels the Models page generates. Empty means everything follows the engine."
@@ -1587,9 +1428,6 @@ msgstr "Generated by this table, then handed to the engine as its caller layer. 
 
 msgid "Entrée $/M"
 msgstr "In $/M"
-
-msgid "Gratuit. Demande à chaque fournisseur la liste de ce qu’il sert, et ce qu’il en dit : capacités, limites. Aucun fournisseur ne publie ses tarifs par API, donc aucun tarif n’est touché ici."
-msgstr "Free. Asks each provider for the list of what it serves, and what it says about it: capabilities, limits. No provider publishes its rates through an API, so no rate is touched here."
 
 msgid "Interrogation des fournisseurs…"
 msgstr "Asking the providers…"
@@ -1654,17 +1492,6 @@ msgstr "A full recipe is estimated at %s — an estimate, never an invoice."
 
 msgid "Réflexion"
 msgstr "Thinking"
-
-msgid "par défaut"
-msgstr "default"
-
-#, php-format
-msgid "Avec le routage actuel, une recette complète est estimée à %1$s, et jusqu’à %2$s si l’approbation finale refuse à chaque tentative. Un plafond sous la première valeur refuse le lot au lancement ; sous la seconde, il peut arrêter une recette avant la fin."
-msgstr "With the current routing, a complete recipe is estimated at %1$s, and up to %2$s if the final approval refuses at every attempt. A ceiling below the first figure refuses the lot at launch; below the second, it may stop a recipe before the end."
-
-#, php-format
-msgid "C’est plus que le plafond par recette : elle serait alors arrêtée avant la fin."
-msgstr "That is more than the per-recipe ceiling: it would then be stopped before the end."
 
 #, php-format
 msgid "Si l’approbation finale refuse à chaque tentative et fait redessiner les images, une recette peut coûter jusqu’à %s."
@@ -1938,9 +1765,6 @@ msgstr "No dish was recognised in these photographs. Add the name of each recipe
 msgid "Aucun texte : chaque plat reconnu sur les photographies deviendra une recette (%d au plus)."
 msgstr "No text: each dish recognised in the photographs will become a recipe (%d at most)."
 
-msgid "Aucun texte fourni : ces recettes ont été nommées d’après les photographies — %s. Chacune sera établie d’après les sources ; vérifiez-les avant de lancer."
-msgstr "No text given: these recipes were named from the photographs — %s. Each will be established from the sources; check them before starting."
-
 msgid "Collez au moins une recette ou ajoutez au moins une photographie."
 msgstr "Paste at least one recipe or add at least one photograph."
 
@@ -1982,9 +1806,6 @@ msgid_plural "%d photographies — écrite d’après elles"
 msgstr[0] "%d photograph — written from it"
 msgstr[1] "%d photographs — written from them"
 
-msgid "%d photographies ne vont avec aucune recette : elles ne seront pas utilisées."
-msgstr "%d photographs go with no recipe: they will not be used."
-
 msgid "%d photographies — écrite d’après elles"
 msgstr "%d photographs — written from them"
 
@@ -2012,9 +1833,6 @@ msgstr "Later…"
 msgid "Sans photographie — références cherchées sur le web"
 msgstr "No photograph — references searched on the web"
 
-msgid "Une photographie ne va avec aucune recette : elle ne sera pas utilisée."
-msgstr "One photograph goes with no recipe: it will not be used."
-
 msgid "Va avec"
 msgstr "Goes with"
 
@@ -2026,9 +1844,6 @@ msgstr "Your photographs"
 
 msgid "Vérifiez à quelle recette va chaque photographie, puis lancez. Une recette illustrée par vos photographies est écrite d’après elles ; sans photographie, ses références sont cherchées sur le web."
 msgstr "Check which recipe each photograph goes with, then start. A recipe illustrated by your photographs is written from them; without a photograph, its references are searched on the web."
-
-msgid "aucune recette"
-msgstr "no recipe"
 
 msgid "Mise de côté"
 msgstr "Set aside"

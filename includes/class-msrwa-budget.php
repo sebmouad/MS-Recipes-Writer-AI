@@ -104,6 +104,4 @@ final class MSRWA_Budget {
 		return '';
 	}
 
-	/** Whether a run still in flight may pay for another wave. */
-	public static function may_continue() { return '' === self::refusal(); }
 }

@@ -19,15 +19,6 @@ final class MSRWA_I18N {
 	}
 
 	/**
-	 * Whether the interface is being read right to left.
-	 *
-	 * Arabic is one of the three shipped languages, so every screen has to work
-	 * mirrored. WordPress sets the body class; this is for the few places that
-	 * have to decide something themselves.
-	 */
-	public static function is_rtl() { return function_exists( 'is_rtl' ) && is_rtl(); }
-
-	/**
 	 * A language name in the reader's own language.
 	 *
 	 * The article language is data, not interface: it is stored as `fr`, `en` or
