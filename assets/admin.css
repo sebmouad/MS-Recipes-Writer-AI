@@ -289,17 +289,65 @@
 .ms-photo-remove:hover, .ms-photo-remove:focus-visible { background: var(--ms-stop); opacity: 1; }
 .ms-photo-bad .ms-photo-remove { position: static; justify-self: end; }
 
-/* --- Pairing ----------------------------------------------------------- */
+/* --- Pairing -----------------------------------------------------------
+   The recipes first, as cards carrying their photographs: they are what is
+   being made. The photographs below, each with what was seen, how sure the
+   pairing is, and the one choice a person makes. */
 
-.ms-pair { display: grid; grid-template-columns: 92px minmax(0, 1fr) 220px; gap: 16px; align-items: start; padding: 15px 20px; border-block-end: 1px solid var(--ms-line-soft); }
-/* A photograph with no preview leaves no column: an empty 92px gutter down
+.ms-pairing > p, .ms-pairing > .ms-note { margin-inline: 20px; }
+.ms-pairing-sub { margin: 22px 20px 10px; font-size: 13px; font-weight: 650; }
+
+.ms-dishes { list-style: none; margin: 0 20px 6px; padding: 0; display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); }
+.ms-dish { margin: 0; padding: 14px 16px; display: grid; gap: 8px; align-content: start; background: var(--ms-raised); border: 1px solid var(--ms-line); border-inline-start: var(--ms-rail) solid var(--ms-line); border-radius: var(--ms-radius); }
+.ms-dish.has-photos { border-inline-start-color: var(--ms-good); }
+.ms-dish-title { font-size: 14px; line-height: 1.35; }
+.ms-dish-thumbs { display: flex; flex-wrap: wrap; gap: 6px; min-block-size: 0; }
+.ms-dish-thumbs:empty { display: none; }
+.ms-dish-thumbs img { inline-size: 44px; block-size: 44px; object-fit: cover; border-radius: 5px; border: 1px solid var(--ms-line); }
+.ms-dish-with { font-size: 12px; color: var(--ms-ink-soft); }
+.ms-dish.has-photos .ms-dish-with { color: var(--ms-good); }
+
+.ms-pairs { list-style: none; margin: 0; padding: 0; border-block-start: 1px solid var(--ms-line-soft); }
+.ms-pair { margin: 0; display: grid; grid-template-columns: 128px minmax(0, 1fr) 15rem; gap: 18px; align-items: start; padding: 16px 20px; border-block-end: 1px solid var(--ms-line-soft); border-inline-start: var(--ms-rail) solid transparent; }
+/* Unsure pairings carry the warning's rail: they are the ones to look at. */
+.ms-pair-warn { border-inline-start-color: var(--ms-warn); }
+.ms-pair-idle .ms-pair-photo { opacity: .6; }
+.ms-pair-stop { border-inline-start-color: var(--ms-stop); background: linear-gradient(to right, var(--ms-stop-soft), transparent 40%); }
+/* A photograph with no preview leaves no column: an empty gutter down
    the page reads as something that failed to load. */
-.ms-pair-blind { grid-template-columns: minmax(0, 1fr) 220px; }
-.ms-pair img { inline-size: 92px; block-size: 92px; object-fit: cover; border-radius: 6px; border: 1px solid var(--ms-line); display: block; }
-.ms-pair select { inline-size: 100%; }
-.ms-pair-file { font-family: var(--ms-mono); font-size: 11px; color: var(--ms-ink-faint); margin-block-start: 6px; overflow-wrap: anywhere; }
-.ms-pair-says { margin: 0; }
-.ms-pair-why { margin: 6px 0 0; color: var(--ms-ink-soft); font-size: 12px; }
+.ms-pair-blind { grid-template-columns: minmax(0, 1fr) 15rem; }
+.ms-pair-photo { display: block; border-radius: 8px; overflow: hidden; border: 1px solid var(--ms-line); }
+.ms-pair-photo img { inline-size: 100%; aspect-ratio: 1; object-fit: cover; display: block; transition: transform .2s ease; }
+.ms-pair-photo:hover img, .ms-pair-photo:focus-visible img { transform: scale(1.04); }
+.ms-pair-body p { margin: 0; }
+.ms-pair-dish { font-size: 14px; font-weight: 650; }
+.ms-pair-says { margin-block-start: 4px !important; color: var(--ms-ink); line-height: 1.5; }
+.ms-pair-why { margin-block-start: 8px !important; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; font-size: 12px; color: var(--ms-ink-soft); }
+.ms-pair-file { font-family: var(--ms-mono); font-size: 11px; color: var(--ms-ink-faint); margin-block-start: 6px !important; overflow-wrap: anywhere; }
+.ms-pair-pick { display: grid; gap: 5px; }
+.ms-pair-pick label { font-size: 11px; font-weight: 650; letter-spacing: .06em; text-transform: uppercase; color: var(--ms-ink-faint); }
+.ms-pair-pick select { inline-size: 100%; max-inline-size: 100%; min-block-size: 36px; }
+.ms-pair-fixed { font-weight: 600; }
+
+/* Launching: one clear action, the rest folded beside it. */
+.ms-launch { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 12px; padding: 16px 20px; background: var(--ms-sunk); border-block-start: 1px solid var(--ms-line); position: sticky; inset-block-end: 0; z-index: 2; }
+.ms-launch #ms-batch-status { margin-inline-end: auto; }
+.ms-later { position: relative; }
+.ms-later > summary { list-style: none; }
+.ms-later > summary::-webkit-details-marker { display: none; }
+.ms-later-body { position: absolute; inset-block-end: calc(100% + 8px); inset-inline-end: 0; display: grid; gap: 8px; padding: 14px; min-inline-size: 16rem; background: var(--ms-raised); border: 1px solid var(--ms-line); border-radius: var(--ms-radius); box-shadow: 0 8px 24px rgba(15, 23, 32, .12); }
+.ms-later-body label { font-weight: 600; }
+
+@media (max-width: 782px) {
+	.ms-pair, .ms-pair-blind { grid-template-columns: 88px minmax(0, 1fr); gap: 12px; padding-inline: 14px; }
+	.ms-pair-pick { grid-column: 1 / -1; }
+	.ms-pair-pick select { font-size: 16px; min-block-size: 42px; }
+	.ms-dishes { margin-inline: 14px; grid-template-columns: minmax(0, 1fr); }
+	.ms-pairing > p, .ms-pairing > .ms-note { margin-inline: 14px; }
+	.ms-launch { padding: 12px 14px; }
+	.ms-launch #ms-dispatch { flex: 1 1 100%; justify-content: center; text-align: center; }
+	.ms-later-body { inset-inline-end: auto; inset-inline-start: 0; }
+}
 
 /* --- Timeline ---------------------------------------------------------- */
 
@@ -354,8 +402,6 @@
 }
 
 @media (max-width: 960px) {
-	.ms-pair, .ms-pair-blind { grid-template-columns: 72px minmax(0, 1fr); }
-	.ms-pair select { grid-column: 1 / -1; }
 	.ms-timeline > div { grid-template-columns: 1fr; gap: 2px; }
 	.ms-ticket { grid-template-columns: 1fr; }
 	.ms-ticket-title, .ms-ticket-meta, .ms-ticket-side { grid-column: 1; grid-row: auto; }

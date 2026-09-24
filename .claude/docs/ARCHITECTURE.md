@@ -368,3 +368,11 @@ Break these and the plugin misreports itself.
     names one recipe per dish the photographs show (`propose()`), marked
     `from_photographs`; a lot in which no dish is recognised is refused and
     its uploads discarded. Without photographs, nothing is paired or billed.
+
+20. **A recipe with the writer's photographs is researched from them.** With
+    `research.web_search` at `without_images`, the engine writes the research
+    from the brief and the photographs, with no web search. The plugin hands
+    the engine `MSRWA_Intake::engine_image()` as `read_image`, which reads a
+    photograph from disk only when it is marked as sent by a writer; the
+    engine never fetches a writer's photograph over the network. Saving the
+    pairing keeps the model's confidence on rows the writer left alone.

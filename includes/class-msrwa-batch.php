@@ -110,10 +110,21 @@ final class MSRWA_Batch {
 		return is_array( $matching ) ? $matching : array( 'recipes' => array(), 'images' => array(), 'pairs' => array() );
 	}
 
-	/** Replaces the pairing with the writer's own, which is always the last word. */
+	/**
+	 * Replaces the pairing with the writer's own, which is always the last word.
+	 *
+	 * A photograph the writer left where the model put it keeps the model's
+	 * confidence and reason; one they moved is marked as theirs. The pairing
+	 * is saved on every change now, and marking every row as confirmed erased
+	 * what the model said about the ones nobody had looked at yet.
+	 */
 	public static function repair( $id, array $pairs ) {
 		global $wpdb;
 		$matching = self::matching( $id );
+		$before = array();
+		foreach ( (array) ( $matching['pairs'] ?? array() ) as $pair ) {
+			if ( isset( $pair['image'] ) ) { $before[ (int) $pair['image'] ] = $pair; }
+		}
 		$clean = array();
 		$taken = array();
 		foreach ( $pairs as $pair ) {
@@ -122,7 +133,9 @@ final class MSRWA_Batch {
 			$recipe = isset( $pair['recipe'] ) && '' !== $pair['recipe'] && null !== $pair['recipe'] ? (int) $pair['recipe'] : null;
 			if ( null !== $recipe && ( $recipe < 0 || $recipe >= count( (array) $matching['recipes'] ) ) ) { $recipe = null; }
 			$taken[ $image ] = true;
-			$clean[] = array( 'image' => $image, 'recipe' => $recipe, 'confidence' => 'haute', 'why' => 'Confirmé par le rédacteur.' );
+			$was = $before[ $image ] ?? null;
+			$kept = $was && ( null === $recipe ? null === ( $was['recipe'] ?? null ) : null !== ( $was['recipe'] ?? null ) && (int) $was['recipe'] === $recipe );
+			$clean[] = $kept ? array_merge( $was, array( 'image' => $image, 'recipe' => $recipe ) ) : array( 'image' => $image, 'recipe' => $recipe, 'confidence' => 'haute', 'why' => '', 'by_writer' => true );
 		}
 		$matching['pairs'] = $clean;
 		$wpdb->update( self::table(), array( 'matching_json' => wp_json_encode( $matching ), 'updated_at' => current_time( 'mysql', true ) ), array( 'id' => absint( $id ) ) );

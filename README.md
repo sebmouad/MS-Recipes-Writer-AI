@@ -5,9 +5,9 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.21.0
+## État actuel — 0.22.0
 
-La version `0.21.0` accepte un lot fait de texte, de photographies ou des deux, et fait lire aux écrans Modèles et Moteur la même règle ; la `0.20.2` rendait l’écran Moteur lisible sur ordinateur comme sur téléphone et distingue le modèle de la réflexion ; la `0.20.1` ne laissait confier une étape qu’à un modèle capable de la faire ; la `0.20.0` remplissait chaque brouillon comme le lisent le thème MS Recipes, MS SEO Plus, MS FB Posts et MS Image Optimizer ; la `0.19.0` ramenait une recette approuvée du premier coup à 0,09–0,10 $ sans perte mesurée ; la `0.18.9` reprenait chaque écran après une revue complète dans le navigateur ; la `0.18.8` réservait l’extension, renommée « MS Recipes AI » dans le menu, à ceux qui peuvent téléverser des fichiers ; la `0.18.7` disait juste ce que fait le plafond par recette ; la `0.18.6` rangeait les photographies envoyées avec le brouillon qu’elles ont servi à écrire ; la `0.18.5` faisait passer un lot de trois recettes en 8 minutes pour 0,125 $ la recette, toutes approuvées ; la `0.18.4` faisait envoyer les photographies d’un lot depuis l’ordinateur du rédacteur ; la `0.18.3` faisait approuver les trois recettes d’un lot réel aux réglages par défaut — image à la une en `low`, collage en `medium` — pour 0,132 $ en moyenne ; la `0.18.2` permettait de choisir le modèle et la qualité de chaque image
+La version `0.22.0` écrit la recherche d’après les photographies du rédacteur quand il en a fourni, sans recherche sur le web, et refait l’écran d’appariement ; la `0.21.0` acceptait un lot fait de texte, de photographies ou des deux, et fait lire aux écrans Modèles et Moteur la même règle ; la `0.20.2` rendait l’écran Moteur lisible sur ordinateur comme sur téléphone et distingue le modèle de la réflexion ; la `0.20.1` ne laissait confier une étape qu’à un modèle capable de la faire ; la `0.20.0` remplissait chaque brouillon comme le lisent le thème MS Recipes, MS SEO Plus, MS FB Posts et MS Image Optimizer ; la `0.19.0` ramenait une recette approuvée du premier coup à 0,09–0,10 $ sans perte mesurée ; la `0.18.9` reprenait chaque écran après une revue complète dans le navigateur ; la `0.18.8` réservait l’extension, renommée « MS Recipes AI » dans le menu, à ceux qui peuvent téléverser des fichiers ; la `0.18.7` disait juste ce que fait le plafond par recette ; la `0.18.6` rangeait les photographies envoyées avec le brouillon qu’elles ont servi à écrire ; la `0.18.5` faisait passer un lot de trois recettes en 8 minutes pour 0,125 $ la recette, toutes approuvées ; la `0.18.4` faisait envoyer les photographies d’un lot depuis l’ordinateur du rédacteur ; la `0.18.3` faisait approuver les trois recettes d’un lot réel aux réglages par défaut — image à la une en `low`, collage en `medium` — pour 0,132 $ en moyenne ; la `0.18.2` permettait de choisir le modèle et la qualité de chaque image
 séparément ; la `0.18.1` fait tenir le plafond par recette jusque dans les reprises
 de l’approbation finale ; la `0.18.0` ramène une recette complète à environ 0,11 $ réels —
 recherche web comprise — sans perte de qualité mesurée ; la `0.17.0` faisait
@@ -74,6 +74,49 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.22.0
+
+**Une recette illustrée par le rédacteur n’est plus cherchée sur le web.**
+La recherche est écrite d’après ses photographies et son texte, avec la
+pratique culinaire établie pour le reste ; sans photographie, elle cherche sur
+le web comme avant. Réglable dans le groupe `research` de l’écran Moteur :
+`without_images` (par défaut) ou `always`.
+
+- Mesuré sur le site de test, une tarte avec sa photographie : recherche à
+  0,0054 $ en 30,6 s, 13/13, contre 0,022–0,028 $ et 42–79 s pour les dix
+  recherches précédentes sur le web ; la recette a été approuvée.
+- **Correction :** les photographies du rédacteur n’atteignaient jamais la
+  recherche. Le moteur lisait une clé que l’extension ne remplit pas, puis
+  refusait toute adresse qui n’est pas en HTTPS public ; chaque run avec
+  photographie enregistrait « image URL is not HTTPS » sous un message disant
+  l’image lue. Elles sont désormais lues depuis les fichiers du site, et
+  seulement si un rédacteur les a envoyées.
+- La lecture de ces photographies est désormais comptée dans le coût de la
+  recherche ; elle ne l’était pas.
+- Une photographie illisible fait revenir à la recherche sur le web, et le
+  run le dit.
+- L’estimation d’un lot compte une recette par photographie, au plus, comme
+  écrite d’après elle.
+
+**L’écran d’appariement.**
+
+- Les recettes d’abord, en cartes : chacune montre ses photographies et dit
+  si elle sera écrite d’après elles ou d’après le web. Les cartes suivent
+  chaque changement.
+- Les photographies ensuite, plus grandes et ouvrables en grand, avec le plat
+  reconnu, un badge de confiance en couleur, et un liseré sur celles qui sont
+  à vérifier. Une photographie mise de côté le dit, au lieu d’afficher
+  « association sûre ».
+- L’appariement s’enregistre à chaque changement ; le bouton
+  « Enregistrer » disparaît. Une photographie que le rédacteur n’a pas touchée
+  garde la confiance et la raison données par le modèle : chaque
+  enregistrement les écrasait toutes.
+- Une note signale les photographies qui ne vont avec aucune recette.
+- « Lancer » est l’action principale, dans une barre qui reste visible ;
+  la programmation est repliée derrière « Plus tard… ». Sur téléphone, tout
+  tient à l’écran.
+- Un lot parti montre l’appariement en texte, plus en listes désactivées.
 
 ## Version 0.21.0
 

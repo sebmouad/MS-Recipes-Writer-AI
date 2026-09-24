@@ -268,17 +268,68 @@
     });
   }
 
-  var save = document.getElementById('ms-save-pairs');
-  if (save) {
-    save.addEventListener('click', function () {
-      save.disabled = true;
-      say(batchStatus, t.saving || '');
-      call('/batches/' + batch + '/pairs', { method: 'POST', body: JSON.stringify({ pairs: pairs() }) })
-        .then(function () { say(batchStatus, t.saved || ''); })
-        .catch(function (error) { say(batchStatus, error.message); })
-        .finally(function () { save.disabled = false; });
-    });
+  // Every change is saved at once: a pairing somebody corrected and then
+  // walked away from used to be lost, with a button nobody had pressed.
+  var pairTimer = null;
+  function savePairs() {
+    return call('/batches/' + batch + '/pairs', { method: 'POST', body: JSON.stringify({ pairs: pairs() }) });
   }
+
+  // The recipe cards follow the choices: which photographs each will carry,
+  // and whether it is written from them or from references on the web.
+  function refreshDishes() {
+    var dishes = document.querySelectorAll('.ms-dish');
+    var loose = 0;
+    var byRecipe = {};
+    document.querySelectorAll('.ms-pair-choice').forEach(function (select) {
+      if ('' === select.value) { loose++; return; }
+      (byRecipe[select.value] = byRecipe[select.value] || []).push(select.dataset.url || '');
+    });
+    dishes.forEach(function (dish) {
+      var photos = byRecipe[dish.dataset.recipe] || [];
+      var thumbs = dish.querySelector('.ms-dish-thumbs');
+      thumbs.innerHTML = '';
+      photos.forEach(function (url) {
+        if (!url) return;
+        var img = document.createElement('img');
+        img.src = url; img.alt = ''; img.loading = 'lazy';
+        thumbs.appendChild(img);
+      });
+      dish.classList.toggle('has-photos', photos.length > 0);
+      dish.querySelector('.ms-dish-with').textContent = photos.length
+        ? (photos.length === 1 ? t.dishOnePhoto : (t.dishPhotos || '').replace('%d', photos.length))
+        : (t.dishNoPhoto || '');
+    });
+    var note = document.getElementById('ms-loose');
+    if (note) {
+      note.hidden = !loose;
+      note.textContent = loose === 1 ? note.dataset.one : (note.dataset.many || '').replace('%d', loose);
+    }
+  }
+
+  document.querySelectorAll('.ms-pair-choice').forEach(function (select) {
+    select.addEventListener('change', function () {
+      // The writer's choice replaces the model's confidence on screen.
+      var row = select.closest('.ms-pair');
+      var badge = row && row.querySelector('.ms-pair-badge');
+      if (row && badge) {
+        var tone = '' === select.value ? 'idle' : 'good';
+        row.className = row.className.replace(/\bms-pair-(good|warn|stop|idle)\b/, 'ms-pair-' + tone);
+        badge.className = badge.className.replace(/\bms-state-(good|warn|stop|idle)\b/, 'ms-state-' + tone);
+        badge.textContent = '' === select.value ? (t.pairAside || '') : (t.pairChosen || '');
+        var reason = row.querySelector('.ms-pair-reason');
+        if (reason) { reason.remove(); }
+      }
+      refreshDishes();
+      window.clearTimeout(pairTimer);
+      say(batchStatus, t.saving || '');
+      pairTimer = window.setTimeout(function () {
+        savePairs()
+          .then(function () { say(batchStatus, t.pairsSaved || t.saved || ''); })
+          .catch(function (error) { say(batchStatus, error.message); });
+      }, 300);
+    });
+  });
 
   var schedule = document.getElementById('ms-schedule');
   if (schedule) {
@@ -287,7 +338,7 @@
       say(batchStatus, t.saving || '');
       // The pairing is settled first, so a lot that leaves at three in the
       // morning leaves with what is on screen now.
-      call('/batches/' + batch + '/pairs', { method: 'POST', body: JSON.stringify({ pairs: pairs() }) })
+      savePairs()
         .then(function () {
           return call('/batches/' + batch + '/schedule', {
             method: 'POST',
@@ -306,7 +357,8 @@
       say(batchStatus, t.sending || '');
       // The pairing is saved first, so what is dispatched is what is on screen
       // rather than what was last confirmed.
-      call('/batches/' + batch + '/pairs', { method: 'POST', body: JSON.stringify({ pairs: pairs() }) })
+      window.clearTimeout(pairTimer);
+      savePairs()
         .then(function () { return call('/batches/' + batch + '/dispatch', { method: 'POST' }); })
         .then(function () { window.location.reload(); })
         .catch(function (error) { say(batchStatus, error.message); dispatch.disabled = false; });

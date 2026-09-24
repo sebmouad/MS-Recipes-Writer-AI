@@ -140,6 +140,13 @@ run carries.
 - [x] The Modèles and Moteur screens share one list of steps, one family rule
   and one catalogue; a model switched off is refused everywhere
   (`tests/test-compat.php`, `tests/test-screens.php`, checked in Chromium).
+- [x] A recipe with the writer's photograph is researched from it, live:
+  research $0.0054 in 30.6 s, 13/13, no search, recipe approved
+  (`tests/test-engine-research-photographs.php`, `tests/real/test-flow.php`
+  with `MSRWA_TEST_PHOTO`).
+- [x] The pairing screen: recipe cards, confidence badges, autosave that keeps
+  the model's word on untouched rows, launch bar, phone layout, checked in
+  Chromium at 390 and 1280 px (`tests/test-pairing.php`).
 - [ ] A complete lot on Claude — the account has no credit. — the Gemini key's
   grounding quota is exhausted, OpenAI is unreachable from the test
   environment and the Claude account has no credit.

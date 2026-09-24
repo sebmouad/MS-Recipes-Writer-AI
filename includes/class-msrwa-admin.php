@@ -163,6 +163,12 @@ final class MSRWA_Admin {
 				'pricesFound' => __( '%1$d tarif(s) trouvé(s) sur %2$d demandé(s).', 'ms-recipes-writer-ai' ),
 				'pricesAreIndicative' => __( 'Ces tarifs sont une indication à vérifier, jamais une facture. Rechargez la page.', 'ms-recipes-writer-ai' ),
 				'saved' => __( 'Appariement enregistré.', 'ms-recipes-writer-ai' ),
+				'dishOnePhoto' => __( '1 photographie — écrite d’après elle', 'ms-recipes-writer-ai' ),
+				/* translators: %d is a number of photographs. */
+				'dishPhotos' => __( '%d photographies — écrite d’après elles', 'ms-recipes-writer-ai' ),
+				'pairAside' => __( 'Mise de côté', 'ms-recipes-writer-ai' ),
+				'pairChosen' => __( 'Choisie par vous', 'ms-recipes-writer-ai' ),
+				'dishNoPhoto' => __( 'Sans photographie — références cherchées sur le web', 'ms-recipes-writer-ai' ),
 				'sending' => __( 'Envoi au moteur…', 'ms-recipes-writer-ai' ),
 				'retrying' => __( 'Reprise…', 'ms-recipes-writer-ai' ),
 				/* translators: %s is a comma-separated list of step names. */
