@@ -574,7 +574,58 @@ photograph, and otherwise use the photograph without the cost of a search.
    leave it, and treat the engine's list as documentation of what the engine
    would do alone. Nothing to decide unless the owner wants it removed.
 
-7. **The step registry is one editorial process.** Multiple content types,
-   each with their own chain of steps, would be a second registry — `steps` is
-   already overridable through the caller layer, so the engine would not have
-   to change. *Proposal:* awaiting a written design before anything is built.
+7. **A second content type — design, awaiting approval.** Owner's request,
+   2026-09-24: written now, built when the second type is defined. Nothing
+   in the recipe engine changes until then.
+
+   **Where things stand.** The engine is two layers in one set of files.
+   The *runtime* is already general: waves and retries (`MSRWA_Engine::run`),
+   provider calls on three providers (`MSRWA_Engine_Call`), configuration in
+   three layers (`MSRWA_Engine_Config`), the result and its events
+   (`MSRWA_Result`), and a step registry any caller may replace (`steps`).
+   The *recipe* is spread through it: `MSRWA_Engine_Input::build()` has one
+   branch per recipe step and about sixty recipe references;
+   `MSRWA_Engine_Score` has one contract per recipe step and the recipe
+   outlines; `MSRWA_Engine::write()` special-cases `research` (photographs,
+   observation) and `proofread`; `draw()` and `image_prompt()` know the
+   collage; `MSRWA_Recipe` validates the canonical recipe. On the plugin
+   side the queue, runs, budgets, costs, rights, catalogue, sources and
+   history are general; `MSRWA_Draft`, `MSRWA_Stack`, `MSRWA_Schema`,
+   `MSRWA_Head`, `MSRWA_Match::brief()` and the profiles are recipe-shaped.
+   The catalogue already carries a `content_type` column. A second engine
+   would share the runtime today, but could not be written without touching
+   the recipe code — which is the thing to avoid.
+
+   **The contract.** A content type is one class per side, registered by
+   key and chosen by `brief['type']` (already `recipe` on every brief):
+
+   | Engine: `MSRWA_Engine_Type_<Name>` | What it answers |
+   |---|---|
+   | `steps()` | its registry: steps, needs, produces, capability, prompt |
+   | `input( $step, $prompt, $brief, $options )` | what a step is sent — today `MSRWA_Engine_Input::build()` |
+   | `score( $step, $answer, $brief, $thresholds )` | whether an answer meets its contract — today `MSRWA_Engine_Score::step()` |
+   | `after( $step, $answer, $brief, $result )` | what happens to an answer before it is kept — today research's photographs and proofread's merge |
+   | `image_prompt( $kind, $brief, $options )` | the image prompts, when the type draws; Facebook templates stay per type |
+   | `prompts/<type>/` | its prompt files; `recipe` keeps `prompts/` |
+
+   | Plugin: `MSRWA_Type_<Name>` | What it answers |
+   |---|---|
+   | `profiles()` | what a lot may ask for, and the steps each runs |
+   | `brief( $item, $images )` | the engine brief from what the writer sent — today `MSRWA_Match::brief()` |
+   | `publish( $post_id, $artifacts )` | how the draft is written — today `MSRWA_Draft`, `MSRWA_Stack`, `MSRWA_Schema` |
+   | `estimate()` | the token shapes the estimate prices |
+
+   The runtime calls these and nothing else; a lot carries its `type`, and
+   screens read their labels from it. History, sources, the report's
+   history section, budgets and the queue need no change.
+
+   **Order of work, when approved.** (1) Move the recipe code behind the
+   engine contract as `MSRWA_Engine_Type_Recipe`, behaviour unchanged: every
+   offline test green and one live lot compared field by field with a lot
+   run before the move. (2) The same on the plugin side, `MSRWA_Type_Recipe`.
+   (3) The second type, written against the contract alone. Steps 1 and 2
+   are the engine's largest change since it was split out; each is its own
+   version, reverted whole if the live lot differs.
+
+   **Decided now.** Nothing is built. Until step 1, a second type cannot
+   share this engine without touching the recipe; after it, it can.
