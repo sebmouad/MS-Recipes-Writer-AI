@@ -114,6 +114,14 @@ $loose = MSRWA_Engine::run_step( 'corrections', array( 'title' => 'Potée', 'art
 	) ),
 ) ) );
 $fixed = $loose->artifacts['corrected'];
+$kept = MSRWA_Engine::run_step( 'corrections', array( 'title' => 'Béchamel', 'artifacts' => array(
+	'article' => array( 'content_html' => '<li><p>Ajoutez le lait en fouettant. Ajoutez le lait en fouettant.</p></li><p>Servez. Il renforce le goût.</p>' ),
+	'review' => array( 'pass' => true, 'findings' => array(), 'corrections' => array(
+		array( 'before' => 'Ajoutez le lait en fouettant. Ajoutez le lait en fouettant.', 'after' => 'Ajoutez le lait en fouettant.' ),
+		array( 'before' => 'Servez. Il renforce le goût.', 'after' => 'Servez.' ),
+	) ),
+) ) );
+msrwa_test_assert( '<li><p>Ajoutez le lait en fouettant.</p></li><p>Servez.</p>' === $kept->artifacts['corrected']['content_html'], 'A correction that keeps the first of two sentences keeps it (got ' . $kept->artifacts['corrected']['content_html'] . ').' );
 msrwa_test_contains( $fixed['content_html'], 'la recette décrite vise une panure frite.', 'A quote capitalised where the article runs on is found, and the replacement keeps the lower case.' );
 msrwa_test_contains( $fixed['content_html'], '<p>Le jarret peut être remplacé par un jambonneau.</p>', 'A quote one word off is found.' );
 msrwa_test_contains( $fixed['content_html'], 'L’huile doit être à 170 °C.', 'A straight apostrophe finds the typographic one.' );

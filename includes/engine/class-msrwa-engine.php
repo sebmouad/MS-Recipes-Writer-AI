@@ -302,8 +302,10 @@ final class MSRWA_Engine {
 			// A review asked to keep only what is documented once replaced a
 			// sentence with a copy of its neighbour: the article then said the
 			// same thing twice. What the article already says is removed instead.
-			if ( '' !== $after && false !== mb_strpos( $html, $after ) ) { $after = ''; }
-			$html = self::substitute( $html, $found, self::same_case( $found, $after ) );
+			// Only a copy elsewhere counts: a correction that keeps the first of
+			// two sentences finds its replacement inside the passage itself.
+			if ( '' !== $after && false !== mb_strpos( str_replace( $found, '', $html ), $after ) ) { $after = ''; }
+			$html = self::substitute( $html, $found, self::same_case( $found, $before, $after ) );
 			$applied[] = $found === $before ? $correction : array_merge( $correction, array( 'quoted' => $before, 'before' => $found ) );
 		}
 
@@ -355,7 +357,7 @@ final class MSRWA_Engine {
 			// second's wording is gone, and its correction is already in the text.
 			if ( null === $found && false !== mb_strpos( $html, $after ) ) { continue; }
 			if ( null === $found || ! self::same_figures( $found, $after ) ) { $skipped[] = $change; continue; }
-			$html = self::substitute( $html, $found, self::same_case( $found, $after ) );
+			$html = self::substitute( $html, $found, self::same_case( $found, $before, $after ) );
 			$applied[] = $found === $before ? $change : array_merge( $change, array( 'quoted' => $before, 'before' => $found ) );
 		}
 		if ( $skipped ) {
@@ -427,10 +429,14 @@ final class MSRWA_Engine {
 		return $best;
 	}
 
-	/** A replacement begins as the passage it replaces does: a quote that began mid-sentence stays lower case. */
-	private static function same_case( $found, $after ) {
+	/**
+	 * A replacement begins as the passage it replaces does: a quote that
+	 * capitalised a passage the article runs on mid-sentence stays lower case.
+	 */
+	private static function same_case( $found, $before, $after ) {
 		$first = mb_substr( (string) $found, 0, 1 );
-		if ( '' === (string) $after || mb_strtolower( $first ) !== $first ) { return (string) $after; }
+		$quoted = mb_substr( (string) $before, 0, 1 );
+		if ( '' === (string) $after || $first === $quoted || mb_strtolower( $quoted ) !== $first ) { return (string) $after; }
 		return mb_strtolower( mb_substr( $after, 0, 1 ) ) . mb_substr( $after, 1 );
 	}
 
@@ -686,7 +692,7 @@ final class MSRWA_Engine {
 			// The owner asked (2026-09-24) that the featured image, like the
 			// collage, be drawn from a photograph of the dish: the writer's, or
 			// else one the research found. The prompt still sets the look.
-			$dish = self::dish_reference( $config, $options, $brief, $result );
+			$dish = self::dish_reference( $config, $options, $brief );
 			if ( $dish ) {
 				$references = array( $dish['image'] );
 				$reference = $dish['from'];
@@ -741,7 +747,7 @@ final class MSRWA_Engine {
 	 * one, otherwise the first readable style reference the caller configured.
 	 */
 	private static function compose_collage( $name, MSRWA_Engine_Config $config, MSRWA_Result $result, array $options, array $brief, array $template, array $findings ) {
-		$reference = self::collage_reference( $config, $options, $brief, $result );
+		$reference = self::collage_reference( $config, $options, $brief );
 		$written = (array) ( $result->artifacts['facebook_composed'] ?? array() );
 		$spent = array( 'cost_usd' => 0.0, 'seconds' => 0.0 );
 		if ( empty( $written['prompt'] ) ) {
@@ -805,10 +811,10 @@ final class MSRWA_Engine {
 	 * like the owner's. Both images now go to the prompt's writer and to the
 	 * image model, the approved collage first, each told what to take from it.
 	 */
-	private static function collage_reference( MSRWA_Engine_Config $config, array $options, array $brief, MSRWA_Result $result = null ) {
+	private static function collage_reference( MSRWA_Engine_Config $config, array $options, array $brief ) {
 		$pixels = (int) $config->get( 'limits.reference_pixels', 768 );
 		$style = self::style_reference( $config );
-		$found = self::dish_reference( $config, $options, $brief, $result );
+		$found = self::dish_reference( $config, $options, $brief );
 		$dish = $found ? $found['image'] : null;
 		$from = $found ? $found['from'] : '';
 		if ( $style['image'] ) { $style['image'] = self::shrink_reference( $style['image'], $pixels ); }
@@ -821,18 +827,24 @@ final class MSRWA_Engine {
 		return array( 'source' => '', 'label' => '', 'file' => '', 'image' => null, 'shown' => array() );
 	}
 
-	/** Photographs already fetched, per run: the collage and the featured image share one. */
+	/** The last photograph fetched: the collage and the featured image of one recipe share it. */
 	private static $dishes = array();
 
-	/** The writer's photograph of the dish, else the research's, made small; null when neither reads. */
-	private static function dish_reference( MSRWA_Engine_Config $config, array $options, array $brief, MSRWA_Result $result = null ) {
-		$key = $result ? spl_object_hash( $result ) : '';
-		if ( '' !== $key && array_key_exists( $key, self::$dishes ) ) { return self::$dishes[ $key ]; }
+	/**
+	 * The writer's photograph of the dish, else the research's, made small; null
+	 * when neither reads. Kept for the recipe it was fetched for, named by what
+	 * it was fetched from — an object's id is reused once it is freed, and cron
+	 * runs several recipes in one request.
+	 */
+	private static function dish_reference( MSRWA_Engine_Config $config, array $options, array $brief ) {
+		$research = MSRWA_Engine_Input::research_package( $brief );
+		$key = md5( (string) json_encode( array( $brief['title'] ?? '', $brief['images'] ?? array(), array_slice( (array) ( $research['visual_references'] ?? array() ), 0, 2 ) ) ) );
+		if ( array_key_exists( $key, self::$dishes ) ) { return self::$dishes[ $key ]; }
 		$image = self::editor_reference( $config, $options, $brief );
 		$from = $image ? 'editor' : '';
 		if ( ! $image ) { $image = self::research_reference( $config, $brief ); $from = $image ? 'research' : ''; }
 		$found = $image ? array( 'from' => $from, 'image' => self::shrink_reference( $image, (int) $config->get( 'limits.reference_pixels', 768 ) ) ) : null;
-		if ( '' !== $key ) { self::$dishes = array( $key => $found ); }
+		self::$dishes = array( $key => $found );
 		return $found;
 	}
 

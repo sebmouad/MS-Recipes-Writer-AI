@@ -62,15 +62,19 @@ A step declares a capability and the engine routes on it:
   review. JSON in, JSON out, repaired by `MSRWA_Json` when a
   model fences it or leaks a control character.
 - **image_generation** — the two images, written into a workspace the caller
-  names.
+  names. Both are drawn on the edits endpoint from a photograph of the dish —
+  the writer's, else the first the research found that still downloads —
+  and the collage also from the approved style collage; with none, from the
+  prompt alone.
 - **vision** — the final approval, which reads both images' bytes beside the
   recipe and what real photographs of the dish showed. It is the only point
   where the two images are checked against each other.
 - **none** — applying the review's corrections, then its language changes.
   It quotes each sentence verbatim and supplies the replacement, so this is a
   substitution, not a judgement: no model, no cost, nothing to invent. A
-  correction whose quote cannot be located in the HTML goes to the editor
-  rather than being dropped.
+  quote is located tolerantly (apostrophes, spaces, first-letter case, a
+  slipped letter within one paragraph); one that still cannot be located goes
+  to the editor rather than being dropped.
 
 ### A refusal goes to the editor
 
@@ -823,8 +827,15 @@ photograph, and otherwise use the photograph without the cost of a search.
     in the article removes the passage; a language change may drop a
     repeated figure but not lose or alter one (`same_figures()`). The review
     prompt now says `after` never repeats a sentence. Replayed over 290
-    stored passages: 8 left to the editor became 4, each absent from the
-    article.
+    stored passages: 8 left to the editor became 2, each absent from the
+    article. A copy counts only outside the passage replaced, so a
+    correction that keeps the first of two sentences keeps it.
+44. **The dish photograph is remembered by recipe, not by object.** The
+    featured image and the collage share one download; it was keyed by the
+    result's object id, which PHP reuses once an object is freed, so a
+    second recipe in one cron request could be drawn from the first's
+    photograph. It is keyed by the title, the brief's images and the
+    research's first references.
 
 ### Still open
 
