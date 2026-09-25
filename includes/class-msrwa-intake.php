@@ -111,6 +111,62 @@ final class MSRWA_Intake {
 	}
 
 	/**
+	 * Images given by their address, fetched by the site and handed back as
+	 * uploaded files, so the same checks and the same storage apply.
+	 *
+	 * The browser cannot fetch them itself — another site's image is not its
+	 * to read — so the server does, through the engine's own fetch: HTTPS
+	 * only, public addresses only, the checked address pinned, no redirect
+	 * followed, the size capped while it downloads.
+	 *
+	 * @return array{files: array, error: string}
+	 */
+	public static function from_urls( array $urls, $max_bytes = 10000000 ) {
+		$urls = array_values( array_unique( array_filter( array_map( static function ( $url ) {
+			$url = trim( (string) $url );
+			return preg_match( '#^https://#i', $url ) ? esc_url_raw( $url, array( 'https' ) ) : '';
+		}, $urls ) ) ) );
+		if ( ! $urls ) { return array( 'files' => array(), 'error' => '' ); }
+		if ( count( $urls ) > self::MAX_PHOTOS ) {
+			/* translators: %d is the largest number of photographs a lot may carry. */
+			return array( 'files' => array(), 'error' => sprintf( __( 'Un lot accepte au plus %d photographies.', 'ms-recipes-writer-ai' ), self::MAX_PHOTOS ) );
+		}
+		$fetched = MSRWA_Engine_Call::fetch_images( $urls, (int) $max_bytes, count( $urls ) );
+		$files = array();
+		foreach ( $urls as $key => $url ) {
+			$image = (array) ( $fetched[ $key ] ?? array() );
+			// The engine's reason names an HTTP status, and a writer is never
+			// shown one: what to check is said instead.
+			if ( empty( $image['data'] ) ) {
+				self::discard( $files );
+				/* translators: %s is a web address. */
+				return array( 'files' => array(), 'error' => sprintf( __( 'L’image à l’adresse %s n’a pas pu être récupérée. Vérifiez que l’adresse mène directement à une image JPEG, PNG ou WebP, qu’elle commence par https:// et qu’elle s’ouvre dans un navigateur.', 'ms-recipes-writer-ai' ), $url ) );
+			}
+			// wp_tempnam() lives in wp-admin and is not loaded for a REST request.
+			$tmp = (string) tempnam( get_temp_dir(), 'msrwa-url' );
+			file_put_contents( $tmp, base64_decode( (string) $image['data'] ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+			$path = (string) wp_parse_url( $url, PHP_URL_PATH );
+			$name = sanitize_file_name( rawurldecode( basename( $path ) ) );
+			$ext = array_search( (string) ( $image['mime'] ?? '' ), array( 'jpg' => 'image/jpeg', 'png' => 'image/png', 'webp' => 'image/webp', 'gif' => 'image/gif' ), true );
+			if ( '' === $name || ! preg_match( '/\.(jpe?g|png|webp|gif)$/i', $name ) ) { $name = ( '' !== preg_replace( '/\.[^.]*$/', '', $name ) ? preg_replace( '/\.[^.]*$/', '', $name ) : 'image' ) . '.' . ( $ext ? $ext : 'jpg' ); }
+			$files[] = array(
+				'name' => $name, 'type' => (string) ( $image['mime'] ?? '' ), 'tmp_name' => $tmp, 'error' => UPLOAD_ERR_OK, 'size' => (int) filesize( $tmp ),
+				'msrwa_origin' => 'url',
+				// Where it came from, without its query: an address can carry a token.
+				'msrwa_source' => strtok( $url, '?#' ),
+			);
+		}
+		return array( 'files' => $files, 'error' => '' );
+	}
+
+	/** Removes the temporary copies of images fetched by address. */
+	public static function discard( array $files ) {
+		foreach ( $files as $file ) {
+			if ( 'url' === ( $file['msrwa_origin'] ?? '' ) && is_file( (string) $file['tmp_name'] ) ) { wp_delete_file( (string) $file['tmp_name'] ); }
+		}
+	}
+
+	/**
 	 * Why a lot's photographs cannot be kept, or '' when they can. All or
 	 * nothing: one refused file refuses the lot, before anything is stored.
 	 */

@@ -85,13 +85,25 @@ MSRWA_Sources::forget_run( 41 );
 msrwa_test_assert( is_file( $root . '/.htaccess' ) && is_file( $root . '/index.php' ), 'The folder is closed to the web.' );
 $kept = MSRWA_Sources::receive( 7, array( $photo( 'Tarte Normande.png', $dir . '/tarte.png' ), $photo( 'copie.png', $dir . '/refuse.png' ) ) );
 msrwa_test_assert( 1 === count( $kept ), 'The same photograph twice in one lot is kept once.' );
-msrwa_test_assert( (bool) preg_match( '/^[a-f0-9]{32}\.png$/', $kept[0]['id'] ) && false !== strpos( $kept[0]['title'], 'Normande' ) && false === strpos( $kept[0]['title'], '.png' ), 'It is named after its bytes and keeps the writer’s title: ' . json_encode( $kept ) );
+msrwa_test_assert( (bool) preg_match( '/^lot\d+-photo1-[a-f0-9]{24}\.png$/', $kept[0]['id'] ) && 'upload' === $kept[0]['origin'] && false !== strpos( $kept[0]['title'], 'Normande' ) && false === strpos( $kept[0]['title'], '.png' ), 'It is named after its bytes and keeps the writer’s title: ' . json_encode( $kept ) );
 msrwa_test_assert( 1 === count( MSRWA_Sources::receive( 8, array( $photo( 'tarte.png', $dir . '/tarte.png' ) ) ) ), 'The same photograph in another lot is accepted again.' );
 msrwa_test_assert( ! $GLOBALS['sideloaded'], 'Nothing enters the media library.' );
 msrwa_test_contains( $kept[0]['url'], 'msrwa/v1/batches/7/photos/', 'The pairing screen shows it through the REST API, behind its checks.' );
 msrwa_test_assert( isset( MSRWA_Sources::read( MSRWA_Sources::lot_dir( 7 ), $kept[0]['id'] )['data'] ), 'It is read back for the vision calls.' );
 msrwa_test_assert( '' === MSRWA_Sources::path( MSRWA_Sources::lot_dir( 7 ), '../8/' . $kept[0]['id'] ), 'A name is never a path.' );
 msrwa_test_assert( '' === MSRWA_Sources::name( '../../wp-config.php' ), 'Anything but a stored name is refused.' );
+msrwa_test_assert( 'lot7-photo1' === MSRWA_Sources::ref( $kept[0]['id'] ) && 'lot7-photo1 · TarteNormande.png' === MSRWA_Sources::label( $kept[0] ), 'Every screen and report names it by its lot and its place: ' . MSRWA_Sources::label( $kept[0] ) );
+msrwa_test_assert( 'abcdef01' === MSRWA_Sources::ref( str_repeat( 'abcdef01', 4 ) . '.jpg' ), 'A photograph kept before, named by its bytes alone, is still read.' );
+$pasted = $photo( 'pasted-20260925-1.png', $dir . '/tarte.png' ) + array( 'msrwa_origin' => 'pasted' );
+MSRWA_Sources::forget_lot( 9 );
+$mixed = MSRWA_Sources::receive( 9, array( $pasted, $photo( 'autre.png', $dir . '/refuse.png' ) ) );
+msrwa_test_assert( 'pasted' === $mixed[0]['origin'] && '' === $mixed[0]['title'] && 'lot9-photo1 · image collée' === MSRWA_Sources::label( $mixed[0] ), 'A pasted image is recorded as pasted, and its browser-made name is not a hint: ' . json_encode( $mixed[0] ) );
+MSRWA_Sources::forget_lot( 9 );
+require_once dirname( __DIR__ ) . '/includes/engine/load.php';
+$linked = MSRWA_Intake::from_urls( array( 'http://example.com/a.jpg' ) );
+msrwa_test_assert( ! $linked['files'] && '' === $linked['error'], 'An address that is not HTTPS is dropped before anything is fetched.' );
+$linked = MSRWA_Intake::from_urls( array( 'https://127.0.0.1/a.jpg' ) );
+msrwa_test_assert( ! $linked['files'] && false !== strpos( $linked['error'], '127.0.0.1' ) && false === strpos( $linked['error'], 'HTTP' ), 'A private address is refused, in words a writer may read: ' . $linked['error'] );
 
 // Sent: each recipe's photographs move into its run's folder, and its history
 // records the brief it was handed, what the engine found, what it completed.

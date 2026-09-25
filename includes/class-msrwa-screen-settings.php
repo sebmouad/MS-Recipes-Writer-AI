@@ -29,25 +29,38 @@ final class MSRWA_Screen_Settings {
 			<section class="ms-card">
 				<h2><?php esc_html_e( 'Clés d’API', 'ms-recipes-writer-ai' ); ?></h2>
 				<p><?php esc_html_e( 'Chiffrées à l’enregistrement et jamais réaffichées. Un champ laissé vide conserve la clé enregistrée ; il ne l’efface pas.', 'ms-recipes-writer-ai' ); ?></p>
+				<div class="ms-keycards">
 				<?php
+				// Where each provider hands out keys: the first thing someone
+				// without one needs, and the page they return to when one leaks.
 				foreach ( array(
-					'openai_key' => array( 'OpenAI', 'openai' ),
-					'gemini_key' => array( 'Gemini', 'gemini' ),
-					'claude_key' => array( 'Claude', 'claude' ),
+					'openai_key' => array( 'OpenAI', 'openai', 'https://platform.openai.com/api-keys' ),
+					'gemini_key' => array( 'Gemini', 'gemini', 'https://aistudio.google.com/apikey' ),
+					'claude_key' => array( 'Claude', 'claude', 'https://console.anthropic.com/settings/keys' ),
 				) as $field => $provider ) :
 					$stored = in_array( $provider[1], $configured, true );
 					?>
-					<p>
-						<label for="ms-<?php echo esc_attr( $field ); ?>"><strong><?php echo esc_html( $provider[0] ); ?></strong></label>
-						<?php if ( $stored ) : ?><span class="ms-state ms-state-good"><?php esc_html_e( 'clé enregistrée', 'ms-recipes-writer-ai' ); ?></span><?php endif; ?>
-						<br>
-						<input type="password" id="ms-<?php echo esc_attr( $field ); ?>" name="msrwa_settings[<?php echo esc_attr( $field ); ?>]" value="" class="regular-text" autocomplete="off"
-							placeholder="<?php echo esc_attr( $stored ? __( 'inchangée', 'ms-recipes-writer-ai' ) : __( 'aucune clé', 'ms-recipes-writer-ai' ) ); ?>">
-					</p>
+					<div class="ms-keycard<?php echo $stored ? ' is-stored' : ''; ?>" data-provider="<?php echo esc_attr( $provider[1] ); ?>">
+						<div class="ms-keycard-head">
+							<span class="ms-keycard-mark" aria-hidden="true"><?php echo esc_html( mb_substr( $provider[0], 0, 1 ) ); ?></span>
+							<label for="ms-<?php echo esc_attr( $field ); ?>"><?php echo esc_html( $provider[0] ); ?></label>
+							<span class="ms-state ms-state-<?php echo $stored ? 'good' : 'idle'; ?>"><?php echo esc_html( $stored ? __( 'clé enregistrée', 'ms-recipes-writer-ai' ) : __( 'aucune clé', 'ms-recipes-writer-ai' ) ); ?></span>
+						</div>
+						<div class="ms-keycard-field">
+							<input type="password" id="ms-<?php echo esc_attr( $field ); ?>" name="msrwa_settings[<?php echo esc_attr( $field ); ?>]" value="" autocomplete="off" spellcheck="false"
+								placeholder="<?php echo esc_attr( $stored ? __( 'inchangée', 'ms-recipes-writer-ai' ) : __( 'collez la clé ici', 'ms-recipes-writer-ai' ) ); ?>">
+							<button type="button" class="button ms-keycard-toggle" aria-controls="ms-<?php echo esc_attr( $field ); ?>" aria-pressed="false" title="<?php esc_attr_e( 'Afficher ce qui est saisi', 'ms-recipes-writer-ai' ); ?>"><span class="dashicons dashicons-visibility" aria-hidden="true"></span><span class="screen-reader-text"><?php esc_html_e( 'Afficher ce qui est saisi', 'ms-recipes-writer-ai' ); ?></span></button>
+						</div>
+						<div class="ms-keycard-foot">
+							<a href="<?php echo esc_url( $provider[2] ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Obtenir une clé', 'ms-recipes-writer-ai' ); ?> <span aria-hidden="true">↗</span></a>
+							<span class="ms-keycard-result" aria-live="polite"></span>
+						</div>
+					</div>
 				<?php endforeach; ?>
+				</div>
 				<?php if ( $configured ) : ?>
 					<p class="ms-keys-check">
-						<button type="button" class="button" id="ms-check-keys"><?php esc_html_e( 'Vérifier les clés', 'ms-recipes-writer-ai' ); ?></button>
+						<button type="button" class="button" id="ms-check-keys"><span class="dashicons dashicons-yes-alt" aria-hidden="true"></span> <?php esc_html_e( 'Vérifier les clés', 'ms-recipes-writer-ai' ); ?></button>
 						<span class="ms-muted"><?php esc_html_e( 'Demande à chaque fournisseur la liste de ses modèles : gratuit, et la seule preuve qu’un vrai appel passera.', 'ms-recipes-writer-ai' ); ?></span>
 					</p>
 					<ul id="ms-keys-result" class="ms-keys-result" aria-live="polite"></ul>

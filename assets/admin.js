@@ -209,6 +209,7 @@
       var total = 0;
       if (files.length > (t.photoCount || 30)) { return (t.photoMany || '').replace('%d', t.photoCount); }
       for (var i = 0; i < files.length; i++) {
+        if (files[i].msrwaUrl) { if (fileProblem(files[i])) { return fileProblem(files[i]); } continue; }
         total += files[i].size;
         if (types.indexOf(files[i].type) === -1) { return (t.photoType || '').replace('%s', files[i].name); }
         if (t.photoBytes && files[i].size > t.photoBytes) { return (t.photoTooBig || '').replace('%1$s', files[i].name).replace('%2$s', megabytes(t.photoBytes)); }
@@ -220,6 +221,7 @@
     // A tile per photograph, added to across several picks and drops: the
     // list is the writer's to build and prune, not replaced by each pick.
     function fileProblem(file) {
+      if (file.msrwaUrl) { return /^https:\/\//i.test(file.msrwaUrl) ? '' : (t.linkNotHttps || ''); }
       if (['image/jpeg', 'image/png', 'image/webp'].indexOf(file.type) === -1) { return (t.photoType || '').replace('%s', file.name); }
       if (t.photoBytes && file.size > t.photoBytes) { return (t.photoTooBig || '').replace('%1$s', file.name).replace('%2$s', megabytes(t.photoBytes)); }
       return '';
@@ -241,11 +243,19 @@
         number.className = 'ms-photo-number';
         number.textContent = String(index + 1);
         tile.appendChild(number);
+        var meta = document.createElement('span');
         if (!problem) {
           var img = document.createElement('img');
-          img.src = URL.createObjectURL(file);
           img.alt = '';
-          previews.push(img.src);
+          if (file.msrwaUrl) {
+            // Shown straight from its site; the site itself fetches it on sending.
+            img.referrerPolicy = 'no-referrer';
+            img.addEventListener('error', function () { tile.classList.add('ms-photo-unseen'); meta.textContent = t.linkUnseen || ''; });
+            img.src = file.msrwaUrl;
+          } else {
+            img.src = URL.createObjectURL(file);
+            previews.push(img.src);
+          }
           tile.appendChild(img);
         }
         var name = document.createElement('span');
@@ -253,9 +263,8 @@
         name.textContent = file.msrwaPasted ? (t.pastedName || '%d').replace('%d', file.msrwaPasted) : file.name;
         name.title = file.name;
         tile.appendChild(name);
-        var meta = document.createElement('span');
         meta.className = 'ms-photo-meta';
-        meta.textContent = problem || (file.msrwaPasted ? (t.pastedTag || '') + ' · ' : '') + sizeLabel(file.size);
+        meta.textContent = problem || (file.msrwaUrl ? (t.linkTag || '') + ' · ' + hostOf(file.msrwaUrl) : '') || (file.msrwaPasted ? (t.pastedTag || '') + ' · ' : '') + sizeLabel(file.size);
         tile.appendChild(meta);
         var remove = document.createElement('button');
         remove.type = 'button';
@@ -275,7 +284,10 @@
 
     function addPhotos(list) {
       Array.prototype.forEach.call(list || [], function (file) {
-        var known = chosen.some(function (other) { return other.name === file.name && other.size === file.size && other.lastModified === file.lastModified; });
+        var known = chosen.some(function (other) {
+          if (file.msrwaUrl || other.msrwaUrl) { return file.msrwaUrl === other.msrwaUrl; }
+          return other.name === file.name && other.size === file.size && other.lastModified === file.lastModified;
+        });
         if (!known) { chosen.push(file); }
       });
       renderPhotos();
@@ -331,6 +343,20 @@
         image.src = url;
       });
     }
+    // An image given by its address: kept as the address, fetched by the site
+    // when the lot is sent. Only what reads as one or more addresses counts.
+    function hostOf(url) { try { return new URL(url).hostname; } catch (e) { return url; } }
+    function links(text) {
+      var words = String(text || '').trim().split(/\s+/).filter(Boolean);
+      if (!words.length || !words.every(function (word) { return /^https?:\/\/\S+$/i.test(word); })) { return []; }
+      return words;
+    }
+    function addLinks(urls) {
+      addPhotos(urls.map(function (url) {
+        var path = url.split(/[?#]/)[0];
+        return { msrwaUrl: url, name: decodeURIComponent(path.substring(path.lastIndexOf('/') + 1)) || hostOf(url), size: 0, type: '' };
+      }));
+    }
     function tagPasted(file, number) { file.msrwaPasted = number; return file; }
     function addPasted(blobs) {
       return Promise.all(blobs.map(fromClipboard)).then(addPhotos);
@@ -340,30 +366,20 @@
       var data = event.clipboardData;
       if (!data) { return; }
       var images = Array.prototype.filter.call(data.files || [], function (file) { return /^image\//.test(file.type); });
-      if (!images.length) { return; }
+      var field = event.target && /^(TEXTAREA|INPUT)$/.test(event.target.tagName);
+      if (!images.length) {
+        // An address pasted outside a field is an image to add; in the
+        // recipes, it is text like any other.
+        var found = field ? [] : links(data.getData('text/plain'));
+        if (found.length) { event.preventDefault(); addLinks(found); }
+        return;
+      }
       // Word and Excel put a picture of the copied text beside the text itself:
       // pasted into a field, the text is what was meant.
-      var field = event.target && /^(TEXTAREA|INPUT)$/.test(event.target.tagName);
       if (field && (data.getData('text/plain') || '').trim()) { return; }
       event.preventDefault();
       addPasted(images);
     });
-
-    var pasteButton = document.getElementById('ms-paste');
-    if (pasteButton) {
-      pasteButton.addEventListener('click', function () {
-        if (!navigator.clipboard || !navigator.clipboard.read) { say(imageCount, t.pasteBlocked || ''); return; }
-        navigator.clipboard.read().then(function (items) {
-          var reads = [];
-          items.forEach(function (item) {
-            var type = item.types.filter(function (kind) { return /^image\//.test(kind); })[0];
-            if (type) { reads.push(item.getType(type)); }
-          });
-          if (!reads.length) { say(imageCount, t.pasteNothing || ''); return null; }
-          return Promise.all(reads).then(addPasted);
-        }).catch(function () { say(imageCount, t.pasteBlocked || ''); });
-      });
-    }
 
     if (drop) {
       ['dragenter', 'dragover'].forEach(function (type) {
@@ -374,7 +390,14 @@
       });
       drop.addEventListener('drop', function (event) {
         event.preventDefault();
-        if (event.dataTransfer) { addPhotos(event.dataTransfer.files); }
+        var data = event.dataTransfer;
+        if (!data) { return; }
+        if (data.files && data.files.length) { addPhotos(data.files); return; }
+        // An image dragged from another tab arrives as its address.
+        var html = data.getData('text/html') || '';
+        var source = /<img[^>]+src="(https?:[^"]+)"/i.exec(html);
+        var found = source ? [source[1].replace(/&amp;/g, '&')] : links(data.getData('text/uri-list') || data.getData('text/plain'));
+        if (found.length) { addLinks(found); }
       });
     }
 
@@ -395,7 +418,15 @@
       // Offered only when the site has more than one Facebook template.
       var template = compose.querySelector('input[name=facebook_template]:checked');
       if (template) { form.append('facebook_template', template.value); }
-      chosen.forEach(function (file) { form.append('photos[]', file, file.name); });
+      // Files first, numbered in the order the server reads them; addresses after.
+      var sent = 0;
+      chosen.forEach(function (file) {
+        if (file.msrwaUrl) { return; }
+        form.append('photos[]', file, file.name);
+        if (file.msrwaPasted) { form.append('pasted[]', String(sent)); }
+        sent++;
+      });
+      chosen.forEach(function (file) { if (file.msrwaUrl) { form.append('urls[]', file.msrwaUrl); } });
       say(status, chosen.length ? (t.uploading || '') + ' ' + (t.describing || '') : '');
       // No Content-Type of our own: the browser writes the multipart boundary.
       fetch(endpoint('/batches'), { method: 'POST', headers: { 'X-WP-Nonce': MSRWA.nonce }, body: form }).then(function (response) {
@@ -669,6 +700,19 @@
 
   // --- Whether the stored keys actually open their providers ----------------
 
+  // Shows what is being typed, for checking a pasted key; the stored key is
+  // never sent back, so there is nothing else to show.
+  document.querySelectorAll('.ms-keycard-toggle').forEach(function (toggle) {
+    var input = document.getElementById(toggle.getAttribute('aria-controls'));
+    if (!input) { return; }
+    toggle.addEventListener('click', function () {
+      var shown = input.type === 'password';
+      input.type = shown ? 'text' : 'password';
+      toggle.setAttribute('aria-pressed', shown ? 'true' : 'false');
+      toggle.querySelector('.dashicons').className = 'dashicons dashicons-' + (shown ? 'hidden' : 'visibility');
+    });
+  });
+
   var checkKeys = document.getElementById('ms-check-keys');
   if (checkKeys) {
     var keysResult = document.getElementById('ms-keys-result');
@@ -682,9 +726,22 @@
         .then(function (data) {
           keysResult.innerHTML = '';
           Object.keys(data).forEach(function (provider) {
+            var tone = { ok: 'good', blocked: 'stop', refused: 'stop', unreachable: 'warn', missing: 'idle' }[data[provider].state] || 'idle';
+            // Each verdict on its own provider's card; a list only for one without.
+            var card = document.querySelector('.ms-keycard[data-provider="' + provider + '"]');
+            if (card) {
+              card.setAttribute('data-check', tone);
+              var slot = card.querySelector('.ms-keycard-result');
+              slot.innerHTML = '';
+              var badge = document.createElement('span');
+              badge.className = 'ms-state ms-state-' + tone;
+              badge.textContent = data[provider].message;
+              slot.appendChild(badge);
+              return;
+            }
             var row = document.createElement('li');
             var state = document.createElement('span');
-            state.className = 'ms-state ms-state-' + ({ ok: 'good', blocked: 'stop', refused: 'stop', unreachable: 'warn', missing: 'idle' }[data[provider].state] || 'idle');
+            state.className = 'ms-state ms-state-' + tone;
             state.textContent = data[provider].label;
             row.appendChild(state);
             row.appendChild(document.createTextNode(' ' + data[provider].message));

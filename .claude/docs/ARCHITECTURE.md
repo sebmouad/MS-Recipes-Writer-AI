@@ -345,13 +345,20 @@ Break these and the plugin misreports itself.
 
 16. **A lot's photographs are the files its writer sent, kept out of the
     media library.** They are uploaded from the writer's computer with the lot
-    (`photos[]`), never picked from the library: `POST /batches` reads no
-    attachment id. `MSRWA_Intake::check()` checks every file from its bytes
+    (`photos[]`, the pasted ones listed in `pasted[]`) or given by address
+    (`urls[]`, fetched by `MSRWA_Intake::from_urls()` through the engine's
+    `fetch_images()`: HTTPS, public address pinned, no redirect, size capped),
+    never picked from the library: `POST /batches` reads no attachment id. `MSRWA_Intake::check()` checks every file from its bytes
     (JPEG, PNG or WebP, under `MSRWA_Admin::photo_bytes()`, at most
     `MSRWA_Intake::MAX_PHOTOS`) and refuses the whole lot on one bad file.
     `MSRWA_Sources` keeps them under `uploads/msrwa/` — closed by `.htaccess`
     and served only by `GET /batches/<id>/photos/<name>` to someone who may see
-    the lot — named after their bytes, so the same file sent twice is one file.
+    the lot — named `lot<lot>-photo<n>-<24 hex of sha256>.<ext>`: `lot82-photo2`
+    is the identifier every screen and report shows, the hash keeps the name
+    unique and unguessable, and the same file sent twice in a lot is one file.
+    Each records its origin (`upload`, `pasted`, `url` with the address
+    without its query) in the lot's `provided` history. Names of only 32 hex,
+    from before 0.28.19, are still read.
     `lots/<lot>/` holds them while the lot is paired; dispatch moves each into
     its run's `<run>/sources/`, beside the web photographs the research read
     (`references/`), and drops the rest; what happened to them is the job's

@@ -11,18 +11,24 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
  * with the first. They live here instead, under uploads/msrwa/, closed to the
  * web and served to the people allowed to see them through the REST API:
  *
- *   msrwa/lots/<lot>/<hash>.<ext>               a lot's photographs, until it is sent
- *   msrwa/<run>/sources/<hash>.<ext>            the writer's photographs for one recipe
+ *   msrwa/lots/<lot>/lot<lot>-photo<n>-<hash>.<ext>  a lot's photographs, until it is sent
+ *   msrwa/<run>/sources/lot<lot>-photo<n>-<hash>.<ext> the writer's photographs for one recipe
  *   msrwa/<run>/sources/references/<hash>.<ext> the photographs the engine found
  *   msrwa/<run>/history/NN-<stage>.json         what happened to them: see MSRWA_History
  *
- * A file is named after its bytes, so the same photograph sent twice is one
- * file, never a name that already exists.
+ * A writer's photograph, uploaded or pasted, is named by its lot and its
+ * place in it — `lot81-photo2` — which every report and screen shows, then
+ * by its bytes, so the name is unique, not guessable, and the same
+ * photograph sent twice in a lot is one file. Photographs kept before
+ * 0.28.19 are named by their bytes alone and are still read.
  */
 final class MSRWA_Sources {
 
 	/** The media types a source may be. */
 	const TYPES = array( 'image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp' );
+
+	/** A stored name, as a pattern: the REST route and name() read the same one. */
+	const NAME = '(?:lot\d+-photo\d+-[a-f0-9]{24}|[a-f0-9]{32})\.(?:jpg|png|webp)';
 
 	/** uploads/msrwa, created closed to the web on first use. */
 	public static function root() {
@@ -54,21 +60,47 @@ final class MSRWA_Sources {
 			$size = @getimagesize( $tmp ); // phpcs:ignore WordPress.PHP.NoSilencedErrors
 			$ext = self::TYPES[ $size['mime'] ?? '' ] ?? '';
 			if ( '' === $ext ) { continue; }
-			$name = substr( (string) hash_file( 'sha256', $tmp ), 0, 32 ) . '.' . $ext;
+			$hash = substr( (string) hash_file( 'sha256', $tmp ), 0, 24 );
 			// The same photograph twice in one lot is one photograph.
-			if ( isset( $seen[ $name ] ) ) { continue; }
-			$seen[ $name ] = true;
-			if ( ! is_file( $dir . '/' . $name ) && ! @copy( $tmp, $dir . '/' . $name ) ) { continue; } // phpcs:ignore WordPress.PHP.NoSilencedErrors
+			if ( isset( $seen[ $hash ] ) ) { continue; }
+			$seen[ $hash ] = true;
+			$ref = 'lot' . absint( $lot ) . '-photo' . count( $seen );
+			$name = $ref . '-' . $hash . '.' . $ext;
+			if ( ! is_file( $dir . '/' . $name ) && ! @copy( $tmp, $dir . '/' . $name ) ) { unset( $seen[ $hash ] ); continue; } // phpcs:ignore WordPress.PHP.NoSilencedErrors
+			$origin = in_array( $file['msrwa_origin'] ?? '', array( 'pasted', 'url' ), true ) ? $file['msrwa_origin'] : 'upload';
+			$pasted = 'pasted' === $origin;
 			$original = sanitize_file_name( (string) ( $file['name'] ?? $name ) );
 			$out[] = array(
 				'id' => $name,
-				'title' => (string) preg_replace( '/\.[^.]+$/', '', $original ),
+				'ref' => $ref,
+				'origin' => $origin,
+				'source' => 'url' === $origin ? esc_url_raw( (string) ( $file['msrwa_source'] ?? '' ) ) : '',
+				// A pasted image's name is the browser's, not the writer's: it
+				// would reach the vision call as a hint about the dish.
+				'title' => $pasted ? '' : (string) preg_replace( '/\.[^.]+$/', '', $original ),
 				'file' => $original,
 				'url' => self::lot_url( $lot, $name ),
 				'mime' => (string) $size['mime'],
 			);
 		}
 		return $out;
+	}
+
+	/** The photograph's identifier as people read it — `lot81-photo2` — from its stored name. */
+	public static function ref( $name ) {
+		$name = self::name( basename( (string) $name ) );
+		if ( preg_match( '/^(lot\d+-photo\d+)-/', $name, $match ) ) { return $match[1]; }
+		return '' === $name ? '' : substr( $name, 0, 8 );
+	}
+
+	/** How a lot's photograph is named on a screen: its identifier, then where it came from. */
+	public static function label( array $image ) {
+		$ref = (string) ( $image['ref'] ?? self::ref( (string) ( $image['id'] ?? '' ) ) );
+		$origin = (string) ( $image['origin'] ?? '' );
+		$from = 'pasted' === $origin ? __( 'image collée', 'ms-recipes-writer-ai' )
+			: ( 'url' === $origin && '' !== (string) ( $image['source'] ?? '' ) ? (string) wp_parse_url( (string) $image['source'], PHP_URL_HOST ) . ' · ' . (string) ( $image['file'] ?? '' ) : (string) ( $image['file'] ?? '' ) );
+		if ( '' === $ref ) { return $from; }
+		return '' === $from || $from === $ref ? $ref : $ref . ' · ' . $from;
 	}
 
 	/** Where the pairing screen shows a lot's photograph: behind the REST API's own checks. */
@@ -79,7 +111,7 @@ final class MSRWA_Sources {
 	/** A stored name, or '' for anything else: never a path. */
 	public static function name( $name ) {
 		$name = (string) $name;
-		return preg_match( '/^[a-f0-9]{32}\.(jpg|png|webp)$/', $name ) ? $name : '';
+		return preg_match( '/^' . self::NAME . '$/', $name ) ? $name : '';
 	}
 
 	/** One stored file as the engine and the vision calls want it: a media type and base64 bytes. */
@@ -114,7 +146,7 @@ final class MSRWA_Sources {
 			$from = self::path( self::lot_dir( $lot ), $image['id'] ?? '' );
 			if ( '' === $from ) { continue; }
 			if ( ! @rename( $from, $dir . '/' . basename( $from ) ) ) { @copy( $from, $dir . '/' . basename( $from ) ); } // phpcs:ignore WordPress.PHP.NoSilencedErrors
-			$photos[] = array( 'file' => basename( $from ), 'name' => (string) ( $image['title'] ?? '' ), 'observation' => (array) ( $image['observation'] ?? array() ) );
+			$photos[] = array( 'file' => basename( $from ), 'ref' => self::ref( basename( $from ) ), 'name' => (string) ( $image['title'] ?? '' ), 'observation' => (array) ( $image['observation'] ?? array() ) );
 		}
 		MSRWA_History::run( $run, 'brief', array(
 			'text_brief' => array( 'title' => (string) ( $brief['title'] ?? '' ), 'text' => (string) ( $brief['text'] ?? '' ) ),

@@ -630,6 +630,16 @@ cost) in the task before changing anything.
   (2026-09-24).** The writer's photograph shows the prompt's writer the dish;
   the collage is drawn from the style reference. Real: the owner's own rôti
   photograph, drawn both ways. See ENGINE.md §7, item 40.
+- [x] **A56 — Photographs by address, readable identifiers, key cards
+  (2026-09-25).** One zone: a click opens the file picker, files drop on
+  it, and a paste anywhere (Ctrl+V) takes a copied image or an image address
+  — no address field, no paste button. An address, pasted or dragged from
+  another tab, is fetched by the site; every writer photograph is stored as
+  `lot<lot>-photo<n>-<hash>` with its origin, shown on the pairing screen
+  and in the report. API keys as one card per provider, with a show toggle,
+  a link to get a key and the check verdict on its card. Real: lot #82 —
+  one uploaded photograph, one by address from meilleurduchef.com — paired,
+  sent and written. `tests/test-intake.php`.
 - [x] **A55 — Pasted photographs, clearer compose form, menu first
   (2026-09-25).** A copied image is pasted with Ctrl+V anywhere on the
   compose page or with the "Coller une image" button; a heavy capture is

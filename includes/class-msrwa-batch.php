@@ -53,7 +53,7 @@ final class MSRWA_Batch {
 			'owner' => get_current_user_id(), 'language' => $language, 'profile' => $profile,
 			'facebook_template' => (string) ( $config_overrides['images']['facebook_template'] ?? '' ),
 			'recipes' => $recipes,
-			'photos' => array_map( static function ( $image ) { return array( 'file' => $image['id'], 'name' => $image['file'], 'mime' => $image['mime'] ); }, $images ),
+			'photos' => array_map( static function ( $image ) { return array( 'file' => $image['id'], 'ref' => $image['ref'], 'origin' => $image['origin'], 'source' => $image['source'], 'name' => $image['file'], 'mime' => $image['mime'] ); }, $images ),
 		) );
 		$match = MSRWA_Match::run( $recipes, $images, self::engine_config( self::config_overrides( $id ) ), MSRWA_Sources::lot_dir( $id ) );
 		$recipes = $match['recipes'];
@@ -61,7 +61,7 @@ final class MSRWA_Batch {
 		// dish is recognised is deleted, and what reading it cost is not.
 		MSRWA_Spend::matching( get_current_user_id(), $id, (float) $match['cost_usd'] );
 		MSRWA_History::lot( $id, 'matching', array(
-			'readings' => array_map( static function ( $image ) { return array( 'file' => $image['id'], 'dish' => $image['dish'] ?? '', 'description' => $image['describes'] ?? '', 'observation' => $image['observation'] ?? array() ); }, $match['images'] ),
+			'readings' => array_map( static function ( $image ) { return array( 'file' => $image['id'], 'ref' => MSRWA_Sources::ref( $image['id'] ), 'dish' => $image['dish'] ?? '', 'description' => $image['describes'] ?? '', 'observation' => $image['observation'] ?? array() ); }, $match['images'] ),
 			'recipes' => $recipes, 'pairs' => $match['pairs'], 'reasoning' => $match['reasoning'],
 			'cost_usd' => $match['cost_usd'], 'seconds' => $match['seconds'], 'errors' => $match['errors'],
 		) );

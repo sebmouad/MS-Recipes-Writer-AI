@@ -44,19 +44,23 @@ final class MSRWA_Screen_Compose {
 			<section class="ms-step">
 				<h3><?php esc_html_e( 'Les photographies', 'ms-recipes-writer-ai' ); ?> <span class="ms-optional"><?php esc_html_e( 'facultatif avec du texte', 'ms-recipes-writer-ai' ); ?></span></h3>
 				<p><?php esc_html_e( 'Sans dire lesquelles vont avec quoi : chacune sera décrite depuis ses propres pixels, puis associée à une recette — ou, sans texte, regroupée avec les autres photographies du même plat. Une photographie est facturée une fois, même si vous corrigez ensuite l’association.', 'ms-recipes-writer-ai' ); ?></p>
-				<div class="ms-drop" id="ms-drop">
+				<?php
+				// One target for everything: a click opens the file picker, a drop
+				// takes files, and a paste anywhere on the page — an image or an
+				// image's address — is read by the script.
+				?>
+				<label class="ms-drop" id="ms-drop" for="ms-photos">
 					<input type="file" id="ms-photos" name="photos[]" class="ms-drop-input" multiple accept="image/jpeg,image/png,image/webp">
-					<span class="dashicons dashicons-format-image ms-drop-icon" aria-hidden="true"></span>
-					<p class="ms-drop-title"><?php esc_html_e( 'Déposez vos photographies ici', 'ms-recipes-writer-ai' ); ?></p>
-					<p class="ms-drop-or"><?php esc_html_e( 'ou', 'ms-recipes-writer-ai' ); ?> <label class="button" for="ms-photos"><span class="dashicons dashicons-upload" aria-hidden="true"></span> <?php esc_html_e( 'Choisir sur mon ordinateur', 'ms-recipes-writer-ai' ); ?></label> <button type="button" class="button" id="ms-paste"><span class="dashicons dashicons-clipboard" aria-hidden="true"></span> <?php esc_html_e( 'Coller une image', 'ms-recipes-writer-ai' ); ?></button></p>
-					<p class="ms-drop-hint"><?php esc_html_e( 'Une image copiée — une capture d’écran, une photographie copiée depuis une page — se colle aussi avec Ctrl+V (⌘V sur Mac), n’importe où sur cette page.', 'ms-recipes-writer-ai' ); ?></p>
-					<p class="ms-drop-hint"><?php echo esc_html( sprintf(
+					<span class="dashicons dashicons-upload ms-drop-icon" aria-hidden="true"></span>
+					<span class="ms-drop-title"><?php esc_html_e( 'Choisir des photographies sur mon ordinateur', 'ms-recipes-writer-ai' ); ?></span>
+					<span class="ms-drop-or"><?php esc_html_e( 'ou déposez-les ici, ou collez avec Ctrl+V (⌘V sur Mac) une image copiée ou l’adresse d’une image', 'ms-recipes-writer-ai' ); ?></span>
+					<span class="ms-drop-hint"><?php echo esc_html( sprintf(
 						/* translators: 1: the largest number of photographs, 2: the largest size of one, in megabytes. */
-						__( 'JPEG, PNG ou WebP, %1$d au plus, %2$s Mo chacune. Elles sont ajoutées à la médiathèque quand le lot est créé.', 'ms-recipes-writer-ai' ),
+						__( 'JPEG, PNG ou WebP, %1$d au plus, %2$s Mo chacune.', 'ms-recipes-writer-ai' ),
 						MSRWA_Intake::MAX_PHOTOS,
 						number_format_i18n( MSRWA_Admin::photo_bytes() / 1000000, 0 )
-					) ); ?></p>
-				</div>
+					) ); ?></span>
+				</label>
 				<div class="ms-photo-bar">
 					<p class="ms-muted ms-photo-count" id="ms-image-count" aria-live="polite"><?php esc_html_e( 'aucune photographie', 'ms-recipes-writer-ai' ); ?></p>
 					<button type="button" class="button-link ms-photo-clear" id="ms-photo-clear" hidden><?php esc_html_e( 'Tout retirer', 'ms-recipes-writer-ai' ); ?></button>

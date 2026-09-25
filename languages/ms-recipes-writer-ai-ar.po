@@ -2327,3 +2327,50 @@ msgstr "الاسم فقط"
 #, php-format
 msgid "Image collée %d"
 msgstr "صورة ملصوقة %d"
+
+msgid "Ce n’est pas l’adresse d’une image."
+msgstr "هذا ليس عنوان صورة."
+
+msgid "L’adresse doit commencer par https://."
+msgstr "يجب أن يبدأ العنوان بـ https://."
+
+#, php-format
+msgid "L’image à l’adresse %s n’a pas pu être récupérée. Vérifiez que l’adresse mène directement à une image JPEG, PNG ou WebP, qu’elle commence par https:// et qu’elle s’ouvre dans un navigateur."
+msgstr "تعذّر جلب الصورة من العنوان %s. تحقّق من أن العنوان يؤدي مباشرة إلى صورة JPEG أو PNG أو WebP، وأنه يبدأ بـ https://، وأنه يُفتح في المتصفح."
+
+msgid "Ou l’adresse d’une image"
+msgstr "أو عنوان صورة"
+
+msgid "Une image copiée — une capture d’écran, une photographie copiée depuis une page — ou l’adresse d’une image se colle aussi avec Ctrl+V (⌘V sur Mac), n’importe où sur cette page."
+msgstr "يمكن أيضًا لصق صورة منسوخة — لقطة شاشة أو صورة منسوخة من صفحة — أو عنوان صورة باستخدام Ctrl+V (أو ⌘V على Mac) في أي مكان من هذه الصفحة."
+
+msgid "aperçu indisponible — le site vérifiera à l’envoi"
+msgstr "لا توجد معاينة — سيتحقق الموقع منها عند الإرسال"
+
+msgid "image collée"
+msgstr "صورة ملصوقة"
+
+msgid "lien"
+msgstr "رابط"
+
+msgid "Afficher ce qui est saisi"
+msgstr "إظهار ما تمت كتابته"
+
+msgid "Obtenir une clé"
+msgstr "الحصول على مفتاح"
+
+msgid "collez la clé ici"
+msgstr "الصق المفتاح هنا"
+
+msgid "inchangée — collez une nouvelle clé pour la remplacer"
+msgstr "دون تغيير — الصق مفتاحًا جديدًا لاستبداله"
+
+msgid "Choisir des photographies sur mon ordinateur"
+msgstr "اختيار صور من حاسوبي"
+
+#, php-format
+msgid "JPEG, PNG ou WebP, %1$d au plus, %2$s Mo chacune."
+msgstr "JPEG أو PNG أو WebP، %1$d كحد أقصى، %2$s ميغابايت لكل صورة."
+
+msgid "ou déposez-les ici, ou collez avec Ctrl+V (⌘V sur Mac) une image copiée ou l’adresse d’une image"
+msgstr "أو أفلتها هنا، أو الصق صورة منسوخة أو عنوان صورة باستخدام Ctrl+V (أو ⌘V على Mac)"

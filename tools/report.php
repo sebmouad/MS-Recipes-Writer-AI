@@ -158,10 +158,11 @@ function report_visual_provenance( $research, array $photos = array(), array $fo
 		$observation = $by_url[ $image ] ?? array();
 		$inspected = ! empty( $observation );
 		$tier = (int) ( $reference['tier'] ?? 0 );
-		$name = preg_match( '/([a-f0-9]{32}\.(?:jpg|png|webp))/', $image, $m ) ? $m[1] : '';
+		$name = preg_match( '/((?:lot\d+-photo\d+-[a-f0-9]{24}|[a-f0-9]{32})\.(?:jpg|png|webp))/', $image, $m ) ? $m[1] : '';
 		$picture = $from_writer ? ( $photos[ $name ] ?? '' ) : ( $found[ $image ] ?? '' );
 
 		$html .= '<div class="list-item"><h3>Photographie ' . $index
+			. ( $from_writer && preg_match( '/^(lot\d+-photo\d+)-/', $name, $ref ) ? ' <code>' . report_h( $ref[1] ) . '</code>' : '' )
 			. ' <span class="pill">' . ( $from_writer ? 'fournie par le rédacteur' : 'trouvée par le moteur' ) . '</span>'
 			. ' <span class="pill ' . ( $inspected ? 'ok' : 'warn' ) . '">' . ( $inspected ? 'lue' : 'non lue' ) . '</span>'
 			. ( $tier && ! $from_writer ? ' <span class="pill">' . ( 1 === $tier ? 'ce plat' : 'plat voisin' ) . '</span>' : '' ) . '</h3>';
@@ -208,7 +209,14 @@ function report_history( array $history, array $photos = array() ) {
 			}
 			if ( ! ( $c['recipes'] ?? array() ) ) { $body .= '<p class="muted">Aucun texte : les recettes ont été nommées d’après les photographies.</p>'; }
 			foreach ( (array) ( $c['photos'] ?? array() ) as $photo ) {
-				$body .= '<div class="list-item">' . $thumb( $photo['file'] ?? '' ) . '<span class="muted">' . report_h( $photo['name'] ?? '' ) . '</span></div>';
+				$origin = array( 'pasted' => 'collée', 'url' => 'par son adresse', 'upload' => 'envoyée' )[ (string) ( $photo['origin'] ?? '' ) ] ?? '';
+				$source = (string) ( $photo['source'] ?? '' );
+				$body .= '<div class="list-item">' . $thumb( $photo['file'] ?? '' )
+					. ( '' !== (string) ( $photo['ref'] ?? '' ) ? '<code>' . report_h( $photo['ref'] ) . '</code> ' : '' )
+					. ( '' !== $origin ? '<span class="pill">' . report_h( $origin ) . '</span> ' : '' )
+					. '<span class="muted">' . report_h( 'pasted' === ( $photo['origin'] ?? '' ) ? '' : ( $photo['name'] ?? '' ) ) . '</span>'
+					. ( '' !== $source ? ' <a class="muted" href="' . report_h( $source ) . '" rel="noopener noreferrer" title="' . report_h( $source ) . '">' . report_h( (string) parse_url( $source, PHP_URL_HOST ) ) . '</a>' : '' )
+					. '</div>';
 			}
 			if ( ! ( $c['photos'] ?? array() ) ) { $body .= '<p class="muted">Aucune photographie envoyée.</p>'; }
 			$html .= '<div class="history-stage"><h3>Ce que le rédacteur a fourni ' . $at . '</h3><div class="list">' . $body . '</div></div>';
@@ -219,6 +227,7 @@ function report_history( array $history, array $photos = array() ) {
 				foreach ( (array) ( $c['pairs'] ?? array() ) as $one ) { if ( (int) ( $one['image'] ?? -1 ) === $i ) { $pair = $one; } }
 				$recipe = isset( $pair['recipe'] ) && null !== $pair['recipe'] ? ( $c['recipes'][ (int) $pair['recipe'] ]['title'] ?? '#' . ( (int) $pair['recipe'] + 1 ) ) : 'aucune recette';
 				$body .= '<div class="list-item">' . $thumb( $reading['file'] ?? '' )
+					. ( '' !== (string) ( $reading['ref'] ?? '' ) ? '<p><code>' . report_h( $reading['ref'] ) . '</code></p>' : '' )
 					. '<p><strong>' . report_h( '' !== (string) ( $reading['dish'] ?? '' ) ? $reading['dish'] : 'plat non reconnu' ) . '</strong> — ' . report_h( $reading['description'] ?? '' ) . '</p>'
 					. '<p>→ ' . report_h( $recipe ) . ' <span class="pill">' . report_h( $pair['confidence'] ?? '' ) . '</span> <span class="muted">' . report_h( $pair['why'] ?? '' ) . '</span></p></div>';
 			}

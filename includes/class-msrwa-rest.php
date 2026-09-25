@@ -16,7 +16,7 @@ final class MSRWA_REST {
 		register_rest_route( 'msrwa/v1', '/batches/(?P<id>\d+)/schedule', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'schedule' ) ) );
 		register_rest_route( 'msrwa/v1', '/batches/(?P<id>\d+)/dispatch', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'dispatch' ) ) );
 		register_rest_route( 'msrwa/v1', '/batches/(?P<id>\d+)/runs', array( 'methods' => 'GET', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'runs' ) ) );
-		register_rest_route( 'msrwa/v1', '/batches/(?P<id>\d+)/photos/(?P<name>[a-f0-9]{32}\.(?:jpg|png|webp))', array( 'methods' => 'GET', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'photo' ) ) );
+		register_rest_route( 'msrwa/v1', '/batches/(?P<id>\d+)/photos/(?P<name>' . MSRWA_Sources::NAME . ')', array( 'methods' => 'GET', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'photo' ) ) );
 		register_rest_route( 'msrwa/v1', '/batches/(?P<id>\d+)', array( 'methods' => 'DELETE', 'permission_callback' => array( __CLASS__, 'can_manage' ), 'callback' => array( __CLASS__, 'remove' ) ) );
 		register_rest_route( 'msrwa/v1', '/queue', array(
 			array( 'methods' => 'GET', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'queue' ) ),
@@ -90,8 +90,16 @@ final class MSRWA_REST {
 		// an attachment id posted here is not read. They are kept with the lot,
 		// out of the library, which holds only what articles show.
 		$files = MSRWA_Intake::files( $request->get_file_params()['photos'] ?? array() );
+		// Which of them were pasted rather than picked, by their place in the upload.
+		foreach ( array_map( 'absint', (array) $request->get_param( 'pasted' ) ) as $index ) {
+			if ( isset( $files[ $index ] ) ) { $files[ $index ]['msrwa_origin'] = 'pasted'; }
+		}
+		// Images given by address come after, fetched here and checked like the rest.
+		$linked = MSRWA_Intake::from_urls( (array) $request->get_param( 'urls' ), MSRWA_Admin::photo_bytes() );
+		if ( '' !== $linked['error'] ) { return new WP_Error( 'msrwa_bad_photo', $linked['error'], array( 'status' => 400 ) ); }
+		$files = array_merge( $files, $linked['files'] );
 		$refused = MSRWA_Intake::check( $files, MSRWA_Admin::photo_bytes() );
-		if ( '' !== $refused ) { return new WP_Error( 'msrwa_bad_photo', $refused, array( 'status' => 400 ) ); }
+		if ( '' !== $refused ) { MSRWA_Intake::discard( $files ); return new WP_Error( 'msrwa_bad_photo', $refused, array( 'status' => 400 ) ); }
 		if ( ! $recipes && ! $files ) { return new WP_Error( 'msrwa_no_recipes', __( 'Collez au moins une recette ou ajoutez au moins une photographie.', 'ms-recipes-writer-ai' ), array( 'status' => 400 ) ); }
 
 		// The per-recipe ceiling is the site's unless the person may set it. It
@@ -118,6 +126,7 @@ final class MSRWA_REST {
 			sanitize_key( (string) MSRWA_Settings::get()['site_language'] ),
 			$overrides
 		);
+		MSRWA_Intake::discard( $files );
 		if ( is_wp_error( $id ) ) { return new WP_Error( $id->get_error_code(), $id->get_error_message(), array( 'status' => 400 ) ); }
 		$created = MSRWA_Batch::get( (int) $id );
 		return rest_ensure_response( array( 'id' => (int) $id, 'recipes' => (int) ( $created['recipes'] ?? count( $recipes ) ), 'images' => (int) ( $created['images'] ?? 0 ) ) );

@@ -161,10 +161,11 @@ final class MSRWA_Admin {
 				/* translators: %s is a file name. */
 				'removePhoto' => __( 'Retirer %s', 'ms-recipes-writer-ai' ),
 				'pastedTag' => __( 'collée', 'ms-recipes-writer-ai' ),
+				'linkTag' => __( 'lien', 'ms-recipes-writer-ai' ),
+				'linkNotHttps' => __( 'L’adresse doit commencer par https://.', 'ms-recipes-writer-ai' ),
+				'linkUnseen' => __( 'aperçu indisponible — le site vérifiera à l’envoi', 'ms-recipes-writer-ai' ),
 				/* translators: %d is the number of the pasted image, counting from 1. */
 				'pastedName' => __( 'Image collée %d', 'ms-recipes-writer-ai' ),
-				'pasteNothing' => __( 'Le presse-papiers ne contient pas d’image.', 'ms-recipes-writer-ai' ),
-				'pasteBlocked' => __( 'Le navigateur ne laisse pas lire le presse-papiers depuis ce bouton : collez avec Ctrl+V (⌘V sur Mac).', 'ms-recipes-writer-ai' ),
 				'recipeTitleOnly' => __( 'le nom seul', 'ms-recipes-writer-ai' ),
 				'recipeWithDetails' => __( 'avec des précisions', 'ms-recipes-writer-ai' ),
 				/* translators: 1: likely cost, 2: the ceiling, 3: number of recipes. */

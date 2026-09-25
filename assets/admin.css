@@ -292,20 +292,24 @@
 .ms-recipe-list small { font-size: 11px; color: var(--ms-ink-soft); }
 
 /* The photographs: a drop zone, then a grid of what was picked. */
-.ms-drop { position: relative; display: grid; justify-items: center; gap: 6px; padding: 26px 20px; text-align: center; border: 2px dashed var(--ms-line); border-radius: var(--ms-radius); background: var(--ms-sunk); transition: border-color .15s ease, background-color .15s ease; }
-.ms-drop.is-over { border-color: var(--ms-lamp); background: var(--ms-lamp-soft); }
+.ms-drop { position: relative; display: grid; justify-items: center; gap: 6px; padding: 30px 20px; cursor: pointer; text-align: center; border: 2px dashed var(--ms-line); border-radius: var(--ms-radius); background: var(--ms-sunk); transition: border-color .15s ease, background-color .15s ease; }
+.ms-drop.is-over, .ms-drop:hover { border-color: var(--ms-lamp); background: var(--ms-lamp-soft); }
+.ms-drop:hover .ms-drop-icon.dashicons { color: var(--ms-lamp); }
 .ms-drop:focus-within { border-color: var(--ms-lamp); }
 .ms-drop-input { position: absolute; inline-size: 1px; block-size: 1px; opacity: 0; overflow: hidden; }
 .ms-drop-icon.dashicons { inline-size: 36px; block-size: 36px; font-size: 36px; color: var(--ms-ink-faint); }
-.ms-drop p { margin: 0; }
-.ms-drop-title { font-size: 14px; font-weight: 600; color: var(--ms-ink); }
-.ms-drop-or { color: var(--ms-ink-soft); }
+.ms-drop > span:not(.dashicons) { display: block; margin: 0; }
+.ms-drop-title { font-size: 15px; font-weight: 650; color: var(--ms-lamp); }
+.ms-drop-or { max-inline-size: 60ch; color: var(--ms-ink-soft); line-height: 1.5; }
 .ms-drop-hint { max-inline-size: 60ch; font-size: 12px; color: var(--ms-ink-soft); line-height: 1.5; }
-.ms-drop-or { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px; }
 /* Once photographs are there, the zone steps back and the photographs lead. */
 .ms-drop.has-photos { padding: 12px 16px; gap: 4px; }
 .ms-drop.has-photos .ms-drop-icon, .ms-drop.has-photos .ms-drop-hint { display: none; }
 .ms-drop.has-photos .ms-drop-title { font-size: 13px; }
+.ms-photo-unseen { border-color: var(--ms-warn); }
+.ms-photo.ms-photo-unseen img { display: none; }
+.ms-photo.ms-photo-unseen::before { content: "\f103"; font-family: dashicons; font-size: 34px; display: grid; place-items: center; aspect-ratio: 1; border-radius: 5px; background: var(--ms-sunk); color: var(--ms-ink-faint); }
+.ms-photo-unseen .ms-photo-meta { color: var(--ms-warn); white-space: normal; }
 .ms-photo-bar { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; margin: 10px 0 0; }
 .ms-photo-count { margin: 0; }
 .ms-photo-clear.button-link { color: var(--ms-stop); font-size: 12px; }
@@ -477,7 +481,25 @@
 }
 
 .ms-state-idle { color: var(--ms-ink-soft); }
+/* API keys: one card per provider, its state, its field, where to get one. */
+.ms-keycards { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr)); margin: 14px 0 16px; }
+.ms-keycard { display: grid; gap: 12px; align-content: start; padding: 14px 16px; background: var(--ms-raised); border: 1px solid var(--ms-line); border-inline-start: var(--ms-rail) solid var(--ms-line); border-radius: var(--ms-radius); }
+.ms-keycard.is-stored { border-inline-start-color: var(--ms-good); }
+.ms-keycard[data-check="stop"] { border-inline-start-color: var(--ms-stop); }
+.ms-keycard[data-check="warn"] { border-inline-start-color: var(--ms-warn); }
+.ms-keycard-head { display: flex; align-items: center; gap: 10px; min-inline-size: 0; }
+.ms-keycard-head label { font-size: 14px; font-weight: 650; color: var(--ms-ink); margin-inline-end: auto; }
+.ms-keycard-mark { inline-size: 30px; block-size: 30px; flex: none; display: grid; place-items: center; border-radius: 8px; background: var(--ms-lamp-soft); color: var(--ms-lamp); font-weight: 700; font-size: 14px; }
+.ms-keycard-field { display: flex; gap: 6px; }
+.ms-keycard-field input { flex: 1 1 auto; min-inline-size: 0; font-family: var(--ms-mono); font-size: 12px; }
+.ms-keycard-field input::placeholder { font-family: var(--ms-sans); color: var(--ms-ink-faint); }
+.ms-keycard-toggle.button { flex: none; display: grid; place-items: center; padding: 0 8px; }
+.ms-keycard-toggle .dashicons { inline-size: 18px; block-size: 18px; font-size: 18px; }
+.ms-keycard-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 10px; font-size: 12px; }
+.ms-keycard-foot a { text-decoration: none; }
+.ms-keycard-result:empty { display: none; }
 .ms-keys-check { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.ms-keys-check .button .dashicons { inline-size: 16px; block-size: 16px; font-size: 16px; vertical-align: text-bottom; margin-block-start: 1px; }
 .ms-keys-result { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
 .ms-keys-result li { margin: 0; }
 

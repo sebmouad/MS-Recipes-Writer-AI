@@ -2283,3 +2283,50 @@ msgstr "name only"
 #, php-format
 msgid "Image collée %d"
 msgstr "Pasted image %d"
+
+msgid "Ce n’est pas l’adresse d’une image."
+msgstr "That is not an image address."
+
+msgid "L’adresse doit commencer par https://."
+msgstr "The address must start with https://."
+
+#, php-format
+msgid "L’image à l’adresse %s n’a pas pu être récupérée. Vérifiez que l’adresse mène directement à une image JPEG, PNG ou WebP, qu’elle commence par https:// et qu’elle s’ouvre dans un navigateur."
+msgstr "The image at %s could not be retrieved. Check that the address leads straight to a JPEG, PNG or WebP image, starts with https:// and opens in a browser."
+
+msgid "Ou l’adresse d’une image"
+msgstr "Or an image address"
+
+msgid "Une image copiée — une capture d’écran, une photographie copiée depuis une page — ou l’adresse d’une image se colle aussi avec Ctrl+V (⌘V sur Mac), n’importe où sur cette page."
+msgstr "A copied image — a screenshot, a photograph copied from a page — or an image address can also be pasted with Ctrl+V (⌘V on a Mac), anywhere on this page."
+
+msgid "aperçu indisponible — le site vérifiera à l’envoi"
+msgstr "no preview — the site will check it when sending"
+
+msgid "image collée"
+msgstr "pasted image"
+
+msgid "lien"
+msgstr "link"
+
+msgid "Afficher ce qui est saisi"
+msgstr "Show what is typed"
+
+msgid "Obtenir une clé"
+msgstr "Get a key"
+
+msgid "collez la clé ici"
+msgstr "paste the key here"
+
+msgid "inchangée — collez une nouvelle clé pour la remplacer"
+msgstr "unchanged — paste a new key to replace it"
+
+msgid "Choisir des photographies sur mon ordinateur"
+msgstr "Choose photographs on my computer"
+
+#, php-format
+msgid "JPEG, PNG ou WebP, %1$d au plus, %2$s Mo chacune."
+msgstr "JPEG, PNG or WebP, %1$d at most, %2$s MB each."
+
+msgid "ou déposez-les ici, ou collez avec Ctrl+V (⌘V sur Mac) une image copiée ou l’adresse d’une image"
+msgstr "or drop them here, or paste a copied image or an image address with Ctrl+V (⌘V on a Mac)"

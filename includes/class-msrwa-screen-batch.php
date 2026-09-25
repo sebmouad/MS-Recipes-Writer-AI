@@ -152,7 +152,7 @@ final class MSRWA_Screen_Batch {
 			$label = sprintf(
 				/* translators: %s is a file name. */
 				__( 'Recette pour la photographie %s', 'ms-recipes-writer-ai' ),
-				(string) $image['file']
+				MSRWA_Sources::label( $image )
 			);
 			$current = null === $pair['recipe'] ? '' : (string) ( $recipes[ (int) $pair['recipe'] ]['title'] ?? '' );
 			?>
@@ -171,7 +171,7 @@ final class MSRWA_Screen_Batch {
 					<p class="ms-pair-why"><span class="ms-state ms-state-<?php echo esc_attr( $tone ); ?> ms-pair-badge"><?php echo esc_html( $pending ? __( 'À décider', 'ms-recipes-writer-ai' ) : ( $aside ? __( 'Mise de côté', 'ms-recipes-writer-ai' ) : ( ! empty( $pair['new_recipe'] ) && ! $mine ? __( 'Nouvelle recette', 'ms-recipes-writer-ai' ) : ( $mine ? __( 'Choisie par vous', 'ms-recipes-writer-ai' ) : self::confidence( (string) $pair['confidence'] ) ) ) ) ); ?></span>
 						<?php $why = self::reason( $pair ); ?>
 						<?php if ( '' !== $why ) : ?><span class="ms-pair-reason"><?php echo esc_html( $why ); ?></span><?php endif; ?></p>
-					<p class="ms-pair-file"><?php echo esc_html( $image['file'] ); ?></p>
+					<p class="ms-pair-file"><?php echo esc_html( MSRWA_Sources::label( $image ) ); ?></p>
 				</div>
 				<div class="ms-pair-pick">
 					<?php if ( $settling ) : ?>

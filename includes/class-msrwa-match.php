@@ -305,7 +305,7 @@ final class MSRWA_Match {
 			'PHOTOGRAPHIES, décrites depuis leurs propres pixels :',
 		);
 		foreach ( $images as $index => $image ) {
-			$lines[] = sprintf( '%d. fichier « %s » — plat reconnu : %s — %s', $index, $image['file'], '' !== $image['dish'] ? $image['dish'] : 'non identifié', $image['describes'] );
+			$lines[] = sprintf( '%d. fichier « %s » — plat reconnu : %s — %s', $index, self::file_label( $image ), '' !== $image['dish'] ? $image['dish'] : 'non identifié', $image['describes'] );
 		}
 		$lines[] = '';
 		$lines[] = 'RÈGLES :';
@@ -343,7 +343,7 @@ final class MSRWA_Match {
 		$lines[] = '';
 		$lines[] = 'PHOTOGRAPHIES, décrites depuis leurs propres pixels :';
 		foreach ( $images as $index => $image ) {
-			$lines[] = sprintf( '%d. fichier « %s » — plat reconnu : %s — %s', $index, $image['file'], '' !== $image['dish'] ? $image['dish'] : 'non identifié', $image['describes'] );
+			$lines[] = sprintf( '%d. fichier « %s » — plat reconnu : %s — %s', $index, self::file_label( $image ), '' !== $image['dish'] ? $image['dish'] : 'non identifié', $image['describes'] );
 		}
 		$lines[] = '';
 		$lines[] = 'RÈGLES :';
@@ -406,6 +406,17 @@ final class MSRWA_Match {
 			if ( ! isset( $taken[ $image ] ) ) { $out[] = array( 'image' => (int) $image, 'recipe' => null, 'confidence' => 'basse', 'why' => 'Non mentionnée par l’appariement.', 'reason' => 'not_mentioned', 'pending' => true ); }
 		}
 		return $out;
+	}
+
+	/**
+	 * How the pairing model is told which photograph it reads: its identifier,
+	 * and the writer's file name when there is one — a name like "tarte.jpg"
+	 * is a hint, a pasted image's is not.
+	 */
+	private static function file_label( array $image ) {
+		$ref = (string) ( $image['ref'] ?? '' );
+		$file = 'pasted' === ( $image['origin'] ?? '' ) ? 'image collée' : (string) ( $image['file'] ?? '' );
+		return '' === $ref ? $file : $ref . ' · ' . $file;
 	}
 
 	/**
