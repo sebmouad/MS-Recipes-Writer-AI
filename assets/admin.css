@@ -276,6 +276,21 @@
 .ms-choice small { display: block; color: var(--ms-ink-soft); margin-block-start: 2px; }
 .ms-choice-cost { margin-inline-start: auto; font-family: var(--ms-mono); font-size: 12px; color: var(--ms-ink-soft); white-space: nowrap; font-variant-numeric: tabular-nums; }
 
+/* The recipes: prose to read, not code; each block shown as it will be read. */
+.ms-recipes-text { display: block; inline-size: 100%; min-block-size: 11rem; padding: 12px 14px; font-size: 14px; line-height: 1.6; color: var(--ms-ink); background: var(--ms-raised); border: 1px solid var(--ms-line); border-radius: var(--ms-radius); resize: vertical; }
+.ms-recipes-text:focus { border-color: var(--ms-lamp); box-shadow: 0 0 0 1px var(--ms-lamp); outline: none; }
+.ms-recipes-text::placeholder { color: var(--ms-ink-faint); }
+.ms-recipes-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin-block-start: 10px; }
+.ms-recipes-bar p { margin: 0; }
+.ms-step .button .dashicons { inline-size: 16px; block-size: 16px; font-size: 16px; vertical-align: text-bottom; margin-block-start: 1px; }
+.ms-recipe-list { list-style: none; counter-reset: ms-recipe; margin: 12px 0 0; padding: 0; display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr)); }
+.ms-recipe-list[hidden] { display: none; }
+.ms-recipe-list li { counter-increment: ms-recipe; position: relative; margin: 0; padding: 9px 12px 9px 44px; display: grid; gap: 1px; min-inline-size: 0; background: var(--ms-sunk); border: 1px solid var(--ms-line-soft); border-radius: var(--ms-radius); }
+.ms-recipe-list li::before { content: counter(ms-recipe); position: absolute; inset-inline-start: 12px; inset-block-start: 50%; transform: translateY(-50%); inline-size: 22px; block-size: 22px; display: grid; place-items: center; border-radius: 50%; background: var(--ms-lamp-soft); color: var(--ms-lamp); font-family: var(--ms-mono); font-size: 11px; font-weight: 700; }
+[dir="rtl"] .ms-recipe-list li { padding: 9px 44px 9px 12px; }
+.ms-recipe-list strong { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ms-recipe-list small { font-size: 11px; color: var(--ms-ink-soft); }
+
 /* The photographs: a drop zone, then a grid of what was picked. */
 .ms-drop { position: relative; display: grid; justify-items: center; gap: 6px; padding: 26px 20px; text-align: center; border: 2px dashed var(--ms-line); border-radius: var(--ms-radius); background: var(--ms-sunk); transition: border-color .15s ease, background-color .15s ease; }
 .ms-drop.is-over { border-color: var(--ms-lamp); background: var(--ms-lamp-soft); }
@@ -286,7 +301,18 @@
 .ms-drop-title { font-size: 14px; font-weight: 600; color: var(--ms-ink); }
 .ms-drop-or { color: var(--ms-ink-soft); }
 .ms-drop-hint { max-inline-size: 60ch; font-size: 12px; color: var(--ms-ink-soft); line-height: 1.5; }
-.ms-photo-count { margin: 10px 0 0; }
+.ms-drop-or { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px; }
+/* Once photographs are there, the zone steps back and the photographs lead. */
+.ms-drop.has-photos { padding: 12px 16px; gap: 4px; }
+.ms-drop.has-photos .ms-drop-icon, .ms-drop.has-photos .ms-drop-hint { display: none; }
+.ms-drop.has-photos .ms-drop-title { font-size: 13px; }
+.ms-photo-bar { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; margin: 10px 0 0; }
+.ms-photo-count { margin: 0; }
+.ms-photo-clear.button-link { color: var(--ms-stop); font-size: 12px; }
+.ms-photo-number { position: absolute; inset-block-start: 10px; inset-inline-start: 10px; min-inline-size: 22px; block-size: 22px; padding: 0 6px; display: grid; place-items: center; border-radius: 11px; background: var(--ms-ink); color: var(--ms-raised); opacity: .82; font-family: var(--ms-mono); font-size: 11px; font-weight: 700; }
+.ms-photo-bad .ms-photo-number { position: static; justify-self: start; }
+.ms-photo { transition: border-color .15s ease; }
+.ms-photo:hover { border-color: var(--ms-lamp); }
 .ms-photo-grid { list-style: none; margin: 12px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); gap: 12px; }
 .ms-photo { position: relative; margin: 0; display: grid; gap: 3px; padding: 6px; border: 1px solid var(--ms-line); border-radius: var(--ms-radius); background: var(--ms-raised); }
 .ms-photo img { display: block; inline-size: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 5px; background: var(--ms-sunk); }

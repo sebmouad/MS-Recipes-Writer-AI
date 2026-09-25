@@ -96,6 +96,8 @@
     var status = document.getElementById('ms-compose-status');
     var chosen = [];
     var previews = [];
+    var drop = document.getElementById('ms-drop');
+    var clear = null;
 
     var pending = null;
 
@@ -161,7 +163,41 @@
       return t.ceilingUsd || 0;
     }
 
-    recipes.addEventListener('input', refreshEstimate);
+    // The recipes as they will be read: one line per block, its title and
+    // whether it says more than the dish's name. What the separator rule
+    // means is shown rather than explained.
+    var recipeList = document.getElementById('ms-recipe-list');
+    function renderRecipes() {
+      var blocks = recipes.value.split(/^\s*-{3,}\s*$/m).map(function (block) {
+        return block.split(/\r?\n/).map(function (line) { return line.trim(); }).filter(Boolean);
+      }).filter(function (lines) { return lines.length; });
+      recipeList.innerHTML = '';
+      recipeList.hidden = blocks.length < 1;
+      blocks.forEach(function (lines) {
+        var item = document.createElement('li');
+        var title = document.createElement('strong');
+        title.textContent = lines[0];
+        title.title = lines[0];
+        var more = document.createElement('small');
+        more.textContent = lines.length > 1 ? (t.recipeWithDetails || '') : (t.recipeTitleOnly || '');
+        item.appendChild(title);
+        item.appendChild(more);
+        recipeList.appendChild(item);
+      });
+    }
+
+    recipes.addEventListener('input', function () { renderRecipes(); refreshEstimate(); });
+    var recipeAdd = document.getElementById('ms-recipe-add');
+    if (recipeAdd) {
+      recipeAdd.addEventListener('click', function () {
+        var text = recipes.value.replace(/\s+$/, '');
+        recipes.value = text ? text + '\n\n---\n\n' : '';
+        recipes.focus();
+        recipes.setSelectionRange(recipes.value.length, recipes.value.length);
+        recipes.scrollTop = recipes.scrollHeight;
+        renderRecipes(); refreshEstimate();
+      });
+    }
     compose.querySelectorAll('input[name=profile]').forEach(function (input) { input.addEventListener('change', refreshEstimate); });
 
     function megabytes(bytes) { return String(Math.floor(bytes / 1000000)); }
@@ -201,6 +237,10 @@
         var problem = fileProblem(file);
         var tile = document.createElement('li');
         tile.className = 'ms-photo' + (problem ? ' ms-photo-bad' : '');
+        var number = document.createElement('span');
+        number.className = 'ms-photo-number';
+        number.textContent = String(index + 1);
+        tile.appendChild(number);
         if (!problem) {
           var img = document.createElement('img');
           img.src = URL.createObjectURL(file);
@@ -210,12 +250,12 @@
         }
         var name = document.createElement('span');
         name.className = 'ms-photo-name';
-        name.textContent = file.name;
+        name.textContent = file.msrwaPasted ? (t.pastedName || '%d').replace('%d', file.msrwaPasted) : file.name;
         name.title = file.name;
         tile.appendChild(name);
         var meta = document.createElement('span');
         meta.className = 'ms-photo-meta';
-        meta.textContent = problem || sizeLabel(file.size);
+        meta.textContent = problem || (file.msrwaPasted ? (t.pastedTag || '') + ' · ' : '') + sizeLabel(file.size);
         tile.appendChild(meta);
         var remove = document.createElement('button');
         remove.type = 'button';
@@ -226,6 +266,8 @@
         tile.appendChild(remove);
         thumbs.appendChild(tile);
       });
+      if (drop) { drop.classList.toggle('has-photos', chosen.length > 0); }
+      if (clear) { clear.hidden = chosen.length < 2; }
       var problem = photoProblem(chosen);
       say(imageCount, problem || (chosen.length === 0 ? (t.noImage || '') : chosen.length === 1 ? t.oneImage : (t.manyImages || '').replace('%d', chosen.length)));
       refreshEstimate();
@@ -245,7 +287,84 @@
       photos.value = '';
     });
 
-    var drop = document.getElementById('ms-drop');
+    clear = document.getElementById('ms-photo-clear');
+    if (clear) { clear.addEventListener('click', function () { chosen = []; renderPhotos(); }); }
+
+    // A pasted image has no name and, from a screen capture, is often a PNG
+    // larger than the server takes. It is named, and re-encoded as a JPEG when
+    // it is too heavy, so a paste never fails where a file pick would pass.
+    var pasted = 0;
+    function fromClipboard(blob) {
+      pasted++;
+      var stamp = new Date().toISOString().slice(0, 19).replace(/[-:T]/g, '');
+      var number = pasted;
+      var name = 'pasted-' + stamp + '-' + number;
+      var extension = { 'image/jpeg': '.jpg', 'image/png': '.png', 'image/webp': '.webp' }[blob.type];
+      if (extension && (!t.photoBytes || blob.size <= t.photoBytes)) {
+        return Promise.resolve(tagPasted(new File([blob], name + extension, { type: blob.type }), number));
+      }
+      return new Promise(function (resolve) {
+        var image = new Image();
+        var url = URL.createObjectURL(blob);
+        image.onload = function () {
+          URL.revokeObjectURL(url);
+          // Smaller and softer in steps until it fits: a photograph fits at the
+          // first, a busy screen capture may need the last.
+          var steps = [[2560, 0.9], [2048, 0.82], [1600, 0.75], [1280, 0.7]];
+          (function attempt(index) {
+            var side = steps[index][0];
+            var scale = Math.min(1, side / Math.max(image.naturalWidth, image.naturalHeight));
+            var canvas = document.createElement('canvas');
+            canvas.width = Math.round(image.naturalWidth * scale);
+            canvas.height = Math.round(image.naturalHeight * scale);
+            var context = canvas.getContext('2d');
+            context.fillStyle = '#fff';
+            context.fillRect(0, 0, canvas.width, canvas.height);
+            context.drawImage(image, 0, 0, canvas.width, canvas.height);
+            canvas.toBlob(function (jpeg) {
+              if (jpeg && t.photoBytes && jpeg.size > t.photoBytes && index + 1 < steps.length) { attempt(index + 1); return; }
+              resolve(tagPasted(new File([jpeg || blob], name + '.jpg', { type: jpeg ? 'image/jpeg' : blob.type }), number));
+            }, 'image/jpeg', steps[index][1]);
+          })(0);
+        };
+        image.onerror = function () { URL.revokeObjectURL(url); resolve(tagPasted(new File([blob], name, { type: blob.type }), number)); };
+        image.src = url;
+      });
+    }
+    function tagPasted(file, number) { file.msrwaPasted = number; return file; }
+    function addPasted(blobs) {
+      return Promise.all(blobs.map(fromClipboard)).then(addPhotos);
+    }
+
+    document.addEventListener('paste', function (event) {
+      var data = event.clipboardData;
+      if (!data) { return; }
+      var images = Array.prototype.filter.call(data.files || [], function (file) { return /^image\//.test(file.type); });
+      if (!images.length) { return; }
+      // Word and Excel put a picture of the copied text beside the text itself:
+      // pasted into a field, the text is what was meant.
+      var field = event.target && /^(TEXTAREA|INPUT)$/.test(event.target.tagName);
+      if (field && (data.getData('text/plain') || '').trim()) { return; }
+      event.preventDefault();
+      addPasted(images);
+    });
+
+    var pasteButton = document.getElementById('ms-paste');
+    if (pasteButton) {
+      pasteButton.addEventListener('click', function () {
+        if (!navigator.clipboard || !navigator.clipboard.read) { say(imageCount, t.pasteBlocked || ''); return; }
+        navigator.clipboard.read().then(function (items) {
+          var reads = [];
+          items.forEach(function (item) {
+            var type = item.types.filter(function (kind) { return /^image\//.test(kind); })[0];
+            if (type) { reads.push(item.getType(type)); }
+          });
+          if (!reads.length) { say(imageCount, t.pasteNothing || ''); return null; }
+          return Promise.all(reads).then(addPasted);
+        }).catch(function () { say(imageCount, t.pasteBlocked || ''); });
+      });
+    }
+
     if (drop) {
       ['dragenter', 'dragover'].forEach(function (type) {
         drop.addEventListener(type, function (event) { event.preventDefault(); drop.classList.add('is-over'); });

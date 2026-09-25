@@ -33,8 +33,12 @@ final class MSRWA_Screen_Compose {
 			<section class="ms-step">
 				<h3><?php esc_html_e( 'Les recettes', 'ms-recipes-writer-ai' ); ?> <span class="ms-optional"><?php esc_html_e( 'facultatif avec des photographies', 'ms-recipes-writer-ai' ); ?></span></h3>
 				<p><?php esc_html_e( 'Une ligne de trois tirets ou plus sépare deux recettes. La première ligne de chaque bloc en devient le titre. Le nom du plat suffit : le reste est établi d’après les sources.', 'ms-recipes-writer-ai' ); ?></p>
-				<textarea id="ms-recipes" name="recipes" rows="14" class="large-text ms-code" spellcheck="false" placeholder="<?php echo esc_attr( __( "Tarte aux pommes normande\nPâte brisée, pommes, crème, calvados…\n\n---\n\nPoulet yassa\nPoulet, oignons, citron…", 'ms-recipes-writer-ai' ) ); ?>"></textarea>
-				<p class="ms-muted" id="ms-recipe-count" aria-live="polite"></p>
+				<textarea id="ms-recipes" name="recipes" rows="10" class="large-text ms-recipes-text" spellcheck="true" placeholder="<?php echo esc_attr( __( "Tarte aux pommes normande\nPâte brisée, pommes, crème, calvados…\n\n---\n\nPoulet yassa\nPoulet, oignons, citron…", 'ms-recipes-writer-ai' ) ); ?>"></textarea>
+				<div class="ms-recipes-bar">
+					<button type="button" class="button" id="ms-recipe-add"><span class="dashicons dashicons-plus-alt2" aria-hidden="true"></span> <?php esc_html_e( 'Ajouter une recette', 'ms-recipes-writer-ai' ); ?></button>
+					<p class="ms-muted" id="ms-recipe-count" aria-live="polite"></p>
+				</div>
+				<ol class="ms-recipe-list" id="ms-recipe-list" hidden></ol>
 			</section>
 
 			<section class="ms-step">
@@ -44,7 +48,8 @@ final class MSRWA_Screen_Compose {
 					<input type="file" id="ms-photos" name="photos[]" class="ms-drop-input" multiple accept="image/jpeg,image/png,image/webp">
 					<span class="dashicons dashicons-format-image ms-drop-icon" aria-hidden="true"></span>
 					<p class="ms-drop-title"><?php esc_html_e( 'Déposez vos photographies ici', 'ms-recipes-writer-ai' ); ?></p>
-					<p class="ms-drop-or"><?php esc_html_e( 'ou', 'ms-recipes-writer-ai' ); ?> <label class="button" for="ms-photos"><?php esc_html_e( 'Choisir sur mon ordinateur', 'ms-recipes-writer-ai' ); ?></label></p>
+					<p class="ms-drop-or"><?php esc_html_e( 'ou', 'ms-recipes-writer-ai' ); ?> <label class="button" for="ms-photos"><span class="dashicons dashicons-upload" aria-hidden="true"></span> <?php esc_html_e( 'Choisir sur mon ordinateur', 'ms-recipes-writer-ai' ); ?></label> <button type="button" class="button" id="ms-paste"><span class="dashicons dashicons-clipboard" aria-hidden="true"></span> <?php esc_html_e( 'Coller une image', 'ms-recipes-writer-ai' ); ?></button></p>
+					<p class="ms-drop-hint"><?php esc_html_e( 'Une image copiée — une capture d’écran, une photographie copiée depuis une page — se colle aussi avec Ctrl+V (⌘V sur Mac), n’importe où sur cette page.', 'ms-recipes-writer-ai' ); ?></p>
 					<p class="ms-drop-hint"><?php echo esc_html( sprintf(
 						/* translators: 1: the largest number of photographs, 2: the largest size of one, in megabytes. */
 						__( 'JPEG, PNG ou WebP, %1$d au plus, %2$s Mo chacune. Elles sont ajoutées à la médiathèque quand le lot est créé.', 'ms-recipes-writer-ai' ),
@@ -52,7 +57,10 @@ final class MSRWA_Screen_Compose {
 						number_format_i18n( MSRWA_Admin::photo_bytes() / 1000000, 0 )
 					) ); ?></p>
 				</div>
-				<p class="ms-muted ms-photo-count" id="ms-image-count" aria-live="polite"><?php esc_html_e( 'aucune photographie', 'ms-recipes-writer-ai' ); ?></p>
+				<div class="ms-photo-bar">
+					<p class="ms-muted ms-photo-count" id="ms-image-count" aria-live="polite"><?php esc_html_e( 'aucune photographie', 'ms-recipes-writer-ai' ); ?></p>
+					<button type="button" class="button-link ms-photo-clear" id="ms-photo-clear" hidden><?php esc_html_e( 'Tout retirer', 'ms-recipes-writer-ai' ); ?></button>
+				</div>
 				<ul class="ms-photo-grid" id="ms-thumbs"></ul>
 			</section>
 

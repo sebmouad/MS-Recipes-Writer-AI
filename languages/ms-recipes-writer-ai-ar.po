@@ -2296,3 +2296,34 @@ msgstr "قيس في 25/09/2026: يفكر من 13000 إلى 15000 رمز، ويك
 
 msgid "Mesuré le 25/09/2026 : en désaccord avec GPT-5.6 Luna sur deux recettes sur trois — il laisse passer un collage refusé et en refuse un approuvé — pour le même coût."
 msgstr "قيس في 25/09/2026: يختلف مع GPT-5.6 Luna في وصفتين من ثلاث — يمرر ملصقًا مرفوضًا ويرفض آخر مقبولًا — بالتكلفة نفسها."
+
+msgid "Ajouter une recette"
+msgstr "إضافة وصفة"
+
+msgid "Coller une image"
+msgstr "لصق صورة"
+
+msgid "Le navigateur ne laisse pas lire le presse-papiers depuis ce bouton : collez avec Ctrl+V (⌘V sur Mac)."
+msgstr "لا يسمح المتصفح لهذا الزر بقراءة الحافظة: الصق باستخدام Ctrl+V (أو ⌘V على Mac)."
+
+msgid "Le presse-papiers ne contient pas d’image."
+msgstr "لا تحتوي الحافظة على صورة."
+
+msgid "Tout retirer"
+msgstr "إزالة الكل"
+
+msgid "Une image copiée — une capture d’écran, une photographie copiée depuis une page — se colle aussi avec Ctrl+V (⌘V sur Mac), n’importe où sur cette page."
+msgstr "يمكن أيضًا لصق صورة منسوخة — لقطة شاشة أو صورة منسوخة من صفحة — باستخدام Ctrl+V (أو ⌘V على Mac) في أي مكان من هذه الصفحة."
+
+msgid "avec des précisions"
+msgstr "مع تفاصيل"
+
+msgid "collée"
+msgstr "ملصوقة"
+
+msgid "le nom seul"
+msgstr "الاسم فقط"
+
+#, php-format
+msgid "Image collée %d"
+msgstr "صورة ملصوقة %d"

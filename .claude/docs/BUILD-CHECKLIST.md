@@ -630,6 +630,13 @@ cost) in the task before changing anything.
   (2026-09-24).** The writer's photograph shows the prompt's writer the dish;
   the collage is drawn from the style reference. Real: the owner's own rôti
   photograph, drawn both ways. See ENGINE.md §7, item 40.
+- [x] **A55 — Pasted photographs, clearer compose form, menu first
+  (2026-09-25).** A copied image is pasted with Ctrl+V anywhere on the
+  compose page or with the "Coller une image" button; a heavy capture is
+  re-encoded to fit the size limit (22 MB PNG → 1.5 MB JPEG); text pasted
+  from Word into the recipes stays text. The recipes are listed as they will
+  be read; the menu sits above the dashboard. Real: a pasted photograph
+  uploaded, described and paired on the test site (lot #81).
 - [x] **A54 — Articles written for the reader (2026-09-25).** No remark
   about sources, documentation or photographs; no plating or camera
   direction; reasons only when sourced; every allergen and safety rule the

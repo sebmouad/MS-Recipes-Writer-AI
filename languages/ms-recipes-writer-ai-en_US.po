@@ -2252,3 +2252,34 @@ msgstr "Measured 25/09/2026: it thinks for 13,000 to 15,000 tokens, costs more t
 
 msgid "Mesuré le 25/09/2026 : en désaccord avec GPT-5.6 Luna sur deux recettes sur trois — il laisse passer un collage refusé et en refuse un approuvé — pour le même coût."
 msgstr "Measured 25/09/2026: disagrees with GPT-5.6 Luna on two recipes in three — it passes a refused collage and refuses an approved one — for the same cost."
+
+msgid "Ajouter une recette"
+msgstr "Add a recipe"
+
+msgid "Coller une image"
+msgstr "Paste an image"
+
+msgid "Le navigateur ne laisse pas lire le presse-papiers depuis ce bouton : collez avec Ctrl+V (⌘V sur Mac)."
+msgstr "The browser does not let this button read the clipboard: paste with Ctrl+V (⌘V on a Mac)."
+
+msgid "Le presse-papiers ne contient pas d’image."
+msgstr "The clipboard holds no image."
+
+msgid "Tout retirer"
+msgstr "Remove all"
+
+msgid "Une image copiée — une capture d’écran, une photographie copiée depuis une page — se colle aussi avec Ctrl+V (⌘V sur Mac), n’importe où sur cette page."
+msgstr "A copied image — a screenshot, a photograph copied from a page — can also be pasted with Ctrl+V (⌘V on a Mac), anywhere on this page."
+
+msgid "avec des précisions"
+msgstr "with details"
+
+msgid "collée"
+msgstr "pasted"
+
+msgid "le nom seul"
+msgstr "name only"
+
+#, php-format
+msgid "Image collée %d"
+msgstr "Pasted image %d"

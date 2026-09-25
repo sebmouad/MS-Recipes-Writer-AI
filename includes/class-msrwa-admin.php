@@ -56,7 +56,10 @@ final class MSRWA_Admin {
 		$manage = MSRWA_Rights::MANAGE;
 
 		$title = __( 'MS Recipes AI', 'ms-recipes-writer-ai' );
-		add_menu_page( $title, self::title_with_waiting( $title ), $write, 'msrwa', array( 'MSRWA_Screen_Pass', 'render' ), 'dashicons-food', 58 );
+		// First in the admin menu, above the dashboard: for the people who use
+		// it, this is what they open WordPress for. A fraction, so it never
+		// takes a slot another menu registered.
+		add_menu_page( $title, self::title_with_waiting( $title ), $write, 'msrwa', array( 'MSRWA_Screen_Pass', 'render' ), 'dashicons-food', 1.01 );
 		add_submenu_page( 'msrwa', __( 'Le pass', 'ms-recipes-writer-ai' ), __( 'Le pass', 'ms-recipes-writer-ai' ), $write, 'msrwa', array( 'MSRWA_Screen_Pass', 'render' ) );
 		add_submenu_page( 'msrwa', __( 'Nouveau lot', 'ms-recipes-writer-ai' ), __( 'Nouveau lot', 'ms-recipes-writer-ai' ), $write, 'msrwa-compose', array( 'MSRWA_Screen_Compose', 'render' ) );
 		add_submenu_page( 'msrwa', __( 'Articles', 'ms-recipes-writer-ai' ), __( 'Articles', 'ms-recipes-writer-ai' ), $write, 'msrwa-articles', array( 'MSRWA_Screen_Articles', 'render' ) );
@@ -157,6 +160,13 @@ final class MSRWA_Admin {
 				'uploading' => __( 'Envoi des photographies…', 'ms-recipes-writer-ai' ),
 				/* translators: %s is a file name. */
 				'removePhoto' => __( 'Retirer %s', 'ms-recipes-writer-ai' ),
+				'pastedTag' => __( 'collée', 'ms-recipes-writer-ai' ),
+				/* translators: %d is the number of the pasted image, counting from 1. */
+				'pastedName' => __( 'Image collée %d', 'ms-recipes-writer-ai' ),
+				'pasteNothing' => __( 'Le presse-papiers ne contient pas d’image.', 'ms-recipes-writer-ai' ),
+				'pasteBlocked' => __( 'Le navigateur ne laisse pas lire le presse-papiers depuis ce bouton : collez avec Ctrl+V (⌘V sur Mac).', 'ms-recipes-writer-ai' ),
+				'recipeTitleOnly' => __( 'le nom seul', 'ms-recipes-writer-ai' ),
+				'recipeWithDetails' => __( 'avec des précisions', 'ms-recipes-writer-ai' ),
 				/* translators: 1: likely cost, 2: the ceiling, 3: number of recipes. */
 				'estimate' => __( 'Environ %1$s pour %3$d recette(s), et au maximum %2$s : le plafond arrête un run avant de le dépasser.', 'ms-recipes-writer-ai' ),
 				'noRecipes' => __( 'Collez au moins une recette ou ajoutez au moins une photographie.', 'ms-recipes-writer-ai' ),
