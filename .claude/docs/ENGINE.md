@@ -920,6 +920,13 @@ photograph, and otherwise use the photograph without the cost of a search.
     - The plugin sets the lead per recipe: a photograph the pairing reads
       as a collage and the writer keeps ticked → `provided` (any lot with
       images); otherwise a complete lot → `drawn`; other lots unchanged.
+    - The drawn collage's look (owner's request, 2026-09-25, collage-only
+      tests against his ChatGPT collages): `facebook_compose_free.tpl.txt`
+      now spells out what makes his collages look home-made — close framing
+      with the food filling each panel, light wood on white marble and a
+      checked linen towel, bright neutral daylight with no orange cast,
+      generous imperfect garnish, an abundant ingredients panel. The first
+      free version gave pale, distant, catalogue-like panels.
 
 ### Still open
 
