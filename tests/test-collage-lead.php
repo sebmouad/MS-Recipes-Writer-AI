@@ -67,4 +67,16 @@ msrwa_test_contains( $instruction, 'No thermometer', 'Nothing with numbers on it
 msrwa_test_missing( MSRWA_Engine_Input::visual_brief( array( 'ingredients' => array() ), array(), false, false ), 'NO GARNISH', 'Led by the collage, garnish is not a defect.' );
 msrwa_test_contains( MSRWA_Engine_Input::visual_brief( array( 'ingredients' => array() ), array() ), 'NO GARNISH', 'Otherwise the rule stands.' );
 
+// Led by a collage, the serving is the collage's and no count is imposed (live runs 72–74).
+$led = array( 'collage_lead' => 'drawn', 'collage' => array( 'serving' => 'Sur une assiette blanche.', 'finished_dish' => 'Une part de tarte levée.' ) );
+$canonical = array( 'ingredients' => array( array( 'name' => 'œufs', 'quantity' => '3', 'unit' => '' ) ), 'equipment' => array( 'moule à tarte cannelé' ) );
+$judged = MSRWA_Engine_Input::visual_brief( $canonical, array(), false, false, MSRWA_Engine_Input::collage_serving( $led ) );
+msrwa_test_contains( $judged, 'Sur une assiette blanche.', 'The serving presentation is the collage’s.' );
+msrwa_test_missing( $judged, 'show exactly these numbers', 'The collage’s mise en place is not held to a count.' );
+msrwa_test_missing( $judged, 'standing in for the serving vessel', 'Nor to the research’s serving vessel.' );
+msrwa_test_contains( MSRWA_Engine_Input::visual_brief( $canonical, array() ), 'show exactly these numbers', 'Without a lead the counts stand.' );
+msrwa_test_assert( '' === MSRWA_Engine_Input::collage_serving( array( 'collage' => $led['collage'] ) ), 'No lead, no collage serving.' );
+msrwa_test_contains( MSRWA_Engine_Input::collage_lead( $led, 'final_approval' ), 'never a finding', 'The judge does not count a drawn collage.' );
+msrwa_test_contains( MSRWA_Engine_Input::collage_lead( $led, 'canonical_recipe' ), 'a dish in its own right', 'A roast beside a gratin is not an ingredient of the gratin.' );
+
 msrwa_test_done( 'the collage leads the recipe: drawn first, or the writer’s own' );

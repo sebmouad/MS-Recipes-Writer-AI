@@ -2498,3 +2498,9 @@ msgstr "يُنشر كما هو مع المقال، وهو المرجع للوص�
 
 msgid "Votre collage Facebook"
 msgstr "كولاج فيسبوك الخاص بك"
+
+msgid "Votre collage"
+msgstr "مجموعتك المصوّرة"
+
+msgid "Publié tel quel et référence de la recette : le juge ne le note pas."
+msgstr "تُنشر كما هي وهي مرجع الوصفة: لا يقيّمها المُحكِّم."

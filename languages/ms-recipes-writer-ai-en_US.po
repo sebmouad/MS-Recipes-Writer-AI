@@ -2450,3 +2450,9 @@ msgstr "Published as it is with the article, and the reference for the recipe, t
 
 msgid "Votre collage Facebook"
 msgstr "Your Facebook collage"
+
+msgid "Votre collage"
+msgstr "Your collage"
+
+msgid "Publié tel quel et référence de la recette : le juge ne le note pas."
+msgstr "Published as it is and the recipe's reference: the judge does not rate it."

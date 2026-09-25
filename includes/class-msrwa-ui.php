@@ -62,7 +62,7 @@ final class MSRWA_UI {
 		foreach ( $figures as $entry ) {
 			// A tone colours the figure the way the states are coloured; an image
 			// shows what the figure is about, above what was said of it.
-			$tone = in_array( $entry['tone'] ?? '', array( 'good', 'warn', 'stop', 'live' ), true ) ? $entry['tone'] : '';
+			$tone = in_array( $entry['tone'] ?? '', array( 'good', 'warn', 'stop', 'live', 'lamp' ), true ) ? $entry['tone'] : '';
 			echo '<div class="ms-figure' . ( '' !== $tone ? ' ms-figure-' . esc_attr( $tone ) : '' ) . '"><dt>' . esc_html( $entry['label'] ) . '</dt>';
 			if ( ! empty( $entry['image'] ) ) { echo '<div class="ms-figure-image">' . wp_get_attachment_image( (int) $entry['image'], 'medium' ) . '</div>'; }
 			echo '<dd>' . esc_html( $entry['value'] );

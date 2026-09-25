@@ -328,8 +328,13 @@ final class MSRWA_Batch {
 	 * draft exactly as a drawn one would be.
 	 */
 	private static function seed_collage( $run, array $collage ) {
-		$path = MSRWA_Sources::path( MSRWA_Sources::run_dir( $run ), (string) ( $collage['id'] ?? '' ) );
-		if ( '' === $path ) { return; }
+		$source = MSRWA_Sources::path( MSRWA_Sources::run_dir( $run ), (string) ( $collage['id'] ?? '' ) );
+		if ( '' === $source ) { return; }
+		// Attaching an image to the draft moves its file into the media library:
+		// the copy goes, and the writer's photograph stays where the lot and the
+		// recipe's record show it.
+		$path = MSRWA_Run::workspace( $run ) . '/facebook-provided-' . basename( $source );
+		if ( ! @copy( $source, $path ) ) { return; } // phpcs:ignore WordPress.PHP.NoSilencedErrors
 		$size = @getimagesize( $path ); // phpcs:ignore WordPress.PHP.NoSilencedErrors
 		MSRWA_Run::seed( $run, 'facebook', array(
 			'kind' => 'facebook', 'path' => $path, 'bytes' => (int) filesize( $path ), 'mime' => (string) ( $size['mime'] ?? 'image/jpeg' ),

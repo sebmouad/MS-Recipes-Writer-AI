@@ -86,9 +86,24 @@ développement, humain ou agent.
   la référence de la recette, de l'article et de l'image à la une ; il n'est
   ni redessiné ni jugé. Décoché, il sert de simple photographie.
 - **Sans collage, sur un lot complet** : le collage est dessiné juste après
-  la recherche, en toute liberté — herbes, garniture, accompagnement, linge,
-  un verre de vin : tout ce qu'une personne mettrait chez elle. La recette,
-  l'article et l'image à la une suivent ensuite ce qu'il montre.
+  la recherche, en toute liberté — herbes, garniture, accompagnement, linge :
+  tout ce qu'une personne mettrait chez elle. La recette, l'article et
+  l'image à la une suivent ensuite ce qu'il montre.
+- **Un collage qui a l'air fait à la maison**, réglé sur vos collages
+  ChatGPT : cadrage serré où le plat remplit chaque case, bois clair,
+  marbre et torchon à carreaux, lumière douce de fenêtre sans reflet
+  orangé, couleurs naturelles (la viande garde sa couleur), une seule
+  méthode de cuisson du début à la fin, aucun thermomètre ni chiffre.
+- Un verre posé à côté de l'assiette n'est plus compté comme ingrédient.
+- Votre collage n'est jamais redessiné : un écart entre les deux images
+  se corrige sur l'image à la une.
+- Le juge ne refuse plus un collage dessiné d'abord pour le nombre d'œufs
+  visibles ou pour une tarte servie sur une assiette plutôt que dans son
+  moule : la présentation est celle du collage.
+- Votre collage reste visible sur l'écran du lot après publication, et
+  l'écran de la recette l'affiche comme « Votre collage », non noté.
+- L'avertissement « brouillon modifié » n'apparaît plus quand personne n'a
+  touché au texte.
 - Dans les deux cas, la recette reprend chaque ingrédient visible sur le
   collage ; les quantités, temps, températures et règles de sécurité
   viennent de la recherche. L'image à la une montre le même plat.

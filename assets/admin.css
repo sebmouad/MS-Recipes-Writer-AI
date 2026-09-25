@@ -751,6 +751,9 @@
 .ms-figure-warn dd { color: var(--ms-warn); }
 .ms-figure-stop { box-shadow: inset 0 var(--ms-rail) 0 var(--ms-stop); background: var(--ms-stop-soft); }
 .ms-figure-stop dd { color: var(--ms-stop); }
+/* Something the writer supplied, not something judged: the lamp colour, and words set as words. */
+.ms-figure-lamp { box-shadow: inset 0 var(--ms-rail) 0 var(--ms-lamp); background: var(--ms-lamp-soft); }
+.ms-figure-lamp dd { color: var(--ms-lamp); font-family: var(--ms-sans); font-size: 20px; letter-spacing: normal; }
 .ms-figure-image { margin: 0 0 12px; }
 .ms-figure-image img { display: block; inline-size: 100%; max-inline-size: 220px; block-size: auto; aspect-ratio: auto; border-radius: var(--ms-radius); border: 1px solid var(--ms-line); }
 

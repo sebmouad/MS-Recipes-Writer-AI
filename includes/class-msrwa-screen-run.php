@@ -44,7 +44,7 @@ final class MSRWA_Screen_Run {
 
 		self::edited( $state['artifacts'] );
 		self::redrawn();
-		self::verdict( $approval, $run );
+		self::verdict( $approval, $run, ! empty( $state['artifacts']['facebook']['provided'] ) );
 		if ( MSRWA_Rights::may_read_diagnostics() ) { self::steps( $state['steps'] ); } else { self::progress( $state['steps'] ); }
 
 		if ( MSRWA_Rights::may_read_diagnostics() ) {
@@ -115,7 +115,12 @@ final class MSRWA_Screen_Run {
 	private static function edited( array $artifacts ) {
 		$machine = (string) ( ( (array) ( $artifacts['proofread'] ?? array() ) )['content_html'] ?? '' );
 		$published = (string) ( ( (array) ( $artifacts['published'] ?? array() ) )['content_html'] ?? '' );
-		if ( '' === $machine || '' === $published || $machine === $published ) { return; }
+		if ( '' === $machine || '' === $published ) { return; }
+		// The draft stores the machine's HTML as blocks: their comments and
+		// classes are not an edit, so only the text a reader sees is compared.
+		$machine = self::readable( $machine );
+		$published = self::readable( $published );
+		if ( $machine === $published ) { return; }
 
 		$difference = abs( mb_strlen( $published ) - mb_strlen( $machine ) );
 		MSRWA_UI::note( esc_html( sprintf(
@@ -123,6 +128,11 @@ final class MSRWA_Screen_Run {
 			__( 'Le brouillon a été modifié depuis sa génération : %s caractères d’écart. Les contrôles ci-dessous portent sur ce que la machine a écrit, pas sur la version actuelle.', 'ms-recipes-writer-ai' ),
 			number_format_i18n( $difference )
 		) ) );
+	}
+
+	/** An article's text as its reader sees it: no block comments, tags or spacing. */
+	public static function readable( $html ) {
+		return trim( (string) preg_replace( '/\s+/u', ' ', html_entity_decode( wp_strip_all_tags( (string) preg_replace( '/<!--.*?-->/s', '', (string) $html ) ), ENT_QUOTES, 'UTF-8' ) ) );
 	}
 
 	/**
@@ -137,7 +147,7 @@ final class MSRWA_Screen_Run {
 		MSRWA_UI::note( esc_html__( 'Image redessinée d’après les remarques. Elle remplace l’ancienne dans le brouillon ; regardez-la avant de publier.', 'ms-recipes-writer-ai' ), 'good' );
 	}
 
-	private static function verdict( array $approval, array $run = array() ) {
+	private static function verdict( array $approval, array $run = array(), $provided = false ) {
 		if ( ! $approval ) { return; }
 		echo '<section class="ms-card"><h2>' . esc_html__( 'Ce que le juge a relevé', 'ms-recipes-writer-ai' ) . '</h2>';
 		echo '<p>' . esc_html__( 'L’avis du moteur sur sa propre production. Ce n’est pas une validation éditoriale : c’est à vous de décider si l’article part.', 'ms-recipes-writer-ai' ) . '</p>';
@@ -159,6 +169,11 @@ final class MSRWA_Screen_Run {
 		foreach ( $targets as $key => $label ) {
 			$entry = (array) ( $approval[ $key ] ?? array() );
 			if ( empty( $entry['verdict'] ) ) { continue; }
+			// The writer's own collage was never judged: it is shown as theirs, not as passed.
+			if ( 'facebook_image' === $key && $provided ) {
+				$figures[] = array( 'label' => $label, 'value' => __( 'Votre collage', 'ms-recipes-writer-ai' ), 'note' => __( 'Publié tel quel et référence de la recette : le juge ne le note pas.', 'ms-recipes-writer-ai' ), 'tone' => 'lamp', 'image' => $images[ $key ] ?? 0 );
+				continue;
+			}
 			$figures[] = array(
 				'label' => $label, 'value' => self::verdict_word( (string) $entry['verdict'] ), 'note' => (string) ( $entry['summary'] ?? '' ),
 				'tone' => $tones[ (string) $entry['verdict'] ] ?? '', 'image' => $images[ $key ] ?? 0,

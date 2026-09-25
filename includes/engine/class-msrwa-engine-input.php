@@ -153,7 +153,10 @@ final class MSRWA_Engine_Input {
 	 * cooling rack and a serving board that appear in no step, and a final panel
 	 * browner than the photographs of the real dish.
 	 */
-	public static function visual_brief( $canonical, $research, $single = false, $garnish_rule = true ) {
+	public static function visual_brief( $canonical, $research, $single = false, $garnish_rule = true, $serving = '' ) {
+		// Led by a collage, how the dish is served is what its last panel shows,
+		// and a mise en place drawn before the recipe owes it no count (ENGINE.md §7, 50).
+		$led = '' !== trim( (string) $serving );
 		$countable = array( 'pièce', 'pièces', 'piece', 'pieces', 'rouleau', 'rouleaux', 'gousse', 'gousses', 'tranche', 'tranches', 'feuille', 'feuilles', 'branche', 'branches', 'oeuf', 'œuf', 'unité', 'unités', '' );
 		$counts = array();
 		$measured = array();
@@ -175,7 +178,7 @@ final class MSRWA_Engine_Input {
 		// One photograph of the finished dish has no mise en place and no panels:
 		// the counts stay, and the cookware and the display rules — a sixth of its
 		// prompt, billed at the image model's rate — do not travel with it.
-		if ( $counts && $single ) {
+		if ( $counts && ( $single || $led ) ) {
 			$lines[] = '• Countable ingredients, exact numbers: ' . implode( '; ', $counts ) . '.';
 		} elseif ( $counts ) {
 			$lines[] = '• Countable ingredients, exact numbers: ' . implode( '; ', $counts ) . '. Where a panel lays the ingredients out — the mise en place — show exactly these numbers, not one more pack, roll, fruit or egg "for composition". This binds the ingredient display only. A later panel showing the dish being made or served need not have them all in shot, and a few of the same fruit resting in the background of a finished shot is styling, not a miscount.';
@@ -186,7 +189,7 @@ final class MSRWA_Engine_Input {
 			$lines[] = '• Every other ingredient is measured, not counted: show a believable amount.';
 		}
 		$equipment = array_values( array_filter( array_map( 'trim', array_map( 'strval', (array) ( $canonical['equipment'] ?? array() ) ) ) ) );
-		if ( $equipment && ! $single ) {
+		if ( $equipment && ! $single && ! $led ) {
 			$lines[] = '• The cookware this recipe names: ' . implode( ', ', $equipment ) . '. These must be the ones actually used for the steps that need them, and in one colour and material throughout — the same tin in every panel it appears in. Ordinary kitchen things a cook obviously needs to perform a step are fine and expected: a board to peel on, a bowl to mix in, a spoon, a knife, a cloth. What is a defect is a support that changes how the finished dish is presented — a cooling rack, a board or a plate standing in for the serving vessel in the last panel alone, or a second tin of a different colour.';
 		}
 		$servings = (int) ( $canonical['servings'] ?? 0 );
@@ -226,7 +229,7 @@ final class MSRWA_Engine_Input {
 		// Every image is generated in its own call, so nothing makes them agree unless
 		// the same decision is written into both. Three refusals in four came from the
 		// featured photograph and the collage's last panel serving the dish differently.
-		$lines[] = '• ONE SERVING PRESENTATION, shared by every image of this recipe: ' . self::serving_presentation( $canonical, $research, true )
+		$lines[] = '• ONE SERVING PRESENTATION, shared by every image of this recipe: ' . ( $led ? trim( (string) $serving ) : self::serving_presentation( $canonical, $research, true ) )
 			. ( $observed ? ' At the colour the observations above record.' : '' )
 			. ' The featured photograph and the last panel of the collage show it that same way — same vessel, same colour: two photographs of one dish, minutes apart.';
 
@@ -582,7 +585,7 @@ final class MSRWA_Engine_Input {
 		$prompt = MSRWA_Prompt::compile( trim( file_get_contents( $file ) ), $settings ) . "\n\n"
 			. 'Recipe title: ' . (string) ( $canonical['title'] ?? $brief['title'] ) . "\n"
 			. 'Exact ingredients: ' . implode( ', ', $ingredients ) . "\n\n"
-			. self::visual_brief( $canonical, $research, 'featured' === $kind ) . "\n";
+			. self::visual_brief( $canonical, $research, 'featured' === $kind, true, self::collage_serving( $brief ) ) . "\n";
 
 		if ( 'facebook' === $kind ) {
 			$all_steps = array_values( (array) ( $canonical['steps'] ?? array() ) );
@@ -717,10 +720,21 @@ final class MSRWA_Engine_Input {
 			return $prompt . "\n\nIMAGES RECEIVED:\n" . ( '' !== $received ? $received : '- none.' )
 				. "\n\nCANONICAL RECIPE: " . $encode( $canonical )
 				. "\n\n" . self::visual_evidence( $research )
-				. "\n" . self::visual_brief( $canonical, $research, false, '' === (string) ( $brief['collage_lead'] ?? '' ) )
+				. "\n" . self::visual_brief( $canonical, $research, false, '' === (string) ( $brief['collage_lead'] ?? '' ), self::collage_serving( $brief ) )
 				. self::collage_lead( $brief, $step );
 		}
 		return $prompt;
+	}
+
+	/**
+	 * How the collage that leads the recipe serves the finished dish, as its
+	 * reading describes it; empty without a lead or a reading.
+	 */
+	public static function collage_serving( $brief ) {
+		if ( '' === (string) ( $brief['collage_lead'] ?? '' ) ) { return ''; }
+		$reading = (array) ( $brief['collage'] ?? array() );
+		$said = trim( trim( (string) ( $reading['serving'] ?? '' ) ) . ' ' . trim( (string) ( $reading['finished_dish'] ?? '' ) ) );
+		return '' === $said ? '' : 'as the last panel of the collage serves it — ' . $said . ' The featured photograph shows the same food served the same way; its plate or board, angle and light may differ, and a tart, gratin or cake may be shown in its baking dish or out of it.';
 	}
 
 	/**
@@ -737,7 +751,7 @@ final class MSRWA_Engine_Input {
 		$encoded = json_encode( $seen, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
 		if ( 'canonical_recipe' === $step ) {
 			return "\nTHE COLLAGE — this recipe is written from " . $whose . '. What it shows is the dish: ' . $encoded
-				. "\nEvery ingredient it shows, and every garnish and side it is served with, is in the recipe's ingredient list — a garnish as an ingredient \"pour servir\". A drink standing beside the plate is not an ingredient: it goes in the notes as what the dish is served with, unless a panel shows it going into the food. Its steps follow the order of the panels and its equipment names the vessels they show. This overrides any instruction to list only what the research names. What the collage never decides is how much: the quantities, times, temperatures and food-safety rules come from the research, and for an ingredient the research does not measure, the usual quantity a home cook would use. A collage shows a kitchen, not a weighing: never count what a panel shows.\n";
+				. "\nEvery ingredient it shows, and every garnish and side it is served with, is in the recipe's ingredient list — a garnish as an ingredient \"pour servir\". A drink standing beside the plate is not an ingredient: it goes in the notes as what the dish is served with, unless a panel shows it going into the food. Nor is a side that is a dish in its own right — a roast, a stew, another gratin, a dish that needs its own recipe: it too goes in the notes as what the dish is served with; a salad, bread, fresh herbs or a simple vegetable stay ingredients. Its steps follow the order of the panels and its equipment names the vessels they show. This overrides any instruction to list only what the research names. What the collage never decides is how much: the quantities, times, temperatures and food-safety rules come from the research, and for an ingredient the research does not measure, the usual quantity a home cook would use. A collage shows a kitchen, not a weighing: never count what a panel shows.\n";
 		}
 		if ( 'article' === $step ) {
 			return "\nTHE DISH AS ITS COLLAGE SHOWS IT — the recipe was written from " . $whose . ', and the article describes the same dish: '
@@ -748,7 +762,7 @@ final class MSRWA_Engine_Input {
 			if ( 'provided' === $lead ) {
 				return "\nTHE COLLAGE IS THE EDITOR'S OWN and is the reference this recipe was written from. Do not judge it: give it \"good\" with no finding. Judge the featured image, and whether it shows the same dish as the collage's last panel — same food, filling and colour; the plate, angle, light and garnish may differ.\n";
 			}
-			return "\nTHE COLLAGE WAS DRAWN FIRST, and the recipe was written from it. Judge the collage as a photograph and as a sequence (checks 1 and 4) — never against the ingredient list: every ingredient, herb, garnish, side, drink or prop a home cook would use is expected in it, and an ingredient the recipe lacks is not a finding. The featured image must show the same dish as the collage's last panel; the plate, angle, light and garnish may differ.\n";
+			return "\nTHE COLLAGE WAS DRAWN FIRST, and the recipe was written from it. Judge the collage as a photograph and as a sequence (checks 1 and 4) — never against the ingredient list: every ingredient, herb, garnish, side, drink or prop a home cook would use is expected in it, and an ingredient the recipe lacks is not a finding. Nothing in it is counted against the recipe either: how many eggs, figs or potatoes a panel shows is never a finding, since the recipe was measured after the collage was drawn. How the collage serves the finished dish — in its baking dish or out of it, on a plate or a board — is the recipe's presentation, never a defect. The featured image must show the same dish as the collage's last panel; the plate, angle, light and garnish may differ.\n";
 		}
 		return '';
 	}

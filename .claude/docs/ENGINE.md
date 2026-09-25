@@ -923,10 +923,23 @@ photograph, and otherwise use the photograph without the cost of a search.
     - The drawn collage's look (owner's request, 2026-09-25, collage-only
       tests against his ChatGPT collages): `facebook_compose_free.tpl.txt`
       now spells out what makes his collages look home-made — close framing
-      with the food filling each panel, light wood on white marble and a
-      checked linen towel, bright neutral daylight with no orange cast,
-      generous imperfect garnish, an abundant ingredients panel. The first
-      free version gave pale, distant, catalogue-like panels.
+      with the food filling each panel, light wood on marble and a checked
+      linen towel, soft and slightly subdued warm-neutral window light (a
+      bright version and an orange cast were both refused), natural
+      unedited colour in every panel with each food keeping its real colour
+      (the softer light first turned the meat grey), physical realism, one
+      cooking method from first panel to last, no object carrying numbers
+      such as a thermometer, generous imperfect garnish and an abundant
+      ingredients panel. The first free version gave pale, distant,
+      catalogue-like panels.
+    - What the judge holds a lead to (live runs 72–74, 2026-09-25: all three
+      refused, all three approved on the same images once fixed): the
+      serving presentation is the collage's, from its reading
+      (`collage_serving()`), not the research's vessel; the mise en place
+      of a collage drawn before the recipe owes no count; a consistency
+      finding against the editor's own collage targets the featured image,
+      so no redraw ever replaces it. A side that is a dish in its own right
+      (a roast beside a gratin) goes in the notes, not the ingredients.
 
 ### Still open
 
