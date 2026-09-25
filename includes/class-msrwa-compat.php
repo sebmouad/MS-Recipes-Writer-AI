@@ -23,6 +23,10 @@ final class MSRWA_Compat {
 	public static function unfit() {
 		return array(
 			'openai:gpt-5-nano' => array(
+				'canonical_recipe' => __( 'Mesuré le 25/09/2026 : sur trois recettes, il perd des ingrédients (sel, poivre, beurre à « 0 »), en invente un (muscade) et oublie la FAQ deux fois sur trois.', 'ms-recipes-writer-ai' ),
+				'article' => __( 'Mesuré le 25/09/2026 : 1 410 et 2 036 mots pour 2 400 demandés, sections de clôture vides ; deux articles sur trois échouent au contrôle de qualité.', 'ms-recipes-writer-ai' ),
+				'review' => __( 'Mesuré le 25/09/2026 : il réfléchit 13 000 à 15 000 jetons, coûte plus que GPT-5.6 Luna et relève 1 à 3 corrections là où Luna en relève 3 à 8.', 'ms-recipes-writer-ai' ),
+				'final_approval' => __( 'Mesuré le 25/09/2026 : en désaccord avec GPT-5.6 Luna sur deux recettes sur trois — il laisse passer un collage refusé et en refuse un approuvé — pour le même coût.', 'ms-recipes-writer-ai' ),
 				'research' => __( 'Mesuré le 23/09/2026 : il consacre toute sa réponse à réfléchir entre deux recherches et s’arrête au plafond (0/14). Avec un plafond de 32 000 jetons, 9/14 sans aucune photographie, pour 2,7 fois le coût de GPT-5.6 Luna.', 'ms-recipes-writer-ai' ),
 			),
 			'openai:gpt-5.4-mini' => array(

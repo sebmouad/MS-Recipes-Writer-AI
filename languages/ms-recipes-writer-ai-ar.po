@@ -2278,3 +2278,21 @@ msgstr "هذا النوع من الدفعات غير متاح للمحررين �
 
 msgid "Types de lot ouverts aux rédacteurs"
 msgstr "أنواع الدفعات المتاحة للمحررين"
+
+msgid "Les mêmes modèles là où les moins chers ont été mesurés insuffisants, un peu moins de réflexion pour la recherche et le contrôle final, les deux images en qualité basse."
+msgstr "النماذج نفسها حيث ثبت بالقياس أن الأرخص غير كافية، وتفكير أقل قليلًا للبحث والفحص النهائي، والصورتان بجودة منخفضة."
+
+msgid "Plus de réflexion pour la recherche, la relecture et le contrôle final, l’image à la une en qualité moyenne et le collage en haute qualité. Les modèles les plus chers coûteraient quatre fois plus pour un article à peine différent."
+msgstr "تفكير أكثر للبحث والمراجعة والفحص النهائي، والصورة الرئيسية بجودة متوسطة والملصق بجودة عالية. النماذج الأغلى ستكلف أربعة أضعاف لمقال لا يكاد يختلف."
+
+msgid "Mesuré le 25/09/2026 : sur trois recettes, il perd des ingrédients (sel, poivre, beurre à « 0 »), en invente un (muscade) et oublie la FAQ deux fois sur trois."
+msgstr "قيس في 25/09/2026: على ثلاث وصفات يُسقط مكونات (الملح، الفلفل، الزبدة بـ«0») ويخترع واحدًا (جوزة الطيب) وينسى الأسئلة الشائعة مرتين من ثلاث."
+
+msgid "Mesuré le 25/09/2026 : 1 410 et 2 036 mots pour 2 400 demandés, sections de clôture vides ; deux articles sur trois échouent au contrôle de qualité."
+msgstr "قيس في 25/09/2026: 1410 و2036 كلمة من أصل 2400 مطلوبة، وأقسام ختامية فارغة؛ مقالان من ثلاثة يفشلان في فحص الجودة."
+
+msgid "Mesuré le 25/09/2026 : il réfléchit 13 000 à 15 000 jetons, coûte plus que GPT-5.6 Luna et relève 1 à 3 corrections là où Luna en relève 3 à 8."
+msgstr "قيس في 25/09/2026: يفكر من 13000 إلى 15000 رمز، ويكلف أكثر من GPT-5.6 Luna ويرصد من 1 إلى 3 تصحيحات حيث يرصد Luna من 3 إلى 8."
+
+msgid "Mesuré le 25/09/2026 : en désaccord avec GPT-5.6 Luna sur deux recettes sur trois — il laisse passer un collage refusé et en refuse un approuvé — pour le même coût."
+msgstr "قيس في 25/09/2026: يختلف مع GPT-5.6 Luna في وصفتين من ثلاث — يمرر ملصقًا مرفوضًا ويرفض آخر مقبولًا — بالتكلفة نفسها."

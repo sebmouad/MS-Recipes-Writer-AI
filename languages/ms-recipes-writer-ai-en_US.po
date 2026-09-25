@@ -2234,3 +2234,21 @@ msgstr "This type of lot is not open to editors on this site. Choose another."
 
 msgid "Types de lot ouverts aux rédacteurs"
 msgstr "Types of lot open to editors"
+
+msgid "Les mêmes modèles là où les moins chers ont été mesurés insuffisants, un peu moins de réflexion pour la recherche et le contrôle final, les deux images en qualité basse."
+msgstr "The same models where the cheapest were measured unfit, a little less thinking for the research and the final check, both images at low quality."
+
+msgid "Plus de réflexion pour la recherche, la relecture et le contrôle final, l’image à la une en qualité moyenne et le collage en haute qualité. Les modèles les plus chers coûteraient quatre fois plus pour un article à peine différent."
+msgstr "More thinking for the research, the review and the final check, the featured image at medium quality and the collage at high quality. The most expensive models would cost four times as much for a barely different article."
+
+msgid "Mesuré le 25/09/2026 : sur trois recettes, il perd des ingrédients (sel, poivre, beurre à « 0 »), en invente un (muscade) et oublie la FAQ deux fois sur trois."
+msgstr "Measured 25/09/2026: over three recipes it drops ingredients (salt, pepper, butter at “0”), invents one (nutmeg) and leaves out the FAQ two times in three."
+
+msgid "Mesuré le 25/09/2026 : 1 410 et 2 036 mots pour 2 400 demandés, sections de clôture vides ; deux articles sur trois échouent au contrôle de qualité."
+msgstr "Measured 25/09/2026: 1,410 and 2,036 words for 2,400 asked, empty closing sections; two articles in three fail the quality check."
+
+msgid "Mesuré le 25/09/2026 : il réfléchit 13 000 à 15 000 jetons, coûte plus que GPT-5.6 Luna et relève 1 à 3 corrections là où Luna en relève 3 à 8."
+msgstr "Measured 25/09/2026: it thinks for 13,000 to 15,000 tokens, costs more than GPT-5.6 Luna and finds 1 to 3 corrections where Luna finds 3 to 8."
+
+msgid "Mesuré le 25/09/2026 : en désaccord avec GPT-5.6 Luna sur deux recettes sur trois — il laisse passer un collage refusé et en refuse un approuvé — pour le même coût."
+msgstr "Measured 25/09/2026: disagrees with GPT-5.6 Luna on two recipes in three — it passes a refused collage and refuses an approved one — for the same cost."

@@ -630,6 +630,11 @@ cost) in the task before changing anything.
   (2026-09-24).** The writer's photograph shows the prompt's writer the dish;
   the collage is drawn from the style reference. Real: the owner's own rôti
   photograph, drawn both ways. See ENGINE.md §7, item 40.
+- [x] **A53 — Content-quality presets from measurements (2026-09-25).**
+  GPT-5 Nano measured unfit for canonical_recipe, article, review and
+  final_approval (`MSRWA_Compat::unfit()`); economy ≈ $0.079 (images low,
+  less thinking on research and approval), premium ≈ $0.135 (more thinking,
+  better images). Real: three recipes per step, figures in the unfit notes.
 - [x] **A52 — Types of lot open to editors (2026-09-25).** Setting
   `editor_profiles`; `MSRWA_Profile::offered()` and `allowed()`; the compose
   form offers only those, `POST /batches` refuses the rest with 403;

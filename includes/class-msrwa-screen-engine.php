@@ -371,16 +371,22 @@ final class MSRWA_Screen_Engine {
 	private static function presets( MSRWA_Engine_Config $config, array $choices, array $current ) {
 		$defaults = MSRWA_Engine_Config::defaults();
 		$shipped_thinking = (array) ( $defaults['thinking'] ?? array() );
+		// Measured 2026-09-25: the cheapest model is unfit for every text step
+		// (MSRWA_Compat::unfit()), and less thinking on the review loses a third
+		// of its corrections. What economy can give up is image quality and some
+		// thinking where it was not missed; what premium can buy within a sane
+		// ceiling is thinking and image quality — the top model on the article
+		// and review alone costs $0.35 a recipe.
 		$plans = array(
-			'economy' => array( 'tier' => 'low', 'thinking' => 'low', 'featured' => 'low', 'facebook' => 'low',
+			'economy' => array( 'tier' => 'low', 'thinking' => array( 'research' => 'low', 'final_approval' => 'low' ), 'featured' => 'low', 'facebook' => 'low',
 				'label' => __( 'Économique', 'ms-recipes-writer-ai' ),
-				'note' => __( 'Les modèles les moins chers là où ils suffisent, peu de réflexion, images en qualité basse.', 'ms-recipes-writer-ai' ) ),
-			'standard' => array( 'tier' => 'medium', 'thinking' => null, 'featured' => (string) ( $defaults['images']['featured_quality'] ?? 'low' ), 'facebook' => (string) ( $defaults['images']['facebook_quality'] ?? 'medium' ),
+				'note' => __( 'Les mêmes modèles là où les moins chers ont été mesurés insuffisants, un peu moins de réflexion pour la recherche et le contrôle final, les deux images en qualité basse.', 'ms-recipes-writer-ai' ) ),
+			'standard' => array( 'tier' => 'medium', 'thinking' => array(), 'featured' => (string) ( $defaults['images']['featured_quality'] ?? 'low' ), 'facebook' => (string) ( $defaults['images']['facebook_quality'] ?? 'medium' ),
 				'label' => __( 'Standard', 'ms-recipes-writer-ai' ),
 				'note' => __( 'Les réglages livrés, mesurés : chaque recette approuvée, le meilleur rapport qualité-prix.', 'ms-recipes-writer-ai' ) ),
-			'premium' => array( 'tier' => 'high', 'thinking' => 'medium', 'featured' => 'medium', 'facebook' => 'high',
+			'premium' => array( 'tier' => 'medium', 'thinking' => array( 'research' => 'high', 'review' => 'high', 'final_approval' => 'high' ), 'featured' => 'medium', 'facebook' => 'high',
 				'label' => __( 'Premium', 'ms-recipes-writer-ai' ),
-				'note' => __( 'Les modèles les plus avancés, plus de réflexion, images en haute qualité.', 'ms-recipes-writer-ai' ) ),
+				'note' => __( 'Plus de réflexion pour la recherche, la relecture et le contrôle final, l’image à la une en qualité moyenne et le collage en haute qualité. Les modèles les plus chers coûteraient quatre fois plus pour un article à peine différent.', 'ms-recipes-writer-ai' ) ),
 		);
 		$out = array();
 		foreach ( $plans as $name => $plan ) {
@@ -405,7 +411,7 @@ final class MSRWA_Screen_Engine {
 					if ( isset( $offered[ $tier ] ) && ! $blocked( $offered[ $tier ] ) ) { $pick = $offered[ $tier ]; break; }
 				}
 				$routing[ $key ] = '' !== $pick ? $pick : (string) ( $defaults['routing'][ $key ] ?? $route );
-				$thinking[ $key ] = null === $plan['thinking'] ? (string) ( $shipped_thinking[ $key ] ?? '' ) : $plan['thinking'];
+				$thinking[ $key ] = (string) ( $plan['thinking'][ $key ] ?? $shipped_thinking[ $key ] ?? '' );
 			}
 			$quality = array( 'featured_image' => $plan['featured'], 'facebook_image' => $plan['facebook'] );
 			$overrides = array(

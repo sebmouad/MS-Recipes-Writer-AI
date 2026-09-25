@@ -1303,20 +1303,16 @@ msgstr ""
 msgid "Les clés, et l’état de ce qui fait avancer le travail."
 msgstr ""
 
-#: class-msrwa-screen-engine.php:377
-msgid "Les modèles les moins chers là où ils suffisent, peu de réflexion, images en qualité basse."
-msgstr ""
-
-#: class-msrwa-screen-engine.php:383
-msgid "Les modèles les plus avancés, plus de réflexion, images en haute qualité."
-msgstr ""
-
 #: class-msrwa-screen-engine.php:131
 msgid "Les modèles proposés ci-dessus sont ceux de l’écran Modèles : ceux qui y sont activés, avec leurs tarifs et les étapes qu’ils ont le droit de servir. Un modèle désactivé ou retiré d’une étape là-bas est grisé ici, avec la raison."
 msgstr ""
 
 #: class-msrwa-screen-diagnostics.php:51
 msgid "Les mêmes constats en un bloc, à coller dans une demande d’aide. Il ne porte ni clé, ni chemin, ni adresse du site."
+msgstr ""
+
+#: class-msrwa-screen-engine.php:383
+msgid "Les mêmes modèles là où les moins chers ont été mesurés insuffisants, un peu moins de réflexion pour la recherche et le contrôle final, les deux images en qualité basse."
 msgstr ""
 
 #: class-msrwa-screen-compose.php:41
@@ -1343,7 +1339,7 @@ msgstr ""
 msgid "Les recettes seront écrites d’après les références trouvées sur le web."
 msgstr ""
 
-#: class-msrwa-screen-engine.php:380
+#: class-msrwa-screen-engine.php:386
 msgid "Les réglages livrés, mesurés : chaque recette approuvée, le meilleur rapport qualité-prix."
 msgstr ""
 
@@ -1435,12 +1431,28 @@ msgstr ""
 msgid "MS Recipes AI — à vérifier avant publication"
 msgstr ""
 
-#: class-msrwa-compat.php:29
+#: class-msrwa-compat.php:33
 msgid "Mesuré le 23/09/2026 : coupé au plafond sans réponse (0/14), pour 0,11 $."
 msgstr ""
 
-#: class-msrwa-compat.php:26
+#: class-msrwa-compat.php:30
 msgid "Mesuré le 23/09/2026 : il consacre toute sa réponse à réfléchir entre deux recherches et s’arrête au plafond (0/14). Avec un plafond de 32 000 jetons, 9/14 sans aucune photographie, pour 2,7 fois le coût de GPT-5.6 Luna."
+msgstr ""
+
+#: class-msrwa-compat.php:27
+msgid "Mesuré le 25/09/2026 : 1 410 et 2 036 mots pour 2 400 demandés, sections de clôture vides ; deux articles sur trois échouent au contrôle de qualité."
+msgstr ""
+
+#: class-msrwa-compat.php:29
+msgid "Mesuré le 25/09/2026 : en désaccord avec GPT-5.6 Luna sur deux recettes sur trois — il laisse passer un collage refusé et en refuse un approuvé — pour le même coût."
+msgstr ""
+
+#: class-msrwa-compat.php:28
+msgid "Mesuré le 25/09/2026 : il réfléchit 13 000 à 15 000 jetons, coûte plus que GPT-5.6 Luna et relève 1 à 3 corrections là où Luna en relève 3 à 8."
+msgstr ""
+
+#: class-msrwa-compat.php:26
+msgid "Mesuré le 25/09/2026 : sur trois recettes, il perd des ingrédients (sel, poivre, beurre à « 0 »), en invente un (muscade) et oublie la FAQ deux fois sur trois."
 msgstr ""
 
 #: class-msrwa-screen-models.php:66
@@ -1659,6 +1671,10 @@ msgstr ""
 msgid "Plat non reconnu"
 msgstr ""
 
+#: class-msrwa-screen-engine.php:389
+msgid "Plus de réflexion pour la recherche, la relecture et le contrôle final, l’image à la une en qualité moyenne et le collage en haute qualité. Les modèles les plus chers coûteraient quatre fois plus pour un article à peine différent."
+msgstr ""
+
 #: class-msrwa-diagnostics.php:273
 msgid "Plus rien ne les lit. Elles ne sont jamais supprimées d’ici : c’est à vous, une fois la sauvegarde faite."
 msgstr ""
@@ -1683,7 +1699,7 @@ msgstr ""
 msgid "Pour les deux images, qui ne réfléchissent pas : le niveau de détail du rendu, qui en fixe le prix."
 msgstr ""
 
-#: class-msrwa-screen-engine.php:382
+#: class-msrwa-screen-engine.php:388
 msgid "Premium"
 msgstr ""
 
@@ -2035,7 +2051,7 @@ msgstr ""
 msgid "Sortie $/M"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:379
+#: class-msrwa-screen-engine.php:385
 msgid "Standard"
 msgstr ""
 
@@ -2385,7 +2401,7 @@ msgstr ""
 msgid "aucun modèle disponible n’a pu lire la page du fournisseur"
 msgstr ""
 
-#: class-msrwa-compat.php:69
+#: class-msrwa-compat.php:73
 msgid "aucun modèle ne répond à ce choix"
 msgstr ""
 
@@ -2461,11 +2477,11 @@ msgstr ""
 msgid "brouillons prêts"
 msgstr ""
 
-#: class-msrwa-compat.php:78
+#: class-msrwa-compat.php:82
 msgid "ce modèle ne sait pas %s, ce que cette étape demande"
 msgstr ""
 
-#: class-msrwa-compat.php:52
+#: class-msrwa-compat.php:56
 msgid "chercher sur le web"
 msgstr ""
 
@@ -2517,7 +2533,7 @@ msgstr ""
 msgid "cron"
 msgstr ""
 
-#: class-msrwa-compat.php:54
+#: class-msrwa-compat.php:58
 msgid "dessiner des images"
 msgstr ""
 
@@ -2537,7 +2553,7 @@ msgstr ""
 msgid "dépensé"
 msgstr ""
 
-#: class-msrwa-compat.php:88
+#: class-msrwa-compat.php:92
 msgid "désactivé sur l’écran Modèles"
 msgstr ""
 
@@ -2641,7 +2657,7 @@ msgstr ""
 msgid "le serveur"
 msgstr ""
 
-#: class-msrwa-compat.php:53
+#: class-msrwa-compat.php:57
 msgid "lire des images"
 msgstr ""
 
@@ -2769,7 +2785,7 @@ msgstr ""
 msgid "remarques"
 msgstr ""
 
-#: class-msrwa-compat.php:93
+#: class-msrwa-compat.php:97
 msgid "retiré de cette étape sur l’écran Modèles"
 msgstr ""
 
@@ -2781,11 +2797,11 @@ msgstr ""
 msgid "rien de coché : aucune restriction"
 msgstr ""
 
-#: class-msrwa-compat.php:82
+#: class-msrwa-compat.php:86
 msgid "rien n’établit que ce modèle sait %s, ce que cette étape demande"
 msgstr ""
 
-#: class-msrwa-compat.php:51
+#: class-msrwa-compat.php:55
 msgid "rédiger du texte"
 msgstr ""
 
@@ -2869,7 +2885,7 @@ msgstr ""
 msgid "Échecs"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:376
+#: class-msrwa-screen-engine.php:382
 msgid "Économique"
 msgstr ""
 
