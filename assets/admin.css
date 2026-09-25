@@ -157,6 +157,7 @@
 .ms-ticket-live { border-inline-start-color: var(--ms-lamp); }
 .ms-ticket-done { border-inline-start-color: var(--ms-good); }
 .ms-ticket-stop { border-inline-start-color: var(--ms-stop); }
+.ms-ticket-warn { border-inline-start-color: var(--ms-warn); }
 
 .ms-ticket-title { grid-column: 1; grid-row: 1; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; min-width: 0; }
 .ms-ticket-no { font-family: var(--ms-mono); font-size: 12px; font-weight: 600; color: var(--ms-lamp); letter-spacing: .02em; }
@@ -223,6 +224,8 @@
 .ms-table td.ms-num, .ms-table th.ms-num { text-align: end; font-family: var(--ms-mono); font-variant-numeric: tabular-nums; }
 .ms-table .ms-key { font-family: var(--ms-mono); font-size: 12px; color: var(--ms-ink-soft); }
 .ms-table small { display: block; color: var(--ms-ink-soft); margin-block-start: 3px; }
+.ms-table tr.ms-row-quiet td { background: var(--ms-sunk); color: var(--ms-ink-soft); }
+.ms-table tr.ms-row-total td { border-block-start: 2px solid var(--ms-line); font-weight: 700; background: var(--ms-sunk); }
 
 /* A label, a bar and its figures. The bar takes whatever the figures leave. */
 .ms-share td { vertical-align: middle; }
@@ -622,3 +625,34 @@
 .ms-style-list { display: flex; flex-wrap: wrap; gap: 16px; margin: 8px 0 12px; }
 .ms-style-item img { display: block; max-width: 100%; height: auto; border: 1px solid var(--ms-line); border-radius: var(--ms-radius); }
 .ms-style-item p { margin: 6px 0 0; }
+
+/* A figure coloured as it reads: a verdict the judge gave, with the image it judged. */
+.ms-figure-good { box-shadow: inset 0 var(--ms-rail) 0 var(--ms-good); }
+.ms-figure-good dd { color: var(--ms-good); }
+.ms-figure-warn { box-shadow: inset 0 var(--ms-rail) 0 var(--ms-lamp); background: var(--ms-warn-soft); }
+.ms-figure-warn dd { color: var(--ms-warn); }
+.ms-figure-stop { box-shadow: inset 0 var(--ms-rail) 0 var(--ms-stop); background: var(--ms-stop-soft); }
+.ms-figure-stop dd { color: var(--ms-stop); }
+.ms-figure-image { margin: 0 0 12px; }
+.ms-figure-image img { display: block; inline-size: 100%; max-inline-size: 220px; block-size: auto; aspect-ratio: auto; border-radius: var(--ms-radius); border: 1px solid var(--ms-line); }
+
+/* Each step's share of what the recipe cost. */
+.ms-costbar { display: block; block-size: 4px; margin-block-start: 6px; margin-inline-start: auto; inline-size: 100%; max-inline-size: 90px; border-radius: 2px; background: linear-gradient(to left, var(--ms-lamp) var(--share), var(--ms-line-soft) var(--share)); }
+[dir="rtl"] .ms-costbar { background: linear-gradient(to right, var(--ms-lamp) var(--share), var(--ms-line-soft) var(--share)); }
+.ms-table tr.ms-row-failed td { background: var(--ms-stop-soft); }
+.ms-table td.ms-num .ms-state { justify-content: center; }
+
+/* A section that folds, its heading kept in the summary. */
+.ms-fold > summary { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; cursor: pointer; list-style: none; padding: 18px 20px; }
+.ms-fold > summary::-webkit-details-marker { display: none; }
+.ms-fold > summary::before { content: "+"; font-weight: 700; color: var(--ms-lamp); inline-size: 1em; }
+.ms-fold[open] > summary::before { content: "–"; }
+.ms-fold > summary h2 { margin: 0; }
+
+/* The timeline tells the story; the plumbing waits behind a toggle. */
+.ms-timeline-all { position: absolute; opacity: 0; pointer-events: none; }
+.ms-timeline-toggle { margin-block-end: 10px; }
+.ms-timeline-all:checked + .ms-timeline-toggle { background: var(--ms-sunk); }
+.ms-timeline-all:focus-visible + .ms-timeline-toggle { outline: 2px solid var(--ms-lamp); outline-offset: 2px; }
+.ms-timeline .ms-ev-attempt, .ms-timeline .ms-ev-input, .ms-timeline .ms-ev-call, .ms-timeline .ms-ev-config, .ms-timeline .ms-ev-start { display: none; }
+.ms-timeline-all:checked ~ .ms-timeline .ms-ev-attempt, .ms-timeline-all:checked ~ .ms-timeline .ms-ev-input, .ms-timeline-all:checked ~ .ms-timeline .ms-ev-call, .ms-timeline-all:checked ~ .ms-timeline .ms-ev-config, .ms-timeline-all:checked ~ .ms-timeline .ms-ev-start { display: grid; }

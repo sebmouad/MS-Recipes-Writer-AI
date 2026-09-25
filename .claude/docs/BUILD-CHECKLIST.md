@@ -630,6 +630,12 @@ cost) in the task before changing anything.
   (2026-09-24).** The writer's photograph shows the prompt's writer the dish;
   the collage is drawn from the style reference. Real: the owner's own rôti
   photograph, drawn both ways. See ENGINE.md §7, item 40.
+- [x] **A51 — Spending log and cost reconciliation (2026-09-25).**
+  `msrwa_spend`, backfilled and reconciled on the test site ($6.8272 =
+  $6.8087 of recipes + $0.0185 of pairings); ceilings and 30-day spend read
+  it; call tables add up; run and analysis screens restyled. Real: lot #80
+  wrote its pairing and four step lines, $0.0232 = run $0.0224 + pairing
+  $0.0008. `tests/test-spend.php`. ARCHITECTURE invariant 26.
 - [x] **A50 — Full audit (2026-09-25).** Security (SQL, rights, nonces,
   escaping, downloads), every screen for both roles in three languages at
   1280 and 390 px, the site's real tests (site, upload, flow). Fixed: the

@@ -30,7 +30,12 @@ final class MSRWA_Screen_Analysis {
 
 		MSRWA_UI::figures( array(
 			array( 'label' => __( 'recettes', 'ms-recipes-writer-ai' ), 'value' => number_format_i18n( $spend['runs'] ) ),
-			array( 'label' => __( 'dépense', 'ms-recipes-writer-ai' ), 'value' => MSRWA_I18N::money( $spend['spend_usd'], 2 ), 'note' => self::ceiling_note( $days ) ),
+			array(
+				'label' => __( 'dépense', 'ms-recipes-writer-ai' ), 'value' => MSRWA_I18N::money( $spend['spend_usd'], 2 ),
+				'note' => trim( self::ceiling_note( $days ) . ' ' . ( $spend['matching_usd'] > 0
+					/* translators: %s is an amount of money. */
+					? sprintf( __( 'Dont %s pour lire et apparier les photographies des lots.', 'ms-recipes-writer-ai' ), MSRWA_I18N::money( $spend['matching_usd'], 2 ) ) : '' ) ),
+			),
 			array(
 				'label' => __( 'par recette', 'ms-recipes-writer-ai' ),
 				'value' => MSRWA_I18N::money( $spend['average_usd'] ),
@@ -55,7 +60,7 @@ final class MSRWA_Screen_Analysis {
 
 		self::verdicts( $verdicts );
 		self::steps( $days );
-		self::models( $days );
+		self::models( $days, (float) $spend['spend_usd'] );
 		self::checks( $days );
 		self::days();
 
@@ -172,9 +177,15 @@ final class MSRWA_Screen_Analysis {
 
 		if ( $verdicts['targets'] ) {
 			echo '<table class="ms-table" style="margin-top:16px"><thead><tr><th>' . esc_html__( 'Artefact', 'ms-recipes-writer-ai' ) . '</th><th>' . esc_html__( 'Verdicts', 'ms-recipes-writer-ai' ) . '</th></tr></thead><tbody>';
+			$targets = array(
+				'article' => __( 'article', 'ms-recipes-writer-ai' ), 'featured_image' => __( 'image à la une', 'ms-recipes-writer-ai' ),
+				'facebook_image' => __( 'collage', 'ms-recipes-writer-ai' ), 'consistency' => __( 'cohérence', 'ms-recipes-writer-ai' ),
+			);
 			foreach ( $verdicts['targets'] as $target => $counts ) {
-				echo '<tr><td class="ms-key">' . esc_html( $target ) . '</td><td>';
-				foreach ( $counts as $verdict => $count ) { echo '<span class="ms-state">' . esc_html( $verdict . ' × ' . $count ) . '</span> '; }
+				echo '<tr><td>' . esc_html( $targets[ $target ] ?? $target ) . '</td><td>';
+				// Good first, then reservations, then refusals: read left to right.
+				uksort( $counts, static function ( $a, $b ) { $order = array( 'good' => 0, 'reservations' => 1, 'bad' => 2 ); return ( $order[ $a ] ?? 3 ) <=> ( $order[ $b ] ?? 3 ); } );
+				foreach ( $counts as $verdict => $count ) { echo '<span class="ms-state ms-state-' . esc_attr( MSRWA_UI::verdict_tone( (string) $verdict ) ) . '">' . esc_html( MSRWA_UI::verdict_word( (string) $verdict ) . ' × ' . $count ) . '</span> '; }
 				echo '</td></tr>';
 			}
 			echo '</tbody></table>';
@@ -198,7 +209,7 @@ final class MSRWA_Screen_Analysis {
 			. '<th class="ms-num">' . esc_html__( 'Échecs', 'ms-recipes-writer-ai' ) . '</th>'
 			. '</tr></thead><tbody>';
 		foreach ( $rows as $row ) {
-			echo '<tr><td><strong>' . esc_html( $row['step'] ) . '</strong><small>' . esc_html( $row['bucket'] ) . '</small></td>'
+			echo '<tr><td><strong>' . esc_html( MSRWA_UI::step_name( (string) $row['step'] ) ) . '</strong> <span class="ms-key">' . esc_html( $row['step'] ) . '</span></td>'
 				. '<td class="ms-num">' . esc_html( $row['runs'] ) . '</td>'
 				. '<td class="ms-num">' . esc_html( MSRWA_I18N::seconds( $row['seconds'] ) ) . '</td>'
 				. '<td class="ms-num">' . esc_html( null === $row['cost'] ? '—' : MSRWA_I18N::money( $row['cost'] ) ) . '</td>'
@@ -211,8 +222,9 @@ final class MSRWA_Screen_Analysis {
 		echo '</tbody></table></div></section>';
 	}
 
-	private static function models( $days ) {
+	private static function models( $days, $spent = 0.0 ) {
 		$rows = MSRWA_Ledger::by_model( $days );
+		$itemised = 0.0;
 		if ( ! $rows ) { return; }
 		echo '<section class="ms-card ms-card-flush"><h2>' . esc_html__( 'Par modèle', 'ms-recipes-writer-ai' ) . '</h2>';
 		echo '<p>' . esc_html__( 'Ce qui a réellement été facturé, et quelle part de l’entrée le fournisseur a servie depuis son cache.', 'ms-recipes-writer-ai' ) . '</p>';
@@ -234,7 +246,16 @@ final class MSRWA_Screen_Analysis {
 				. '<td class="ms-num">' . esc_html( number_format_i18n( (int) $row['output_tokens'] ) ) . '</td>'
 				. '<td class="ms-num">' . esc_html( MSRWA_I18N::money( $row['spend'], 2 ) ) . '</td>'
 				. '<td class="ms-num">' . esc_html( $row['unpriced'] ? $row['unpriced'] : '—' ) . '</td></tr>';
+			$itemised += (float) $row['spend'];
 		}
+		// What no call row carries — the research reading the photographs it
+		// cites, a lot pairing its photographs — so the table adds up to the
+		// spend above instead of falling a little short of it.
+		$rest = $spent - $itemised;
+		if ( $rest > 0.005 ) {
+			echo '<tr class="ms-row-quiet"><td colspan="5"><small>' . esc_html__( 'Hors appels détaillés : lecture des photographies citées par la recherche, appariement des photographies des lots', 'ms-recipes-writer-ai' ) . '</small></td><td class="ms-num">' . esc_html( MSRWA_I18N::money( $rest, 2 ) ) . '</td><td></td></tr>';
+		}
+		echo '<tr class="ms-row-total"><td colspan="5">' . esc_html__( 'Total', 'ms-recipes-writer-ai' ) . '</td><td class="ms-num">' . esc_html( MSRWA_I18N::money( max( $spent, $itemised ), 2 ) ) . '</td><td></td></tr>';
 		echo '</tbody></table></div></section>';
 	}
 
@@ -248,7 +269,7 @@ final class MSRWA_Screen_Analysis {
 			. '<th class="ms-num">' . esc_html__( 'Échecs', 'ms-recipes-writer-ai' ) . '</th><th class="ms-num">' . esc_html__( 'Sur', 'ms-recipes-writer-ai' ) . '</th>'
 			. '<th class="ms-num">' . esc_html__( 'Taux', 'ms-recipes-writer-ai' ) . '</th></tr></thead><tbody>';
 		foreach ( $rows as $row ) {
-			echo '<tr><td>' . esc_html( $row['step'] ) . '</td><td class="ms-key">' . esc_html( $row['check'] ) . '</td>'
+			echo '<tr><td>' . esc_html( MSRWA_UI::step_name( (string) $row['step'] ) ) . '</td><td class="ms-key">' . esc_html( $row['check'] ) . '</td>'
 				. '<td class="ms-num">' . esc_html( $row['failed'] ) . '</td><td class="ms-num">' . esc_html( $row['seen'] ) . '</td>'
 				. '<td class="ms-num">' . esc_html( round( 100 * $row['failed'] / max( 1, $row['seen'] ) ) . ' %' ) . '</td></tr>';
 		}

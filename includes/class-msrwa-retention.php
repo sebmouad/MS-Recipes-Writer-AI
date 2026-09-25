@@ -65,6 +65,7 @@ final class MSRWA_Retention {
 			'artifacts' => self::artifacts( $policy['artifacts'] ) + self::history( $policy['artifacts'] ),
 			'runs' => self::runs( $policy['runs'] ),
 		);
+		if ( class_exists( 'MSRWA_Spend' ) && MSRWA_DB::table_exists( MSRWA_DB::tables()['spend'] ) ) { MSRWA_Spend::prune(); }
 		// Written down every time, including when it took nothing: "ran an hour
 		// ago and found nothing to remove" and "has not run since March" look
 		// identical on screen otherwise.

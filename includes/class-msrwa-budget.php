@@ -37,17 +37,11 @@ final class MSRWA_Budget {
 	 * refused.
 	 */
 	public static function spent() {
-		global $wpdb;
-		$t = MSRWA_DB::tables();
-		$row = $wpdb->get_row(
-			"SELECT
-				COALESCE(SUM(CASE WHEN created_at >= DATE_SUB(UTC_TIMESTAMP(), INTERVAL 1 DAY) THEN cost_usd END), 0) day,
-				COALESCE(SUM(CASE WHEN created_at >= DATE_SUB(UTC_TIMESTAMP(), INTERVAL 30 DAY) THEN cost_usd END), 0) month
-			FROM {$t['runs']}", ARRAY_A );
-
+		// Every amount on the day it was spent, lot pairings and redraws
+		// included, and still counted after its lot is deleted.
 		return array(
-			'daily' => round( (float) ( $row['day'] ?? 0 ), 6 ),
-			'monthly' => round( (float) ( $row['month'] ?? 0 ), 6 ),
+			'daily' => MSRWA_Spend::window( 1 )['spend_usd'],
+			'monthly' => MSRWA_Spend::window( 30 )['spend_usd'],
 		);
 	}
 

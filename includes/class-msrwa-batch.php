@@ -57,6 +57,9 @@ final class MSRWA_Batch {
 		) );
 		$match = MSRWA_Match::run( $recipes, $images, self::engine_config( self::config_overrides( $id ) ), MSRWA_Sources::lot_dir( $id ) );
 		$recipes = $match['recipes'];
+		// Counted before anything else can happen to the lot: a lot in which no
+		// dish is recognised is deleted, and what reading it cost is not.
+		MSRWA_Spend::matching( get_current_user_id(), $id, (float) $match['cost_usd'] );
 		MSRWA_History::lot( $id, 'matching', array(
 			'readings' => array_map( static function ( $image ) { return array( 'file' => $image['id'], 'dish' => $image['dish'] ?? '', 'description' => $image['describes'] ?? '', 'observation' => $image['observation'] ?? array() ); }, $match['images'] ),
 			'recipes' => $recipes, 'pairs' => $match['pairs'], 'reasoning' => $match['reasoning'],

@@ -120,7 +120,8 @@ attached to the wrong dish, which would illustrate a whole article.
 
 ## Data model
 
-Six tables, all prefixed `wp_msrwa_`.
+Nine tables, all prefixed `wp_msrwa_` (the catalogue, the history and the
+spending log are described where they are used; the six below are a run's).
 
 | table | one row per | holds |
 |---|---|---|
@@ -130,6 +131,7 @@ Six tables, all prefixed `wp_msrwa_`.
 | `calls` | provider call | endpoint, tier, tokens, cached share, price |
 | `events` | thing that happened | the timeline |
 | `artifacts` | named output | what the engine produced |
+| `spend` | amount spent | owner, lot, run, step (or `matching`), cost, the day it was spent |
 
 Rows rather than one JSON blob per run, deliberately: a blob answers *what
 happened in run twelve*, rows answer *what the review costs across every run*,
@@ -438,3 +440,16 @@ Break these and the plugin misreports itself.
     until the writer pairs it, names a new recipe for it or sets it aside
     (`set_aside`). A recipe named after photographs that were all set aside is
     not sent.
+
+26. **The ceilings count every amount on the day it was spent.** Every priced
+    step and every lot's photograph pairing writes a line to `msrwa_spend`
+    (`MSRWA_Spend`), which deleting a lot or a recipe does not touch and
+    retention clears after 400 days. `MSRWA_Budget::spent()` and the 30-day
+    spend on the pass and in the analysis read it, scoped to the reader where
+    a screen is. Summed from the runs, a lot's pairing was never counted, a
+    redraw counted on its recipe's creation day, and a deleted lot gave its
+    money back to the day's ceiling. The average per recipe is a finished
+    recipe's. Where a step spent more than its itemised calls — the research
+    reading the photographs it cites — the call tables show the difference as
+    its own line, so they add up to the total.
+

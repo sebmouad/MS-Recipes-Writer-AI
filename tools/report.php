@@ -631,7 +631,7 @@ function report_configuration( $config ) {
  * went each way, how many the provider served from its own cache, and what it
  * cost. A bill that surprises somebody is explained from this table.
  */
-function report_calls( $events ) {
+function report_calls( $events, $steps = array() ) {
 	$rows = '';
 	foreach ( (array) $events as $event ) {
 		if ( 'call' !== $event['kind'] ) { continue; }
@@ -650,6 +650,22 @@ function report_calls( $events ) {
 			. '</tr>';
 	}
 	if ( '' === $rows ) { return '<p class="muted">Aucun appel fournisseur n’a été enregistré pour ce passage.</p>'; }
+	// A step can spend more than its itemised calls: the research reads the
+	// photographs it cites with calls of their own, billed to it without a
+	// line here. The difference is shown, so the table adds up to the total.
+	$billed = array();
+	foreach ( (array) $events as $event ) {
+		if ( 'call' === ( $event['kind'] ?? '' ) ) { $billed[ $event['step'] ] = ( $billed[ $event['step'] ] ?? 0.0 ) + (float) ( $event['data']['cost_usd'] ?? 0 ); }
+	}
+	$total = array_sum( $billed );
+	foreach ( (array) $steps as $step ) {
+		$gap = (float) ( $step['cost_usd'] ?? 0 ) - ( $billed[ $step['step'] ] ?? 0.0 );
+		$billed[ $step['step'] ] = max( 0.0, -$gap );
+		if ( $gap < 0.00001 ) { continue; }
+		$total += $gap;
+		$rows .= '<tr class="unitemised"><td data-label="Étape">' . report_h( $step['step'] ) . '</td><td data-label="Modèle" colspan="6" class="muted">' . report_h( 'research' === $step['step'] ? 'Lecture des photographies citées, comptée dans la recherche' : 'Part de l’étape sans appel détaillé' ) . '</td><td data-label="Coût">$' . number_format( $gap, 4 ) . '</td></tr>';
+	}
+	$rows .= '<tr class="total"><td data-label="Total" colspan="7"><strong>Total</strong></td><td data-label="Coût"><strong>$' . number_format( $total, 4 ) . '</strong></td></tr>';
 	return '<div class="table-wrap"><table><thead><tr><th>Étape</th><th>Modèle</th><th>Point d’accès</th><th>Temps</th><th>Entrée</th><th>Depuis le cache</th><th>Sortie</th><th>Coût</th></tr></thead><tbody>' . $rows . '</tbody></table></div>';
 }
 
@@ -821,7 +837,7 @@ function report_render( array $run ) {
 
 		. $section( 'Contrôles, étape par étape', '<p class="muted">Chaque vérification qu’une étape a passée, avec ce qu’elle a mesuré. Un score se lit, il ne se croit pas.</p>' . report_scorecards( $run['steps'] ?? array() ), 'controles', false )
 
-		. $section( 'Appels aux fournisseurs', '<p class="muted">Ce que chaque appel a réellement fait. Les coûts sont des estimations calculées avec les tarifs configurés, jamais une facture.</p>' . report_calls( $run['events'] ?? array() ), 'appels', false )
+		. $section( 'Appels aux fournisseurs', '<p class="muted">Ce que chaque appel a réellement fait. Les coûts sont des estimations calculées avec les tarifs configurés, jamais une facture.</p>' . report_calls( $run['events'] ?? array(), $run['steps'] ?? array() ), 'appels', false )
 
 		. $section( 'Ce que chaque étape a reçu', '<p class="muted">D’où venait son prompt, sa taille, son plafond de sortie et les artefacts qui l’accompagnaient.</p>' . report_fold( 'Ouvrir le détail des entrées', report_inputs( $run['events'] ?? array() ) ), 'entrees', false )
 

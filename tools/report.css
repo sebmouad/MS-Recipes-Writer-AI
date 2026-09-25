@@ -126,3 +126,6 @@ td[data-label="Modèle"]{white-space:nowrap}
 .tl-all:checked~.timeline .ev-detail{display:grid}
 @media(max-width:640px){.ev{grid-template-columns:54px auto minmax(0,1fr)}.ev-msg{grid-column:1/-1}.toc{padding-inline:18px}}
 @media(max-width:640px){.summary-grid{grid-template-columns:1fr 1fr;gap:10px}.summary-grid .card{padding:12px}}
+
+tr.unitemised td{background:#fbf7f1}
+tr.total td{border-top:2px solid var(--line);background:#f8f1eb}

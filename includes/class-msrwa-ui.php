@@ -60,12 +60,30 @@ final class MSRWA_UI {
 	public static function figures( array $figures ) {
 		echo '<dl class="ms-figures">';
 		foreach ( $figures as $entry ) {
-			echo '<div class="ms-figure"><dt>' . esc_html( $entry['label'] ) . '</dt><dd>' . esc_html( $entry['value'] );
+			// A tone colours the figure the way the states are coloured; an image
+			// shows what the figure is about, above what was said of it.
+			$tone = in_array( $entry['tone'] ?? '', array( 'good', 'warn', 'stop', 'live' ), true ) ? $entry['tone'] : '';
+			echo '<div class="ms-figure' . ( '' !== $tone ? ' ms-figure-' . esc_attr( $tone ) : '' ) . '"><dt>' . esc_html( $entry['label'] ) . '</dt>';
+			if ( ! empty( $entry['image'] ) ) { echo '<div class="ms-figure-image">' . wp_get_attachment_image( (int) $entry['image'], 'medium' ) . '</div>'; }
+			echo '<dd>' . esc_html( $entry['value'] );
 			if ( ! empty( $entry['note'] ) ) { echo '<small>' . esc_html( $entry['note'] ) . '</small>'; }
 			echo '</dd></div>';
 		}
 		echo '</dl>';
 	}
+
+	/** The judge's word for an image, in the reader's language. */
+	public static function verdict_word( $verdict ) {
+		$words = array(
+			'good' => __( 'bon', 'ms-recipes-writer-ai' ),
+			'reservations' => __( 'réserves', 'ms-recipes-writer-ai' ),
+			'bad' => __( 'mauvais', 'ms-recipes-writer-ai' ),
+		);
+		return $words[ $verdict ] ?? $verdict;
+	}
+
+	/** How a verdict is coloured, the way the states are. */
+	public static function verdict_tone( $verdict ) { return array( 'good' => 'good', 'reservations' => 'warn', 'bad' => 'stop' )[ $verdict ] ?? ''; }
 
 	/**
 	 * What a run's state is called, and how it reads.
@@ -217,7 +235,7 @@ final class MSRWA_UI {
 	 */
 	public static function ticket( array $run, $url, $selectable = false ) {
 		$state = self::state_of( $run );
-		$spine = in_array( $state['tone'], array( 'live' ), true ) ? 'live' : ( 'stop' === $state['tone'] ? 'stop' : ( 'good' === $state['tone'] ? 'done' : '' ) );
+		$spine = in_array( $state['tone'], array( 'live' ), true ) ? 'live' : ( 'stop' === $state['tone'] ? 'stop' : ( 'good' === $state['tone'] ? 'done' : ( 'warn' === $state['tone'] ? 'warn' : '' ) ) );
 		?>
 		<article class="ms-ticket<?php echo $spine ? ' ms-ticket-' . esc_attr( $spine ) : ''; ?>" data-run="<?php echo esc_attr( $run['id'] ); ?>">
 			<div class="ms-ticket-title">

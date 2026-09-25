@@ -37,7 +37,8 @@ function msrwa_analysis_html( array $now, array $before, array $buckets ) {
 	$GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
 	$GLOBALS['wpdb']->on( 'GROUP BY s.bucket', $buckets );
 	$GLOBALS['wpdb']->on( 'INTERVAL 60 DAY', array( $before ) );
-	$GLOBALS['wpdb']->on( 'SUM(r.cost_usd) spend, COUNT(*) runs', array( $now ) );
+	$GLOBALS['wpdb']->on( 'FROM wp_msrwa_spend', array( array( 'spend' => $now['spend'], 'matching' => 0.0 ) ) );
+	$GLOBALS['wpdb']->on( 'COUNT(*) runs, AVG(CASE', array( $now ) );
 	ob_start();
 	MSRWA_Screen_Analysis::render();
 	return ob_get_clean();

@@ -5,9 +5,9 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.28.11
+## État actuel — 0.28.12
 
-La version `0.28.11` corrige ce que l'audit complet a trouvé, dont les lots publiés qui demandaient encore une relecture ; la `0.28.10` servait chaque plat comme il se sert — un gratin dans son plat, un mijoté dans sa cocotte ; la `0.28.9` allégeait la consigne de l'image à la une et n'y recopie plus que le plat ; la `0.28.8` corrigeait ce que la vérification complète du code a trouvé ; la `0.28.7` ouvrait le rapport sur ce qu'il faut regarder avant de publier et colore son déroulé ; la `0.28.6` retrouvait dans l'article les corrections citées un peu librement et supprime les phrases en double ; la `0.28.5` dessinait aussi l'image à la une avec la photographie du plat — celle du rédacteur, sinon celle de la recherche ; la `0.28.4` dessinait le collage à partir de votre collage de référence et d'une photographie du plat — celle du rédacteur, sinon celle trouvée par la recherche ; la `0.28.3` gardait le rendu du collage de référence même quand le rédacteur envoie sa photographie ; la `0.28.2` faisait tourner les recettes d'un lot en parallèle sans attendre le cron du site ; la `0.28.1` abaissait le plafond par recette à 0,15 $, fournit le collage de référence avec l'extension et met les consignes en cache ; la `0.28.0` réduisait le coût d'une recette complète d'environ 38 % — une relecture au lieu de trois, un contrôle final qui ne regarde que les images, une seule recherche web et plus de nouveau dessin automatique, remplacé par un bouton pour l'éditeur ; la `0.27.1` réduisait le coût du collage Facebook de plus de moitié et n'y montrait plus d'emballage ; la `0.27.0` dessinait le visuel Facebook comme ChatGPT le fait pour le propriétaire : la consigne est d'abord rédigée à partir de la recette et d'une image de référence, puis le collage est dessiné avec cette référence ; la `0.26.8` dessinait le visuel Facebook d'après la consigne que le propriétaire utilise lui-même ; la `0.26.7` faisait suivre à la recette le plat que décrit le rédacteur et relève le plafond par recette à 0,25 $ ; la `0.26.6` dessinait le visuel Facebook en qualité haute et ne fait plus redessiner un collage pour un aromate montré une étape trop tôt ; la `0.26.5` permettait au moteur de dessiner avec les modèles d'image de Gemini, au bon prix ; la `0.26.4` donnait au visuel Facebook le style des collages de référence du propriétaire : lumineux, net, cadré serré ; la `0.26.3` faisait ressembler le visuel Facebook à de vraies photographies plutôt qu'à des images de synthèse ; la `0.26.2` rendait le visuel Facebook plus chaleureux et plus proche du plat, et le fait toujours finir sur le plat ouvert ; la `0.26.1` retirait les copies des prompts que gardaient les réglages :
+La version `0.28.12` compte chaque somme dépensée le jour où elle l'est, fait tomber juste les tableaux de coûts et rend plus lisibles l'écran d'une recette et l'analyse ; la `0.28.11` corrigeait ce que l'audit complet a trouvé, dont les lots publiés qui demandaient encore une relecture ; la `0.28.10` servait chaque plat comme il se sert — un gratin dans son plat, un mijoté dans sa cocotte ; la `0.28.9` allégeait la consigne de l'image à la une et n'y recopie plus que le plat ; la `0.28.8` corrigeait ce que la vérification complète du code a trouvé ; la `0.28.7` ouvrait le rapport sur ce qu'il faut regarder avant de publier et colore son déroulé ; la `0.28.6` retrouvait dans l'article les corrections citées un peu librement et supprime les phrases en double ; la `0.28.5` dessinait aussi l'image à la une avec la photographie du plat — celle du rédacteur, sinon celle de la recherche ; la `0.28.4` dessinait le collage à partir de votre collage de référence et d'une photographie du plat — celle du rédacteur, sinon celle trouvée par la recherche ; la `0.28.3` gardait le rendu du collage de référence même quand le rédacteur envoie sa photographie ; la `0.28.2` faisait tourner les recettes d'un lot en parallèle sans attendre le cron du site ; la `0.28.1` abaissait le plafond par recette à 0,15 $, fournit le collage de référence avec l'extension et met les consignes en cache ; la `0.28.0` réduisait le coût d'une recette complète d'environ 38 % — une relecture au lieu de trois, un contrôle final qui ne regarde que les images, une seule recherche web et plus de nouveau dessin automatique, remplacé par un bouton pour l'éditeur ; la `0.27.1` réduisait le coût du collage Facebook de plus de moitié et n'y montrait plus d'emballage ; la `0.27.0` dessinait le visuel Facebook comme ChatGPT le fait pour le propriétaire : la consigne est d'abord rédigée à partir de la recette et d'une image de référence, puis le collage est dessiné avec cette référence ; la `0.26.8` dessinait le visuel Facebook d'après la consigne que le propriétaire utilise lui-même ; la `0.26.7` faisait suivre à la recette le plat que décrit le rédacteur et relève le plafond par recette à 0,25 $ ; la `0.26.6` dessinait le visuel Facebook en qualité haute et ne fait plus redessiner un collage pour un aromate montré une étape trop tôt ; la `0.26.5` permettait au moteur de dessiner avec les modèles d'image de Gemini, au bon prix ; la `0.26.4` donnait au visuel Facebook le style des collages de référence du propriétaire : lumineux, net, cadré serré ; la `0.26.3` faisait ressembler le visuel Facebook à de vraies photographies plutôt qu'à des images de synthèse ; la `0.26.2` rendait le visuel Facebook plus chaleureux et plus proche du plat, et le fait toujours finir sur le plat ouvert ; la `0.26.1` retirait les copies des prompts que gardaient les réglages :
 le moteur exécute ses propres gabarits, et ce qui n’est lu par rien ne se
 périme plus en silence. Le détail de chaque version suit, de la plus récente à
 la plus ancienne.
@@ -76,6 +76,35 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.28.12
+
+**Audit des coûts.** Aucun changement dans le moteur ; tout se passe dans
+l'extension.
+- **Chaque somme dépensée est comptée, le jour où elle l'est.** Un journal de
+  dépenses reçoit une ligne par étape payée et par appariement de photographies
+  d'un lot. Les plafonds du jour et du mois, la dépense sur 30 jours du tableau
+  de bord et de l'analyse le lisent. Avant, la lecture des photographies d'un
+  lot n'était jamais comptée, un nouveau dessin comptait au jour de création
+  de sa recette, et supprimer un lot rendait son argent au plafond du jour. Il
+  est rempli à la mise à jour depuis ce qui était déjà enregistré : sur le
+  site de test, 6,8272 $ = 6,8087 $ de recettes + 0,0185 $ d'appariements.
+- **Les tableaux d'appels tombent juste.** La lecture des photographies citées
+  par la recherche est facturée sans appel détaillé ; elle apparaît désormais
+  sur sa propre ligne, suivie d'un total égal au coût de la recette (rapport,
+  écran de la recette, analyse par modèle).
+- Le coût moyen par recette ne compte plus les recettes en attente à 0 $.
+- **Écran de la recette.** Chaque verdict du juge est affiché à côté de
+  l'image qu'il juge, en couleur (bon, réserves, mauvais) ; le coût se lit
+  face au plafond ; les scores sont des pastilles colorées et chaque étape
+  montre sa part du coût ; la liste des productions est repliée ; le déroulé
+  ne montre que l'histoire, le détail s'affiche d'un clic.
+- **Analyse.** Le tableau « Où part l'argent » débordait de sa carte : réparé.
+  Verdicts traduits et colorés, noms d'étapes lisibles, part de l'appariement
+  dans la dépense, tableau par modèle qui retombe sur le total.
+- **Lot.** Ce que le lot a dépensé s'affiche à côté de son plafond. Les
+  montants peints par la page suivent le format de la langue, comme ceux
+  imprimés par le serveur. Une recette « à corriger » a son liseré orange.
 
 ## Version 0.28.11
 

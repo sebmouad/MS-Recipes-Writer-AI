@@ -33,6 +33,8 @@ final class MSRWA_Screen_Batch {
 				__( 'photographies', 'ms-recipes-writer-ai' ) => number_format_i18n( $batch['images'] ),
 				__( 'langue', 'ms-recipes-writer-ai' ) => MSRWA_I18N::language_name( $batch['language'] ),
 				MSRWA_Rights::may_see_money() ? __( 'plafond', 'ms-recipes-writer-ai' ) : '' => MSRWA_Rights::may_see_money() ? MSRWA_I18N::money( $batch['budget_usd'], 2 ) : '',
+				// Its recipes and the reading of its photographs, together.
+				MSRWA_Rights::may_see_money() ? __( 'dépensé', 'ms-recipes-writer-ai' ) : ' ' => MSRWA_Rights::may_see_money() ? MSRWA_I18N::money( MSRWA_Spend::for_batch( (int) $batch['id'] ) ) : '',
 			) ),
 			self::head_actions( $batch )
 		);

@@ -48,7 +48,7 @@ final class MSRWA_Screen_Run {
 		if ( MSRWA_Rights::may_read_diagnostics() ) { self::steps( $state['steps'] ); } else { self::progress( $state['steps'] ); }
 
 		if ( MSRWA_Rights::may_read_diagnostics() ) {
-			self::calls( $id );
+			self::calls( $id, $state['steps'] );
 			self::artifacts( $state['artifacts'] );
 			self::timeline( $state['events'] );
 		}
@@ -61,7 +61,9 @@ final class MSRWA_Screen_Run {
 			__( 'étapes', 'ms-recipes-writer-ai' ) => $run['steps_done'] . ' / ' . $run['steps_total'],
 		);
 		if ( MSRWA_Rights::may_see_money() ) {
-			$figures[ __( 'coût', 'ms-recipes-writer-ai' ) ] = MSRWA_I18N::money( $state['totals']['cost_usd'] );
+			$ceiling = (float) ( MSRWA_Batch::config_for( (int) $run['batch_id'] )['limits']['budget_usd'] ?? 0 );
+			/* translators: 1: what the recipe cost, 2: its ceiling. */
+			$figures[ __( 'coût', 'ms-recipes-writer-ai' ) ] = $ceiling > 0 ? sprintf( __( '%1$s sur %2$s', 'ms-recipes-writer-ai' ), MSRWA_I18N::money( $state['totals']['cost_usd'] ), MSRWA_I18N::money( $ceiling, 2 ) ) : MSRWA_I18N::money( $state['totals']['cost_usd'] );
 			$figures[ __( 'durée', 'ms-recipes-writer-ai' ) ] = MSRWA_I18N::seconds( $state['totals']['seconds'] );
 		}
 		return $figures;
@@ -147,10 +149,20 @@ final class MSRWA_Screen_Run {
 			'facebook_image' => __( 'collage', 'ms-recipes-writer-ai' ),
 			'consistency' => __( 'cohérence', 'ms-recipes-writer-ai' ),
 		);
+		// Each verdict beside the image it judged, coloured as it reads.
+		$post_id = (int) ( $run['draft_post_id'] ?? 0 );
+		$images = $post_id ? array(
+			'featured_image' => (int) get_post_thumbnail_id( $post_id ),
+			'facebook_image' => (int) get_post_meta( $post_id, MSRWA_Draft::generated_key( 'facebook' ), true ),
+		) : array();
+		$tones = array( 'good' => 'good', 'reservations' => 'warn', 'bad' => 'stop' );
 		foreach ( $targets as $key => $label ) {
 			$entry = (array) ( $approval[ $key ] ?? array() );
 			if ( empty( $entry['verdict'] ) ) { continue; }
-			$figures[] = array( 'label' => $label, 'value' => self::verdict_word( (string) $entry['verdict'] ), 'note' => (string) ( $entry['summary'] ?? '' ) );
+			$figures[] = array(
+				'label' => $label, 'value' => self::verdict_word( (string) $entry['verdict'] ), 'note' => (string) ( $entry['summary'] ?? '' ),
+				'tone' => $tones[ (string) $entry['verdict'] ] ?? '', 'image' => $images[ $key ] ?? 0,
+			);
 		}
 		if ( $figures ) { MSRWA_UI::figures( $figures ); }
 
@@ -205,14 +217,7 @@ final class MSRWA_Screen_Run {
 		echo '<span class="ms-muted" aria-live="polite"></span></p>';
 	}
 
-	private static function verdict_word( $verdict ) {
-		$words = array(
-			'good' => __( 'bon', 'ms-recipes-writer-ai' ),
-			'reservations' => __( 'réserves', 'ms-recipes-writer-ai' ),
-			'bad' => __( 'mauvais', 'ms-recipes-writer-ai' ),
-		);
-		return $words[ $verdict ] ?? $verdict;
-	}
+	private static function verdict_word( $verdict ) { return MSRWA_UI::verdict_word( $verdict ); }
 
 	/**
 	 * The steps as a writer needs them: what has been done and what went wrong,
@@ -241,16 +246,21 @@ final class MSRWA_Screen_Run {
 		echo '<th class="ms-num">' . esc_html__( 'Score', 'ms-recipes-writer-ai' ) . '</th>'
 			. '<th>' . esc_html__( 'Contrôles non satisfaits', 'ms-recipes-writer-ai' ) . '</th></tr></thead><tbody>';
 
+		$spent = max( 0.000001, array_sum( array_map( static function ( $step ) { return (float) $step['cost_usd']; }, $steps ) ) );
 		foreach ( $steps as $step ) {
-			echo '<tr><td><strong>' . esc_html( MSRWA_UI::step_name( $step['step'] ) ) . '</strong> <span class="ms-key">' . esc_html( $step['step'] ) . '</span>';
+			echo '<tr' . ( '' !== $step['error'] ? ' class="ms-row-failed"' : '' ) . '><td><strong>' . esc_html( MSRWA_UI::step_name( $step['step'] ) ) . '</strong> <span class="ms-key">' . esc_html( $step['step'] ) . '</span>';
 			if ( '' !== $step['error'] ) { echo '<small>' . esc_html( $step['error'] ) . '</small>'; }
 			echo '</td>';
 			if ( MSRWA_Rights::may_read_diagnostics() ) { echo '<td class="ms-key">' . esc_html( $step['model'] ) . '</td>'; }
 			echo '<td class="ms-num">' . esc_html( MSRWA_I18N::seconds( $step['seconds'] ) ) . '</td>';
 			if ( MSRWA_Rights::may_see_money() ) {
-				echo '<td class="ms-num">' . esc_html( null === $step['cost_usd'] ? __( 'tarif inconnu', 'ms-recipes-writer-ai' ) : MSRWA_I18N::money( $step['cost_usd'] ) ) . '</td>';
+				// The bar is the step's share of the recipe: where the money went, at a glance.
+				$share = null === $step['cost_usd'] ? 0 : (int) round( 100 * (float) $step['cost_usd'] / $spent );
+				echo '<td class="ms-num">' . esc_html( null === $step['cost_usd'] ? __( 'tarif inconnu', 'ms-recipes-writer-ai' ) : MSRWA_I18N::money( $step['cost_usd'] ) )
+					. ( $share > 0 ? '<span class="ms-costbar" style="--share:' . (int) $share . '%" title="' . esc_attr( $share . ' %' ) . '"></span>' : '' ) . '</td>';
 			}
-			echo '<td class="ms-num">' . esc_html( null === $step['passed'] ? '—' : $step['passed'] . ' / ' . $step['total'] ) . '</td><td class="ms-wrap">';
+			$tone = null === $step['passed'] ? '' : ( '' !== $step['error'] ? 'stop' : ( (int) $step['passed'] < (int) $step['total'] ? 'warn' : 'good' ) );
+			echo '<td class="ms-num">' . ( null === $step['passed'] ? ( '' !== $step['error'] ? '<span class="ms-state ms-state-stop">' . esc_html__( 'échec', 'ms-recipes-writer-ai' ) . '</span>' : '—' ) : '<span class="ms-state ms-state-' . esc_attr( $tone ) . '">' . esc_html( $step['passed'] . ' / ' . $step['total'] ) . '</span>' ) . '</td><td class="ms-wrap">';
 			$failed = array_filter( (array) $step['checks'], static function ( $check ) { return is_array( $check ) && empty( $check['pass'] ); } );
 			if ( ! $failed ) { echo '—'; }
 			foreach ( $failed as $label => $check ) {
@@ -261,7 +271,7 @@ final class MSRWA_Screen_Run {
 		echo '</tbody></table></div></section>';
 	}
 
-	private static function calls( $id ) {
+	private static function calls( $id, array $steps = array() ) {
 		$calls = MSRWA_Run::calls( $id );
 		if ( ! $calls ) { return; }
 		echo '<section class="ms-card ms-card-flush"><h2>' . esc_html__( 'Appels', 'ms-recipes-writer-ai' ) . '</h2>';
@@ -271,6 +281,7 @@ final class MSRWA_Screen_Run {
 			. '<th class="ms-num">' . esc_html__( 'Entrée', 'ms-recipes-writer-ai' ) . '</th><th class="ms-num">' . esc_html__( 'Cache', 'ms-recipes-writer-ai' ) . '</th>'
 			. '<th class="ms-num">' . esc_html__( 'Sortie', 'ms-recipes-writer-ai' ) . '</th><th class="ms-num">' . esc_html__( 'Durée', 'ms-recipes-writer-ai' ) . '</th>'
 			. '<th class="ms-num">' . esc_html__( 'Coût', 'ms-recipes-writer-ai' ) . '</th></tr></thead><tbody>';
+		$billed = array();
 		foreach ( $calls as $call ) {
 			$input = (int) $call['input_tokens'];
 			echo '<tr><td>' . esc_html( $call['step'] ) . '</td>'
@@ -280,23 +291,41 @@ final class MSRWA_Screen_Run {
 				. '<td class="ms-num">' . esc_html( number_format_i18n( (int) $call['output_tokens'] ) ) . '</td>'
 				. '<td class="ms-num">' . esc_html( MSRWA_I18N::seconds( $call['seconds'] ) ) . '</td>'
 				. '<td class="ms-num">' . esc_html( empty( $call['priced'] ) ? __( 'tarif inconnu', 'ms-recipes-writer-ai' ) : MSRWA_I18N::money( $call['cost_usd'] ) ) . '</td></tr>';
+			$billed[ $call['step'] ] = ( $billed[ $call['step'] ] ?? 0.0 ) + (float) $call['cost_usd'];
 		}
+		// The research reads the photographs it cites with calls billed to it
+		// but not itemised: the difference is its own line, so the table adds
+		// up to what the recipe cost.
+		$total = array_sum( $billed );
+		foreach ( $steps as $step ) {
+			$gap = (float) ( $step['cost_usd'] ?? 0 ) - ( $billed[ $step['step'] ] ?? 0.0 );
+			$billed[ $step['step'] ] = max( 0.0, -$gap );
+			if ( $gap < 0.00001 ) { continue; }
+			$total += $gap;
+			echo '<tr class="ms-row-quiet"><td>' . esc_html( $step['step'] ) . '</td><td colspan="5"><small>' . esc_html__( 'Part de l’étape sans appel détaillé : la lecture des photographies qu’elle cite', 'ms-recipes-writer-ai' ) . '</small></td>'
+				. '<td class="ms-num">' . esc_html( MSRWA_I18N::money( $gap ) ) . '</td></tr>';
+		}
+		echo '<tr class="ms-row-total"><td colspan="6">' . esc_html__( 'Total', 'ms-recipes-writer-ai' ) . '</td><td class="ms-num">' . esc_html( MSRWA_I18N::money( $total ) ) . '</td></tr>';
 		echo '</tbody></table></div></section>';
 	}
 
 	private static function artifacts( array $artifacts ) {
 		if ( ! $artifacts ) { return; }
-		echo '<section class="ms-card ms-card-flush"><h2>' . esc_html__( 'Productions', 'ms-recipes-writer-ai' ) . '</h2>';
+		echo '<section class="ms-card ms-card-flush"><details class="ms-fold"><summary><h2>' . esc_html__( 'Productions', 'ms-recipes-writer-ai' ) . '</h2><span class="ms-muted">' . esc_html( sprintf( /* translators: %d is how many. */ _n( '%d élément conservé', '%d éléments conservés', count( $artifacts ), 'ms-recipes-writer-ai' ), count( $artifacts ) ) ) . '</span></summary>';
 		echo '<table class="ms-table"><thead><tr><th>' . esc_html__( 'Nom', 'ms-recipes-writer-ai' ) . '</th><th class="ms-num">' . esc_html__( 'Taille', 'ms-recipes-writer-ai' ) . '</th></tr></thead><tbody>';
 		foreach ( $artifacts as $key => $value ) {
 			echo '<tr><td class="ms-key">' . esc_html( $key ) . '</td><td class="ms-num">' . esc_html( size_format( strlen( (string) wp_json_encode( $value ) ) ) ) . '</td></tr>';
 		}
-		echo '</tbody></table></section>';
+		echo '</tbody></table></details></section>';
 	}
 
 	private static function timeline( array $events ) {
 		if ( ! $events ) { return; }
-		echo '<section class="ms-card"><h2>' . esc_html__( 'Déroulé', 'ms-recipes-writer-ai' ) . '</h2><div class="ms-timeline">';
+		// The story — waves, steps, readings, warnings, decisions — shows; the
+		// attempts, prompts and calls behind it are one click away.
+		echo '<section class="ms-card"><h2>' . esc_html__( 'Déroulé', 'ms-recipes-writer-ai' ) . '</h2>'
+			. '<input type="checkbox" id="ms-timeline-all" class="ms-timeline-all"><label for="ms-timeline-all" class="button ms-timeline-toggle">' . esc_html__( 'Afficher aussi les essais, consignes et appels', 'ms-recipes-writer-ai' ) . '</label>'
+			. '<div class="ms-timeline">';
 		// One colour per kind of event, so a failure or a warning is seen from afar.
 		$flags = array(
 			'error' => __( 'Échec', 'ms-recipes-writer-ai' ), 'warning' => __( 'Avertissement', 'ms-recipes-writer-ai' ),

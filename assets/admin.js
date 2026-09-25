@@ -39,7 +39,13 @@
   }
 
   function say(node, message) { if (node) node.textContent = message || ''; }
-  function money(value) { return value.toFixed(4) + ' $'; }
+  // As MSRWA_I18N::money() writes it, so a painted amount matches a printed one.
+  function money(value, decimals) {
+    var format = MSRWA.money || {};
+    var parts = Number(value || 0).toFixed(undefined === decimals ? 4 : decimals).split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, format.thousands || ',');
+    return (format.pattern || '%s $').replace('%s', parts.join(format.decimal || '.'));
+  }
 
   /** The separator the writer types, mirrored from MSRWA_Intake so the count agrees. */
   function countRecipes(text) {
@@ -930,7 +936,6 @@
             cell.textContent = title;
             head.appendChild(cell);
           });
-          var money = function (value) { return '$' + Number(value).toFixed(4); };
           Object.keys(data.routes).forEach(function (step) {
             var route = data.routes[step];
             var row = table.insertRow();

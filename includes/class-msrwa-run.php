@@ -298,6 +298,8 @@ final class MSRWA_Run {
 			);
 		}
 		MSRWA_DB::insert_many( $t['steps'], $steps );
+		$owner = $wpdb->get_row( $wpdb->prepare( 'SELECT id, owner_id, batch_id FROM ' . $t['runs'] . ' WHERE id = %d', $id ), ARRAY_A );
+		if ( $owner ) { MSRWA_Spend::steps( $owner, $steps, $now ); }
 
 		$events = array();
 		$calls = array();

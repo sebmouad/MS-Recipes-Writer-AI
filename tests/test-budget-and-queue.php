@@ -12,14 +12,14 @@ require_once MSRWA_DIR . 'includes/class-msrwa-run.php';
 
 msrwa_test_settings( array( 'daily_budget_usd' => 0, 'monthly_budget_usd' => 0 ) );
 $GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
-$GLOBALS['wpdb']->on( 'FROM wp_msrwa_runs', array( array( 'day' => 4.0, 'month' => 40.0 ) ) );
+$GLOBALS['wpdb']->on( 'INTERVAL 1 DAY', array( array( 'spend' => 4.0, 'matching' => 0.0 ) ) )->on( 'INTERVAL 30 DAY', array( array( 'spend' => 40.0, 'matching' => 0.0 ) ) );
 msrwa_test_assert( '' === MSRWA_Budget::refusal( 999.0 ), 'A ceiling of zero is no ceiling, whatever the lot costs.' );
 
 // A budget belongs to the site, so the spend behind it is never scoped to the
 // reader: a writer refused a lot has to be able to see why.
 msrwa_test_as_editor( 7 );
 $GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
-$GLOBALS['wpdb']->on( 'FROM wp_msrwa_runs', array( array( 'day' => 4.0, 'month' => 40.0 ) ) );
+$GLOBALS['wpdb']->on( 'INTERVAL 1 DAY', array( array( 'spend' => 4.0, 'matching' => 0.0 ) ) )->on( 'INTERVAL 30 DAY', array( array( 'spend' => 40.0, 'matching' => 0.0 ) ) );
 MSRWA_Budget::spent();
 msrwa_test_missing( $GLOBALS['wpdb']->log(), 'owner_id', 'Spend against a ceiling counts the whole site, not one writer.' );
 
@@ -92,7 +92,7 @@ msrwa_test_missing( $GLOBALS['wpdb']->log(), '"status":"failed"', 'A hold is not
 $GLOBALS['msrwa_test_options'] = array();
 msrwa_test_settings( array( 'daily_budget_usd' => 4, 'monthly_budget_usd' => 0 ) );
 $GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
-$GLOBALS['wpdb']->on( 'FROM wp_msrwa_runs', array( array( 'day' => 4.0, 'month' => 40.0 ) ) );
+$GLOBALS['wpdb']->on( 'INTERVAL 1 DAY', array( array( 'spend' => 4.0, 'matching' => 0.0 ) ) )->on( 'INTERVAL 30 DAY', array( array( 'spend' => 40.0, 'matching' => 0.0 ) ) );
 MSRWA_Run::tick( 12 );
 msrwa_test_contains( $GLOBALS['wpdb']->log(), '"status":"queued"', 'A ceiling reached mid-lot parks the recipe instead of paying for another wave.' );
 msrwa_test_missing( $GLOBALS['wpdb']->log(), '"status":"failed"', 'A recipe stopped by a ceiling has not failed; it is waiting for room.' );

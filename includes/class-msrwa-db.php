@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
 final class MSRWA_DB {
 
 	/** Bumped whenever the schema below changes. */
-	const SCHEMA = 10;
+	const SCHEMA = 11;
 
 	public static function tables() {
 		global $wpdb;
@@ -31,6 +31,7 @@ final class MSRWA_DB {
 			'artifacts' => $prefix . 'artifacts',
 			'catalog'   => $prefix . 'catalog',
 			'history'   => $prefix . 'history',
+			'spend'     => $prefix . 'spend',
 		);
 	}
 
@@ -82,6 +83,11 @@ final class MSRWA_DB {
 			// A job's history, one row per stage, written once. Lot stages carry
 			// run_id 0 until the lot is sent. See MSRWA_History.
 			"CREATE TABLE {$t['history']} (\n id bigint(20) unsigned NOT NULL AUTO_INCREMENT,\n batch_id bigint(20) unsigned NOT NULL DEFAULT 0,\n run_id bigint(20) unsigned NOT NULL DEFAULT 0,\n stage varchar(32) NOT NULL,\n step varchar(64) NOT NULL DEFAULT '',\n content_json longtext NULL,\n bytes int unsigned NOT NULL DEFAULT 0,\n created_at datetime NOT NULL,\n PRIMARY KEY (id),\n KEY run_order (run_id,id),\n KEY batch_order (batch_id,id),\n KEY created_at (created_at)\n) $charset;",
+			// Every amount spent, on the day it was spent, kept when the lot or
+			// the recipe it paid for is deleted. The site's ceilings read it:
+			// counted from the runs, a deleted lot gave its money back to the
+			// day's ceiling, and a lot's photograph reading was never counted.
+			"CREATE TABLE {$t['spend']} (\n id bigint(20) unsigned NOT NULL AUTO_INCREMENT,\n owner_id bigint(20) unsigned NOT NULL DEFAULT 0,\n batch_id bigint(20) unsigned NOT NULL DEFAULT 0,\n run_id bigint(20) unsigned NOT NULL DEFAULT 0,\n step varchar(64) NOT NULL DEFAULT '',\n cost_usd decimal(12,6) NOT NULL DEFAULT 0,\n created_at datetime NOT NULL,\n PRIMARY KEY (id),\n KEY created_at (created_at),\n KEY owner_day (owner_id,created_at)\n) $charset;",
 		) as $statement ) { dbDelta( $statement ); }
 
 		foreach ( array(
@@ -104,6 +110,7 @@ final class MSRWA_DB {
 			self::backfill_check_counts();
 		}
 
+		MSRWA_Spend::backfill();
 		self::reclaim_duplicates();
 		self::rename_generated_keys();
 		self::credit_generated_images();

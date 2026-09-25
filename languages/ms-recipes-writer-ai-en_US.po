@@ -2175,3 +2175,26 @@ msgstr "The article is in the bin."
 
 msgid "L’article a été supprimé de WordPress."
 msgstr "The article was deleted from WordPress."
+
+msgid "Part de l’étape sans appel détaillé : la lecture des photographies qu’elle cite"
+msgstr "Part of the step with no itemised call: reading the photographs it cites"
+
+msgid "Total"
+msgstr "Total"
+
+msgid "%d élément conservé"
+msgid_plural "%d éléments conservés"
+msgstr[0] "%d item kept"
+msgstr[1] "%d items kept"
+
+msgid "Afficher aussi les essais, consignes et appels"
+msgstr "Also show attempts, prompts and calls"
+
+msgid "Dont %s pour lire et apparier les photographies des lots."
+msgstr "Including %s to read and pair the lots’ photographs."
+
+msgid "Hors appels détaillés : lecture des photographies citées par la recherche, appariement des photographies des lots"
+msgstr "Outside itemised calls: reading the photographs the research cites, pairing the lots’ photographs"
+
+msgid "dépensé"
+msgstr "spent"

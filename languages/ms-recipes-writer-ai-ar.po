@@ -2211,3 +2211,30 @@ msgstr "المقال في سلة المهملات."
 
 msgid "L’article a été supprimé de WordPress."
 msgstr "حُذف المقال من ووردبريس."
+
+msgid "Part de l’étape sans appel détaillé : la lecture des photographies qu’elle cite"
+msgstr "جزء من الخطوة دون استدعاء مفصَّل: قراءة الصور التي تستشهد بها"
+
+msgid "Total"
+msgstr "المجموع"
+
+msgid "%d élément conservé"
+msgid_plural "%d éléments conservés"
+msgstr[0] "لا عناصر محفوظة"
+msgstr[1] "عنصر واحد محفوظ"
+msgstr[2] "عنصران محفوظان"
+msgstr[3] "%d عناصر محفوظة"
+msgstr[4] "%d عنصرًا محفوظًا"
+msgstr[5] "%d عنصر محفوظ"
+
+msgid "Afficher aussi les essais, consignes et appels"
+msgstr "إظهار المحاولات والتعليمات والاستدعاءات أيضًا"
+
+msgid "Dont %s pour lire et apparier les photographies des lots."
+msgstr "منها %s لقراءة صور الدفعات ومطابقتها."
+
+msgid "Hors appels détaillés : lecture des photographies citées par la recherche, appariement des photographies des lots"
+msgstr "خارج الاستدعاءات المفصَّلة: قراءة الصور التي يستشهد بها البحث، ومطابقة صور الدفعات"
+
+msgid "dépensé"
+msgstr "المُنفَق"

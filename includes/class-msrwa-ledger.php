@@ -51,16 +51,23 @@ final class MSRWA_Ledger {
 		$scope = MSRWA_Rights::scope_sql( 'r.owner_id' );
 		$since = $days > 0 ? $wpdb->prepare( ' AND r.created_at >= DATE_SUB(UTC_TIMESTAMP(), INTERVAL %d DAY)', (int) $days ) : '';
 
+		// The average is a finished recipe's: a queued one has cost nothing yet
+		// and pulled it down.
 		$row = $wpdb->get_row(
-			"SELECT SUM(r.cost_usd) spend, COUNT(*) runs, AVG(r.cost_usd) average, AVG(r.seconds) seconds
+			"SELECT COUNT(*) runs, AVG(CASE WHEN r.status IN ('done','failed') THEN r.cost_usd END) average,
+				AVG(CASE WHEN r.status IN ('done','failed') THEN r.seconds END) seconds
 			FROM {$t['runs']} r WHERE {$scope}{$since}", ARRAY_A );
+		// What was spent is read from the spending lines, which count a lot's
+		// pairing and outlive a deleted lot; the runs only know their recipes.
+		$spent = MSRWA_Spend::window( $days, MSRWA_Rights::scope_sql( 'x.owner_id' ) );
 
 		$unpriced = (int) $wpdb->get_var(
 			"SELECT COUNT(*) FROM {$t['steps']} s INNER JOIN {$t['runs']} r ON r.id = s.run_id
 			WHERE {$scope}{$since} AND s.cost_usd IS NULL AND (s.input_tokens > 0 OR s.output_tokens > 0)" );
 
 		return array(
-			'spend_usd' => round( (float) ( $row['spend'] ?? 0 ), 4 ),
+			'spend_usd' => round( $spent['spend_usd'], 4 ),
+			'matching_usd' => round( $spent['matching_usd'], 4 ),
 			'runs' => (int) ( $row['runs'] ?? 0 ),
 			'average_usd' => round( (float) ( $row['average'] ?? 0 ), 4 ),
 			'seconds' => round( (float) ( $row['seconds'] ?? 0 ), 1 ),
@@ -126,7 +133,8 @@ final class MSRWA_Ledger {
 		$scope = MSRWA_Rights::scope_sql( 'r.owner_id' );
 
 		$row = $wpdb->get_row( $wpdb->prepare(
-			"SELECT COUNT(*) runs, AVG(r.cost_usd) average, AVG(r.seconds) seconds
+			"SELECT COUNT(*) runs, AVG(CASE WHEN r.status IN ('done','failed') THEN r.cost_usd END) average,
+				AVG(CASE WHEN r.status IN ('done','failed') THEN r.seconds END) seconds
 			FROM {$t['runs']} r
 			WHERE {$scope}
 				AND r.created_at >= DATE_SUB(UTC_TIMESTAMP(), INTERVAL %d DAY)

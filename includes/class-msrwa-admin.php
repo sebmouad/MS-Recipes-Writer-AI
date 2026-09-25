@@ -122,6 +122,14 @@ final class MSRWA_Admin {
 		wp_localize_script( 'msrwa-admin', 'MSRWA', array(
 			'api' => esc_url_raw( rest_url( 'msrwa/v1' ) ),
 			'nonce' => wp_create_nonce( 'wp_rest' ),
+			// Amounts the script paints read as the ones the page printed: the
+			// same currency pattern and the reader's own separators.
+			'money' => array(
+				/* translators: %s is an amount of money. Put the currency sign where your language puts it. */
+				'pattern' => __( '%s $', 'ms-recipes-writer-ai' ),
+				'decimal' => isset( $GLOBALS['wp_locale'] ) ? (string) $GLOBALS['wp_locale']->number_format['decimal_point'] : '.',
+				'thousands' => isset( $GLOBALS['wp_locale'] ) ? (string) $GLOBALS['wp_locale']->number_format['thousands_sep'] : ',',
+			),
 			'text' => array(
 				'failed' => __( 'Une erreur est survenue.', 'ms-recipes-writer-ai' ),
 				'oneRecipe' => __( '1 recette détectée', 'ms-recipes-writer-ai' ),
