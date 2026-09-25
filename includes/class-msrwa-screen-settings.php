@@ -333,7 +333,7 @@ final class MSRWA_Screen_Settings {
 		$refused = get_transient( 'msrwa_style_refused_' . get_current_user_id() );
 		if ( false !== $refused ) { delete_transient( 'msrwa_style_refused_' . get_current_user_id() ); }
 		echo '<section class="ms-card" id="ms-style"><h2>' . esc_html__( 'Style du collage Facebook', 'ms-recipes-writer-ai' ) . '</h2>';
-		echo '<p>' . esc_html__( 'Un de vos collages dont le rendu doit être repris : lumière, couleurs, cadrage, plan de travail. Seul son style est repris, jamais son plat. Quand le rédacteur a envoyé une photographie du plat, c’est elle qui sert de référence.', 'ms-recipes-writer-ai' ) . '</p>';
+		echo '<p>' . esc_html__( 'Un de vos collages dont le rendu doit être repris : lumière, couleurs, cadrage, plan de travail. Seul son style est repris, jamais son plat. Quand le rédacteur a envoyé une photographie du plat, elle montre le plat et ce collage garde le style.', 'ms-recipes-writer-ai' ) . '</p>';
 		if ( false !== $refused ) { MSRWA_UI::note( esc_html( (string) $refused ), 'warn' ); }
 		if ( ! $paths && '' !== MSRWA_Sources::default_style() ) {
 			$preview = MSRWA_Sources::style_preview( MSRWA_Sources::default_style() );

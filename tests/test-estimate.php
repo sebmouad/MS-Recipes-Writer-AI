@@ -119,4 +119,14 @@ $unpriced = MSRWA_Estimate::recipe( MSRWA_Profile::ARTICLE, array( 'routing' => 
 msrwa_test_assert( in_array( 'article', $unpriced['unpriced'], true ), 'An unpriced route is reported as unknown.' );
 msrwa_test_assert( ! isset( $unpriced['steps']['article'] ), 'And it is not silently counted as costing nothing.' );
 
+// The collage leads a complete recipe (0.28.27): runs 71–77 on the test
+// site cost $0.085 and $0.095 from text alone, $0.067–0.070 with a
+// photograph, and $0.042–0.049 with the writer's own collage, which is read,
+// never drawn.
+msrwa_test_assert( isset( $full['steps']['collage_reading'] ), 'A complete recipe pays for reading its collage.' );
+$provided = MSRWA_Estimate::recipe( MSRWA_Profile::FULL, array(), true, 'provided' );
+msrwa_test_assert( ! isset( $provided['steps']['facebook_image'] ) && isset( $provided['steps']['collage_reading'] ), 'The writer’s own collage is read and never priced as a drawing.' );
+msrwa_test_assert( $provided['cost_usd'] < MSRWA_Estimate::recipe( MSRWA_Profile::FULL, array(), true )['cost_usd'], 'So it costs less than a drawn one.' );
+msrwa_test_assert( ! isset( MSRWA_Estimate::recipe( MSRWA_Profile::ARTICLE )['steps']['collage_reading'] ), 'An article alone reads no collage.' );
+
 msrwa_test_done( 'estimates track what runs really cost' );

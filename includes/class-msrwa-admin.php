@@ -222,7 +222,7 @@ final class MSRWA_Admin {
 				'previewCost' => __( 'Coût estimé', 'ms-recipes-writer-ai' ),
 				'previewThinking' => __( 'Réflexion', 'ms-recipes-writer-ai' ),
 				/* translators: %s is an amount in US dollars. */
-				'retryMax' => __( 'Si l’approbation finale refuse à chaque tentative et fait redessiner les images, une recette peut coûter jusqu’à %s.', 'ms-recipes-writer-ai' ),
+				'retryMax' => __( 'Si la recherche utilise toutes les recherches permises et que le contrôle final doit être redemandé, une recette peut coûter jusqu’à %s. Une image refusée n’est jamais redessinée d’office.', 'ms-recipes-writer-ai' ),
 				'retryOverCeiling' => __( 'Le plafond par recette est plus bas : il arrête les nouvelles tentatives avant de le franchir, la recette se termine et le dernier verdict va au rédacteur.', 'ms-recipes-writer-ai' ),
 				/* translators: %s is an amount in US dollars. */
 				'previewTotal' => __( 'Une recette complète est estimée à %s — une estimation, jamais une facture.', 'ms-recipes-writer-ai' ),

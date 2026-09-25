@@ -1479,10 +1479,6 @@ msgstr "تُقدَّر الوصفة الكاملة بـ %s — تقدير، ول
 msgid "Réflexion"
 msgstr "التفكير"
 
-#, php-format
-msgid "Si l’approbation finale refuse à chaque tentative et fait redessiner les images, une recette peut coûter jusqu’à %s."
-msgstr "إذا رفضت الموافقة النهائية في كل محاولة وأعادت رسم الصور، قد تكلّف الوصفة حتى %s."
-
 msgid "lu sur la page du fournisseur"
 msgstr "مقروء من صفحة المزوّد"
 
@@ -2119,9 +2115,6 @@ msgstr "تعذّر حفظ الصورة."
 msgid "Style du collage Facebook"
 msgstr "أسلوب كولاج فيسبوك"
 
-msgid "Un de vos collages dont le rendu doit être repris : lumière, couleurs, cadrage, plan de travail. Seul son style est repris, jamais son plat. Quand le rédacteur a envoyé une photographie du plat, c’est elle qui sert de référence."
-msgstr "أحد كولاجاتك الذي يُراد استنساخ مظهره: الإضاءة والألوان والتأطير وسطح العمل. يُؤخذ أسلوبه فقط، لا طبقه أبدًا. وحين يرسل المحرر صورة للطبق، تكون تلك الصورة هي المرجع."
-
 msgid "Aucune référence : le collage est dessiné à partir du texte seul."
 msgstr "لا مرجع: يُرسم الكولاج من النص وحده."
 
@@ -2172,12 +2165,6 @@ msgstr "أُعيد رسم الكولاج %d مرة وفق هذه الملاحظ�
 
 msgid "Ajoutez votre propre collage pour la remplacer ; retirez-le pour y revenir."
 msgstr "أضف الكولاج الخاص بك ليحل محلها؛ واحذفه للعودة إليها."
-
-msgid "La chaîne complète : le texte relu et vérifié, puis les deux images jugées ensemble, face à la recette. Une image refusée vous est signalée, et vous décidez de la faire redessiner."
-msgstr "السلسلة الكاملة: نص مراجَع ومدقَّق، ثم تُحكَّم الصورتان معًا مقارنةً بالوصفة. تُنبَّه إلى الصورة المرفوضة، وتقرر أنت إعادة رسمها."
-
-msgid "Pas de collage. Le texte est relu et vérifié, et l’image à la une est jugée face à la recette."
-msgstr "بلا كولاج. يُراجَع النص ويُدقَّق، وتُحكَّم الصورة البارزة مقارنةً بالوصفة."
 
 msgid "référence fournie avec l’extension"
 msgstr "مرجع مرفق مع الإضافة"
@@ -2504,3 +2491,15 @@ msgstr "مجموعتك المصوّرة"
 
 msgid "Publié tel quel et référence de la recette : le juge ne le note pas."
 msgstr "تُنشر كما هي وهي مرجع الوصفة: لا يقيّمها المُحكِّم."
+
+msgid "La chaîne complète : le collage Facebook d’abord — le vôtre, ou dessiné librement après la recherche —, puis la recette et l’article qui le suivent et l’image à la une du même plat. Le texte est relu et vérifié, les deux images jugées ensemble. Une image refusée vous est signalée, et vous décidez de la faire redessiner ; votre propre collage ne l’est jamais."
+msgstr "السلسلة الكاملة: كولاج فيسبوك أولًا — كولاجك، أو كولاج يُرسم بحرية بعد البحث — ثم الوصفة والمقال اللذان يتبعانه، وصورة بارزة للطبق نفسه. يُراجَع النص ويُدقَّق، وتُقيَّم الصورتان معًا. تُبلَّغ بالصورة المرفوضة، وتقرّر أنت إعادة رسمها؛ أما كولاجك فلا يُعاد رسمه أبدًا."
+
+msgid "Aucun collage n’est dessiné ; le vôtre, s’il est joint, est publié tel quel et sert de référence. Le texte est relu et vérifié, et l’image à la une est jugée face à la recette."
+msgstr "لا يُرسم أي كولاج؛ وإن أرفقت كولاجك يُنشر كما هو ويكون المرجع. يُراجَع النص ويُدقَّق، وتُقيَّم الصورة البارزة مقارنةً بالوصفة."
+
+msgid "Si la recherche utilise toutes les recherches permises et que le contrôle final doit être redemandé, une recette peut coûter jusqu’à %s. Une image refusée n’est jamais redessinée d’office."
+msgstr "إذا استخدم البحث كل عمليات البحث المسموح بها واحتاج الفحص النهائي إلى إعادة الطلب، فقد تصل تكلفة الوصفة إلى %s. لا يُعاد رسم الصورة المرفوضة تلقائيًا أبدًا."
+
+msgid "Un de vos collages dont le rendu doit être repris : lumière, couleurs, cadrage, plan de travail. Seul son style est repris, jamais son plat. Quand le rédacteur a envoyé une photographie du plat, elle montre le plat et ce collage garde le style."
+msgstr "أحد كولاجاتك التي يُراد اعتماد مظهرها: الإضاءة والألوان والتأطير وسطح العمل. يُؤخذ أسلوبه فقط، لا طبقه أبدًا. وإذا أرسل المحرر صورة للطبق، فهي تُظهر الطبق ويحافظ هذا الكولاج على الأسلوب."

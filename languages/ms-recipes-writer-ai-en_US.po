@@ -1459,10 +1459,6 @@ msgstr "A full recipe is estimated at %s — an estimate, never an invoice."
 msgid "Réflexion"
 msgstr "Thinking"
 
-#, php-format
-msgid "Si l’approbation finale refuse à chaque tentative et fait redessiner les images, une recette peut coûter jusqu’à %s."
-msgstr "If the final approval refuses at every attempt and has the images redrawn, a recipe can cost up to %s."
-
 msgid "lu sur la page du fournisseur"
 msgstr "read from the provider’s page"
 
@@ -2083,9 +2079,6 @@ msgstr "The image could not be saved."
 msgid "Style du collage Facebook"
 msgstr "Facebook collage style"
 
-msgid "Un de vos collages dont le rendu doit être repris : lumière, couleurs, cadrage, plan de travail. Seul son style est repris, jamais son plat. Quand le rédacteur a envoyé une photographie du plat, c’est elle qui sert de référence."
-msgstr "One of your collages whose look should be reproduced: light, colours, framing, work surface. Only its style is taken, never its dish. When the writer has sent a photograph of the dish, that photograph is the reference instead."
-
 msgid "Aucune référence : le collage est dessiné à partir du texte seul."
 msgstr "No reference: the collage is drawn from the text alone."
 
@@ -2136,12 +2129,6 @@ msgstr "The collage was redrawn %d time(s) from these findings; the new one has 
 
 msgid "Ajoutez votre propre collage pour la remplacer ; retirez-le pour y revenir."
 msgstr "Add your own collage to replace it; remove it to go back."
-
-msgid "La chaîne complète : le texte relu et vérifié, puis les deux images jugées ensemble, face à la recette. Une image refusée vous est signalée, et vous décidez de la faire redessiner."
-msgstr "The full chain: the text reviewed and fact-checked, then both images judged together against the recipe. A refused image is flagged to you, and you decide whether to have it redrawn."
-
-msgid "Pas de collage. Le texte est relu et vérifié, et l’image à la une est jugée face à la recette."
-msgstr "No collage. The text is reviewed and fact-checked, and the featured image is judged against the recipe."
 
 msgid "référence fournie avec l’extension"
 msgstr "reference shipped with the plugin"
@@ -2456,3 +2443,15 @@ msgstr "Your collage"
 
 msgid "Publié tel quel et référence de la recette : le juge ne le note pas."
 msgstr "Published as it is and the recipe's reference: the judge does not rate it."
+
+msgid "La chaîne complète : le collage Facebook d’abord — le vôtre, ou dessiné librement après la recherche —, puis la recette et l’article qui le suivent et l’image à la une du même plat. Le texte est relu et vérifié, les deux images jugées ensemble. Une image refusée vous est signalée, et vous décidez de la faire redessiner ; votre propre collage ne l’est jamais."
+msgstr "The full chain: the Facebook collage first — yours, or drawn freely after the research — then the recipe and the article that follow it, and a featured image of the same dish. The text is reviewed and fact-checked, and both images are judged together. A refused image is flagged to you, and you decide whether to have it redrawn; your own collage never is."
+
+msgid "Aucun collage n’est dessiné ; le vôtre, s’il est joint, est publié tel quel et sert de référence. Le texte est relu et vérifié, et l’image à la une est jugée face à la recette."
+msgstr "No collage is drawn; yours, if attached, is published as it is and serves as the reference. The text is reviewed and fact-checked, and the featured image is judged against the recipe."
+
+msgid "Si la recherche utilise toutes les recherches permises et que le contrôle final doit être redemandé, une recette peut coûter jusqu’à %s. Une image refusée n’est jamais redessinée d’office."
+msgstr "If the research uses every search it is allowed and the final check has to be asked again, a recipe can cost up to %s. A refused image is never redrawn automatically."
+
+msgid "Un de vos collages dont le rendu doit être repris : lumière, couleurs, cadrage, plan de travail. Seul son style est repris, jamais son plat. Quand le rédacteur a envoyé une photographie du plat, elle montre le plat et ce collage garde le style."
+msgstr "One of your collages whose look is to be kept: light, colours, framing, worktop. Only its style is taken, never its dish. When the writer sent a photograph of the dish, it shows the dish and this collage keeps the style."

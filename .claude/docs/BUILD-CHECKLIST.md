@@ -630,6 +630,15 @@ cost) in the task before changing anything.
   (2026-09-24).** The writer's photograph shows the prompt's writer the dish;
   the collage is drawn from the style reference. Real: the owner's own rôti
   photograph, drawn both ways. See ENGINE.md §7, item 40.
+- [x] **A61 — Estimate, cache and texts after the collage lead (2026-09-25).**
+  `MSRWA_Estimate` plans the steps a lead runs (`collage_reading`, no
+  drawing for a provided collage) and prices the featured image with its
+  reference; one prompt-cache key per step (ENGINE.md §7, 51); button icons
+  centred under WordPress 7's button CSS; profile and cost texts rewritten.
+  `tests/test-estimate.php`, `tests/test-prompt-cache.php`. Real: runs 71–79
+  reconciled (run = steps = calls, research's photo reading unitemised as
+  shown), estimate within their range, caching measured on runs 78–79, icons
+  measured centred on every screen with WordPress 7's CSS.
 - [x] **A60 — The collage leads the recipe (2026-09-25).** Scenario 1:
   the writer's collage, recognised at pairing and kept ticked, is the
   Facebook image and the reference (not drawn, not judged). Scenarios 2–4

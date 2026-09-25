@@ -39,7 +39,13 @@ final class MSRWA_Estimate {
 			// Images, recipe and photographs only: 7 247–7 707 in, 890–1 270 out on
 			// 0.28.0, against 16 500 in when it read the article and research too.
 			'final_approval' => array( 'input' => 8000, 'output' => 1500 ),
-			'featured_image' => array( 'input' => 1450, 'output' => 440 ),
+			// Drawn from a reference image since 0.28.x — a photograph of the dish or
+			// the collage's last panel — which is input too: 2 054 in, 196 out on a
+			// live run of 0.28.27, against 1 450 measured before the reference.
+			'featured_image' => array( 'input' => 2100, 'output' => 440 ),
+			// The collage read panel by panel when it leads the recipe: 2 370 in,
+			// 1 227 out on a live run of 0.28.27.
+			'collage_reading' => array( 'input' => 2400, 'output' => 1250 ),
 			'facebook_image' => array( 'input' => 2550, 'output' => 345 ),
 			'corrections' => array( 'input' => 0, 'output' => 0 ),
 		);
@@ -52,8 +58,8 @@ final class MSRWA_Estimate {
 	 * than as free — the same distinction the ledger keeps — so an estimate that
 	 * cannot be completed says so instead of reading low.
 	 */
-	public static function recipe( $profile, array $overrides = array(), $with_photographs = false ) {
-		return self::recipe_on( MSRWA_Engine_Config::create( MSRWA_Engine_Settings::merge( MSRWA_Engine_Settings::stored(), $overrides ) ), $profile, $with_photographs );
+	public static function recipe( $profile, array $overrides = array(), $with_photographs = false, $lead = null ) {
+		return self::recipe_on( MSRWA_Engine_Config::create( MSRWA_Engine_Settings::merge( MSRWA_Engine_Settings::stored(), $overrides ) ), $profile, $with_photographs, $lead );
 	}
 
 	/**
@@ -61,16 +67,22 @@ final class MSRWA_Estimate {
 	 * A recipe the writer sent photographs with is researched from them, with
 	 * no web search, unless `research.web_search` is `always`.
 	 */
-	public static function recipe_on( MSRWA_Engine_Config $config, $profile, $with_photographs = false ) {
+	public static function recipe_on( MSRWA_Engine_Config $config, $profile, $with_photographs = false, $lead = null ) {
 		$from_photographs = $with_photographs && 'always' !== (string) $config->get( 'research.web_search', 'without_images' );
-		$registry = (array) $config->get( 'steps', array() );
+		// The steps the recipe will really run: a complete lot draws its collage
+		// first and reads it, and the writer's own collage is read, not drawn
+		// (ENGINE.md §7, 50). Unsaid, the lead is the one a lot without a
+		// collage of the writer's gets.
+		$lead = null === $lead ? MSRWA_Profile::lead( $profile, false ) : (string) $lead;
+		$planned = MSRWA_Profile::run_steps( $profile, (array) $config->get( 'steps', array() ), $lead );
+		$registry = MSRWA_Engine_Steps::for_lead( (array) $config->get( 'steps', array() ), $lead );
 		$shape = self::shape();
 
 		$total = 0.0;
 		$unknown = array();
 		$steps = array();
 
-		foreach ( MSRWA_Profile::steps( $profile, $registry ) as $name ) {
+		foreach ( $planned as $name ) {
 			$capability = MSRWA_Engine_Steps::capability( $name, $registry );
 			if ( 'none' === $capability ) { continue; }
 			// Image steps do not route by their own name: the engine sends every
@@ -206,7 +218,7 @@ final class MSRWA_Estimate {
 	/** Which routing key the engine will actually use for a step. */
 	public static function route_for( $name, $capability, $config = null ) {
 		if ( 'image_generation' === $capability ) { return $config instanceof MSRWA_Engine_Config ? $config->image_route( $name ) : 'image'; }
-		if ( 'vision' === $capability ) { return 'vision'; }
+		if ( 'vision' === $capability || 'read' === $capability ) { return 'vision'; }
 		return $name;
 	}
 }

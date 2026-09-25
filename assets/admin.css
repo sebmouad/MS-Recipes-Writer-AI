@@ -322,7 +322,12 @@
 .ms-recipes-text::placeholder { color: var(--ms-ink-faint); }
 .ms-recipes-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin-block-start: 10px; }
 .ms-recipes-bar p { margin: 0; }
-.ms-step .button .dashicons { inline-size: 16px; block-size: 16px; font-size: 16px; vertical-align: text-bottom; margin-block-start: 1px; }
+.ms-step .button .dashicons { inline-size: 16px; block-size: 16px; font-size: 16px; }
+/* WordPress 7 sets a button icon's line-height to 1.9, the button's height,
+   so a glyph sized smaller sat at the bottom of its box: every icon here is
+   centred by its button instead, whatever the WordPress version. */
+.wp-core-ui .msrwa .button .dashicons { line-height: 1; margin: 0; vertical-align: middle; }
+.wp-core-ui .msrwa .button:has(> .dashicons) { display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
 .ms-recipe-list { list-style: none; counter-reset: ms-recipe; margin: 12px 0 0; padding: 0; display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr)); }
 .ms-recipe-list[hidden] { display: none; }
 .ms-recipe-list li { counter-increment: ms-recipe; position: relative; margin: 0; padding: 9px 12px 9px 44px; display: grid; gap: 1px; min-inline-size: 0; background: var(--ms-sunk); border: 1px solid var(--ms-line-soft); border-radius: var(--ms-radius); }
@@ -560,13 +565,13 @@
 .ms-keycard-field { display: flex; gap: 6px; }
 .ms-keycard-field input { flex: 1 1 auto; min-inline-size: 0; font-family: var(--ms-mono); font-size: 12px; }
 .ms-keycard-field input::placeholder { font-family: var(--ms-sans); color: var(--ms-ink-faint); }
-.ms-keycard-toggle.button { flex: none; display: grid; place-items: center; padding: 0 8px; }
+.wp-core-ui .msrwa .ms-keycard-toggle.button { flex: none; display: grid; place-items: center; padding: 0 8px; }
 .ms-keycard-toggle .dashicons { inline-size: 18px; block-size: 18px; font-size: 18px; }
 .ms-keycard-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 10px; font-size: 12px; }
 .ms-keycard-foot a { text-decoration: none; }
 .ms-keycard-result:empty { display: none; }
 .ms-keys-check { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
-.ms-keys-check .button .dashicons { inline-size: 16px; block-size: 16px; font-size: 16px; vertical-align: text-bottom; margin-block-start: 1px; }
+.ms-keys-check .button .dashicons { inline-size: 16px; block-size: 16px; font-size: 16px; }
 .ms-keys-result { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
 .ms-keys-result li { margin: 0; }
 

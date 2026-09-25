@@ -941,6 +941,18 @@ photograph, and otherwise use the photograph without the cost of a search.
       so no redraw ever replaces it. A side that is a dish in its own right
       (a roast beside a gratin) goes in the notes, not the ingredients.
 
+51. **One prompt-cache key per step (2026-09-25, owner's request to cut
+    cost).** The recipe, the article and the review sent the recipe's
+    research hash as `prompt_cache_key`, but OpenAI caches from the start
+    of the request, where each step's own instructions sit: no call ever
+    shared a prefix with another under that key, and seven live recipes
+    cached 0 of 4 400–9 900 tokens on those steps. Every text step now
+    sends `msrwa-<step>`. Two recipes in a row: the second's article reused
+    1 669 tokens and its review 1 091; the recipe step's instructions are
+    under the 1 024-token minimum and stay uncached. Claude's breakpoints
+    are unchanged.
+
+
 ### Still open
 
 

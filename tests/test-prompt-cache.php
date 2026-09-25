@@ -18,7 +18,9 @@ foreach ( $inputs as $step => $input ) { msrwa_test_assert( 0 === strpos( $input
 msrwa_test_assert( 0 === strpos( $inputs['article'], $recipe ) && 0 === strpos( $inputs['review'], $recipe ), 'The article and the review then share the recipe too.' );
 msrwa_test_assert( false !== strpos( $inputs['review'], 'INSTRUCTIONS FOR review' ) && strpos( $inputs['review'], 'INSTRUCTIONS' ) > strlen( $recipe ) - 3, 'Each step’s own instructions come after the shared part.' );
 
-// OpenAI: one cache key for the recipe's calls, so they reach the same cache.
+// OpenAI caches from the start of the request, where each step's own
+// instructions sit: one key per step, the same for every recipe, so the next
+// recipe finds them. Keyed by the recipe's research, nothing was ever reused.
 $keys = array( 'settings' => array( 'keys' => array( 'openai' => 'k', 'claude' => 'k' ) ) );
 $sent = array();
 MSRWA_Engine_Call::$transport = static function ( $url, $payload ) use ( &$sent ) { $sent[] = $payload; return array( 'status' => 500, 'raw' => '{}' ); };
@@ -26,8 +28,12 @@ $artifacts = array( 'research' => $brief['research'], 'canonical' => $brief['can
 foreach ( array( 'canonical_recipe', 'article', 'review' ) as $step ) {
 	MSRWA_Engine::run_step( $step, array( 'title' => 'Tarte', 'artifacts' => $artifacts ), array( 'config' => $keys ) );
 }
-$cache_keys = array_unique( array_map( static function ( $payload ) { return (string) ( $payload['prompt_cache_key'] ?? '' ); }, $sent ) );
-msrwa_test_assert( 1 === count( $cache_keys ) && '' !== reset( $cache_keys ), 'The three calls carry one prompt_cache_key.' );
+$cache_keys = array_map( static function ( $payload ) { return (string) ( $payload['prompt_cache_key'] ?? '' ); }, $sent );
+msrwa_test_assert( array( 'msrwa-canonical_recipe', 'msrwa-article', 'msrwa-review' ) === $cache_keys, 'Each step carries its own key: ' . implode( ', ', $cache_keys ) . '.' );
+$first = $sent;
+MSRWA_Engine::run_step( 'article', array( 'title' => 'Crêpes', 'artifacts' => array( 'research' => array( 'dish_identity' => array( 'name' => 'Crêpes' ) ) ) + $artifacts ), array( 'config' => $keys ) );
+msrwa_test_assert( 'msrwa-article' === (string) ( end( $sent )['prompt_cache_key'] ?? '' ), 'The same for another recipe, whose research differs.' );
+$sent = $first;
 // OpenAI serves from its cache only what is sent as the instructions: each
 // step's own prompt, the same on every recipe, goes there.
 foreach ( array( 0 => 'canonical_recipe.tpl.txt', 1 => 'article.tpl.txt', 2 => 'review.tpl.txt' ) as $call => $file ) {

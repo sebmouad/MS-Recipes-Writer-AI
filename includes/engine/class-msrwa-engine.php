@@ -506,10 +506,15 @@ final class MSRWA_Engine {
 		// one cache key for them, and a breakpoint after the research and after
 		// the recipe for the provider that needs them marked.
 		$wire['instructions'] = (string) $prompt['text'];
+		// OpenAI caches from the start of the request, and the step's own
+		// instructions come first: one key per step lets every recipe reuse
+		// them. The key used to be the recipe's research, which no other call
+		// shares a prefix with — 0 of 4 400 to 9 900 tokens cached on seven
+		// live recipes (ENGINE.md §7, 51).
+		$wire['cache_key'] = 'msrwa-' . $name;
 		if ( in_array( $name, array( 'canonical_recipe', 'article', 'review' ), true ) ) {
 			$research = MSRWA_Engine_Input::shared_context( $brief );
 			$recipe = MSRWA_Engine_Input::shared_context( $brief, true );
-			$wire['cache_key'] = 'msrwa-' . substr( md5( $research ), 0, 24 );
 			$wire['cache_breaks'] = array_values( array_filter( array( strlen( rtrim( $research ) ), 'canonical_recipe' === $name ? 0 : strlen( rtrim( $recipe ) ) ), static function ( $at ) use ( $input, $research ) { return $at > 0 && 0 === strpos( $input, rtrim( $research ) ); } ) );
 		}
 		$plan = MSRWA_Engine_Call::plan_text( $route['provider'], $route['model'], $input, $ceiling, true, $web_search, $wire );

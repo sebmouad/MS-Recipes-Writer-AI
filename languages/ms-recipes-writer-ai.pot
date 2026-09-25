@@ -367,6 +367,10 @@ msgstr ""
 msgid "Au-dessus du plafond de %s par recette : les lots seraient refusés tant qu’il n’est pas relevé dans les Réglages."
 msgstr ""
 
+#: class-msrwa-profile.php:36
+msgid "Aucun collage n’est dessiné ; le vôtre, s’il est joint, est publié tel quel et sert de référence. Le texte est relu et vérifié, et l’image à la une est jugée face à la recette."
+msgstr ""
+
 #: class-msrwa-screen-analysis.php:331
 msgid "Aucun contrôle en échec"
 msgstr ""
@@ -1128,7 +1132,7 @@ msgid "JSON invalide, donc ignoré pour : %s. Le reste a bien été enregistré,
 msgstr ""
 
 #: class-msrwa-profile.php:31
-msgid "La chaîne complète : le texte relu et vérifié, puis les deux images jugées ensemble, face à la recette. Une image refusée vous est signalée, et vous décidez de la faire redessiner."
+msgid "La chaîne complète : le collage Facebook d’abord — le vôtre, ou dessiné librement après la recherche —, puis la recette et l’article qui le suivent et l’image à la une du même plat. Le texte est relu et vérifié, les deux images jugées ensemble. Une image refusée vous est signalée, et vous décidez de la faire redessiner ; votre propre collage ne l’est jamais."
 msgstr ""
 
 #: class-msrwa-screen-engine.php:141
@@ -1713,10 +1717,6 @@ msgstr ""
 msgid "Partir le"
 msgstr ""
 
-#: class-msrwa-profile.php:36
-msgid "Pas de collage. Le texte est relu et vérifié, et l’image à la une est jugée face à la recette."
-msgstr ""
-
 #: class-msrwa-screen-pass.php:169 class-msrwa-screen-pass.php:170
 msgid "Pas encore parti"
 msgstr ""
@@ -2170,7 +2170,7 @@ msgid "Seules les tâches planifiées et les droits accordés sont retirés ; r�
 msgstr ""
 
 #: class-msrwa-admin.php:225
-msgid "Si l’approbation finale refuse à chaque tentative et fait redessiner les images, une recette peut coûter jusqu’à %s."
+msgid "Si la recherche utilise toutes les recherches permises et que le contrôle final doit être redemandé, une recette peut coûter jusqu’à %s. Une image refusée n’est jamais redessinée d’office."
 msgstr ""
 
 #: class-msrwa-operations.php:51
@@ -2390,7 +2390,7 @@ msgid "Un contrôle qui échoue une fois sur six est du bruit ; six fois sur six
 msgstr ""
 
 #: class-msrwa-screen-settings.php:336
-msgid "Un de vos collages dont le rendu doit être repris : lumière, couleurs, cadrage, plan de travail. Seul son style est repris, jamais son plat. Quand le rédacteur a envoyé une photographie du plat, c’est elle qui sert de référence."
+msgid "Un de vos collages dont le rendu doit être repris : lumière, couleurs, cadrage, plan de travail. Seul son style est repris, jamais son plat. Quand le rédacteur a envoyé une photographie du plat, elle montre le plat et ce collage garde le style."
 msgstr ""
 
 #: class-msrwa-screen-settings.php:418
