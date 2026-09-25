@@ -37,6 +37,7 @@ RULES:
 - Use the research package for ingredient choice, technique, success cues, failures, safety, storage and visual description. When it conflicts with the canonical recipe, keep the canonical figures and avoid repeating the disputed claim.
 - Treat visual observations as appearance evidence only. Never infer hidden ingredients, quantities or preparation steps from an image.
 - No meta description, slug, categories, tags or SEO section inside the text.
+- "categories" are chosen, never invented: when SITE CATEGORIES are supplied, only names from that list, copied exactly.
 
 OUTPUT — a valid JSON object only, no Markdown, with exactly these keys:
 - "title", "excerpt" ({{excerpt_min}} to {{excerpt_max}} characters), "seo_title" ({{seo_title_min}} to {{seo_title_max}} characters), "seo_description" ({{seo_description_min}} to {{seo_description_max}} characters), "slug", "tags", "categories"

@@ -49,6 +49,10 @@ msrwa_test_contains( $recipe_input, 'never an ingredient, a quantity or a step',
 
 $article_input = lab_build_input( 'article', 'PROMPT', $brief, array() );
 msrwa_test_contains( $article_input, 'APPEARANCE OF THE COOKED DISH', 'The article must receive how the dish looks.' );
+msrwa_test_missing( $article_input, 'SITE CATEGORIES', 'A brief without the site’s categories says nothing about them.' );
+$with_categories = lab_build_input( 'article', 'PROMPT', $brief + array( 'site_categories' => array( 'Tartes', 'Desserts', '<b>Viandes</b>' ) ), array() );
+msrwa_test_contains( $with_categories, 'SITE CATEGORIES', 'The article is given the site’s categories to choose from.' );
+msrwa_test_contains( $with_categories, '["Tartes","Desserts","Viandes"]', 'Listed exactly, stripped of markup.' );
 // The image's directions reached the prose when the article received them.
 foreach ( array( 'VISUAL BRIEF', 'NO GARNISH', 'ONE SERVING PRESENTATION' ) as $direction ) {
 	msrwa_test_assert( false === strpos( $article_input, $direction ), 'The article must not receive the image direction ' . $direction . '.' );

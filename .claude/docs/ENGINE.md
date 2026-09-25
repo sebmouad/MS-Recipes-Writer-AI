@@ -875,6 +875,18 @@ photograph, and otherwise use the photograph without the cost of a search.
     recipes, both versions reviewed by today's review: remarks 27 → 0,
     allergens missing 2 → 0, corrections 58 → 28, major findings 5 → 0, same
     cost ($0.0077 per article), words 2 511–2 826 → 2 563–2 723.
+49. **The article chooses its categories from the site's.** Owner's
+    report, 2026-09-25: posts were not filed under the site's categories.
+    The article named its own ("Apéritif", "Cuisine française familiale")
+    and the plugin keeps only names that exist, so a site whose categories
+    differ from a model's generic words got none — Gratin dauphinois went to
+    Uncategorized. The brief may now carry `site_categories`;
+    `normalise_brief()` keeps it (it dropped every key but four), the
+    article input adds `SITE CATEGORIES` after the appearance, and the prompt
+    says categories are chosen, never invented. Measured on three recipes
+    against a ten-category list: every choice from the list (Entrées +
+    Fritures et beignets; Poissons et fruits de mer + Gratins; Viandes et
+    volailles), same cost. Real: lot #83, Gratin dauphinois → Gratins.
 
 ### Still open
 

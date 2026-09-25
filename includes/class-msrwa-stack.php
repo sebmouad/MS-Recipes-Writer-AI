@@ -262,6 +262,23 @@ final class MSRWA_Stack {
 	}
 
 	/**
+	 * The categories this site files posts under, for the article to choose
+	 * from. Left to its own words, the model named "Apéritif" or "Cuisine
+	 * française familiale" on a site that had neither, and the post stayed
+	 * uncategorised. The default category is never offered; the most used
+	 * come first, and a site with hundreds sends its first sixty.
+	 */
+	public static function site_categories() {
+		$default = (int) get_option( 'default_category' );
+		$names = array();
+		foreach ( (array) get_terms( array( 'taxonomy' => 'category', 'hide_empty' => false, 'orderby' => 'count', 'order' => 'DESC', 'number' => 61 ) ) as $term ) {
+			if ( ! is_object( $term ) || (int) $term->term_id === $default ) { continue; }
+			$names[] = html_entity_decode( (string) $term->name, ENT_QUOTES, 'UTF-8' );
+		}
+		return array_slice( $names, 0, 60 );
+	}
+
+	/**
 	 * Existing categories the suggestions name, compared without accents, case
 	 * or a plural's final letter: "plat principal" is filed under "Plats
 	 * principaux". The default category never counts as a match.

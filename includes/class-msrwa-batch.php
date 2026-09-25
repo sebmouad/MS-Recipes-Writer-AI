@@ -291,6 +291,8 @@ final class MSRWA_Batch {
 			// nothing left to be written from.
 			if ( ! empty( $recipe['from_photographs'] ) && ! $images ) { continue; }
 			$brief = MSRWA_Match::brief( $recipe, $images );
+			// What the article may file itself under: this site's categories, not a model's guess.
+			$brief['site_categories'] = MSRWA_Stack::site_categories();
 			$run = MSRWA_Run::create( (int) $id, (int) $batch['owner_id'], $brief, $config, MSRWA_Profile::steps( $batch['profile'], (array) ( $config['steps'] ?? array() ) ) );
 			if ( $run ) {
 				MSRWA_History::inherit( (int) $id, $run );

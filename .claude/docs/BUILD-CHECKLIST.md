@@ -630,6 +630,11 @@ cost) in the task before changing anything.
   (2026-09-24).** The writer's photograph shows the prompt's writer the dish;
   the collage is drawn from the style reference. Real: the owner's own rôti
   photograph, drawn both ways. See ENGINE.md §7, item 40.
+- [x] **A58 — Categories chosen from the site's (2026-09-25).**
+  `MSRWA_Stack::site_categories()` in each brief; the engine passes them to
+  the article, which picks one or two; `category_ids()` files the post.
+  Real: lot #83, Gratin dauphinois filed under Gratins (was Uncategorized).
+  See ENGINE.md §7, item 49. `tests/test-visual-reference.php`.
 - [x] **A57 — Reset and uninstall choice (2026-09-25).** `MSRWA_Reset`:
   settings (keys kept unless asked), or settings and data (DELETE, not
   TRUNCATE, drafts' `_msrwa_run_id` dropped, refused while a recipe runs,

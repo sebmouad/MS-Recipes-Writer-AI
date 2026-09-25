@@ -344,6 +344,18 @@ final class MSRWA_Engine_Input {
 	}
 
 	/**
+	 * The categories the caller's site files posts under. The article chooses
+	 * among them rather than naming its own: a name the site does not have is
+	 * a post left uncategorised. Absent from a brief, nothing is said.
+	 */
+	public static function site_categories( $brief ) {
+		$names = array_values( array_filter( array_map( static function ( $name ) { return trim( strip_tags( (string) $name ) ); }, (array) ( $brief['site_categories'] ?? array() ) ) ) );
+		if ( ! $names ) { return ''; }
+		return 'SITE CATEGORIES — "categories" names one or two of these, copied exactly, the most specific that fit the dish; never a name outside this list, and an empty array when none fits: '
+			. json_encode( array_slice( $names, 0, 60 ), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . "\n";
+	}
+
+	/**
 	 * How the dish looks, for the article. It used to receive the image's visual
 	 * brief, and the brief's directions reached the prose: fourteen articles
 	 * measured told their readers to serve "sur une assiette en céramique unie",
@@ -640,6 +652,7 @@ final class MSRWA_Engine_Input {
 			$feedback = is_array( $brief['feedback'] ?? null ) ? $brief['feedback'] : array();
 			return self::shared_context( $brief, true ) . $prompt . MSRWA_Quality::prompt_contract( $settings )
 				. "\n" . self::appearance_for_prose( $research )
+				. self::site_categories( $brief )
 				. ( $feedback ? "\nREVIEW FINDINGS TO CORRECT IN THE COMPLETE RETURNED ARTICLE: " . $encode( $feedback ) : '' );
 		}
 		if ( 'review' === $step ) {

@@ -1104,6 +1104,8 @@ final class MSRWA_Engine {
 			'title' => (string) ( $brief['title'] ?? '' ),
 			'text' => (string) ( $brief['text'] ?? '' ),
 			'images' => array_values( (array) ( $brief['images'] ?? array() ) ),
+			// The caller's categories, for the article to choose among (ENGINE.md §7, 49).
+			'site_categories' => array_values( array_filter( array_map( 'strval', (array) ( $brief['site_categories'] ?? array() ) ) ) ),
 		);
 	}
 }
