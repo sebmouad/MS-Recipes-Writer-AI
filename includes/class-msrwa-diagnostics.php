@@ -69,8 +69,9 @@ final class MSRWA_Diagnostics {
 			), __( 'Rechargez n’importe quel écran d’administration : la migration se déclenche au premier chargement après une mise à jour.', 'ms-recipes-writer-ai' ) );
 		}
 		return self::check( 'good', __( 'Tables', 'ms-recipes-writer-ai' ), sprintf(
-			/* translators: %d is a schema version number. */
-			__( 'Les six tables sont là, schéma %d.', 'ms-recipes-writer-ai' ),
+			/* translators: 1: a number of tables, 2: a schema version number. */
+			__( 'Les %1$d tables sont là, schéma %2$d.', 'ms-recipes-writer-ai' ),
+			count( MSRWA_DB::tables() ),
 			MSRWA_DB::SCHEMA
 		) );
 	}

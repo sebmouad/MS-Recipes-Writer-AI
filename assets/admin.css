@@ -448,6 +448,8 @@
 
 .ms-muted { color: var(--ms-ink-soft); }
 .ms-num, .ms-key { font-family: var(--ms-mono); font-variant-numeric: tabular-nums; }
+/* A button in a figures column is still a button, in the screen's own type. */
+.ms-num .button { font-family: var(--ms-sans); }
 .ms-code { font-family: var(--ms-mono); font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere; background: var(--ms-sunk); border: 1px solid var(--ms-line-soft); border-radius: 6px; padding: 12px 14px; max-height: 420px; overflow: auto; }
 
 @media (max-width: 782px) {
@@ -493,12 +495,16 @@
 .ms-reset-confirm { display: grid; gap: 4px; }
 .ms-reset-confirm label { font-size: 12px; font-weight: 600; color: var(--ms-ink); }
 .ms-reset-confirm input { max-inline-size: 14rem; font-family: var(--ms-mono); letter-spacing: .08em; }
+/* A file field drawn as a button of the screen, not the browser's grey one. */
+.msrwa input[type="file"] { font-size: 13px; color: var(--ms-ink-soft); max-inline-size: 100%; }
+.msrwa input[type="file"]::file-selector-button { margin-inline-end: 10px; padding: 0 10px; min-block-size: 30px; font: inherit; color: var(--ms-lamp); background: var(--ms-raised); border: 1px solid var(--ms-lamp); border-radius: 3px; cursor: pointer; }
+.msrwa input[type="file"]::file-selector-button:hover { background: var(--ms-lamp-soft); }
 .ms-uninstall { margin-block-start: 18px; padding-block-start: 16px; border-block-start: 1px solid var(--ms-line-soft); }
 .ms-uninstall h3 { margin: 0 0 4px; font-size: 14px; display: flex; align-items: center; gap: 8px; }
 .ms-uninstall h3 .dashicons { color: var(--ms-ink-soft); }
 .ms-uninstall > p { color: var(--ms-ink-soft); max-inline-size: 78ch; }
 .ms-reset-busy { color: var(--ms-stop); font-size: 13px; }
-.ms-reset-option .ms-reset-go { margin-block-start: auto; }
+.ms-reset-option .ms-reset-go { margin-block-start: 4px; }
 
 /* API keys: one card per provider, its state, its field, where to get one. */
 .ms-keycards { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr)); margin: 14px 0 16px; }
@@ -546,20 +552,22 @@
 
 .ms-catalog .ms-grid-cell { min-inline-size: 22rem; }
 
+.ms-grid-steps { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 14px; margin-block-end: 4px; }
 .ms-grid-step {
-	display: inline-block;
-	inline-size: 10.5rem;
-	margin-block-end: 2px;
+	display: flex;
+	align-items: flex-start;
+	gap: 6px;
 	font-size: 12px;
+	line-height: 1.4;
 	color: var(--ms-ink-soft);
-	vertical-align: top;
 }
+.ms-grid-step input { margin: 1px 0 0; flex: none; }
 
 .ms-catalog .ms-num { inline-size: 6.5rem; }
 
 @media (max-width: 900px) {
 	.ms-catalog .ms-grid-cell { min-inline-size: 0; }
-	.ms-grid-step { inline-size: 100%; }
+	.ms-grid-steps { grid-template-columns: minmax(0, 1fr); }
 }
 
 /* --- The model picker -------------------------------------------------
@@ -720,7 +728,7 @@
 .ms-fold > summary::-webkit-details-marker { display: none; }
 .ms-fold > summary::before { content: "+"; font-weight: 700; color: var(--ms-lamp); inline-size: 1em; }
 .ms-fold[open] > summary::before { content: "–"; }
-.ms-fold > summary h2 { margin: 0; }
+.ms-fold > summary h2, .ms-advanced > summary h2 { margin: 0; font-size: 13px; font-weight: 650; text-transform: uppercase; letter-spacing: .06em; color: var(--ms-ink-soft); }
 
 /* The timeline tells the story; the plumbing waits behind a toggle. */
 .ms-timeline-all { position: absolute; opacity: 0; pointer-events: none; }

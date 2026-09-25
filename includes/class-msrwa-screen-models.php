@@ -118,6 +118,7 @@ final class MSRWA_Screen_Models {
 								// only the steps of its family, as on the Moteur screen.
 								$draws = MSRWA_Compat::is_image_model( $row['provider'], $row['model_id'] );
 								?>
+								<div class="ms-grid-steps">
 								<?php foreach ( $steps as $key => $step ) : ?>
 									<?php if ( $step['image'] !== $draws ) { continue; } ?>
 									<?php
@@ -131,8 +132,9 @@ final class MSRWA_Screen_Models {
 										<?php echo esc_html( $step['label'] ); ?>
 									</label>
 								<?php endforeach; ?>
+								</div>
 								<?php if ( ! $row['steps'] ) : ?>
-									<br><small class="ms-muted"><?php esc_html_e( 'rien de coché : aucune restriction', 'ms-recipes-writer-ai' ); ?></small>
+									<small class="ms-muted"><?php esc_html_e( 'rien de coché : aucune restriction', 'ms-recipes-writer-ai' ); ?></small>
 								<?php endif; ?>
 							</td>
 						</tr>

@@ -262,8 +262,10 @@ final class MSRWA_UI {
 				<?php endif; ?>
 			</div>
 			<div class="ms-ticket-side">
-				<?php echo self::progress( $run['steps_done'], $run['steps_total'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 				<?php
+				// A finished recipe's bar is always full: on a list of them it
+				// was one identical green line per row, saying nothing.
+				if ( 'done' !== ( $run['status'] ?? '' ) ) { echo self::progress( $run['steps_done'], $run['steps_total'] ); } // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				// Once the post has left the drafts its own state, below, says it;
 				// the same word twice on one row reads as two different facts.
 				$post_id = (int) ( $run['draft_post_id'] ?? 0 );

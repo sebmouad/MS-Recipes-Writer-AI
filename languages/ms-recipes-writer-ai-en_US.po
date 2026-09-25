@@ -2414,3 +2414,7 @@ msgstr "Keep everything"
 
 msgid "WordPress ne pose aucune question au moment de supprimer une extension : ce qui part est choisi ici, à l’avance. Les articles et la médiathèque restent dans tous les cas."
 msgstr "WordPress asks nothing when an extension is deleted: what goes is chosen here, in advance. Articles and the media library stay in every case."
+
+#, php-format
+msgid "Les %1$d tables sont là, schéma %2$d."
+msgstr "All %1$d tables are there, schema %2$d."

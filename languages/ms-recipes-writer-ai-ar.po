@@ -2462,3 +2462,7 @@ msgstr "الاحتفاظ بكل شيء"
 
 msgid "WordPress ne pose aucune question au moment de supprimer une extension : ce qui part est choisi ici, à l’avance. Les articles et la médiathèque restent dans tous les cas."
 msgstr "لا يطرح ووردبريس أي سؤال عند حذف إضافة: ما يُحذف يُختار هنا مسبقًا. تبقى المقالات ومكتبة الوسائط في جميع الأحوال."
+
+#, php-format
+msgid "Les %1$d tables sont là, schéma %2$d."
+msgstr "الجداول (%1$d) كلها موجودة، المخطط %2$d."
