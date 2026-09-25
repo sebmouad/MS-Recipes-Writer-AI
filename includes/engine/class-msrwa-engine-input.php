@@ -267,17 +267,60 @@ final class MSRWA_Engine_Input {
 			'cocotte' => 'served in the cooking pot it was made in',
 			'poêle' => 'served in the pan it was made in',
 		);
-		$decision = '';
-		foreach ( $vessels as $needle => $sentence ) {
+		// A dish baked to be served in its dish is served in it, whatever word an
+		// observation lets fall: "assiette" in a gratin's photographs is usually
+		// the portion beside it, and lifted the whole gratin onto a plate.
+		$decision = self::baked_in_its_dish( $canonical );
+		foreach ( '' === $decision ? $vessels : array() as $needle => $sentence ) {
 			if ( false !== mb_stripos( $text, $needle ) ) { $decision = $sentence; break; }
 		}
-		if ( '' === $decision ) { $decision = 'removed from whatever it was cooked in and served whole on a plain ceramic plate'; }
+		if ( '' === $decision ) { $decision = self::served_from_recipe( $canonical ); }
 
 		$appearance = trim( preg_replace( '/\s+/', ' ', self::about_the_dish( $appearance_text ) ) );
 		$framing = ', whole and centred, photographed from a three-quarter angle at table height, never from directly above';
 		if ( $short ) { return $decision . $framing . '.'; }
 		return $decision . $framing
 			. ( '' === $appearance ? '' : ', and at exactly the colour the observations record: ' . mb_substr( $appearance, 0, 240 ) );
+	}
+
+	/** The serving of a dish baked to be served in its own dish, or '' for any other. */
+	private static function baked_in_its_dish( $canonical ) {
+		$title = mb_strtolower( (string) ( $canonical['title'] ?? '' ) );
+		$equipment = mb_strtolower( implode( ' | ', array_map( 'strval', (array) ( $canonical['equipment'] ?? array() ) ) ) );
+		foreach ( array( 'plats à gratin individuels', 'ramequin', 'cassolette' ) as $word ) {
+			if ( false !== mb_strpos( $equipment, $word ) ) { return 'served in the individual baking dishes it was cooked in, straight from the oven, one of them in front'; }
+		}
+		foreach ( array( 'gratin', 'parmentier', 'lasagne', 'clafoutis', 'moussaka', 'crumble', 'tian ' ) as $word ) {
+			if ( false !== mb_strpos( $title . ' ', $word ) || ( 'gratin' === $word && false !== mb_strpos( $equipment, 'plat à gratin' ) ) ) {
+				return 'served in the baking dish it was cooked in, straight from the oven, never lifted out onto a plate';
+			}
+		}
+		return '';
+	}
+
+	/**
+	 * How the dish is served when no photograph shows it, read from the recipe.
+	 *
+	 * The fallback used to be a plate for everything, so a gratin was drawn
+	 * lifted out of the dish it is baked and served in, and a potée out of its
+	 * pot. A dish baked to be served in its dish stays in it; a stew goes to
+	 * the deep dish the recipe names, else stays in its pot; a tart or quiche
+	 * stays in its tin. Anything else is plated.
+	 */
+	public static function served_from_recipe( $canonical ) {
+		$title = mb_strtolower( (string) ( $canonical['title'] ?? '' ) );
+		$equipment = mb_strtolower( implode( ' | ', array_map( 'strval', (array) ( $canonical['equipment'] ?? array() ) ) ) );
+		$has = static function ( $text, array $words ) {
+			foreach ( $words as $word ) { if ( false !== mb_strpos( $text, $word ) ) { return true; } }
+			return false;
+		};
+		$baked = self::baked_in_its_dish( $canonical );
+		if ( '' !== $baked ) { return $baked; }
+		if ( $has( $equipment, array( 'moule à tarte', 'moule à quiche', 'cercle à tarte' ) ) ) { return 'presented in its own baking tin, the same tin as the earlier panels'; }
+		if ( $has( $equipment, array( 'cocotte', 'faitout', 'marmite', 'tajine' ) ) && ! $has( $equipment, array( 'plaque de cuisson', 'moule' ) ) ) {
+			return $has( $equipment, array( 'plat creux', 'plat de service' ) ) ? 'served in a deep serving dish with its cooking liquid, out of the pot' : 'served in the cooking pot it was made in';
+		}
+		return 'removed from whatever it was cooked in and served whole on a plain ceramic plate';
 	}
 
 	/**

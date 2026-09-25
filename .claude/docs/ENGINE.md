@@ -844,6 +844,14 @@ photograph, and otherwise use the photograph without the cost of a search.
     says that what sits beside the dish in the photograph and is not an
     ingredient is left out: a research photograph's cherry tomatoes had been
     copied onto the plate.
+46. **Serving read from the recipe.** When no observation names a vessel,
+    `served_from_recipe()` decides from the canonical title and equipment
+    instead of plating everything: a dish baked to be served in its dish
+    (gratin, parmentier, lasagne, clafoutis, moussaka, crumble, tian, or a
+    `plat à gratin`) stays in it — and wins even over an observation's
+    "assiette", which in a gratin's photographs is the portion beside it —
+    individual dishes stay individual, a stew goes to the deep dish named or
+    stays in its pot, a tart or quiche stays in its tin.
 
 ### Still open
 

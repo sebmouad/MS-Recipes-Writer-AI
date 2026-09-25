@@ -156,4 +156,14 @@ msrwa_test_missing( $generated, 'assiette blanche', 'The image generator must st
 msrwa_test_missing( $generated, 'riz à côté', 'Another cook\'s accompaniment must never reach the generator.' );
 msrwa_test_contains( $generated, 'Doré et brun clair', 'Colour must still reach the generator.' );
 
+// A gratin was drawn lifted onto a plate: the fallback served everything on
+// one. A dish baked to be served in its dish stays in it, even when a
+// photograph's observations mention a plate; a stew goes to its deep dish.
+$gratin = array( 'title' => 'Gratin de cabillaud à la béchamel', 'equipment' => array( 'four', 'plat à gratin', 'casserole' ) );
+$plated = array( 'visual_observations' => array( array( 'observable_details' => 'Une portion sur une assiette blanche.' ) ) );
+msrwa_test_contains( MSRWA_Engine_Input::serving_presentation( $gratin, $plated, true ), 'served in the baking dish it was cooked in', 'A gratin is served in its dish.' );
+msrwa_test_contains( MSRWA_Engine_Input::serving_presentation( array( 'title' => 'Gratin', 'equipment' => array( 'quatre plats à gratin individuels' ) ), array(), true ), 'individual baking dishes', 'Individual gratins stay individual.' );
+msrwa_test_contains( MSRWA_Engine_Input::serving_presentation( array( 'title' => 'Potée', 'equipment' => array( 'grand faitout', 'grand plat creux' ) ), array(), true ), 'deep serving dish', 'A stew goes to the deep dish the recipe names.' );
+msrwa_test_contains( MSRWA_Engine_Input::serving_presentation( array( 'title' => 'Croquettes', 'equipment' => array( 'friteuse' ) ), array(), true ), 'plain ceramic plate', 'Anything else is still plated.' );
+
 msrwa_test_done( 'image prompts' );

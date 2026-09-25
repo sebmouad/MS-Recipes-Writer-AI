@@ -630,6 +630,10 @@ cost) in the task before changing anything.
   (2026-09-24).** The writer's photograph shows the prompt's writer the dish;
   the collage is drawn from the style reference. Real: the owner's own rôti
   photograph, drawn both ways. See ENGINE.md §7, item 40.
+- [x] **A49 — Each dish served as it is served (2026-09-25).** Gratins in
+  their baking dish, stews in their pot or deep dish, tarts in their tin.
+  Real: gratin de pommes de terre à la viande hachée, $0.0169.
+  `tests/test-image-prompt.php`. ENGINE.md §7, item 46.
 - [x] **A48 — Report reads from its conclusions (2026-09-25).** Attention
   box, section menu, before/after corrections, colour per event kind in the
   report and on the run screen. Checked in Chromium at 1280 and 390 px on
