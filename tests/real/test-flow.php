@@ -15,7 +15,10 @@ if ( empty( $health['body']['providers'] ) ) { msrwa_real_skip( 'No API key is s
 // MSRWA_TEST_PROFILE=full runs the images and the final approval too, which is
 // what the estimate of a complete recipe is measured against.
 $profile = in_array( getenv( 'MSRWA_TEST_PROFILE' ), array( 'article', 'featured', 'full' ), true ) ? getenv( 'MSRWA_TEST_PROFILE' ) : 'article';
-$estimate = msrwa_real_request( 'GET', '/msrwa/v1/estimate?profile=' . $profile . '&recipes=1&images=0' );
+// A real photograph of the dish is paired and replaces the web search, so
+// the recipe is estimated with it; a drawn stand-in is set aside and is not.
+$sends_photo = '' !== (string) getenv( 'MSRWA_TEST_PHOTO' ) && is_readable( (string) getenv( 'MSRWA_TEST_PHOTO' ) );
+$estimate = msrwa_real_request( 'GET', '/msrwa/v1/estimate?profile=' . $profile . '&recipes=1&images=' . ( $sends_photo ? 1 : 0 ) );
 $expected = (float) ( $estimate['body']['cost_usd'] ?? 0 );
 $most = (float) ( $estimate['body']['max_usd'] ?? $expected );
 msrwa_real_assert( $expected > 0, 'The article profile must be priced before it is run.' );

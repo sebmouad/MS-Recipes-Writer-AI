@@ -54,7 +54,10 @@ final class MSRWA_I18N {
 			/* translators: %s is a number of seconds. */
 			return sprintf( __( '%s s', 'ms-recipes-writer-ai' ), number_format_i18n( $seconds, 1 ) );
 		}
+		// Rounded once, to whole seconds, before splitting: 179.8 s used to
+		// read "2 min 60 s".
+		$whole = (int) round( $seconds );
 		/* translators: 1: whole minutes, 2: remaining seconds. */
-		return sprintf( __( '%1$d min %2$d s', 'ms-recipes-writer-ai' ), floor( $seconds / 60 ), round( fmod( $seconds, 60 ) ) );
+		return sprintf( __( '%1$d min %2$d s', 'ms-recipes-writer-ai' ), intdiv( $whole, 60 ), $whole % 60 );
 	}
 }

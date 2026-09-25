@@ -144,7 +144,15 @@ final class MSRWA_UI {
 		}
 		if ( 'cancelled' === $status ) { return array( '', __( 'Arrêtée à la demande. Elle peut être reprise là où elle s’était arrêtée.', 'ms-recipes-writer-ai' ) ); }
 		if ( 'done' === $status ) {
-			if ( ! (int) ( $run['draft_post_id'] ?? 0 ) ) { return array( 'warn', __( 'Le travail est terminé, mais aucun brouillon n’a pu être créé. Un administrateur doit regarder le détail.', 'ms-recipes-writer-ai' ) ); }
+			$post_id = (int) ( $run['draft_post_id'] ?? 0 );
+			if ( ! $post_id ) { return array( 'warn', __( 'Le travail est terminé, mais aucun brouillon n’a pu être créé. Un administrateur doit regarder le détail.', 'ms-recipes-writer-ai' ) ); }
+			// Once the post has left the drafts the decision is made: the lot
+			// kept asking for a review of articles already published.
+			$post_status = array_key_exists( 'post_status', $run ) ? $run['post_status'] : get_post_status( $post_id );
+			if ( in_array( $post_status, array( 'publish', 'private' ), true ) ) { return array( 'good', __( 'L’article est publié. Rien d’autre à faire.', 'ms-recipes-writer-ai' ) ); }
+			if ( 'future' === $post_status ) { return array( 'live', __( 'L’article est programmé ; il paraîtra à la date choisie.', 'ms-recipes-writer-ai' ) ); }
+			if ( 'trash' === $post_status ) { return array( '', __( 'L’article est à la corbeille.', 'ms-recipes-writer-ai' ) ); }
+			if ( null === $post_status || false === $post_status ) { return array( '', __( 'L’article a été supprimé de WordPress.', 'ms-recipes-writer-ai' ) ); }
 			$approved = $run['approved'] ?? null;
 			if ( null !== $approved && ! $approved ) {
 				return array( 'warn', __( 'Le brouillon est prêt, mais le contrôle final a relevé des points à vérifier. Lisez-les avant de publier.', 'ms-recipes-writer-ai' ) );

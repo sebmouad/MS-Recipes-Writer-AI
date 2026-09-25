@@ -2163,3 +2163,15 @@ msgstr "Retry"
 
 msgid "Échec"
 msgstr "Failure"
+
+msgid "L’article est publié. Rien d’autre à faire."
+msgstr "The article is published. Nothing else to do."
+
+msgid "L’article est programmé ; il paraîtra à la date choisie."
+msgstr "The article is scheduled; it will appear on the chosen date."
+
+msgid "L’article est à la corbeille."
+msgstr "The article is in the bin."
+
+msgid "L’article a été supprimé de WordPress."
+msgstr "The article was deleted from WordPress."

@@ -509,9 +509,10 @@ function report_timeline( $events ) {
 	foreach ( $kinds as $kind => $meta ) {
 		if ( ! empty( $counts[ $kind ] ) ) { $legend .= '<span class="pill ' . $meta[1] . '">' . report_h( $meta[0] ) . ' · ' . (int) $counts[ $kind ] . '</span> '; }
 	}
-	// The one script on the page: without it the details stay hidden, and the story still reads.
+	// No script: the site serves this page with a policy that runs none, so
+	// the details are shown by a checkbox the stylesheet reads.
 	return '<div class="legend">' . $legend . '</div>'
-		. '<p><button type="button" class="toggle" onclick="var t=this.parentNode.nextElementSibling;t.classList.toggle(\'all\');this.textContent=t.classList.contains(\'all\')?\'Masquer les essais, appels et entrées\':\'Afficher aussi les essais, appels et entrées\'">Afficher aussi les essais, appels et entrées</button></p>'
+		. '<input type="checkbox" id="tl-all" class="tl-all"><label for="tl-all" class="toggle">Afficher aussi les essais, appels et entrées</label>'
 		. '<ol class="timeline">' . $rows . '</ol>';
 }
 

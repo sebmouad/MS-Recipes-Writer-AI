@@ -25,7 +25,7 @@ msgstr ""
 msgid "%1$d en cours, %2$d en attente ; entretien piloté par %3$s."
 msgstr ""
 
-#: class-msrwa-i18n.php:58
+#: class-msrwa-i18n.php:61
 msgid "%1$d min %2$d s"
 msgstr ""
 
@@ -41,7 +41,7 @@ msgstr ""
 msgid "%1$d traitée(s), %2$d ignorée(s) : l’action ne s’appliquait pas, ou elles ne vous appartiennent pas."
 msgstr ""
 
-#: class-msrwa-ui.php:199
+#: class-msrwa-ui.php:207
 msgid "%1$d étapes sur %2$d"
 msgstr ""
 
@@ -417,7 +417,7 @@ msgstr ""
 msgid "Brief remis au moteur"
 msgstr ""
 
-#: class-msrwa-ui.php:269
+#: class-msrwa-ui.php:277
 msgid "Brouillon"
 msgstr ""
 
@@ -533,7 +533,7 @@ msgstr ""
 msgid "Cette heure est déjà passée."
 msgstr ""
 
-#: class-msrwa-run.php:691
+#: class-msrwa-run.php:695
 msgid "Cette image ne peut pas être redessinée."
 msgstr ""
 
@@ -721,7 +721,7 @@ msgstr ""
 msgid "DISABLE_WP_CRON est actif. Les lots n’avanceront que si un cron serveur appelle wp-cron.php ; sans cela ils resteront en attente sans rien signaler."
 msgstr ""
 
-#: class-msrwa-ui.php:270
+#: class-msrwa-ui.php:278
 msgid "Dans la corbeille"
 msgstr ""
 
@@ -853,11 +853,11 @@ msgstr ""
 msgid "En attente : la file est suspendue par un administrateur. Elle repartira d’elle-même quand la file reprendra."
 msgstr ""
 
-#: class-msrwa-run.php:207
+#: class-msrwa-run.php:211
 msgid "En attente de : %s, qui n’est jamais arrivé."
 msgstr ""
 
-#: class-msrwa-ui.php:268
+#: class-msrwa-ui.php:276
 msgid "En attente de relecture"
 msgstr ""
 
@@ -1005,7 +1005,7 @@ msgstr ""
 msgid "Interrogation des fournisseurs…"
 msgstr ""
 
-#: class-msrwa-ui.php:293
+#: class-msrwa-ui.php:301
 msgid "Intitulé dans WordPress : « %s »"
 msgstr ""
 
@@ -1061,11 +1061,11 @@ msgstr ""
 msgid "La narration minute par minute. La table qui grossit le plus vite, et celle que personne ne relit."
 msgstr ""
 
-#: class-msrwa-ui.php:190
+#: class-msrwa-ui.php:198
 msgid "La recette s’est arrêtée avant la fin. La reprendre relance seulement ce qui a échoué."
 msgstr ""
 
-#: class-msrwa-ui.php:188
+#: class-msrwa-ui.php:196
 msgid "La recette s’est arrêtée à l’étape « %s ». La reprendre relance seulement ce qui a échoué."
 msgstr ""
 
@@ -1087,11 +1087,11 @@ msgstr ""
 msgid "Le brouillon a été modifié depuis sa génération : %s caractères d’écart. Les contrôles ci-dessous portent sur ce que la machine a écrit, pas sur la version actuelle."
 msgstr ""
 
-#: class-msrwa-ui.php:152
+#: class-msrwa-ui.php:160
 msgid "Le brouillon est prêt à être relu. Rien n’est publié tant que vous ne le décidez pas."
 msgstr ""
 
-#: class-msrwa-ui.php:150
+#: class-msrwa-ui.php:158
 msgid "Le brouillon est prêt, mais le contrôle final a relevé des points à vérifier. Lisez-les avant de publier."
 msgstr ""
 
@@ -1103,7 +1103,7 @@ msgstr ""
 msgid "Le collage a été redessiné %d fois d’après ces remarques ; le nouveau n’a pas été rejugé."
 msgstr ""
 
-#: class-msrwa-ui.php:166
+#: class-msrwa-ui.php:174
 msgid "Le compte du service d’écriture n’a plus de crédit. Un administrateur doit le recharger, puis reprendre la recette : rien de ce qui est fait n’est perdu."
 msgstr ""
 
@@ -1159,7 +1159,7 @@ msgstr ""
 msgid "Le nettoyage n’a encore jamais tourné."
 msgstr ""
 
-#: class-msrwa-run.php:719
+#: class-msrwa-run.php:723
 msgid "Le nouveau dessin a échoué. Réessayez plus tard."
 msgstr ""
 
@@ -1171,11 +1171,11 @@ msgstr ""
 msgid "Le pass → « Reprendre la file » quand vous voulez qu’elles repartent."
 msgstr ""
 
-#: class-msrwa-run.php:702
+#: class-msrwa-run.php:706
 msgid "Le plafond de cette recette est atteint."
 msgstr ""
 
-#: class-msrwa-ui.php:175
+#: class-msrwa-ui.php:183
 msgid "Le plafond de dépense de cette recette a été atteint avant la fin. Ce qui est fait est gardé ; un administrateur peut relever le plafond et la reprendre."
 msgstr ""
 
@@ -1207,19 +1207,19 @@ msgstr ""
 msgid "Le schéma enregistré est %1$d ; cette version en attend %2$d."
 msgstr ""
 
-#: class-msrwa-ui.php:172
+#: class-msrwa-ui.php:180
 msgid "Le service d’écriture a refusé la clé du site. Un administrateur doit la vérifier dans les réglages, puis reprendre la recette."
 msgstr ""
 
-#: class-msrwa-ui.php:184
+#: class-msrwa-ui.php:192
 msgid "Le service d’écriture n’a pas répondu à temps. Reprendre la recette suffit en général : rien de ce qui est fait n’est perdu."
 msgstr ""
 
-#: class-msrwa-ui.php:181
+#: class-msrwa-ui.php:189
 msgid "Le service d’écriture refuse d’en traiter davantage pour le moment : c’est une limite de son côté, pas du site. Reprendre la recette plus tard suffit souvent ; si cela se répète, la limite du compte doit être relevée chez le fournisseur."
 msgstr ""
 
-#: class-msrwa-ui.php:169
+#: class-msrwa-ui.php:177
 msgid "Le site n’est relié à aucun service d’écriture pour une étape de cette recette. Un administrateur doit enregistrer la clé, puis la reprendre."
 msgstr ""
 
@@ -1227,7 +1227,7 @@ msgstr ""
 msgid "Le total est incomplet : %s tourne(nt) sur un modèle sans tarif publié."
 msgstr ""
 
-#: class-msrwa-ui.php:147
+#: class-msrwa-ui.php:148
 msgid "Le travail est terminé, mais aucun brouillon n’a pu être créé. Un administrateur doit regarder le détail."
 msgstr ""
 
@@ -1343,8 +1343,24 @@ msgstr ""
 msgid "L’appariement de ce lot est arrêté : il est parti avec ce qui suit."
 msgstr ""
 
-#: class-msrwa-ui.php:275
+#: class-msrwa-ui.php:155
+msgid "L’article a été supprimé de WordPress."
+msgstr ""
+
+#: class-msrwa-ui.php:283
 msgid "L’article a été supprimé définitivement ; le suivi de la recette reste ici."
+msgstr ""
+
+#: class-msrwa-ui.php:153
+msgid "L’article est programmé ; il paraîtra à la date choisie."
+msgstr ""
+
+#: class-msrwa-ui.php:152
+msgid "L’article est publié. Rien d’autre à faire."
+msgstr ""
+
+#: class-msrwa-ui.php:154
+msgid "L’article est à la corbeille."
 msgstr ""
 
 #: class-msrwa-screen-run.php:141
@@ -1391,7 +1407,7 @@ msgstr ""
 msgid "Mise de côté"
 msgstr ""
 
-#: class-msrwa-ui.php:303
+#: class-msrwa-ui.php:311
 msgid "Modifier"
 msgstr ""
 
@@ -1631,7 +1647,7 @@ msgstr ""
 msgid "Programmer"
 msgstr ""
 
-#: class-msrwa-ui.php:267
+#: class-msrwa-ui.php:275
 msgid "Programmé"
 msgstr ""
 
@@ -1639,7 +1655,7 @@ msgstr ""
 msgid "Programmés"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:121 class-msrwa-ui.php:307
+#: class-msrwa-screen-engine.php:121 class-msrwa-ui.php:315
 msgid "Prévisualiser"
 msgstr ""
 
@@ -1651,11 +1667,11 @@ msgstr ""
 msgid "Publier la recette en données structurées (Recipe JSON-LD)"
 msgstr ""
 
-#: class-msrwa-ui.php:265
+#: class-msrwa-ui.php:273
 msgid "Publié"
 msgstr ""
 
-#: class-msrwa-ui.php:266
+#: class-msrwa-ui.php:274
 msgid "Publié en privé"
 msgstr ""
 
@@ -1783,7 +1799,7 @@ msgstr ""
 msgid "Reprise…"
 msgstr ""
 
-#: class-msrwa-ui.php:299
+#: class-msrwa-ui.php:307
 msgid "Restaurer"
 msgstr ""
 
@@ -1995,7 +2011,7 @@ msgstr ""
 msgid "Supprimer le lot"
 msgstr ""
 
-#: class-msrwa-ui.php:274
+#: class-msrwa-ui.php:282
 msgid "Supprimé de WordPress"
 msgstr ""
 
@@ -2035,7 +2051,7 @@ msgstr ""
 msgid "Sélection"
 msgstr ""
 
-#: class-msrwa-ui.php:218
+#: class-msrwa-ui.php:226
 msgid "Sélectionner %s"
 msgstr ""
 
@@ -2217,7 +2233,7 @@ msgstr ""
 msgid "Visuel Facebook"
 msgstr ""
 
-#: class-msrwa-ui.php:305
+#: class-msrwa-ui.php:313
 msgid "Voir"
 msgstr ""
 
@@ -2529,7 +2545,7 @@ msgstr ""
 msgid "langue"
 msgstr ""
 
-#: class-msrwa-ui.php:286
+#: class-msrwa-ui.php:294
 msgid "le %s"
 msgstr ""
 
@@ -2601,7 +2617,7 @@ msgstr ""
 msgid "modifié"
 msgstr ""
 
-#: class-msrwa-ui.php:286
+#: class-msrwa-ui.php:294
 msgid "modifié le %s"
 msgstr ""
 
@@ -2633,7 +2649,7 @@ msgstr ""
 msgid "par recette, sur 30 jours"
 msgstr ""
 
-#: class-msrwa-ui.php:235
+#: class-msrwa-ui.php:243
 msgid "passe devant"
 msgstr ""
 

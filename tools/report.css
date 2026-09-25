@@ -119,6 +119,10 @@ td[data-label="Modèle"]{white-space:nowrap}
 .ev-blue{border-left-color:#5b8bd0}
 .ev-ok{border-left-color:#4f9e72}
 .ev-detail{display:none}
-.timeline.all .ev-detail{display:grid}
+.tl-all{position:absolute;opacity:0;pointer-events:none}
+.toggle{display:inline-block;margin:0 0 12px}
+.tl-all:checked+.toggle{background:#6b2d20;color:#fff}
+.tl-all:focus-visible+.toggle{outline:2px solid var(--accent2);outline-offset:2px}
+.tl-all:checked~.timeline .ev-detail{display:grid}
 @media(max-width:640px){.ev{grid-template-columns:54px auto minmax(0,1fr)}.ev-msg{grid-column:1/-1}.toc{padding-inline:18px}}
 @media(max-width:640px){.summary-grid{grid-template-columns:1fr 1fr;gap:10px}.summary-grid .card{padding:12px}}

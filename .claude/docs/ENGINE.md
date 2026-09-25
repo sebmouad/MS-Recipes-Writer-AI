@@ -852,6 +852,10 @@ photograph, and otherwise use the photograph without the cost of a search.
     "assiette", which in a gratin's photographs is the portion beside it —
     individual dishes stay individual, a stew goes to the deep dish named or
     stays in its pot, a tart or quiche stays in its tin.
+47. **An evidence download connects to the address it checked.**
+    `unfetchable()` resolves the host once and hands the address back;
+    `fetch_images()` pins it with `CURLOPT_RESOLVE`, so a second lookup
+    cannot answer with a private address (DNS rebinding).
 
 ### Still open
 

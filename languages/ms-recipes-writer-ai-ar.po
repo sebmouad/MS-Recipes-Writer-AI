@@ -2199,3 +2199,15 @@ msgstr "محاولة جديدة"
 
 msgid "Échec"
 msgstr "إخفاق"
+
+msgid "L’article est publié. Rien d’autre à faire."
+msgstr "المقال منشور. لا شيء آخر للقيام به."
+
+msgid "L’article est programmé ; il paraîtra à la date choisie."
+msgstr "المقال مجدول؛ سيظهر في التاريخ المختار."
+
+msgid "L’article est à la corbeille."
+msgstr "المقال في سلة المهملات."
+
+msgid "L’article a été supprimé de WordPress."
+msgstr "حُذف المقال من ووردبريس."

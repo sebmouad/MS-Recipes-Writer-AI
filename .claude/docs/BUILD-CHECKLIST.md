@@ -630,6 +630,12 @@ cost) in the task before changing anything.
   (2026-09-24).** The writer's photograph shows the prompt's writer the dish;
   the collage is drawn from the style reference. Real: the owner's own rôti
   photograph, drawn both ways. See ENGINE.md §7, item 40.
+- [x] **A50 — Full audit (2026-09-25).** Security (SQL, rights, nonces,
+  escaping, downloads), every screen for both roles in three languages at
+  1280 and 390 px, the site's real tests (site, upload, flow). Fixed: the
+  published-article sentence, "2 min 60 s", the report toggle under the
+  report's script policy, the download address pin, stale real-test
+  expectations.
 - [x] **A49 — Each dish served as it is served (2026-09-25).** Gratins in
   their baking dish, stews in their pot or deep dish, tarts in their tin.
   Real: gratin de pommes de terre à la viande hachée, $0.0169.

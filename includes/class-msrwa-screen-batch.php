@@ -16,7 +16,7 @@ final class MSRWA_Screen_Batch {
 		if ( ! MSRWA_Rights::may_write() ) { wp_die( esc_html__( 'Vous n’avez pas accès à cet écran.', 'ms-recipes-writer-ai' ) ); }
 
 		$batch = MSRWA_Batch::get( isset( $_GET['batch_id'] ) ? absint( $_GET['batch_id'] ) : 0 );
-		if ( ! $batch || ! MSRWA_Batch::may_see( $batch ) ) { wp_die( esc_html__( 'Lot introuvable.', 'ms-recipes-writer-ai' ) ); }
+		if ( ! $batch || ! MSRWA_Batch::may_see( $batch ) ) { wp_die( esc_html__( 'Lot introuvable.', 'ms-recipes-writer-ai' ), '', array( 'response' => 404, 'back_link' => true ) ); }
 
 		$matching = MSRWA_Batch::matching( (int) $batch['id'] );
 		$runs = MSRWA_Run::for_batch( (int) $batch['id'] );

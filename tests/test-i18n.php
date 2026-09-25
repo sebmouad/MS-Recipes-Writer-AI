@@ -126,4 +126,9 @@ foreach ( glob( dirname( __DIR__ ) . '/languages/*.po' ) as $po ) {
 	msrwa_test_contains( $mo, 'Plural-Forms: nplurals=' . ( $declared[1] ?? '?' ), basename( $po ) . ' compiles with its plural rule.' );
 }
 
+// A duration is rounded once: 179.8 s read "2 min 60 s" on the lot page.
+msrwa_test_load( 'i18n' );
+msrwa_test_assert( '3 min 0 s' === MSRWA_I18N::seconds( 179.8 ), 'Seconds never reach 60: ' . MSRWA_I18N::seconds( 179.8 ) );
+msrwa_test_assert( '2 min 5 s' === MSRWA_I18N::seconds( 125.2 ), 'Minutes and seconds split: ' . MSRWA_I18N::seconds( 125.2 ) );
+
 msrwa_test_done( 'translation catalogues OK' );

@@ -187,6 +187,10 @@ unset( $GLOBALS['msrwa_test_options'][ MSRWA_Settings::OPTION ] );
 
 // --- A writer reads a sentence, not a stack trace ----------------------------
 
+// A published article is done: the lot kept asking for a review of it.
+msrwa_test_contains( MSRWA_UI::reason( array( 'status' => 'done', 'draft_post_id' => 9, 'approved' => 0, 'post_status' => 'publish' ) )[1], 'publié', 'A published article is said to be published, not to review.' );
+msrwa_test_missing( MSRWA_UI::reason( array( 'status' => 'done', 'draft_post_id' => 9, 'approved' => 0, 'post_status' => 'publish' ) )[1], 'avant de publier', 'Nor asked to be checked before publishing.' );
+msrwa_test_contains( MSRWA_UI::reason( array( 'status' => 'done', 'draft_post_id' => 9, 'approved' => 1, 'post_status' => 'draft' ) )[1], 'relu', 'A draft still waits to be read.' );
 msrwa_test_assert( 'stop' === MSRWA_UI::reason( array( 'status' => 'failed' ), array( array( 'step' => 'research', 'error' => 'No API key for claude.' ) ) )[0], 'A missing key stops.' );
 msrwa_test_contains( MSRWA_UI::reason( array( 'status' => 'failed' ), array( array( 'step' => 'research', 'error' => 'No API key for claude.' ) ) )[1], 'clé', 'A missing key is said as a missing key.' );
 msrwa_test_missing( MSRWA_UI::reason( array( 'status' => 'failed' ), array( array( 'step' => 'research', 'error' => 'No API key for claude.' ) ) )[1], 'claude', 'Without naming the provider to a writer.' );

@@ -644,12 +644,17 @@ final class MSRWA_Engine_Call {
 		$handles = array();
 
 		foreach ( $urls as $key => $url ) {
-			$refused = self::unfetchable( $url );
+			$ip = '';
+			$refused = self::unfetchable( $url, $ip );
 			if ( '' !== $refused ) { $results[ $key ] = array( 'error' => $refused ); continue; }
 			if ( count( $handles ) >= max( 1, (int) $limit ) ) { $results[ $key ] = array( 'error' => 'too many images requested at once' ); continue; }
 			$bytes[ $key ] = '';
 			$handle = curl_init( $url );
+			$host = (string) parse_url( $url, PHP_URL_HOST );
 			curl_setopt_array( $handle, array(
+				// The address checked above is the one connected to: a second
+				// lookup could answer with a private one (DNS rebinding).
+				CURLOPT_RESOLVE => array( $host . ':' . (int) ( parse_url( $url, PHP_URL_PORT ) ?: 443 ) . ':' . $ip ),
 				CURLOPT_FOLLOWLOCATION => false, CURLOPT_TIMEOUT => 30,
 				CURLOPT_PROTOCOLS => CURLPROTO_HTTPS,
 				CURLOPT_USERAGENT => 'MSRWA-Prompt-Lab/1.0',
@@ -680,7 +685,7 @@ final class MSRWA_Engine_Call {
 	}
 
 	/** Why an image URL is not worth opening a connection for, or '' when it is. */
-	private static function unfetchable( $url ) {
+	private static function unfetchable( $url, &$ip = '' ) {
 		if ( ! preg_match( '#^https://#i', (string) $url ) ) { return 'image URL is not HTTPS'; }
 		$host = (string) parse_url( $url, PHP_URL_HOST );
 		$ip = gethostbyname( $host );
