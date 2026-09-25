@@ -630,6 +630,9 @@ cost) in the task before changing anything.
   (2026-09-24).** The writer's photograph shows the prompt's writer the dish;
   the collage is drawn from the style reference. Real: the owner's own rôti
   photograph, drawn both ways. See ENGINE.md §7, item 40.
+- [~] **A47 — Corrections not found in the HTML (2026-09-25).** Loose
+  quotes located, copied neighbours and repeated sentences removed. Replayed
+  offline over every stored run; next live run confirms. ENGINE.md §7, 43.
 - [~] **A46 — Featured image from a dish photograph (2026-09-24).** The
   writer's photograph, or the research's, is sent with the featured prompt.
   Offline only; the next live run measures it. See ENGINE.md §7, item 42.

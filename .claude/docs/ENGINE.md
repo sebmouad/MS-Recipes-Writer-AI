@@ -816,6 +816,15 @@ photograph, and otherwise use the photograph without the cost of a search.
     it shows the dish only. `dish_reference()` fetches it once per run for
     both images; the artifact records `reference` (editor or research).
     Offline test only so far: `tests/test-collage-compose.php`.
+43. **Quotes located loosely, duplicates removed.** `locate()` tries the
+    quote as written, then with apostrophes, spaces and the first letter's
+    case left open, then against same-length runs of sentences in one
+    paragraph within 4% of its letters. A correction whose `after` is already
+    in the article removes the passage; a language change may drop a
+    repeated figure but not lose or alter one (`same_figures()`). The review
+    prompt now says `after` never repeats a sentence. Replayed over 290
+    stored passages: 8 left to the editor became 4, each absent from the
+    article.
 
 ### Still open
 

@@ -293,12 +293,18 @@ final class MSRWA_Engine {
 		foreach ( (array) ( ( (array) ( $result->artifacts['review'] ?? array() ) )['corrections'] ?? array() ) as $correction ) {
 			if ( ! is_array( $correction ) ) { continue; }
 			$before = trim( (string) ( $correction['before'] ?? '' ) );
-			if ( '' === $before || trim( (string) ( $correction['after'] ?? '' ) ) === $before ) { continue; }
-			// The review answers in plain sentences while the article is HTML, so a
-			// sentence broken by a tag cannot be substituted. Say so rather than guess.
-			if ( false === mb_strpos( $html, $before ) ) { $unapplied[] = $correction; continue; }
-			$html = self::substitute( $html, $before, (string) ( $correction['after'] ?? '' ) );
-			$applied[] = $correction;
+			$after = trim( (string) ( $correction['after'] ?? '' ) );
+			if ( '' === $before || $after === $before ) { continue; }
+			// A sentence broken by a tag, or quoted too loosely to be sure of, is
+			// handed to the editor rather than guessed at.
+			$found = self::locate( $html, $before );
+			if ( null === $found ) { $unapplied[] = $correction; continue; }
+			// A review asked to keep only what is documented once replaced a
+			// sentence with a copy of its neighbour: the article then said the
+			// same thing twice. What the article already says is removed instead.
+			if ( '' !== $after && false !== mb_strpos( $html, $after ) ) { $after = ''; }
+			$html = self::substitute( $html, $found, self::same_case( $found, $after ) );
+			$applied[] = $found === $before ? $correction : array_merge( $correction, array( 'quoted' => $before, 'before' => $found ) );
 		}
 
 		$article['content_html'] = $html;
@@ -344,19 +350,88 @@ final class MSRWA_Engine {
 			$before = trim( (string) ( $change['before'] ?? '' ) );
 			$after = trim( (string) ( $change['after'] ?? '' ) );
 			if ( '' === $before || '' === $after || $before === $after ) { continue; }
-			preg_match_all( '/\d+(?:[.,]\d+)?/', $before, $was );
-			preg_match_all( '/\d+(?:[.,]\d+)?/', $after, $is );
+			$found = self::locate( $html, $before );
 			// Proofreaders list overlapping passages: once the first is applied the
 			// second's wording is gone, and its correction is already in the text.
-			if ( false === mb_strpos( $html, $before ) && false !== mb_strpos( $html, $after ) ) { continue; }
-			if ( $was[0] !== $is[0] || false === mb_strpos( $html, $before ) ) { $skipped[] = $change; continue; }
-			$html = self::substitute( $html, $before, $after );
-			$applied[] = $change;
+			if ( null === $found && false !== mb_strpos( $html, $after ) ) { continue; }
+			if ( null === $found || ! self::same_figures( $found, $after ) ) { $skipped[] = $change; continue; }
+			$html = self::substitute( $html, $found, self::same_case( $found, $after ) );
+			$applied[] = $found === $before ? $change : array_merge( $change, array( 'quoted' => $before, 'before' => $found ) );
 		}
 		if ( $skipped ) {
 			$result->event( 'warning', 'proofread', sprintf( '%d change(s) not applied: quoted text not found verbatim, or a figure would have changed.', count( $skipped ) ), array( 'skipped' => $skipped ) );
 		}
 		return array( 'content_html' => $html, 'changes' => $applied, 'clean' => ! $applied, 'changes_not_applied' => $skipped );
+	}
+
+	/**
+	 * The figures a language change may not alter. Removing a sentence the
+	 * article repeats drops a copy of its figures and changes none of them,
+	 * so a change passes when every figure it keeps was there, and no figure
+	 * that was there is gone.
+	 */
+	private static function same_figures( $before, $after ) {
+		preg_match_all( '/\d+(?:[.,]\d+)?/', (string) $before, $was );
+		preg_match_all( '/\d+(?:[.,]\d+)?/', (string) $after, $is );
+		if ( $was[0] === $is[0] ) { return true; }
+		$left = array_count_values( $was[0] );
+		foreach ( $is[0] as $figure ) {
+			if ( empty( $left[ $figure ] ) ) { return false; }
+			$left[ $figure ]--;
+		}
+		return array_values( array_unique( $was[0] ) ) === array_values( array_unique( $is[0] ) );
+	}
+
+	/**
+	 * Where a quoted passage is in the article, as the article writes it; null
+	 * when it cannot be found with confidence.
+	 *
+	 * Replayed over 290 quoted passages (2026-09-25), half of those left to the
+	 * editor were in the article all along: the quote capitalised a sentence
+	 * the article began mid-line, or wrote a straight apostrophe, or slipped a
+	 * letter. The quote is tried as written, then with apostrophes, spaces and
+	 * its first letter's case left open, then against each run of sentences of
+	 * the same length inside one paragraph, accepted only within a few letters.
+	 */
+	private static function locate( $html, $before ) {
+		$html = (string) $html;
+		$before = trim( (string) $before );
+		if ( '' === $before ) { return null; }
+		if ( false !== mb_strpos( $html, $before ) ) { return $before; }
+
+		$pattern = '';
+		foreach ( preg_split( '//u', $before, -1, PREG_SPLIT_NO_EMPTY ) as $index => $char ) {
+			if ( in_array( $char, array( "'", '’', '‘', 'ʼ' ), true ) ) { $pattern .= "['’‘ʼ]"; continue; }
+			if ( preg_match( '/^[\s\x{00A0}\x{202F}]$/u', $char ) ) { $pattern .= '(?:\s|&nbsp;|\x{00A0}|\x{202F})+'; continue; }
+			$pattern .= 0 === $index && mb_strtolower( $char ) !== mb_strtoupper( $char ) ? '[' . preg_quote( mb_strtolower( $char ), '/' ) . preg_quote( mb_strtoupper( $char ), '/' ) . ']' : preg_quote( $char, '/' );
+		}
+		$pattern = str_replace( '(?:\s|&nbsp;|\x{00A0}|\x{202F})+(?:\s|&nbsp;|\x{00A0}|\x{202F})+', '(?:\s|&nbsp;|\x{00A0}|\x{202F})+', $pattern );
+		if ( preg_match( '/' . $pattern . '/u', $html, $match ) ) { return $match[0]; }
+
+		if ( false !== strpos( $before, '<' ) ) { return null; }
+		$sentences = static function ( $text ) { return preg_split( '/(?<=[.!?…])\s+/u', trim( $text ), -1, PREG_SPLIT_NO_EMPTY ); };
+		$count = count( $sentences( $before ) );
+		$length = strlen( $before );
+		$allowed = max( 2, (int) floor( $length * 0.04 ) );
+		$best = null;
+		$closest = $allowed + 1;
+		foreach ( preg_split( '/<[^>]+>/', $html, -1, PREG_SPLIT_NO_EMPTY ) as $run ) {
+			$parts = $sentences( $run );
+			for ( $start = 0; $start + $count <= count( $parts ); $start++ ) {
+				$candidate = implode( ' ', array_slice( $parts, $start, $count ) );
+				if ( abs( strlen( $candidate ) - $length ) > $allowed || false === mb_strpos( $run, $candidate ) ) { continue; }
+				$distance = max( strlen( $candidate ), $length ) - similar_text( $candidate, $before );
+				if ( $distance < $closest ) { $closest = $distance; $best = $candidate; }
+			}
+		}
+		return $best;
+	}
+
+	/** A replacement begins as the passage it replaces does: a quote that began mid-sentence stays lower case. */
+	private static function same_case( $found, $after ) {
+		$first = mb_substr( (string) $found, 0, 1 );
+		if ( '' === (string) $after || mb_strtolower( $first ) !== $first ) { return (string) $after; }
+		return mb_strtolower( mb_substr( $after, 0, 1 ) ) . mb_substr( $after, 1 );
 	}
 
 	/**

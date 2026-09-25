@@ -99,6 +99,28 @@ $trimmed = MSRWA_Engine::run_step( 'corrections', array( 'title' => 'Souris', 'a
 ) ) );
 msrwa_test_assert( '<p>Utilisez un bouillon.</p><p>Servez chaud.</p>' === $trimmed->artifacts['corrected']['content_html'], 'An unsupported sentence is removed cleanly (got ' . $trimmed->artifacts['corrected']['content_html'] . ').' );
 
+// A quote the review wrote a little loosely is still the article's passage:
+// a straight apostrophe, a capital where the article runs on mid-sentence, a
+// slipped letter. A replacement that copies a sentence already there removes
+// the passage instead of saying it twice. Each case is one measured in a run.
+$loose = MSRWA_Engine::run_step( 'corrections', array( 'title' => 'Potée', 'artifacts' => array(
+	'article' => array( 'content_html' => '<p>Deux modes : la recette décrite vise une panure fritée.</p><p>Le jarret peut être remplacé par un jambonneau ou une rouelle, documentés comme d’excellents remplacements.</p><p>L’huile doit être chaude.</p><ul><li><p>Ajoutez le lait. Ne versez pas tout d’un coup.</p></li></ul>' ),
+	'review' => array( 'pass' => true, 'findings' => array(), 'corrections' => array(
+		array( 'before' => 'La recette décrite vise une panure fritée.', 'after' => 'La recette décrite vise une panure frite.' ),
+		array( 'before' => 'Le jarret peut être remplacé par un jambonneau ou à une rouelle, documentés comme d’excellents remplacements.', 'after' => 'Le jarret peut être remplacé par un jambonneau.' ),
+		array( 'before' => "L'huile doit être chaude.", 'after' => "L’huile doit être à 170 °C." ),
+		array( 'before' => 'Ne versez pas tout d’un coup.', 'after' => 'Ajoutez le lait.' ),
+		array( 'before' => 'Une phrase que cet article ne contient vraiment pas du tout.', 'after' => 'Autre.' ),
+	) ),
+) ) );
+$fixed = $loose->artifacts['corrected'];
+msrwa_test_contains( $fixed['content_html'], 'la recette décrite vise une panure frite.', 'A quote capitalised where the article runs on is found, and the replacement keeps the lower case.' );
+msrwa_test_contains( $fixed['content_html'], '<p>Le jarret peut être remplacé par un jambonneau.</p>', 'A quote one word off is found.' );
+msrwa_test_contains( $fixed['content_html'], 'L’huile doit être à 170 °C.', 'A straight apostrophe finds the typographic one.' );
+msrwa_test_contains( $fixed['content_html'], '<li><p>Ajoutez le lait.</p></li>', 'A replacement that repeats its neighbour removes the passage.' );
+msrwa_test_assert( 4 === count( $fixed['corrections_applied'] ) && 1 === count( $fixed['corrections_for_the_editor'] ), 'Only the passage the article does not contain is left to the editor.' );
+msrwa_test_assert( 'La recette décrite vise une panure fritée.' === ( $fixed['corrections_applied'][0]['quoted'] ?? '' ), 'What the review quoted is kept beside what was replaced.' );
+
 // Configuration speaks the engine's vocabulary, and the caller overrides it in that
 // vocabulary — never the other way round.
 $config = MSRWA_Engine_Config::create(

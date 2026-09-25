@@ -47,3 +47,19 @@ msrwa_test_assert( true === ( $clean->artifacts['proofread']['clean'] ?? null ),
 
 MSRWA_Engine_Call::$transport = null;
 msrwa_test_done( 'the review returns its language changes and the engine applies them' );
+
+// The article repeated a sentence; removing the copy drops its figures but
+// changes none, and is applied.
+$twice = MSRWA_Engine::run_step( 'proofread', array( 'title' => 'Gratin', 'artifacts' => array(
+	'research' => array( 'facts' => array() ),
+	'canonical' => array( 'title' => 'Gratin', 'ingredients' => array(), 'steps' => array() ),
+	'article' => array( 'title' => 'Gratin', 'content_html' => '<p>x</p>' ),
+	'review' => array( 'pass' => true, 'findings' => array(), 'corrections' => array(), 'changes' => array(
+		array( 'type' => 'consistency', 'before' => 'Réchauffez à 74 °C à cœur. Réchauffez à 74 °C à cœur.', 'after' => 'Réchauffez à 74 °C à cœur.' ),
+		array( 'type' => 'consistency', 'before' => 'Cuire 45 minutes. Cuire 40 minutes.', 'after' => 'Cuire 45 minutes.' ),
+	) ),
+	'corrected' => array( 'content_html' => '<p>Réchauffez à 74 °C à cœur. Réchauffez à 74 °C à cœur.</p><p>Cuire 45 minutes. Cuire 40 minutes.</p>' ),
+) ), array( 'config' => array( 'settings' => array( 'keys' => array( 'openai' => 'k' ) ) ) ) );
+$once = (string) ( $twice->artifacts['proofread']['content_html'] ?? '' );
+msrwa_test_contains( $once, '<p>Réchauffez à 74 °C à cœur.</p>', 'A repeated sentence is removed.' );
+msrwa_test_contains( $once, 'Cuire 40 minutes.', 'Removing a sentence that carries a figure of its own is still refused.' );

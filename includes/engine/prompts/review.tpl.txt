@@ -23,7 +23,7 @@ TASK: read the article once against the canonical recipe and the supplied RESEAR
 
 QUOTING, for corrections and changes alike — the engine substitutes each one into the article itself:
 - "before" is copied character for character from the article's text — accents, apostrophes and spacing included — and stays within one paragraph, heading or list item: never across an HTML tag, never including a tag.
-- "after" is that same passage corrected, as plain text, in the author's voice.
+- "after" is that same passage corrected, as plain text, in the author's voice. It never repeats a sentence the article already contains: to remove a passage, "after" is an empty string.
 - Keep each passage as short as makes it unique in the article: usually one sentence.
 - A correct sentence is not listed at all. A faithful, well-written article returns empty lists. Do not invent work.
 
