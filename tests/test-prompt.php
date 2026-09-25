@@ -46,7 +46,7 @@ $brief = lab_brief( 'tarte-pommes' );
 $article_template = MSRWA_Prompt::compile( trim( file_get_contents( MSRWA_Engine_Input::prompt_path( 'article.tpl.txt' ) ) ), lab_settings() );
 $article_input = lab_build_input( 'article', $article_template, $brief, array() );
 msrwa_test_contains( $article_input, 'RESEARCH PACKAGE:', 'The article lab input must carry the shared research package.' );
-msrwa_test_contains( $article_input, 'observed in photographs of it', 'Real-image observations must reach the article, distilled rather than raw.' );
+msrwa_test_contains( $article_input, 'APPEARANCE OF THE COOKED DISH', 'Real-image observations must reach the article, distilled rather than raw.' );
 $facebook_template = file_get_contents( dirname( __DIR__ ) . '/includes/engine/prompts/facebook_image.tpl.txt' );
 $facebook_prompt = MSRWA_Prompt::compile( $facebook_template, lab_settings() );
 msrwa_test_contains( $facebook_prompt, 'one vertical 2:3 canvas at 1024x1536', 'The Facebook benchmark must compile to the dominant reference geometry.' );

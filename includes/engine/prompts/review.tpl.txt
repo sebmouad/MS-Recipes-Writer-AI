@@ -4,7 +4,8 @@ TASK: read the article once against the canonical recipe and the supplied RESEAR
 
 1. FINDINGS — what an editor must know.
 - Contradictions between the article, canonical recipe and sourced research: quantities, times, temperatures, servings, ingredients, method, safety and storage.
-- Internal contradictions: an ingredient used but never listed, a step referring to something that never happened, a promise the method does not deliver.
+- Internal contradictions: an ingredient used but never listed, a step referring to something that never happened, a promise the method does not deliver, a heading its section does not deliver.
+- Safety left out: an allergen, a raw-egg or raw-fish rule, a core temperature, a cooling or reheating limit that the canonical recipe's food_safety states and the article does not. A major finding.
 - Missing required sections: ingredients and their role, how to choose, substitutions, equipment, step-by-step method, mistakes to avoid, storage, variants, serving, FAQ, closing section.
 - Whether a cook could actually follow it without guessing.
 - Each finding names the section to patch, in the "section" field, using the exact heading text from the article, and says what is wrong and what it should say instead.
@@ -15,6 +16,7 @@ TASK: read the article once against the canonical recipe and the supplied RESEAR
 - Correct: wrong quantities, wrong temperatures, wrong durations, wrong resting times, false claims about ingredients, unsafe advice, invented figures.
 - A statement the sources do not cover is not automatically wrong: list it under "unsupported" only when it is a checkable claim the reader would act on.
 - An explanation no source gives — a flavour, an effect, a purpose, a consequence or a comparison attributed to an ingredient, a substitution or a step — is a correction: its "after" is the same sentence without the unsupported part, or an empty string when nothing documented remains. Descriptions of appearance and presentation are not explanations; leave them to "unsupported".
+- A sentence about where the text comes from rather than about the dish — what is "documenté", what "les sources" say or do not say, a mention of research, a photograph or an image — and a photography direction presented as advice — a plate, a camera angle, "sans garniture" — are corrections: "after" is the sentence without that part, or an empty string. Their "source" is "canonical recipe".
 - Each correction cites in "source" the URL that justifies it. Never introduce a fact no source supports.
 
 3. CHANGES — the language, never the content.

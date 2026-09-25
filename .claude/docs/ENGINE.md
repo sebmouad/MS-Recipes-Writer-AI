@@ -856,6 +856,25 @@ photograph, and otherwise use the photograph without the cost of a search.
     `unfetchable()` resolves the host once and hands the address back;
     `fetch_images()` pins it with `CURLOPT_RESOLVE`, so a second lookup
     cannot answer with a private address (DNS rebinding).
+48. **The article is written for the reader, not about its making.**
+    Owner's request, 2026-09-25. Fourteen articles measured 7 to 10 remarks
+    about their sources each ("les sources consultées ne documentent pas…",
+    "température documentée"), photography directions in the prose ("assiette
+    en céramique sobre, sans garniture ajoutée"), about three invented reasons
+    the review then cut, and four of them dropped an allergen the recipe had
+    flagged. The article prompt now has a VOICE rule (nothing about sources,
+    photographs or gaps: an unknown point is left out), a SAFETY AND
+    ALLERGENS rule (every `food_safety` entry reaches the article), headings
+    that deliver what they name, and reasons and signs of doneness only as a
+    source gives them. The article no longer receives the image's visual
+    brief — only `appearance_for_prose()`, colours and textures filtered of
+    staging. The review corrects any remark left about sources or a
+    photograph direction, and raises a missing allergen as major. Two scored
+    checks, `written for the reader` and `allergens carried`, measure it; the
+    article has one attempt, so neither buys a retry. Measured on three
+    recipes, both versions reviewed by today's review: remarks 27 → 0,
+    allergens missing 2 → 0, corrections 58 → 28, major findings 5 → 0, same
+    cost ($0.0077 per article), words 2 511–2 826 → 2 563–2 723.
 
 ### Still open
 

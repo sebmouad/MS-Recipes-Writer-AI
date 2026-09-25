@@ -344,6 +344,27 @@ final class MSRWA_Engine_Input {
 	}
 
 	/**
+	 * How the dish looks, for the article. It used to receive the image's visual
+	 * brief, and the brief's directions reached the prose: fourteen articles
+	 * measured told their readers to serve "sur une assiette en céramique unie",
+	 * "sans garniture", "vue de trois-quarts". Colour and texture describe the
+	 * food; the plate, the frame and the garnish rule belong to the photograph.
+	 */
+	public static function appearance_for_prose( $research ) {
+		$observed = array();
+		foreach ( (array) ( $research['visual_observations'] ?? array() ) as $observation ) {
+			if ( ! is_array( $observation ) ) { continue; }
+			foreach ( array( 'colours', 'textures' ) as $key ) {
+				$value = self::about_the_dish( self::observation_text( $observation[ $key ] ?? '' ) );
+				if ( '' !== $value ) { $observed[] = $value; }
+			}
+		}
+		if ( ! $observed ) { return ''; }
+		return "APPEARANCE OF THE COOKED DISH: " . implode( ' ', array_slice( array_unique( $observed ), 0, 6 ) )
+			. " Use it for the signs a cook reads by eye — what the surface does, what a cut reveals, what correctly cooked looks like. It is not a serving instruction: the plate, the angle and the garnish are the reader's choice.\n";
+	}
+
+	/**
 	 * The part of the research an image model can act on.
 	 *
 	 * The whole package used to be sent, and it grew past the provider's 32,000
@@ -618,7 +639,7 @@ final class MSRWA_Engine_Input {
 			// A rewrite carries the findings the reviews raised; a first draft carries none.
 			$feedback = is_array( $brief['feedback'] ?? null ) ? $brief['feedback'] : array();
 			return self::shared_context( $brief, true ) . $prompt . MSRWA_Quality::prompt_contract( $settings )
-				. "\n" . self::visual_brief( $canonical, $research )
+				. "\n" . self::appearance_for_prose( $research )
 				. ( $feedback ? "\nREVIEW FINDINGS TO CORRECT IN THE COMPLETE RETURNED ARTICLE: " . $encode( $feedback ) : '' );
 		}
 		if ( 'review' === $step ) {

@@ -48,7 +48,17 @@ msrwa_test_contains( $recipe_input, 'OBSERVED APPEARANCE', 'The recipe must rece
 msrwa_test_contains( $recipe_input, 'never an ingredient, a quantity or a step', 'An observation may establish appearance only.' );
 
 $article_input = lab_build_input( 'article', 'PROMPT', $brief, array() );
-msrwa_test_contains( $article_input, 'VISUAL BRIEF', 'The article must receive the derived visual brief.' );
+msrwa_test_contains( $article_input, 'APPEARANCE OF THE COOKED DISH', 'The article must receive how the dish looks.' );
+// The image's directions reached the prose when the article received them.
+foreach ( array( 'VISUAL BRIEF', 'NO GARNISH', 'ONE SERVING PRESENTATION' ) as $direction ) {
+	msrwa_test_assert( false === strpos( $article_input, $direction ), 'The article must not receive the image direction ' . $direction . '.' );
+}
+msrwa_test_assert( array( 'documentee', 'les sources', 'sans garniture' ) === MSRWA_Engine_Score::behind_the_scenes( '<p>La cuisson n’est pas documentée : les sources restent muettes.</p><p>Servez sans garniture.</p>' ), 'An article talking about its sources or its photograph must be caught.' );
+msrwa_test_assert( array() === MSRWA_Engine_Score::behind_the_scenes( '<p>Enfournez 35 minutes, jusqu’à ce que la surface soit dorée.</p>' ), 'Plain cooking prose must pass.' );
+$safety = array( 'food_safety' => array( 'Les œufs, le lait et le gluten de la farine sont des allergènes présents.', 'Cuire 12 minutes.' ) );
+msrwa_test_assert( array( 'lait' ) === MSRWA_Engine_Score::allergens_left_out( '<p>Allergènes : œufs et gluten (farine).</p>', $safety ), 'An allergen the recipe names and the article drops must be caught.' );
+msrwa_test_assert( array() === MSRWA_Engine_Score::allergens_left_out( '<p>Allergènes : œufs, lait et gluten.</p>', $safety ), 'An article naming every allergen must pass.' );
+msrwa_test_assert( array( 'allergen notice' ) === MSRWA_Engine_Score::allergens_left_out( '<p>Battez les œufs avec le lait et la farine sans gluten.</p>', $safety ), 'Ingredients named in passing are not an allergen notice.' );
 
 foreach ( array( 'featured', 'facebook' ) as $kind ) {
 	$image_prompt = lab_image_prompt( $kind, $brief, array() );

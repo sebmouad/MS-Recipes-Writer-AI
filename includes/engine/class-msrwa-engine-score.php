@@ -140,6 +140,10 @@ final class MSRWA_Engine_Score {
 			$checks['French typography'] = array( 'pass' => $accents >= (float) $limits['article_accents_per_1000'], 'detail' => sprintf( '%.1f accented characters per 1000 (French prose sits near 30)', $accents ) );
 			$checks['two parts'] = array( 'pass' => false !== strpos( $content, '<!--nextpage-->' ) || ! empty( $json['content_html_part2'] ), 'detail' => false !== strpos( $content, '<!--nextpage-->' ) ? 'page break present' : 'single block' );
 			$checks['no metadata in body'] = array( 'pass' => ! preg_match( '/meta.?description|slug\s*:|mots.?cl(é|e)s\s*:/iu', $content ), 'detail' => 'body carries prose only' );
+			$meta = self::behind_the_scenes( $content );
+			$checks['written for the reader'] = array( 'pass' => ! $meta, 'detail' => $meta ? 'talks about its making: ' . implode( ' · ', array_slice( $meta, 0, 3 ) ) : 'no remark about sources or photographs' );
+			$allergens = self::allergens_left_out( $content, $canonical );
+			$checks['allergens carried'] = array( 'pass' => ! $allergens, 'detail' => $allergens ? 'the recipe names ' . implode( ', ', $allergens ) . ' as allergens; the article does not' : 'every allergen the recipe names' );
 			$fields = array( 'title', 'excerpt', 'seo_title', 'seo_description', 'slug', 'tags', 'categories', 'recipe_meta', 'internal_links', 'facebook_caption', 'faq', 'visual_final_notes' );
 			$absent = array();
 			foreach ( $fields as $field ) { if ( ! array_key_exists( $field, $json ) ) { $absent[] = $field; } }
@@ -192,6 +196,59 @@ final class MSRWA_Engine_Score {
 		$passed = 0;
 		foreach ( $checks as $check ) { if ( $check['pass'] ) { $passed++; } }
 		return array( 'checks' => $checks, 'passed' => $passed, 'total' => count( $checks ), 'pass' => $passed === count( $checks ) );
+	}
+
+	/**
+	 * Phrases in which an article talks about how it was made rather than about
+	 * the dish. Measured on fourteen articles: "les sources consultées ne
+	 * documentent pas…", and photography directions — "sans garniture", "vue de
+	 * trois-quarts" — reaching the prose from the image brief.
+	 */
+	public static function behind_the_scenes( $html ) {
+		$plain = self::fold( html_entity_decode( strip_tags( (string) $html ), ENT_QUOTES, 'UTF-8' ) );
+		$patterns = array(
+			'/\b(?:non[ -])?documente(?:e|s|es|nt)?\b/u', '/\bles sources\b/u', '/\bsources consultees\b/u', '/\brecette canonique\b/u',
+			'/\bdossier de recherche\b/u', '/\bsans garniture\b/u', '/\bvue (?:de|en) (?:trois[- ]quarts|dessus|plongee)\b/u', '/\bceramique unie\b/u',
+			'/\b(?:un)?documented\b/u', '/\bthe sources\b/u', '/\bcanonical recipe\b/u', '/\bno garnish\b/u', '/\bthree-quarter view\b/u',
+		);
+		$found = array();
+		foreach ( $patterns as $pattern ) {
+			if ( preg_match_all( $pattern, $plain, $matches ) ) { $found = array_merge( $found, $matches[0] ); }
+		}
+		return array_values( array_unique( $found ) );
+	}
+
+	/**
+	 * The allergens the recipe's food-safety notes name that the article never
+	 * mentions. Four of fourteen measured articles dropped the eggs, the milk or
+	 * the gluten the recipe had flagged.
+	 */
+	public static function allergens_left_out( $html, $canonical ) {
+		$notes = '';
+		foreach ( (array) ( $canonical['food_safety'] ?? array() ) as $note ) {
+			if ( is_scalar( $note ) && false !== strpos( self::fold( $note ), 'allerg' ) ) { $notes .= ' ' . self::fold( $note ); }
+		}
+		if ( '' === $notes ) { return array(); }
+		$plain = self::fold( html_entity_decode( strip_tags( (string) $html ), ENT_QUOTES, 'UTF-8' ) );
+		$named = array(
+			'gluten' => array( 'gluten' ), 'oeufs' => array( 'oeuf', 'egg' ), 'lait' => array( 'lait', 'lactose', 'milk', 'dairy' ),
+			'poisson' => array( 'poisson', 'fish' ), 'crustaces' => array( 'crustace', 'shellfish' ), 'fruits a coque' => array( 'fruits a coque', 'noix', 'nut' ),
+			'arachide' => array( 'arachide', 'cacahuete', 'peanut' ), 'soja' => array( 'soja', 'soy' ), 'sesame' => array( 'sesame' ),
+			'moutarde' => array( 'moutarde', 'mustard' ), 'celeri' => array( 'celeri', 'celery' ), 'sulfites' => array( 'sulfite' ),
+		);
+		$missing = array();
+		foreach ( $named as $allergen => $words ) {
+			$in_notes = false; $in_article = false;
+			foreach ( $words as $word ) {
+				$pattern = '/\\b' . preg_quote( $word, '/' ) . '/u';
+				if ( preg_match( $pattern, $notes ) ) { $in_notes = true; }
+				if ( preg_match( $pattern, $plain ) ) { $in_article = true; }
+			}
+			if ( $in_notes && ! $in_article ) { $missing[] = $allergen; }
+		}
+		// The allergens are named once, as allergens, not merely as ingredients.
+		if ( ! $missing && false === strpos( $plain, 'allerg' ) ) { $missing[] = 'allergen notice'; }
+		return $missing;
 	}
 
 	/**

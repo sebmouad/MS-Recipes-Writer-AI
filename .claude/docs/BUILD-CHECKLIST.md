@@ -630,6 +630,13 @@ cost) in the task before changing anything.
   (2026-09-24).** The writer's photograph shows the prompt's writer the dish;
   the collage is drawn from the style reference. Real: the owner's own rôti
   photograph, drawn both ways. See ENGINE.md §7, item 40.
+- [x] **A54 — Articles written for the reader (2026-09-25).** No remark
+  about sources, documentation or photographs; no plating or camera
+  direction; reasons only when sourced; every allergen and safety rule the
+  recipe states; headings that deliver. Checks `written for the reader` and
+  `allergens carried`. Real: three stored recipes rewritten and reviewed,
+  remarks 27 → 0, corrections 58 → 28. See ENGINE.md §7, item 48.
+  `tests/test-visual-reference.php`.
 - [x] **A53 — Content-quality presets from measurements (2026-09-25).**
   GPT-5 Nano measured unfit for canonical_recipe, article, review and
   final_approval (`MSRWA_Compat::unfit()`); economy ≈ $0.079 (images low,

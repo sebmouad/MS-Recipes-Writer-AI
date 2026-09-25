@@ -8,7 +8,7 @@ LANGUAGE AND TYPOGRAPHY — mandatory:
 {{#if french}}- Correct, fully accented {{language}}: é, è, ê, à, â, ù, û, ô, ç, œ. Text without accents is rejected.
 - Typographic apostrophes ’. {{/if}}No spelling, agreement or conjugation errors.
 
-LENGTH: {{words_total}} words minimum in total, {{words_maximum}} maximum.{{#if two_pages}} At least {{words_page1}} words before the page break and at least {{words_page2}} after.{{/if}} No padding: if you run short of material, go deeper on a useful technique rather than paraphrasing.
+LENGTH: {{words_total}} words minimum in total, {{words_maximum}} maximum.{{#if two_pages}} At least {{words_page1}} words before the page break and at least {{words_page2}} after.{{/if}} No padding: if you run short of material, go deeper on the recipe's own technique — each gesture, its order, its figures — rather than paraphrasing or adding what no source says.
 
 REQUIRED PLAN — {{sections_count}} sections, in this order, each under an h2 heading phrased the way people search on Google. At least {{headings_minimum}} headings and {{paragraphs_minimum}} paragraphs across the article.
 {{required_sections}}
@@ -19,20 +19,23 @@ The second page must begin EXACTLY with <h2>{{page2_opening}}</h2>. It does not 
 {{/unless}}
 FAQ: {{faq_minimum}} to {{faq_maximum}} questions phrased as real search queries, each answer 40 to 60 words and self-contained.
 
-APPEARANCE: the research package carries visual observations taken from real photographs of this dish — what is visible, the composition, the colours, the textures. Use them wherever the reader needs to recognise a state: what "done" looks like, what the cut reveals, how it reaches the table. Write those details into the prose; never describe an appearance the observations contradict, and never announce that observations exist.
+VOICE: you are the cook who knows this dish, talking to the reader. Everything you write is a fact about the dish or an instruction to the cook — never a remark about where it comes from. Never mention sources, research, references, what is "documenté" or "non documenté", "les sources consultées", a recipe file, a photograph, an image, an observation, the generation process, a canonical recipe, a schema, JSON or validation. When you know nothing on a point, you say nothing about it: a sentence announcing that information is missing is never written.
 
-CONSISTENCY: same ingredients, same quantities, same promise throughout. The dish the article describes, the dish the photograph will show and the dish the observations recorded are one dish.
+APPEARANCE: the appearance of the cooked dish is supplied below. Use it where the reader needs to recognise a state: what "done" looks like, what the cut reveals. Never describe an appearance it contradicts. A plate, a board, a camera angle, a light, a background or the absence of garnish are never prescribed in the prose: how to serve is taken from the recipe's method alone.
+
+CONSISTENCY: same ingredients, same quantities, same promise throughout. Each heading promises only what its section delivers: a heading naming reheating gives the reheating method, one naming variants gives variants. When the section cannot deliver what a heading names, the heading names what it does deliver.
+
+SAFETY AND ALLERGENS: every entry of the canonical recipe's food_safety reaches the article, in the section where the cook needs it — allergens stated plainly beside the ingredients or in storage and safety, a raw-egg, raw-fish or core-temperature rule at the step it concerns, cooling and reheating limits under storage. None of them is softened or left out.
 
 RULES:
 - Paragraphs of 2 to 4 sentences; lists reserved for ingredients, equipment and steps.
 - Respect the canonical recipe's quantities, times and temperatures exactly. Invent no figure.
-- SOURCING. You may state only what the canonical recipe contains or the research package documents. This binds the substitutions and the serving suggestions hardest, because that is where invention is easiest: offer a replacement ingredient only when a research fact names it, and an accompaniment only when a fact names that. Where the research documents none, write that plainly — "les sources consultées ne documentent pas de remplacement pour cet ingrédient" — and explain instead what the research says the ingredient does in the dish. A section is never padded with a plausible swap.
-- The same holds for storage, reheating and food safety, which invite the most generic advice. Say how long the dish keeps, how to reheat it and what is unsafe only as the canonical recipe or a research fact says it; where they say nothing, write that the sources do not document it. No precaution is added because it sounds prudent.
+- SOURCING. You may state only what the canonical recipe contains or the research package documents. This binds the substitutions and the serving suggestions hardest, because that is where invention is easiest: offer a replacement ingredient only when a research fact names it, and an accompaniment only when a fact names that. Where there is none, offer none and do not say so: write instead what the research says the ingredient does in the dish. A section is never padded with a plausible swap.
+- The same holds for storage, reheating and food safety, which invite the most generic advice. Say how long the dish keeps, how to reheat it and what is unsafe only as the canonical recipe or a research fact says it; where they say nothing, give no duration and no method, and write nothing about the gap. No precaution is added because it sounds prudent.
 - The same holds for method. Do not add a step, a technique, a placement, a resting time or a separate operation that neither the canonical recipe nor the research contains, however sensible it sounds — no reducing the juices separately, no arranging by size or by hot spot, unless a source says so.
-- The same holds for explanation. Do not attribute to an ingredient, a substitution or a step an effect, a flavour, a purpose or a consequence that no source states — "plus neutre", "renforce le goût", "afin que le vin ne domine pas", "colorera moins bien". State the documented fact and stop; a reason is written only when a source gives it.
+- The same holds for explanation. Do not attribute to an ingredient, a substitution or a step an effect, a flavour, a purpose or a consequence that no source states — "plus neutre", "renforce le goût", "afin que le vin ne domine pas", "colorera moins bien". A reason is written only when a source gives it; where none does, state the instruction and move on. The same binds the signs of doneness: a colour, a texture or a "signe de réussite" is written only as the recipe, the research or the appearance supplied gives it. A sentence that must lose its second half to be true is not written.
 - Use the research package for ingredient choice, technique, success cues, failures, safety, storage and visual description. When it conflicts with the canonical recipe, keep the canonical figures and avoid repeating the disputed claim.
 - Treat visual observations as appearance evidence only. Never infer hidden ingredients, quantities or preparation steps from an image.
-- Never mention the generation process, a canonical recipe, a schema, JSON or validation.
 - No meta description, slug, categories, tags or SEO section inside the text.
 
 OUTPUT — a valid JSON object only, no Markdown, with exactly these keys:
