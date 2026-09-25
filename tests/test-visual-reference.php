@@ -54,7 +54,13 @@ foreach ( array( 'featured', 'facebook' ) as $kind ) {
 	$image_prompt = lab_image_prompt( $kind, $brief, array() );
 	msrwa_test_contains( $image_prompt, 'VISUAL BRIEF', 'The ' . $kind . ' prompt must receive the derived visual brief.' );
 	msrwa_test_contains( $image_prompt, 'ONE SERVING PRESENTATION', 'Both images must share one serving decision.' );
-	msrwa_test_contains( $image_prompt, 'Moule à tarte de 28 cm', 'The canonical equipment must bound what may appear.' );
+	if ( 'facebook' === $kind ) {
+		msrwa_test_contains( $image_prompt, 'Moule à tarte de 28 cm', 'The canonical equipment must bound what may appear in the panels.' );
+	} else {
+		// One photograph of the served dish: its vessel is the serving decision,
+		// and the panels' cookware and display rules are not paid for again.
+		msrwa_test_missing( $image_prompt, 'the same tin in every panel', 'The featured prompt carries no panel rules.' );
+	}
 	msrwa_test_contains( $image_prompt, 'exactly 6 pièces', 'A countable ingredient must reach the prompt as a number.' );
 	msrwa_test_contains( $image_prompt, 'exactly 1 rouleau', 'One pastry roll must be stated as one.' );
 }

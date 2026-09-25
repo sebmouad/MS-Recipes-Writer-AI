@@ -153,7 +153,7 @@ final class MSRWA_Engine_Input {
 	 * cooling rack and a serving board that appear in no step, and a final panel
 	 * browner than the photographs of the real dish.
 	 */
-	public static function visual_brief( $canonical, $research ) {
+	public static function visual_brief( $canonical, $research, $single = false ) {
 		$countable = array( 'pièce', 'pièces', 'piece', 'pieces', 'rouleau', 'rouleaux', 'gousse', 'gousses', 'tranche', 'tranches', 'feuille', 'feuilles', 'branche', 'branches', 'oeuf', 'œuf', 'unité', 'unités', '' );
 		$counts = array();
 		$measured = array();
@@ -172,16 +172,21 @@ final class MSRWA_Engine_Input {
 
 		$lines = array( 'VISUAL BRIEF — derived from this recipe and binding. Each line below exists because a real image failed on it.' );
 		$lines[] = '• NO GARNISH THAT IS NOT AN INGREDIENT. The most common defect in these images, across every dish tried, is a sprig of herb laid on the finished plate — rosemary, thyme, parsley, coriander, a bay leaf — because that is how this kind of dish is usually photographed. If the ingredient list below does not contain it, it does not go in the picture, in any panel, however conventional it looks. The same applies to a citrus wedge, a grind of visible spice, a drizzle, a dusting or a scattering of seeds. Serve the dish bare rather than garnish it with something the cook was never told to buy.';
-		if ( $counts ) {
+		// One photograph of the finished dish has no mise en place and no panels:
+		// the counts stay, and the cookware and the display rules — a sixth of its
+		// prompt, billed at the image model's rate — do not travel with it.
+		if ( $counts && $single ) {
+			$lines[] = '• Countable ingredients, exact numbers: ' . implode( '; ', $counts ) . '.';
+		} elseif ( $counts ) {
 			$lines[] = '• Countable ingredients, exact numbers: ' . implode( '; ', $counts ) . '. Where a panel lays the ingredients out — the mise en place — show exactly these numbers, not one more pack, roll, fruit or egg "for composition". This binds the ingredient display only. A later panel showing the dish being made or served need not have them all in shot, and a few of the same fruit resting in the background of a finished shot is styling, not a miscount.';
 		}
 		// The list itself is already in the prompt; restating it here and again in
 		// the closing rules was three copies of the same forty words per image.
-		if ( $measured ) {
+		if ( $measured && ! $single ) {
 			$lines[] = '• Every other ingredient is measured, not counted: show a believable amount.';
 		}
 		$equipment = array_values( array_filter( array_map( 'trim', array_map( 'strval', (array) ( $canonical['equipment'] ?? array() ) ) ) ) );
-		if ( $equipment ) {
+		if ( $equipment && ! $single ) {
 			$lines[] = '• The cookware this recipe names: ' . implode( ', ', $equipment ) . '. These must be the ones actually used for the steps that need them, and in one colour and material throughout — the same tin in every panel it appears in. Ordinary kitchen things a cook obviously needs to perform a step are fine and expected: a board to peel on, a bowl to mix in, a spoon, a knife, a cloth. What is a defect is a support that changes how the finished dish is presented — a cooling rack, a board or a plate standing in for the serving vessel in the last panel alone, or a second tin of a different colour.';
 		}
 		$servings = (int) ( $canonical['servings'] ?? 0 );
@@ -459,7 +464,7 @@ final class MSRWA_Engine_Input {
 		$prompt = MSRWA_Prompt::compile( trim( file_get_contents( $file ) ), $settings ) . "\n\n"
 			. 'Recipe title: ' . (string) ( $canonical['title'] ?? $brief['title'] ) . "\n"
 			. 'Exact ingredients: ' . implode( ', ', $ingredients ) . "\n\n"
-			. self::visual_brief( $canonical, $research ) . "\n";
+			. self::visual_brief( $canonical, $research, 'featured' === $kind ) . "\n";
 
 		if ( 'facebook' === $kind ) {
 			$all_steps = array_values( (array) ( $canonical['steps'] ?? array() ) );

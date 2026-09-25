@@ -87,7 +87,11 @@ final class MSRWA_Run {
 		// A recipe left `running` by a killed request is the watchdog's, and the
 		// watchdog is cron too.
 		self::recover_expired();
-		foreach ( self::for_batch( $batch_id ) as $run ) {
+		$runs = self::for_batch( $batch_id );
+		// The page sends up to three nudges at once: each starts from a
+		// different recipe rather than all three queueing on the first's lease.
+		shuffle( $runs );
+		foreach ( $runs as $run ) {
 			if ( ! self::may_see( $run ) || ! self::overdue( $run ) ) { continue; }
 			self::tick( (int) $run['id'] );
 			return (int) $run['id'];

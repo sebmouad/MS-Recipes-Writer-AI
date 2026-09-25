@@ -836,6 +836,14 @@ photograph, and otherwise use the photograph without the cost of a search.
     second recipe in one cron request could be drawn from the first's
     photograph. It is keyed by the title, the brief's images and the
     research's first references.
+45. **The featured prompt carries no panel rules.** `visual_brief()` takes
+    `$single`: for the one photograph of the finished dish it keeps the
+    counts and drops the cookware, the mise-en-place and the measured-amount
+    lines, which only a collage uses. 1,100 fewer characters, about $0.001 a
+    recipe at the image model's input rate. The dish reference note also
+    says that what sits beside the dish in the photograph and is not an
+    ingredient is left out: a research photograph's cherry tomatoes had been
+    copied onto the plate.
 
 ### Still open
 

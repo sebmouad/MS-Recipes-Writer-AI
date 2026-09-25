@@ -696,7 +696,7 @@ final class MSRWA_Engine {
 			if ( $dish ) {
 				$references = array( $dish['image'] );
 				$reference = $dish['from'];
-				$prompt .= "\n\nREFERENCE IMAGE: a photograph of this dish" . ( 'editor' === $reference ? ' sent by the writer' : ' found by the research' ) . ". Follow what the dish looks like — shape, filling, layering, doneness, crust and colour of the food — and nothing else: not its light, background, plate, props or framing, which this prompt sets. Never reproduce the photograph itself, its flaws or anything written on it.";
+				$prompt .= "\n\nREFERENCE IMAGE: a photograph of this dish" . ( 'editor' === $reference ? ' sent by the writer' : ' found by the research' ) . ". Follow what the dish looks like — shape, filling, layering, doneness, crust and colour of the food — and nothing else: not its light, background, plate, props or framing, which this prompt sets. Anything beside the dish in it that the ingredient list does not name — a side vegetable, a garnish, a sauce bowl — is left out. Never reproduce the photograph itself, its flaws or anything written on it.";
 			}
 		}
 		$ceiling = (int) $config->get( 'limits.image_prompt_chars', 30000 );

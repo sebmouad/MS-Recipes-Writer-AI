@@ -128,18 +128,15 @@ msrwa_real_assert( 'draft' === (string) ( $draft['body']['status'] ?? '' ), 'It 
 msrwa_real_assert( '' !== trim( (string) ( $draft['body']['content']['raw'] ?? '' ) ), 'A draft with no article in it is worse than no draft.' );
 msrwa_real_note( 'draft #' . $post . ': ' . wp_strip_all_tags_compat( (string) ( $draft['body']['title']['raw'] ?? '' ) ) );
 
-// The photograph the writer sent is attached to the draft that came of it,
-// where the editor will look for it — unless the pairing set it aside.
+// The photograph the writer sent is working material, not article content:
+// since 0.24 it stays in the run's closed folder and never enters the media
+// library, where it would sit beside the generated images as if published.
 if ( $photo ) {
 	$media = msrwa_real_request( 'GET', '/wp/v2/media?parent=' . $post . '&per_page=20&context=edit' );
 	$sent = array_filter( (array) $media['body'], static function ( $item ) { return false !== strpos( (string) ( $item['source_url'] ?? '' ), 'msrwa-flow-tarte' ); } );
 	msrwa_real_note( count( (array) $media['body'] ) . ' attachment(s) on the draft, ' . count( $sent ) . ' of them the photograph sent' );
-	if ( '' !== $real_photo ) {
-		msrwa_real_assert( 1 === count( $sent ), 'The writer\'s photograph is attached to the draft.' );
-	} else {
-		msrwa_real_assert( count( $sent ) <= 1, 'A drawn photograph is attached at most once.' );
-		msrwa_real_note( 'no real photograph given (MSRWA_TEST_PHOTO): the drawn one ' . ( $sent ? 'was paired' : 'was set aside by the pairing, as it should be' ) );
-	}
+	msrwa_real_assert( 0 === count( $sent ), 'The writer\'s photograph stays out of the media library.' );
+	if ( '' === $real_photo ) { msrwa_real_note( 'no real photograph given (MSRWA_TEST_PHOTO): a drawn one stood in for it' ); }
 }
 
 // What the article wrote about itself must reach the post: proofreading returns

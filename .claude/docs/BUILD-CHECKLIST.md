@@ -637,9 +637,10 @@ cost) in the task before changing anything.
 - [~] **A47 — Corrections not found in the HTML (2026-09-25).** Loose
   quotes located, copied neighbours and repeated sentences removed. Replayed
   offline over every stored run; next live run confirms. ENGINE.md §7, 43.
-- [~] **A46 — Featured image from a dish photograph (2026-09-24).** The
+- [x] **A46 — Featured image from a dish photograph (2026-09-24).** The
   writer's photograph, or the research's, is sent with the featured prompt.
-  Offline only; the next live run measures it. See ENGINE.md §7, item 42.
+  Real: lab rôti and croquettes, and the site's full flow (lot #74, reference
+  `editor`, $0.0661). See ENGINE.md §7, items 42 and 45.
 - [x] **A45 — Style collage + prompt + dish photograph (2026-09-24).** The
   writer's photograph, or the research's, goes to both models beside the
   approved collage. Real: the owner's rôti photograph and croquettes from a
