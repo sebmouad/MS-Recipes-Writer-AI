@@ -25,11 +25,11 @@ msgstr ""
 msgid "%1$d en cours, %2$d en attente ; entretien piloté par %3$s."
 msgstr ""
 
-#: class-msrwa-i18n.php:63
+#: class-msrwa-i18n.php:70
 msgid "%1$d h %2$d min"
 msgstr ""
 
-#: class-msrwa-i18n.php:66
+#: class-msrwa-i18n.php:73
 msgid "%1$d min %2$d s"
 msgstr ""
 
@@ -37,16 +37,20 @@ msgstr ""
 msgid "%1$d recette(s) attendent depuis %2$s sans que rien n’avance."
 msgstr ""
 
-#: class-msrwa-admin.php:185
+#: class-msrwa-admin.php:187
 msgid "%1$d tarif(s) trouvé(s) sur %2$d demandé(s)."
 msgstr ""
 
-#: class-msrwa-admin.php:215
+#: class-msrwa-admin.php:217
 msgid "%1$d traitée(s), %2$d ignorée(s) : l’action ne s’appliquait pas, ou elles ne vous appartiennent pas."
 msgstr ""
 
 #: class-msrwa-ui.php:225
 msgid "%1$d étapes sur %2$d"
+msgstr ""
+
+#: class-msrwa-admin.php:166 class-msrwa-ui.php:283
+msgid "%1$d/%2$d étapes"
 msgstr ""
 
 #: class-msrwa-admin.php:155 class-msrwa-intake.php:102
@@ -89,7 +93,7 @@ msgid_plural "%d groupes en JSON, pour une modification à la main"
 msgstr[0] ""
 msgstr[1] ""
 
-#: class-msrwa-admin.php:182
+#: class-msrwa-admin.php:184
 msgid "%d modèle(s)"
 msgstr ""
 
@@ -103,7 +107,7 @@ msgstr[1] ""
 msgid "%d photographies"
 msgstr ""
 
-#: class-msrwa-admin.php:190
+#: class-msrwa-admin.php:192
 msgid "%d photographies — écrite d’après elles"
 msgstr ""
 
@@ -123,7 +127,7 @@ msgstr[1] ""
 msgid "%d recettes détectées"
 msgstr ""
 
-#: class-msrwa-admin.php:201
+#: class-msrwa-admin.php:203
 msgid "%d recettes sélectionnées"
 msgstr ""
 
@@ -153,7 +157,7 @@ msgstr ""
 msgid "%d étape(s) sans tarif publié"
 msgstr ""
 
-#: class-msrwa-admin.php:134 class-msrwa-i18n.php:48
+#: class-msrwa-admin.php:134 class-msrwa-i18n.php:55
 msgid "%s $"
 msgstr ""
 
@@ -177,7 +181,7 @@ msgstr ""
 msgid "%s n’est pas une photographie JPEG, PNG ou WebP."
 msgstr ""
 
-#: class-msrwa-i18n.php:55
+#: class-msrwa-i18n.php:62
 msgid "%s s"
 msgstr ""
 
@@ -195,7 +199,7 @@ msgstr ""
 msgid "1 photographie"
 msgstr ""
 
-#: class-msrwa-admin.php:188
+#: class-msrwa-admin.php:190
 msgid "1 photographie — écrite d’après elle"
 msgstr ""
 
@@ -203,7 +207,7 @@ msgstr ""
 msgid "1 recette détectée"
 msgstr ""
 
-#: class-msrwa-admin.php:199
+#: class-msrwa-admin.php:201
 msgid "1 recette sélectionnée"
 msgstr ""
 
@@ -215,7 +219,7 @@ msgstr ""
 msgid "7 jours"
 msgstr ""
 
-#: class-msrwa-admin.php:236 class-msrwa-admin.php:243 class-msrwa-admin.php:257 class-msrwa-operations.php:18 class-msrwa-operations.php:72 class-msrwa-operations.php:120 class-msrwa-operations.php:121
+#: class-msrwa-admin.php:238 class-msrwa-admin.php:245 class-msrwa-admin.php:259 class-msrwa-operations.php:18 class-msrwa-operations.php:72 class-msrwa-operations.php:120 class-msrwa-operations.php:121
 msgid "Accès refusé."
 msgstr ""
 
@@ -259,7 +263,7 @@ msgstr ""
 msgid "Analyse"
 msgstr ""
 
-#: class-msrwa-profile.php:89
+#: class-msrwa-profile.php:99
 msgid "Anglais"
 msgstr ""
 
@@ -267,7 +271,7 @@ msgstr ""
 msgid "Appariement corrigé par le rédacteur"
 msgstr ""
 
-#: class-msrwa-admin.php:187
+#: class-msrwa-admin.php:189
 msgid "Appariement enregistré."
 msgstr ""
 
@@ -275,7 +279,7 @@ msgstr ""
 msgid "Appels"
 msgstr ""
 
-#: class-msrwa-admin.php:202
+#: class-msrwa-admin.php:204
 msgid "Application…"
 msgstr ""
 
@@ -283,7 +287,7 @@ msgstr ""
 msgid "Appliquer"
 msgstr ""
 
-#: class-msrwa-profile.php:90
+#: class-msrwa-profile.php:100
 msgid "Arabe"
 msgstr ""
 
@@ -315,11 +319,15 @@ msgstr ""
 msgid "Article en %s."
 msgstr ""
 
+#: class-msrwa-profile.php:51
+msgid "Article et image"
+msgstr ""
+
 #: class-msrwa-profile.php:35
 msgid "Article et image à la une"
 msgstr ""
 
-#: class-msrwa-profile.php:40
+#: class-msrwa-profile.php:40 class-msrwa-profile.php:52
 msgid "Article seul"
 msgstr ""
 
@@ -347,7 +355,7 @@ msgstr ""
 msgid "Attendre que le quota se réinitialise, ou relever la limite du compte chez le fournisseur."
 msgstr ""
 
-#: class-msrwa-admin.php:212
+#: class-msrwa-admin.php:214
 msgid "Attention : une recette est estimée à %1$s, au-dessus du plafond de %2$s. Elle s’arrêterait en route ; le lot sera refusé au lancement. Relevez le plafond ou choisissez une sortie plus légère."
 msgstr ""
 
@@ -407,7 +415,7 @@ msgstr ""
 msgid "Aucune clé enregistrée : aucune recette ne peut partir."
 msgstr ""
 
-#: class-msrwa-admin.php:289 class-msrwa-sources.php:255
+#: class-msrwa-admin.php:291 class-msrwa-sources.php:255
 msgid "Aucune image reçue."
 msgstr ""
 
@@ -455,7 +463,7 @@ msgstr ""
 msgid "Brief remis au moteur"
 msgstr ""
 
-#: class-msrwa-ui.php:297
+#: class-msrwa-ui.php:338
 msgid "Brouillon"
 msgstr ""
 
@@ -475,7 +483,7 @@ msgstr ""
 msgid "Ce lot dépasse le plafond par recette fixé pour le site : il s’arrêterait en route. Choisissez une sortie plus légère, ou demandez à un administrateur de relever le plafond."
 msgstr ""
 
-#: class-msrwa-admin.php:213
+#: class-msrwa-admin.php:215
 msgid "Ce lot dépasse le plafond par recette fixé pour le site et sera refusé au lancement. Choisissez une sortie plus légère, ou demandez à un administrateur de relever le plafond."
 msgstr ""
 
@@ -567,7 +575,7 @@ msgstr ""
 msgid "Ce type de lot n’est pas ouvert aux rédacteurs sur ce site. Choisissez-en un autre."
 msgstr ""
 
-#: class-msrwa-admin.php:186
+#: class-msrwa-admin.php:188
 msgid "Ces tarifs sont une indication à vérifier, jamais une facture. Rechargez la page."
 msgstr ""
 
@@ -631,7 +639,7 @@ msgstr ""
 msgid "Chiffrées à l’enregistrement et jamais réaffichées. Un champ laissé vide conserve la clé enregistrée ; il ne l’efface pas."
 msgstr ""
 
-#: class-msrwa-admin.php:192 class-msrwa-screen-batch.php:171
+#: class-msrwa-admin.php:194 class-msrwa-screen-batch.php:171
 msgid "Choisie par vous"
 msgstr ""
 
@@ -647,7 +655,7 @@ msgstr ""
 msgid "Choisit d’un coup le modèle, la réflexion et la qualité d’image de chaque étape. Changer une étape à la main fait passer à « Personnalisé »."
 msgstr ""
 
-#: class-msrwa-admin.php:220
+#: class-msrwa-admin.php:222
 msgid "Clé présente"
 msgstr ""
 
@@ -659,7 +667,7 @@ msgstr ""
 msgid "Collage Facebook"
 msgstr ""
 
-#: class-msrwa-admin.php:175 class-msrwa-batch.php:30 class-msrwa-rest.php:103
+#: class-msrwa-admin.php:177 class-msrwa-batch.php:30 class-msrwa-rest.php:103
 msgid "Collez au moins une recette ou ajoutez au moins une photographie."
 msgstr ""
 
@@ -677,6 +685,10 @@ msgstr ""
 
 #: class-msrwa-screen-pass.php:86
 msgid "Comment ça marche"
+msgstr ""
+
+#: class-msrwa-profile.php:50
+msgid "Complet"
 msgstr ""
 
 #: class-msrwa-screen-settings.php:140
@@ -747,7 +759,7 @@ msgstr ""
 msgid "Coût"
 msgstr ""
 
-#: class-msrwa-admin.php:222
+#: class-msrwa-admin.php:224 class-msrwa-ui.php:285
 msgid "Coût estimé"
 msgstr ""
 
@@ -775,7 +787,7 @@ msgstr ""
 msgid "DISABLE_WP_CRON est actif. Les lots n’avanceront que si un cron serveur appelle wp-cron.php ; sans cela ils resteront en attente sans rien signaler."
 msgstr ""
 
-#: class-msrwa-ui.php:298
+#: class-msrwa-ui.php:339
 msgid "Dans la corbeille"
 msgstr ""
 
@@ -823,7 +835,7 @@ msgstr ""
 msgid "Des étapes tournent sur un modèle sans tarif publié : %s. La dépense sera incomplète, jamais fausse."
 msgstr ""
 
-#: class-msrwa-admin.php:176
+#: class-msrwa-admin.php:178
 msgid "Description des photographies…"
 msgstr ""
 
@@ -843,7 +855,7 @@ msgstr ""
 msgid "Droits"
 msgstr ""
 
-#: class-msrwa-screen-run.php:244 class-msrwa-screen-run.php:282
+#: class-msrwa-screen-run.php:244 class-msrwa-screen-run.php:282 class-msrwa-ui.php:284
 msgid "Durée"
 msgstr ""
 
@@ -907,7 +919,7 @@ msgstr ""
 msgid "D’où vient ce tarif"
 msgstr ""
 
-#: class-msrwa-admin.php:267
+#: class-msrwa-admin.php:269
 msgid "EFFACER"
 msgstr ""
 
@@ -927,7 +939,7 @@ msgstr ""
 msgid "En attente de : %s, qui n’est jamais arrivé."
 msgstr ""
 
-#: class-msrwa-ui.php:296
+#: class-msrwa-ui.php:337
 msgid "En attente de relecture"
 msgstr ""
 
@@ -955,7 +967,7 @@ msgstr ""
 msgid "Engendré par ce tableau, puis remis au moteur comme couche appelante. Les niveaux sont le moins cher, le milieu et le plus cher de ce que ce site a vraiment — c’est ce qui empêche un niveau de désigner un modèle que personne n’a tarifé ou que le fournisseur a retiré. Seules les étapes de texte passent par un niveau ; la génération d’image nomme son modèle directement."
 msgstr ""
 
-#: class-msrwa-admin.php:177
+#: class-msrwa-admin.php:179
 msgid "Enregistrement…"
 msgstr ""
 
@@ -995,11 +1007,11 @@ msgstr ""
 msgid "Entrée $/M"
 msgstr ""
 
-#: class-msrwa-admin.php:174
+#: class-msrwa-admin.php:176
 msgid "Environ %1$s pour %3$d recette(s), et au maximum %2$s : le plafond arrête un run avant de le dépasser."
 msgstr ""
 
-#: class-msrwa-admin.php:195
+#: class-msrwa-admin.php:197
 msgid "Envoi au moteur…"
 msgstr ""
 
@@ -1011,7 +1023,7 @@ msgstr ""
 msgid "Envoi programmé le %s. Rien n’est dépensé d’ici là."
 msgstr ""
 
-#: class-msrwa-profile.php:91
+#: class-msrwa-profile.php:101
 msgid "Espagnol"
 msgstr ""
 
@@ -1047,7 +1059,7 @@ msgstr ""
 msgid "Fournisseur"
 msgstr ""
 
-#: class-msrwa-profile.php:88
+#: class-msrwa-profile.php:98
 msgid "Français"
 msgstr ""
 
@@ -1071,7 +1083,7 @@ msgstr ""
 msgid "Image Facebook"
 msgstr ""
 
-#: class-msrwa-admin.php:170
+#: class-msrwa-admin.php:172
 msgid "Image collée %d"
 msgstr ""
 
@@ -1087,11 +1099,11 @@ msgstr ""
 msgid "Image à la une"
 msgstr ""
 
-#: class-msrwa-admin.php:178
+#: class-msrwa-admin.php:180
 msgid "Interrogation des fournisseurs…"
 msgstr ""
 
-#: class-msrwa-ui.php:321
+#: class-msrwa-ui.php:362
 msgid "Intitulé dans WordPress : « %s »"
 msgstr ""
 
@@ -1273,7 +1285,7 @@ msgstr ""
 msgid "Le plafond du jour est atteint : %1$s dépensés sur %2$s. Rien de plus ne sera lancé avant demain."
 msgstr ""
 
-#: class-msrwa-admin.php:226
+#: class-msrwa-admin.php:228
 msgid "Le plafond par recette est plus bas : il arrête les nouvelles tentatives avant de le franchir, la recette se termine et le dernier verdict va au rédacteur."
 msgstr ""
 
@@ -1309,7 +1321,7 @@ msgstr ""
 msgid "Le site n’est relié à aucun service d’écriture pour une étape de cette recette. Un administrateur doit enregistrer la clé, puis la reprendre."
 msgstr ""
 
-#: class-msrwa-admin.php:198
+#: class-msrwa-admin.php:200
 msgid "Le total est incomplet : %s tourne(nt) sur un modèle sans tarif publié."
 msgstr ""
 
@@ -1317,7 +1329,7 @@ msgstr ""
 msgid "Le travail est terminé, mais aucun brouillon n’a pu être créé. Un administrateur doit regarder le détail."
 msgstr ""
 
-#: class-msrwa-admin.php:179
+#: class-msrwa-admin.php:181
 msgid "Lecture des pages de tarifs…"
 msgstr ""
 
@@ -1425,7 +1437,7 @@ msgstr ""
 msgid "Lot"
 msgstr ""
 
-#: class-msrwa-screen-batch.php:29
+#: class-msrwa-screen-batch.php:29 class-msrwa-ui.php:277
 msgid "Lot %d"
 msgstr ""
 
@@ -1441,7 +1453,7 @@ msgstr ""
 msgid "Légende Facebook"
 msgstr ""
 
-#: class-msrwa-admin.php:167
+#: class-msrwa-admin.php:169
 msgid "L’adresse doit commencer par https://."
 msgstr ""
 
@@ -1453,7 +1465,7 @@ msgstr ""
 msgid "L’article a été supprimé de WordPress."
 msgstr ""
 
-#: class-msrwa-ui.php:303
+#: class-msrwa-ui.php:344
 msgid "L’article a été supprimé définitivement ; le suivi de la recette reste ici."
 msgstr ""
 
@@ -1529,11 +1541,11 @@ msgstr ""
 msgid "Mineur"
 msgstr ""
 
-#: class-msrwa-admin.php:191 class-msrwa-screen-batch.php:171
+#: class-msrwa-admin.php:193 class-msrwa-screen-batch.php:171
 msgid "Mise de côté"
 msgstr ""
 
-#: class-msrwa-ui.php:331
+#: class-msrwa-ui.php:372
 msgid "Modifier"
 msgstr ""
 
@@ -1569,11 +1581,11 @@ msgstr ""
 msgid "Méta-description"
 msgstr ""
 
-#: class-msrwa-admin.php:194 class-msrwa-screen-batch.php:114
+#: class-msrwa-admin.php:196 class-msrwa-screen-batch.php:114
 msgid "Ne sera pas écrite : sa photographie est écartée"
 msgstr ""
 
-#: class-msrwa-admin.php:205
+#: class-msrwa-admin.php:207
 msgid "Nettoyage…"
 msgstr ""
 
@@ -1793,7 +1805,7 @@ msgstr ""
 msgid "Programmer"
 msgstr ""
 
-#: class-msrwa-ui.php:295
+#: class-msrwa-ui.php:336
 msgid "Programmé"
 msgstr ""
 
@@ -1801,7 +1813,7 @@ msgstr ""
 msgid "Programmés"
 msgstr ""
 
-#: class-msrwa-screen-engine.php:121 class-msrwa-ui.php:335
+#: class-msrwa-screen-engine.php:121 class-msrwa-ui.php:376
 msgid "Prévisualiser"
 msgstr ""
 
@@ -1813,11 +1825,11 @@ msgstr ""
 msgid "Publier la recette en données structurées (Recipe JSON-LD)"
 msgstr ""
 
-#: class-msrwa-ui.php:293
+#: class-msrwa-ui.php:334
 msgid "Publié"
 msgstr ""
 
-#: class-msrwa-ui.php:294
+#: class-msrwa-ui.php:335
 msgid "Publié en privé"
 msgstr ""
 
@@ -1865,7 +1877,7 @@ msgstr ""
 msgid "Rapport complet"
 msgstr ""
 
-#: class-msrwa-admin.php:216
+#: class-msrwa-admin.php:218
 msgid "Rapport copié."
 msgstr ""
 
@@ -1893,7 +1905,7 @@ msgstr ""
 msgid "Recharger le compte chez le fournisseur, puis reprendre les recettes arrêtées."
 msgstr ""
 
-#: class-msrwa-admin.php:180
+#: class-msrwa-admin.php:182
 msgid "Rechargez la page pour voir le catalogue à jour."
 msgstr ""
 
@@ -1941,15 +1953,15 @@ msgstr ""
 msgid "Reprendre la file"
 msgstr ""
 
-#: class-msrwa-admin.php:204
+#: class-msrwa-admin.php:206
 msgid "Reprise de la file…"
 msgstr ""
 
-#: class-msrwa-admin.php:196
+#: class-msrwa-admin.php:198
 msgid "Reprise…"
 msgstr ""
 
-#: class-msrwa-ui.php:327
+#: class-msrwa-ui.php:368
 msgid "Restaurer"
 msgstr ""
 
@@ -2013,7 +2025,7 @@ msgstr ""
 msgid "Rien à analyser"
 msgstr ""
 
-#: class-msrwa-admin.php:183
+#: class-msrwa-admin.php:185
 msgid "Rien à chercher : chaque modèle servi a déjà un tarif."
 msgstr ""
 
@@ -2021,7 +2033,7 @@ msgstr ""
 msgid "Routage"
 msgstr ""
 
-#: class-msrwa-admin.php:219
+#: class-msrwa-admin.php:221
 msgid "Route"
 msgstr ""
 
@@ -2041,7 +2053,7 @@ msgstr ""
 msgid "Réactivez l’extension : les capacités sont accordées depuis une seule liste, à l’activation comme à la mise à jour."
 msgstr ""
 
-#: class-msrwa-screen-articles.php:57
+#: class-msrwa-screen-articles.php:57 class-msrwa-ui.php:273
 msgid "Rédacteur"
 msgstr ""
 
@@ -2049,7 +2061,7 @@ msgstr ""
 msgid "Rédaction"
 msgstr ""
 
-#: class-msrwa-admin.php:223 class-msrwa-screen-engine.php:234 class-msrwa-screen-engine.php:263
+#: class-msrwa-admin.php:225 class-msrwa-screen-engine.php:234 class-msrwa-screen-engine.php:263
 msgid "Réflexion"
 msgstr ""
 
@@ -2109,7 +2121,7 @@ msgstr ""
 msgid "Sans dire lesquelles vont avec quoi : chacune sera décrite depuis ses propres pixels, puis associée à une recette — ou, sans texte, regroupée avec les autres photographies du même plat. Une photographie est facturée une fois, même si vous corrigez ensuite l’association."
 msgstr ""
 
-#: class-msrwa-admin.php:193 class-msrwa-screen-batch.php:114
+#: class-msrwa-admin.php:195 class-msrwa-screen-batch.php:114
 msgid "Sans photographie — références cherchées sur le web"
 msgstr ""
 
@@ -2117,7 +2129,7 @@ msgstr ""
 msgid "Sans tarif"
 msgstr ""
 
-#: class-msrwa-admin.php:229
+#: class-msrwa-admin.php:231
 msgid "Sans tarif, donc absentes du total :"
 msgstr ""
 
@@ -2137,7 +2149,7 @@ msgstr ""
 msgid "Seules les tâches planifiées et les droits accordés sont retirés ; réinstallée, l’extension reprend là où elle en était."
 msgstr ""
 
-#: class-msrwa-admin.php:225
+#: class-msrwa-admin.php:227
 msgid "Si l’approbation finale refuse à chaque tentative et fait redessiner les images, une recette peut coûter jusqu’à %s."
 msgstr ""
 
@@ -2177,11 +2189,11 @@ msgstr ""
 msgid "Supprimer"
 msgstr ""
 
-#: class-msrwa-admin.php:208
+#: class-msrwa-admin.php:210
 msgid "Supprimer %d recette(s) et tout ce que le moteur en a rapporté ? C’est irréversible."
 msgstr ""
 
-#: class-msrwa-admin.php:209
+#: class-msrwa-admin.php:211
 msgid "Supprimer ce lot et tout ce que le moteur en a rapporté ? Les brouillons déjà produits sont conservés. C’est irréversible."
 msgstr ""
 
@@ -2197,7 +2209,7 @@ msgstr ""
 msgid "Supprimer les réglages seulement"
 msgstr ""
 
-#: class-msrwa-ui.php:302
+#: class-msrwa-ui.php:343
 msgid "Supprimé de WordPress"
 msgstr ""
 
@@ -2229,7 +2241,7 @@ msgstr ""
 msgid "Suspendre la file"
 msgstr ""
 
-#: class-msrwa-admin.php:203
+#: class-msrwa-admin.php:205
 msgid "Suspension…"
 msgstr ""
 
@@ -2237,11 +2249,11 @@ msgstr ""
 msgid "Sélection"
 msgstr ""
 
-#: class-msrwa-ui.php:244
+#: class-msrwa-ui.php:266
 msgid "Sélectionner %s"
 msgstr ""
 
-#: class-msrwa-admin.php:217
+#: class-msrwa-admin.php:219
 msgid "Sélectionné : copiez avec votre raccourci habituel."
 msgstr ""
 
@@ -2257,7 +2269,7 @@ msgstr ""
 msgid "Taille"
 msgstr ""
 
-#: class-msrwa-admin.php:221
+#: class-msrwa-admin.php:223
 msgid "Tarif connu"
 msgstr ""
 
@@ -2411,7 +2423,7 @@ msgid_plural "%d photographies attendent votre décision : associez-les à une r
 msgstr[0] ""
 msgstr[1] ""
 
-#: class-msrwa-admin.php:228
+#: class-msrwa-admin.php:230
 msgid "Une recette complète est estimée à %s — une estimation, jamais une facture."
 msgstr ""
 
@@ -2439,7 +2451,7 @@ msgstr ""
 msgid "Visuel Facebook"
 msgstr ""
 
-#: class-msrwa-ui.php:333
+#: class-msrwa-ui.php:374
 msgid "Voir"
 msgstr ""
 
@@ -2467,11 +2479,11 @@ msgstr ""
 msgid "Vous n’avez pas accès à cet export."
 msgstr ""
 
-#: class-msrwa-admin.php:271 class-msrwa-admin.php:280 class-msrwa-admin.php:297 class-msrwa-screen-analysis.php:16 class-msrwa-screen-articles.php:15 class-msrwa-screen-batch.php:16 class-msrwa-screen-compose.php:15 class-msrwa-screen-diagnostics.php:14 class-msrwa-screen-engine.php:16 class-msrwa-screen-models.php:19 class-msrwa-screen-models.php:209 class-msrwa-screen-pass.php:14 class-msrwa-screen-run.php:15 class-msrwa-screen-settings.php:15
+#: class-msrwa-admin.php:273 class-msrwa-admin.php:282 class-msrwa-admin.php:299 class-msrwa-screen-analysis.php:16 class-msrwa-screen-articles.php:15 class-msrwa-screen-batch.php:16 class-msrwa-screen-compose.php:15 class-msrwa-screen-diagnostics.php:14 class-msrwa-screen-engine.php:16 class-msrwa-screen-models.php:19 class-msrwa-screen-models.php:209 class-msrwa-screen-pass.php:14 class-msrwa-screen-run.php:15 class-msrwa-screen-settings.php:15
 msgid "Vous n’avez pas accès à cet écran."
 msgstr ""
 
-#: class-msrwa-admin.php:206
+#: class-msrwa-admin.php:208
 msgid "Vérification…"
 msgstr ""
 
@@ -2503,7 +2515,7 @@ msgstr ""
 msgid "accessibles"
 msgstr ""
 
-#: class-msrwa-admin.php:168
+#: class-msrwa-admin.php:170
 msgid "aperçu indisponible — le site vérifiera à l’envoi"
 msgstr ""
 
@@ -2587,7 +2599,7 @@ msgstr ""
 msgid "avancé"
 msgstr ""
 
-#: class-msrwa-admin.php:172
+#: class-msrwa-admin.php:174
 msgid "avec des précisions"
 msgstr ""
 
@@ -2659,7 +2671,7 @@ msgstr ""
 msgid "collez la clé ici"
 msgstr ""
 
-#: class-msrwa-admin.php:165
+#: class-msrwa-admin.php:167
 msgid "collée"
 msgstr ""
 
@@ -2735,6 +2747,10 @@ msgstr ""
 msgid "haute"
 msgstr ""
 
+#: class-msrwa-i18n.php:44
+msgid "il y a %s"
+msgstr ""
+
 #: class-msrwa-sources.php:100
 msgid "image collée"
 msgstr ""
@@ -2783,7 +2799,7 @@ msgstr ""
 msgid "langue"
 msgstr ""
 
-#: class-msrwa-ui.php:314
+#: class-msrwa-ui.php:355
 msgid "le %s"
 msgstr ""
 
@@ -2799,7 +2815,7 @@ msgstr ""
 msgid "le fournisseur répond %d : réessayez plus tard"
 msgstr ""
 
-#: class-msrwa-admin.php:171
+#: class-msrwa-admin.php:173
 msgid "le nom seul"
 msgstr ""
 
@@ -2811,7 +2827,7 @@ msgstr ""
 msgid "le serveur"
 msgstr ""
 
-#: class-msrwa-admin.php:166
+#: class-msrwa-admin.php:168
 msgid "lien"
 msgstr ""
 
@@ -2863,7 +2879,7 @@ msgstr ""
 msgid "modifié"
 msgstr ""
 
-#: class-msrwa-ui.php:314
+#: class-msrwa-ui.php:355
 msgid "modifié le %s"
 msgstr ""
 
@@ -2895,7 +2911,7 @@ msgstr ""
 msgid "par recette, sur 30 jours"
 msgstr ""
 
-#: class-msrwa-ui.php:261
+#: class-msrwa-ui.php:287
 msgid "passe devant"
 msgstr ""
 
@@ -3051,7 +3067,7 @@ msgstr ""
 msgid "Élargissez le filtre, ou repartez de la liste complète."
 msgstr ""
 
-#: class-msrwa-admin.php:218 class-msrwa-screen-analysis.php:264 class-msrwa-screen-analysis.php:333 class-msrwa-screen-engine.php:232 class-msrwa-screen-engine.php:268 class-msrwa-screen-engine.php:309 class-msrwa-screen-run.php:242 class-msrwa-screen-run.php:280
+#: class-msrwa-admin.php:220 class-msrwa-screen-analysis.php:264 class-msrwa-screen-analysis.php:333 class-msrwa-screen-engine.php:232 class-msrwa-screen-engine.php:268 class-msrwa-screen-engine.php:309 class-msrwa-screen-run.php:242 class-msrwa-screen-run.php:280
 msgid "Étape"
 msgstr ""
 

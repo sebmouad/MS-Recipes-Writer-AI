@@ -236,30 +236,57 @@ final class MSRWA_UI {
 	public static function ticket( array $run, $url, $selectable = false ) {
 		$state = self::state_of( $run );
 		$spine = in_array( $state['tone'], array( 'live' ), true ) ? 'live' : ( 'stop' === $state['tone'] ? 'stop' : ( 'good' === $state['tone'] ? 'done' : ( 'warn' === $state['tone'] ? 'warn' : '' ) ) );
+		$lot = self::lot_of( $run );
+		$post_id = (int) ( $run['draft_post_id'] ?? 0 );
+		$thumb = $post_id ? (int) get_post_thumbnail_id( $post_id ) : 0;
+		$author = self::owner( (int) ( $run['owner_id'] ?? 0 ) );
+		$icon = array( MSRWA_Profile::ARTICLE => 'media-text', MSRWA_Profile::FEATURED => 'format-image', MSRWA_Profile::FULL => 'images-alt2' )[ $lot['profile'] ] ?? 'food';
+		$fact = static function ( $dashicon, $text, $title = '', $field = '' ) {
+			if ( '' === (string) $text ) { return; }
+			echo '<li' . ( '' !== $title ? ' title="' . esc_attr( $title ) . '"' : '' ) . '><span class="dashicons dashicons-' . esc_attr( $dashicon ) . '" aria-hidden="true"></span>'
+				. '<span' . ( '' !== $field ? ' data-field="' . esc_attr( $field ) . '"' : '' ) . '>' . esc_html( $text ) . '</span></li>';
+		};
 		?>
 		<article class="ms-ticket<?php echo $spine ? ' ms-ticket-' . esc_attr( $spine ) : ''; ?>" data-run="<?php echo esc_attr( $run['id'] ); ?>">
-			<div class="ms-ticket-title">
-				<?php if ( $selectable ) : ?>
-					<input type="checkbox" class="ms-pick-run" value="<?php echo esc_attr( $run['id'] ); ?>"
-						aria-label="<?php echo esc_attr( sprintf( /* translators: %s is a recipe title. */ __( 'Sélectionner %s', 'ms-recipes-writer-ai' ), $run['label'] ) ); ?>">
-				<?php endif; ?>
-				<span class="ms-ticket-no">#<?php echo esc_html( $run['id'] ); ?></span>
-				<a class="ms-ticket-name" href="<?php echo esc_url( $url ); ?>"><?php echo esc_html( $run['label'] ); ?></a>
-			</div>
-			<div class="ms-ticket-meta">
-				<span data-field="steps"><?php echo esc_html( $run['steps_done'] . '/' . $run['steps_total'] ); ?></span>
-				<?php if ( MSRWA_Rights::may_see_money() && isset( $run['cost_usd'] ) ) : ?>
-					<span data-field="cost"><?php echo esc_html( MSRWA_I18N::money( $run['cost_usd'] ) ); ?></span>
-				<?php endif; ?>
-				<?php if ( isset( $run['seconds'] ) ) : ?>
-					<span data-field="seconds"><?php echo esc_html( MSRWA_I18N::seconds( $run['seconds'] ) ); ?></span>
-				<?php endif; ?>
-				<?php if ( '' !== (string) ( $run['step'] ?? '' ) && 'running' === $run['status'] ) : ?>
-					<span class="ms-key" data-field="step"><?php echo esc_html( $run['step'] ); ?></span>
-				<?php endif; ?>
-				<?php if ( 'queued' === $run['status'] && (int) ( $run['priority'] ?? 0 ) > 0 ) : ?>
-					<span class="ms-key"><?php esc_html_e( 'passe devant', 'ms-recipes-writer-ai' ); ?></span>
-				<?php endif; ?>
+			<a class="ms-ticket-thumb<?php echo $thumb ? '' : ' is-empty'; ?>" href="<?php echo esc_url( $url ); ?>" tabindex="-1" aria-hidden="true">
+				<?php
+				// The article's own featured image once there is one; until then
+				// the kind of lot, so the column never reads as a missing picture.
+				if ( $thumb ) {
+					echo wp_get_attachment_image( $thumb, 'thumbnail', false, array( 'alt' => '', 'loading' => 'lazy' ) );
+				} else {
+					echo '<span class="dashicons dashicons-' . esc_attr( $icon ) . '"></span>';
+				}
+				?>
+			</a>
+			<div class="ms-ticket-body">
+				<div class="ms-ticket-title">
+					<?php if ( $selectable ) : ?>
+						<input type="checkbox" class="ms-pick-run" value="<?php echo esc_attr( $run['id'] ); ?>"
+							aria-label="<?php echo esc_attr( sprintf( /* translators: %s is a recipe title. */ __( 'Sélectionner %s', 'ms-recipes-writer-ai' ), $run['label'] ) ); ?>">
+					<?php endif; ?>
+					<a class="ms-ticket-name" href="<?php echo esc_url( $url ); ?>"><?php echo esc_html( $run['label'] ); ?></a>
+					<span class="ms-ticket-no">#<?php echo esc_html( $run['id'] ); ?></span>
+				</div>
+				<ul class="ms-ticket-facts">
+					<?php
+					$fact( 'admin-users', $author, __( 'Rédacteur', 'ms-recipes-writer-ai' ) );
+					if ( (int) ( $run['batch_id'] ?? 0 ) ) {
+						echo '<li><span class="dashicons dashicons-portfolio" aria-hidden="true"></span><a href="' . esc_url( admin_url( 'admin.php?page=msrwa-batch&batch_id=' . (int) $run['batch_id'] ) ) . '">'
+							/* translators: %d is a lot number. */
+							. esc_html( sprintf( __( 'Lot %d', 'ms-recipes-writer-ai' ), (int) $run['batch_id'] ) ) . '</a></li>';
+					}
+					$fact( $icon, MSRWA_Profile::short( $lot['profile'] ), (string) ( MSRWA_Profile::all()[ $lot['profile'] ]['label'] ?? '' ) );
+					$fact( 'translation', '' !== $lot['language'] ? strtoupper( $lot['language'] ) : '', (string) ( MSRWA_Profile::languages()[ $lot['language'] ] ?? '' ) );
+					$fact( 'calendar-alt', isset( $run['created_at'] ) ? MSRWA_I18N::ago( $run['created_at'] ) : '', isset( $run['created_at'] ) ? MSRWA_I18N::when( $run['created_at'] ) : '' );
+					/* translators: 1: steps done, 2: steps planned. */
+					$fact( 'list-view', sprintf( __( '%1$d/%2$d étapes', 'ms-recipes-writer-ai' ), (int) $run['steps_done'], (int) $run['steps_total'] ), '', 'steps' );
+					if ( isset( $run['seconds'] ) ) { $fact( 'clock', MSRWA_I18N::seconds( $run['seconds'] ), __( 'Durée', 'ms-recipes-writer-ai' ), 'seconds' ); }
+					if ( MSRWA_Rights::may_see_money() && isset( $run['cost_usd'] ) ) { $fact( 'money-alt', MSRWA_I18N::money( $run['cost_usd'] ), __( 'Coût estimé', 'ms-recipes-writer-ai' ), 'cost' ); }
+					if ( '' !== (string) ( $run['step'] ?? '' ) && 'running' === $run['status'] ) { $fact( 'update', MSRWA_UI::step_name( (string) $run['step'] ), '', 'step' ); }
+					if ( 'queued' === $run['status'] && (int) ( $run['priority'] ?? 0 ) > 0 ) { $fact( 'arrow-up-alt', __( 'passe devant', 'ms-recipes-writer-ai' ) ); }
+					?>
+				</ul>
 			</div>
 			<div class="ms-ticket-side">
 				<?php
@@ -268,7 +295,6 @@ final class MSRWA_UI {
 				if ( 'done' !== ( $run['status'] ?? '' ) ) { echo self::progress( $run['steps_done'], $run['steps_total'] ); } // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				// Once the post has left the drafts its own state, below, says it;
 				// the same word twice on one row reads as two different facts.
-				$post_id = (int) ( $run['draft_post_id'] ?? 0 );
 				$decided = $post_id && 'done' === ( $run['status'] ?? '' ) && ! in_array( array_key_exists( 'post_status', $run ) ? $run['post_status'] : get_post_status( $post_id ), array( 'draft', 'pending' ), true );
 				?>
 				<?php if ( ! $decided ) : ?><span data-field="state"><?php echo self::state( $run ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span><?php endif; ?>
@@ -276,6 +302,21 @@ final class MSRWA_UI {
 			<?php self::post_state( $run ); ?>
 		</article>
 		<?php
+	}
+
+	/**
+	 * The lot's kind and language for a row. The lists read them with the run;
+	 * a lot's own page passes runs without them, and asks its lot once.
+	 */
+	private static function lot_of( array $run ) {
+		static $lots = array();
+		if ( array_key_exists( 'profile', $run ) ) { return array( 'profile' => (string) $run['profile'], 'language' => (string) ( $run['language'] ?? '' ) ); }
+		$id = (int) ( $run['batch_id'] ?? 0 );
+		if ( ! isset( $lots[ $id ] ) ) {
+			$batch = $id && class_exists( 'MSRWA_Batch' ) ? MSRWA_Batch::get( $id ) : null;
+			$lots[ $id ] = array( 'profile' => (string) ( $batch['profile'] ?? '' ), 'language' => (string) ( $batch['language'] ?? '' ) );
+		}
+		return $lots[ $id ];
 	}
 
 	/**

@@ -340,11 +340,13 @@ final class MSRWA_Ledger {
 		// be displayed has no business crossing the wire, and `SELECT *` on a
 		// table holding longtext is wasteful besides.
 		$columns = 'r.id, r.batch_id, r.owner_id, r.label, r.status, r.step, r.steps_done, r.steps_total, r.approved, r.priority, r.draft_post_id, r.error_message, r.created_at, '
-			. 'p.post_status, p.post_title, p.post_modified_gmt, p.post_date_gmt, ' . self::post_bucket_sql() . ' AS post_bucket';
+			. 'p.post_status, p.post_title, p.post_modified_gmt, p.post_date_gmt, ' . self::post_bucket_sql() . ' AS post_bucket, '
+			// What kind of lot and in which language: the row names both.
+			. 'b.profile, b.language';
 		if ( MSRWA_Rights::may_see_money() ) { $columns .= ', r.cost_usd, r.seconds'; }
 
 		$rows = (array) $wpdb->get_results( $wpdb->prepare(
-			"SELECT {$columns} FROM {$t['runs']} r LEFT JOIN {$wpdb->posts} p ON p.ID = r.draft_post_id WHERE {$clause} ORDER BY r.id DESC LIMIT %d OFFSET %d",
+			"SELECT {$columns} FROM {$t['runs']} r LEFT JOIN {$wpdb->posts} p ON p.ID = r.draft_post_id LEFT JOIN {$t['batches']} b ON b.id = r.batch_id WHERE {$clause} ORDER BY r.id DESC LIMIT %d OFFSET %d",
 			$per_page, ( $page - 1 ) * $per_page ), ARRAY_A );
 
 		return array(

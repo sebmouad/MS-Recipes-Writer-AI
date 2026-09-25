@@ -44,6 +44,16 @@ final class MSRWA_Profile {
 		);
 	}
 
+	/** The kind of lot in two or three words, for a row that has no room for the sentence. */
+	public static function short( $profile ) {
+		$short = array(
+			self::FULL => __( 'Complet', 'ms-recipes-writer-ai' ),
+			self::FEATURED => __( 'Article et image', 'ms-recipes-writer-ai' ),
+			self::ARTICLE => __( 'Article seul', 'ms-recipes-writer-ai' ),
+		);
+		return $short[ (string) $profile ] ?? '';
+	}
+
 	public static function exists( $profile ) { return array_key_exists( (string) $profile, self::all() ); }
 
 	/**

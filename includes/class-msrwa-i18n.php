@@ -37,6 +37,13 @@ final class MSRWA_I18N {
 	}
 
 	/** "il y a 4 minutes", in the reader's language. */
+	public static function ago( $mysql_utc ) {
+		$timestamp = strtotime( (string) $mysql_utc . ' UTC' );
+		if ( ! $timestamp ) { return ''; }
+		/* translators: %s is a length of time, such as "4 minutes". */
+		return sprintf( __( 'il y a %s', 'ms-recipes-writer-ai' ), human_time_diff( $timestamp, time() ) );
+	}
+
 	/**
 	 * An amount in dollars, written the way the reader's language writes it.
 	 *

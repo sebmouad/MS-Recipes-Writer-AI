@@ -2418,3 +2418,17 @@ msgstr "WordPress asks nothing when an extension is deleted: what goes is chosen
 #, php-format
 msgid "Les %1$d tables sont là, schéma %2$d."
 msgstr "All %1$d tables are there, schema %2$d."
+
+#, php-format
+msgid "%1$d/%2$d étapes"
+msgstr "%1$d/%2$d steps"
+
+msgid "Article et image"
+msgstr "Article and image"
+
+msgid "Complet"
+msgstr "Complete"
+
+#, php-format
+msgid "il y a %s"
+msgstr "%s ago"

@@ -150,8 +150,8 @@
 .ms-rail { display: grid; }
 .ms-ticket {
 	display: grid;
-	grid-template-columns: minmax(0, 1fr) auto;
-	gap: 4px 18px;
+	grid-template-columns: 64px minmax(0, 1fr) auto;
+	gap: 4px 16px;
 	align-items: center;
 	padding: 14px 18px;
 	border-block-end: 1px solid var(--ms-line-soft);
@@ -165,13 +165,24 @@
 .ms-ticket-stop { border-inline-start-color: var(--ms-stop); }
 .ms-ticket-warn { border-inline-start-color: var(--ms-warn); }
 
-.ms-ticket-title { grid-column: 1; grid-row: 1; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; min-width: 0; }
-.ms-ticket-no { font-family: var(--ms-mono); font-size: 12px; font-weight: 600; color: var(--ms-lamp); letter-spacing: .02em; }
-.ms-ticket-name { font-weight: 600; overflow-wrap: anywhere; }
-.ms-ticket-meta { grid-column: 1; grid-row: 2; display: flex; gap: 14px; flex-wrap: wrap; font-family: var(--ms-mono); font-size: 12px; color: var(--ms-ink-soft); font-variant-numeric: tabular-nums; }
-/* Both the row and the column, or auto-placement hands this the first column
-   and the ticket reads state-first with its own name pushed to the far edge. */
-.ms-ticket-side { grid-column: 2; grid-row: 1 / span 2; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+/* The picture: the article's featured image, or the kind of lot until there is one. */
+.ms-ticket-thumb { grid-column: 1; grid-row: 1; align-self: start; inline-size: 64px; block-size: 64px; border-radius: 8px; overflow: hidden; display: grid; place-items: center; background: var(--ms-sunk); border: 1px solid var(--ms-line-soft); }
+.ms-ticket-thumb img { inline-size: 100%; block-size: 100%; object-fit: cover; display: block; }
+.ms-ticket-thumb .dashicons { inline-size: 26px; block-size: 26px; font-size: 26px; color: var(--ms-ink-faint); }
+.ms-ticket-body { grid-column: 2; grid-row: 1; min-inline-size: 0; display: grid; gap: 6px; }
+.ms-ticket-title { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; min-width: 0; }
+.ms-ticket-title input { align-self: center; margin: 0; }
+.ms-ticket-no { font-family: var(--ms-mono); font-size: 11px; font-weight: 600; color: var(--ms-ink-faint); letter-spacing: .02em; }
+.ms-ticket-name { font-size: 14px; font-weight: 650; overflow-wrap: anywhere; text-decoration: none; }
+.ms-ticket-name:hover { text-decoration: underline; }
+/* The facts, each behind its icon: who, which lot, what kind, when, how far, what it cost. */
+.ms-ticket-facts { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--ms-ink-soft); font-variant-numeric: tabular-nums; }
+.ms-ticket-facts li { margin: 0; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+.ms-ticket-facts .dashicons { inline-size: 14px; block-size: 14px; font-size: 14px; color: var(--ms-ink-faint); }
+.ms-ticket-facts a { color: inherit; text-decoration: none; border-block-end: 1px dotted currentColor; }
+.ms-ticket-facts a:hover { color: var(--ms-lamp); }
+/* Its own column and row, or auto-placement pushes the state first. */
+.ms-ticket-side { grid-column: 3; grid-row: 1; align-self: start; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
 
 /* --- State -------------------------------------------------------------
  * The word carries the meaning; the dot is a second signal for someone
@@ -462,9 +473,10 @@
 
 @media (max-width: 960px) {
 	.ms-timeline > div { grid-template-columns: 1fr; gap: 2px; }
-	.ms-ticket { grid-template-columns: 1fr; }
-	.ms-ticket-title, .ms-ticket-meta, .ms-ticket-side { grid-column: 1; grid-row: auto; }
-	.ms-ticket-side { justify-content: flex-start; }
+	.ms-ticket { grid-template-columns: 48px minmax(0, 1fr); gap: 8px 12px; padding: 12px 14px; }
+	.ms-ticket-thumb { inline-size: 48px; block-size: 48px; }
+	.msrwa .ms-ticket-post-links .button { min-block-size: 32px; padding: 0 12px; font-size: 13px; line-height: 30px; }
+	.ms-ticket-side { grid-column: 2; grid-row: 2; justify-content: flex-start; }
 }
 
 /* --- Warnings that stop a lot before it spends --------------------------
@@ -686,7 +698,7 @@
 .ms-post-tab[aria-current="page"] .ms-count { background: var(--ms-lamp-soft); color: var(--ms-lamp); }
 .ms-post-tab-trash .ms-count, .ms-post-tab-deleted .ms-count { background: var(--ms-stop-soft); color: var(--ms-stop); }
 
-.ms-ticket-post { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin-block-start: 6px; padding-block-start: 8px; border-block-start: 1px dashed var(--ms-line-soft); }
+.ms-ticket-post { grid-column: 2 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin-block-start: 6px; padding-block-start: 8px; border-block-start: 1px dashed var(--ms-line-soft); }
 .ms-ticket-post small { margin: 0; }
 .ms-ticket-post-title { color: var(--ms-ink-soft); font-style: italic; }
 .ms-ticket-post-links { display: inline-flex; gap: 6px; margin-inline-start: auto; }

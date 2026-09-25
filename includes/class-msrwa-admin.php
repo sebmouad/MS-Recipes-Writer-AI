@@ -162,6 +162,8 @@ final class MSRWA_Admin {
 				'uploading' => __( 'Envoi des photographies…', 'ms-recipes-writer-ai' ),
 				/* translators: %s is a file name. */
 				'removePhoto' => __( 'Retirer %s', 'ms-recipes-writer-ai' ),
+				/* translators: 1: steps done, 2: steps planned. */
+				'stepsOf' => __( '%1$d/%2$d étapes', 'ms-recipes-writer-ai' ),
 				'pastedTag' => __( 'collée', 'ms-recipes-writer-ai' ),
 				'linkTag' => __( 'lien', 'ms-recipes-writer-ai' ),
 				'linkNotHttps' => __( 'L’adresse doit commencer par https://.', 'ms-recipes-writer-ai' ),

@@ -1299,9 +1299,9 @@
       var node = ticket.querySelector('[data-field="' + field + '"]');
       if (node && value !== undefined && String(value).indexOf('undefined') === -1) node.textContent = value;
     };
-    set('steps', run.steps_done + '/' + run.steps_total);
+    set('steps', (t.stepsOf || '%1$d/%2$d').replace('%1$d', run.steps_done).replace('%2$d', run.steps_total));
     set('cost', money(run.cost_usd));
-    set('step', 'running' === run.status ? run.step : '');
+    set('step', 'running' === run.status ? run.step_label : '');
 
     var bar = ticket.querySelector('.ms-progress i');
     if (bar) bar.style.inlineSize = Math.min(100, Math.round(100 * run.steps_done / Math.max(1, run.steps_total))) + '%';

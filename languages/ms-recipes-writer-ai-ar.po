@@ -2466,3 +2466,17 @@ msgstr "لا يطرح ووردبريس أي سؤال عند حذف إضافة: �
 #, php-format
 msgid "Les %1$d tables sont là, schéma %2$d."
 msgstr "الجداول (%1$d) كلها موجودة، المخطط %2$d."
+
+#, php-format
+msgid "%1$d/%2$d étapes"
+msgstr "%1$d/%2$d خطوات"
+
+msgid "Article et image"
+msgstr "مقال وصورة"
+
+msgid "Complet"
+msgstr "كامل"
+
+#, php-format
+msgid "il y a %s"
+msgstr "منذ %s"

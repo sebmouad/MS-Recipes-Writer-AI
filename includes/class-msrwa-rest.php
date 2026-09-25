@@ -190,7 +190,7 @@ final class MSRWA_REST {
 			$stalled += MSRWA_Run::overdue( $run ) ? 1 : 0;
 			$out[] = array(
 				'id' => (int) $run['id'], 'label' => (string) $run['label'], 'status' => (string) $run['status'],
-				'step' => (string) $run['step'], 'steps_done' => (int) $run['steps_done'], 'steps_total' => (int) $run['steps_total'],
+				'step' => (string) $run['step'], 'step_label' => MSRWA_UI::step_name( (string) $run['step'] ), 'steps_done' => (int) $run['steps_done'], 'steps_total' => (int) $run['steps_total'],
 				'cost_usd' => (float) $run['cost_usd'], 'seconds' => (float) $run['seconds'],
 				'approved' => null === $run['approved'] ? null : (bool) $run['approved'],
 				'draft_post_id' => (int) $run['draft_post_id'],
