@@ -3,14 +3,17 @@
 // scheduled, in the bin or deleted there, and renamed on the way. The state is
 // read from the post, never remembered by the plugin.
 require __DIR__ . '/bootstrap.php';
-msrwa_test_load( 'rights', 'i18n', 'ui', 'ledger' );
+msrwa_test_load( 'rights', 'i18n', 'ui', 'ledger', 'profile' );
 if ( true ) {
 	if ( ! function_exists( 'get_preview_post_link' ) ) { function get_preview_post_link( $post ) { return 'https://example.test/?p=' . (int) $post->ID . '&preview=true'; } }
 }
 msrwa_test_as_admin();
 $GLOBALS['msrwa_test_caps'][] = 'delete_post';
 
-$render = static function ( array $run ) { ob_start(); MSRWA_UI::post_state( $run ); return (string) ob_get_clean(); };
+$render = static function ( array $run ) {
+	$run += array( 'id' => 7, 'batch_id' => 0, 'owner_id' => 1, 'status' => 'done', 'step' => '', 'steps_done' => 9, 'steps_total' => 9, 'approved' => 1, 'priority' => 0, 'profile' => 'full', 'language' => 'fr' );
+	ob_start(); MSRWA_UI::run_table( array( $run ) ); return (string) ob_get_clean();
+};
 $GLOBALS['msrwa_test_posts'][201] = (object) array( 'ID' => 201, 'post_status' => 'publish', 'post_title' => 'Tarte normande au calvados', 'post_date_gmt' => '2026-09-24 08:00:00', 'post_modified_gmt' => '2026-09-24 08:00:00' );
 $GLOBALS['msrwa_test_posts'][202] = (object) array( 'ID' => 202, 'post_status' => 'trash', 'post_title' => 'Poulet yassa', 'post_date_gmt' => '2026-09-23 08:00:00', 'post_modified_gmt' => '2026-09-24 09:00:00' );
 $GLOBALS['msrwa_test_posts'][203] = (object) array( 'ID' => 203, 'post_status' => 'draft', 'post_title' => 'Daube', 'post_date_gmt' => '0000-00-00 00:00:00', 'post_modified_gmt' => '2026-09-24 10:00:00' );
@@ -33,7 +36,8 @@ msrwa_test_contains( $draft, 'preview=true', 'And is previewed rather than viewe
 
 $gone = $render( array( 'label' => 'Soupe', 'draft_post_id' => 999 ) );
 msrwa_test_contains( $gone, 'Supprimé de WordPress', 'A post deleted outright says so, and the recipe’s record stays.' );
-msrwa_test_assert( '' === $render( array( 'label' => 'En cours', 'draft_post_id' => 0 ) ), 'A recipe with no article yet shows nothing about one.' );
+$pending = $render( array( 'label' => 'En cours', 'draft_post_id' => 0, 'status' => 'running' ) );
+msrwa_test_assert( false === strpos( $pending, 'ms-run-action' ) && false === strpos( $pending, 'Brouillon' ), 'A recipe with no article yet shows nothing about one.' );
 
 // "To review" and "to fix" are for drafts: once the editor has published the
 // post, the flag gives way to what WordPress did with it.

@@ -195,11 +195,8 @@ final class MSRWA_Screen_Pass {
 			echo '</section>';
 			return;
 		}
-		echo '<div class="ms-rail">';
-		foreach ( $runs as $run ) {
-			MSRWA_UI::ticket( $run, admin_url( 'admin.php?page=msrwa-run&run_id=' . (int) $run['id'] ) );
-		}
-		echo '</div></section>';
+		MSRWA_UI::run_table( $runs );
+		echo '</section>';
 	}
 
 	/**

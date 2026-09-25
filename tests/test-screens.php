@@ -255,18 +255,18 @@ msrwa_test_missing( ( msrwa_render( array( 'MSRWA_Screen_Pass', 'render' ) )['ht
 // --- Queue order is said where it is true, and only there ---------------
 
 $waiting = array( 'id' => 9, 'batch_id' => 1, 'owner_id' => 1, 'label' => 'Tarte', 'status' => 'queued', 'step' => '', 'steps_done' => 0, 'steps_total' => 10, 'approved' => null, 'priority' => 5, 'draft_post_id' => 0 );
-ob_start(); MSRWA_UI::ticket( $waiting, '#' ); $html = ob_get_clean();
+ob_start(); MSRWA_UI::run_table( array( $waiting ) ); $html = ob_get_clean();
 msrwa_test_contains( $html, 'passe devant', 'A recipe pushed to the front says so while it waits.' );
 
 $waiting['priority'] = 0;
-ob_start(); MSRWA_UI::ticket( $waiting, '#' ); $html = ob_get_clean();
+ob_start(); MSRWA_UI::run_table( array( $waiting ) ); $html = ob_get_clean();
 msrwa_test_missing( $html, 'passe devant', 'A recipe in the ordinary order says nothing about order.' );
 
 // Reordering a recipe that is already moving would change nothing, so it is
 // never offered.
 $waiting['status'] = 'running';
 $waiting['priority'] = 5;
-ob_start(); MSRWA_UI::ticket( $waiting, '#' ); $html = ob_get_clean();
+ob_start(); MSRWA_UI::run_table( array( $waiting ) ); $html = ob_get_clean();
 msrwa_test_missing( $html, 'passe devant', 'A recipe already running is past the queue.' );
 
 // --- The REST base is not always a path ---------------------------------

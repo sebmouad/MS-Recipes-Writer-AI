@@ -2480,3 +2480,12 @@ msgstr "كامل"
 #, php-format
 msgid "il y a %s"
 msgstr "منذ %s"
+
+msgid "Actions"
+msgstr "إجراءات"
+
+msgid "Article"
+msgstr "المقال"
+
+msgid "Créée"
+msgstr "أُنشئت"

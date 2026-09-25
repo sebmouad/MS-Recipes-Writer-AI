@@ -82,11 +82,7 @@ final class MSRWA_Screen_Articles {
 				?>
 			<?php else : ?>
 				<?php self::bulk_bar(); ?>
-				<div class="ms-rail" id="ms-bulk-rail">
-					<?php foreach ( $found['runs'] as $run ) : ?>
-						<?php MSRWA_UI::ticket( $run, admin_url( 'admin.php?page=msrwa-run&run_id=' . (int) $run['id'] ), true ); ?>
-					<?php endforeach; ?>
-				</div>
+				<?php MSRWA_UI::run_table( $found['runs'], true, 'ms-bulk-rail' ); ?>
 				<?php self::pages( $found, $filters ); ?>
 			<?php endif; ?>
 		</section>

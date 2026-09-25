@@ -282,11 +282,7 @@ final class MSRWA_Screen_Batch {
 	private static function runs( array $runs ) {
 		if ( ! $runs ) { return; }
 		echo '<section class="ms-card ms-card-flush"><h2>' . esc_html__( 'Recettes', 'ms-recipes-writer-ai' ) . '</h2>';
-		echo '<div class="ms-rail">';
-		foreach ( $runs as $run ) {
-			MSRWA_UI::ticket( $run, admin_url( 'admin.php?page=msrwa-run&run_id=' . (int) $run['id'] ) );
-		}
-		echo '</div>';
+		MSRWA_UI::run_table( $runs );
 		echo '<p class="ms-muted" style="padding:14px 20px">' . esc_html__( 'Les recettes avancent en parallèle, trois à la fois, sans attendre une visite du site. Vous pouvez fermer cet onglet ; laissé ouvert, il relance aussi une recette que le cron du site aurait oubliée.', 'ms-recipes-writer-ai' ) . '</p>';
 		echo '</section>';
 	}

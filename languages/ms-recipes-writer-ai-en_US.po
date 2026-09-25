@@ -2432,3 +2432,12 @@ msgstr "Complete"
 #, php-format
 msgid "il y a %s"
 msgstr "%s ago"
+
+msgid "Actions"
+msgstr "Actions"
+
+msgid "Article"
+msgstr "Article"
+
+msgid "Créée"
+msgstr "Created"

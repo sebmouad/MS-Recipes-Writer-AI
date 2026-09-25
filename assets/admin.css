@@ -142,54 +142,76 @@
 .ms-row > :last-child { margin-inline-start: auto; }
 
 /* --- The rail ---------------------------------------------------------
- * The signature. One ticket per run, its state carried on a spine at the
- * leading edge so the rail is readable before any row is. border-inline-start
- * puts the spine on the correct side in Arabic without a second rule.
+ * The signature: recipes as a table of tickets under the pass lamp. Each
+ * row's state is the stripe on its leading edge, read before any cell;
+ * border-inline-start puts it on the correct side in Arabic. The recipe
+ * cell says what it is, the cells after it where it stands, figures set
+ * flush to the end in tabular digits so they line up down the column.
  */
 
-.ms-rail { display: grid; }
-.ms-ticket {
-	display: grid;
-	grid-template-columns: 72px minmax(0, 1fr) auto;
-	grid-template-areas: "thumb body side" "thumb body figures" "thumb post post";
-	gap: 2px 18px;
-	align-items: start;
-	padding: 16px 20px;
-	border-block-end: 1px solid var(--ms-line-soft);
-	border-inline-start: var(--ms-rail) solid var(--ms-line);
-	background: var(--ms-raised);
-	transition: background-color .12s ease;
-}
-.ms-ticket:last-child { border-block-end: 0; }
-.ms-ticket:hover { background: var(--ms-sunk); }
-.ms-ticket-live { border-inline-start-color: var(--ms-lamp); }
-.ms-ticket-done { border-inline-start-color: var(--ms-good); }
-.ms-ticket-stop { border-inline-start-color: var(--ms-stop); }
-.ms-ticket-warn { border-inline-start-color: var(--ms-warn); }
+.ms-runs { inline-size: 100%; border-collapse: collapse; font-size: 13px; }
+.ms-runs thead th { padding: 10px 14px; text-align: start; font-size: 12px; font-weight: 600; color: var(--ms-ink-soft); background: var(--ms-sunk); border-block-end: 1px solid var(--ms-line); white-space: nowrap; }
+.ms-runs td, .ms-runs tbody th { padding: 14px; text-align: start; vertical-align: middle; border-block-end: 1px solid var(--ms-line-soft); font-weight: 400; }
+/* Every column but the recipe's is as wide as what it holds; the recipe takes the rest. */
+.ms-runs td { inline-size: 1%; white-space: nowrap; }
+.ms-runs tbody tr:last-child > * { border-block-end: 0; }
+.ms-runs tbody tr:hover > * { background: var(--ms-sunk); }
+.ms-runs .ms-runs-num { text-align: end; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.ms-runs .ms-runs-pick { inline-size: 1%; padding-inline-end: 0; }
+.ms-runs .ms-runs-pick input { margin: 0; }
+.ms-runs .ms-runs-act { inline-size: 1%; white-space: nowrap; text-align: end; }
+.ms-runs small { display: block; margin-block-start: 4px; font-size: 12px; color: var(--ms-ink-soft); }
+.ms-runs time { color: var(--ms-ink-soft); white-space: nowrap; }
 
-/* The picture: the article's featured image, or the kind of lot until there is one. */
-.ms-ticket-thumb { grid-area: thumb; inline-size: 72px; block-size: 72px; border-radius: 10px; overflow: hidden; display: grid; place-items: center; background: var(--ms-sunk); box-shadow: inset 0 0 0 1px var(--ms-line-soft); }
-.ms-ticket-thumb img { inline-size: 100%; block-size: 100%; object-fit: cover; display: block; transition: transform .2s ease; }
-.ms-ticket:hover .ms-ticket-thumb img { transform: scale(1.04); }
-.ms-ticket-thumb.is-empty .dashicons { inline-size: 28px; block-size: 28px; font-size: 28px; color: var(--ms-ink-faint); }
-/* The leading side: what the recipe is. */
-.ms-ticket-body { grid-area: body; min-inline-size: 0; display: grid; gap: 7px; align-content: start; }
-.ms-ticket-title { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; min-width: 0; }
-.ms-ticket-title input { align-self: center; margin: 0; }
-.ms-ticket-name { font-size: 15px; font-weight: 650; line-height: 1.3; color: var(--ms-ink); overflow-wrap: anywhere; text-decoration: none; }
-.ms-ticket-name:hover, .ms-ticket-name:focus { color: var(--ms-lamp); text-decoration: underline; text-underline-offset: 3px; }
-.ms-ticket-no { font-family: var(--ms-mono); font-size: 11px; color: var(--ms-ink-faint); }
-.ms-ticket-facts { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 12.5px; color: var(--ms-ink-soft); }
-.ms-ticket-facts li { margin: 0; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
-.ms-ticket-facts .dashicons { inline-size: 15px; block-size: 15px; font-size: 15px; color: var(--ms-ink-faint); }
-.ms-ticket-facts a { color: var(--ms-ink); font-weight: 600; text-decoration: none; }
-.ms-ticket-facts a:hover, .ms-ticket-facts a:focus { color: var(--ms-lamp); text-decoration: underline; }
-/* The trailing side: where it stands — the state, and under it the figures that explain it. */
-.ms-ticket-side { grid-area: side; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
-.ms-ticket-figures { grid-area: figures; margin: 4px 0 0; display: flex; gap: 12px; justify-content: flex-end; font-family: var(--ms-mono); font-size: 12px; color: var(--ms-ink-soft); font-variant-numeric: tabular-nums; white-space: nowrap; }
-.ms-ticket-figures div { display: contents; }
-.ms-ticket-figures dd { margin: 0; }
-.ms-ticket-figures .ms-ticket-cost { color: var(--ms-ink); font-weight: 600; }
+/* The stripe: the lamp over the ticket. */
+.ms-run > :first-child { border-inline-start: 4px solid var(--ms-line); }
+.ms-run-live > :first-child { border-inline-start-color: var(--ms-lamp); }
+.ms-run-good > :first-child { border-inline-start-color: var(--ms-good); }
+.ms-run-warn > :first-child { border-inline-start-color: var(--ms-warn); }
+.ms-run-stop > :first-child { border-inline-start-color: var(--ms-stop); }
+
+/* What the recipe is: its picture, its name, and where it comes from. */
+.ms-run-recipe { min-inline-size: 16rem; }
+.ms-run-thumb { float: inline-start; margin-inline-end: 14px; inline-size: 56px; block-size: 56px; border-radius: 8px; overflow: hidden; display: grid; place-items: center; background: var(--ms-sunk); box-shadow: inset 0 0 0 1px var(--ms-line-soft); }
+.ms-run-thumb img { inline-size: 100%; block-size: 100%; object-fit: cover; display: block; }
+.ms-run-thumb.is-empty .dashicons { inline-size: 24px; block-size: 24px; font-size: 24px; color: var(--ms-ink-faint); }
+.ms-run-id { display: block; overflow: hidden; }
+.ms-run-name { font-size: 14px; font-weight: 650; line-height: 1.35; color: var(--ms-ink); text-decoration: none; overflow-wrap: anywhere; }
+.ms-run-name:hover, .ms-run-name:focus { color: var(--ms-lamp); text-decoration: underline; text-underline-offset: 3px; }
+.ms-run-no { color: var(--ms-ink-faint); font-variant-numeric: tabular-nums; }
+.ms-run-about { display: flex; flex-wrap: wrap; gap: 2px 12px; margin-block-start: 5px; font-size: 12px; color: var(--ms-ink-soft); }
+.ms-run-about a { color: var(--ms-ink); font-weight: 600; text-decoration: none; }
+.ms-run-about a:hover, .ms-run-about a:focus { color: var(--ms-lamp); text-decoration: underline; }
+.ms-run-wptitle { display: block; margin-block-start: 4px; font-size: 12px; font-style: italic; color: var(--ms-ink-soft); }
+
+/* Where it stands. */
+.ms-run-state .ms-progress { display: block; margin-block-start: 8px; }
+.ms-run-cost { font-weight: 650; color: var(--ms-ink); }
+.ms-run-action { display: inline-grid; place-items: center; inline-size: 32px; block-size: 32px; margin-inline-start: 4px; border-radius: 6px; color: var(--ms-ink-soft); border: 1px solid var(--ms-line); background: var(--ms-raised); text-decoration: none; }
+.ms-run-action:hover, .ms-run-action:focus { color: var(--ms-lamp); border-color: var(--ms-lamp); background: var(--ms-lamp-soft); }
+.ms-run-action .dashicons { inline-size: 18px; block-size: 18px; font-size: 18px; }
+
+/* On a phone a row is a ticket again: the recipe across the top, its
+   facts two by two beneath, each named by its column. */
+@media (max-width: 782px) {
+	.ms-runs thead { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); }
+	.ms-runs, .ms-runs tbody { display: block; }
+	.ms-runs tr.ms-run { position: relative; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px 14px; padding: 14px; border-block-end: 1px solid var(--ms-line-soft); border-inline-start: 4px solid var(--ms-line); }
+	.ms-runs tr.ms-run-live { border-inline-start-color: var(--ms-lamp); }
+	.ms-runs tr.ms-run-good { border-inline-start-color: var(--ms-good); }
+	.ms-runs tr.ms-run-warn { border-inline-start-color: var(--ms-warn); }
+	.ms-runs tr.ms-run-stop { border-inline-start-color: var(--ms-stop); }
+	.ms-runs tr.ms-run > * { display: block; padding: 0; border: 0; background: none; }
+	.ms-runs tr.ms-run > :first-child { border-inline-start: 0; }
+	.ms-runs tbody th.ms-run-recipe { grid-column: 1 / -1; display: block; min-inline-size: 0; }
+	.ms-runs td[data-label]::before { content: attr(data-label); display: block; margin-block-end: 3px; font-size: 11px; font-weight: 600; color: var(--ms-ink-faint); }
+	.ms-runs tr.ms-run > td { grid-column: span 3; }
+	/* The three figures share a row. */
+	.ms-runs tr.ms-run > td.ms-runs-num { grid-column: span 2; text-align: start; }
+	.ms-runs tr.ms-run > .ms-runs-pick { position: absolute; inset-block-start: 14px; inset-inline-end: 14px; inline-size: auto; }
+	.ms-runs tr.ms-run > .ms-runs-act { grid-column: 1 / -1; text-align: start; inline-size: auto; }
+	.ms-run-action { margin-inline: 0 6px; inline-size: 40px; block-size: 36px; }
+}
 
 /* --- State -------------------------------------------------------------
  * The word carries the meaning; the dot is a second signal for someone
@@ -480,12 +502,6 @@
 
 @media (max-width: 960px) {
 	.ms-timeline > div { grid-template-columns: 1fr; gap: 2px; }
-	.ms-ticket { grid-template-columns: 56px minmax(0, 1fr); grid-template-areas: "thumb body" "thumb side" "figures figures" "post post"; gap: 8px 12px; padding: 14px; }
-	.ms-ticket-thumb { inline-size: 56px; block-size: 56px; }
-	.ms-ticket-side { justify-content: flex-start; }
-	.ms-ticket-figures { justify-content: flex-start; margin: 0; }
-	.msrwa .ms-ticket-post-links .button { min-block-size: 32px; padding: 0 12px; font-size: 13px; line-height: 30px; }
-	.ms-ticket-side { grid-column: 2; grid-row: 2; justify-content: flex-start; }
 }
 
 /* --- Warnings that stop a lot before it spends --------------------------
@@ -707,12 +723,7 @@
 .ms-post-tab[aria-current="page"] .ms-count { background: var(--ms-lamp-soft); color: var(--ms-lamp); }
 .ms-post-tab-trash .ms-count, .ms-post-tab-deleted .ms-count { background: var(--ms-stop-soft); color: var(--ms-stop); }
 
-.ms-ticket-post { grid-area: post; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin-block-start: 10px; padding-block-start: 10px; border-block-start: 1px solid var(--ms-line-soft); font-size: 12px; }
-.ms-ticket-post small { margin: 0; }
-.ms-ticket-post-title { color: var(--ms-ink-soft); font-style: italic; }
-.ms-ticket-post-links { display: inline-flex; gap: 6px; margin-inline-start: auto; }
 @media (max-width: 782px) {
-	.ms-ticket-post-links { margin-inline-start: 0; flex-basis: 100%; }
 	.ms-post-tabs { padding-inline: 12px; }
 }
 

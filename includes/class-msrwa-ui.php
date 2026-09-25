@@ -227,90 +227,148 @@ final class MSRWA_UI {
 	}
 
 	/**
-	 * One run on the rail.
+	 * Recipes as a table: the pass, Articles and a lot's page share it.
 	 *
-	 * The spine at the leading edge carries the state before anything is read,
-	 * which is the whole reason the rail exists: an editor glancing at the page
-	 * should see that something went wrong without reading a word.
+	 * Each row is one ticket under the pass lamp — its state is the stripe at
+	 * the leading edge, read before any cell. The recipe cell says what it is;
+	 * the cells after it say where it stands, figures aligned at the end.
+	 * Columns a reader may not be shown are not drawn at all: a writer sees
+	 * neither author nor money. The body keeps `ms-rail` and each row
+	 * `data-run`, so the lot's page and the pass refresh rows in place.
 	 */
-	public static function ticket( array $run, $url, $selectable = false ) {
+	public static function run_table( array $runs, $selectable = false, $body_id = '' ) {
+		$author = MSRWA_Rights::may_see_everything();
+		$money = MSRWA_Rights::may_see_money();
+		?>
+		<table class="ms-runs">
+			<thead>
+				<tr>
+					<?php if ( $selectable ) : ?><th class="ms-runs-pick"><span class="screen-reader-text"><?php esc_html_e( 'Sélection', 'ms-recipes-writer-ai' ); ?></span></th><?php endif; ?>
+					<th><?php esc_html_e( 'Recette', 'ms-recipes-writer-ai' ); ?></th>
+					<?php if ( $author ) : ?><th><?php esc_html_e( 'Rédacteur', 'ms-recipes-writer-ai' ); ?></th><?php endif; ?>
+					<th><?php esc_html_e( 'État', 'ms-recipes-writer-ai' ); ?></th>
+					<th><?php esc_html_e( 'Article', 'ms-recipes-writer-ai' ); ?></th>
+					<th><?php esc_html_e( 'Créée', 'ms-recipes-writer-ai' ); ?></th>
+					<th class="ms-runs-num"><?php esc_html_e( 'Étapes', 'ms-recipes-writer-ai' ); ?></th>
+					<?php if ( $money ) : ?>
+						<th class="ms-runs-num"><?php esc_html_e( 'Durée', 'ms-recipes-writer-ai' ); ?></th>
+						<th class="ms-runs-num"><?php esc_html_e( 'Coût', 'ms-recipes-writer-ai' ); ?></th>
+					<?php endif; ?>
+					<th class="ms-runs-act"><span class="screen-reader-text"><?php esc_html_e( 'Actions', 'ms-recipes-writer-ai' ); ?></span></th>
+				</tr>
+			</thead>
+			<tbody class="ms-rail"<?php echo '' !== $body_id ? ' id="' . esc_attr( $body_id ) . '"' : ''; ?>>
+				<?php foreach ( $runs as $run ) { self::run_row( $run, $selectable, $author, $money ); } ?>
+			</tbody>
+		</table>
+		<?php
+	}
+
+	private static function run_row( array $run, $selectable, $author, $money ) {
+		$url = admin_url( 'admin.php?page=msrwa-run&run_id=' . (int) $run['id'] );
 		$state = self::state_of( $run );
-		$spine = in_array( $state['tone'], array( 'live' ), true ) ? 'live' : ( 'stop' === $state['tone'] ? 'stop' : ( 'good' === $state['tone'] ? 'done' : ( 'warn' === $state['tone'] ? 'warn' : '' ) ) );
+		$tone = '' !== $state['tone'] ? $state['tone'] : 'idle';
 		$lot = self::lot_of( $run );
 		$post_id = (int) ( $run['draft_post_id'] ?? 0 );
 		$thumb = $post_id ? (int) get_post_thumbnail_id( $post_id ) : 0;
-		$author = self::owner( (int) ( $run['owner_id'] ?? 0 ) );
 		$icon = array( MSRWA_Profile::ARTICLE => 'media-text', MSRWA_Profile::FEATURED => 'format-image', MSRWA_Profile::FULL => 'images-alt2' )[ $lot['profile'] ] ?? 'food';
-		$fact = static function ( $dashicon, $text, $title = '', $field = '' ) {
-			if ( '' === (string) $text ) { return; }
-			echo '<li' . ( '' !== $title ? ' title="' . esc_attr( $title ) . '"' : '' ) . '><span class="dashicons dashicons-' . esc_attr( $dashicon ) . '" aria-hidden="true"></span>'
-				. '<span' . ( '' !== $field ? ' data-field="' . esc_attr( $field ) . '"' : '' ) . '>' . esc_html( $text ) . '</span></li>';
-		};
+		$post = $post_id ? get_post( $post_id ) : null;
+		$wp_title = $post ? trim( (string) $post->post_title ) : '';
+		$languages = MSRWA_Profile::languages();
 		?>
-		<article class="ms-ticket<?php echo $spine ? ' ms-ticket-' . esc_attr( $spine ) : ''; ?>" data-run="<?php echo esc_attr( $run['id'] ); ?>">
-			<a class="ms-ticket-thumb<?php echo $thumb ? '' : ' is-empty'; ?>" href="<?php echo esc_url( $url ); ?>" tabindex="-1" aria-hidden="true">
-				<?php
-				// The article's own featured image once there is one; until then
-				// the kind of lot, so the column never reads as a missing picture.
-				if ( $thumb ) {
-					echo wp_get_attachment_image( $thumb, 'thumbnail', false, array( 'alt' => '', 'loading' => 'lazy' ) );
-				} else {
-					echo '<span class="dashicons dashicons-' . esc_attr( $icon ) . '"></span>';
-				}
-				?>
-			</a>
-			<div class="ms-ticket-body">
-				<div class="ms-ticket-title">
-					<?php if ( $selectable ) : ?>
-						<input type="checkbox" class="ms-pick-run" value="<?php echo esc_attr( $run['id'] ); ?>"
-							aria-label="<?php echo esc_attr( sprintf( /* translators: %s is a recipe title. */ __( 'Sélectionner %s', 'ms-recipes-writer-ai' ), $run['label'] ) ); ?>">
+		<tr class="ms-run ms-run-<?php echo esc_attr( $tone ); ?>" data-run="<?php echo esc_attr( $run['id'] ); ?>">
+			<?php if ( $selectable ) : ?>
+				<td class="ms-runs-pick"><input type="checkbox" class="ms-pick-run" value="<?php echo esc_attr( $run['id'] ); ?>"
+					aria-label="<?php echo esc_attr( sprintf( /* translators: %s is a recipe title. */ __( 'Sélectionner %s', 'ms-recipes-writer-ai' ), $run['label'] ) ); ?>"></td>
+			<?php endif; ?>
+			<th scope="row" class="ms-run-recipe">
+				<a class="ms-run-thumb<?php echo $thumb ? '' : ' is-empty'; ?>" href="<?php echo esc_url( $url ); ?>" tabindex="-1" aria-hidden="true">
+					<?php echo $thumb ? wp_get_attachment_image( $thumb, 'thumbnail', false, array( 'alt' => '', 'loading' => 'lazy' ) ) : '<span class="dashicons dashicons-' . esc_attr( $icon ) . '"></span>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				</a>
+				<span class="ms-run-id">
+					<a class="ms-run-name" href="<?php echo esc_url( $url ); ?>"><?php echo esc_html( $run['label'] ); ?></a>
+					<span class="ms-run-about">
+						<span class="ms-run-no">#<?php echo esc_html( $run['id'] ); ?></span>
+						<?php if ( (int) ( $run['batch_id'] ?? 0 ) ) : ?>
+							<a href="<?php echo esc_url( admin_url( 'admin.php?page=msrwa-batch&batch_id=' . (int) $run['batch_id'] ) ); ?>"><?php echo esc_html( sprintf( /* translators: %d is a lot number. */ __( 'Lot %d', 'ms-recipes-writer-ai' ), (int) $run['batch_id'] ) ); ?></a>
+						<?php endif; ?>
+						<?php if ( '' !== MSRWA_Profile::short( $lot['profile'] ) ) : ?><span title="<?php echo esc_attr( (string) ( MSRWA_Profile::all()[ $lot['profile'] ]['label'] ?? '' ) ); ?>"><?php echo esc_html( MSRWA_Profile::short( $lot['profile'] ) ); ?></span><?php endif; ?>
+						<?php if ( '' !== $lot['language'] ) : ?><span><?php echo esc_html( (string) ( $languages[ $lot['language'] ] ?? strtoupper( $lot['language'] ) ) ); ?></span><?php endif; ?>
+					</span>
+					<?php if ( '' !== $wp_title && $wp_title !== (string) $run['label'] ) : ?>
+						<span class="ms-run-wptitle"><?php echo esc_html( sprintf( /* translators: %s is the article's current title in WordPress. */ __( 'Intitulé dans WordPress : « %s »', 'ms-recipes-writer-ai' ), $wp_title ) ); ?></span>
 					<?php endif; ?>
-					<a class="ms-ticket-name" href="<?php echo esc_url( $url ); ?>"><?php echo esc_html( $run['label'] ); ?></a>
-					<span class="ms-ticket-no">#<?php echo esc_html( $run['id'] ); ?></span>
-				</div>
-				<ul class="ms-ticket-facts">
-					<?php
-					$fact( 'admin-users', $author, __( 'Rédacteur', 'ms-recipes-writer-ai' ) );
-					if ( (int) ( $run['batch_id'] ?? 0 ) ) {
-						echo '<li><span class="dashicons dashicons-portfolio" aria-hidden="true"></span><a href="' . esc_url( admin_url( 'admin.php?page=msrwa-batch&batch_id=' . (int) $run['batch_id'] ) ) . '">'
-							/* translators: %d is a lot number. */
-							. esc_html( sprintf( __( 'Lot %d', 'ms-recipes-writer-ai' ), (int) $run['batch_id'] ) ) . '</a></li>';
-					}
-					$fact( $icon, MSRWA_Profile::short( $lot['profile'] ), (string) ( MSRWA_Profile::all()[ $lot['profile'] ]['label'] ?? '' ) );
-					$fact( 'translation', '' !== $lot['language'] ? strtoupper( $lot['language'] ) : '', (string) ( MSRWA_Profile::languages()[ $lot['language'] ] ?? '' ) );
-					$fact( 'calendar-alt', isset( $run['created_at'] ) ? MSRWA_I18N::ago( $run['created_at'] ) : '', isset( $run['created_at'] ) ? MSRWA_I18N::when( $run['created_at'] ) : '' );
-					if ( '' !== (string) ( $run['step'] ?? '' ) && 'running' === $run['status'] ) { $fact( 'update', MSRWA_UI::step_name( (string) $run['step'] ), '', 'step' ); }
-					if ( 'queued' === $run['status'] && (int) ( $run['priority'] ?? 0 ) > 0 ) { $fact( 'arrow-up-alt', __( 'passe devant', 'ms-recipes-writer-ai' ) ); }
-					?>
-				</ul>
-			</div>
-			<?php
-			// Identity on the left, standing on the right: the figures sit under
-			// the state they explain, in tabular type, and line up down the list.
-			?>
-			<dl class="ms-ticket-figures">
-				<div title="<?php esc_attr_e( 'Étapes', 'ms-recipes-writer-ai' ); ?>"><dt class="screen-reader-text"><?php esc_html_e( 'Étapes', 'ms-recipes-writer-ai' ); ?></dt><dd data-field="steps"><?php echo esc_html( sprintf( /* translators: 1: steps done, 2: steps planned. */ __( '%1$d/%2$d étapes', 'ms-recipes-writer-ai' ), (int) $run['steps_done'], (int) $run['steps_total'] ) ); ?></dd></div>
-				<?php if ( isset( $run['seconds'] ) ) : ?>
-					<div title="<?php esc_attr_e( 'Durée', 'ms-recipes-writer-ai' ); ?>"><dt class="screen-reader-text"><?php esc_html_e( 'Durée', 'ms-recipes-writer-ai' ); ?></dt><dd data-field="seconds"><?php echo esc_html( MSRWA_I18N::seconds( $run['seconds'] ) ); ?></dd></div>
-				<?php endif; ?>
-				<?php if ( MSRWA_Rights::may_see_money() && isset( $run['cost_usd'] ) ) : ?>
-					<div title="<?php esc_attr_e( 'Coût estimé', 'ms-recipes-writer-ai' ); ?>"><dt class="screen-reader-text"><?php esc_html_e( 'Coût estimé', 'ms-recipes-writer-ai' ); ?></dt><dd class="ms-ticket-cost" data-field="cost"><?php echo esc_html( MSRWA_I18N::money( $run['cost_usd'] ) ); ?></dd></div>
-				<?php endif; ?>
-			</dl>
-			<div class="ms-ticket-side">
-				<?php
-				// A finished recipe's bar is always full: on a list of them it
-				// was one identical green line per row, saying nothing.
-				if ( 'done' !== ( $run['status'] ?? '' ) ) { echo self::progress( $run['steps_done'], $run['steps_total'] ); } // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-				// Once the post has left the drafts its own state, below, says it;
-				// the same word twice on one row reads as two different facts.
-				$decided = $post_id && 'done' === ( $run['status'] ?? '' ) && ! in_array( array_key_exists( 'post_status', $run ) ? $run['post_status'] : get_post_status( $post_id ), array( 'draft', 'pending' ), true );
-				?>
-				<?php if ( ! $decided ) : ?><span data-field="state"><?php echo self::state( $run ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span><?php endif; ?>
-			</div>
-			<?php self::post_state( $run ); ?>
-		</article>
+				</span>
+			</th>
+			<?php if ( $author ) : ?><td data-label="<?php esc_attr_e( 'Rédacteur', 'ms-recipes-writer-ai' ); ?>"><?php echo esc_html( self::owner( (int) ( $run['owner_id'] ?? 0 ) ) ); ?></td><?php endif; ?>
+			<td data-label="<?php esc_attr_e( 'État', 'ms-recipes-writer-ai' ); ?>" class="ms-run-state">
+				<span data-field="state"><?php echo self::state( $run ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+				<?php if ( 'done' !== ( $run['status'] ?? '' ) ) { echo self::progress( $run['steps_done'], $run['steps_total'] ); } // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				<?php if ( '' !== (string) ( $run['step'] ?? '' ) && 'running' === $run['status'] ) : ?><small data-field="step"><?php echo esc_html( self::step_name( (string) $run['step'] ) ); ?></small><?php endif; ?>
+				<?php if ( 'queued' === $run['status'] && (int) ( $run['priority'] ?? 0 ) > 0 ) : ?><small><?php esc_html_e( 'passe devant', 'ms-recipes-writer-ai' ); ?></small><?php endif; ?>
+			</td>
+			<td data-label="<?php esc_attr_e( 'Article', 'ms-recipes-writer-ai' ); ?>"><?php self::post_badge( $run, $post ); ?></td>
+			<td data-label="<?php esc_attr_e( 'Créée', 'ms-recipes-writer-ai' ); ?>">
+				<?php if ( ! empty( $run['created_at'] ) ) : ?><time datetime="<?php echo esc_attr( gmdate( 'c', (int) strtotime( $run['created_at'] . ' UTC' ) ) ); ?>" title="<?php echo esc_attr( MSRWA_I18N::when( $run['created_at'] ) ); ?>"><?php echo esc_html( MSRWA_I18N::ago( $run['created_at'] ) ); ?></time><?php endif; ?>
+			</td>
+			<td data-label="<?php esc_attr_e( 'Étapes', 'ms-recipes-writer-ai' ); ?>" class="ms-runs-num"><span data-field="steps"><?php echo esc_html( (int) $run['steps_done'] . '/' . (int) $run['steps_total'] ); ?></span></td>
+			<?php if ( $money ) : ?>
+				<td data-label="<?php esc_attr_e( 'Durée', 'ms-recipes-writer-ai' ); ?>" class="ms-runs-num"><span data-field="seconds"><?php echo isset( $run['seconds'] ) ? esc_html( MSRWA_I18N::seconds( $run['seconds'] ) ) : '—'; ?></span></td>
+				<td data-label="<?php esc_attr_e( 'Coût', 'ms-recipes-writer-ai' ); ?>" class="ms-runs-num ms-run-cost"><span data-field="cost"><?php echo isset( $run['cost_usd'] ) ? esc_html( MSRWA_I18N::money( $run['cost_usd'] ) ) : '—'; ?></span></td>
+			<?php endif; ?>
+			<td class="ms-runs-act"><?php self::post_links( $post_id, $post ); ?></td>
+		</tr>
 		<?php
+	}
+
+	/**
+	 * What became of the article in WordPress. The post's life is WordPress's —
+	 * published, scheduled, binned or deleted there — so it is read from the
+	 * post, never remembered here.
+	 */
+	private static function post_badge( array $run, $post ) {
+		if ( ! (int) ( $run['draft_post_id'] ?? 0 ) ) { echo '<span class="ms-muted">—</span>'; return; }
+		if ( ! $post ) {
+			echo '<span class="ms-state ms-state-stop" title="' . esc_attr__( 'L’article a été supprimé définitivement ; le suivi de la recette reste ici.', 'ms-recipes-writer-ai' ) . '">' . esc_html__( 'Supprimé de WordPress', 'ms-recipes-writer-ai' ) . '</span>';
+			return;
+		}
+		$states = array(
+			'publish' => array( 'good', __( 'Publié', 'ms-recipes-writer-ai' ) ),
+			'private' => array( 'good', __( 'Publié en privé', 'ms-recipes-writer-ai' ) ),
+			'future' => array( 'live', __( 'Programmé', 'ms-recipes-writer-ai' ) ),
+			'pending' => array( 'warn', __( 'En attente de relecture', 'ms-recipes-writer-ai' ) ),
+			'draft' => array( 'idle', __( 'Brouillon', 'ms-recipes-writer-ai' ) ),
+			'trash' => array( 'stop', __( 'Dans la corbeille', 'ms-recipes-writer-ai' ) ),
+		);
+		list( $tone, $label ) = $states[ $post->post_status ] ?? $states['draft'];
+		echo '<span class="ms-state ms-state-' . esc_attr( $tone ) . '">' . esc_html( $label ) . '</span>';
+		// The date that matters for that state: when it went out, or was last touched.
+		$when = in_array( $post->post_status, array( 'publish', 'future', 'private' ), true ) ? $post->post_date_gmt : $post->post_modified_gmt;
+		if ( $when && '0000-00-00 00:00:00' !== $when ) {
+			echo '<small title="' . esc_attr( MSRWA_I18N::when( $when ) ) . '">' . esc_html( MSRWA_I18N::ago( $when ) ) . '</small>';
+		}
+	}
+
+	/** Edit, preview or view, restore from the bin — as icon buttons that name themselves. */
+	private static function post_links( $post_id, $post ) {
+		if ( ! $post ) { return; }
+		$button = static function ( $href, $icon, $label, $blank = false ) {
+			return '<a class="ms-run-action" href="' . esc_url( $href ) . '" title="' . esc_attr( $label ) . '"' . ( $blank ? ' target="_blank" rel="noopener"' : '' ) . '>'
+				. '<span class="dashicons dashicons-' . esc_attr( $icon ) . '" aria-hidden="true"></span><span class="screen-reader-text">' . esc_html( $label ) . '</span></a>';
+		};
+		$links = array();
+		if ( 'trash' === $post->post_status ) {
+			if ( current_user_can( 'delete_post', $post_id ) ) { $links[] = $button( wp_nonce_url( admin_url( 'post.php?post=' . $post_id . '&action=untrash' ), 'untrash-post_' . $post_id ), 'undo', __( 'Restaurer', 'ms-recipes-writer-ai' ) ); }
+		} else {
+			$edit = (string) get_edit_post_link( $post_id );
+			if ( '' !== $edit ) { $links[] = $button( $edit, 'edit', __( 'Modifier', 'ms-recipes-writer-ai' ) ); }
+			if ( in_array( $post->post_status, array( 'publish', 'private' ), true ) ) {
+				$links[] = $button( (string) get_permalink( $post_id ), 'external', __( 'Voir', 'ms-recipes-writer-ai' ), true );
+			} elseif ( '' !== $edit ) {
+				$links[] = $button( (string) get_preview_post_link( $post ), 'visibility', __( 'Prévisualiser', 'ms-recipes-writer-ai' ), true );
+			}
+		}
+		echo implode( '', $links ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- built from escaped parts above.
 	}
 
 	/**
@@ -326,67 +384,6 @@ final class MSRWA_UI {
 			$lots[ $id ] = array( 'profile' => (string) ( $batch['profile'] ?? '' ), 'language' => (string) ( $batch['language'] ?? '' ) );
 		}
 		return $lots[ $id ];
-	}
-
-	/**
-	 * What became of the article in WordPress, and what can be done with it.
-	 *
-	 * The run knows the post it wrote; the post's life is WordPress's — it is
-	 * published, scheduled, sent to the bin or deleted there, and renamed on
-	 * the way. So the state is read from the post, never remembered here.
-	 */
-	public static function post_state( array $run ) {
-		$post_id = (int) ( $run['draft_post_id'] ?? 0 );
-		if ( ! $post_id ) { return; }
-		$post = get_post( $post_id );
-		$states = array(
-			'publish' => array( 'good', __( 'Publié', 'ms-recipes-writer-ai' ) ),
-			'private' => array( 'good', __( 'Publié en privé', 'ms-recipes-writer-ai' ) ),
-			'future' => array( 'live', __( 'Programmé', 'ms-recipes-writer-ai' ) ),
-			'pending' => array( 'warn', __( 'En attente de relecture', 'ms-recipes-writer-ai' ) ),
-			'draft' => array( 'idle', __( 'Brouillon', 'ms-recipes-writer-ai' ) ),
-			'trash' => array( 'stop', __( 'Dans la corbeille', 'ms-recipes-writer-ai' ) ),
-		);
-		echo '<div class="ms-ticket-post">';
-		if ( ! $post ) {
-			echo '<span class="ms-state ms-state-stop">' . esc_html__( 'Supprimé de WordPress', 'ms-recipes-writer-ai' ) . '</span>';
-			echo '<small class="ms-muted">' . esc_html__( 'L’article a été supprimé définitivement ; le suivi de la recette reste ici.', 'ms-recipes-writer-ai' ) . '</small></div>';
-			return;
-		}
-		list( $tone, $label ) = $states[ $post->post_status ] ?? $states['draft'];
-		echo '<span class="ms-state ms-state-' . esc_attr( $tone ) . '">' . esc_html( $label ) . '</span>';
-
-		// The date that matters for that state: when it went out, or will.
-		$when = 'publish' === $post->post_status || 'future' === $post->post_status || 'private' === $post->post_status ? $post->post_date_gmt : $post->post_modified_gmt;
-		if ( $when && '0000-00-00 00:00:00' !== $when ) {
-			echo '<small class="ms-muted">' . esc_html( sprintf(
-				/* translators: %s is a date. */
-				'future' === $post->post_status ? __( 'le %s', 'ms-recipes-writer-ai' ) : ( 'draft' === $post->post_status || 'pending' === $post->post_status || 'trash' === $post->post_status ? __( 'modifié le %s', 'ms-recipes-writer-ai' ) : __( 'le %s', 'ms-recipes-writer-ai' ) ),
-				MSRWA_I18N::when( $when )
-			) ) . '</small>';
-		}
-		$title = trim( (string) $post->post_title );
-		if ( '' !== $title && $title !== (string) ( $run['label'] ?? '' ) ) {
-			/* translators: %s is the article's current title in WordPress. */
-			echo '<small class="ms-ticket-post-title">' . esc_html( sprintf( __( 'Intitulé dans WordPress : « %s »', 'ms-recipes-writer-ai' ), $title ) ) . '</small>';
-		}
-
-		$links = array();
-		if ( 'trash' === $post->post_status ) {
-			if ( current_user_can( 'delete_post', $post_id ) ) {
-				$links[] = '<a class="button button-small" href="' . esc_url( wp_nonce_url( admin_url( 'post.php?post=' . $post_id . '&action=untrash' ), 'untrash-post_' . $post_id ) ) . '">' . esc_html__( 'Restaurer', 'ms-recipes-writer-ai' ) . '</a>';
-			}
-		} else {
-			$edit = (string) get_edit_post_link( $post_id );
-			if ( '' !== $edit ) { $links[] = '<a class="button button-small" href="' . esc_url( $edit ) . '">' . esc_html__( 'Modifier', 'ms-recipes-writer-ai' ) . '</a>'; }
-			if ( in_array( $post->post_status, array( 'publish', 'private' ), true ) ) {
-				$links[] = '<a class="button button-small" href="' . esc_url( (string) get_permalink( $post_id ) ) . '" target="_blank" rel="noopener">' . esc_html__( 'Voir', 'ms-recipes-writer-ai' ) . '</a>';
-			} elseif ( '' !== $edit ) {
-				$links[] = '<a class="button button-small" href="' . esc_url( (string) get_preview_post_link( $post ) ) . '" target="_blank" rel="noopener">' . esc_html__( 'Prévisualiser', 'ms-recipes-writer-ai' ) . '</a>';
-			}
-		}
-		if ( $links ) { echo '<span class="ms-ticket-post-links">' . implode( ' ', $links ) . '</span>'; } // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- built from escaped parts above.
-		echo '</div>';
 	}
 
 	/** An empty screen says what to do next, never just that there is nothing. */
