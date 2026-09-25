@@ -144,4 +144,14 @@ set_time_limit( 0 );
 MSRWA_Stack::room_for_images();
 msrwa_test_assert( 0 === (int) ini_get( 'max_execution_time' ), 'No limit is never turned into one.' );
 
-msrwa_test_done( 'the MS stack reads what the draft wrote' );
+// Filed as it is published, among the site's own categories, from the clues
+// the article carries. Nothing is created, and a near word is not a match.
+$site = array( 11 => 'Tartes et quiches', 12 => 'Viandes et volailles', 13 => 'Poissons et fruits de mer', 14 => 'Gratins', 15 => 'Pommes de terre', 16 => 'Desserts', 17 => 'Recettes rapides', 18 => 'Plats principaux' );
+msrwa_test_assert( array( 14 ) === MSRWA_Stack::choose_categories( $site, array( 3 => array( 'accompagnement' ), 2 => array( 'Gratin dauphinois' ) ) ), 'A title word files the gratin with the gratins.' );
+msrwa_test_assert( array( 16, 11 ) === MSRWA_Stack::choose_categories( $site, array( 3 => array( 'dessert' ), 2 => array( 'Tarte aux pommes normande' ) ) ), 'The recipe’s own category first, then what the title names — and never the potatoes.' );
+msrwa_test_assert( array( 18 ) === MSRWA_Stack::choose_categories( $site, array( 3 => array( 'plat principal' ), 2 => array( 'Rôti Orloff' ) ) ), 'A category named in full wins.' );
+msrwa_test_assert( array( 12 ) === MSRWA_Stack::choose_categories( $site, array( 2 => array( 'poulet yassa', 'volaille' ) ) ), 'Either half of "Viandes et volailles" is enough.' );
+msrwa_test_assert( array( 15 ) === MSRWA_Stack::choose_categories( $site, array( 2 => array( 'purée de pommes de terre' ) ) ), 'Both words of "Pommes de terre" together are.' );
+msrwa_test_assert( array() === MSRWA_Stack::choose_categories( $site, array( 2 => array( 'recette facile', 'couscous' ) ) ), 'Words every recipe site shares match nothing, and nothing is guessed.' );
+
+msrwa_test_done( 'the MS stack reads what the draft wrote, and files it as it is published' );

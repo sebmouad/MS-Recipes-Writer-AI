@@ -299,6 +299,80 @@ final class MSRWA_Stack {
 		return array_values( array_unique( $ids ) );
 	}
 
+	/**
+	 * Files an article of this plugin's as it is published, when it still sits
+	 * in the default category only: a draft written before the article chose
+	 * from the site's list, a category created since, or none that fitted then.
+	 * An editor's own choice is never touched, no category is created, and no
+	 * model is asked — publishing stays instant and free.
+	 */
+	public static function on_publish( $new_status, $old_status, $post ) {
+		if ( ! in_array( $new_status, array( 'publish', 'future' ), true ) || $new_status === $old_status ) { return; }
+		if ( ! is_object( $post ) || 'post' !== $post->post_type ) { return; }
+		$recipe = json_decode( (string) get_post_meta( $post->ID, '_msrwa_recipe', true ), true );
+		if ( ! is_array( $recipe ) && ! get_post_meta( $post->ID, '_msrwa_run_id', true ) ) { return; }
+		$default = (int) get_option( 'default_category' );
+		$current = array_map( 'intval', (array) wp_get_post_categories( $post->ID ) );
+		if ( array_diff( $current, array( $default, 0 ) ) ) { return; }
+
+		$categories = array();
+		foreach ( (array) get_terms( array( 'taxonomy' => 'category', 'hide_empty' => false ) ) as $term ) {
+			if ( is_object( $term ) && (int) $term->term_id !== $default ) { $categories[ (int) $term->term_id ] = html_entity_decode( (string) $term->name, ENT_QUOTES, 'UTF-8' ); }
+		}
+		$recipe = is_array( $recipe ) ? $recipe : array();
+		$tags = array_map( static function ( $tag ) { return is_object( $tag ) ? (string) $tag->name : ''; }, (array) wp_get_post_tags( $post->ID ) );
+		$chosen = self::choose_categories( $categories, array(
+			3 => array( (string) get_post_meta( $post->ID, '_msrwa_suggested_category', true ), (string) ( $recipe['recipe_category'] ?? '' ), (string) ( $recipe['cuisine'] ?? '' ) ),
+			2 => array_merge( array( (string) $post->post_title, (string) ( $recipe['title'] ?? '' ) ), self::listed( $recipe['keywords'] ?? array() ), $tags ),
+		) );
+		if ( ! $chosen ) { return; }
+		wp_set_post_categories( $post->ID, $chosen, false );
+		delete_post_meta( $post->ID, '_msrwa_suggested_category' );
+	}
+
+	/**
+	 * The one or two categories the clues point to, or none. A category named
+	 * in full by a clue wins outright; otherwise each of its words that a clue
+	 * contains counts that clue's weight — "Gratin dauphinois" points to
+	 * "Gratins", "rôti de porc" to "Viandes et porc" only through "porc". Words
+	 * every recipe site shares carry nothing. Pure: the caller reads the site.
+	 *
+	 * @param array $categories id => name.
+	 * @param array $clues      weight => list of texts.
+	 */
+	public static function choose_categories( array $categories, array $clues ) {
+		$generic = array( 'recette', 'cuisine', 'maison', 'facile', 'rapide', 'idee', 'plat', 'autre', 'divers' );
+		$texts = array();
+		foreach ( $clues as $weight => $list ) {
+			foreach ( (array) $list as $text ) {
+				$key = self::term_key( (string) $text );
+				if ( '' !== $key ) { $texts[] = array( (int) $weight, $key, array_flip( explode( ' ', $key ) ) ); }
+			}
+		}
+		$scores = array();
+		foreach ( $categories as $id => $name ) {
+			$key = self::term_key( (string) $name );
+			if ( '' === $key ) { continue; }
+			// "Viandes et volailles" is either; "Pommes de terre" is both words,
+			// or "Tarte aux pommes" would be filed with the potatoes.
+			$alternatives = array();
+			foreach ( preg_split( '/\s+(?:et|and|ou|or)\s+|[,&\/]/u', (string) $name ) as $part ) {
+				$words = array_values( array_filter( explode( ' ', self::term_key( $part ) ), static function ( $word ) use ( $generic ) { return mb_strlen( $word ) > 3 && ! in_array( $word, $generic, true ); } ) );
+				if ( $words ) { $alternatives[] = $words; }
+			}
+			$score = 0;
+			foreach ( $texts as $text ) {
+				if ( $text[1] === $key ) { $score += 10 * $text[0]; continue; }
+				foreach ( $alternatives as $words ) {
+					if ( ! array_diff_key( array_flip( $words ), $text[2] ) ) { $score += $text[0]; break; }
+				}
+			}
+			if ( $score >= 2 ) { $scores[ (int) $id ] = $score; }
+		}
+		arsort( $scores );
+		return array_slice( array_keys( $scores ), 0, 2 );
+	}
+
 	/** A category name reduced to what two spellings of it share. */
 	public static function term_key( $name ) {
 		$words = preg_split( '/\s+/', self::fold( $name ) );

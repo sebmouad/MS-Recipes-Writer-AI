@@ -70,6 +70,7 @@ final class MSRWA_Plugin {
 		// one: every screen in French, whatever the reader had chosen.
 		add_action( 'init', array( 'MSRWA_I18N', 'load' ) );
 		add_action( 'rest_api_init', array( 'MSRWA_REST', 'register' ) );
+		add_action( 'transition_post_status', array( 'MSRWA_Stack', 'on_publish' ), 10, 3 );
 		add_action( 'msrwa_run_step', array( 'MSRWA_Run', 'tick' ) );
 		MSRWA_Worker::hooks();
 		add_action( 'msrwa_cleanup', array( 'MSRWA_Run', 'recover_expired' ) );

@@ -630,6 +630,14 @@ cost) in the task before changing anything.
   (2026-09-24).** The writer's photograph shows the prompt's writer the dish;
   the collage is drawn from the style reference. Real: the owner's own rôti
   photograph, drawn both ways. See ENGINE.md §7, item 40.
+- [x] **A59 — Filed as it is published (2026-09-25).**
+  `MSRWA_Stack::on_publish()` on `transition_post_status`: a post of this
+  plugin's still in the default category only is given one or two existing
+  categories from its own clues (`choose_categories()`, pure, no model).
+  Never overrides an editor's category, never creates one. Real: Gratin
+  dauphinois (run #58, Uncategorized, suggestion "accompagnement") filed
+  under Gratins on publish, both by `wp_update_post` and through the REST
+  API the block editor uses; Rôti Orloff kept its own. `tests/test-stack.php`.
 - [x] **A58 — Categories chosen from the site's (2026-09-25).**
   `MSRWA_Stack::site_categories()` in each brief; the engine passes them to
   the article, which picks one or two; `category_ids()` files the post.
