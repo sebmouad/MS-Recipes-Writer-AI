@@ -39,6 +39,37 @@
   }
 
   function say(node, message) { if (node) node.textContent = message || ''; }
+
+  // Where the money goes: each segment says what it is and how much, on hover
+  // or keyboard focus. Nothing is lost without it: the table below has it all.
+  (function () {
+    var bars = document.querySelectorAll('.ms-split-bar [data-tip]');
+    if (!bars.length) return;
+    var tip = document.createElement('div');
+    tip.className = 'ms-split-tip';
+    tip.hidden = true;
+    (bars[0].closest('.msrwa') || document.body).appendChild(tip);
+    function show(event) {
+      var cell = event.currentTarget;
+      tip.textContent = '';
+      var title = document.createElement('b');
+      title.textContent = cell.getAttribute('data-tip-title') || '';
+      tip.appendChild(title);
+      tip.appendChild(document.createTextNode(cell.getAttribute('data-tip') || ''));
+      tip.hidden = false;
+      var box = cell.getBoundingClientRect();
+      var x = event.clientX || box.left + box.width / 2;
+      tip.style.left = Math.max(8, Math.min(window.innerWidth - tip.offsetWidth - 8, x - tip.offsetWidth / 2)) + 'px';
+      tip.style.top = Math.max(8, box.top - tip.offsetHeight - 8) + 'px';
+    }
+    function hide() { tip.hidden = true; }
+    Array.prototype.forEach.call(bars, function (cell) {
+      cell.addEventListener('mousemove', show);
+      cell.addEventListener('focus', show);
+      cell.addEventListener('mouseleave', hide);
+      cell.addEventListener('blur', hide);
+    });
+  })();
   // As MSRWA_I18N::money() writes it, so a painted amount matches a printed one.
   function money(value, decimals) {
     var format = MSRWA.money || {};

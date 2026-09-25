@@ -129,17 +129,52 @@ final class MSRWA_Screen_Analysis {
 
 		echo '<section class="ms-card"><h2>' . esc_html__( 'Où part l’argent', 'ms-recipes-writer-ai' ) . '</h2>';
 		echo '<p>' . esc_html__( 'Les quatre postes du moteur, dépense et temps passé. Le temps n’est pas la dépense : une image coûte cher et va vite, une relecture est l’inverse.', 'ms-recipes-writer-ai' ) . '</p>';
+
+		// Each item keeps its colour whatever its rank: the order is the
+		// product's, not the period's.
+		$order = array( 'article' => 1, 'featured' => 2, 'facebook' => 3, 'other' => 4 );
+		$by = array();
+		foreach ( $rows as $row ) { $by[ (string) $row['bucket'] ] = $row; }
+		uksort( $by, static function ( $a, $b ) use ( $order ) { return ( $order[ $a ] ?? 9 ) <=> ( $order[ $b ] ?? 9 ); } );
+
+		echo '<div class="ms-split">';
+		echo '<ul class="ms-split-legend">';
+		foreach ( $by as $bucket => $row ) {
+			echo '<li><i class="ms-cat-' . (int) ( $order[ $bucket ] ?? 4 ) . '"></i>' . esc_html( $labels[ $bucket ] ?? $bucket ) . ' <b>' . esc_html( MSRWA_I18N::money( $row['spend'], 2 ) ) . '</b></li>';
+		}
+		echo '</ul>';
+		foreach ( array(
+			array( __( 'Dépense', 'ms-recipes-writer-ai' ), 'spend', $total, MSRWA_I18N::money( $total, 2 ) ),
+			array( __( 'Temps', 'ms-recipes-writer-ai' ), 'seconds', $minutes, MSRWA_I18N::seconds( $minutes ) ),
+		) as $bar ) {
+			list( $title, $field, $sum, $shown ) = $bar;
+			echo '<div class="ms-split-row"><span>' . esc_html( $title ) . '</span><div class="ms-split-bar" role="img" aria-label="' . esc_attr( $title ) . '">';
+			foreach ( $by as $bucket => $row ) {
+				$value = (float) $row[ $field ];
+				$share = $sum > 0 ? 100 * $value / $sum : 0;
+				if ( $share <= 0 ) { continue; }
+				$amount = 'spend' === $field ? MSRWA_I18N::money( $value, 2 ) : MSRWA_I18N::seconds( $value );
+				$label = $labels[ $bucket ] ?? $bucket;
+				echo '<div class="ms-cat-' . (int) ( $order[ $bucket ] ?? 4 ) . '" style="--w:' . esc_attr( number_format( $share, 2, '.', '' ) ) . '%" tabindex="0"'
+					. ' data-tip-title="' . esc_attr( $label ) . '" data-tip="' . esc_attr( $title . ' : ' . $amount . ' · ' . round( $share ) . ' %' ) . '"'
+					. ' aria-label="' . esc_attr( $label . ', ' . $title . ' ' . $amount . ', ' . round( $share ) . ' %' ) . '">'
+					// A share too narrow for its label is left to the tooltip and the table.
+					. ( $share >= 9 ? '<em>' . esc_html( round( $share ) . ' %' ) . '</em>' : '' ) . '</div>';
+			}
+			echo '</div><strong>' . esc_html( $shown ) . '</strong></div>';
+		}
+		echo '</div>';
+
+		// The same figures as a table, for whoever reads numbers rather than bars.
 		echo '<table class="ms-table ms-share"><thead><tr>'
-			. '<th>' . esc_html__( 'Poste', 'ms-recipes-writer-ai' ) . '</th><th class="ms-bar"></th>'
+			. '<th>' . esc_html__( 'Poste', 'ms-recipes-writer-ai' ) . '</th>'
 			. '<th class="ms-num">' . esc_html__( 'Dépense', 'ms-recipes-writer-ai' ) . '</th>'
 			. '<th class="ms-num">' . esc_html__( 'Temps', 'ms-recipes-writer-ai' ) . '</th>'
 			. '</tr></thead><tbody>';
-		foreach ( $rows as $row ) {
-			$bucket = (string) $row['bucket'];
+		foreach ( $by as $bucket => $row ) {
 			$share = $total > 0 ? round( 100 * (float) $row['spend'] / $total ) : 0;
 			$time = $minutes > 0 ? round( 100 * (float) $row['seconds'] / $minutes ) : 0;
-			echo '<tr><td class="ms-share-label">' . esc_html( $labels[ $bucket ] ?? $bucket ) . '</td>'
-				. '<td class="ms-bar"><span class="ms-progress"><i style="inline-size:' . (int) $share . '%"></i></span></td>'
+			echo '<tr><td class="ms-share-label"><i class="ms-swatch ms-cat-' . (int) ( $order[ $bucket ] ?? 4 ) . '"></i> ' . esc_html( $labels[ $bucket ] ?? $bucket ) . '</td>'
 				. '<td class="ms-num">' . esc_html( MSRWA_I18N::money( $row['spend'], 2 ) )
 				/* translators: %s is a percentage, e.g. "30 %". */
 				. '<small>' . esc_html( sprintf( __( '%s du coût', 'ms-recipes-writer-ai' ), $share . ' %' ) ) . '</small></td>'

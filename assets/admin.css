@@ -49,6 +49,12 @@
 	--ms-warn-soft: #fdf4e3;
 	--ms-stop: #a11d1d;
 	--ms-stop-soft: #fbeceb;
+	/* Categorical, for the cost items: fixed order, one hue per item, never
+	   reassigned by rank. Validated for colour-blind separation. */
+	--ms-cat-1: #2a78d6;
+	--ms-cat-2: #eb6834;
+	--ms-cat-3: #1baf7a;
+	--ms-cat-4: #eda100;
 
 	--ms-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
 	--ms-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
@@ -656,3 +662,32 @@
 .ms-timeline-all:focus-visible + .ms-timeline-toggle { outline: 2px solid var(--ms-lamp); outline-offset: 2px; }
 .ms-timeline .ms-ev-attempt, .ms-timeline .ms-ev-input, .ms-timeline .ms-ev-call, .ms-timeline .ms-ev-config, .ms-timeline .ms-ev-start { display: none; }
 .ms-timeline-all:checked ~ .ms-timeline .ms-ev-attempt, .ms-timeline-all:checked ~ .ms-timeline .ms-ev-input, .ms-timeline-all:checked ~ .ms-timeline .ms-ev-call, .ms-timeline-all:checked ~ .ms-timeline .ms-ev-config, .ms-timeline-all:checked ~ .ms-timeline .ms-ev-start { display: grid; }
+
+/* Where the money goes: spend and time as two 100 % bars, the same items in
+   the same colours, so an expensive quick item stands out against a cheap slow one. */
+.ms-split { margin: 6px 0 18px; }
+.ms-split-legend { display: flex; flex-wrap: wrap; gap: 8px 20px; margin: 0 0 14px; padding: 0; list-style: none; font-size: 13px; }
+.ms-split-legend li { display: flex; align-items: center; gap: 8px; }
+.ms-split-legend i { inline-size: 12px; block-size: 12px; border-radius: 3px; flex: none; }
+.ms-split-legend b { font-family: var(--ms-mono); font-weight: 600; color: var(--ms-ink); }
+.ms-split-row { display: grid; grid-template-columns: 90px minmax(0, 1fr) 110px; gap: 14px; align-items: center; margin: 0 0 10px; }
+.ms-split-row > span { font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: var(--ms-ink-faint); }
+.ms-split-row > strong { font-family: var(--ms-mono); font-size: 13px; text-align: end; color: var(--ms-ink); font-weight: 600; }
+.ms-split-bar { display: flex; gap: 2px; block-size: 34px; }
+.ms-split-bar > div { position: relative; flex: 0 0 var(--w); min-inline-size: 3px; display: flex; align-items: center; padding-inline: 8px; overflow: hidden; color: var(--ms-raised); font-family: var(--ms-mono); font-size: 12px; font-weight: 600; white-space: nowrap; cursor: default; outline: none; }
+.ms-split-bar > div:first-child { border-start-start-radius: 4px; border-end-start-radius: 4px; }
+.ms-split-bar > div:last-child { border-start-end-radius: 4px; border-end-end-radius: 4px; }
+.ms-split-bar > div > em { font-style: normal; text-shadow: 0 0 2px rgb(0 0 0 / .35); }
+.ms-split-bar > div:hover, .ms-split-bar > div:focus-visible { filter: brightness(1.08); box-shadow: inset 0 0 0 2px var(--ms-ink); }
+.ms-cat-1 { background: var(--ms-cat-1); }
+.ms-cat-2 { background: var(--ms-cat-2); }
+.ms-cat-3 { background: var(--ms-cat-3); }
+.ms-cat-4 { background: var(--ms-cat-4); }
+.ms-split-tip { position: fixed; z-index: 99999; pointer-events: none; padding: 8px 10px; border-radius: 6px; background: var(--ms-ink); color: var(--ms-raised); font-size: 12px; line-height: 1.45; max-inline-size: 260px; box-shadow: 0 4px 14px rgb(0 0 0 / .18); }
+.ms-split-tip b { display: block; font-size: 13px; }
+@media (max-width: 640px) {
+	.ms-split-row { grid-template-columns: 1fr; gap: 4px; }
+	.ms-split-row > strong { text-align: start; }
+}
+.ms-swatch { display: inline-block; inline-size: 10px; block-size: 10px; border-radius: 2px; margin-inline-end: 6px; vertical-align: baseline; }
+.ms-split-bar > .ms-cat-3 > em, .ms-split-bar > .ms-cat-4 > em { color: var(--ms-ink); text-shadow: none; }

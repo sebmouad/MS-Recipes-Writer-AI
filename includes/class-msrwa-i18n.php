@@ -57,6 +57,11 @@ final class MSRWA_I18N {
 		// Rounded once, to whole seconds, before splitting: 179.8 s used to
 		// read "2 min 60 s".
 		$whole = (int) round( $seconds );
+		if ( $whole >= 3600 ) {
+			$minutes = (int) round( $whole / 60 );
+			/* translators: 1: whole hours, 2: remaining minutes. */
+			return sprintf( __( '%1$d h %2$d min', 'ms-recipes-writer-ai' ), intdiv( $minutes, 60 ), $minutes % 60 );
+		}
 		/* translators: 1: whole minutes, 2: remaining seconds. */
 		return sprintf( __( '%1$d min %2$d s', 'ms-recipes-writer-ai' ), intdiv( $whole, 60 ), $whole % 60 );
 	}

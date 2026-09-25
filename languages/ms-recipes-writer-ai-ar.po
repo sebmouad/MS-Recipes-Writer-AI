@@ -2238,3 +2238,7 @@ msgstr "خارج الاستدعاءات المفصَّلة: قراءة الصو�
 
 msgid "dépensé"
 msgstr "المُنفَق"
+
+#. translators: 1: whole hours, 2: remaining minutes.
+msgid "%1$d h %2$d min"
+msgstr "%1$d س %2$d د"

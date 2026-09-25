@@ -2198,3 +2198,7 @@ msgstr "Outside itemised calls: reading the photographs the research cites, pair
 
 msgid "dépensé"
 msgstr "spent"
+
+#. translators: 1: whole hours, 2: remaining minutes.
+msgid "%1$d h %2$d min"
+msgstr "%1$d h %2$d min"
