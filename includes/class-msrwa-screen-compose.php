@@ -62,9 +62,10 @@ final class MSRWA_Screen_Compose {
 					? __( 'Chaque recette suit le même chemin. Les montants sont calculés depuis le routage et les tarifs réellement configurés — ce sont des estimations, jamais une facture.', 'ms-recipes-writer-ai' )
 					: __( 'Chaque recette suit le même chemin. Plus il y a d’images, plus la recette demande de travail.', 'ms-recipes-writer-ai' ) ); ?></p>
 				<div class="ms-choices">
-					<?php foreach ( MSRWA_Profile::all() as $key => $profile ) : ?>
+					<?php $msrwa_offered = MSRWA_Profile::offered(); ?>
+					<?php foreach ( $msrwa_offered as $key => $profile ) : ?>
 						<label class="ms-choice">
-							<input type="radio" name="profile" value="<?php echo esc_attr( $key ); ?>" <?php checked( MSRWA_Profile::FULL, $key ); ?>>
+							<input type="radio" name="profile" value="<?php echo esc_attr( $key ); ?>" <?php checked( isset( $msrwa_offered[ MSRWA_Profile::FULL ] ) ? MSRWA_Profile::FULL : array_key_first( $msrwa_offered ), $key ); ?>>
 							<span class="ms-choice-body">
 								<strong><?php echo esc_html( $profile['label'] ); ?></strong>
 								<small><?php echo esc_html( $profile['description'] ); ?></small>

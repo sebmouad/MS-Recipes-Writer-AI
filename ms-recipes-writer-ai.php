@@ -2,7 +2,7 @@
 /**
  * Plugin Name: MS Recipes Writer AI
  * Description: Le rédacteur fournit plusieurs recettes et plusieurs photographies ; le plugin les apparie, construit un brief par recette et les envoie toutes au moteur.
- * Version: 0.28.14
+ * Version: 0.28.15
  * Author: Mouad Sebhaoui
  * License: GPL-2.0-or-later
  * Text Domain: ms-recipes-writer-ai
@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'MSRWA_VERSION', '0.28.14' );
+define( 'MSRWA_VERSION', '0.28.15' );
 define( 'MSRWA_FILE', __FILE__ );
 define( 'MSRWA_DIR', plugin_dir_path( __FILE__ ) );
 define( 'MSRWA_URL', plugin_dir_url( __FILE__ ) );

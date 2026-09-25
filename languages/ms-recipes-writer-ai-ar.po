@@ -2269,3 +2269,12 @@ msgstr "ما أُنفق مقابل كل سقف، بما في ذلك قراءة �
 
 msgid "Plafonds du site"
 msgstr "سقوف الموقع"
+
+msgid "Ce qu’un rédacteur peut lancer. Un type décoché disparaît de son formulaire et est refusé s’il est demandé autrement. Les administrateurs gardent les trois. Il en reste toujours au moins un : tout décocher les rouvre tous."
+msgstr "ما يمكن للمحرر إطلاقه. يختفي النوع غير المحدد من نموذجه ويُرفض إن طُلب بطريقة أخرى. يحتفظ المديرون بالأنواع الثلاثة. يبقى نوع واحد مفتوحًا على الأقل: إلغاء تحديدها كلها يعيد فتحها كلها."
+
+msgid "Ce type de lot n’est pas ouvert aux rédacteurs sur ce site. Choisissez-en un autre."
+msgstr "هذا النوع من الدفعات غير متاح للمحررين على هذا الموقع. اختر نوعًا آخر."
+
+msgid "Types de lot ouverts aux rédacteurs"
+msgstr "أنواع الدفعات المتاحة للمحررين"

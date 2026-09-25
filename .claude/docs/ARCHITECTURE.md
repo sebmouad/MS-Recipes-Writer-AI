@@ -453,3 +453,9 @@ Break these and the plugin misreports itself.
     reading the photographs it cites — the call tables show the difference as
     its own line, so they add up to the total.
 
+27. **An editor starts only the types of lot the settings leave open.**
+    `MSRWA_Profile::offered()` is every type for an administrator and the
+    `editor_profiles` setting for anyone else — never empty: a list with none
+    reopens all. The compose form offers these; `POST /batches` refuses any
+    other with 403, since the form is a courtesy and the route is the rule.
+

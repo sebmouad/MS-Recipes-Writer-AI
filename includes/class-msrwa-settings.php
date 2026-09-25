@@ -28,6 +28,8 @@ final class MSRWA_Settings {
 			'quality_min_score'        => 90,
 			'quality_min_words'   => 2400,
 			'site_language'       => 'fr',
+			// The types of lot an editor may start; administrators keep all three.
+			'editor_profiles'     => array( 'full', 'featured', 'article' ),
 			'recipe_schema'       => 1,
 			'seo_meta'            => 1,
 			'article_page2_heading' => 'Préparation de la recette étape par étape',
@@ -68,8 +70,12 @@ final class MSRWA_Settings {
 
 	/** Stores the difference from the defaults, with every key encrypted on the way in. */
 	public static function save( $raw, $source = 'admin' ) {
+		$raw = (array) $raw;
+		// A form that sends no box ticked sends nothing at all: its marker says
+		// the list was on the page, so an empty one is an answer, not an absence.
+		if ( ! empty( $raw['editor_profiles_sent'] ) && ! isset( $raw['editor_profiles'] ) ) { $raw['editor_profiles'] = array(); }
 		// The credentials form only submits three fields; preserve all others.
-		$clean = self::sanitize( array_merge( self::get(), (array) $raw ) );
+		$clean = self::sanitize( array_merge( self::get(), $raw ) );
 		$defaults = self::defaults();
 		$stored = (array) get_option( self::OPTION, array() );
 		$out = array();
@@ -192,6 +198,12 @@ final class MSRWA_Settings {
 		// These were never read back from a submission, so every save reset them
 		// to what ships: the site language could not be chosen at all.
 		$out['site_language'] = isset( $raw['site_language'] ) && in_array( $raw['site_language'], array( 'fr', 'en', 'ar', 'es' ), true ) ? $raw['site_language'] : $defaults['site_language'];
+		// At least one type stays open: an editor offered nothing could not
+		// work at all, which is not a setting anybody means to make.
+		if ( isset( $raw['editor_profiles'] ) || ! empty( $raw['editor_profiles_sent'] ) ) {
+			$picked = array_values( array_intersect( array( 'full', 'featured', 'article' ), array_map( 'strval', (array) ( $raw['editor_profiles'] ?? array() ) ) ) );
+			$out['editor_profiles'] = $picked ? $picked : $defaults['editor_profiles'];
+		}
 		$heading = isset( $raw['article_page2_heading'] ) ? trim( sanitize_text_field( (string) $raw['article_page2_heading'] ) ) : '';
 		$out['article_page2_heading'] = '' !== $heading ? mb_substr( $heading, 0, 120 ) : $defaults['article_page2_heading'];
 		if ( isset( $raw['required_sections'] ) && is_array( $raw['required_sections'] ) ) {

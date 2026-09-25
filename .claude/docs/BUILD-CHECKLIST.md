@@ -630,6 +630,12 @@ cost) in the task before changing anything.
   (2026-09-24).** The writer's photograph shows the prompt's writer the dish;
   the collage is drawn from the style reference. Real: the owner's own rôti
   photograph, drawn both ways. See ENGINE.md §7, item 40.
+- [x] **A52 — Types of lot open to editors (2026-09-25).** Setting
+  `editor_profiles`; `MSRWA_Profile::offered()` and `allowed()`; the compose
+  form offers only those, `POST /batches` refuses the rest with 403;
+  administrators keep all three; never empty. Real: saved from the settings
+  form, writer offered "article" only, a posted `full` refused.
+  `tests/test-editor-profiles.php`, `tests/test-settings-save.php`.
 - [x] **A51 — Spending log and cost reconciliation (2026-09-25).**
   `msrwa_spend`, backfilled and reconciled on the test site ($6.8272 =
   $6.8087 of recipes + $0.0185 of pairings); ceilings and 30-day spend read

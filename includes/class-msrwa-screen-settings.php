@@ -82,6 +82,24 @@ final class MSRWA_Screen_Settings {
 			</section>
 
 			<section class="ms-card">
+				<h2><?php esc_html_e( 'Types de lot ouverts aux rédacteurs', 'ms-recipes-writer-ai' ); ?></h2>
+				<p><?php esc_html_e( 'Ce qu’un rédacteur peut lancer. Un type décoché disparaît de son formulaire et est refusé s’il est demandé autrement. Les administrateurs gardent les trois. Il en reste toujours au moins un : tout décocher les rouvre tous.', 'ms-recipes-writer-ai' ); ?></p>
+				<input type="hidden" name="msrwa_settings[editor_profiles_sent]" value="1">
+				<div class="ms-choices">
+					<?php foreach ( MSRWA_Profile::all() as $key => $profile ) : ?>
+						<label class="ms-choice">
+							<input type="checkbox" name="msrwa_settings[editor_profiles][]" value="<?php echo esc_attr( $key ); ?>" <?php checked( in_array( $key, (array) $settings['editor_profiles'], true ) ); ?>>
+							<span class="ms-choice-body">
+								<strong><?php echo esc_html( $profile['label'] ); ?></strong>
+								<small><?php echo esc_html( $profile['description'] ); ?></small>
+							</span>
+							<span class="ms-choice-cost">~ <?php echo esc_html( MSRWA_I18N::money( MSRWA_Estimate::recipe( $key )['cost_usd'], 4 ) ); ?></span>
+						</label>
+					<?php endforeach; ?>
+				</div>
+			</section>
+
+			<section class="ms-card">
 				<h2><?php esc_html_e( 'Les articles', 'ms-recipes-writer-ai' ); ?></h2>
 				<p><?php esc_html_e( 'Ce que chaque article doit être. Ces réglages atteignent directement les prompts et les contrôles du moteur.', 'ms-recipes-writer-ai' ); ?></p>
 				<p>

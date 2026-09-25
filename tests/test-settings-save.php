@@ -69,4 +69,13 @@ foreach ( array( 'recipe_schema', 'seo_meta' ) as $toggle ) {
 	msrwa_test_assert( 1 === MSRWA_Settings::get()[ $toggle ], $toggle . ' can be turned back on.' );
 }
 
+// The types of lot open to editors: a list, of known types, never empty.
+MSRWA_Settings::save( array( 'editor_profiles' => array( 'article', 'nonsense' ), 'editor_profiles_sent' => 1 ) );
+msrwa_test_assert( array( 'article' ) === MSRWA_Settings::get()['editor_profiles'], 'Only known types are kept.' );
+msrwa_test_assert( ! isset( get_option( MSRWA_Settings::OPTION )['editor_profiles_sent'] ), 'The form’s marker is not stored.' );
+MSRWA_Settings::save( array( 'quality_min_words' => 2500 ) );
+msrwa_test_assert( array( 'article' ) === MSRWA_Settings::get()['editor_profiles'], 'A save from another form leaves the choice alone.' );
+MSRWA_Settings::save( array( 'editor_profiles_sent' => 1 ) );
+msrwa_test_assert( array( 'full', 'featured', 'article' ) === MSRWA_Settings::get()['editor_profiles'], 'Unticking every type reopens them all.' );
+
 msrwa_test_done( 'production settings save regression' );

@@ -2225,3 +2225,12 @@ msgstr "What was spent against each ceiling, photograph reading and redraws incl
 
 msgid "Plafonds du site"
 msgstr "Site ceilings"
+
+msgid "Ce qu’un rédacteur peut lancer. Un type décoché disparaît de son formulaire et est refusé s’il est demandé autrement. Les administrateurs gardent les trois. Il en reste toujours au moins un : tout décocher les rouvre tous."
+msgstr "What an editor may start. An unticked type disappears from their form and is refused if asked for any other way. Administrators keep all three. At least one always stays open: unticking them all reopens them all."
+
+msgid "Ce type de lot n’est pas ouvert aux rédacteurs sur ce site. Choisissez-en un autre."
+msgstr "This type of lot is not open to editors on this site. Choose another."
+
+msgid "Types de lot ouverts aux rédacteurs"
+msgstr "Types of lot open to editors"

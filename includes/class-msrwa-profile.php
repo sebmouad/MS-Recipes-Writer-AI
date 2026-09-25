@@ -47,6 +47,20 @@ final class MSRWA_Profile {
 	public static function exists( $profile ) { return array_key_exists( (string) $profile, self::all() ); }
 
 	/**
+	 * The types the current user may start a lot with. An administrator may use
+	 * all three; an editor, those the settings leave open — at least one.
+	 */
+	public static function offered() {
+		$all = self::all();
+		if ( MSRWA_Rights::may_manage() ) { return $all; }
+		$open = array_intersect_key( $all, array_flip( (array) ( MSRWA_Settings::get()['editor_profiles'] ?? array() ) ) );
+		return $open ? $open : $all;
+	}
+
+	/** Whether the current user may start a lot of this type. */
+	public static function allowed( $profile ) { return array_key_exists( (string) $profile, self::offered() ); }
+
+	/**
 	 * The Facebook templates a lot may pick, key => label, the site's default
 	 * first. Only templates whose prompt file exists are offered; with one,
 	 * there is nothing to pick and no field is shown.

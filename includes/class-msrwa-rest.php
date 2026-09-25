@@ -105,9 +105,16 @@ final class MSRWA_REST {
 		$overrides = array();
 		$template = sanitize_key( (string) $request->get_param( 'facebook_template' ) );
 		if ( '' !== $template && isset( MSRWA_Profile::facebook_templates()[ $template ] ) ) { $overrides['images']['facebook_template'] = $template; }
+		// A type the settings closed to editors is refused here too, not only
+		// left off the form: the form is a courtesy, this is the rule.
+		$profile = sanitize_key( (string) $request->get_param( 'profile' ) );
+		if ( '' === $profile ) { $profile = (string) array_key_first( MSRWA_Profile::offered() ); }
+		if ( ! MSRWA_Profile::allowed( $profile ) ) {
+			return new WP_Error( 'msrwa_profile_closed', __( 'Ce type de lot n’est pas ouvert aux rédacteurs sur ce site. Choisissez-en un autre.', 'ms-recipes-writer-ai' ), array( 'status' => 403 ) );
+		}
 		$id = MSRWA_Batch::create(
 			$recipes, $files, $budget,
-			sanitize_key( (string) $request->get_param( 'profile' ) ),
+			$profile,
 			sanitize_key( (string) MSRWA_Settings::get()['site_language'] ),
 			$overrides
 		);
