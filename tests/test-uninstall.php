@@ -61,4 +61,30 @@ foreach ( array_keys( MSRWA_DB::tables() ) as $table ) {
 	msrwa_test_contains( $uninstall, "'" . $table . "'", 'Uninstalling drops the ' . $table . ' table.' );
 }
 
-msrwa_test_done( 'uninstall leaves nothing behind' );
+// How much goes is the site's choice, made beforehand: by default everything.
+msrwa_test_contains( $uninstall, "get_option( 'msrwa_uninstall', 'all' )", 'uninstall.php follows the choice made on the settings screen, all by default.' );
+msrwa_test_contains( $uninstall, "delete_post_meta_by_key( '_msrwa_run_id' )", 'With the runs gone, the drafts lose their link to them, and only that.' );
+$scope_of = static function ( $choice ) use ( $uninstall ) {
+	// Runs uninstall.php against a counting double, for one stored choice.
+	$GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
+	$GLOBALS['msrwa_test_options'] = array( 'msrwa_uninstall' => $choice, 'msrwa_settings' => array( 'site_language' => 'en' ), 'msrwa_schema' => 11 );
+	$GLOBALS['msrwa_test_meta_dropped'] = array();
+	if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) { define( 'WP_UNINSTALL_PLUGIN', 'ms-recipes-writer-ai' ); }
+	$GLOBALS['msrwa_test_caps'] = array( 'activate_plugins' );
+	include MSRWA_DIR . 'uninstall.php';
+	return array( 'log' => $GLOBALS['wpdb']->log(), 'options' => $GLOBALS['msrwa_test_options'], 'meta' => $GLOBALS['msrwa_test_meta_dropped'] );
+};
+if ( ! function_exists( 'delete_post_meta_by_key' ) ) { function delete_post_meta_by_key( $key ) { $GLOBALS['msrwa_test_meta_dropped'][] = $key; return true; } }
+if ( ! function_exists( 'get_role' ) ) { function get_role( $role ) { return null; } }
+$all = $scope_of( 'all' );
+msrwa_test_contains( $all['log'], 'DROP TABLE IF EXISTS wp_msrwa_runs', 'All: the work goes.' );
+msrwa_test_assert( ! isset( $all['options']['msrwa_settings'] ) && ! isset( $all['options']['msrwa_uninstall'] ), 'All: nothing of the plugin’s options stays.' );
+$settings = $scope_of( 'settings' );
+msrwa_test_contains( $settings['log'], 'wp_msrwa_catalog', 'Settings: the catalogue goes.' );
+msrwa_test_missing( $settings['log'], 'wp_msrwa_runs', 'Settings: the work stays.' );
+msrwa_test_assert( ! isset( $settings['options']['msrwa_settings'] ) && isset( $settings['options']['msrwa_schema'] ) && ! $settings['meta'], 'Settings: the settings go, what describes the work stays, the drafts keep their link.' );
+$nothing = $scope_of( 'nothing' );
+msrwa_test_missing( $nothing['log'], 'DROP TABLE', 'Nothing: not a table.' );
+msrwa_test_assert( isset( $nothing['options']['msrwa_settings'], $nothing['options']['msrwa_uninstall'] ), 'Nothing: every option stays, the choice included.' );
+
+msrwa_test_done( 'uninstall removes what the site chose, everything by default' );

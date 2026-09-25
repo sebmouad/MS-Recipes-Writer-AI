@@ -281,6 +281,20 @@ final class MSRWA_Sources {
 	}
 
 	/** Removes one directory under uploads/msrwa and everything in it, and nothing outside. */
+	/**
+	 * Every folder under uploads/msrwa but the style references: the lots, the
+	 * runs, their photographs, drawn images and history. What a data reset
+	 * clears; the style references are a setting.
+	 */
+	public static function forget_work() {
+		foreach ( (array) glob( self::root() . '/*', GLOB_ONLYDIR ) as $dir ) {
+			if ( 'style' !== basename( (string) $dir ) ) { self::remove( $dir ); }
+		}
+	}
+
+	/** The uploaded style references, so the shipped one serves again. */
+	public static function forget_styles() { self::remove( self::style_dir() ); }
+
 	private static function remove( $dir ) {
 		$root = realpath( self::root() );
 		$dir = realpath( (string) $dir );

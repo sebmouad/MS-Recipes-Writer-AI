@@ -2374,3 +2374,91 @@ msgstr "JPEG أو PNG أو WebP، %1$d كحد أقصى، %2$s ميغابايت �
 
 msgid "ou déposez-les ici, ou collez avec Ctrl+V (⌘V sur Mac) une image copiée ou l’adresse d’une image"
 msgstr "أو أفلتها هنا، أو الصق صورة منسوخة أو عنوان صورة باستخدام Ctrl+V (أو ⌘V على Mac)"
+
+msgid "EFFACER"
+msgstr "مسح"
+
+msgid "Effacer aussi les clés d’API"
+msgstr "مسح مفاتيح API أيضًا"
+
+msgid "Effacer définitivement toutes les données et rétablir les réglages ? Cette action ne peut pas être annulée."
+msgstr "مسح جميع البيانات نهائيًا واستعادة الإعدادات؟ لا يمكن التراجع عن هذا الإجراء."
+
+#, php-format
+msgid "En plus des réglages : les %1$d lots et %2$d recettes, leurs rapports, leur historique, les photographies envoyées et le journal des dépenses — pour tous les rédacteurs. Les brouillons restent, sans lien vers leur rapport."
+msgstr "بالإضافة إلى الإعدادات: الدفعات (%1$d) والوصفات (%2$d) وتقاريرها وسجلها والصور المرسلة وسجل النفقات — لجميع المحررين. تبقى المسودات، دون رابط إلى تقريرها."
+
+msgid "Les réglages"
+msgstr "الإعدادات"
+
+msgid "Les réglages et les données"
+msgstr "الإعدادات والبيانات"
+
+msgid "Les réglages ont été rétablis et les données effacées. Les brouillons et la médiathèque sont intacts."
+msgstr "تمت استعادة الإعدادات ومسح البيانات. المسودات ومكتبة الوسائط لم تُمس."
+
+msgid "Les réglages ont été rétablis tels qu’à l’installation."
+msgstr "تمت استعادة الإعدادات كما كانت عند التثبيت."
+
+#, php-format
+msgid "Pour confirmer, tapez %s"
+msgstr "للتأكيد، اكتب %s"
+
+msgid "Revenir à l’état d’une installation neuve. Les articles déjà créés — brouillons et publiés — et les images de la médiathèque ne sont jamais touchés."
+msgstr "العودة إلى حالة تثبيت جديد. المقالات التي أُنشئت — المسودات والمنشورة — وصور مكتبة الوسائط لا تُمس أبدًا."
+
+#, php-format
+msgid "Rien n’a été effacé : tapez %s pour confirmer."
+msgstr "لم يُمسح شيء: اكتب %s للتأكيد."
+
+msgid "Réglages, Moteur et Modèles reviennent aux valeurs livrées, le collage Facebook au style de référence fourni. Les lots, les recettes, les rapports et les dépenses restent."
+msgstr "تعود الإعدادات والمحرك والنماذج إلى القيم الأصلية، وكولاج فيسبوك إلى النمط المرجعي المرفق. تبقى الدفعات والوصفات والتقارير والنفقات."
+
+msgid "Réinitialiser"
+msgstr "إعادة الضبط"
+
+msgid "Rétablir les réglages"
+msgstr "استعادة الإعدادات"
+
+msgid "Rétablir tous les réglages tels qu’à l’installation ?"
+msgstr "استعادة جميع الإعدادات كما كانت عند التثبيت؟"
+
+msgid "Tout effacer et rétablir"
+msgstr "مسح الكل والاستعادة"
+
+#, php-format
+msgid "%d recette est en cours : attendez qu’elle finisse ou annulez-la avant d’effacer les données."
+msgid_plural "%d recettes sont en cours : attendez qu’elles finissent ou annulez-les avant d’effacer les données."
+msgstr[0] "لا توجد وصفات قيد التنفيذ (%d)."
+msgstr[1] "وصفة واحدة قيد التنفيذ (%d): انتظر انتهاءها أو ألغها قبل مسح البيانات."
+msgstr[2] "وصفتان قيد التنفيذ (%d): انتظر انتهاءهما أو ألغهما قبل مسح البيانات."
+msgstr[3] "%d وصفات قيد التنفيذ: انتظر انتهاءها أو ألغها قبل مسح البيانات."
+msgstr[4] "%d وصفة قيد التنفيذ: انتظر انتهاءها أو ألغها قبل مسح البيانات."
+msgstr[5] "%d وصفة قيد التنفيذ: انتظر انتهاءها أو ألغها قبل مسح البيانات."
+
+msgid "Comme la réinitialisation complète, avec les clés d’API : rien de l’extension ne reste sur le site."
+msgstr "مثل إعادة الضبط الكاملة، بما في ذلك مفاتيح API: لا يبقى شيء من الإضافة على الموقع."
+
+msgid "Enregistrer ce choix"
+msgstr "حفظ هذا الاختيار"
+
+msgid "Les réglages et les clés partent ; les lots, les recettes, les rapports et les dépenses restent, pour une réinstallation."
+msgstr "تُحذف الإعدادات والمفاتيح؛ وتبقى الدفعات والوصفات والتقارير والنفقات لإعادة التثبيت."
+
+msgid "Quand l’extension est supprimée"
+msgstr "عند حذف الإضافة"
+
+msgid "Seules les tâches planifiées et les droits accordés sont retirés ; réinstallée, l’extension reprend là où elle en était."
+msgstr "تُزال المهام المجدولة والصلاحيات الممنوحة فقط؛ وعند إعادة التثبيت تستأنف الإضافة من حيث توقفت."
+
+msgid "Supprimer les réglages et les données"
+msgstr "حذف الإعدادات والبيانات"
+
+msgid "Supprimer les réglages seulement"
+msgstr "حذف الإعدادات فقط"
+
+msgid "Tout garder"
+msgstr "الاحتفاظ بكل شيء"
+
+msgid "WordPress ne pose aucune question au moment de supprimer une extension : ce qui part est choisi ici, à l’avance. Les articles et la médiathèque restent dans tous les cas."
+msgstr "لا يطرح ووردبريس أي سؤال عند حذف إضافة: ما يُحذف يُختار هنا مسبقًا. تبقى المقالات ومكتبة الوسائط في جميع الأحوال."

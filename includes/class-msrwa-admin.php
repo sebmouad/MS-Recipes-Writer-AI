@@ -13,6 +13,8 @@ final class MSRWA_Admin {
 		add_action( 'admin_menu', array( __CLASS__, 'menu' ), 30 );
 		add_action( 'admin_post_msrwa_save_settings', array( __CLASS__, 'save_settings' ) );
 		add_action( 'admin_post_msrwa_save_engine', array( __CLASS__, 'save_engine' ) );
+		add_action( 'admin_post_msrwa_reset', array( __CLASS__, 'reset' ) );
+		add_action( 'admin_post_msrwa_uninstall_choice', array( __CLASS__, 'uninstall_choice' ) );
 		add_action( 'admin_post_msrwa_style', array( __CLASS__, 'save_style' ) );
 		add_action( 'admin_post_msrwa_save_models', array( 'MSRWA_Screen_Models', 'save' ) );
 		add_action( 'admin_post_msrwa_report', array( 'MSRWA_Operations', 'report' ) );
@@ -227,6 +229,42 @@ final class MSRWA_Admin {
 				'previewUnpriced' => __( 'Sans tarif, donc absentes du total :', 'ms-recipes-writer-ai' ),
 			),
 		) );
+	}
+
+	/** Settings, or settings and data, back to a fresh install. */
+	public static function reset() {
+		if ( ! MSRWA_Rights::may_manage() ) { wp_die( esc_html__( 'Accès refusé.', 'ms-recipes-writer-ai' ) ); }
+		check_admin_referer( 'msrwa_reset' );
+		$scope = 'all' === sanitize_key( (string) ( $_POST['scope'] ?? '' ) ) ? 'all' : 'settings';
+		$forget_keys = ! empty( $_POST['forget_keys'] );
+		$back = admin_url( 'admin.php?page=msrwa-settings' );
+		if ( 'all' === $scope ) {
+			// Everyone's work goes, not only the person's own.
+			if ( ! current_user_can( MSRWA_Rights::VIEW_ALL ) ) { wp_die( esc_html__( 'Accès refusé.', 'ms-recipes-writer-ai' ) ); }
+			$typed = trim( sanitize_text_field( wp_unslash( (string) ( $_POST['confirm'] ?? '' ) ) ) );
+			if ( mb_strtoupper( $typed ) !== mb_strtoupper( self::erase_word() ) ) { wp_safe_redirect( add_query_arg( 'reset', 'unconfirmed', $back ) . '#ms-reset' ); exit; }
+			$done = MSRWA_Reset::everything( $forget_keys );
+			if ( is_wp_error( $done ) ) { wp_safe_redirect( add_query_arg( 'reset', 'busy', $back ) . '#ms-reset' ); exit; }
+		} else {
+			MSRWA_Reset::settings( $forget_keys );
+		}
+		wp_safe_redirect( add_query_arg( 'reset', $scope, $back ) );
+		exit;
+	}
+
+	/** What deleting the plugin will remove, decided ahead of time. */
+	public static function uninstall_choice() {
+		if ( ! MSRWA_Rights::may_manage() ) { wp_die( esc_html__( 'Accès refusé.', 'ms-recipes-writer-ai' ) ); }
+		check_admin_referer( 'msrwa_uninstall_choice' );
+		MSRWA_Reset::choose_uninstall( sanitize_key( (string) ( $_POST['uninstall'] ?? '' ) ) );
+		wp_safe_redirect( add_query_arg( 'reset', 'uninstall', admin_url( 'admin.php?page=msrwa-settings' ) ) . '#ms-reset' );
+		exit;
+	}
+
+	/** The word typed to confirm that the data goes, in the screen's language. */
+	public static function erase_word() {
+		/* translators: the word a person types to confirm that all data is erased; one word, in capitals. */
+		return __( 'EFFACER', 'ms-recipes-writer-ai' );
 	}
 
 	public static function save_settings() {

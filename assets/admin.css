@@ -481,6 +481,25 @@
 }
 
 .ms-state-idle { color: var(--ms-ink-soft); }
+/* Starting over: two panels side by side, the one that erases marked red. */
+.ms-reset-options { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr)); margin-block-start: 12px; }
+.ms-reset-option { display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; border: 1px solid var(--ms-line); border-inline-start: var(--ms-rail) solid var(--ms-warn); border-radius: var(--ms-radius); background: var(--ms-raised); }
+.ms-reset-option.ms-reset-all { border-inline-start-color: var(--ms-stop); }
+.ms-reset-option h3 { margin: 0; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+.ms-reset-option h3 .dashicons { color: var(--ms-warn); }
+.ms-reset-all h3 .dashicons { color: var(--ms-stop); }
+.ms-reset-option p { margin: 0; color: var(--ms-ink-soft); }
+.ms-reset-keys { font-size: 13px; }
+.ms-reset-confirm { display: grid; gap: 4px; }
+.ms-reset-confirm label { font-size: 12px; font-weight: 600; color: var(--ms-ink); }
+.ms-reset-confirm input { max-inline-size: 14rem; font-family: var(--ms-mono); letter-spacing: .08em; }
+.ms-uninstall { margin-block-start: 18px; padding-block-start: 16px; border-block-start: 1px solid var(--ms-line-soft); }
+.ms-uninstall h3 { margin: 0 0 4px; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+.ms-uninstall h3 .dashicons { color: var(--ms-ink-soft); }
+.ms-uninstall > p { color: var(--ms-ink-soft); max-inline-size: 78ch; }
+.ms-reset-busy { color: var(--ms-stop); font-size: 13px; }
+.ms-reset-option .ms-reset-go { margin-block-start: auto; }
+
 /* API keys: one card per provider, its state, its field, where to get one. */
 .ms-keycards { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr)); margin: 14px 0 16px; }
 .ms-keycard { display: grid; gap: 12px; align-content: start; padding: 14px 16px; background: var(--ms-raised); border: 1px solid var(--ms-line); border-inline-start: var(--ms-rail) solid var(--ms-line); border-radius: var(--ms-radius); }

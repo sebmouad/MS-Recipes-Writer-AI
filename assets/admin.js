@@ -700,6 +700,21 @@
 
   // --- Whether the stored keys actually open their providers ----------------
 
+  // Starting over: each form asks once more, and the one that erases the
+  // data opens only once its word is typed.
+  document.querySelectorAll('.ms-reset-option[data-confirm]').forEach(function (form) {
+    form.addEventListener('submit', function (event) {
+      if (!window.confirm(form.getAttribute('data-confirm'))) { event.preventDefault(); }
+    });
+  });
+  var resetWord = document.getElementById('ms-reset-word');
+  var resetAll = document.getElementById('ms-reset-all');
+  if (resetWord && resetAll) {
+    resetWord.addEventListener('input', function () {
+      resetAll.disabled = resetWord.value.trim().toUpperCase() !== String(resetWord.getAttribute('data-word')).toUpperCase();
+    });
+  }
+
   // Shows what is being typed, for checking a pasted key; the stored key is
   // never sent back, so there is nothing else to show.
   document.querySelectorAll('.ms-keycard-toggle').forEach(function (toggle) {

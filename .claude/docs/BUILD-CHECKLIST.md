@@ -630,6 +630,13 @@ cost) in the task before changing anything.
   (2026-09-24).** The writer's photograph shows the prompt's writer the dish;
   the collage is drawn from the style reference. Real: the owner's own rôti
   photograph, drawn both ways. See ENGINE.md §7, item 40.
+- [x] **A57 — Reset and uninstall choice (2026-09-25).** `MSRWA_Reset`:
+  settings (keys kept unless asked), or settings and data (DELETE, not
+  TRUNCATE, drafts' `_msrwa_run_id` dropped, refused while a recipe runs,
+  typed word, `msrwa_view_all`). `msrwa_uninstall` = all | settings |
+  nothing, read by uninstall.php. Real: both resets and the choice run on the
+  test site (45 lots, 65 recipes → 0, keys kept, draft #226 kept), then
+  restored. `tests/test-reset.php`, `tests/test-uninstall.php`.
 - [x] **A56 — Photographs by address, readable identifiers, key cards
   (2026-09-25).** One zone: a click opens the file picker, files drop on
   it, and a paste anywhere (Ctrl+V) takes a copied image or an image address

@@ -22,6 +22,9 @@ final class MSRWA_Screen_Settings {
 		);
 
 		if ( isset( $_GET['saved'] ) ) { MSRWA_UI::note( esc_html__( 'Enregistré.', 'ms-recipes-writer-ai' ) ); }
+		$reset = sanitize_key( (string) ( $_GET['reset'] ?? '' ) );
+		if ( 'settings' === $reset ) { MSRWA_UI::note( esc_html__( 'Les réglages ont été rétablis tels qu’à l’installation.', 'ms-recipes-writer-ai' ) ); }
+		if ( 'all' === $reset ) { MSRWA_UI::note( esc_html__( 'Les réglages ont été rétablis et les données effacées. Les brouillons et la médiathèque sont intacts.', 'ms-recipes-writer-ai' ) ); }
 		?>
 		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 			<input type="hidden" name="action" value="msrwa_save_settings">
@@ -172,7 +175,85 @@ final class MSRWA_Screen_Settings {
 		<?php self::budget(); ?>
 		<?php
 		self::health();
+		self::reset_section();
 		echo '</div>';
+	}
+
+	/**
+	 * Starting over, in two sizes, each with its own button: the settings
+	 * alone, or the settings and every piece of work. The larger one names
+	 * what goes and what stays, and asks for a word to be typed.
+	 */
+	private static function reset_section() {
+		global $wpdb;
+		$t = MSRWA_DB::tables();
+		$lots = (int) $wpdb->get_var( 'SELECT COUNT(*) FROM ' . $t['batches'] ); // phpcs:ignore WordPress.DB
+		$runs = (int) $wpdb->get_var( 'SELECT COUNT(*) FROM ' . $t['runs'] ); // phpcs:ignore WordPress.DB
+		$busy = MSRWA_Reset::refusal();
+		$may_erase = current_user_can( MSRWA_Rights::VIEW_ALL );
+		$state = sanitize_key( (string) ( $_GET['reset'] ?? '' ) );
+		$word = MSRWA_Admin::erase_word();
+		?>
+		<section class="ms-card ms-reset" id="ms-reset">
+			<h2><?php esc_html_e( 'Réinitialiser', 'ms-recipes-writer-ai' ); ?></h2>
+			<p><?php esc_html_e( 'Revenir à l’état d’une installation neuve. Les articles déjà créés — brouillons et publiés — et les images de la médiathèque ne sont jamais touchés.', 'ms-recipes-writer-ai' ); ?></p>
+			<?php if ( 'unconfirmed' === $state ) { MSRWA_UI::note( esc_html( sprintf( /* translators: %s is the word to type. */ __( 'Rien n’a été effacé : tapez %s pour confirmer.', 'ms-recipes-writer-ai' ), $word ) ), 'stop' ); } ?>
+			<?php if ( 'busy' === $state && '' !== $busy ) { MSRWA_UI::note( esc_html( $busy ), 'stop' ); } ?>
+			<div class="ms-reset-options">
+				<form class="ms-reset-option" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" data-confirm="<?php esc_attr_e( 'Rétablir tous les réglages tels qu’à l’installation ?', 'ms-recipes-writer-ai' ); ?>">
+					<input type="hidden" name="action" value="msrwa_reset"><input type="hidden" name="scope" value="settings">
+					<?php wp_nonce_field( 'msrwa_reset' ); ?>
+					<h3><span class="dashicons dashicons-image-rotate" aria-hidden="true"></span> <?php esc_html_e( 'Les réglages', 'ms-recipes-writer-ai' ); ?></h3>
+					<p><?php esc_html_e( 'Réglages, Moteur et Modèles reviennent aux valeurs livrées, le collage Facebook au style de référence fourni. Les lots, les recettes, les rapports et les dépenses restent.', 'ms-recipes-writer-ai' ); ?></p>
+					<label class="ms-reset-keys"><input type="checkbox" name="forget_keys" value="1"> <?php esc_html_e( 'Effacer aussi les clés d’API', 'ms-recipes-writer-ai' ); ?></label>
+					<p class="ms-reset-go"><button type="submit" class="button"><?php esc_html_e( 'Rétablir les réglages', 'ms-recipes-writer-ai' ); ?></button></p>
+				</form>
+				<?php if ( $may_erase ) : ?>
+				<form class="ms-reset-option ms-reset-all" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" data-confirm="<?php esc_attr_e( 'Effacer définitivement toutes les données et rétablir les réglages ? Cette action ne peut pas être annulée.', 'ms-recipes-writer-ai' ); ?>">
+					<input type="hidden" name="action" value="msrwa_reset"><input type="hidden" name="scope" value="all">
+					<?php wp_nonce_field( 'msrwa_reset' ); ?>
+					<h3><span class="dashicons dashicons-trash" aria-hidden="true"></span> <?php esc_html_e( 'Les réglages et les données', 'ms-recipes-writer-ai' ); ?></h3>
+					<p><?php echo esc_html( sprintf(
+						/* translators: 1: a number of lots, 2: a number of recipes. */
+						__( 'En plus des réglages : les %1$d lots et %2$d recettes, leurs rapports, leur historique, les photographies envoyées et le journal des dépenses — pour tous les rédacteurs. Les brouillons restent, sans lien vers leur rapport.', 'ms-recipes-writer-ai' ),
+						$lots, $runs
+					) ); ?></p>
+					<label class="ms-reset-keys"><input type="checkbox" name="forget_keys" value="1"> <?php esc_html_e( 'Effacer aussi les clés d’API', 'ms-recipes-writer-ai' ); ?></label>
+					<?php if ( '' !== $busy ) : ?>
+						<p class="ms-reset-busy"><?php echo esc_html( $busy ); ?></p>
+					<?php else : ?>
+						<p class="ms-reset-confirm"><label for="ms-reset-word"><?php echo esc_html( sprintf( /* translators: %s is the word to type. */ __( 'Pour confirmer, tapez %s', 'ms-recipes-writer-ai' ), $word ) ); ?></label>
+							<input type="text" id="ms-reset-word" name="confirm" autocomplete="off" spellcheck="false" data-word="<?php echo esc_attr( $word ); ?>"></p>
+					<?php endif; ?>
+					<p class="ms-reset-go"><button type="submit" class="button ms-danger" id="ms-reset-all" <?php disabled( true ); ?>><?php esc_html_e( 'Tout effacer et rétablir', 'ms-recipes-writer-ai' ); ?></button></p>
+				</form>
+				<?php endif; ?>
+			</div>
+			<?php if ( 'uninstall' === $state ) { MSRWA_UI::note( esc_html__( 'Enregistré.', 'ms-recipes-writer-ai' ) ); } ?>
+			<form class="ms-uninstall" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+				<input type="hidden" name="action" value="msrwa_uninstall_choice">
+				<?php wp_nonce_field( 'msrwa_uninstall_choice' ); ?>
+				<h3><span class="dashicons dashicons-admin-plugins" aria-hidden="true"></span> <?php esc_html_e( 'Quand l’extension est supprimée', 'ms-recipes-writer-ai' ); ?></h3>
+				<p><?php esc_html_e( 'WordPress ne pose aucune question au moment de supprimer une extension : ce qui part est choisi ici, à l’avance. Les articles et la médiathèque restent dans tous les cas.', 'ms-recipes-writer-ai' ); ?></p>
+				<div class="ms-choices">
+					<?php
+					$choice = MSRWA_Reset::uninstall_choice();
+					foreach ( array(
+						'all' => array( __( 'Supprimer les réglages et les données', 'ms-recipes-writer-ai' ), __( 'Comme la réinitialisation complète, avec les clés d’API : rien de l’extension ne reste sur le site.', 'ms-recipes-writer-ai' ) ),
+						'settings' => array( __( 'Supprimer les réglages seulement', 'ms-recipes-writer-ai' ), __( 'Les réglages et les clés partent ; les lots, les recettes, les rapports et les dépenses restent, pour une réinstallation.', 'ms-recipes-writer-ai' ) ),
+						'nothing' => array( __( 'Tout garder', 'ms-recipes-writer-ai' ), __( 'Seules les tâches planifiées et les droits accordés sont retirés ; réinstallée, l’extension reprend là où elle en était.', 'ms-recipes-writer-ai' ) ),
+					) as $value => $option ) :
+						?>
+						<label class="ms-choice">
+							<input type="radio" name="uninstall" value="<?php echo esc_attr( $value ); ?>" <?php checked( $choice, $value ); ?>>
+							<span class="ms-choice-body"><strong><?php echo esc_html( $option[0] ); ?></strong><small><?php echo esc_html( $option[1] ); ?></small></span>
+						</label>
+					<?php endforeach; ?>
+				</div>
+				<p><button type="submit" class="button"><?php esc_html_e( 'Enregistrer ce choix', 'ms-recipes-writer-ai' ); ?></button></p>
+			</form>
+		</section>
+		<?php
 	}
 
 	/** Where each ceiling stands right now. */

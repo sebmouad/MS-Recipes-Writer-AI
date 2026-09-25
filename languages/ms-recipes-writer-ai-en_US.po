@@ -2330,3 +2330,87 @@ msgstr "JPEG, PNG or WebP, %1$d at most, %2$s MB each."
 
 msgid "ou déposez-les ici, ou collez avec Ctrl+V (⌘V sur Mac) une image copiée ou l’adresse d’une image"
 msgstr "or drop them here, or paste a copied image or an image address with Ctrl+V (⌘V on a Mac)"
+
+msgid "EFFACER"
+msgstr "ERASE"
+
+msgid "Effacer aussi les clés d’API"
+msgstr "Also erase the API keys"
+
+msgid "Effacer définitivement toutes les données et rétablir les réglages ? Cette action ne peut pas être annulée."
+msgstr "Permanently erase all data and restore the settings? This cannot be undone."
+
+#, php-format
+msgid "En plus des réglages : les %1$d lots et %2$d recettes, leurs rapports, leur historique, les photographies envoyées et le journal des dépenses — pour tous les rédacteurs. Les brouillons restent, sans lien vers leur rapport."
+msgstr "On top of the settings: the %1$d lots and %2$d recipes, their reports, their history, the photographs sent and the spending log — for every writer. Drafts stay, without a link to their report."
+
+msgid "Les réglages"
+msgstr "The settings"
+
+msgid "Les réglages et les données"
+msgstr "The settings and the data"
+
+msgid "Les réglages ont été rétablis et les données effacées. Les brouillons et la médiathèque sont intacts."
+msgstr "The settings were restored and the data erased. Drafts and the media library are untouched."
+
+msgid "Les réglages ont été rétablis tels qu’à l’installation."
+msgstr "The settings were restored to how they were at installation."
+
+#, php-format
+msgid "Pour confirmer, tapez %s"
+msgstr "To confirm, type %s"
+
+msgid "Revenir à l’état d’une installation neuve. Les articles déjà créés — brouillons et publiés — et les images de la médiathèque ne sont jamais touchés."
+msgstr "Return to the state of a fresh install. Articles already created — drafts and published — and images in the media library are never touched."
+
+#, php-format
+msgid "Rien n’a été effacé : tapez %s pour confirmer."
+msgstr "Nothing was erased: type %s to confirm."
+
+msgid "Réglages, Moteur et Modèles reviennent aux valeurs livrées, le collage Facebook au style de référence fourni. Les lots, les recettes, les rapports et les dépenses restent."
+msgstr "Settings, Engine and Models return to the shipped values, the Facebook collage to the supplied style reference. Lots, recipes, reports and spending stay."
+
+msgid "Réinitialiser"
+msgstr "Reset"
+
+msgid "Rétablir les réglages"
+msgstr "Restore the settings"
+
+msgid "Rétablir tous les réglages tels qu’à l’installation ?"
+msgstr "Restore all settings to how they were at installation?"
+
+msgid "Tout effacer et rétablir"
+msgstr "Erase everything and restore"
+
+#, php-format
+msgid "%d recette est en cours : attendez qu’elle finisse ou annulez-la avant d’effacer les données."
+msgid_plural "%d recettes sont en cours : attendez qu’elles finissent ou annulez-les avant d’effacer les données."
+msgstr[0] "%d recipe is running: wait for it to finish or cancel it before erasing the data."
+msgstr[1] "%d recipes are running: wait for them to finish or cancel them before erasing the data."
+
+msgid "Comme la réinitialisation complète, avec les clés d’API : rien de l’extension ne reste sur le site."
+msgstr "Like the full reset, API keys included: nothing of the extension stays on the site."
+
+msgid "Enregistrer ce choix"
+msgstr "Save this choice"
+
+msgid "Les réglages et les clés partent ; les lots, les recettes, les rapports et les dépenses restent, pour une réinstallation."
+msgstr "The settings and keys go; lots, recipes, reports and spending stay, for a reinstallation."
+
+msgid "Quand l’extension est supprimée"
+msgstr "When the extension is deleted"
+
+msgid "Seules les tâches planifiées et les droits accordés sont retirés ; réinstallée, l’extension reprend là où elle en était."
+msgstr "Only the scheduled tasks and the granted permissions are removed; reinstalled, the extension picks up where it left off."
+
+msgid "Supprimer les réglages et les données"
+msgstr "Remove the settings and the data"
+
+msgid "Supprimer les réglages seulement"
+msgstr "Remove the settings only"
+
+msgid "Tout garder"
+msgstr "Keep everything"
+
+msgid "WordPress ne pose aucune question au moment de supprimer une extension : ce qui part est choisi ici, à l’avance. Les articles et la médiathèque restent dans tous les cas."
+msgstr "WordPress asks nothing when an extension is deleted: what goes is chosen here, in advance. Articles and the media library stay in every case."
