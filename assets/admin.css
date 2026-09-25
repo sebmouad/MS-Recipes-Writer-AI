@@ -150,13 +150,15 @@
 .ms-rail { display: grid; }
 .ms-ticket {
 	display: grid;
-	grid-template-columns: 64px minmax(0, 1fr) auto;
-	gap: 4px 16px;
-	align-items: center;
-	padding: 14px 18px;
+	grid-template-columns: 72px minmax(0, 1fr) auto;
+	grid-template-areas: "thumb body side" "thumb body figures" "thumb post post";
+	gap: 2px 18px;
+	align-items: start;
+	padding: 16px 20px;
 	border-block-end: 1px solid var(--ms-line-soft);
 	border-inline-start: var(--ms-rail) solid var(--ms-line);
 	background: var(--ms-raised);
+	transition: background-color .12s ease;
 }
 .ms-ticket:last-child { border-block-end: 0; }
 .ms-ticket:hover { background: var(--ms-sunk); }
@@ -166,23 +168,28 @@
 .ms-ticket-warn { border-inline-start-color: var(--ms-warn); }
 
 /* The picture: the article's featured image, or the kind of lot until there is one. */
-.ms-ticket-thumb { grid-column: 1; grid-row: 1; align-self: start; inline-size: 64px; block-size: 64px; border-radius: 8px; overflow: hidden; display: grid; place-items: center; background: var(--ms-sunk); border: 1px solid var(--ms-line-soft); }
-.ms-ticket-thumb img { inline-size: 100%; block-size: 100%; object-fit: cover; display: block; }
-.ms-ticket-thumb .dashicons { inline-size: 26px; block-size: 26px; font-size: 26px; color: var(--ms-ink-faint); }
-.ms-ticket-body { grid-column: 2; grid-row: 1; min-inline-size: 0; display: grid; gap: 6px; }
+.ms-ticket-thumb { grid-area: thumb; inline-size: 72px; block-size: 72px; border-radius: 10px; overflow: hidden; display: grid; place-items: center; background: var(--ms-sunk); box-shadow: inset 0 0 0 1px var(--ms-line-soft); }
+.ms-ticket-thumb img { inline-size: 100%; block-size: 100%; object-fit: cover; display: block; transition: transform .2s ease; }
+.ms-ticket:hover .ms-ticket-thumb img { transform: scale(1.04); }
+.ms-ticket-thumb.is-empty .dashicons { inline-size: 28px; block-size: 28px; font-size: 28px; color: var(--ms-ink-faint); }
+/* The leading side: what the recipe is. */
+.ms-ticket-body { grid-area: body; min-inline-size: 0; display: grid; gap: 7px; align-content: start; }
 .ms-ticket-title { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; min-width: 0; }
 .ms-ticket-title input { align-self: center; margin: 0; }
-.ms-ticket-no { font-family: var(--ms-mono); font-size: 11px; font-weight: 600; color: var(--ms-ink-faint); letter-spacing: .02em; }
-.ms-ticket-name { font-size: 14px; font-weight: 650; overflow-wrap: anywhere; text-decoration: none; }
-.ms-ticket-name:hover { text-decoration: underline; }
-/* The facts, each behind its icon: who, which lot, what kind, when, how far, what it cost. */
-.ms-ticket-facts { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--ms-ink-soft); font-variant-numeric: tabular-nums; }
-.ms-ticket-facts li { margin: 0; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
-.ms-ticket-facts .dashicons { inline-size: 14px; block-size: 14px; font-size: 14px; color: var(--ms-ink-faint); }
-.ms-ticket-facts a { color: inherit; text-decoration: none; border-block-end: 1px dotted currentColor; }
-.ms-ticket-facts a:hover { color: var(--ms-lamp); }
-/* Its own column and row, or auto-placement pushes the state first. */
-.ms-ticket-side { grid-column: 3; grid-row: 1; align-self: start; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+.ms-ticket-name { font-size: 15px; font-weight: 650; line-height: 1.3; color: var(--ms-ink); overflow-wrap: anywhere; text-decoration: none; }
+.ms-ticket-name:hover, .ms-ticket-name:focus { color: var(--ms-lamp); text-decoration: underline; text-underline-offset: 3px; }
+.ms-ticket-no { font-family: var(--ms-mono); font-size: 11px; color: var(--ms-ink-faint); }
+.ms-ticket-facts { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 12.5px; color: var(--ms-ink-soft); }
+.ms-ticket-facts li { margin: 0; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+.ms-ticket-facts .dashicons { inline-size: 15px; block-size: 15px; font-size: 15px; color: var(--ms-ink-faint); }
+.ms-ticket-facts a { color: var(--ms-ink); font-weight: 600; text-decoration: none; }
+.ms-ticket-facts a:hover, .ms-ticket-facts a:focus { color: var(--ms-lamp); text-decoration: underline; }
+/* The trailing side: where it stands — the state, and under it the figures that explain it. */
+.ms-ticket-side { grid-area: side; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+.ms-ticket-figures { grid-area: figures; margin: 4px 0 0; display: flex; gap: 12px; justify-content: flex-end; font-family: var(--ms-mono); font-size: 12px; color: var(--ms-ink-soft); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ms-ticket-figures div { display: contents; }
+.ms-ticket-figures dd { margin: 0; }
+.ms-ticket-figures .ms-ticket-cost { color: var(--ms-ink); font-weight: 600; }
 
 /* --- State -------------------------------------------------------------
  * The word carries the meaning; the dot is a second signal for someone
@@ -473,8 +480,10 @@
 
 @media (max-width: 960px) {
 	.ms-timeline > div { grid-template-columns: 1fr; gap: 2px; }
-	.ms-ticket { grid-template-columns: 48px minmax(0, 1fr); gap: 8px 12px; padding: 12px 14px; }
-	.ms-ticket-thumb { inline-size: 48px; block-size: 48px; }
+	.ms-ticket { grid-template-columns: 56px minmax(0, 1fr); grid-template-areas: "thumb body" "thumb side" "figures figures" "post post"; gap: 8px 12px; padding: 14px; }
+	.ms-ticket-thumb { inline-size: 56px; block-size: 56px; }
+	.ms-ticket-side { justify-content: flex-start; }
+	.ms-ticket-figures { justify-content: flex-start; margin: 0; }
 	.msrwa .ms-ticket-post-links .button { min-block-size: 32px; padding: 0 12px; font-size: 13px; line-height: 30px; }
 	.ms-ticket-side { grid-column: 2; grid-row: 2; justify-content: flex-start; }
 }
@@ -698,7 +707,7 @@
 .ms-post-tab[aria-current="page"] .ms-count { background: var(--ms-lamp-soft); color: var(--ms-lamp); }
 .ms-post-tab-trash .ms-count, .ms-post-tab-deleted .ms-count { background: var(--ms-stop-soft); color: var(--ms-stop); }
 
-.ms-ticket-post { grid-column: 2 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin-block-start: 6px; padding-block-start: 8px; border-block-start: 1px dashed var(--ms-line-soft); }
+.ms-ticket-post { grid-area: post; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin-block-start: 10px; padding-block-start: 10px; border-block-start: 1px solid var(--ms-line-soft); font-size: 12px; }
 .ms-ticket-post small { margin: 0; }
 .ms-ticket-post-title { color: var(--ms-ink-soft); font-style: italic; }
 .ms-ticket-post-links { display: inline-flex; gap: 6px; margin-inline-start: auto; }

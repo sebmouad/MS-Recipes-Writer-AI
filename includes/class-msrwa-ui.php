@@ -279,15 +279,24 @@ final class MSRWA_UI {
 					$fact( $icon, MSRWA_Profile::short( $lot['profile'] ), (string) ( MSRWA_Profile::all()[ $lot['profile'] ]['label'] ?? '' ) );
 					$fact( 'translation', '' !== $lot['language'] ? strtoupper( $lot['language'] ) : '', (string) ( MSRWA_Profile::languages()[ $lot['language'] ] ?? '' ) );
 					$fact( 'calendar-alt', isset( $run['created_at'] ) ? MSRWA_I18N::ago( $run['created_at'] ) : '', isset( $run['created_at'] ) ? MSRWA_I18N::when( $run['created_at'] ) : '' );
-					/* translators: 1: steps done, 2: steps planned. */
-					$fact( 'list-view', sprintf( __( '%1$d/%2$d étapes', 'ms-recipes-writer-ai' ), (int) $run['steps_done'], (int) $run['steps_total'] ), '', 'steps' );
-					if ( isset( $run['seconds'] ) ) { $fact( 'clock', MSRWA_I18N::seconds( $run['seconds'] ), __( 'Durée', 'ms-recipes-writer-ai' ), 'seconds' ); }
-					if ( MSRWA_Rights::may_see_money() && isset( $run['cost_usd'] ) ) { $fact( 'money-alt', MSRWA_I18N::money( $run['cost_usd'] ), __( 'Coût estimé', 'ms-recipes-writer-ai' ), 'cost' ); }
 					if ( '' !== (string) ( $run['step'] ?? '' ) && 'running' === $run['status'] ) { $fact( 'update', MSRWA_UI::step_name( (string) $run['step'] ), '', 'step' ); }
 					if ( 'queued' === $run['status'] && (int) ( $run['priority'] ?? 0 ) > 0 ) { $fact( 'arrow-up-alt', __( 'passe devant', 'ms-recipes-writer-ai' ) ); }
 					?>
 				</ul>
 			</div>
+			<?php
+			// Identity on the left, standing on the right: the figures sit under
+			// the state they explain, in tabular type, and line up down the list.
+			?>
+			<dl class="ms-ticket-figures">
+				<div title="<?php esc_attr_e( 'Étapes', 'ms-recipes-writer-ai' ); ?>"><dt class="screen-reader-text"><?php esc_html_e( 'Étapes', 'ms-recipes-writer-ai' ); ?></dt><dd data-field="steps"><?php echo esc_html( sprintf( /* translators: 1: steps done, 2: steps planned. */ __( '%1$d/%2$d étapes', 'ms-recipes-writer-ai' ), (int) $run['steps_done'], (int) $run['steps_total'] ) ); ?></dd></div>
+				<?php if ( isset( $run['seconds'] ) ) : ?>
+					<div title="<?php esc_attr_e( 'Durée', 'ms-recipes-writer-ai' ); ?>"><dt class="screen-reader-text"><?php esc_html_e( 'Durée', 'ms-recipes-writer-ai' ); ?></dt><dd data-field="seconds"><?php echo esc_html( MSRWA_I18N::seconds( $run['seconds'] ) ); ?></dd></div>
+				<?php endif; ?>
+				<?php if ( MSRWA_Rights::may_see_money() && isset( $run['cost_usd'] ) ) : ?>
+					<div title="<?php esc_attr_e( 'Coût estimé', 'ms-recipes-writer-ai' ); ?>"><dt class="screen-reader-text"><?php esc_html_e( 'Coût estimé', 'ms-recipes-writer-ai' ); ?></dt><dd class="ms-ticket-cost" data-field="cost"><?php echo esc_html( MSRWA_I18N::money( $run['cost_usd'] ) ); ?></dd></div>
+				<?php endif; ?>
+			</dl>
 			<div class="ms-ticket-side">
 				<?php
 				// A finished recipe's bar is always full: on a list of them it
