@@ -1055,6 +1055,11 @@ final class MSRWA_Engine {
 			if ( ! empty( $result->artifacts['facebook']['provided'] ) && is_array( $verdict ) && $verdict ) {
 				$verdict['facebook_image'] = array( 'verdict' => 'good', 'realism' => 'good', 'panels_counted' => (int) $config->facebook_template()['panels'], 'last_panel_opened' => true, 'summary' => 'Collage fourni par le rédacteur : référence de la recette, non jugé.' );
 				$verdict['findings'] = array_values( array_filter( (array) ( $verdict['findings'] ?? array() ), static function ( $finding ) { return ! is_array( $finding ) || 'facebook_image' !== ( $finding['target'] ?? '' ); } ) );
+				// A mismatch between the two images is the featured image's to fix:
+				// a redraw must never replace the editor's collage.
+				foreach ( $verdict['findings'] as $index => $finding ) {
+					if ( is_array( $finding ) && 'consistency' === ( $finding['target'] ?? '' ) ) { $verdict['findings'][ $index ]['target'] = 'featured_image'; }
+				}
 				$blocking = array_filter( $verdict['findings'], static function ( $finding ) { return is_array( $finding ) && 'blocking' === ( $finding['severity'] ?? '' ); } );
 				if ( isset( $verdict['approved'] ) && is_bool( $verdict['approved'] ) ) { $verdict['approved'] = ! $blocking; }
 			}

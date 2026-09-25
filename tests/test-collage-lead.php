@@ -55,6 +55,13 @@ msrwa_test_missing( $free, 'add nothing it does not use', 'No recipe restricts i
 $instruction = (string) file_get_contents( MSRWA_Engine_Input::prompt_path( 'facebook_compose_free.tpl.txt' ) );
 msrwa_test_missing( $instruction, 'Add no ingredient, garnish or step the recipe does not have', 'The free instruction drops the restriction.' );
 msrwa_test_missing( $instruction, 'no cloth', 'And lets a home kitchen look lived in.' );
+// The look the owner approved (2026-09-25): close, soft, natural, physically real.
+msrwa_test_contains( $instruction, 'The food fills each panel', 'The camera is close, as in the owner’s collages.' );
+msrwa_test_contains( $instruction, 'no orange or amber cast', 'Softer light without an orange cast.' );
+msrwa_test_contains( $instruction, 'never bright, overexposed or airy', 'The bright version was refused.' );
+msrwa_test_contains( $instruction, 'Never grey, greyish-pink', 'Meat keeps its natural colour.' );
+msrwa_test_contains( $instruction, 'One method from the first panel to the last', 'The served dish is what the panel before it made.' );
+msrwa_test_contains( $instruction, 'No thermometer', 'Nothing with numbers on it.' );
 
 // The judge's garnish rule is dropped where the collage leads.
 msrwa_test_missing( MSRWA_Engine_Input::visual_brief( array( 'ingredients' => array() ), array(), false, false ), 'NO GARNISH', 'Led by the collage, garnish is not a defect.' );

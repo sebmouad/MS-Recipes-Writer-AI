@@ -681,9 +681,12 @@ final class MSRWA_Run {
 	public static function redrawable( array $run ) {
 		$post_id = (int) ( $run['draft_post_id'] ?? 0 );
 		if ( ! $post_id || 'done' !== (string) $run['status'] || ! self::may_see( $run ) ) { return array(); }
-		$approval = (array) ( self::artifacts( (int) $run['id'] )['approval'] ?? array() );
+		$artifacts = self::artifacts( (int) $run['id'] );
+		$approval = (array) ( $artifacts['approval'] ?? array() );
 		$out = array();
 		foreach ( MSRWA_Engine_Score::images_to_retry( $approval ) as $kind ) {
+			// The editor's own collage is never drawn over.
+			if ( 'facebook' === $kind && ! empty( $artifacts['facebook']['provided'] ) ) { continue; }
 			if ( (int) get_post_meta( $post_id, '_msrwa_' . $kind . '_redrawn', true ) < self::REDRAWS ) { $out[] = $kind; }
 		}
 		return $out;
