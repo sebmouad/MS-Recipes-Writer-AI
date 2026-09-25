@@ -131,6 +131,7 @@ final class MSRWA_UI {
 			'article' => __( 'Rédaction', 'ms-recipes-writer-ai' ),
 			'featured_image' => __( 'Image à la une', 'ms-recipes-writer-ai' ),
 			'facebook_image' => __( 'Collage Facebook', 'ms-recipes-writer-ai' ),
+			'collage_reading' => __( 'Lecture du collage', 'ms-recipes-writer-ai' ),
 			'review' => __( 'Relecture, faits et langue', 'ms-recipes-writer-ai' ),
 			'corrections' => __( 'Corrections', 'ms-recipes-writer-ai' ),
 			'proofread' => __( 'Correction de la langue', 'ms-recipes-writer-ai' ),

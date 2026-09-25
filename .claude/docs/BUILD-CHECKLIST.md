@@ -630,6 +630,12 @@ cost) in the task before changing anything.
   (2026-09-24).** The writer's photograph shows the prompt's writer the dish;
   the collage is drawn from the style reference. Real: the owner's own rôti
   photograph, drawn both ways. See ENGINE.md §7, item 40.
+- [~] **A60 — The collage leads the recipe (2026-09-25).** Scenario 1:
+  the writer's collage, recognised at pairing and kept ticked, is the
+  Facebook image and the reference (not drawn, not judged). Scenarios 2–4
+  on a complete lot: research → free collage → reading → recipe → article
+  + featured → review → approval. See ENGINE.md §7, item 50.
+  `tests/test-collage-lead.php`.
 - [x] **A59 — Filed as it is published (2026-09-25).**
   `MSRWA_Stack::on_publish()` on `transition_post_status`: a post of this
   plugin's still in the default category only is given one or two existing

@@ -90,6 +90,8 @@ final class MSRWA_Engine_Config {
 				'review'           => 16000,
 				'final_approval'   => 14000,
 				'vision'           => 1200,
+				// Six panels, each with its ingredients and stage, and the finished dish.
+				'collage_reading'  => 2500,
 			),
 
 			// How many times a step may be asked again before the run gives up.

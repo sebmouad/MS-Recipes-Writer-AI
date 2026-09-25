@@ -107,6 +107,9 @@ final class MSRWA_Match {
 			$out['images'][ $index ] = array_merge( $images[ $index ], array(
 				'dish' => is_array( $seen ) ? (string) ( $seen['dish'] ?? '' ) : '',
 				'describes' => is_array( $seen ) ? (string) ( $seen['description'] ?? '' ) : '',
+				// A step-by-step collage the writer made is offered as the recipe's
+				// Facebook image and its reference (ENGINE.md §7, 50).
+				'collage' => is_array( $seen ) && true === ( $seen['collage'] ?? null ),
 				'observation' => $observation,
 			) );
 			if ( ! is_array( $seen ) ) { $out['errors'][] = $images[ $index ]['file'] . ' : description illisible'; }
@@ -325,7 +328,8 @@ final class MSRWA_Match {
 	private static function vision_instruction( $language = 'français', $engine = '' ) {
 		return ( '' !== trim( $engine ) ? $engine : MSRWA_Engine_Call::default_vision_instruction() )
 			. ' Add two keys to the same JSON object: "dish", the name of the dish as a cook would recognise it, in ' . $language . ', or "" if you cannot name it; '
-			. '"description", one sentence in ' . $language . ' saying what is visible — main ingredients, colour, doneness, presentation. '
+			. '"description", one sentence in ' . $language . ' saying what is visible — main ingredients, colour, doneness, presentation; '
+			. '"collage", true when the image is a grid of several photographs showing a recipe being made step by step, false for a single photograph. '
 			. 'Describe only what is visible; never invent a hidden ingredient, a quantity or an origin.';
 	}
 

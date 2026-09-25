@@ -2441,3 +2441,12 @@ msgstr "Article"
 
 msgid "Créée"
 msgstr "Created"
+
+msgid "Lecture du collage"
+msgstr "Reading the collage"
+
+msgid "Publié tel quel avec l’article, et référence de la recette, de l’article et de l’image à la une. Décoché, il sert de simple photographie et un nouveau collage est dessiné."
+msgstr "Published as it is with the article, and the reference for the recipe, the article and the featured image. Unticked, it is used as an ordinary photograph and a new collage is drawn."
+
+msgid "Votre collage Facebook"
+msgstr "Your Facebook collage"

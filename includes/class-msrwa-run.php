@@ -53,6 +53,13 @@ final class MSRWA_Run {
 		return $id;
 	}
 
+	/**
+	 * An artifact a run starts with rather than produces: the editor's own
+	 * collage stands where the drawn one would, so every later step and the
+	 * draft read it exactly as they would read a drawing.
+	 */
+	public static function seed( $id, $key, array $value ) { self::record_artifact( absint( $id ), (string) $key, $value, current_time( 'mysql', true ) ); }
+
 	public static function queue( $id, $delay = 5 ) {
 		// The event is the safety net; the worker is what runs it now.
 		if ( ! wp_next_scheduled( 'msrwa_run_step', array( absint( $id ) ) ) ) {
@@ -192,7 +199,8 @@ final class MSRWA_Run {
 		$config = MSRWA_Batch::config_for( (int) $run['batch_id'] );
 		$state = self::state( $id );
 		$artifacts = (array) $state['artifacts'];
-		$registry = (array) ( $config['steps'] ?? array() );
+		$lead = (string) ( $brief['collage_lead'] ?? '' );
+		$registry = MSRWA_Engine_Steps::for_lead( (array) ( $config['steps'] ?? array() ), $lead );
 
 		$done = array();
 		foreach ( (array) $state['steps'] as $step ) { $done[] = (string) $step['step']; }
@@ -200,7 +208,7 @@ final class MSRWA_Run {
 		// The batch's profile decides which steps this run has: an article-only
 		// batch must not sit waiting for an image it never asked anyone to draw.
 		$batch = MSRWA_Batch::get( (int) $run['batch_id'] );
-		$wanted = MSRWA_Profile::steps( $batch ? $batch['profile'] : MSRWA_Profile::FULL, $registry );
+		$wanted = MSRWA_Profile::run_steps( $batch ? $batch['profile'] : MSRWA_Profile::FULL, (array) ( $config['steps'] ?? array() ), $lead );
 		$remaining = array_values( array_diff( $wanted, $done ) );
 		if ( ! $remaining ) { self::complete( $id, $state ); return false; }
 
@@ -718,7 +726,7 @@ final class MSRWA_Run {
 			'read_image' => MSRWA_Sources::reader( $id ),
 		) );
 		self::absorb( $id, $state, $result->to_array() );
-		self::remember( $id, $result, (array) ( $config['steps'] ?? array() ) );
+		self::remember( $id, $result, MSRWA_Engine_Steps::for_lead( (array) ( $config['steps'] ?? array() ), (string) ( $brief['collage_lead'] ?? '' ) ) );
 
 		$image = (array) ( $result->artifacts[ $kind ] ?? array() );
 		if ( ! $result->ok || ! $image || ! MSRWA_Draft::replace_image( (int) $run['draft_post_id'], $kind, $image ) ) {

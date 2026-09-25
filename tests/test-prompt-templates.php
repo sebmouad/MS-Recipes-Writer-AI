@@ -7,7 +7,7 @@ msrwa_test_load( 'images', 'prompt' );
 require_once dirname( __DIR__ ) . '/tools/lib/steps.php';
 
 $templates = glob( dirname( __DIR__ ) . '/includes/engine/prompts/*.txt' );
-msrwa_test_assert( 10 === count( $templates ), 'Ten prompts: four text stages, the research written from the editor’s photographs, two images, the collage’s brief and its composing instruction, and the final approval.' );
+msrwa_test_assert( 12 === count( $templates ), 'Twelve prompts: four text stages, the research written from the editor’s photographs, two images, the collage’s brief and its two composing instructions (following a recipe, or drawn first and free), the collage’s reading, and the final approval.' );
 
 foreach ( $templates as $path ) {
 	$name = basename( $path );

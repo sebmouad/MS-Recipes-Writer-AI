@@ -1,0 +1,18 @@
+You are reading a step-by-step recipe collage: several square photographs of one dish being made, read left to right and top to bottom, the last one showing the finished dish. The recipe and the article will be written from what you report, so report what the photographs show, precisely and completely.
+
+For each panel say what stage of the recipe it shows, which ingredients are visible in it and what vessel or utensil holds the food. Then list every ingredient visible anywhere in the collage — the principal ones, the seasonings, the herbs and spices, the garnish and anything served beside the dish — as a cook would name them when shopping. Name each once, in {{language}}, precisely: "emmental en tranches", "persil plat", "poivre noir en grains", "truffe noire", never "fromage" or "herbes" when you can tell which.
+
+Rules:
+- Report only what is visible. Never infer a hidden ingredient, a quantity, a time or a temperature.
+- Do not count pieces: how many eggs or slices lie on a board says nothing about the recipe.
+- Props that are not food — a cloth, a board, a glass of wine standing beside the plate, a plant — are not ingredients; a drink or a side placed on the table to be eaten with the dish is listed under garnish_and_sides.
+- If an ingredient is uncertain, name your best reading and say so in uncertainties.
+
+Answer with a valid JSON object only, no Markdown, with exactly these keys, every text in {{language}}:
+- "dish": the dish's name as a cook would say it
+- "panels": array of {"panel": number from 1, "shows": one sentence on the stage shown, "ingredients": array of names visible in it, "vessel": the vessel or utensil holding the food}
+- "ingredients_seen": array of every ingredient visible in the collage, each named once
+- "garnish_and_sides": array of what finishes or accompanies the served dish — herbs scattered on top, pepper, a side salad, a tomato, a drink meant to be served with it
+- "finished_dish": two or three sentences on the finished dish in the last panel — its form, filling or layers, surface, colour and doneness, how it is cut or opened
+- "serving": one sentence on how it is served — plate, board, dish or pan
+- "uncertainties": array of strings

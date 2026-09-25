@@ -173,7 +173,8 @@ final class MSRWA_Operations {
 		}
 
 		$batch = MSRWA_Batch::get( (int) $run['batch_id'] );
-		$state['planned'] = MSRWA_Profile::steps( $batch ? $batch['profile'] : MSRWA_Profile::FULL, (array) ( MSRWA_Batch::config_for( (int) $run['batch_id'] )['steps'] ?? array() ) );
+		$brief = (array) json_decode( (string) ( $run['brief_json'] ?? '' ), true );
+		$state['planned'] = MSRWA_Profile::run_steps( $batch ? $batch['profile'] : MSRWA_Profile::FULL, (array) ( MSRWA_Batch::config_for( (int) $run['batch_id'] )['steps'] ?? array() ), (string) ( $brief['collage_lead'] ?? '' ) );
 		$state['photos'] = self::embedded( MSRWA_Sources::run_dir( $id ), glob( MSRWA_Sources::run_dir( $id ) . '/*' ) );
 		$found = array();
 		foreach ( $state['history'] as $row ) {

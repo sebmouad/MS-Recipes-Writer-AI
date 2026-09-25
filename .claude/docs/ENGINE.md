@@ -887,6 +887,39 @@ photograph, and otherwise use the photograph without the cost of a search.
     against a ten-category list: every choice from the list (Entrées +
     Fritures et beignets; Poissons et fruits de mer + Gratins; Viandes et
     volailles), same cost. Real: lot #83, Gratin dauphinois → Gratins.
+50. **The Facebook collage leads the recipe.** Owner's design, approved
+    2026-09-25. His own ChatGPT collages were more real than the engine's
+    because nothing held them to a recipe: truffle, herbs, a second cheese,
+    a linen, a glass of wine. The engine drew the collage last, from the
+    recipe, under three rules (no garnish not in the list, exact counts,
+    only the named cookware). Now the collage comes first and the recipe
+    follows it.
+    - `brief.collage_lead` = `drawn` | `provided` | '' (kept by
+      `normalise_brief()`); `MSRWA_Engine_Steps::for_lead()` rewrites the
+      registry for it — `facebook_image` needs only `research`; a new step
+      `collage_reading` (capability `read`, vision route, prompt
+      `collage_reading.tpl.txt`, produces `collage`) reads each panel, every
+      ingredient and garnish seen, the finished dish; `canonical_recipe`,
+      `article` and `featured_image` need `collage`. `skipped('provided')`
+      leaves out `facebook_image`: the editor's collage arrives as the
+      `facebook` artifact (`provided: true`).
+    - `drawn`: the collage prompt is written from
+      `facebook_compose_free.tpl.txt` and `collage_brief_free()` — the dish,
+      the writer's words, what recipe sites say "to add freely to", no recipe
+      and none of the three rules.
+    - The recipe lists everything the collage shows (a garnish "pour
+      servir"); quantities, times, temperatures and safety come from the
+      research — a collage shows a kitchen, not a weighing. The article
+      describes the collage's finished dish. The featured image takes the
+      collage's last panel, cut from the grid, as its reference: the same
+      dish, its own plate and angle.
+    - The final approval judges a drawn collage as a photograph and a
+      sequence, never against the list, without the no-garnish rule; the
+      editor's own collage is not judged — its verdict is set to good and
+      its findings dropped, so only the featured image can refuse.
+    - The plugin sets the lead per recipe: a photograph the pairing reads
+      as a collage and the writer keeps ticked → `provided` (any lot with
+      images); otherwise a complete lot → `drawn`; other lots unchanged.
 
 ### Still open
 

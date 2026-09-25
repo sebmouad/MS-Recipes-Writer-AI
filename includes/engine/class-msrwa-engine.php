@@ -30,9 +30,10 @@ final class MSRWA_Engine {
 	 */
 	public static function run( array $input, array $options = array(), $observer = null ) {
 		$result = new MSRWA_Result( $observer );
+		$brief = self::normalise_brief( $input );
+		$options = self::led( $options, $brief );
 		$config = self::configure( $options );
 
-		$brief = self::normalise_brief( $input );
 		if ( '' === trim( (string) $brief['title'] ) && '' === trim( (string) $brief['text'] ) ) {
 			return $result->fail( 'run', 'The brief carries neither a title nor a text; there is nothing to research.' );
 		}
@@ -45,6 +46,7 @@ final class MSRWA_Engine {
 		$registry = (array) $config->get( 'steps', array() );
 		$only = array_values( array_filter( (array) ( $options['only'] ?? array() ) ) );
 		$remaining = $only ? array_values( array_intersect( MSRWA_Engine_Steps::names( $registry ), $only ) ) : MSRWA_Engine_Steps::names( $registry );
+		$remaining = array_values( array_diff( $remaining, MSRWA_Engine_Steps::skipped( $brief['collage_lead'] ) ) );
 		foreach ( (array) ( $input['artifacts'] ?? array() ) as $key => $value ) { $result->artifact( $key, $value ); }
 		$budget = (float) $config->get( 'limits.budget_usd', 0 );
 
@@ -103,11 +105,21 @@ final class MSRWA_Engine {
 	 */
 	public static function run_step( $name, array $input, array $options = array(), $observer = null ) {
 		$result = new MSRWA_Result( $observer );
+		$brief = self::normalise_brief( $input );
+		$options = self::led( $options, $brief );
 		$config = self::configure( $options );
-		$result->artifact( 'brief', self::normalise_brief( $input ) );
+		$result->artifact( 'brief', $brief );
 		foreach ( (array) ( $input['artifacts'] ?? array() ) as $key => $value ) { $result->artifact( $key, $value ); }
 		self::perform( $name, $config, $result, $options );
 		return $result;
+	}
+
+	/** The caller's configuration with the step order the brief's collage lead implies. */
+	private static function led( array $options, array $brief ) {
+		if ( '' === $brief['collage_lead'] ) { return $options; }
+		$options['config'] = (array) ( $options['config'] ?? array() );
+		$options['config']['steps'] = MSRWA_Engine_Steps::for_lead( (array) ( $options['config']['steps'] ?? array() ), $brief['collage_lead'] );
+		return $options;
 	}
 
 	/** Resolves the three configuration layers and points the shared classes at the result. */
@@ -201,6 +213,7 @@ final class MSRWA_Engine {
 		// A redraw the editor asked for carries the judge's findings in the options.
 		if ( 'image_generation' === $capability ) { return self::draw( $name, $config, $result, $options, $findings ? $findings : array_values( (array) ( $options['findings'] ?? array() ) ) ); }
 		if ( 'vision' === $capability ) { return self::decide( $name, $config, $result, $options ); }
+		if ( 'read' === $capability ) { return self::read_collage( $name, $config, $result, $options ); }
 		return self::write( $name, $config, $result, $options );
 	}
 
@@ -672,7 +685,12 @@ final class MSRWA_Engine {
 		MSRWA_Engine_Input::use_observation_fields( (array) $config->get( 'observation_fields', array( 'colours', 'textures' ) ) );
 		$template = $config->facebook_template();
 		$choices = array_merge( $options, array( 'collage_panels' => $template['panels'], 'collage_columns' => $template['columns'], 'collage_rows' => $template['rows'], 'facebook_prompt' => $template['prompt'] ) );
-		$prompt = MSRWA_Engine_Input::image_prompt( $kind, $brief, $choices, $findings );
+		$lead = (string) ( $brief['collage_lead'] ?? '' );
+		// Drawn before the recipe, the collage has no recipe to be prompted from:
+		// should its prompt not be written, the free brief itself is drawn.
+		$prompt = 'facebook' === $kind && 'drawn' === $lead
+			? MSRWA_Engine_Input::collage_brief_free( $brief, '' !== $template['brief'] ? $template['brief'] : 'facebook_brief.tpl.txt' )
+			: MSRWA_Engine_Input::image_prompt( $kind, $brief, $choices, $findings );
 		$references = array();
 		$composed = array( 'cost_usd' => 0.0, 'seconds' => 0.0 );
 		if ( 'facebook' === $kind && '' !== $template['compose'] && '' !== $template['brief'] ) {
@@ -688,7 +706,14 @@ final class MSRWA_Engine {
 			}
 		}
 		$reference = '';
-		if ( 'featured' === $kind ) {
+		$panel = 'featured' === $kind && '' !== $lead && ! empty( $result->artifacts['facebook'] ) ? self::last_panel( (array) $result->artifacts['facebook'], $template, $config ) : null;
+		if ( $panel ) {
+			// Led by the collage, the featured image is the collage's dish: the
+			// finished dish of its last panel is the reference (ENGINE.md §7, 50).
+			$references = array( $panel );
+			$reference = 'collage';
+			$prompt .= "\n\nREFERENCE IMAGE: the finished dish from this recipe's own step-by-step collage — the dish the article is about. Draw the same dish: the same food, filling, layering, colour, doneness and garnish. The plate, the angle, the light and the setting are yours, as this prompt sets them: never copy the panel's framing, and never make a collage or split image.";
+		} elseif ( 'featured' === $kind ) {
 			// The owner asked (2026-09-24) that the featured image, like the
 			// collage, be drawn from a photograph of the dish: the writer's, or
 			// else one the research found. The prompt still sets the look.
@@ -753,8 +778,13 @@ final class MSRWA_Engine {
 		if ( empty( $written['prompt'] ) ) {
 			$route = $config->model_for( 'image_compose' );
 			$wire = $config->provider( $route['provider'], $route['model'], 'image_compose' );
-			$instruction = MSRWA_Prompt::compile( trim( (string) file_get_contents( MSRWA_Engine_Input::prompt_path( $template['compose'] ) ) ), MSRWA_Engine_Input::settings() );
-			$message = MSRWA_Engine_Input::collage_brief( $brief, $template['brief'], $reference['source'] );
+			// Drawn first, the collage is free: its own instruction, and a brief
+			// with no recipe to obey (ENGINE.md §7, 50).
+			$free = 'drawn' === ( $brief['collage_lead'] ?? '' );
+			$instruction = MSRWA_Prompt::compile( trim( (string) file_get_contents( MSRWA_Engine_Input::prompt_path( $free ? 'facebook_compose_free.tpl.txt' : $template['compose'] ) ) ), MSRWA_Engine_Input::settings() );
+			$message = $free
+				? MSRWA_Engine_Input::collage_brief_free( $brief, $template['brief'], $reference['source'] )
+				: MSRWA_Engine_Input::collage_brief( $brief, $template['brief'], $reference['source'] );
 			$call = MSRWA_Engine_Call::compose( $route['provider'], $route['model'], $instruction, $message, $reference['shown'], $config->max_output( 'image_compose' ), $wire );
 			if ( isset( $call['error'] ) ) { return array( 'error' => (string) $call['error'], 'seconds' => (float) ( $call['seconds'] ?? 0 ) ); }
 			self::report_call( $result, $name, $route, $wire['text_endpoint'] ?? '', $call, $config );
@@ -763,7 +793,7 @@ final class MSRWA_Engine {
 			if ( strlen( $text ) < 200 ) { return array( 'error' => 'the answer was too short to be a prompt', 'cost_usd' => $spent['cost_usd'], 'seconds' => $spent['seconds'] ); }
 			$written = array( 'prompt' => $text, 'reference' => $reference['source'], 'reference_label' => $reference['label'], 'reference_file' => (string) ( $reference['file'] ?? '' ), 'model' => $route['model'] );
 			$result->artifact( 'facebook_composed', $written );
-			$result->event( 'input', $name, sprintf( 'Collage prompt written by %s from the recipe%s: %s characters.', $route['model'], '' !== $reference['source'] ? ' and ' . $reference['label'] : '', number_format( strlen( $text ) ) ) );
+			$result->event( 'input', $name, sprintf( 'Collage prompt written by %s from %s%s: %s characters.', $route['model'], $free ? 'the dish and the research, freely' : 'the recipe', '' !== $reference['source'] ? ' and ' . $reference['label'] : '', number_format( strlen( $text ) ) ) );
 		}
 		$prompt = (string) $written['prompt'];
 		$findings = array_values( array_filter( $findings, 'is_array' ) );
@@ -779,6 +809,32 @@ final class MSRWA_Engine {
 			$prompt .= "\n\nREFERENCE IMAGES: the first is the approved collage — reproduce its photographic look exactly (light, colour, white balance, wood surface, tight framing) and nothing of its food. The second is a photograph of this dish — follow what the dish looks like (shape, filling, layering, doneness) and nothing else: not its light, colours, background, dish or framing.";
 		}
 		return array( 'prompt' => $prompt, 'references' => (array) ( $reference['shown'] ?? array() ) ) + $spent;
+	}
+
+	/**
+	 * The last panel of a collage — the finished dish — cut out of the grid,
+	 * a little inside its borders so no separator line comes with it. Null
+	 * when the collage cannot be read or GD cannot cut it.
+	 */
+	private static function last_panel( array $collage, array $template, MSRWA_Engine_Config $config ) {
+		$image = self::read_image( $collage );
+		if ( isset( $image['error'] ) || ! function_exists( 'imagecreatefromstring' ) ) { return null; }
+		$source = @imagecreatefromstring( (string) base64_decode( (string) $image['data'] ) ); // phpcs:ignore WordPress.PHP.NoSilencedErrors
+		if ( ! $source ) { return null; }
+		$columns = max( 1, (int) ( $template['columns'] ?? 2 ) );
+		$rows = max( 1, (int) ( $template['rows'] ?? 3 ) );
+		$width = imagesx( $source ) / $columns;
+		$height = imagesy( $source ) / $rows;
+		$inset = 0.04;
+		$cell = @imagecrop( $source, array( // phpcs:ignore WordPress.PHP.NoSilencedErrors
+			'x' => (int) round( ( $columns - 1 ) * $width + $width * $inset ), 'y' => (int) round( ( $rows - 1 ) * $height + $height * $inset ),
+			'width' => (int) round( $width * ( 1 - 2 * $inset ) ), 'height' => (int) round( $height * ( 1 - 2 * $inset ) ),
+		) );
+		if ( ! $cell ) { return null; }
+		ob_start();
+		imagejpeg( $cell, null, 90 );
+		$bytes = (string) ob_get_clean();
+		return '' === $bytes ? null : self::shrink_reference( array( 'mime' => 'image/jpeg', 'data' => base64_encode( $bytes ) ), (int) $config->get( 'limits.reference_pixels', 768 ) );
 	}
 
 	/**
@@ -891,6 +947,48 @@ final class MSRWA_Engine {
 		return array( 'source' => '', 'label' => '', 'file' => '', 'image' => null );
 	}
 
+	/**
+	 * Reads the collage that leads the recipe, panel by panel: what each shows,
+	 * every ingredient and garnish visible, and the finished dish. The recipe,
+	 * the article and the featured image are written from this reading.
+	 */
+	private static function read_collage( $name, MSRWA_Engine_Config $config, MSRWA_Result $result, array $options ) {
+		$route = $config->model_for( 'vision' );
+		if ( '' === $route['model'] ) { return self::failed( 'No model resolves for the vision route.' ); }
+		$collage = (array) ( $result->artifacts['facebook'] ?? array() );
+		$image = self::read_image( $collage );
+		if ( isset( $image['error'] ) ) { return self::failed( $image['error'], 0, $route ); }
+		$brief = self::working_set( $name, $result );
+		$instruction = MSRWA_Prompt::compile( trim( (string) file_get_contents( MSRWA_Engine_Input::prompt_path( 'collage_reading.tpl.txt' ) ) ), MSRWA_Engine_Input::settings() );
+		$wire = $config->provider( $route['provider'], $route['model'], 'vision' );
+		$context = (string) ( $brief['title'] ?? '' ) . ( '' !== trim( (string) ( $brief['text'] ?? '' ) ) ? ' — ' . mb_substr( trim( (string) $brief['text'] ), 0, 600 ) : '' );
+		$plan = MSRWA_Engine_Call::plan_vision( $route['provider'], $route['model'], $image, $context, $config->max_output( $name ), $wire, $instruction );
+		if ( isset( $plan['error'] ) ) { return self::failed( $plan['error'], 0, $route ); }
+		$provided = ! empty( $collage['provided'] );
+		$result->event( 'input', $name, sprintf( 'Reading %s collage, %s KB.', $provided ? "the editor's own" : 'the drawn', number_format( (int) $image['bytes'] / 1024, 1 ) ), array( 'route' => $route ) );
+
+		return array( 'plan' => $plan, 'finish' => static function ( $call ) use ( $name, $route, $wire, $config, $result, $provided ) {
+			if ( isset( $call['error'] ) ) { return self::failed( $call['error'], $call['seconds'] ?? 0, $route ); }
+			self::report_call( $result, $name, $route, $wire['text_endpoint'] ?? '', $call, $config );
+			$reading = MSRWA_Json::decode( (string) ( $call['text'] ?? '' ) );
+			$reading = is_array( $reading ) ? $reading : array();
+			$checks = array(
+				'valid JSON' => array( 'pass' => (bool) $reading, 'detail' => $reading ? count( $reading ) . ' keys' : 'not parseable' ),
+				'ingredients named' => array( 'pass' => count( (array) ( $reading['ingredients_seen'] ?? array() ) ) >= 2, 'detail' => count( (array) ( $reading['ingredients_seen'] ?? array() ) ) . ' ingredient(s)' ),
+				'panels read' => array( 'pass' => count( (array) ( $reading['panels'] ?? array() ) ) >= 2, 'detail' => count( (array) ( $reading['panels'] ?? array() ) ) . ' panel(s)' ),
+				'finished dish described' => array( 'pass' => '' !== trim( (string) ( $reading['finished_dish'] ?? '' ) ), 'detail' => mb_substr( (string) ( $reading['finished_dish'] ?? '' ), 0, 80 ) ),
+			);
+			$passed = count( array_filter( $checks, static function ( $check ) { return $check['pass']; } ) );
+			return array(
+				'provider' => $route['provider'], 'model' => $route['model'], 'tier' => $route['tier'], 'seconds' => $call['seconds'],
+				'usage' => $call['usage'], 'cost_usd' => $config->price( $route['provider'], $route['model'], $call['usage'] ),
+				'status' => (string) ( $call['status'] ?? '' ), 'passed' => $passed, 'total' => count( $checks ), 'checks' => $checks, 'error' => '',
+				'artifact' => $reading ? $reading + array( 'source' => $provided ? 'provided' : 'drawn' ) : array(),
+				'retry' => $passed === count( $checks ) ? '' : sprintf( 'Scored %d/%d; asking again.', $passed, count( $checks ) ),
+			);
+		} );
+	}
+
 	/** The one step that sees both images at once, and decides on them. */
 	private static function decide( $name, MSRWA_Engine_Config $config, MSRWA_Result $result, array $options ) {
 		$route = $config->model_for( $name );
@@ -951,6 +1049,15 @@ final class MSRWA_Engine {
 
 			$verdict = MSRWA_Json::decode( $call['text'] );
 			$verdict = MSRWA_Engine_Score::enforce( is_array( $verdict ) ? $verdict : array(), (string) ( $config->get( 'settings', array() )['site_language'] ?? 'fr' ) );
+			// The editor's own collage is the reference, not a candidate: whatever
+			// the judge said of it is set aside, and only the featured image can
+			// still refuse the run (ENGINE.md §7, 50).
+			if ( ! empty( $result->artifacts['facebook']['provided'] ) && is_array( $verdict ) && $verdict ) {
+				$verdict['facebook_image'] = array( 'verdict' => 'good', 'realism' => 'good', 'panels_counted' => (int) $config->facebook_template()['panels'], 'last_panel_opened' => true, 'summary' => 'Collage fourni par le rédacteur : référence de la recette, non jugé.' );
+				$verdict['findings'] = array_values( array_filter( (array) ( $verdict['findings'] ?? array() ), static function ( $finding ) { return ! is_array( $finding ) || 'facebook_image' !== ( $finding['target'] ?? '' ); } ) );
+				$blocking = array_filter( $verdict['findings'], static function ( $finding ) { return is_array( $finding ) && 'blocking' === ( $finding['severity'] ?? '' ); } );
+				if ( isset( $verdict['approved'] ) && is_bool( $verdict['approved'] ) ) { $verdict['approved'] = ! $blocking; }
+			}
 			$configured = (array) $config->get( 'approval_targets', array() );
 			$checks = MSRWA_Engine_Score::approval( $verdict, count( $images ), $config->facebook_template()['panels'], $configured ? $configured : $targets );
 			$passed = count( array_filter( $checks, static function ( $check ) { return ! empty( $check['pass'] ); } ) );
@@ -1021,6 +1128,7 @@ final class MSRWA_Engine {
 		return array_merge( $brief, array(
 			'research'  => (array) ( $result->artifacts['research'] ?? array() ),
 			'canonical' => (array) ( $result->artifacts['canonical'] ?? array() ),
+			'collage'   => (array) ( $result->artifacts['collage'] ?? array() ),
 			'article'   => $article,
 			'feedback'  => $feedback,
 		) );
@@ -1061,7 +1169,7 @@ final class MSRWA_Engine {
 	/** Which artifacts a step was actually given, for the record of what it saw. */
 	private static function attached( array $brief ) {
 		$attached = array();
-		foreach ( array( 'research', 'canonical', 'article', 'feedback', 'image_observations' ) as $key ) {
+		foreach ( array( 'research', 'canonical', 'collage', 'article', 'feedback', 'image_observations' ) as $key ) {
 			if ( ! empty( $brief[ $key ] ) ) { $attached[] = $key; }
 		}
 		return $attached;
@@ -1106,6 +1214,8 @@ final class MSRWA_Engine {
 			'images' => array_values( (array) ( $brief['images'] ?? array() ) ),
 			// The caller's categories, for the article to choose among (ENGINE.md §7, 49).
 			'site_categories' => array_values( array_filter( array_map( 'strval', (array) ( $brief['site_categories'] ?? array() ) ) ) ),
+			// Whether the Facebook collage leads the recipe, and whose it is (ENGINE.md §7, 50).
+			'collage_lead' => in_array( $brief['collage_lead'] ?? '', array( 'drawn', 'provided' ), true ) ? (string) $brief['collage_lead'] : '',
 		);
 	}
 }

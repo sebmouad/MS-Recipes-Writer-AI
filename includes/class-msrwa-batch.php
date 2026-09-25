@@ -166,6 +166,11 @@ final class MSRWA_Batch {
 			if ( $image < 0 || $image >= count( (array) $matching['images'] ) || isset( $taken[ $image ] ) ) { continue; }
 			$choice = (string) ( $pair['recipe'] ?? '' );
 			$taken[ $image ] = true;
+			// Unticked, a collage is an ordinary photograph of the dish, and the
+			// recipe's collage is drawn again.
+			if ( array_key_exists( 'collage', $pair ) && ! empty( $matching['images'][ $image ]['collage'] ) ) {
+				$matching['images'][ $image ]['collage_off'] = ! $pair['collage'];
+			}
 			$was = $before[ $image ] ?? null;
 			// Three choices beside a recipe: set the photograph aside, make it a
 			// recipe of its own under a name the writer gives, or leave it
@@ -293,10 +298,20 @@ final class MSRWA_Batch {
 			$brief = MSRWA_Match::brief( $recipe, $images );
 			// What the article may file itself under: this site's categories, not a model's guess.
 			$brief['site_categories'] = MSRWA_Stack::site_categories();
-			$run = MSRWA_Run::create( (int) $id, (int) $batch['owner_id'], $brief, $config, MSRWA_Profile::steps( $batch['profile'], (array) ( $config['steps'] ?? array() ) ) );
+			// The writer's own Facebook collage, when one of its photographs is
+			// one and they kept it ticked, leads the recipe and is not drawn
+			// again; a complete lot without one has its collage drawn first
+			// (ENGINE.md §7, 50).
+			$collage = null;
+			foreach ( $images as $image ) {
+				if ( ! empty( $image['collage'] ) && empty( $image['collage_off'] ) ) { $collage = $image; break; }
+			}
+			$brief['collage_lead'] = MSRWA_Profile::lead( $batch['profile'], null !== $collage );
+			$run = MSRWA_Run::create( (int) $id, (int) $batch['owner_id'], $brief, $config, MSRWA_Profile::run_steps( $batch['profile'], (array) ( $config['steps'] ?? array() ), $brief['collage_lead'] ) );
 			if ( $run ) {
 				MSRWA_History::inherit( (int) $id, $run );
 				MSRWA_Sources::hand_over( (int) $id, $run, $brief );
+				if ( 'provided' === $brief['collage_lead'] ) { self::seed_collage( $run, $collage ); }
 				$started++;
 			}
 		}
@@ -305,6 +320,21 @@ final class MSRWA_Batch {
 
 		$wpdb->update( self::table(), array( 'status' => $started ? 'running' : 'failed', 'updated_at' => current_time( 'mysql', true ) ), array( 'id' => absint( $id ) ) );
 		return $started;
+	}
+
+	/**
+	 * The writer's collage as the run's Facebook image: the file handed over to
+	 * the run, marked as provided, read by every later step and attached to the
+	 * draft exactly as a drawn one would be.
+	 */
+	private static function seed_collage( $run, array $collage ) {
+		$path = MSRWA_Sources::path( MSRWA_Sources::run_dir( $run ), (string) ( $collage['id'] ?? '' ) );
+		if ( '' === $path ) { return; }
+		$size = @getimagesize( $path ); // phpcs:ignore WordPress.PHP.NoSilencedErrors
+		MSRWA_Run::seed( $run, 'facebook', array(
+			'kind' => 'facebook', 'path' => $path, 'bytes' => (int) filesize( $path ), 'mime' => (string) ( $size['mime'] ?? 'image/jpeg' ),
+			'size' => $size ? (int) $size[0] . 'x' . (int) $size[1] : '', 'provided' => true, 'file' => (string) ( $collage['id'] ?? '' ),
+		) );
 	}
 
 	/** A batch with work in it again is not a finished batch. */

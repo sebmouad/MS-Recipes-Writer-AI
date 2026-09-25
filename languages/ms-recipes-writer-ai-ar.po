@@ -2489,3 +2489,12 @@ msgstr "المقال"
 
 msgid "Créée"
 msgstr "أُنشئت"
+
+msgid "Lecture du collage"
+msgstr "قراءة الكولاج"
+
+msgid "Publié tel quel avec l’article, et référence de la recette, de l’article et de l’image à la une. Décoché, il sert de simple photographie et un nouveau collage est dessiné."
+msgstr "يُنشر كما هو مع المقال، وهو المرجع للوصفة والمقال والصورة البارزة. إذا أُلغي تحديده، يُستخدم كصورة عادية ويُرسم كولاج جديد."
+
+msgid "Votre collage Facebook"
+msgstr "كولاج فيسبوك الخاص بك"

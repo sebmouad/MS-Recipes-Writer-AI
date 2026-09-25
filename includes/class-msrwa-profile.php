@@ -111,6 +111,26 @@ final class MSRWA_Profile {
 	}
 
 	/**
+	 * The steps one recipe runs: its lot's profile, in the order its collage
+	 * lead sets — drawn first, or the editor's own collage in place of the
+	 * drawing (ENGINE.md §7, 50).
+	 */
+	public static function run_steps( $profile, array $registry, $lead ) {
+		$led = MSRWA_Engine_Steps::for_lead( $registry, (string) $lead );
+		return array_values( array_diff( self::steps( $profile, $led ), MSRWA_Engine_Steps::skipped( (string) $lead ) ) );
+	}
+
+	/**
+	 * Which collage leads a recipe: the editor's own when one of its
+	 * photographs is a collage they kept ticked (any profile with images), a
+	 * collage drawn first on a complete lot, and none otherwise.
+	 */
+	public static function lead( $profile, $provided ) {
+		if ( $provided && self::ARTICLE !== $profile ) { return 'provided'; }
+		return self::FULL === $profile ? 'drawn' : '';
+	}
+
+	/**
 	 * The engine configuration this profile implies.
 	 *
 	 * A step that is not run produces no artifact, so anything that declared a

@@ -153,7 +153,7 @@ final class MSRWA_Engine_Input {
 	 * cooling rack and a serving board that appear in no step, and a final panel
 	 * browner than the photographs of the real dish.
 	 */
-	public static function visual_brief( $canonical, $research, $single = false ) {
+	public static function visual_brief( $canonical, $research, $single = false, $garnish_rule = true ) {
 		$countable = array( 'pièce', 'pièces', 'piece', 'pieces', 'rouleau', 'rouleaux', 'gousse', 'gousses', 'tranche', 'tranches', 'feuille', 'feuilles', 'branche', 'branches', 'oeuf', 'œuf', 'unité', 'unités', '' );
 		$counts = array();
 		$measured = array();
@@ -171,7 +171,7 @@ final class MSRWA_Engine_Input {
 		}
 
 		$lines = array( 'VISUAL BRIEF — derived from this recipe and binding. Each line below exists because a real image failed on it.' );
-		$lines[] = '• NO GARNISH THAT IS NOT AN INGREDIENT. The most common defect in these images, across every dish tried, is a sprig of herb laid on the finished plate — rosemary, thyme, parsley, coriander, a bay leaf — because that is how this kind of dish is usually photographed. If the ingredient list below does not contain it, it does not go in the picture, in any panel, however conventional it looks. The same applies to a citrus wedge, a grind of visible spice, a drizzle, a dusting or a scattering of seeds. Serve the dish bare rather than garnish it with something the cook was never told to buy.';
+		if ( $garnish_rule ) { $lines[] = '• NO GARNISH THAT IS NOT AN INGREDIENT. The most common defect in these images, across every dish tried, is a sprig of herb laid on the finished plate — rosemary, thyme, parsley, coriander, a bay leaf — because that is how this kind of dish is usually photographed. If the ingredient list below does not contain it, it does not go in the picture, in any panel, however conventional it looks. The same applies to a citrus wedge, a grind of visible spice, a drizzle, a dusting or a scattering of seeds. Serve the dish bare rather than garnish it with something the cook was never told to buy.'; }
 		// One photograph of the finished dish has no mise en place and no panels:
 		// the counts stay, and the cookware and the display rules — a sixth of its
 		// prompt, billed at the image model's rate — do not travel with it.
@@ -521,6 +521,48 @@ final class MSRWA_Engine_Input {
 		return $text;
 	}
 
+	/**
+	 * The user's brief for a collage drawn before any recipe exists (ENGINE.md
+	 * §7, 50): the dish, the writer's words, and what the research found about
+	 * how it is made — as knowledge of the dish, never as a list that limits
+	 * what the collage may show.
+	 */
+	public static function collage_brief_free( $brief, $template_file, $reference = '' ) {
+		$research = self::research_package( $brief );
+		$title = trim( (string) ( $brief['title'] ?? '' ) );
+		if ( '' === $title ) { $title = (string) ( $research['dish_identity']['name'] ?? '' ); }
+		$text = str_replace( '[DISH]', $title, MSRWA_Prompt::compile( trim( (string) file_get_contents( self::prompt_path( $template_file ) ) ), self::settings() ) );
+		$notes = trim( (string) ( $brief['text'] ?? '' ) );
+		$text .= "\n\nTHE DISH: " . $title . ( '' !== $notes ? "\nWhat the writer said about it: " . mb_substr( $notes, 0, 1500 ) : '' );
+		$known = array();
+		foreach ( array_slice( (array) ( $research['ingredients'] ?? array() ), 0, 20 ) as $ingredient ) {
+			if ( is_array( $ingredient ) && '' !== trim( (string) ( $ingredient['name'] ?? '' ) ) ) { $known[] = trim( (string) $ingredient['name'] ); }
+		}
+		$method = array();
+		foreach ( array_slice( (array) ( $research['preparation'] ?? array() ), 0, 10 ) as $index => $step ) {
+			$action = is_array( $step ) ? trim( (string) ( $step['action'] ?? '' ) ) : trim( (string) $step );
+			if ( '' !== $action ) { $method[] = ( $index + 1 ) . '. ' . $action; }
+		}
+		$sides = array();
+		foreach ( array_slice( (array) ( $research['accompaniments'] ?? array() ), 0, 5 ) as $side ) {
+			if ( is_array( $side ) && '' !== trim( (string) ( $side['name'] ?? '' ) ) ) { $sides[] = trim( (string) $side['name'] ); }
+		}
+		if ( $known || $method ) {
+			$text .= "\n\nWHAT RECIPE SITES SAY ABOUT IT — how the dish is usually made, to get it right; add freely to it:"
+				. ( $known ? "\nUsual ingredients: " . implode( ', ', $known ) . '.' : '' )
+				. ( $method ? "\nUsual method:\n" . implode( "\n", $method ) : '' )
+				. ( $sides ? "\nOften served with: " . implode( ', ', $sides ) . '.' : '' );
+		}
+		if ( 0 === strpos( (string) $reference, 'style+' ) ) {
+			$text .= "\n\nThe first attached image is my own approved collage of another dish: keep its look, never its food, its steps or its cookware. The second is " . ( 'style+editor' === $reference ? "the editor's photograph of this dish" : 'a photograph of this dish from a recipe site' ) . ": take what the dish is from it, never its light, colours, background or framing.";
+		} elseif ( 'editor' === $reference || 'research' === $reference ) {
+			$text .= "\n\nThe attached image is a photograph of this dish " . ( 'editor' === $reference ? 'supplied by the editor.' : 'from a recipe site.' );
+		} elseif ( 'style' === $reference ) {
+			$text .= "\n\nThe attached image is my own approved collage of another dish: keep its look, never its food, its steps or its cookware.";
+		}
+		return $text;
+	}
+
 	public static function image_prompt( $kind, $brief, $options = array(), $findings = array() ) {
 		$settings = self::settings();
 		$research = self::research_package( $brief );
@@ -645,7 +687,8 @@ final class MSRWA_Engine_Input {
 		// instructions come after the shared part, never before it.
 		if ( 'canonical_recipe' === $step ) {
 			return self::shared_context( $brief ) . $prompt . "\nEDITOR BRIEF: " . $encode( $editor )
-				. "\n" . self::observed_appearance( $research );
+				. "\n" . self::observed_appearance( $research )
+				. self::collage_lead( $brief, $step );
 		}
 		if ( 'article' === $step ) {
 			// A rewrite carries the findings the reviews raised; a first draft carries none.
@@ -653,6 +696,7 @@ final class MSRWA_Engine_Input {
 			return self::shared_context( $brief, true ) . $prompt . MSRWA_Quality::prompt_contract( $settings )
 				. "\n" . self::appearance_for_prose( $research )
 				. self::site_categories( $brief )
+				. self::collage_lead( $brief, $step )
 				. ( $feedback ? "\nREVIEW FINDINGS TO CORRECT IN THE COMPLETE RETURNED ARTICLE: " . $encode( $feedback ) : '' );
 		}
 		if ( 'review' === $step ) {
@@ -673,9 +717,40 @@ final class MSRWA_Engine_Input {
 			return $prompt . "\n\nIMAGES RECEIVED:\n" . ( '' !== $received ? $received : '- none.' )
 				. "\n\nCANONICAL RECIPE: " . $encode( $canonical )
 				. "\n\n" . self::visual_evidence( $research )
-				. "\n" . self::visual_brief( $canonical, $research );
+				. "\n" . self::visual_brief( $canonical, $research, false, '' === (string) ( $brief['collage_lead'] ?? '' ) )
+				. self::collage_lead( $brief, $step );
 		}
 		return $prompt;
+	}
+
+	/**
+	 * What a step is told when the Facebook collage leads the recipe (ENGINE.md
+	 * §7, 50). The collage says what the dish is — every ingredient, garnish and
+	 * side it shows; the research says how much and how long. Empty otherwise.
+	 */
+	public static function collage_lead( $brief, $step ) {
+		$lead = (string) ( $brief['collage_lead'] ?? '' );
+		if ( '' === $lead ) { return ''; }
+		$reading = (array) ( $brief['collage'] ?? array() );
+		$whose = 'provided' === $lead ? "the editor's own step-by-step collage of this dish" : 'a step-by-step collage of this dish, drawn before this recipe';
+		$seen = array_intersect_key( $reading, array_flip( array( 'panels', 'ingredients_seen', 'garnish_and_sides', 'finished_dish', 'serving' ) ) );
+		$encoded = json_encode( $seen, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+		if ( 'canonical_recipe' === $step ) {
+			return "\nTHE COLLAGE — this recipe is written from " . $whose . '. What it shows is the dish: ' . $encoded
+				. "\nEvery ingredient it shows, and every garnish and side it is served with, is in the recipe's ingredient list — a garnish as an ingredient \"pour servir\"; its steps follow the order of the panels and its equipment names the vessels they show. This overrides any instruction to list only what the research names. What the collage never decides is how much: the quantities, times, temperatures and food-safety rules come from the research, and for an ingredient the research does not measure, the usual quantity a home cook would use. A collage shows a kitchen, not a weighing: never count what a panel shows.\n";
+		}
+		if ( 'article' === $step ) {
+			return "\nTHE DISH AS ITS COLLAGE SHOWS IT — the recipe was written from " . $whose . ', and the article describes the same dish: '
+				. json_encode( array_intersect_key( $reading, array_flip( array( 'finished_dish', 'serving', 'garnish_and_sides' ) ) ), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES )
+				. "\nWhere the article says what the finished dish looks like or how it is served, this is it. Its garnish and sides are part of the recipe.\n";
+		}
+		if ( 'final_approval' === $step ) {
+			if ( 'provided' === $lead ) {
+				return "\nTHE COLLAGE IS THE EDITOR'S OWN and is the reference this recipe was written from. Do not judge it: give it \"good\" with no finding. Judge the featured image, and whether it shows the same dish as the collage's last panel — same food, filling and colour; the plate, angle, light and garnish may differ.\n";
+			}
+			return "\nTHE COLLAGE WAS DRAWN FIRST, and the recipe was written from it. Judge the collage as a photograph and as a sequence (checks 1 and 4) — never against the ingredient list: every ingredient, herb, garnish, side, drink or prop a home cook would use is expected in it, and an ingredient the recipe lacks is not a finding. The featured image must show the same dish as the collage's last panel; the plate, angle, light and garnish may differ.\n";
+		}
+		return '';
 	}
 
 	/** Heading texts of an article body. */

@@ -172,6 +172,22 @@ final class MSRWA_Screen_Batch {
 						<?php $why = self::reason( $pair ); ?>
 						<?php if ( '' !== $why ) : ?><span class="ms-pair-reason"><?php echo esc_html( $why ); ?></span><?php endif; ?></p>
 					<p class="ms-pair-file"><?php echo esc_html( MSRWA_Sources::label( $image ) ); ?></p>
+					<?php if ( ! empty( $image['collage'] ) ) : ?>
+						<?php
+						// A collage the writer made becomes the recipe's Facebook image and its
+						// reference; unticked, it is an ordinary photograph and a collage is drawn.
+						$kept = empty( $image['collage_off'] );
+						?>
+						<?php if ( $settling ) : ?>
+							<label class="ms-pair-collage">
+								<input type="checkbox" class="ms-pair-collage-use" data-image="<?php echo esc_attr( $index ); ?>" <?php checked( $kept ); ?>>
+								<span><strong><?php esc_html_e( 'Votre collage Facebook', 'ms-recipes-writer-ai' ); ?></strong>
+								<small><?php esc_html_e( 'Publié tel quel avec l’article, et référence de la recette, de l’article et de l’image à la une. Décoché, il sert de simple photographie et un nouveau collage est dessiné.', 'ms-recipes-writer-ai' ); ?></small></span>
+							</label>
+						<?php elseif ( $kept ) : ?>
+							<p class="ms-pair-collage"><span class="dashicons dashicons-images-alt2" aria-hidden="true"></span> <strong><?php esc_html_e( 'Votre collage Facebook', 'ms-recipes-writer-ai' ); ?></strong></p>
+						<?php endif; ?>
+					<?php endif; ?>
 				</div>
 				<div class="ms-pair-pick">
 					<?php if ( $settling ) : ?>

@@ -22,8 +22,14 @@ final class MSRWA_Engine_Steps {
 	public static function all( $overrides = array() ) {
 		$steps = self::shipped();
 		foreach ( (array) $overrides as $name => $changes ) {
-			if ( ! is_array( $changes ) ) { continue; }
+			if ( ! is_array( $changes ) || '_order' === $name ) { continue; }
 			$steps[ $name ] = isset( $steps[ $name ] ) ? array_merge( $steps[ $name ], $changes ) : array_merge( self::blank(), $changes );
+		}
+		// A step a caller adds lands last unless the caller says where.
+		if ( ! empty( $overrides['_order'] ) && is_array( $overrides['_order'] ) ) {
+			$ordered = array();
+			foreach ( $overrides['_order'] as $name ) { if ( isset( $steps[ $name ] ) ) { $ordered[ $name ] = $steps[ $name ]; } }
+			$steps = $ordered + $steps;
 		}
 		return $steps;
 	}
@@ -93,6 +99,44 @@ final class MSRWA_Engine_Steps {
 			),
 		);
 	}
+
+	/**
+	 * The registry when the Facebook collage leads the recipe (ENGINE.md §7, 50).
+	 *
+	 * `drawn`: the collage is drawn right after the research, freely, and read
+	 * panel by panel; the recipe, the article and the featured image then follow
+	 * what it shows. `provided`: the editor's own collage stands in for the
+	 * drawing (see skipped()) and is read the same way. Anything else leaves
+	 * the registry as it is — the recipe first, the images drawn from it.
+	 */
+	public static function for_lead( array $overrides, $lead ) {
+		if ( ! in_array( $lead, array( 'drawn', 'provided' ), true ) ) { return $overrides; }
+		$steps = self::all( $overrides );
+		$set = static function ( $name, array $changes ) use ( &$overrides ) {
+			$overrides[ $name ] = array_merge( (array) ( $overrides[ $name ] ?? array() ), $changes );
+		};
+		$set( 'facebook_image', array( 'needs' => array( 'research' ) ) );
+		$set( 'collage_reading', array(
+			'label' => 'Lecture du collage', 'bucket' => 'facebook', 'capability' => 'read', 'prompt' => 'collage_reading.tpl.txt',
+			'needs' => array( 'facebook' ), 'produces' => 'collage',
+			'expects' => 'what each panel of the collage shows: ingredients, garnish, stages and the finished dish',
+		) );
+		$with = static function ( $name ) use ( $steps ) { return array_values( array_unique( array_merge( (array) ( $steps[ $name ]['needs'] ?? array() ), array( 'collage' ) ) ) ); };
+		foreach ( array( 'canonical_recipe', 'article', 'featured_image' ) as $name ) { $set( $name, array( 'needs' => $with( $name ) ) ); }
+		// Registered after the collage and before the recipe, so a list of the
+		// steps reads in the order they run.
+		$ordered = array();
+		foreach ( array_keys( self::all( $overrides ) ) as $name ) {
+			if ( 'collage_reading' === $name ) { continue; }
+			if ( 'canonical_recipe' === $name ) { $ordered['collage_reading'] = true; }
+			$ordered[ $name ] = true;
+		}
+		$overrides['_order'] = array_keys( $ordered );
+		return $overrides;
+	}
+
+	/** The steps a lead leaves out: the editor's own collage is not drawn again. */
+	public static function skipped( $lead ) { return 'provided' === $lead ? array( 'facebook_image' ) : array(); }
 
 	public static function names( $overrides = array() ) { return array_keys( self::all( $overrides ) ); }
 

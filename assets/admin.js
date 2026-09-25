@@ -457,10 +457,15 @@
   function pairs(creating) {
     return Array.prototype.map.call(document.querySelectorAll('.ms-pair-choice'), function (select) {
       var image = parseInt(select.dataset.image, 10);
-      if (creating && creating.image === image) { return { image: image, recipe: 'new', title: creating.title }; }
-      if ('aside' === select.value) { return { image: image, recipe: 'aside' }; }
-      if ('' === select.value || 'new' === select.value) { return { image: image, recipe: null }; }
-      return { image: image, recipe: parseInt(select.value, 10) };
+      var pair;
+      if (creating && creating.image === image) { pair = { image: image, recipe: 'new', title: creating.title }; }
+      else if ('aside' === select.value) { pair = { image: image, recipe: 'aside' }; }
+      else if ('' === select.value || 'new' === select.value) { pair = { image: image, recipe: null }; }
+      else { pair = { image: image, recipe: parseInt(select.value, 10) }; }
+      // A collage the writer made: kept as the recipe's Facebook image, or not.
+      var collage = document.querySelector('.ms-pair-collage-use[data-image="' + image + '"]');
+      if (collage) { pair.collage = collage.checked; }
+      return pair;
     });
   }
 
@@ -521,6 +526,13 @@
       else if (status.dataset.pending) { status.textContent = ''; delete status.dataset.pending; }
     }
   }
+
+  document.querySelectorAll('.ms-pair-collage-use').forEach(function (box) {
+    box.addEventListener('change', function () {
+      say(batchStatus, t.saving || '');
+      savePairs().then(function () { say(batchStatus, t.saved || ''); }).catch(function (error) { say(batchStatus, error.message); });
+    });
+  });
 
   document.querySelectorAll('.ms-pair-choice').forEach(function (select) {
     var row = select.closest('.ms-pair');
