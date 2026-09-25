@@ -2242,3 +2242,30 @@ msgstr "المُنفَق"
 #. translators: 1: whole hours, 2: remaining minutes.
 msgid "%1$d h %2$d min"
 msgstr "%1$d س %2$d د"
+
+msgid "%1$s dépensés pour %2$d recette(s), soit %3$s par jour en moyenne. Chaque somme compte le jour où elle a été dépensée."
+msgstr "أُنفق %1$s على %2$d وصفة، أي %3$s يوميًا في المتوسط. يُحتسب كل مبلغ في اليوم الذي أُنفق فيه."
+
+msgid "%d autre contrôle, en échec plus rarement"
+msgid_plural "%d autres contrôles, en échec plus rarement"
+msgstr[0] "لا فحوص أخرى"
+msgstr[1] "فحص آخر يفشل أقل"
+msgstr[2] "فحصان آخران يفشلان أقل"
+msgstr[3] "%d فحوص أخرى تفشل أقل"
+msgstr[4] "%d فحصًا آخر يفشل أقل"
+msgstr[5] "%d فحص آخر يفشل أقل"
+
+msgid "Dépense par jour sur quatorze jours"
+msgstr "الإنفاق اليومي على مدى أربعة عشر يومًا"
+
+msgid "Voir les chiffres"
+msgstr "عرض الأرقام"
+
+msgid "plafond du jour %s"
+msgstr "السقف اليومي %s"
+
+msgid "Ce qui a été dépensé face à chaque plafond, lectures de photographies et nouveaux dessins compris. Un lot qui le dépasserait est refusé avant de partir."
+msgstr "ما أُنفق مقابل كل سقف، بما في ذلك قراءة الصور وإعادة الرسم. تُرفض الدفعة التي قد تتجاوزه قبل انطلاقها."
+
+msgid "Plafonds du site"
+msgstr "سقوف الموقع"

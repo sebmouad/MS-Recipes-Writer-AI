@@ -43,7 +43,7 @@
   // Where the money goes: each segment says what it is and how much, on hover
   // or keyboard focus. Nothing is lost without it: the table below has it all.
   (function () {
-    var bars = document.querySelectorAll('.ms-split-bar [data-tip]');
+    var bars = document.querySelectorAll('.ms-split-bar [data-tip], .ms-columns [data-tip]');
     if (!bars.length) return;
     var tip = document.createElement('div');
     tip.className = 'ms-split-tip';

@@ -2202,3 +2202,26 @@ msgstr "spent"
 #. translators: 1: whole hours, 2: remaining minutes.
 msgid "%1$d h %2$d min"
 msgstr "%1$d h %2$d min"
+
+msgid "%1$s dépensés pour %2$d recette(s), soit %3$s par jour en moyenne. Chaque somme compte le jour où elle a été dépensée."
+msgstr "%1$s spent on %2$d recipe(s), %3$s a day on average. Each amount counts on the day it was spent."
+
+msgid "%d autre contrôle, en échec plus rarement"
+msgid_plural "%d autres contrôles, en échec plus rarement"
+msgstr[0] "%d other check, failing less often"
+msgstr[1] "%d other checks, failing less often"
+
+msgid "Dépense par jour sur quatorze jours"
+msgstr "Spend per day over fourteen days"
+
+msgid "Voir les chiffres"
+msgstr "See the figures"
+
+msgid "plafond du jour %s"
+msgstr "daily ceiling %s"
+
+msgid "Ce qui a été dépensé face à chaque plafond, lectures de photographies et nouveaux dessins compris. Un lot qui le dépasserait est refusé avant de partir."
+msgstr "What was spent against each ceiling, photograph reading and redraws included. A lot that would cross one is refused before it starts."
+
+msgid "Plafonds du site"
+msgstr "Site ceilings"

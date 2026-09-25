@@ -169,13 +169,26 @@ final class MSRWA_Ledger {
 	public static function by_day( $days = 14 ) {
 		global $wpdb;
 		$t = self::tables();
-		$scope = MSRWA_Rights::scope_sql( 'r.owner_id' );
-
-		return (array) $wpdb->get_results( $wpdb->prepare(
-			"SELECT DATE(r.created_at) day, COUNT(*) runs, SUM(r.cost_usd) spend, AVG(r.seconds) seconds
-			FROM {$t['runs']} r
-			WHERE {$scope} AND r.created_at >= DATE_SUB(UTC_TIMESTAMP(), INTERVAL %d DAY)
-			GROUP BY DATE(r.created_at) ORDER BY day ASC", max( 1, (int) $days ) ), ARRAY_A );
+		$window = max( 1, (int) $days );
+		// Money by the day it was spent, from the spending lines (pairings and
+		// redraws included); recipes by the day they were created.
+		$spend = (array) $wpdb->get_results( $wpdb->prepare(
+			"SELECT DATE(x.created_at) day, SUM(x.cost_usd) spend FROM {$t['spend']} x
+			WHERE " . MSRWA_Rights::scope_sql( 'x.owner_id' ) . " AND x.created_at >= DATE_SUB(UTC_TIMESTAMP(), INTERVAL %d DAY)
+			GROUP BY DATE(x.created_at)", $window ), ARRAY_A );
+		$runs = (array) $wpdb->get_results( $wpdb->prepare(
+			"SELECT DATE(r.created_at) day, COUNT(*) runs FROM {$t['runs']} r
+			WHERE " . MSRWA_Rights::scope_sql( 'r.owner_id' ) . " AND r.created_at >= DATE_SUB(UTC_TIMESTAMP(), INTERVAL %d DAY)
+			GROUP BY DATE(r.created_at)", $window ), ARRAY_A );
+		$days_seen = array();
+		foreach ( $spend as $row ) { if ( empty( $row['day'] ) ) { continue; } $days_seen[ (string) $row['day'] ] = array( 'day' => (string) $row['day'], 'runs' => 0, 'spend' => (float) $row['spend'] ); }
+		foreach ( $runs as $row ) {
+			if ( empty( $row['day'] ) ) { continue; }
+			$day = (string) $row['day'];
+			$days_seen[ $day ] = array( 'day' => $day, 'runs' => (int) $row['runs'], 'spend' => (float) ( $days_seen[ $day ]['spend'] ?? 0 ) );
+		}
+		ksort( $days_seen );
+		return array_values( $days_seen );
 	}
 
 	/**

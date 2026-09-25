@@ -211,7 +211,35 @@ final class MSRWA_Screen_Analysis {
 		) );
 
 		if ( $verdicts['targets'] ) {
-			echo '<table class="ms-table" style="margin-top:16px"><thead><tr><th>' . esc_html__( 'Artefact', 'ms-recipes-writer-ai' ) . '</th><th>' . esc_html__( 'Verdicts', 'ms-recipes-writer-ai' ) . '</th></tr></thead><tbody>';
+			// One bar per thing judged, split good / reservations / bad in the
+			// status colours, each part labelled: how often the judge objects to
+			// each image, at a glance.
+			$names = array(
+				'article' => __( 'article', 'ms-recipes-writer-ai' ), 'featured_image' => __( 'image à la une', 'ms-recipes-writer-ai' ),
+				'facebook_image' => __( 'collage', 'ms-recipes-writer-ai' ), 'consistency' => __( 'cohérence', 'ms-recipes-writer-ai' ),
+			);
+			echo '<div class="ms-split" style="margin-top:18px"><ul class="ms-split-legend">';
+			foreach ( array( 'good', 'reservations', 'bad' ) as $verdict ) {
+				echo '<li><i class="ms-verdict-' . esc_attr( MSRWA_UI::verdict_tone( $verdict ) ) . '"></i>' . esc_html( MSRWA_UI::verdict_word( $verdict ) ) . '</li>';
+			}
+			echo '</ul>';
+			foreach ( $verdicts['targets'] as $target => $counts ) {
+				$all = max( 1, array_sum( $counts ) );
+				echo '<div class="ms-split-row"><span>' . esc_html( $names[ $target ] ?? $target ) . '</span><div class="ms-split-bar ms-verdict-bar">';
+				foreach ( array( 'good', 'reservations', 'bad' ) as $verdict ) {
+					if ( empty( $counts[ $verdict ] ) ) { continue; }
+					$share = 100 * (int) $counts[ $verdict ] / $all;
+					$word = MSRWA_UI::verdict_word( $verdict );
+					echo '<div class="ms-verdict-' . esc_attr( MSRWA_UI::verdict_tone( $verdict ) ) . '" style="--w:' . esc_attr( number_format( $share, 2, '.', '' ) ) . '%" tabindex="0"'
+						. ' data-tip-title="' . esc_attr( $names[ $target ] ?? $target ) . '" data-tip="' . esc_attr( $word . ' : ' . (int) $counts[ $verdict ] . ' · ' . round( $share ) . ' %' ) . '"'
+						. ' aria-label="' . esc_attr( $word . ' ' . (int) $counts[ $verdict ] ) . '">'
+						. ( $share >= 6 ? '<em>' . esc_html( (string) (int) $counts[ $verdict ] ) . '</em>' : '' ) . '</div>';
+				}
+				echo '</div><strong>' . esc_html( round( 100 * (int) ( $counts['good'] ?? 0 ) / $all ) . ' %' ) . '</strong></div>';
+			}
+			echo '</div>';
+			echo '<details class="ms-fold ms-fold-inline"><summary>' . esc_html__( 'Voir les chiffres', 'ms-recipes-writer-ai' ) . '</summary>';
+			echo '<table class="ms-table" style="margin-top:8px"><thead><tr><th>' . esc_html__( 'Artefact', 'ms-recipes-writer-ai' ) . '</th><th>' . esc_html__( 'Verdicts', 'ms-recipes-writer-ai' ) . '</th></tr></thead><tbody>';
 			$targets = array(
 				'article' => __( 'article', 'ms-recipes-writer-ai' ), 'featured_image' => __( 'image à la une', 'ms-recipes-writer-ai' ),
 				'facebook_image' => __( 'collage', 'ms-recipes-writer-ai' ), 'consistency' => __( 'cohérence', 'ms-recipes-writer-ai' ),
@@ -223,7 +251,7 @@ final class MSRWA_Screen_Analysis {
 				foreach ( $counts as $verdict => $count ) { echo '<span class="ms-state ms-state-' . esc_attr( MSRWA_UI::verdict_tone( (string) $verdict ) ) . '">' . esc_html( MSRWA_UI::verdict_word( (string) $verdict ) . ' × ' . $count ) . '</span> '; }
 				echo '</td></tr>';
 			}
-			echo '</tbody></table>';
+			echo '</tbody></table></details>';
 		}
 		echo '</section>';
 	}
@@ -243,12 +271,14 @@ final class MSRWA_Screen_Analysis {
 			. '<th class="ms-num">' . esc_html__( 'Score', 'ms-recipes-writer-ai' ) . '</th>'
 			. '<th class="ms-num">' . esc_html__( 'Échecs', 'ms-recipes-writer-ai' ) . '</th>'
 			. '</tr></thead><tbody>';
+		$all = max( 0.000001, array_sum( array_map( static function ( $row ) { return (float) $row['spend']; }, $rows ) ) );
 		foreach ( $rows as $row ) {
+			$share = (int) round( 100 * (float) $row['spend'] / $all );
 			echo '<tr><td><strong>' . esc_html( MSRWA_UI::step_name( (string) $row['step'] ) ) . '</strong> <span class="ms-key">' . esc_html( $row['step'] ) . '</span></td>'
 				. '<td class="ms-num">' . esc_html( $row['runs'] ) . '</td>'
 				. '<td class="ms-num">' . esc_html( MSRWA_I18N::seconds( $row['seconds'] ) ) . '</td>'
 				. '<td class="ms-num">' . esc_html( null === $row['cost'] ? '—' : MSRWA_I18N::money( $row['cost'] ) ) . '</td>'
-				. '<td class="ms-num">' . esc_html( MSRWA_I18N::money( $row['spend'], 2 ) ) . '</td>'
+				. '<td class="ms-num">' . esc_html( MSRWA_I18N::money( $row['spend'], 2 ) ) . ( $share > 0 ? '<span class="ms-costbar" style="--share:' . (int) $share . '%" title="' . esc_attr( $share . ' %' ) . '"></span>' : '' ) . '</td>'
 				. '<td class="ms-num">' . esc_html( number_format_i18n( round( (float) $row['input_tokens'] ) ) ) . '</td>'
 				. '<td class="ms-num">' . esc_html( number_format_i18n( round( (float) $row['output_tokens'] ) ) ) . '</td>'
 				. '<td class="ms-num">' . esc_html( null === $row['score'] ? '—' : round( 100 * (float) $row['score'] ) . ' %' ) . '</td>'
@@ -303,12 +333,19 @@ final class MSRWA_Screen_Analysis {
 			. '<th>' . esc_html__( 'Étape', 'ms-recipes-writer-ai' ) . '</th><th>' . esc_html__( 'Contrôle', 'ms-recipes-writer-ai' ) . '</th>'
 			. '<th class="ms-num">' . esc_html__( 'Échecs', 'ms-recipes-writer-ai' ) . '</th><th class="ms-num">' . esc_html__( 'Sur', 'ms-recipes-writer-ai' ) . '</th>'
 			. '<th class="ms-num">' . esc_html__( 'Taux', 'ms-recipes-writer-ai' ) . '</th></tr></thead><tbody>';
-		foreach ( $rows as $row ) {
+		// The ten that fail most; the long tail of one-offs is folded below.
+		foreach ( array_values( $rows ) as $index => $row ) {
+			if ( 10 === $index ) {
+				echo '</tbody></table></div><details class="ms-fold ms-fold-inline"><summary>' . esc_html( sprintf(
+					/* translators: %d is a number of checks. */
+					_n( '%d autre contrôle, en échec plus rarement', '%d autres contrôles, en échec plus rarement', count( $rows ) - 10, 'ms-recipes-writer-ai' ), count( $rows ) - 10 ) ) . '</summary><div class="ms-scroll"><table class="ms-table"><tbody>';
+			}
+			$rate = (int) round( 100 * $row['failed'] / max( 1, $row['seen'] ) );
 			echo '<tr><td>' . esc_html( MSRWA_UI::step_name( (string) $row['step'] ) ) . '</td><td class="ms-key">' . esc_html( $row['check'] ) . '</td>'
 				. '<td class="ms-num">' . esc_html( $row['failed'] ) . '</td><td class="ms-num">' . esc_html( $row['seen'] ) . '</td>'
-				. '<td class="ms-num">' . esc_html( round( 100 * $row['failed'] / max( 1, $row['seen'] ) ) . ' %' ) . '</td></tr>';
+				. '<td class="ms-num"><span class="ms-state ms-state-' . ( $rate >= 50 ? 'stop' : ( $rate >= 20 ? 'warn' : '' ) ) . '">' . esc_html( $rate . ' %' ) . '</span></td></tr>';
 		}
-		echo '</tbody></table></div></section>';
+		echo '</tbody></table></div>' . ( count( $rows ) > 10 ? '</details>' : '' ) . '</section>';
 	}
 
 	/** Spend per day, drawn as bars rather than a chart library nobody can audit. */
@@ -329,15 +366,41 @@ final class MSRWA_Screen_Analysis {
 			$peak = max( $peak, (float) ( $seen[ $day ]['spend'] ?? 0 ) );
 		}
 
+		// A column per day, the daily ceiling as a line across them when one is
+		// set: how close each day came is the question this answers.
+		$ceiling = (float) MSRWA_Budget::ceilings()['daily'];
+		$scale = max( $peak, $ceiling, 0.0001 );
+		$spent = array_sum( array_map( static function ( $row ) { return (float) $row['spend']; }, $rows ) );
+		$recipes = array_sum( array_map( static function ( $row ) { return (int) $row['runs']; }, $rows ) );
+		$last = count( $rows ) - 1;
+
 		echo '<section class="ms-card"><h2>' . esc_html__( 'Sur quatorze jours', 'ms-recipes-writer-ai' ) . '</h2>';
-		echo '<table class="ms-table ms-share"><tbody>';
-		foreach ( $rows as $row ) {
-			$share = $peak > 0 ? round( 100 * (float) $row['spend'] / $peak ) : 0;
-			echo '<tr' . ( $row['runs'] ? '' : ' class="ms-muted"' ) . '><td class="ms-key ms-share-label">' . esc_html( $row['day'] ) . '</td>'
-				. '<td class="ms-bar"><span class="ms-progress"><i style="inline-size:' . (int) $share . '%"></i></span></td>'
-				. '<td class="ms-num">' . esc_html( MSRWA_I18N::money( $row['spend'], 2 ) ) . '</td>'
-				. '<td class="ms-num">' . esc_html( sprintf( /* translators: %d is a count of recipes. */ _n( '%d recette', '%d recettes', (int) $row['runs'], 'ms-recipes-writer-ai' ), (int) $row['runs'] ) ) . '</td></tr>';
+		echo '<p>' . esc_html( sprintf(
+			/* translators: 1: an amount of money, 2: a number of recipes, 3: an amount of money. */
+			__( '%1$s dépensés pour %2$d recette(s), soit %3$s par jour en moyenne. Chaque somme compte le jour où elle a été dépensée.', 'ms-recipes-writer-ai' ),
+			MSRWA_I18N::money( $spent, 2 ), $recipes, MSRWA_I18N::money( $spent / 14, 2 )
+		) ) . '</p>';
+		echo '<div class="ms-columns" role="img" aria-label="' . esc_attr__( 'Dépense par jour sur quatorze jours', 'ms-recipes-writer-ai' ) . '">';
+		if ( $ceiling > 0 ) {
+			echo '<div class="ms-columns-limit" style="--at:' . esc_attr( number_format( 100 * $ceiling / $scale, 2, '.', '' ) ) . '%"><span>'
+				/* translators: %s is an amount of money. */
+				. esc_html( sprintf( __( 'plafond du jour %s', 'ms-recipes-writer-ai' ), MSRWA_I18N::money( $ceiling, 2 ) ) ) . '</span></div>';
 		}
-		echo '</tbody></table></section>';
+		foreach ( $rows as $index => $row ) {
+			$value = (float) $row['spend'];
+			$time = strtotime( $row['day'] . ' 12:00:00' );
+			$long = date_i18n( get_option( 'date_format' ), $time );
+			/* translators: %d is a count of recipes. */
+			$count = sprintf( _n( '%d recette', '%d recettes', (int) $row['runs'], 'ms-recipes-writer-ai' ), (int) $row['runs'] );
+			// Labels only where they carry weight: the busiest day, today, and
+			// any day over the ceiling.
+			$label = $value > 0 && ( $value === $peak || $index === $last || ( $ceiling > 0 && $value > $ceiling ) ) ? MSRWA_I18N::money( $value, 2 ) : '';
+			echo '<div class="ms-column' . ( $ceiling > 0 && $value > $ceiling ? ' ms-column-over' : '' ) . ( $index === $last ? ' ms-column-today' : '' ) . '" tabindex="0"'
+				. ' data-tip-title="' . esc_attr( $long ) . '" data-tip="' . esc_attr( MSRWA_I18N::money( $value, 2 ) . ' · ' . $count ) . '" aria-label="' . esc_attr( $long . ' : ' . MSRWA_I18N::money( $value, 2 ) . ', ' . $count ) . '">'
+				. '<span class="ms-column-value">' . esc_html( $label ) . '</span>'
+				. '<i style="--h:' . esc_attr( number_format( $value > 0 ? max( 1.5, 100 * $value / $scale ) : 0, 2, '.', '' ) ) . '%"></i>'
+				. '<small>' . esc_html( date_i18n( 'j', $time ) ) . '</small></div>';
+		}
+		echo '</div></section>';
 	}
 }

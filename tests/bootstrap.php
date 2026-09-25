@@ -71,6 +71,7 @@ if ( ! function_exists( 'wp_rand' ) ) { function wp_rand( $min = 0, $max = 1 ) {
 if ( ! function_exists( 'wp_generate_uuid4' ) ) { function wp_generate_uuid4() { return '00000000-0000-4000-8000-000000000000'; } }
 if ( ! function_exists( 'current_time' ) ) { function current_time( $type = 'mysql', $gmt = 0 ) { return 'timestamp' === $type ? 1789000000 : '2026-09-20 12:00:00'; } }
 if ( ! function_exists( 'number_format_i18n' ) ) { function number_format_i18n( $value, $decimals = 0 ) { return number_format( (float) $value, $decimals ); } }
+if ( ! function_exists( 'date_i18n' ) ) { function date_i18n( $format, $timestamp = false ) { return gmdate( (string) $format, false === $timestamp ? time() : (int) $timestamp ); } }
 if ( ! function_exists( 'human_time_diff' ) ) { function human_time_diff( $from, $to = 0 ) { return max( 0, (int) round( abs( $to - $from ) / 60 ) ) . ' min'; } }
 if ( ! function_exists( 'current_user_can' ) ) { function current_user_can( $capability ) { return in_array( $capability, (array) $GLOBALS['msrwa_test_caps'], true ); } }
 if ( ! function_exists( 'get_current_user_id' ) ) { function get_current_user_id() { return (int) $GLOBALS['msrwa_test_user']; } }

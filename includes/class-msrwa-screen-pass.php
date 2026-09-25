@@ -61,6 +61,7 @@ final class MSRWA_Screen_Pass {
 			);
 		}
 		MSRWA_UI::figures( $figures );
+		if ( $money ) { self::ceilings(); }
 
 		self::queue();
 		self::waiting();
@@ -199,5 +200,32 @@ final class MSRWA_Screen_Pass {
 			MSRWA_UI::ticket( $run, admin_url( 'admin.php?page=msrwa-run&run_id=' . (int) $run['id'] ) );
 		}
 		echo '</div></section>';
+	}
+
+	/**
+	 * How full each site ceiling is, as a gauge: spent against the ceiling,
+	 * green, then orange past four fifths, red once reached. Only the ceilings
+	 * the site set are drawn.
+	 */
+	private static function ceilings() {
+		$state = MSRWA_Budget::state();
+		$names = array( 'daily' => __( 'aujourd’hui', 'ms-recipes-writer-ai' ), 'monthly' => __( '30 jours', 'ms-recipes-writer-ai' ) );
+		$rows = '';
+		foreach ( $names as $key => $name ) {
+			$gauge = (array) ( $state[ $key ] ?? array() );
+			if ( empty( $gauge['ceiling'] ) ) { continue; }
+			$share = (int) $gauge['share'];
+			$tone = $gauge['exceeded'] ? 'stop' : ( $share >= 80 ? 'warn' : 'good' );
+			$rows .= '<div class="ms-split-row"><span>' . esc_html( $name ) . '</span>'
+				. '<div class="ms-gauge" role="meter" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' . esc_attr( (string) $share ) . '" aria-label="' . esc_attr( $name ) . '"><i class="ms-gauge-' . esc_attr( $tone ) . '" style="--w:' . esc_attr( (string) max( 1, $share ) ) . '%"></i></div>'
+				. '<strong>' . esc_html( sprintf(
+					/* translators: 1: spent, 2: the ceiling. */
+					__( '%1$s sur %2$s', 'ms-recipes-writer-ai' ), MSRWA_I18N::money( $gauge['spent'], 2 ), MSRWA_I18N::money( $gauge['ceiling'], 2 )
+				) ) . '</strong></div>';
+		}
+		if ( '' === $rows ) { return; }
+		echo '<section class="ms-card"><h2>' . esc_html__( 'Plafonds du site', 'ms-recipes-writer-ai' ) . '</h2>'
+			. '<p>' . esc_html__( 'Ce qui a été dépensé face à chaque plafond, lectures de photographies et nouveaux dessins compris. Un lot qui le dépasserait est refusé avant de partir.', 'ms-recipes-writer-ai' ) . '</p>'
+			. '<div class="ms-split ms-gauges">' . $rows . '</div></section>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- built from escaped parts above.
 	}
 }
