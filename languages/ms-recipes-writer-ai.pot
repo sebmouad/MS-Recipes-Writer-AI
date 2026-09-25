@@ -401,6 +401,10 @@ msgstr ""
 msgid "Avec le routage actuel, une recette complète est estimée à %1$s, et jusqu’à %2$s si l’approbation finale refuse à chaque tentative. Un plafond sous la première valeur refuse le lot au lancement ; sous la seconde, il arrête les nouvelles tentatives avant de le franchir, et la recette se termine avec le dernier verdict."
 msgstr ""
 
+#: class-msrwa-screen-run.php:302
+msgid "Avertissement"
+msgstr ""
+
 #: class-msrwa-editor.php:109 class-msrwa-editor.php:183
 msgid "Bloquant"
 msgstr ""
@@ -791,6 +795,10 @@ msgstr ""
 
 #: class-msrwa-schedule.php:32
 msgid "Décidez d’abord du sort de chaque photographie."
+msgstr ""
+
+#: class-msrwa-screen-run.php:303
+msgid "Décision"
 msgstr ""
 
 #: class-msrwa-screen-compose.php:117
@@ -1469,6 +1477,10 @@ msgstr ""
 
 #: class-msrwa-admin.php:61 class-msrwa-screen-articles.php:39 class-msrwa-screen-articles.php:80 class-msrwa-screen-compose.php:19 class-msrwa-screen-pass.php:33 class-msrwa-screen-pass.php:193
 msgid "Nouveau lot"
+msgstr ""
+
+#: class-msrwa-screen-run.php:303
+msgid "Nouvel essai"
 msgstr ""
 
 #: class-msrwa-screen-batch.php:169
@@ -2755,6 +2767,10 @@ msgstr ""
 
 #: class-msrwa-screen-batch.php:183
 msgid "Écarter cette photographie"
+msgstr ""
+
+#: class-msrwa-screen-run.php:302
+msgid "Échec"
 msgstr ""
 
 #: class-msrwa-screen-analysis.php:198 class-msrwa-screen-analysis.php:248 class-msrwa-screen-articles.php:174

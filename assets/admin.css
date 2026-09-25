@@ -360,6 +360,17 @@
 
 .ms-timeline { display: grid; font-size: 13px; }
 .ms-timeline > div { display: grid; grid-template-columns: 78px 132px minmax(0, 1fr); gap: 14px; padding: 8px 0; border-block-end: 1px solid var(--ms-line-soft); }
+.ms-timeline > div { border-inline-start: var(--ms-rail) solid transparent; padding-inline-start: 10px; }
+.ms-timeline .ms-ev-error { border-inline-start-color: var(--ms-stop); background: var(--ms-stop-soft); }
+.ms-timeline .ms-ev-warning, .ms-timeline .ms-ev-retry { border-inline-start-color: var(--ms-lamp); background: var(--ms-warn-soft); }
+.ms-timeline .ms-ev-decision { border-inline-start-color: var(--ms-warn); background: var(--ms-lamp-soft); }
+.ms-timeline .ms-ev-observe { border-inline-start-color: var(--ms-live); }
+.ms-timeline .ms-ev-wave, .ms-timeline .ms-ev-step { border-inline-start-color: var(--ms-ink-faint); }
+.ms-timeline .ms-ev-start, .ms-timeline .ms-ev-finish { border-inline-start-color: var(--ms-good); }
+.ms-timeline .ms-ev-attempt, .ms-timeline .ms-ev-input, .ms-timeline .ms-ev-call, .ms-timeline .ms-ev-config { color: var(--ms-ink-faint); }
+.ms-ev-flag { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; }
+.ms-ev-error .ms-ev-flag { color: var(--ms-stop); }
+.ms-ev-warning .ms-ev-flag, .ms-ev-retry .ms-ev-flag, .ms-ev-decision .ms-ev-flag { color: var(--ms-warn); }
 .ms-timeline time, .ms-timeline .ms-key { font-family: var(--ms-mono); font-size: 12px; color: var(--ms-ink-faint); font-variant-numeric: tabular-nums; }
 
 /* --- Checks ------------------------------------------------------------

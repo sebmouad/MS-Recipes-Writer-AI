@@ -297,10 +297,16 @@ final class MSRWA_Screen_Run {
 	private static function timeline( array $events ) {
 		if ( ! $events ) { return; }
 		echo '<section class="ms-card"><h2>' . esc_html__( 'Déroulé', 'ms-recipes-writer-ai' ) . '</h2><div class="ms-timeline">';
+		// One colour per kind of event, so a failure or a warning is seen from afar.
+		$flags = array(
+			'error' => __( 'Échec', 'ms-recipes-writer-ai' ), 'warning' => __( 'Avertissement', 'ms-recipes-writer-ai' ),
+			'retry' => __( 'Nouvel essai', 'ms-recipes-writer-ai' ), 'decision' => __( 'Décision', 'ms-recipes-writer-ai' ),
+		);
 		foreach ( $events as $event ) {
-			echo '<div><time>' . esc_html( MSRWA_I18N::seconds( $event['at'] ) ) . '</time>'
+			$kind = sanitize_html_class( (string) ( $event['kind'] ?? '' ) );
+			echo '<div class="ms-ev-' . esc_attr( $kind ) . '"><time>' . esc_html( MSRWA_I18N::seconds( $event['at'] ) ) . '</time>'
 				. '<span class="ms-key">' . esc_html( $event['step'] ) . '</span>'
-				. '<span>' . esc_html( $event['message'] ) . '</span></div>';
+				. '<span>' . ( isset( $flags[ $kind ] ) ? '<b class="ms-ev-flag">' . esc_html( $flags[ $kind ] ) . '</b> ' : '' ) . esc_html( $event['message'] ) . '</span></div>';
 		}
 		echo '</div></section>';
 	}

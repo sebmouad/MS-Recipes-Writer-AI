@@ -356,23 +356,27 @@ function report_corrections( $corrected ) {
 	$pending = (array) ( $corrected['corrections_for_the_editor'] ?? array() );
 	if ( ! $applied && ! $pending ) { return '<p class="muted">La vérification des faits n’a demandé aucune correction.</p>'; }
 
+	$card = static function ( $row, $tone ) {
+		$after = trim( (string) ( $row['after'] ?? '' ) );
+		$quoted = (string) ( $row['quoted'] ?? '' );
+		return '<article class="finding ' . $tone . '"><div class="diff"><del>' . report_h( $row['before'] ?? '' ) . '</del>'
+			. ( '' === $after ? '<p><span class="pill neutral">Passage supprimé</span></p>' : '<ins>' . report_h( $after ) . '</ins>' ) . '</div>'
+			. ( '' !== $quoted && $quoted !== ( $row['before'] ?? '' ) ? '<p class="muted small">La relecture citait : « ' . report_h( $quoted ) . ' » — retrouvé dans l’article sous la forme ci-dessus.</p>' : '' )
+			. ( '' !== (string) ( $row['reason'] ?? '' ) ? '<p><span class="finding-label">Pourquoi</span> ' . report_h( $row['reason'] ) . '</p>' : '' )
+			. ( empty( $row['source'] ) ? '' : '<p class="muted small">Source : ' . report_link( $row['source'] ) . '</p>' )
+			. '</article>';
+	};
 	$html = '';
-	foreach ( array(
-		array( $applied, 'Appliquées automatiquement', 'La phrase citée a été remplacée mot pour mot. Aucun modèle n’est intervenu.', 'ok' ),
-		array( $pending, 'À appliquer à la main', 'La phrase citée est introuvable telle quelle dans le HTML — une balise la coupe. À vous de décider.', 'warn' ),
-	) as $group ) {
-		list( $rows, $title, $note, $tone ) = $group;
-		$html .= '<h3 class="finding-title">' . report_h( $title ) . ' <span class="pill ' . ( $rows ? $tone : 'ok' ) . '">' . count( $rows ) . '</span></h3>';
-		if ( ! $rows ) { $html .= '<p class="muted">Aucune.</p>'; continue; }
-		$html .= '<p class="muted">' . report_h( $note ) . '</p><div class="findings">';
-		foreach ( $rows as $row ) {
-			$html .= '<article class="finding"><blockquote class="finding-quote">' . report_h( $row['before'] ?? '' ) . '</blockquote>'
-				. '<p><span class="finding-label">Remplacée par</span> ' . report_h( $row['after'] ?? '' ) . '</p>'
-				. '<p><span class="finding-label">Pourquoi</span> ' . report_h( $row['reason'] ?? '' ) . '</p>'
-				. ( empty( $row['source'] ) ? '' : '<p class="muted">Source : ' . report_link( $row['source'] ) . '</p>' )
-				. '</article>';
-		}
-		$html .= '</div>';
+	if ( $pending ) {
+		$cards = '';
+		foreach ( $pending as $row ) { $cards .= $card( $row, 'blocking' ); }
+		$html .= '<h3 class="finding-title">À appliquer à la main <span class="pill warn">' . count( $pending ) . '</span></h3>'
+			. '<p class="muted">Ces phrases ne figurent pas dans l’article, même en tolérant une apostrophe, une majuscule ou une lettre de travers : la relecture a cité un texte qui n’y est pas. À vous de décider.</p><div class="findings">' . $cards . '</div>';
+	}
+	if ( $applied ) {
+		$cards = '';
+		foreach ( $applied as $row ) { $cards .= $card( $row, 'done' ); }
+		$html .= report_fold( count( $applied ) . ' correction(s) appliquée(s) automatiquement — sans modèle, phrase par phrase', '<div class="findings">' . $cards . '</div>', ! $pending && count( $applied ) <= 3 );
 	}
 	return $html;
 }
@@ -403,8 +407,14 @@ function report_review( $review, $proofread ) {
 		: 'La correction de la langue n’a pas eu lieu : ces constats restent à traiter par l’éditeur.' ) . '</p>';
 	if ( $changes ) {
 		$rows = '';
-		foreach ( $changes as $change ) { $rows .= '<div class="list-item"><p class="muted">' . report_h( $change['type'] ?? '' ) . '</p><p><del>' . report_h( $change['before'] ?? '' ) . '</del></p><p><ins>' . report_h( $change['after'] ?? '' ) . '</ins></p></div>'; }
+		foreach ( $changes as $change ) { $rows .= '<div class="list-item"><span class="pill neutral">' . report_h( report_label( (string) ( $change['type'] ?? '' ) ) ) . '</span><div class="diff"><del>' . report_h( $change['before'] ?? '' ) . '</del><ins>' . report_h( $change['after'] ?? '' ) . '</ins></div></div>'; }
 		$html .= report_fold( 'Ce que la relecture a changé', '<div class="list">' . $rows . '</div>' );
+	}
+	$skipped = array_values( array_filter( (array) ( ( is_array( $proofread ) ? $proofread : array() )['changes_not_applied'] ?? array() ), 'is_array' ) );
+	if ( $skipped ) {
+		$rows = '';
+		foreach ( $skipped as $change ) { $rows .= '<div class="list-item"><div class="diff"><del>' . report_h( $change['before'] ?? '' ) . '</del><ins>' . report_h( $change['after'] ?? '' ) . '</ins></div></div>'; }
+		$html .= report_fold( count( $skipped ) . ' changement(s) de langue non appliqué(s) — introuvable(s) ou touchant un chiffre', '<div class="list">' . $rows . '</div>' );
 	}
 	return $html;
 }
@@ -457,18 +467,87 @@ function report_scorecards( $steps ) {
 	return $html;
 }
 
-/** What the run did, second by second: waves, retries, warnings and failures. */
-function report_timeline( $events ) {
-	$rows = '';
-	foreach ( (array) $events as $event ) {
-		// The call and input detail have their own tables; the timeline is the story.
-		if ( in_array( $event['kind'], array( 'start', 'attempt', 'call', 'input', 'config' ), true ) ) { continue; }
-		$tone = array( 'error' => 'bad', 'retry' => 'warn', 'warning' => 'warn', 'decision' => 'warn' );
-		$rows .= '<div><dt><span class="pill ' . ( $tone[ $event['kind'] ] ?? 'ok' ) . '">' . report_h( $event['kind'] ) . '</span> ' . report_h( $event['at'] ) . ' s</dt><dd>' . report_h( $event['message'] ) . '</dd></div>';
-	}
-	return '<dl class="data">' . $rows . '</dl>';
+/**
+ * What each kind of event means, and its colour. The story — waves, steps,
+ * readings, retries, warnings, decisions, failures — shows by default; the
+ * plumbing (attempts, calls, inputs, configuration) is one click away.
+ */
+function report_event_kinds() {
+	return array(
+		'error'    => array( 'Échec', 'bad', false ),
+		'warning'  => array( 'Avertissement', 'warn', false ),
+		'retry'    => array( 'Nouvel essai', 'warn', false ),
+		'decision' => array( 'Décision', 'violet', false ),
+		'observe'  => array( 'Lecture', 'teal', false ),
+		'wave'     => array( 'Vague', 'blue', false ),
+		'step'     => array( 'Étape', 'blue', false ),
+		'start'    => array( 'Début', 'ok', true ),
+		'finish'   => array( 'Fin', 'ok', false ),
+		'attempt'  => array( 'Essai', 'neutral', true ),
+		'input'    => array( 'Entrée', 'neutral', true ),
+		'call'     => array( 'Appel', 'neutral', true ),
+		'config'   => array( 'Configuration', 'neutral', true ),
+	);
 }
 
+/** What the run did, second by second, each kind in its own colour. */
+function report_timeline( $events ) {
+	$kinds = report_event_kinds();
+	$rows = '';
+	$counts = array();
+	foreach ( (array) $events as $event ) {
+		$kind = (string) ( $event['kind'] ?? '' );
+		$meta = $kinds[ $kind ] ?? array( $kind, 'neutral', true );
+		$counts[ $kind ] = ( $counts[ $kind ] ?? 0 ) + 1;
+		$rows .= '<li class="ev ev-' . report_h( $meta[1] ) . ( $meta[2] ? ' ev-detail' : '' ) . '"><span class="ev-at">' . report_h( $event['at'] ?? '' ) . ' s</span>'
+			. '<span class="pill ' . report_h( $meta[1] ) . '">' . report_h( $meta[0] ) . '</span>'
+			. '<code class="ev-step">' . ( 'run' === (string) ( $event['step'] ?? '' ) ? '' : report_h( $event['step'] ?? '' ) ) . '</code>'
+			. '<span class="ev-msg">' . report_h( $event['message'] ?? '' ) . '</span></li>';
+	}
+	if ( '' === $rows ) { return '<p class="muted">Rien n’a été enregistré.</p>'; }
+	$legend = '';
+	foreach ( $kinds as $kind => $meta ) {
+		if ( ! empty( $counts[ $kind ] ) ) { $legend .= '<span class="pill ' . $meta[1] . '">' . report_h( $meta[0] ) . ' · ' . (int) $counts[ $kind ] . '</span> '; }
+	}
+	// The one script on the page: without it the details stay hidden, and the story still reads.
+	return '<div class="legend">' . $legend . '</div>'
+		. '<p><button type="button" class="toggle" onclick="var t=this.parentNode.nextElementSibling;t.classList.toggle(\'all\');this.textContent=t.classList.contains(\'all\')?\'Masquer les essais, appels et entrées\':\'Afficher aussi les essais, appels et entrées\'">Afficher aussi les essais, appels et entrées</button></p>'
+		. '<ol class="timeline">' . $rows . '</ol>';
+}
+
+/**
+ * What an editor must look at before publishing, gathered at the top so the
+ * report is read from its conclusions: failures, refused images, corrections
+ * that could not be applied, blocking review findings, warnings.
+ */
+function report_attention( array $run ) {
+	$artifacts = (array) ( $run['artifacts'] ?? array() );
+	$items = array();
+	$errors = count( (array) ( $run['errors'] ?? array() ) );
+	if ( $errors ) { $items[] = array( 'bad', sprintf( '%d étape(s) en échec.', $errors ), 'resume' ); }
+	$approval = (array) ( $artifacts['approval'] ?? array() );
+	foreach ( array( 'featured_image' => 'L’image à la une a été refusée', 'facebook_image' => 'Le collage a été refusé' ) as $key => $label ) {
+		if ( 'bad' === ( $approval[ $key ]['verdict'] ?? '' ) ) { $items[] = array( 'bad', $label . ' par l’approbation finale : à redessiner ou à accepter.', 'approbation' ); }
+	}
+	$pending = count( (array) ( $artifacts['corrected']['corrections_for_the_editor'] ?? array() ) );
+	if ( $pending ) { $items[] = array( 'warn', sprintf( '%d correction(s) factuelle(s) à appliquer à la main.', $pending ), 'revue' ); }
+	$skipped = count( (array) ( $artifacts['proofread']['changes_not_applied'] ?? array() ) );
+	if ( $skipped ) { $items[] = array( 'warn', sprintf( '%d changement(s) de langue non appliqué(s).', $skipped ), 'revue' ); }
+	$serious = 0;
+	foreach ( (array) ( $artifacts['review']['findings'] ?? array() ) as $finding ) {
+		if ( is_array( $finding ) && in_array( $finding['severity'] ?? '', array( 'blocking', 'major', 'critical' ), true ) ) { $serious++; }
+	}
+	if ( $serious ) { $items[] = array( 'warn', sprintf( '%d constat(s) majeur(s) de la relecture, laissé(s) à l’éditeur.', $serious ), 'revue' ); }
+	$warnings = 0;
+	foreach ( (array) ( $run['events'] ?? array() ) as $event ) {
+		if ( in_array( $event['kind'] ?? '', array( 'warning', 'retry' ), true ) ) { $warnings++; }
+	}
+	if ( $warnings ) { $items[] = array( 'warn', sprintf( '%d avertissement(s) ou nouvel(s) essai(s) pendant l’exécution.', $warnings ), 'deroule' ); }
+	if ( ! $items ) { return '<div class="attention ok"><strong>Rien à reprendre.</strong> Aucune étape en échec, aucune correction laissée de côté, aucune image refusée. L’article reste à relire avant publication.</div>'; }
+	$list = '';
+	foreach ( $items as $item ) { $list .= '<li class="' . $item[0] . '"><a href="#' . $item[2] . '">' . report_h( $item[1] ) . '</a></li>'; }
+	return '<div class="attention"><strong>À regarder avant de publier</strong><ul>' . $list . '</ul></div>';
+}
 
 /**
  * The canonical recipe as a recipe, not as a key/value dump.
@@ -555,7 +634,7 @@ function report_calls( $events ) {
 	$rows = '';
 	foreach ( (array) $events as $event ) {
 		if ( 'call' !== $event['kind'] ) { continue; }
-		$data = (array) $event['data'];
+		$data = (array) ( $event['data'] ?? array() );
 		$usage = (array) ( $data['usage'] ?? array() );
 		$cached = (int) ( $usage['cached_input_tokens'] ?? 0 );
 		$rows .= '<tr>'
@@ -578,7 +657,7 @@ function report_inputs( $events ) {
 	$rows = '';
 	foreach ( (array) $events as $event ) {
 		if ( 'input' !== $event['kind'] ) { continue; }
-		$data = (array) $event['data'];
+		$data = (array) ( $event['data'] ?? array() );
 		$attached = (array) ( $data['attached'] ?? array() );
 		$rows .= '<div><dt>' . report_h( $event['step'] ) . '</dt><dd>' . report_h( $event['message'] )
 			. ( $attached ? '<br><span class="muted">Artefacts : ' . report_h( implode( ', ', $attached ) ) . '</span>' : '' )
@@ -676,16 +755,20 @@ function report_render( array $run ) {
 
 	$css = trim( (string) file_get_contents( __DIR__ . '/report.css' ) );
 	$n = 0;
-	$section = static function ( $heading, $body ) use ( &$n ) {
-		$n++;
-		return '<section class="section"><h2>' . $n . ' · ' . report_h( $heading ) . '</h2>' . $body . '</section>';
+	$toc = array();
+	$section = static function ( $heading, $body, $id = '', $numbered = true ) use ( &$n, &$toc ) {
+		$id = '' !== $id ? $id : 's' . ( count( $toc ) + 1 );
+		if ( $numbered ) { $n++; }
+		$toc[] = array( $id, $heading );
+		return '<section class="section" id="' . $id . '"><h2>' . ( $numbered ? $n . ' · ' : '' ) . report_h( $heading ) . '</h2>' . $body . '</section>';
 	};
 	$covers = array_filter( array( 'le brief', $history ? 'son historique' : '', 'la recherche', 'la recette canonique', 'l’article final', 'les contrôles', 'les coûts', 'les temps', $images ? 'les visuels' : '' ) );
 
 	$page = '<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' . report_h( $title ) . ' — Rapport complet</title><style>' . $css . '</style></head><body><main>'
-		. '<header class="hero"><div class="eyebrow">' . report_h( $run['eyebrow'] ?? 'Test laboratoire · une exécution du moteur' ) . '</div><h1>' . report_h( $title ) . '</h1><p>Rapport autonome : ' . report_h( implode( ', ', $covers ) ) . '. Aucun fichier externe n’est nécessaire.</p></header>'
+		. '<header class="hero"><div class="eyebrow">' . report_h( $run['eyebrow'] ?? 'Test laboratoire · une exécution du moteur' ) . '</div><h1>' . report_h( $title ) . '</h1><p>Rapport autonome : ' . report_h( implode( ', ', $covers ) ) . '. Aucun fichier externe n’est nécessaire.</p></header>';
+	$body = ''
 
-		. '<section class="section"><h2>Résumé de l’exécution</h2><div class="summary-grid">'
+		. $section( 'Résumé de l’exécution', report_attention( $run ) . '<div class="summary-grid">'
 		. '<div class="card"><div class="muted">Temps cumulé</div><div class="kpi">' . number_format( (float) ( $totals['seconds'] ?? 0 ), 1 ) . ' s</div></div>'
 		. '<div class="card"><div class="muted">Coût cumulé</div><div class="kpi">$' . number_format( $total, 4 ) . '</div></div>'
 		. '<div class="card"><div class="muted">Jetons</div><div class="kpi">' . number_format( (int) ( $totals['input_tokens'] ?? 0 ) + (int) ( $totals['output_tokens'] ?? 0 ) ) . '</div><div class="muted">' . number_format( (int) ( $totals['input_tokens'] ?? 0 ) ) . ' entrée · ' . number_format( (int) ( $totals['output_tokens'] ?? 0 ) ) . ' sortie' . ( $cached_total ? ' · ' . number_format( $cached_total ) . ' relus depuis le cache' : '' ) . '</div></div>'
@@ -694,8 +777,7 @@ function report_render( array $run ) {
 		. '<h3>Où va l’argent</h3><div class="summary-grid">' . $bucket_cards . '</div>'
 		. '<p class="muted">Les coûts sont des estimations calculées avec les tarifs publiés, jamais une facture. Chaque essai est compté, y compris ceux qu’un nouvel essai a remplacés.</p>'
 		. '<div class="table-wrap"><table><thead><tr><th>Étape</th><th>Modèle</th><th>Essais</th><th>Temps</th><th>Entrée</th><th>Sortie</th><th>Coût</th><th>Contrat</th></tr></thead><tbody>' . report_steps( $run['steps'] ?? array() ) . '</tbody></table></div>'
-		. ( '' === $errors ? '' : '<div class="findings-wrap"><h3 class="finding-title">Échecs</h3><div class="findings">' . $errors . '</div></div>' )
-		. '</section>'
+		. ( '' === $errors ? '' : '<div class="findings-wrap"><h3 class="finding-title">Échecs</h3><div class="findings">' . $errors . '</div></div>' ), 'resume', false )
 
 		. ( $history
 			? $section( 'Historique : de ce qui a été fourni au brief', '<p class="muted">Ce que le rédacteur a envoyé, comment les photographies ont été lues et appariées, le brief remis au moteur et ce qu’il en a complété — dans l’ordre où c’est arrivé.</p>' . report_history( $history, $photos ) )
@@ -709,7 +791,7 @@ function report_render( array $run ) {
 			. report_recipe_card( $canonical )
 			. ( $canonical ? report_fold( 'Tous les champs de la recette', report_value( $canonical ) ) : '' ) )
 
-		. $section( 'Article final — à relire avant publication', '' !== $content ? '<article class="article">' . $content . '</article>' : $not_reached )
+		. $section( 'Article final — à relire avant publication', '' !== $content ? '<article class="article">' . $content . '</article>' : $not_reached, 'article' )
 
 		. $section( 'SEO, publication et données éditoriales', $metadata ? report_fold( 'Ouvrir les métadonnées de publication', report_value( $metadata ) ) : '<p class="muted">Aucune métadonnée : l’article n’a pas été écrit, ou sa version de travail a été libérée une fois le brouillon créé.</p>' )
 
@@ -717,14 +799,14 @@ function report_render( array $run ) {
 			? $section( 'Revue, vérification des faits et corrections', '<p class="muted">Une relecture — constats, faits et langue — puis ce que le moteur a réellement changé dans le texte.</p>'
 				. '<h3>Vérification des faits</h3><div class="findings-wrap">' . report_corrections( $corrected ) . '</div>'
 				. '<h3>Revue éditoriale</h3>' . ( $reached( 'review' ) ? report_review( $artifacts['review'] ?? array(), $proofread ) : $not_reached )
-				. ( ! empty( $artifacts['review']['unsupported'] ) ? report_fold( 'Affirmations qu’aucune source ne couvre', report_value( $artifacts['review']['unsupported'] ) ) : '' ) )
+				. ( ! empty( $artifacts['review']['unsupported'] ) ? report_fold( 'Affirmations qu’aucune source ne couvre', report_value( $artifacts['review']['unsupported'] ) ) : '' ), 'revue' )
 			: '' )
 
 		. ( $images
 			? $section( 'Visuels générés', '<div class="image-grid">'
 				. ( $wants( 'featured_image' ) ? report_image( $artifacts['featured'] ?? array(), 'Image à la une', 'Photographie culinaire éditoriale, ' . report_h( $artifacts['featured']['size'] ?? '' ) . '.' ) : '' )
 				. ( $wants( 'facebook_image' ) ? report_image( $artifacts['facebook'] ?? array(), 'Collage Facebook', 'Progression culinaire en panneaux, ' . report_h( $artifacts['facebook']['size'] ?? '' ) . ', sans texte.' ) : '' )
-				. '</div>' )
+				. '</div>', 'visuels' )
 			: '' )
 
 		. ( $wants( 'final_approval' )
@@ -733,21 +815,23 @@ function report_render( array $run ) {
 					. report_approval_cards( $approval )
 					. '<div class="findings-wrap">' . report_findings( $approval ) . '</div>'
 					. report_redraws( $run['steps'] ?? array(), $artifacts )
-				: $not_reached )
+				: $not_reached, 'approbation' )
 			: '' )
 
-		. '<section class="section"><h2>Contrôles, étape par étape</h2><p class="muted">Chaque vérification qu’une étape a passée, avec ce qu’elle a mesuré. Un score se lit, il ne se croit pas.</p>' . report_scorecards( $run['steps'] ?? array() ) . '</section>'
+		. $section( 'Contrôles, étape par étape', '<p class="muted">Chaque vérification qu’une étape a passée, avec ce qu’elle a mesuré. Un score se lit, il ne se croit pas.</p>' . report_scorecards( $run['steps'] ?? array() ), 'controles', false )
 
-		. '<section class="section"><h2>Appels aux fournisseurs</h2><p class="muted">Ce que chaque appel a réellement fait. Les coûts sont des estimations calculées avec les tarifs configurés, jamais une facture.</p>' . report_calls( $run['events'] ?? array() ) . '</section>'
+		. $section( 'Appels aux fournisseurs', '<p class="muted">Ce que chaque appel a réellement fait. Les coûts sont des estimations calculées avec les tarifs configurés, jamais une facture.</p>' . report_calls( $run['events'] ?? array() ), 'appels', false )
 
-		. '<section class="section"><h2>Ce que chaque étape a reçu</h2><p class="muted">D’où venait son prompt, sa taille, son plafond de sortie et les artefacts qui l’accompagnaient.</p>' . report_fold( 'Ouvrir le détail des entrées', report_inputs( $run['events'] ?? array() ) ) . '</section>'
+		. $section( 'Ce que chaque étape a reçu', '<p class="muted">D’où venait son prompt, sa taille, son plafond de sortie et les artefacts qui l’accompagnaient.</p>' . report_fold( 'Ouvrir le détail des entrées', report_inputs( $run['events'] ?? array() ) ), 'entrees', false )
 
-		. '<section class="section"><h2>Configuration de ce passage</h2><p class="muted">Rien n’est figé dans le moteur : chaque valeur ci-dessous est une clé de configuration, et chacune dit qui l’a décidée.</p>' . report_fold( 'Ouvrir la configuration effective', report_configuration( (array) ( $artifacts['config'] ?? array() ) ) ) . '</section>'
+		. $section( 'Configuration de ce passage', '<p class="muted">Rien n’est figé dans le moteur : chaque valeur ci-dessous est une clé de configuration, et chacune dit qui l’a décidée.</p>' . report_fold( 'Ouvrir la configuration effective', report_configuration( (array) ( $artifacts['config'] ?? array() ) ) ), 'configuration', false )
 
-		. '<section class="section"><h2>Déroulé de l’exécution</h2><p class="muted">Les vagues, les reprises et les avertissements, dans l’ordre où ils se sont produits.</p>' . report_fold( 'Ouvrir le déroulé', report_timeline( $run['events'] ?? array() ) ) . '</section>'
+		. $section( 'Déroulé de l’exécution', '<p class="muted">Les vagues, les reprises et les avertissements, dans l’ordre où ils se sont produits.</p>' . report_fold( 'Ouvrir le déroulé', report_timeline( $run['events'] ?? array() ) ), 'deroule', false )
 
-		. '<section class="section"><h2>Prompts et données brutes</h2><p>Les clés d’API ne figurent jamais dans ce rapport.</p>' . $prompts . report_fold( 'Ouvrir les données brutes', $raw ) . '</section>'
+		. $section( 'Prompts et données brutes', '<p>Les clés d’API ne figurent jamais dans ce rapport.</p>' . $prompts . report_fold( 'Ouvrir les données brutes', $raw ), 'brut', false )
 
 		. '<footer class="footer">Rapport généré le ' . report_h( gmdate( 'Y-m-d H:i:s' ) ) . ' UTC · MS Recipes Writer AI</footer></main></body></html>';
-	return $page;
+	$nav = '';
+	foreach ( $toc as $entry ) { $nav .= '<a href="#' . $entry[0] . '">' . report_h( trim( preg_split( '/ — | : |, /u', $entry[1] )[0] ) ) . '</a>'; }
+	return $page . '<nav class="toc" aria-label="Sections du rapport">' . $nav . '</nav>' . $body;
 }

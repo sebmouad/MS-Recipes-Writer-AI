@@ -64,4 +64,28 @@ msrwa_test_assert( false !== strpos( report_link( 'culinary_practice' ), 'pratiq
 msrwa_test_contains( report_link( 'javascript:alert(1)' ), 'schéma refusé', 'Another scheme still is.' );
 msrwa_test_missing( report_link( 'javascript:alert(1)' ), '<a ', 'And is never a link.' );
 
+// The page opens on what needs a person, and every kind of event has its colour.
+$busy = $run;
+$busy['artifacts']['corrected'] = array(
+	'corrections_applied' => array( array( 'before' => 'Il renforce le goût.', 'after' => '', 'reason' => 'Non documenté.' ), array( 'quoted' => 'La pâte cuit.', 'before' => 'la pâte cuit.', 'after' => 'la pâte cuit 20 min.' ) ),
+	'corrections_for_the_editor' => array( array( 'before' => 'Une phrase absente.', 'after' => 'Autre.' ) ),
+);
+$busy['events'] = array(
+	array( 'at' => 0, 'kind' => 'wave', 'step' => 'run', 'message' => 'Next: research' ),
+	array( 'at' => 1, 'kind' => 'call', 'step' => 'research', 'message' => 'answered' ),
+	array( 'at' => 2, 'kind' => 'warning', 'step' => 'research', 'message' => 'Attention.' ),
+	array( 'at' => 3, 'kind' => 'error', 'step' => 'article', 'message' => 'Cassé.' ),
+);
+$page = report_render( $busy );
+msrwa_test_contains( $page, 'À regarder avant de publier', 'What needs a person is at the top.' );
+msrwa_test_contains( $page, '1 correction(s) factuelle(s) à appliquer à la main', 'Including the corrections left to the editor.' );
+msrwa_test_contains( $page, 'href="#revue"', 'And each item leads to its section.' );
+msrwa_test_contains( $page, 'class="toc"', 'The page has a way round it.' );
+msrwa_test_contains( $page, 'Passage supprimé', 'A correction that removed its passage says so, not an empty replacement.' );
+msrwa_test_contains( $page, 'La relecture citait : « La pâte cuit. »', 'A passage found from a loose quote shows what was quoted.' );
+msrwa_test_contains( $page, 'ev ev-warn', 'A warning has its colour.' );
+msrwa_test_contains( $page, 'ev ev-bad', 'So does a failure.' );
+msrwa_test_contains( $page, 'ev ev-neutral ev-detail', 'The plumbing is one click away, not in the story.' );
+msrwa_test_contains( $page, 'Avertissement · 1', 'The legend counts each kind.' );
+
 msrwa_test_done( 'the report tells a job’s whole story, and only what it planned' );

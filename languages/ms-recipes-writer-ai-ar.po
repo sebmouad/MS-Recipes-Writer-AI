@@ -2187,3 +2187,15 @@ msgstr "المراجعة والحقائق واللغة"
 
 msgid "Les recettes avancent en parallèle, trois à la fois, sans attendre une visite du site. Vous pouvez fermer cet onglet ; laissé ouvert, il relance aussi une recette que le cron du site aurait oubliée."
 msgstr "تتقدم الوصفات بالتوازي، ثلاثًا في كل مرة، دون انتظار زيارة للموقع. يمكنك إغلاق هذا التبويب؛ وإن بقي مفتوحًا فإنه يعيد تشغيل أي وصفة أغفلها cron الموقع."
+
+msgid "Avertissement"
+msgstr "تحذير"
+
+msgid "Décision"
+msgstr "قرار"
+
+msgid "Nouvel essai"
+msgstr "محاولة جديدة"
+
+msgid "Échec"
+msgstr "إخفاق"

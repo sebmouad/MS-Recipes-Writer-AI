@@ -2151,3 +2151,15 @@ msgstr "Review, facts and language"
 
 msgid "Les recettes avancent en parallèle, trois à la fois, sans attendre une visite du site. Vous pouvez fermer cet onglet ; laissé ouvert, il relance aussi une recette que le cron du site aurait oubliée."
 msgstr "Recipes move forward side by side, three at a time, without waiting for a visit to the site. You may close this tab; left open, it also restarts a recipe the site's cron missed."
+
+msgid "Avertissement"
+msgstr "Warning"
+
+msgid "Décision"
+msgstr "Decision"
+
+msgid "Nouvel essai"
+msgstr "Retry"
+
+msgid "Échec"
+msgstr "Failure"

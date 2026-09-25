@@ -630,6 +630,10 @@ cost) in the task before changing anything.
   (2026-09-24).** The writer's photograph shows the prompt's writer the dish;
   the collage is drawn from the style reference. Real: the owner's own rôti
   photograph, drawn both ways. See ENGINE.md §7, item 40.
+- [x] **A48 — Report reads from its conclusions (2026-09-25).** Attention
+  box, section menu, before/after corrections, colour per event kind in the
+  report and on the run screen. Checked in Chromium at 1280 and 390 px on
+  stored runs and on the test site. `tests/test-report.php`.
 - [~] **A47 — Corrections not found in the HTML (2026-09-25).** Loose
   quotes located, copied neighbours and repeated sentences removed. Replayed
   offline over every stored run; next live run confirms. ENGINE.md §7, 43.
