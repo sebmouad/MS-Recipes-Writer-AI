@@ -170,8 +170,12 @@ final class MSRWA_Engine_Config {
 				// Every search-tool action one call may take: OpenAI's paid searches
 				// and its free page reads together, sent as max_tool_calls. Each page
 				// read is input the call pays for; one search and a few pages is enough.
-				// The maximum estimate prices them all as searches.
-				'web_tool_calls'     => 6,
+				// The maximum estimate prices them all as searches. Five is the one
+				// search and the "two or three pages" the prompt asks for, with one
+				// read to spare, and keeps a full recipe's maximum under the shipped
+				// $0.15 ceiling since reference images are billed at their own rate
+				// (owner, 2026-09-26: the ceiling stays, the cap moves).
+				'web_tool_calls'     => 5,
 			),
 
 			'language' => 'fr',

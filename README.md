@@ -5,9 +5,10 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.28.39
+## État actuel — 0.28.40
 
-La version `0.28.39` applique les cinq corrections du moteur que l'audit
+La version `0.28.40` garde le plafond par recette à 0,15 $ et limite la
+recherche à cinq appels d'outil ; la `0.28.39` appliquait les cinq corrections du moteur que l'audit
 proposait : le contrôle des images ne refuse plus pour un compte, un plat ou
 une découpe, la relecture suit la langue de l'article, les images de
 référence sont facturées à leur vrai prix, et une correction ne laisse plus
@@ -93,6 +94,14 @@ développement, humain ou agent.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
 
+## Version 0.28.40
+
+**Le plafond par recette reste à 0,15 $.** La 0.28.39 le portait à 0,16 $
+pour que le pire cas y tienne ; c'est la recherche qui est bornée à la place :
+cinq appels d'outil au lieu de six — une recherche et les deux ou trois pages
+qu'on lui demande de lire, avec une lecture de marge. Le pire cas d'une
+recette complète passe de 0,152 $ à 0,142 $ ; l'estimation reste à 0,099 $.
+
 ## Version 0.28.39
 
 **Les cinq corrections du moteur, appliquées.**
@@ -108,9 +117,7 @@ développement, humain ou agent.
 - **Les images de référence au vrai prix.** Le modèle d'image facture une
   image reçue plus cher que le texte (8 $ contre 5 $ par million de jetons) :
   environ 0,007 $ par recette étaient comptés trop bas. L'estimation d'une
-  recette complète passe à 0,099 $ ; le plafond par recette livré passe de
-  0,15 $ à 0,16 $ pour que le pire cas y tienne. Un site qui a déjà enregistré
-  son plafond le garde.
+  recette complète passe à 0,099 $.
 - **Une correction ne laisse plus de phrase orpheline** : quand retirer une
   phrase laisserait la suivante commencer par « Leur » ou « Cette » sans rien
   à quoi se rapporter, la phrase est gardée ou laissée au rédacteur.

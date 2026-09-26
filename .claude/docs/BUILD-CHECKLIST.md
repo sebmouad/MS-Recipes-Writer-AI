@@ -634,8 +634,9 @@ cost) in the task before changing anything.
   approval of ENGINE.md §7, items 8–12, now decided items 55–59: the judge
   reads the image brief as context; the review's typography and the recipe's
   course follow the article's language; a reference image is billed at the
-  image input rate ($8 against $5 on gpt-image-2.5-flare), with the shipped
-  ceiling at $0.16 so the estimate's maximum fits; a correction never leaves
+  image input rate ($8 against $5 on gpt-image-2.5-flare), the research's
+  tool calls capped at 5 (0.28.40) so the estimate's maximum, $0.142, fits the
+  shipped $0.15 ceiling; a correction never leaves
   the next sentence leaning on nothing. A page a reader cannot open answers
   404. Real: `test-parallel.php`, three full recipes in 202 s, three at once,
   all three approved by the new picture check with no finding; the 404 and

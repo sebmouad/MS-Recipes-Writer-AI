@@ -1004,8 +1004,12 @@ photograph, and otherwise use the photograph without the cost of a search.
     it keeps one rate. The references measured 900 tokens for the featured
     photograph and 1 472 for the collage — about $0.007 a recipe that was read
     low. The plugin's catalogue carries the third and fourth figures from the
-    engine's list, and the shipped per-recipe ceiling became $0.16 so the
-    estimate's maximum ($0.152) still fits under it.
+    engine's list. The estimate's maximum rose to $0.152, over the shipped
+    $0.15 ceiling; 0.28.39 raised the ceiling to $0.16, and 0.28.40, at the
+    owner's word, put it back and capped `limits.web_tool_calls` at 5 instead
+    of 6 — one search and the two or three pages the prompt asks for, with a
+    read to spare: live research used one or two searches and three to six
+    reads. The maximum is $0.142.
 
 59. **A correction never orphans its neighbour.** `leaned_on()` says whether
     the next sentence of the same paragraph opens on a pronoun or a

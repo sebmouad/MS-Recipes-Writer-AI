@@ -46,9 +46,10 @@ msrwa_test_assert( $full['max_usd'] > $full['cost_usd'] && $full['max_usd'] < $f
 // The shipped per-recipe ceiling (owner, 2026-09-24): a full recipe billed
 // $0.0736 on the site, and each redraw an editor asks for $0.020. $0.15 let
 // the recipe, its two allowed collage redraws and the estimate's maximum through
-// until 0.28.39 priced the reference images at their own rate: $0.16 since.
+// and still does: when 0.28.39 priced reference images at their own rate, the
+// research's tool calls were capped at five rather than the ceiling raised.
 $ceiling = (float) MSRWA_Settings_Defaults_For_Test::ceiling();
-msrwa_test_assert( 0.16 === $ceiling, 'The shipped per-recipe ceiling is $0.16.' );
+msrwa_test_assert( 0.15 === $ceiling, 'The shipped per-recipe ceiling is $0.15.' );
 msrwa_test_assert( MSRWA_Estimate::fits( $full['cost_usd'], $ceiling ), 'A full recipe fits under the shipped ceiling; estimated ' . $full['cost_usd'] );
 msrwa_test_assert( $full['max_usd'] < $ceiling, 'So does its maximum; got ' . $full['max_usd'] );
 msrwa_test_assert( 0.0736 + 2 * 0.020 < $ceiling, 'With room for the two redraws an editor may ask for.' );
