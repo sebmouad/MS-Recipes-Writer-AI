@@ -1046,3 +1046,63 @@ photograph, and otherwise use the photograph without the cost of a search.
 
    **Decided now.** Nothing is built. Until step 1, a second type cannot
    share this engine without touching the recipe; after it, it can.
+
+8. **The picture check enforces the image model's brief (audit of
+   2026-09-26).** Of the last twenty finished recipes (#60–#81), seven were
+   refused, and five of those refusals break the check's own rules: #73 for
+   four eggs where the recipe has three ("a count stays minor even where the
+   visual brief states one"); #72, #74 and #79 because the featured image or
+   the last panel served the dish on another plate, or cut rather than whole
+   ("a different bowl … is minor"; under a lead, "whole or with a piece cut —
+   none of that makes them two different dishes"); #61 because the last panel
+   *was* opened, which check 4 requires. Every one quotes the visual brief:
+   "exactly three", "présentation imposée", "même moule". That brief is what
+   the image model was told to draw, and `build()` sends it to the judge
+   whole — headed "derived from this recipe and binding", with exact counts
+   and "ONE SERVING PRESENTATION … same vessel". A cheap judge follows the
+   concrete lines over the general rule, and each false refusal offers the
+   editor a paid redraw. *Proposal:* send the judge `visual_evidence()` and
+   the canonical recipe only, or keep the brief under a heading that says
+   what it is — "what the image model was asked for; not a checklist: counts,
+   vessels and whole-or-cut are minor". Measure on the same five recipes:
+   the refusals should drop to #60 (flaked almonds) and #78 (a last panel not
+   opened), both real.
+
+9. **The review's language rules are French for every language.** Part 3 of
+   `review.tpl.txt` asks for "missing accents: é, è, ê, à, â, ù, û, ô, ç, œ"
+   and typographic apostrophes whatever `{{language}}` is; `article.tpl.txt`
+   already fences the same rules with `{{#if french}}`. An English or Arabic
+   article is proofread for French accents. *Proposal:* the same fence in the
+   review, with the language named for the rest.
+
+10. **The recipe's course is French on every site.** `canonical_recipe.tpl.txt`
+    gives `recipe_category` as one of "entrée, plat principal, accompagnement,
+    dessert …" while every other value is in `{{language}}`; the structured
+    data of an English or Spanish article then carries a French
+    `recipeCategory`. *Proposal:* name the eight courses in `{{language}}`, or
+    keep them as fixed keys and translate at output.
+
+11. **A reference image may be billed at the text input rate.** The featured
+    image and the collage are drawn from reference images on
+    `/v1/images/edits`, and `read()` prices the call's whole `input_tokens` at
+    the model's single input rate. OpenAI's image models have published a
+    separate, higher rate for image input — gpt-image-1: $5 text, $10 image —
+    and the response splits it (`input_tokens_details.image_tokens`). If
+    gpt-image-2.5-flare does the same, each drawing reads a little low (about
+    1 500 image tokens a call). *Proposal:* check the model's pricing page;
+    if it has an image input rate, carry it as a third input rate and price
+    `image_tokens` with it, the way Gemini's image output already is.
+
+12. **A correction can orphan the sentence after it.** In #81 the review
+    shortened "La première adaptation consiste à laisser les poivrons non
+    pelés." to "Les poivrons peuvent rester non pelés.", a sentence already in
+    the article, so the duplicate was removed — and the Variants section now
+    opens on "Leur quantité et leur découpe restent identiques", whose "leur"
+    points at nothing. "Conservez leurs quantités et leur place dans la
+    méthode." lost its subject the same way. Both passed the proofread, which
+    reads sentences, not paragraphs. *Proposal:* one rule in part 2 of
+    `review.tpl.txt` — "when `after` removes or shortens a sentence, the
+    sentences around it must still read without it; if one would not,
+    include it in `before` and correct the two together" — and, in the
+    duplicate removal, drop a sentence only when the next one does not open
+    on a pronoun; otherwise keep the shortened form.
