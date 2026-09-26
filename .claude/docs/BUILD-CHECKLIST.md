@@ -647,6 +647,13 @@ cost) in the task before changing anything.
   calories per serving, quality 98/100. Published locally under the MS
   Recipes theme, FAQPage printed on page 2 only (0.29.1: page 1 claimed the
   FAQ page 2 shows).
+- [x] **A73 — A locked post keeps its recipe to itself (2026-09-26, 0.29.2).**
+  Found auditing the MS suite. `MSRWA_Schema::print_head()` and
+  `MSRWA_Head` print nothing for a password-protected post, whose Recipe,
+  FAQ and description gave its content away; the caption asked of the article
+  is 200–280 characters, under MS FB Posts' 300. Offline: `test-seo.php`.
+  Real: on the test site, a locked post rendered for an anonymous visitor
+  carries none of its text, and the password holder still sees it.
 - [x] **A71 — The audit's engine fixes (2026-09-26, 0.28.39).** Owner's
   approval of ENGINE.md §7, items 8–12, now decided items 55–59: the judge
   reads the image brief as context; the review's typography and the recipe's

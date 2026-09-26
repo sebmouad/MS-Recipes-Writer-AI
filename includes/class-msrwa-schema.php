@@ -16,7 +16,8 @@ final class MSRWA_Schema {
 	public static function hooks() { add_action( 'wp_head', array( __CLASS__, 'print_head' ), 30 ); }
 
 	public static function print_head() {
-		if ( ! is_singular( 'post' ) ) { return; }
+		// A locked post's recipe and questions are part of what the password protects.
+		if ( ! is_singular( 'post' ) || post_password_required( get_queried_object_id() ) ) { return; }
 		foreach ( array( self::for_post( get_queried_object_id() ), self::faq_for_post( get_queried_object_id() ) ) as $data ) {
 			if ( ! $data ) { continue; }
 			echo "\n<script type=\"application/ld+json\">" . wp_json_encode( $data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG ) . "</script>\n";

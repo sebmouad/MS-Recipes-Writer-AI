@@ -63,4 +63,27 @@ foreach ( array( 'research.tpl.txt', 'research_photographs.tpl.txt' ) as $file )
 	foreach ( array( '"appliance_versions"', '"diet_adaptations"', '"nutrition"' ) as $key ) { msrwa_test_contains( $research, $key, $file . ' gathers ' . $key . '.' ); }
 }
 
+
+// --- A locked post keeps its recipe to itself --------------------------------
+if ( ! function_exists( 'is_singular' ) ) { function is_singular( $type = '' ) { return true; } }
+if ( ! function_exists( 'get_queried_object_id' ) ) { function get_queried_object_id() { return 298; } }
+if ( ! function_exists( 'post_password_required' ) ) { function post_password_required( $post = null ) { return ! empty( $GLOBALS['msrwa_test_locked'] ); } }
+if ( ! function_exists( 'get_query_var' ) ) { function get_query_var( $name ) { return 0; } }
+msrwa_test_load( 'head' );
+msrwa_test_settings( array( 'recipe_schema' => 1, 'seo_meta' => 1 ) );
+$GLOBALS['msrwa_test_posts'][298] = (object) array( 'ID' => 298, 'post_status' => 'publish', 'post_content' => $page, 'post_author' => 1 );
+$GLOBALS['msrwa_test_meta'][298] = array( '_msrwa_run_id' => 8, '_recipe_faq' => wp_json_encode( $faq ) );
+$GLOBALS['msrwa_test_locked'] = false;
+ob_start();
+MSRWA_Schema::print_head();
+msrwa_test_contains( ob_get_clean(), 'FAQPage', 'An open post prints its FAQ markup.' );
+$GLOBALS['msrwa_test_locked'] = true;
+ob_start();
+MSRWA_Schema::print_head();
+msrwa_test_assert( '' === ob_get_clean(), 'A password-protected post prints no Recipe or FAQ markup: its ingredients and answers are what the password protects.' );
+$subject = new ReflectionMethod( 'MSRWA_Head', 'subject' );
+$subject->setAccessible( true );
+msrwa_test_assert( 0 === $subject->invoke( null ), 'Nor its description in the meta tags.' );
+$GLOBALS['msrwa_test_locked'] = false;
+
 msrwa_test_done( 'articles written to be found and advertised beside' );

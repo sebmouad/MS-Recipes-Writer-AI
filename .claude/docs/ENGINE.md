@@ -1034,6 +1034,12 @@ photograph, and otherwise use the photograph without the cost of a search.
     editor's photographs, with no nutrition then), and the article offers
     them only from there.
 
+61. **The Facebook caption fits MS FB Posts (owner's request, 2026-09-26).**
+    `facebook_caption` asks 200 to 280 characters instead of 200 to 400. MS FB
+    Posts keeps 300 characters per caption by default and cuts the rest, which
+    took the closing question off a long caption. The captions written so far
+    measured 234 to 265.
+
 
 6. **The engine's `models` list is a second source of truth for prices.** The
    plugin now owns the catalogue — models, rates and per-step compatibility in

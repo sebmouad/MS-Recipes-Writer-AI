@@ -5,9 +5,10 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.29.1
+## État actuel — 0.29.2
 
-La version `0.29.1` ne met la FAQ en données structurées que sur la page de
+La version `0.29.2` garde un article protégé par mot de passe muet dans
+l'en-tête et raccourcit la légende Facebook ; la `0.29.1` ne met la FAQ en données structurées que sur la page de
 l'article qui la montre ; la `0.29.0` écrivait chaque article pour être trouvé par Google, Bing,
 Yahoo et les assistants IA, et pour attirer les annonces les mieux payées ;
 la `0.28.40` garde le plafond par recette à 0,15 $ et limite la
@@ -96,6 +97,15 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.29.2
+
+**Un article protégé par mot de passe ne se trahit plus.** Ses données
+structurées (recette, FAQ) et ses balises de description ne sont plus
+imprimées tant que le mot de passe n'est pas donné : elles contenaient ses
+ingrédients et ses réponses. La légende Facebook demandée fait 200 à 280
+caractères, sous la limite de 300 de MS FB Posts, qui coupait la question
+finale d'une légende plus longue.
 
 ## Version 0.29.1
 

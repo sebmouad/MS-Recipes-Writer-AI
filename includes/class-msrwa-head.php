@@ -63,7 +63,7 @@ final class MSRWA_Head {
 		if ( ! is_singular( 'post' ) || self::another_plugin_prints_it() ) { return 0; }
 		if ( empty( MSRWA_Settings::get()['seo_meta'] ) ) { return 0; }
 		$post_id = (int) get_queried_object_id();
-		if ( ! $post_id || 'publish' !== get_post_status( $post_id ) ) { return 0; }
+		if ( ! $post_id || 'publish' !== get_post_status( $post_id ) || post_password_required( $post_id ) ) { return 0; }
 		// Only what this plugin produced. A site's own posts are its own business.
 		return get_post_meta( $post_id, '_msrwa_run_id', true ) ? $post_id : 0;
 	}

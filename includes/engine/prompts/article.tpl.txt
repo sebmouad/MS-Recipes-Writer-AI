@@ -55,5 +55,5 @@ OUTPUT — a valid JSON object only, no Markdown, with exactly these keys:
 - "faq": {{faq_minimum}} to {{faq_maximum}} objects {question, answer} matching the FAQ in the article
 - "recipe_meta": an empty object {} — recipe metadata is taken from the canonical recipe by the engine
 - "internal_links": 0 to {{internal_links_max}} objects {url, anchor} pointing only at the allowed internal paths supplied, the anchor existing verbatim in the text; an empty array if none fit
-- "facebook_caption": 200 to 400 characters, warm, ending on a question or an invitation, without excessive hashtags
+- "facebook_caption": 200 to 280 characters, warm, ending on a question or an invitation, without excessive hashtags
 - "visual_final_notes": 250 to 350 characters describing how the finished dish really looks — texture, plating, vessel, garnish, colours, light — to guide the photograph. Build them on the visual observations supplied, adding only what this recipe's own ingredients and method make certain. Contradicting them here sends the photographer after the wrong dish.
