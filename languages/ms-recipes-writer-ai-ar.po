@@ -1113,9 +1113,6 @@ msgstr "عطّل الإضافة ثم أعد تفعيلها: تثبيت الجد�
 msgid "Enregistrez sa clé dans Réglages, ou changez la route dans Moteur → Modèle par étape."
 msgstr "احفظ مفتاحه في الإعدادات، أو غيّر المسار في المحرّك ← النموذج لكل خطوة."
 
-msgid "Enregistrée(s) pour : %s. Une clé enregistrée n’est pas une clé valide — « Vérifier les clés » le dit gratuitement."
-msgstr "محفوظ لـ: %s. المفتاح المحفوظ ليس بالضرورة مفتاحًا صالحًا — «تحقّق من المفاتيح» يقول ذلك مجانًا."
-
 msgid "File"
 msgstr "الطابور"
 
@@ -2513,3 +2510,7 @@ msgstr "دفعات الوصفات"
 
 msgid "Lots de recettes → « Reprendre la file » quand vous voulez qu’elles repartent."
 msgstr "دفعات الوصفات ← «استئناف الطابور» عندما تريد لها أن تنطلق من جديد."
+
+#, php-format
+msgid "Clés enregistrées : %s. Cela ne prouve pas qu’elles fonctionnent : le bouton « Vérifier les clés », dans Réglages, teste chacune auprès de son fournisseur, sans rien facturer."
+msgstr "المفاتيح المحفوظة: %s. هذا لا يثبت أنها تعمل: زر «تحقّق من المفاتيح» في الإعدادات يختبر كل مفتاح لدى مزوّده، دون أي تكلفة."

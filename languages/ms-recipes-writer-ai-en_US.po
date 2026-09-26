@@ -1101,9 +1101,6 @@ msgstr "Deactivate the plugin and activate it again: the tables are installed on
 msgid "Enregistrez sa clé dans Réglages, ou changez la route dans Moteur → Modèle par étape."
 msgstr "Save its key in Settings, or change the route under Engine → Model per step."
 
-msgid "Enregistrée(s) pour : %s. Une clé enregistrée n’est pas une clé valide — « Vérifier les clés » le dit gratuitement."
-msgstr "Saved for: %s. A saved key is not a valid key — “Check the keys” says which, and says it for free."
-
 msgid "File"
 msgstr "Queue"
 
@@ -2457,3 +2454,7 @@ msgstr "Recipe lots"
 
 msgid "Lots de recettes → « Reprendre la file » quand vous voulez qu’elles repartent."
 msgstr "Recipe lots → “Release the queue” when you want them moving again."
+
+#, php-format
+msgid "Clés enregistrées : %s. Cela ne prouve pas qu’elles fonctionnent : le bouton « Vérifier les clés », dans Réglages, teste chacune auprès de son fournisseur, sans rien facturer."
+msgstr "Keys saved: %s. That doesn’t prove they work: the “Check the keys” button in Settings tests each one with its provider, at no charge."

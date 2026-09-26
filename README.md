@@ -99,6 +99,8 @@ développement, humain ou agent.
   collages, les échecs des dernières 24 heures.
 - Un bouton « Vérifier à nouveau », une note quand tout est en ordre, et
   chaque correction à faire mise en évidence.
+- La ligne des clés d'API dit clairement qu'une clé enregistrée n'est pas
+  forcément valide, et que « Vérifier les clés » la teste sans frais.
 
 **Pas de doublon avec le thème.** Le JSON-LD Recipe et l'Open Graph ne sont
 imprimés que si le thème MS Recipes (ou MS SEO Plus) ne le fait pas : si le

@@ -112,7 +112,7 @@ final class MSRWA_Diagnostics {
 
 		return self::check( 'good', __( 'Clés d’API', 'ms-recipes-writer-ai' ), sprintf(
 			/* translators: %s is a comma-separated list of provider names. */
-			__( 'Enregistrée(s) pour : %s. Une clé enregistrée n’est pas une clé valide — « Vérifier les clés » le dit gratuitement.', 'ms-recipes-writer-ai' ),
+			__( 'Clés enregistrées : %s. Cela ne prouve pas qu’elles fonctionnent : le bouton « Vérifier les clés », dans Réglages, teste chacune auprès de son fournisseur, sans rien facturer.', 'ms-recipes-writer-ai' ),
 			implode( ', ', array_map( array( 'MSRWA_UI', 'provider_name' ), $configured ) )
 		) );
 	}

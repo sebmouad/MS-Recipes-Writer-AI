@@ -695,6 +695,10 @@ msgstr ""
 msgid "Clés d’API"
 msgstr ""
 
+#: class-msrwa-diagnostics.php:115
+msgid "Clés enregistrées : %s. Cela ne prouve pas qu’elles fonctionnent : le bouton « Vérifier les clés », dans Réglages, teste chacune auprès de son fournisseur, sans rien facturer."
+msgstr ""
+
 #: class-msrwa-draft.php:219 class-msrwa-screen-analysis.php:123 class-msrwa-ui.php:133
 msgid "Collage Facebook"
 msgstr ""
@@ -1029,10 +1033,6 @@ msgstr ""
 
 #: class-msrwa-screen-engine.php:42 class-msrwa-screen-models.php:41 class-msrwa-screen-settings.php:24 class-msrwa-screen-settings.php:250
 msgid "Enregistré."
-msgstr ""
-
-#: class-msrwa-diagnostics.php:115
-msgid "Enregistrée(s) pour : %s. Une clé enregistrée n’est pas une clé valide — « Vérifier les clés » le dit gratuitement."
 msgstr ""
 
 #: class-msrwa-admin.php:176
