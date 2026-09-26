@@ -301,7 +301,6 @@ final class MSRWA_Draft {
 		return $written && '' !== $lossy && strlen( $lossy ) < strlen( $bytes ) ? $lossy : $bytes;
 	}
 
-	/** Copies one generated file into the uploads directory as an attachment. */
 	/**
 	 * Adds one generated image to the media library the way WordPress adds a
 	 * file from elsewhere: media_handle_sideload(), which runs the upload

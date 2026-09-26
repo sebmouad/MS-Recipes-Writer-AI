@@ -49,7 +49,6 @@ final class MSRWA_Stack {
 		add_filter( 'ms_seo_plus_structured_data', array( __CLASS__, 'enrich' ), 20, 2 );
 	}
 
-	/** The MS Recipes theme is printing canonical, Open Graph and Recipe markup. */
 	/**
 	 * The attachment details of a generated image: alternative text and title
 	 * from the SEO title, caption and description from the SEO description,

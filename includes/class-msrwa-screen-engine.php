@@ -279,14 +279,6 @@ final class MSRWA_Screen_Engine {
 	}
 
 	/**
-	 * One model, as the screen has to describe it: name, price, and whether
-	 * the provider still answers to it.
-	 *
-	 * `served` is deliberately three-valued. A provider that has never been
-	 * asked says nothing about its models, and reporting silence as "missing"
-	 * would send an administrator chasing a model that is perfectly fine.
-	 */
-	/**
 	 * Every step the engine will run, in the order its dependencies allow.
 	 *
 	 * The registry was readable only as raw JSON in the `steps` override box,
@@ -432,6 +424,14 @@ final class MSRWA_Screen_Engine {
 		return $out;
 	}
 
+	/**
+	 * One model, as the screen has to describe it: name, price, and whether
+	 * the provider still answers to it.
+	 *
+	 * `served` is deliberately three-valued. A provider that has never been
+	 * asked says nothing about its models, and reporting silence as "missing"
+	 * would send an administrator chasing a model that is perfectly fine.
+	 */
 	private static function describe_model( $provider, $model, array $prices ) {
 		$rate = $prices[ $provider ][ $model ] ?? null;
 		$priced = is_array( $rate ) && isset( $rate[0], $rate[1] );

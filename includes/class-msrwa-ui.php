@@ -401,7 +401,6 @@ final class MSRWA_UI {
 		echo '<div class="ms-note' . ( $tone ? ' ms-note-' . esc_attr( $tone ) : '' ) . '"><p>' . wp_kses_post( $text ) . '</p></div>';
 	}
 
-	/** The author's name, or a dash when the reader may not see whose it is. */
 	/**
 	 * Who sent a recipe and what became of it, for the top of its own page:
 	 * the writer and the article's author, the lot and its kind, the dates,

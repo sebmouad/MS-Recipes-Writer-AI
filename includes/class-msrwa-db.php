@@ -159,14 +159,6 @@ final class MSRWA_DB {
 	}
 
 	/**
-	 * Counts the failing checks on steps stored before the column existed.
-	 *
-	 * In pages, oldest first, stopping when it runs out. Nothing here loads
-	 * more than a few hundred rows at a time, because this runs on activation
-	 * on somebody's live site and must not be the thing that exhausts its
-	 * memory limit.
-	 */
-	/**
 	 * Moves the generated images' attachment ids off meta keys MS Image
 	 * Optimizer reads as content references (see MSRWA_Draft::generated_key()).
 	 * One statement per key, idempotent: a second run finds nothing to move.
@@ -205,6 +197,14 @@ final class MSRWA_DB {
 		}
 	}
 
+	/**
+	 * Counts the failing checks on steps stored before the column existed.
+	 *
+	 * In pages, oldest first, stopping when it runs out. Nothing here loads
+	 * more than a few hundred rows at a time, because this runs on activation
+	 * on somebody's live site and must not be the thing that exhausts its
+	 * memory limit.
+	 */
 	private static function backfill_check_counts() {
 		global $wpdb;
 		$t = self::tables();

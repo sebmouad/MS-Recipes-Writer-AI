@@ -26,7 +26,6 @@ final class MSRWA_Json {
 		return null;
 	}
 
-	/** Same contract as decode(), raising the pipeline's error when it fails. */
 	/**
 	 * Drops byte sequences that are not valid UTF-8. An answer stopped at
 	 * max_tokens is cut mid-character, and that single broken character makes

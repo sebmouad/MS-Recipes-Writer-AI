@@ -274,12 +274,6 @@ final class MSRWA_Ledger {
 	}
 
 	/**
-	 * The runs a screen lists, filtered the way a person filters.
-	 *
-	 * Returns the rows and the total, because a list that cannot say how many
-	 * there are cannot be paged.
-	 */
-	/**
 	 * What became of a recipe's article in WordPress, as one word the screen
 	 * filters on: its post may be a draft, scheduled, published, in the bin,
 	 * deleted outright, or not written yet.
@@ -328,6 +322,12 @@ final class MSRWA_Ledger {
 		return $counts;
 	}
 
+	/**
+	 * The runs a screen lists, filtered the way a person filters.
+	 *
+	 * Returns the rows and the total, because a list that cannot say how many
+	 * there are cannot be paged.
+	 */
 	public static function runs( array $filters = array() ) {
 		global $wpdb;
 		$t = self::tables();
