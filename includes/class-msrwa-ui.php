@@ -399,6 +399,65 @@ final class MSRWA_UI {
 	}
 
 	/** The author's name, or a dash when the reader may not see whose it is. */
+	/**
+	 * Who sent a recipe and what became of it, for the top of its own page:
+	 * the writer and the article's author, the lot and its kind, the dates,
+	 * the article in WordPress, its categories and length, and what the
+	 * writer sent. Nothing here is money or engine vocabulary: writers read it.
+	 */
+	public static function facts( array $run ) {
+		$lot = self::lot_of( $run );
+		$post_id = (int) ( $run['draft_post_id'] ?? 0 );
+		$post = $post_id ? get_post( $post_id ) : null;
+		$person = static function ( $user_id ) {
+			$user = get_userdata( (int) $user_id );
+			if ( ! $user ) { return '<span class="ms-muted">—</span>'; }
+			return '<span class="ms-fact-person">' . get_avatar( $user->ID, 24, '', '', array( 'class' => 'ms-fact-avatar' ) ) . esc_html( $user->display_name ) . '</span>';
+		};
+		$date = static function ( $gmt ) {
+			if ( empty( $gmt ) || '0000-00-00 00:00:00' === $gmt ) { return '<span class="ms-muted">—</span>'; }
+			return '<time datetime="' . esc_attr( gmdate( 'c', (int) strtotime( $gmt . ' UTC' ) ) ) . '">' . esc_html( MSRWA_I18N::when( $gmt ) ) . '</time><small>' . esc_html( MSRWA_I18N::ago( $gmt ) ) . '</small>';
+		};
+		$facts = array();
+		$facts[ __( 'Rédacteur', 'ms-recipes-writer-ai' ) ] = $person( (int) ( $run['owner_id'] ?? 0 ) );
+		if ( $post && (int) $post->post_author !== (int) ( $run['owner_id'] ?? 0 ) ) {
+			$facts[ __( 'Auteur de l’article', 'ms-recipes-writer-ai' ) ] = $person( (int) $post->post_author );
+		}
+		$languages = MSRWA_Profile::languages();
+		$kind = (string) ( MSRWA_Profile::all()[ $lot['profile'] ]['label'] ?? '' );
+		$batch = (int) ( $run['batch_id'] ?? 0 );
+		$facts[ __( 'Lot', 'ms-recipes-writer-ai' ) ] = ( $batch ? '<a href="' . esc_url( admin_url( 'admin.php?page=msrwa-batch&batch_id=' . $batch ) ) . '">' . esc_html( sprintf( /* translators: %d is a lot number. */ __( 'Lot %d', 'ms-recipes-writer-ai' ), $batch ) ) . '</a>' : '—' )
+			. ( '' !== $kind ? '<small>' . esc_html( $kind ) . ( '' !== $lot['language'] ? ' · ' . esc_html( (string) ( $languages[ $lot['language'] ] ?? strtoupper( $lot['language'] ) ) ) : '' ) . '</small>' : '' );
+		$facts[ __( 'Créée', 'ms-recipes-writer-ai' ) ] = $date( (string) ( $run['created_at'] ?? '' ) );
+		if ( in_array( (string) ( $run['status'] ?? '' ), array( 'done', 'failed', 'cancelled' ), true ) ) {
+			$facts[ __( 'Terminée', 'ms-recipes-writer-ai' ) ] = $date( (string) ( $run['updated_at'] ?? '' ) );
+		}
+		if ( $post_id ) {
+			ob_start();
+			self::post_badge( $run, $post );
+			$facts[ __( 'Article', 'ms-recipes-writer-ai' ) ] = '<span class="ms-fact-post">' . ob_get_clean() . '</span>';
+		}
+		if ( $post ) {
+			$names = wp_get_post_categories( $post_id, array( 'fields' => 'names' ) );
+			$facts[ __( 'Catégories', 'ms-recipes-writer-ai' ) ] = $names && ! is_wp_error( $names ) ? esc_html( implode( ', ', $names ) ) : '<span class="ms-muted">—</span>';
+			$words = str_word_count( wp_strip_all_tags( (string) $post->post_content ), 0, 'àâäéèêëîïôöùûüçœæÀÂÄÉÈÊËÎÏÔÖÙÛÜÇŒÆ’\'-' );
+			$facts[ __( 'Longueur', 'ms-recipes-writer-ai' ) ] = esc_html( sprintf( /* translators: %s is a number of words. */ _n( '%s mot', '%s mots', $words, 'ms-recipes-writer-ai' ), number_format_i18n( $words ) ) );
+		}
+		$brief = (array) json_decode( (string) ( $run['brief_json'] ?? '' ), true );
+		$photos = count( (array) ( $brief['images'] ?? array() ) );
+		$lead = (string) ( $brief['collage_lead'] ?? '' );
+		$sent = $photos ? sprintf( /* translators: %d is a number of photographs. */ _n( '%d photographie', '%d photographies', $photos, 'ms-recipes-writer-ai' ), $photos ) : __( 'texte seul', 'ms-recipes-writer-ai' );
+		$collage = 'provided' === $lead ? __( 'votre collage Facebook', 'ms-recipes-writer-ai' ) : ( 'drawn' === $lead ? __( 'collage dessiné en premier', 'ms-recipes-writer-ai' ) : '' );
+		$facts[ __( 'Envoyé', 'ms-recipes-writer-ai' ) ] = esc_html( $sent ) . ( '' !== $collage ? '<small>' . esc_html( $collage ) . '</small>' : '' );
+
+		echo '<section class="ms-card ms-facts" aria-label="' . esc_attr__( 'La recette', 'ms-recipes-writer-ai' ) . '"><dl>';
+		// Each value above is built from escaped parts.
+		foreach ( $facts as $label => $html ) { echo '<div><dt>' . esc_html( $label ) . '</dt><dd>' . $html . '</dd></div>'; } // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo '</dl>';
+		if ( $post ) { echo '<div class="ms-facts-links">'; self::post_links( $post_id, $post ); echo '</div>'; }
+		echo '</section>';
+	}
+
 	public static function owner( $owner_id ) {
 		if ( ! MSRWA_Rights::may_see_everything() ) { return ''; }
 		$user = get_userdata( (int) $owner_id );

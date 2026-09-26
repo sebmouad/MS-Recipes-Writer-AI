@@ -102,9 +102,6 @@ msgstr "Cached"
 msgid "Ce qui a réellement été facturé, et quelle part de l’entrée le fournisseur a servie depuis son cache."
 msgstr "What was actually billed, and how much of the input the provider served from its cache."
 
-msgid "Ce qu’il faut produire"
-msgstr "What to produce"
-
 msgid "Contrôle"
 msgstr "Check"
 
@@ -185,9 +182,6 @@ msgstr "Model"
 
 msgid "Moteur"
 msgstr "Engine"
-
-msgid "Nouveau lot"
-msgstr "New lot"
 
 msgid "Ouvrir les réglages"
 msgstr "Open settings"
@@ -606,9 +600,6 @@ msgstr "steps"
 msgid "Texte uniquement, relu et vérifié. Aucune image n’est générée, et le jugement final n’aurait rien à regarder."
 msgstr "Text only, proofread and checked. No image is generated, and the final judgement would have nothing to look at."
 
-msgid "Chaque recette suit le même chemin. Les montants sont calculés depuis le routage et les tarifs réellement configurés — ce sont des estimations, jamais une facture."
-msgstr "Every recipe takes the same path. The amounts are worked out from the routing and rates actually configured — estimates, never an invoice."
-
 msgid "Le total est incomplet : %s tourne(nt) sur un modèle sans tarif publié."
 msgstr "The total is incomplete: %s run(s) on a model with no published rate."
 
@@ -911,9 +902,6 @@ msgstr "This lot is over the site’s per-recipe ceiling and will be refused whe
 
 msgid "Ce que chaque article doit être. Ces réglages atteignent directement les prompts et les contrôles du moteur."
 msgstr "What every article must be. These settings go straight into the engine’s prompts and checks."
-
-msgid "Chaque recette suit le même chemin. Plus il y a d’images, plus la recette demande de travail."
-msgstr "Every recipe takes the same path. The more images, the more work a recipe takes."
 
 msgid "Collage Facebook"
 msgstr "Facebook collage"
@@ -1466,9 +1454,6 @@ msgstr "A lot accepts at most %d photographs."
 msgid "Avec le routage actuel, une recette complète est estimée à %1$s, et jusqu’à %2$s si l’approbation finale refuse à chaque tentative. Un plafond sous la première valeur refuse le lot au lancement ; sous la seconde, il arrête les nouvelles tentatives avant de le franchir, et la recette se termine avec le dernier verdict."
 msgstr "With the current routing, a complete recipe is estimated at %1$s, and up to %2$s if the final approval refuses at every attempt. A ceiling below the first figure refuses the lot at launch; below the second, it stops further attempts before crossing it, and the recipe finishes with the last verdict."
 
-msgid "Le plafond par recette est plus bas : il arrête les nouvelles tentatives avant de le franchir, la recette se termine et le dernier verdict va au rédacteur."
-msgstr "The per-recipe ceiling is lower: it stops further attempts before crossing it, the recipe finishes and the last verdict goes to the writer."
-
 msgid "Choisir…"
 msgstr "Choose…"
 
@@ -1539,15 +1524,6 @@ msgstr "Check the pairing"
 
 msgid "Relisez les brouillons"
 msgstr "Review the drafts"
-
-msgid "Article en %1$s · plafond de %2$s par recette."
-msgstr "Article in %1$s · ceiling of %2$s per recipe."
-
-msgid "Article en %s."
-msgstr "Article in %s."
-
-msgid "Modifier dans les réglages"
-msgstr "Change in settings"
 
 msgid "S’applique à chaque recette de chaque lot : le formulaire de lot n’en propose plus."
 msgstr "Applies to every recipe of every lot: the lot form no longer offers one."
@@ -1904,12 +1880,6 @@ msgstr "Result"
 msgid "Étape de création"
 msgstr "Creation step"
 
-msgid "Le modèle du visuel Facebook de chaque recette de ce lot."
-msgstr "The Facebook image template for every recipe in this lot."
-
-msgid "Visuel Facebook"
-msgstr "Facebook image"
-
 msgid "Créer"
 msgstr "Create"
 
@@ -2163,15 +2133,6 @@ msgstr "What was spent against each ceiling, photograph reading and redraws incl
 msgid "Plafonds du site"
 msgstr "Site ceilings"
 
-msgid "Ce qu’un rédacteur peut lancer. Un type décoché disparaît de son formulaire et est refusé s’il est demandé autrement. Les administrateurs gardent les trois. Il en reste toujours au moins un : tout décocher les rouvre tous."
-msgstr "What an editor may start. An unticked type disappears from their form and is refused if asked for any other way. Administrators keep all three. At least one always stays open: unticking them all reopens them all."
-
-msgid "Ce type de lot n’est pas ouvert aux rédacteurs sur ce site. Choisissez-en un autre."
-msgstr "This type of lot is not open to editors on this site. Choose another."
-
-msgid "Types de lot ouverts aux rédacteurs"
-msgstr "Types of lot open to editors"
-
 msgid "Les mêmes modèles là où les moins chers ont été mesurés insuffisants, un peu moins de réflexion pour la recherche et le contrôle final, les deux images en qualité basse."
 msgstr "The same models where the cheapest were measured unfit, a little less thinking for the research and the final check, both images at low quality."
 
@@ -2382,9 +2343,63 @@ msgid "Déposez un nouveau lot, puis suivez ce qui est en cours, ce qui attend u
 msgstr "Drop in a new lot, then follow what is running, what is waiting to be read and what stopped."
 
 #, php-format
-msgid "Environ %1$s pour %3$d recette(s) · jamais plus de %2$s : le plafond arrête une recette avant de le dépasser."
-msgstr "About %1$s for %3$d recipe(s) · never more than %2$s: the ceiling stops a recipe before it goes over."
-
-#, php-format
 msgid "Au pire %s par recette, si la recherche use de toutes ses recherches permises."
 msgstr "At worst %s per recipe, if the research uses every search it is allowed."
+
+#, php-format
+msgid "%d photographie"
+msgid_plural "%d photographies"
+msgstr[0] "%d photograph"
+msgstr[1] "%d photographs"
+
+#, php-format
+msgid "%s mot"
+msgid_plural "%s mots"
+msgstr[0] "%s word"
+msgstr[1] "%s words"
+
+msgid "Administrateur"
+msgstr "Administrator"
+
+msgid "Auteur de l’article"
+msgstr "Article author"
+
+msgid "Catégories"
+msgstr "Categories"
+
+msgid "Ce que produit un lot"
+msgstr "What a lot produces"
+
+#, php-format
+msgid "Environ %1$s pour %2$d recette(s)."
+msgstr "About %1$s for %2$d recipe(s)."
+
+msgid "Envoyé"
+msgstr "Sent"
+
+msgid "La recette"
+msgstr "The recipe"
+
+msgid "Le type de chaque lot, selon qui l’envoie. Le formulaire du nouveau lot ne le demande pas : ce choix vaut pour tous les lots de ce type d’utilisateur, avec la langue et le plafond ci-dessus. Montants estimés par recette."
+msgstr "Each lot's type, by who sends it. The new-lot form does not ask for it: this choice applies to every lot from that kind of user, with the language and ceiling above. Amounts are estimates per recipe."
+
+msgid "Nouveau lot de recettes"
+msgstr "New recipes lot"
+
+msgid "Terminée"
+msgstr "Finished"
+
+msgid "Utilisateur"
+msgstr "User"
+
+msgid "collage dessiné en premier"
+msgstr "collage drawn first"
+
+msgid "texte seul"
+msgstr "text only"
+
+msgid "votre collage Facebook"
+msgstr "your Facebook collage"
+
+msgid "Éditeur"
+msgstr "Editor"

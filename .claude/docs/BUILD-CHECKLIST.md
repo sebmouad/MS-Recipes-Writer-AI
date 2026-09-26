@@ -630,6 +630,15 @@ cost) in the task before changing anything.
   (2026-09-24).** The writer's photograph shows the prompt's writer the dish;
   the collage is drawn from the style reference. Real: the owner's own rôti
   photograph, drawn both ways. See ENGINE.md §7, item 40.
+- [x] **A63 — Lot type by kind of user; toolbar button; recipe facts (2026-09-26).**
+  `lot_profiles` replaces `editor_profiles` (migrated in `MSRWA_Settings::get()`);
+  `MSRWA_Profile::for_user()`; the form drops type, language and ceiling;
+  `MSRWA_Admin::toolbar()`; `MSRWA_UI::facts()` on the recipe screen.
+  `tests/test-lot-profiles.php`, `tests/test-settings-save.php`,
+  `tests/test-screens.php`. Real: the settings table saved in a browser, and a
+  writer's lot sent through the form took the writers' type (lot 98, `article`);
+  the toolbar button on the admin and the site for admin and writer, opening
+  the form; the recipe facts on runs 77 and 80, desktop and phone.
 - [x] **A62 — One page for the new lot and the pass (2026-09-26).**
   `MSRWA_Screen_Compose::form()` heads `MSRWA_Screen_Pass::render()`; the
   *Nouveau lot* menu entry is gone and `msrwa-compose` still opens the pass.

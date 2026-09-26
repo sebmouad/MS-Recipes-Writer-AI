@@ -69,13 +69,14 @@ foreach ( array( 'recipe_schema', 'seo_meta' ) as $toggle ) {
 	msrwa_test_assert( 1 === MSRWA_Settings::get()[ $toggle ], $toggle . ' can be turned back on.' );
 }
 
-// The types of lot open to editors: a list, of known types, never empty.
-MSRWA_Settings::save( array( 'editor_profiles' => array( 'article', 'nonsense' ), 'editor_profiles_sent' => 1 ) );
-msrwa_test_assert( array( 'article' ) === MSRWA_Settings::get()['editor_profiles'], 'Only known types are kept.' );
-msrwa_test_assert( ! isset( get_option( MSRWA_Settings::OPTION )['editor_profiles_sent'] ), 'The form’s marker is not stored.' );
+// One lot type per kind of user, of known types only; a save from another
+// form leaves them alone. A site that closed types to editors before keeps,
+// for its writers and editors, the most complete it left open.
+MSRWA_Settings::save( array( 'lot_profiles' => array( 'writer' => 'article', 'editor' => 'nonsense', 'admin' => 'featured' ) ) );
+msrwa_test_assert( array( 'writer' => 'article', 'editor' => 'full', 'admin' => 'featured' ) === MSRWA_Settings::get()['lot_profiles'], 'Only known types are kept.' );
 MSRWA_Settings::save( array( 'quality_min_words' => 2500 ) );
-msrwa_test_assert( array( 'article' ) === MSRWA_Settings::get()['editor_profiles'], 'A save from another form leaves the choice alone.' );
-MSRWA_Settings::save( array( 'editor_profiles_sent' => 1 ) );
-msrwa_test_assert( array( 'full', 'featured', 'article' ) === MSRWA_Settings::get()['editor_profiles'], 'Unticking every type reopens them all.' );
+msrwa_test_assert( 'article' === MSRWA_Settings::get()['lot_profiles']['writer'], 'A save from another form leaves the choice alone.' );
+update_option( MSRWA_Settings::OPTION, array( 'editor_profiles' => array( 'featured', 'article' ) ) );
+msrwa_test_assert( array( 'writer' => 'featured', 'editor' => 'featured', 'admin' => 'full' ) === MSRWA_Settings::get()['lot_profiles'], 'The old editors’ choice carries over.' );
 
 msrwa_test_done( 'production settings save regression' );

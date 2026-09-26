@@ -77,6 +77,8 @@ final class MSRWA_Plugin {
 		add_action( 'msrwa_cleanup', array( __CLASS__, 'prune' ) );
 		add_action( 'msrwa_cleanup', array( 'MSRWA_Schedule', 'due' ) );
 		if ( is_admin() ) { MSRWA_Admin::hooks(); MSRWA_Editor::hooks(); }
+		// The toolbar is drawn on the site as well as in the admin.
+		add_action( 'admin_bar_menu', array( 'MSRWA_Admin', 'toolbar' ), 75 );
 		MSRWA_Schema::hooks();
 		MSRWA_Head::hooks();
 		MSRWA_Stack::hooks();

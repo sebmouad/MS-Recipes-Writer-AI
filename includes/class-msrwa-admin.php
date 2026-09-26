@@ -49,6 +49,21 @@ final class MSRWA_Admin {
 
 	public static function submenu_file( $file ) { return '' !== self::hidden_parent() ? self::hidden_parent() : $file; }
 
+	/**
+	 * "Nouveau lot de recettes" in WordPress's own toolbar, beside "+ New":
+	 * starting a lot is what the people allowed to do it come for, from any
+	 * screen of the admin or the site. It opens the form at the top of the pass.
+	 */
+	public static function toolbar( $bar ) {
+		if ( ! is_user_logged_in() || ! MSRWA_Rights::may_write() || ! $bar instanceof WP_Admin_Bar ) { return; }
+		$bar->add_node( array(
+			'id' => 'msrwa-new-lot',
+			'title' => '<span class="ab-icon dashicons dashicons-food" aria-hidden="true"></span><span class="ab-label">' . esc_html__( 'Nouveau lot de recettes', 'ms-recipes-writer-ai' ) . '</span>',
+			'href' => admin_url( 'admin.php?page=msrwa#ms-new' ),
+			'meta' => array( 'class' => 'msrwa-toolbar-new', 'title' => __( 'Nouveau lot de recettes', 'ms-recipes-writer-ai' ) ),
+		) );
+	}
+
 	/** In the order the work happens: the pass with its new lot, the record, the levers. */
 	public static function menu() {
 		// No upload rights, no plugin: a contributor does not see the menu at
@@ -148,7 +163,6 @@ final class MSRWA_Admin {
 				/* translators: %d is a number of photographs. */
 				'manyImages' => __( '%d photographies', 'ms-recipes-writer-ai' ),
 				// The site's ceiling, for the estimate line; a writer is never sent it.
-				'ceilingUsd' => MSRWA_Rights::may_see_money() ? (float) MSRWA_Settings::get()['per_recipe_budget_usd'] : 0,
 				'photoBytes' => self::photo_bytes(),
 				'photoCount' => MSRWA_Intake::MAX_PHOTOS,
 				'postBytes' => self::post_bytes(),
@@ -171,8 +185,10 @@ final class MSRWA_Admin {
 				'pastedName' => __( 'Image collée %d', 'ms-recipes-writer-ai' ),
 				'recipeTitleOnly' => __( 'le nom seul', 'ms-recipes-writer-ai' ),
 				'recipeWithDetails' => __( 'avec des précisions', 'ms-recipes-writer-ai' ),
-				/* translators: 1: likely cost, 2: the ceiling, 3: number of recipes. */
-				'estimate' => __( 'Environ %1$s pour %3$d recette(s) · jamais plus de %2$s : le plafond arrête une recette avant de le dépasser.', 'ms-recipes-writer-ai' ),
+				/* translators: 1: likely cost, 2: number of recipes. */
+				'estimate' => __( 'Environ %1$s pour %2$d recette(s).', 'ms-recipes-writer-ai' ),
+				/* translators: %s is an amount in US dollars. */
+				'retryMax' => __( 'Au pire %s par recette, si la recherche use de toutes ses recherches permises.', 'ms-recipes-writer-ai' ),
 				'noRecipes' => __( 'Collez au moins une recette ou ajoutez au moins une photographie.', 'ms-recipes-writer-ai' ),
 				'describing' => __( 'Description des photographies…', 'ms-recipes-writer-ai' ),
 				'saving' => __( 'Enregistrement…', 'ms-recipes-writer-ai' ),
@@ -222,9 +238,6 @@ final class MSRWA_Admin {
 				'previewPrice' => __( 'Tarif connu', 'ms-recipes-writer-ai' ),
 				'previewCost' => __( 'Coût estimé', 'ms-recipes-writer-ai' ),
 				'previewThinking' => __( 'Réflexion', 'ms-recipes-writer-ai' ),
-				/* translators: %s is an amount in US dollars. */
-				'retryMax' => __( 'Au pire %s par recette, si la recherche use de toutes ses recherches permises.', 'ms-recipes-writer-ai' ),
-				'retryOverCeiling' => __( 'Le plafond par recette est plus bas : il arrête les nouvelles tentatives avant de le franchir, la recette se termine et le dernier verdict va au rédacteur.', 'ms-recipes-writer-ai' ),
 				/* translators: %s is an amount in US dollars. */
 				'previewTotal' => __( 'Une recette complète est estimée à %s — une estimation, jamais une facture.', 'ms-recipes-writer-ai' ),
 				'previewUnpriced' => __( 'Sans tarif, donc absentes du total :', 'ms-recipes-writer-ai' ),

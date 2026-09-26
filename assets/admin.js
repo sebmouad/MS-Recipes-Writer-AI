@@ -117,10 +117,7 @@
       // ask a hundred times.
       window.clearTimeout(pending);
       pending = window.setTimeout(function () {
-        var profile = compose.querySelector('input[name=profile]:checked');
-
         var query = {
-          profile: profile ? profile.value : '',
           recipes: count,
           images: chosen.length
         };
@@ -131,36 +128,22 @@
             say(estimate, data.fits === false ? (t.overCeilingWriter || '') : '');
             return;
           }
-          var cap = ceiling() * count;
-          // Two numbers, and they are different things: what this is likely to
-          // cost, and the most it is allowed to cost. Showing only the first is
-          // how a surprise bill happens.
+          // What this is likely to cost. What the lot produces and its ceiling
+          // are the site's settings, not this form's.
           var line = (t.estimate || '')
             .replace('%1$s', money(data.cost_usd))
-            .replace('%2$s', money(cap))
-            .replace('%3$d', count);
+            .replace('%2$d', count);
           if (data.unpriced && data.unpriced.length) {
             line += ' ' + (t.unpriced || '').replace('%s', data.unpriced.join(', '));
           }
           if (data.fits === false) {
             line += ' ' + (t.overCeiling || '').replace('%1$s', money(data.per_recipe_usd)).replace('%2$s', money(data.ceiling_usd));
-          } else if (data.per_recipe_max_usd > data.per_recipe_usd) {
-            // Research may search more than it is asked to, and the final
-            // check may have to be asked again; nothing is redrawn by itself.
-            line += ' ' + (t.retryMax || '').replace('%s', money(data.per_recipe_max_usd));
-            if (data.ceiling_usd > 0 && data.per_recipe_max_usd > data.ceiling_usd) { line += ' ' + (t.retryOverCeiling || ''); }
           }
           say(estimate, line);
         }).catch(function () {
           say(estimate, '');
         });
       }, 400);
-    }
-
-    // A writer is never shown money, so the field is simply not there for
-    // them and the server applies the site's own ceiling.
-    function ceiling() {
-      return t.ceilingUsd || 0;
     }
 
     // The recipes as they will be read: one line per block, its title and
@@ -198,7 +181,6 @@
         renderRecipes(); refreshEstimate();
       });
     }
-    compose.querySelectorAll('input[name=profile]').forEach(function (input) { input.addEventListener('change', refreshEstimate); });
 
     function megabytes(bytes) { return String(Math.floor(bytes / 1000000)); }
 
@@ -414,10 +396,6 @@
       if (problem) { say(status, problem); button.disabled = false; return; }
       var form = new FormData();
       form.append('recipes', recipes.value);
-      form.append('profile', (compose.querySelector('input[name=profile]:checked') || {}).value || '');
-      // Offered only when the site has more than one Facebook template.
-      var template = compose.querySelector('input[name=facebook_template]:checked');
-      if (template) { form.append('facebook_template', template.value); }
       // Files first, numbered in the order the server reads them; addresses after.
       var sent = 0;
       chosen.forEach(function (file) {

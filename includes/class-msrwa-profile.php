@@ -56,35 +56,33 @@ final class MSRWA_Profile {
 
 	public static function exists( $profile ) { return array_key_exists( (string) $profile, self::all() ); }
 
-	/**
-	 * The types the current user may start a lot with. An administrator may use
-	 * all three; an editor, those the settings leave open — at least one.
-	 */
-	public static function offered() {
-		$all = self::all();
-		if ( MSRWA_Rights::may_manage() ) { return $all; }
-		$open = array_intersect_key( $all, array_flip( (array) ( MSRWA_Settings::get()['editor_profiles'] ?? array() ) ) );
-		return $open ? $open : $all;
+	/** The three kinds of user a lot type is set for, in the settings. */
+	public static function users() {
+		return array(
+			'writer' => __( 'Rédacteur', 'ms-recipes-writer-ai' ),
+			'editor' => __( 'Éditeur', 'ms-recipes-writer-ai' ),
+			'admin' => __( 'Administrateur', 'ms-recipes-writer-ai' ),
+		);
 	}
 
-	/** Whether the current user may start a lot of this type. */
-	public static function allowed( $profile ) { return array_key_exists( (string) $profile, self::offered() ); }
+	/**
+	 * Which of those a user is: an administrator manages the plugin, an editor
+	 * can edit others' posts, a writer is anybody else allowed to send a lot.
+	 */
+	public static function user_kind( $user_id = 0 ) {
+		$user_id = $user_id ? (int) $user_id : get_current_user_id();
+		if ( user_can( $user_id, MSRWA_Rights::MANAGE ) ) { return 'admin'; }
+		return user_can( $user_id, 'edit_others_posts' ) ? 'editor' : 'writer';
+	}
 
 	/**
-	 * The Facebook templates a lot may pick, key => label, the site's default
-	 * first. Only templates whose prompt file exists are offered; with one,
-	 * there is nothing to pick and no field is shown.
+	 * What a lot sent by this user produces: an administrator's choice in the
+	 * settings, one per kind of user. A lot used to pick its own, which put a
+	 * decision about cost and output in front of everyone who sent one.
 	 */
-	public static function facebook_templates() {
-		$config = MSRWA_Engine_Config::create( MSRWA_Engine_Settings::stored() );
-		$default = $config->facebook_template()['key'];
-		$out = array();
-		foreach ( array_filter( (array) $config->get( 'images.facebook_templates', array() ), 'is_array' ) as $key => $template ) {
-			if ( '' === (string) ( $template['prompt'] ?? '' ) || ! is_readable( MSRWA_Engine_Input::prompt_path( (string) $template['prompt'] ) ) ) { continue; }
-			$out[ (string) $key ] = (string) ( $template['label'] ?? $key );
-		}
-		if ( isset( $out[ $default ] ) ) { $out = array( $default => $out[ $default ] ) + $out; }
-		return $out;
+	public static function for_user( $user_id = 0 ) {
+		$profile = (string) ( ( (array) ( MSRWA_Settings::get()['lot_profiles'] ?? array() ) )[ self::user_kind( $user_id ) ] ?? self::FULL );
+		return self::exists( $profile ) ? $profile : self::FULL;
 	}
 
 	public static function get( $profile ) {

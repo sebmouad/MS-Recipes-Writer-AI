@@ -102,9 +102,6 @@ msgstr "من الذاكرة"
 msgid "Ce qui a réellement été facturé, et quelle part de l’entrée le fournisseur a servie depuis son cache."
 msgstr "ما جرت فوترته فعلاً، وكم من المُدخل قدّمه المزوّد من ذاكرته."
 
-msgid "Ce qu’il faut produire"
-msgstr "ما المطلوب إنتاجه"
-
 msgid "Contrôle"
 msgstr "الفحص"
 
@@ -185,9 +182,6 @@ msgstr "النموذج"
 
 msgid "Moteur"
 msgstr "المحرك"
-
-msgid "Nouveau lot"
-msgstr "دفعة جديدة"
 
 msgid "Ouvrir les réglages"
 msgstr "افتح الإعدادات"
@@ -606,9 +600,6 @@ msgstr "خطوات"
 msgid "Texte uniquement, relu et vérifié. Aucune image n’est générée, et le jugement final n’aurait rien à regarder."
 msgstr "نص فقط، مُدقَّق ومُتحقَّق منه. لا تُولَّد أي صورة، ولن يكون لدى الحكم النهائي ما ينظر إليه."
 
-msgid "Chaque recette suit le même chemin. Les montants sont calculés depuis le routage et les tarifs réellement configurés — ce sont des estimations, jamais une facture."
-msgstr "كل وصفة تسلك المسار نفسه. والمبالغ محسوبة من التوجيه والتسعيرات المُعدّة فعلاً — تقديرات لا فاتورة."
-
 msgid "Le total est incomplet : %s tourne(nt) sur un modèle sans tarif publié."
 msgstr "المجموع ناقص: %s تجري على نموذج بلا تسعيرة منشورة."
 
@@ -923,9 +914,6 @@ msgstr "تتجاوز هذه الدفعة سقف الوصفة المحدد للم
 
 msgid "Ce que chaque article doit être. Ces réglages atteignent directement les prompts et les contrôles du moteur."
 msgstr "ما يجب أن تكون عليه كل مقالة. تصل هذه الإعدادات مباشرة إلى تعليمات المحرك وفحوصه."
-
-msgid "Chaque recette suit le même chemin. Plus il y a d’images, plus la recette demande de travail."
-msgstr "تسلك كل وصفة المسار نفسه. كلما زادت الصور زاد العمل الذي تتطلبه الوصفة."
 
 msgid "Collage Facebook"
 msgstr "مجموعة صور فيسبوك"
@@ -1486,9 +1474,6 @@ msgstr "تقبل الدفعة %d صورة على الأكثر."
 msgid "Avec le routage actuel, une recette complète est estimée à %1$s, et jusqu’à %2$s si l’approbation finale refuse à chaque tentative. Un plafond sous la première valeur refuse le lot au lancement ; sous la seconde, il arrête les nouvelles tentatives avant de le franchir, et la recette se termine avec le dernier verdict."
 msgstr "مع التوجيه الحالي، تُقدَّر الوصفة الكاملة بـ %1$s، وحتى %2$s إذا رفضت الموافقة النهائية في كل محاولة. سقف أقل من القيمة الأولى يرفض الدفعة عند الإطلاق؛ وسقف أقل من الثانية يوقف المحاولات الإضافية قبل تجاوزه، وتكتمل الوصفة بآخر حكم."
 
-msgid "Le plafond par recette est plus bas : il arrête les nouvelles tentatives avant de le franchir, la recette se termine et le dernier verdict va au rédacteur."
-msgstr "سقف الوصفة أقل من ذلك: يوقف المحاولات الإضافية قبل تجاوزه، وتكتمل الوصفة ويذهب آخر حكم إلى المحرر."
-
 msgid "Choisir…"
 msgstr "اختر…"
 
@@ -1563,15 +1548,6 @@ msgstr "تحقق من المطابقة"
 
 msgid "Relisez les brouillons"
 msgstr "راجع المسودات"
-
-msgid "Article en %1$s · plafond de %2$s par recette."
-msgstr "المقال باللغة %1$s · سقف %2$s لكل وصفة."
-
-msgid "Article en %s."
-msgstr "المقال باللغة %s."
-
-msgid "Modifier dans les réglages"
-msgstr "التعديل في الإعدادات"
 
 msgid "S’applique à chaque recette de chaque lot : le formulaire de lot n’en propose plus."
 msgstr "يُطبَّق على كل وصفة في كل دفعة: لم يعد نموذج الدفعة يعرضه."
@@ -1936,12 +1912,6 @@ msgstr "النتيجة"
 msgid "Étape de création"
 msgstr "خطوة الإنشاء"
 
-msgid "Le modèle du visuel Facebook de chaque recette de ce lot."
-msgstr "قالب صورة فيسبوك لكل وصفة في هذه الدفعة."
-
-msgid "Visuel Facebook"
-msgstr "صورة فيسبوك"
-
 msgid "Créer"
 msgstr "إنشاء"
 
@@ -2207,15 +2177,6 @@ msgstr "ما أُنفق مقابل كل سقف، بما في ذلك قراءة �
 msgid "Plafonds du site"
 msgstr "سقوف الموقع"
 
-msgid "Ce qu’un rédacteur peut lancer. Un type décoché disparaît de son formulaire et est refusé s’il est demandé autrement. Les administrateurs gardent les trois. Il en reste toujours au moins un : tout décocher les rouvre tous."
-msgstr "ما يمكن للمحرر إطلاقه. يختفي النوع غير المحدد من نموذجه ويُرفض إن طُلب بطريقة أخرى. يحتفظ المديرون بالأنواع الثلاثة. يبقى نوع واحد مفتوحًا على الأقل: إلغاء تحديدها كلها يعيد فتحها كلها."
-
-msgid "Ce type de lot n’est pas ouvert aux rédacteurs sur ce site. Choisissez-en un autre."
-msgstr "هذا النوع من الدفعات غير متاح للمحررين على هذا الموقع. اختر نوعًا آخر."
-
-msgid "Types de lot ouverts aux rédacteurs"
-msgstr "أنواع الدفعات المتاحة للمحررين"
-
 msgid "Les mêmes modèles là où les moins chers ont été mesurés insuffisants, un peu moins de réflexion pour la recherche et le contrôle final, les deux images en qualité basse."
 msgstr "النماذج نفسها حيث ثبت بالقياس أن الأرخص غير كافية، وتفكير أقل قليلًا للبحث والفحص النهائي، والصورتان بجودة منخفضة."
 
@@ -2430,9 +2391,71 @@ msgid "Déposez un nouveau lot, puis suivez ce qui est en cours, ce qui attend u
 msgstr "أودِع دفعة جديدة، ثم تابع ما يجري تنفيذه، وما ينتظر المراجعة، وما توقّف."
 
 #, php-format
-msgid "Environ %1$s pour %3$d recette(s) · jamais plus de %2$s : le plafond arrête une recette avant de le dépasser."
-msgstr "حوالي %1$s لـ %3$d وصفة · لا أكثر من %2$s أبدًا: يوقف السقف الوصفة قبل تجاوزه."
-
-#, php-format
 msgid "Au pire %s par recette, si la recherche use de toutes ses recherches permises."
 msgstr "في أسوأ الأحوال %s للوصفة، إذا استخدم البحث كل عمليات البحث المسموح بها."
+
+#, php-format
+msgid "%d photographie"
+msgid_plural "%d photographies"
+msgstr[0] "لا صور"
+msgstr[1] "صورة واحدة"
+msgstr[2] "صورتان"
+msgstr[3] "%d صور"
+msgstr[4] "%d صورة"
+msgstr[5] "%d صورة"
+
+#, php-format
+msgid "%s mot"
+msgid_plural "%s mots"
+msgstr[0] "لا كلمات"
+msgstr[1] "كلمة واحدة"
+msgstr[2] "كلمتان"
+msgstr[3] "%s كلمات"
+msgstr[4] "%s كلمة"
+msgstr[5] "%s كلمة"
+
+msgid "Administrateur"
+msgstr "مدير"
+
+msgid "Auteur de l’article"
+msgstr "كاتب المقال"
+
+msgid "Catégories"
+msgstr "التصنيفات"
+
+msgid "Ce que produit un lot"
+msgstr "ما تُنتجه الدفعة"
+
+#, php-format
+msgid "Environ %1$s pour %2$d recette(s)."
+msgstr "حوالي %1$s لـ %2$d وصفة."
+
+msgid "Envoyé"
+msgstr "المُرسَل"
+
+msgid "La recette"
+msgstr "الوصفة"
+
+msgid "Le type de chaque lot, selon qui l’envoie. Le formulaire du nouveau lot ne le demande pas : ce choix vaut pour tous les lots de ce type d’utilisateur, avec la langue et le plafond ci-dessus. Montants estimés par recette."
+msgstr "نوع كل دفعة حسب من يرسلها. لا يطلبه نموذج الدفعة الجديدة: يسري هذا الاختيار على كل دفعات هذا النوع من المستخدمين، مع اللغة والسقف أعلاه. المبالغ تقديرية لكل وصفة."
+
+msgid "Nouveau lot de recettes"
+msgstr "دفعة وصفات جديدة"
+
+msgid "Terminée"
+msgstr "انتهت"
+
+msgid "Utilisateur"
+msgstr "المستخدم"
+
+msgid "collage dessiné en premier"
+msgstr "كولاج رُسم أولًا"
+
+msgid "texte seul"
+msgstr "نص فقط"
+
+msgid "votre collage Facebook"
+msgstr "كولاج فيسبوك الخاص بك"
+
+msgid "Éditeur"
+msgstr "محرر"

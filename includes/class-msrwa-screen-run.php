@@ -28,6 +28,7 @@ final class MSRWA_Screen_Run {
 			self::figures( $run, $state ),
 			self::actions( $run )
 		);
+		MSRWA_UI::facts( $run );
 
 		// Where it stands, in a sentence, for everybody; the raw message only for
 		// whoever can act on it.

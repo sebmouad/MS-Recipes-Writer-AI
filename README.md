@@ -5,10 +5,11 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.28.29
+## État actuel — 0.28.30
 
-La version `0.28.29` réunit le nouveau lot et le pass sur une seule page, le
-formulaire en tête ; la `0.28.28` alignait l'estimation sur les coûts réels et
+La version `0.28.30` règle le type de chaque lot dans les réglages, par type
+d'utilisateur, et ajoute *Nouveau lot de recettes* à la barre d'outils ; la
+`0.28.29` réunissait le nouveau lot et le pass sur une seule page ; la `0.28.28` alignait l'estimation sur les coûts réels et
 faisait servir le cache du fournisseur ; la `0.28.27` faisait du collage
 Facebook le point de départ de la recette. Le détail de chaque version suit, de
 la plus récente à la plus ancienne.
@@ -80,6 +81,26 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.28.30
+
+**Le type de lot se règle une fois, par type d'utilisateur.**
+- Le formulaire *Nouveau lot de recettes* ne demande plus que les recettes et
+  les photographies : plus de choix de ce qu'il faut produire, plus de rappel
+  de la langue ni du plafond.
+- *Réglages → Ce que produit un lot* : un tableau, une ligne par type
+  d'utilisateur — rédacteur, éditeur, administrateur — et une colonne par
+  type de lot avec son coût estimé. Chaque lot prend le type de la personne
+  qui l'envoie. Un site qui avait fermé des types aux rédacteurs garde, pour
+  les rédacteurs et les éditeurs, le plus complet qu'il avait laissé ouvert.
+- *Nouveau lot de recettes* dans la barre d'outils de WordPress, en haut de
+  chaque écran de l'administration et du site, pour qui peut envoyer un lot.
+- L'écran d'une recette dit qui l'a envoyée (avec son avatar) et, s'il
+  diffère, l'auteur de l'article ; le lot, son type et sa langue ; quand elle
+  a été créée et terminée ; l'état de l'article, ses catégories et sa
+  longueur ; ce qui a été envoyé (texte seul ou photographies, votre collage
+  ou un collage dessiné en premier) ; et les liens pour le modifier ou le voir.
+- L'estimation sous le formulaire tient en une phrase.
 
 ## Version 0.28.29
 

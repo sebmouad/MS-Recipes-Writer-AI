@@ -59,9 +59,8 @@ final class MSRWA_REST {
 	 * that cannot be exceeded.
 	 */
 	public static function estimate( WP_REST_Request $request ) {
-		$profile = sanitize_key( (string) $request->get_param( 'profile' ) );
 		$estimate = MSRWA_Estimate::lot(
-			MSRWA_Profile::exists( $profile ) ? $profile : MSRWA_Profile::FULL,
+			MSRWA_Profile::for_user(),
 			(int) $request->get_param( 'recipes' ),
 			(int) $request->get_param( 'images' )
 		);
@@ -102,29 +101,15 @@ final class MSRWA_REST {
 		if ( '' !== $refused ) { MSRWA_Intake::discard( $files ); return new WP_Error( 'msrwa_bad_photo', $refused, array( 'status' => 400 ) ); }
 		if ( ! $recipes && ! $files ) { return new WP_Error( 'msrwa_no_recipes', __( 'Collez au moins une recette ou ajoutez au moins une photographie.', 'ms-recipes-writer-ai' ), array( 'status' => 400 ) ); }
 
-		// The per-recipe ceiling is the site's unless the person may set it. It
-		// used to be worked out here and then not used, so anybody who could
-		// submit a lot could name their own ceiling by posting one.
-		// Language and ceiling are the site's settings, never the request's: a
-		// lot cannot name a language nobody reviews in or a ceiling of its own.
+		// What the lot produces, its language and its ceiling are the site's
+		// settings, an administrator's, never the request's: a lot cannot name
+		// its own type, a language nobody reviews in, or a ceiling of its own.
 		$budget = (float) MSRWA_Settings::get()['per_recipe_budget_usd'];
-		// The Facebook template is the lot's to choose, among the site's; an
-		// unknown key is not an error, the site's default serves.
-		$overrides = array();
-		$template = sanitize_key( (string) $request->get_param( 'facebook_template' ) );
-		if ( '' !== $template && isset( MSRWA_Profile::facebook_templates()[ $template ] ) ) { $overrides['images']['facebook_template'] = $template; }
-		// A type the settings closed to editors is refused here too, not only
-		// left off the form: the form is a courtesy, this is the rule.
-		$profile = sanitize_key( (string) $request->get_param( 'profile' ) );
-		if ( '' === $profile ) { $profile = (string) array_key_first( MSRWA_Profile::offered() ); }
-		if ( ! MSRWA_Profile::allowed( $profile ) ) {
-			return new WP_Error( 'msrwa_profile_closed', __( 'Ce type de lot n’est pas ouvert aux rédacteurs sur ce site. Choisissez-en un autre.', 'ms-recipes-writer-ai' ), array( 'status' => 403 ) );
-		}
 		$id = MSRWA_Batch::create(
 			$recipes, $files, $budget,
-			$profile,
+			MSRWA_Profile::for_user(),
 			sanitize_key( (string) MSRWA_Settings::get()['site_language'] ),
-			$overrides
+			array()
 		);
 		MSRWA_Intake::discard( $files );
 		if ( is_wp_error( $id ) ) { return new WP_Error( $id->get_error_code(), $id->get_error_message(), array( 'status' => 400 ) ); }

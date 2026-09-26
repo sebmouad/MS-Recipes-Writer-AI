@@ -97,22 +97,37 @@ final class MSRWA_Screen_Settings {
 				</p>
 			</section>
 
-			<section class="ms-card">
-				<h2><?php esc_html_e( 'Types de lot ouverts aux rédacteurs', 'ms-recipes-writer-ai' ); ?></h2>
-				<p><?php esc_html_e( 'Ce qu’un rédacteur peut lancer. Un type décoché disparaît de son formulaire et est refusé s’il est demandé autrement. Les administrateurs gardent les trois. Il en reste toujours au moins un : tout décocher les rouvre tous.', 'ms-recipes-writer-ai' ); ?></p>
-				<input type="hidden" name="msrwa_settings[editor_profiles_sent]" value="1">
-				<div class="ms-choices">
-					<?php foreach ( MSRWA_Profile::all() as $key => $profile ) : ?>
-						<label class="ms-choice">
-							<input type="checkbox" name="msrwa_settings[editor_profiles][]" value="<?php echo esc_attr( $key ); ?>" <?php checked( in_array( $key, (array) $settings['editor_profiles'], true ) ); ?>>
-							<span class="ms-choice-body">
-								<strong><?php echo esc_html( $profile['label'] ); ?></strong>
-								<small><?php echo esc_html( $profile['description'] ); ?></small>
-							</span>
-							<span class="ms-choice-cost">~ <?php echo esc_html( MSRWA_I18N::money( MSRWA_Estimate::recipe( $key )['cost_usd'], 4 ) ); ?></span>
-						</label>
+			<section class="ms-card ms-card-flush" id="ms-lot-types">
+				<h2><?php esc_html_e( 'Ce que produit un lot', 'ms-recipes-writer-ai' ); ?></h2>
+				<p><?php esc_html_e( 'Le type de chaque lot, selon qui l’envoie. Le formulaire du nouveau lot ne le demande pas : ce choix vaut pour tous les lots de ce type d’utilisateur, avec la langue et le plafond ci-dessus. Montants estimés par recette.', 'ms-recipes-writer-ai' ); ?></p>
+				<?php $msrwa_profiles = MSRWA_Profile::all(); ?>
+				<?php echo MSRWA_UI::scroll( __( 'Ce que produit un lot', 'ms-recipes-writer-ai' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- scroll() escapes its own. ?>
+				<table class="ms-table ms-lot-types">
+					<thead><tr>
+						<th scope="col"><?php esc_html_e( 'Utilisateur', 'ms-recipes-writer-ai' ); ?></th>
+						<?php foreach ( $msrwa_profiles as $key => $profile ) : ?>
+							<th scope="col"><?php echo esc_html( $profile['label'] ); ?><small>~ <?php echo esc_html( MSRWA_I18N::money( MSRWA_Estimate::recipe( $key )['cost_usd'], 4 ) ); ?></small></th>
+						<?php endforeach; ?>
+					</tr></thead>
+					<tbody>
+						<?php foreach ( MSRWA_Profile::users() as $who => $name ) : ?>
+							<tr>
+								<th scope="row"><?php echo esc_html( $name ); ?></th>
+								<?php foreach ( $msrwa_profiles as $key => $profile ) : ?>
+									<td data-label="<?php echo esc_attr( $profile['label'] ); ?>"><label class="ms-lot-type">
+										<input type="radio" name="msrwa_settings[lot_profiles][<?php echo esc_attr( $who ); ?>]" value="<?php echo esc_attr( $key ); ?>" <?php checked( (string) ( $settings['lot_profiles'][ $who ] ?? 'full' ), $key ); ?>>
+										<span class="screen-reader-text"><?php echo esc_html( $name . ' — ' . $profile['label'] ); ?></span>
+									</label></td>
+								<?php endforeach; ?>
+							</tr>
+						<?php endforeach; ?>
+					</tbody>
+				</table></div>
+				<dl class="ms-lot-type-notes">
+					<?php foreach ( $msrwa_profiles as $profile ) : ?>
+						<dt><?php echo esc_html( $profile['label'] ); ?></dt><dd><?php echo esc_html( $profile['description'] ); ?></dd>
 					<?php endforeach; ?>
-				</div>
+				</dl>
 			</section>
 
 			<section class="ms-card">

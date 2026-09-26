@@ -2,7 +2,8 @@
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
 /**
- * Submitting work: recipes, photographs, what to produce.
+ * Submitting work: recipes and photographs. What a lot produces, its language
+ * and its ceiling are the site's, set by an administrator in the settings.
  *
  * Numbered, because it genuinely is a sequence — nothing can be paired before
  * the photographs are chosen, and nothing dispatched before the pairing is
@@ -20,7 +21,7 @@ final class MSRWA_Screen_Compose {
 		?>
 		<section class="ms-new" id="ms-new" aria-labelledby="ms-new-title">
 			<div class="ms-new-head">
-				<h2 id="ms-new-title"><?php esc_html_e( 'Nouveau lot', 'ms-recipes-writer-ai' ); ?></h2>
+				<h2 id="ms-new-title"><?php esc_html_e( 'Nouveau lot de recettes', 'ms-recipes-writer-ai' ); ?></h2>
 				<p><?php esc_html_e( 'Des recettes, des photographies, ou les deux. Les photographies sont décrites puis associées ; sans texte, chaque plat qu’elles montrent devient une recette. Vous confirmez avant que quoi que ce soit ne soit généré.', 'ms-recipes-writer-ai' ); ?></p>
 			</div>
 		<form id="ms-compose" class="ms-steps">
@@ -66,64 +67,9 @@ final class MSRWA_Screen_Compose {
 
 			</div>
 
-			<section class="ms-step">
-				<h3><?php esc_html_e( 'Ce qu’il faut produire', 'ms-recipes-writer-ai' ); ?></h3>
-				<p><?php echo esc_html( MSRWA_Rights::may_see_money()
-					? __( 'Chaque recette suit le même chemin. Les montants sont calculés depuis le routage et les tarifs réellement configurés — ce sont des estimations, jamais une facture.', 'ms-recipes-writer-ai' )
-					: __( 'Chaque recette suit le même chemin. Plus il y a d’images, plus la recette demande de travail.', 'ms-recipes-writer-ai' ) ); ?></p>
-				<div class="ms-choices">
-					<?php $msrwa_offered = MSRWA_Profile::offered(); ?>
-					<?php foreach ( $msrwa_offered as $key => $profile ) : ?>
-						<label class="ms-choice">
-							<input type="radio" name="profile" value="<?php echo esc_attr( $key ); ?>" <?php checked( isset( $msrwa_offered[ MSRWA_Profile::FULL ] ) ? MSRWA_Profile::FULL : array_key_first( $msrwa_offered ), $key ); ?>>
-							<span class="ms-choice-body">
-								<strong><?php echo esc_html( $profile['label'] ); ?></strong>
-								<small><?php echo esc_html( $profile['description'] ); ?></small>
-							</span>
-							<?php if ( MSRWA_Rights::may_see_money() ) : ?>
-								<span class="ms-choice-cost" data-profile-cost="<?php echo esc_attr( $key ); ?>">~ <?php echo esc_html( MSRWA_I18N::money( MSRWA_Estimate::recipe( $key )['cost_usd'], 4 ) ); ?></span>
-							<?php endif; ?>
-						</label>
-					<?php endforeach; ?>
-				</div>
-				<?php $msrwa_templates = MSRWA_Profile::facebook_templates(); ?>
-				<?php if ( count( $msrwa_templates ) > 1 ) : ?>
-					<h3><?php esc_html_e( 'Visuel Facebook', 'ms-recipes-writer-ai' ); ?></h3>
-					<p><?php esc_html_e( 'Le modèle du visuel Facebook de chaque recette de ce lot.', 'ms-recipes-writer-ai' ); ?></p>
-					<div class="ms-choices">
-						<?php foreach ( $msrwa_templates as $key => $label ) : ?>
-							<label class="ms-choice">
-								<input type="radio" name="facebook_template" value="<?php echo esc_attr( $key ); ?>" <?php checked( array_key_first( $msrwa_templates ), $key ); ?>>
-								<span class="ms-choice-body"><strong><?php echo esc_html( $label ); ?></strong></span>
-							</label>
-						<?php endforeach; ?>
-					</div>
-				<?php endif; ?>
-			</section>
-
-			<?php
-			// Language and ceiling are the site's, set once in the settings: a
-			// lot used to carry its own, and a writer could pick a language
-			// nobody reviews in, or an administrator a ceiling nobody meant.
-			$settings = MSRWA_Settings::get();
-			$languages = MSRWA_Profile::languages();
-			$language = $languages[ (string) $settings['site_language'] ] ?? (string) $settings['site_language'];
-			?>
 			<div class="ms-new-go">
 				<div class="ms-new-go-text">
 					<p id="ms-estimate" class="ms-new-estimate" aria-live="polite"></p>
-					<p class="ms-muted ms-lot-defaults" id="ms-lot-defaults">
-						<?php
-						echo esc_html( MSRWA_Rights::may_see_money()
-							/* translators: 1: a language name, 2: an amount in US dollars. */
-							? sprintf( __( 'Article en %1$s · plafond de %2$s par recette.', 'ms-recipes-writer-ai' ), $language, MSRWA_I18N::money( (float) $settings['per_recipe_budget_usd'], 2 ) )
-							/* translators: %s is a language name. */
-							: sprintf( __( 'Article en %s.', 'ms-recipes-writer-ai' ), $language ) );
-						if ( MSRWA_Rights::may_manage() ) {
-							echo ' <a href="' . esc_url( admin_url( 'admin.php?page=msrwa-settings' ) ) . '">' . esc_html__( 'Modifier dans les réglages', 'ms-recipes-writer-ai' ) . '</a>';
-						}
-						?>
-					</p>
 					<p class="ms-muted"><?php esc_html_e( 'Rien n’est écrit à cette étape : seules les photographies sont décrites. Vous verrez les recettes et l’appariement avant de lancer quoi que ce soit.', 'ms-recipes-writer-ai' ); ?></p>
 				</div>
 				<div class="ms-new-go-action">

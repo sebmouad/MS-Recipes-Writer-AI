@@ -145,10 +145,9 @@ msrwa_test_as_admin();
 $GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
 $html = msrwa_render( array( 'MSRWA_Screen_Compose', 'form' ) )['html'] ?? '';
 // The ceiling is the site's, set in the settings: a lot is not asked for one,
-// and the screen says which one applies and where it is changed.
+// and the form no longer repeats it.
 msrwa_test_missing( $html, 'id="ms-budget"', 'A lot does not carry a ceiling of its own.' );
-msrwa_test_contains( $html, '0.33', 'The ceiling shown is the site’s, not a number hardcoded in a template.' );
-msrwa_test_contains( $html, 'page=msrwa-settings', 'An administrator is pointed to where it is changed.' );
+msrwa_test_missing( $html, '0.33', 'Nor shows the settings’ ceiling.' );
 
 unset( $GLOBALS['msrwa_test_options'][ MSRWA_Settings::OPTION ] );
 
@@ -162,28 +161,15 @@ msrwa_test_missing( $GLOBALS['wpdb']->log(), 'SUM(r.cost_usd)', 'A writer’s pa
 $GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
 msrwa_test_missing( msrwa_render( array( 'MSRWA_Screen_Compose', 'form' ) )['html'] ?? '', 'ms-choice-cost', 'A writer is not shown a price per profile.' );
 
-// A lot defaults to the site's article language, not always French.
+// The form asks for recipes and photographs only: the lot's type, language
+// and ceiling are the settings', and it offers none of them.
 msrwa_test_as_admin();
-$GLOBALS['msrwa_test_options'][ MSRWA_Settings::OPTION ] = array( 'site_language' => 'en' );
 $GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
 $compose = msrwa_render( array( 'MSRWA_Screen_Compose', 'form' ) )['html'] ?? '';
-msrwa_test_contains( $compose, 'Article en Anglais', 'The site language is the one a lot is written in.' );
-msrwa_test_missing( $compose, 'id="ms-language"', 'A lot does not choose a language of its own.' );
-
-// One Facebook template: nothing to pick, no field. A second, with its prompt
-// file, is offered on the lot; one whose file is missing never is.
-msrwa_test_missing( $compose, 'name="facebook_template"', 'With one Facebook template the lot shows no choice.' );
-$GLOBALS['msrwa_test_options'][ MSRWA_Engine_Settings::OPTION ] = array( 'images' => array( 'facebook_templates' => array(
-	'hero' => array( 'label' => 'Photo héro', 'prompt' => 'featured_image.tpl.txt', 'panels' => 1 ),
-	'ghost' => array( 'label' => 'Fantôme', 'prompt' => 'missing.tpl.txt' ),
-) ) );
-$GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
-$compose = msrwa_render( array( 'MSRWA_Screen_Compose', 'form' ) )['html'] ?? '';
-msrwa_test_contains( $compose, 'value="hero"', 'A second template is offered on the lot.' );
-msrwa_test_assert( (bool) preg_match( '/value="collage"\s+checked/', $compose ) && strpos( $compose, 'value="collage"' ) < strpos( $compose, 'value="hero"' ), 'The site’s default comes first, checked.' );
-msrwa_test_missing( $compose, 'value="ghost"', 'A template without its prompt file is never offered.' );
-unset( $GLOBALS['msrwa_test_options'][ MSRWA_Engine_Settings::OPTION ] );
-unset( $GLOBALS['msrwa_test_options'][ MSRWA_Settings::OPTION ] );
+foreach ( array( 'name="profile"', 'name="facebook_template"', 'id="ms-language"', 'ms-lot-defaults' ) as $field ) {
+	msrwa_test_missing( $compose, $field, 'The form offers no ' . $field . '.' );
+}
+msrwa_test_contains( $compose, 'Nouveau lot de recettes', 'It is named for what it sends.' );
 
 // --- A writer reads a sentence, not a stack trace ----------------------------
 

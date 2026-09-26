@@ -317,9 +317,6 @@
 .ms-new .ms-step { background: var(--ms-ground); }
 .ms-new-inputs { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr)); align-items: stretch; }
 .ms-new-inputs .ms-recipes-text { min-block-size: 11rem; }
-.ms-new .ms-choices { grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr)); }
-.ms-new .ms-choice { display: grid; grid-template-columns: auto minmax(0, 1fr); align-content: start; column-gap: 10px; }
-.ms-new .ms-choice-cost { grid-column: 2; margin: 8px 0 0; justify-self: start; }
 .ms-new-go { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px 24px; padding: 16px 20px; border-radius: var(--ms-radius); background: var(--ms-lamp-soft); border: 1px solid var(--ms-line); }
 .ms-new-go-text { min-inline-size: 0; flex: 1 1 22rem; }
 .ms-new-go-text p { margin: 0 0 4px; }
@@ -327,6 +324,29 @@
 .ms-new-estimate { font-weight: 600; color: var(--ms-ink); }
 .ms-new-estimate:empty { display: none; }
 .ms-new-go-action { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+/* A recipe's page: who sent it and what became of it, under its title. */
+.ms-facts { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 12px 24px; }
+.ms-facts dl { flex: 1 1 36rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(10.5rem, 1fr)); gap: 14px 22px; margin: 0; }
+.ms-facts dl > div { min-inline-size: 0; }
+.ms-facts dt { margin: 0 0 4px; font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: var(--ms-ink-faint); }
+.ms-facts dd { margin: 0; font-weight: 550; color: var(--ms-ink); overflow-wrap: anywhere; }
+.ms-facts dd small { display: block; margin-block-start: 2px; font-weight: 400; font-size: 12px; color: var(--ms-ink-soft); }
+.ms-fact-person { display: inline-flex; align-items: center; gap: 8px; }
+.ms-fact-person .ms-fact-avatar { inline-size: 24px; block-size: 24px; border-radius: 50%; }
+.ms-fact-post { display: grid; justify-items: start; gap: 2px; }
+.ms-fact-post small { display: block; }
+.ms-facts-links { display: flex; gap: 6px; }
+/* Settings: one lot type per kind of user, a radio per cell. */
+.ms-lot-types th small { display: block; margin-block-start: 2px; font-family: var(--ms-mono); font-weight: 400; text-transform: none; letter-spacing: 0; color: var(--ms-ink-faint); }
+.ms-lot-types td, .ms-lot-types thead th:not(:first-child) { text-align: center; }
+.ms-lot-types tbody th { font-weight: 600; }
+.ms-lot-type { display: inline-grid; place-items: center; inline-size: 36px; block-size: 36px; border-radius: 50%; cursor: pointer; }
+.ms-lot-type:hover { background: var(--ms-lamp-soft); }
+.ms-lot-type input { margin: 0; }
+.ms-lot-type-notes { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 16px; margin: 0; padding: 14px 20px 18px; font-size: 12.5px; color: var(--ms-ink-soft); }
+.ms-lot-type-notes dt { font-weight: 600; color: var(--ms-ink); }
+.ms-lot-type-notes dd { margin: 0; }
+@media (max-width: 640px) { .ms-lot-type-notes { grid-template-columns: 1fr; } .ms-lot-type-notes dd { margin-block-end: 8px; } }
 /* A rail with nothing on it is one line: the form to start is above. */
 .ms-card-quiet { padding-block: 14px; }
 .ms-card-quiet > p { margin: 0; }
@@ -337,7 +357,6 @@
 .ms-choice-body { min-width: 0; }
 .ms-choice strong { display: block; }
 .ms-choice small { display: block; color: var(--ms-ink-soft); margin-block-start: 2px; }
-.ms-choice-cost { margin-inline-start: auto; font-family: var(--ms-mono); font-size: 12px; color: var(--ms-ink-soft); white-space: nowrap; font-variant-numeric: tabular-nums; }
 
 /* The recipes: prose to read, not code; each block shown as it will be read. */
 .ms-recipes-text { display: block; inline-size: 100%; min-block-size: 11rem; padding: 12px 14px; font-size: 14px; line-height: 1.6; color: var(--ms-ink); background: var(--ms-raised); border: 1px solid var(--ms-line); border-radius: var(--ms-radius); resize: vertical; }

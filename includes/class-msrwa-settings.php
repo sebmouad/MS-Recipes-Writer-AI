@@ -28,8 +28,9 @@ final class MSRWA_Settings {
 			'quality_min_score'        => 90,
 			'quality_min_words'   => 2400,
 			'site_language'       => 'fr',
-			// The types of lot an editor may start; administrators keep all three.
-			'editor_profiles'     => array( 'full', 'featured', 'article' ),
+			// What a lot produces, by who sends it: an administrator's choice for
+			// each kind of user, never the lot's.
+			'lot_profiles'        => array( 'writer' => 'full', 'editor' => 'full', 'admin' => 'full' ),
 			'recipe_schema'       => 1,
 			'seo_meta'            => 1,
 			'article_page2_heading' => 'Préparation de la recette étape par étape',
@@ -64,6 +65,14 @@ final class MSRWA_Settings {
 		// A setting a later version retired stays in the option until the next
 		// save; it is not handed to anything in the meantime.
 		$values = array_merge( $defaults, array_intersect_key( is_array( $stored ) ? $stored : array(), $defaults ) );
+		// Before 0.28.30 each lot picked its type among those left open to
+		// non-administrators: a site that closed some keeps, for its writers and
+		// editors, the most complete it left open.
+		if ( is_array( $stored ) && ! isset( $stored['lot_profiles'] ) && ! empty( $stored['editor_profiles'] ) ) {
+			foreach ( array( 'full', 'featured', 'article' ) as $profile ) {
+				if ( in_array( $profile, (array) $stored['editor_profiles'], true ) ) { $values['lot_profiles']['writer'] = $profile; $values['lot_profiles']['editor'] = $profile; break; }
+			}
+		}
 		foreach ( self::secrets() as $key ) { $values[ $key ] = self::decrypt_secret( (string) ( $values[ $key ] ?? '' ) ); }
 		return $values;
 	}
@@ -71,9 +80,6 @@ final class MSRWA_Settings {
 	/** Stores the difference from the defaults, with every key encrypted on the way in. */
 	public static function save( $raw, $source = 'admin' ) {
 		$raw = (array) $raw;
-		// A form that sends no box ticked sends nothing at all: its marker says
-		// the list was on the page, so an empty one is an answer, not an absence.
-		if ( ! empty( $raw['editor_profiles_sent'] ) && ! isset( $raw['editor_profiles'] ) ) { $raw['editor_profiles'] = array(); }
 		// The credentials form only submits three fields; preserve all others.
 		$clean = self::sanitize( array_merge( self::get(), $raw ) );
 		$defaults = self::defaults();
@@ -198,11 +204,9 @@ final class MSRWA_Settings {
 		// These were never read back from a submission, so every save reset them
 		// to what ships: the site language could not be chosen at all.
 		$out['site_language'] = isset( $raw['site_language'] ) && in_array( $raw['site_language'], array( 'fr', 'en', 'ar', 'es' ), true ) ? $raw['site_language'] : $defaults['site_language'];
-		// At least one type stays open: an editor offered nothing could not
-		// work at all, which is not a setting anybody means to make.
-		if ( isset( $raw['editor_profiles'] ) || ! empty( $raw['editor_profiles_sent'] ) ) {
-			$picked = array_values( array_intersect( array( 'full', 'featured', 'article' ), array_map( 'strval', (array) ( $raw['editor_profiles'] ?? array() ) ) ) );
-			$out['editor_profiles'] = $picked ? $picked : $defaults['editor_profiles'];
+		foreach ( $defaults['lot_profiles'] as $who => $profile ) {
+			$picked = (string) ( ( (array) ( $raw['lot_profiles'] ?? array() ) )[ $who ] ?? '' );
+			$out['lot_profiles'][ $who ] = in_array( $picked, array( 'full', 'featured', 'article' ), true ) ? $picked : $profile;
 		}
 		$heading = isset( $raw['article_page2_heading'] ) ? trim( sanitize_text_field( (string) $raw['article_page2_heading'] ) ) : '';
 		$out['article_page2_heading'] = '' !== $heading ? mb_substr( $heading, 0, 120 ) : $defaults['article_page2_heading'];

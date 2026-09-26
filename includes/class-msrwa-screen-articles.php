@@ -36,7 +36,7 @@ final class MSRWA_Screen_Articles {
 				? __( 'Toutes les recettes passées par le moteur, avec leur état et ce qu’elles ont coûté.', 'ms-recipes-writer-ai' )
 				: __( 'Vos recettes passées par le moteur, avec leur état et leur brouillon.', 'ms-recipes-writer-ai' ),
 			array( __( 'résultats', 'ms-recipes-writer-ai' ) => number_format_i18n( $found['total'] ) ),
-			'<a class="button button-primary" href="' . esc_url( admin_url( 'admin.php?page=msrwa#ms-new' ) ) . '">' . esc_html__( 'Nouveau lot', 'ms-recipes-writer-ai' ) . '</a>'
+			'<a class="button button-primary" href="' . esc_url( admin_url( 'admin.php?page=msrwa#ms-new' ) ) . '">' . esc_html__( 'Nouveau lot de recettes', 'ms-recipes-writer-ai' ) . '</a>'
 		);
 		?>
 		<section class="ms-card ms-card-flush">
@@ -77,7 +77,7 @@ final class MSRWA_Screen_Articles {
 					'' !== $filters['search'] || '' !== $filters['status'] || '' !== $filters['post']
 						? __( 'Élargissez le filtre, ou repartez de la liste complète.', 'ms-recipes-writer-ai' )
 						: __( 'Déposez des recettes et des photographies pour lancer un premier lot.', 'ms-recipes-writer-ai' ),
-					'<a class="button button-primary" href="' . esc_url( admin_url( 'admin.php?page=msrwa#ms-new' ) ) . '">' . esc_html__( 'Nouveau lot', 'ms-recipes-writer-ai' ) . '</a>'
+					'<a class="button button-primary" href="' . esc_url( admin_url( 'admin.php?page=msrwa#ms-new' ) ) . '">' . esc_html__( 'Nouveau lot de recettes', 'ms-recipes-writer-ai' ) . '</a>'
 				);
 				?>
 			<?php else : ?>
