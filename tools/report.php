@@ -82,6 +82,11 @@ function report_label( $key ) {
 		'recipe outline' => 'repères de la recette', 'every step has its sign' => 'chaque étape a son signe de réussite',
 		'every ingredient is sourced' => 'chaque ingrédient a sa source', 'photographs of this dish' => 'photographies de ce plat',
 		'references carry a URL' => 'les références ont une adresse',
+		'focus_keyword' => 'Expression principale', 'secondary_keywords' => 'Expressions secondaires',
+		'focus keyword placed' => 'expression principale bien placée',
+		'appliance_versions' => 'Versions aux appareils', 'appliance' => 'Appareil', 'setting' => 'Réglage',
+		'diet_adaptations' => 'Adaptations aux régimes', 'diet' => 'Régime', 'change' => 'Changement',
+		'protein_g' => 'Protéines (g)', 'carbohydrates_g' => 'Glucides (g)', 'fat_g' => 'Lipides (g)',
 	);
 	return $labels[ (string) $key ] ?? str_replace( '_', ' ', (string) $key );
 }

@@ -19,6 +19,14 @@ The second page must begin EXACTLY with <h2>{{page2_opening}}</h2>. It does not 
 {{/unless}}
 FAQ: {{faq_minimum}} to {{faq_maximum}} questions phrased as real search queries, each answer 40 to 60 words and self-contained.
 
+SEARCH — written to be found by Google, Bing and Yahoo, and quoted by AI assistants:
+- Choose one "focus_keyword": the phrase most people type to find this recipe, in {{language}}, two to five words, usually the dish's name with the word for recipe or its most searched quality (easy, homemade, traditional) when this recipe really is that. Choose 4 to 6 "secondary_keywords": the long-tail questions and variants people search about this dish — its time, its oven temperature, how to keep it, what to serve with it, the appliance or diet versions the research documents.
+- Place the focus keyword, word for word, at the start of "seo_title", in "slug", in "seo_description", in the first sentence of the article and in one h2 heading. Use each secondary keyword once, where it fits: an h2 or h3 heading, an FAQ question, a sentence. Never more: a phrase repeated for its own sake reads as spam to readers and to search engines.
+- The first paragraph answers the search on its own, in 40 to 60 words: what the dish is, how long it takes in total, for how many, and its key temperature or technique. Right after it, a short list of the key facts — total time, servings, difficulty, oven temperature or cooking method, and calories per serving when the recipe gives them — each "label: value", taken from the canonical recipe. AI assistants and featured snippets quote exactly this.
+- Every heading reads as a question or a phrase someone would search, never a label such as "Introduction". Each section opens with the sentence that answers its heading, then develops it.
+- Name things precisely, the way a buyer searches for them: the equipment by its type, material and the size this recipe's quantities call for (a 28 cm tart tin, a 24 cm cast-iron casserole, an instant-read thermometer), never a brand; the cut of meat, the variety of the fruit, the kind of flour the recipe uses. Advertisers bid on these exact names, and they are what the reader needs to shop.
+- When the research documents them, give the appliance versions (multicooker, air fryer, slow cooker, food processor), the diet adaptations (gluten-free, dairy-free, vegetarian) and the nutrition per serving each in its own paragraph under the variants or the FAQ, with the figures the source gives. What the research does not document is not offered.
+
 VOICE: you are the cook who knows this dish, talking to the reader. Everything you write is a fact about the dish or an instruction to the cook — never a remark about where it comes from. Never mention sources, research, references, what is "documenté" or "non documenté", "les sources consultées", a recipe file, a photograph, an image, an observation, the generation process, a canonical recipe, a schema, JSON or validation. When you know nothing on a point, you say nothing about it: a sentence announcing that information is missing is never written.
 
 APPEARANCE: the appearance of the cooked dish is supplied below. Use it where the reader needs to recognise a state: what "done" looks like, what the cut reveals. Never describe an appearance it contradicts. A plate, a board, a camera angle, a light, a background or the absence of garnish are never prescribed in the prose: how to serve is taken from the recipe's method alone.
@@ -29,7 +37,7 @@ SAFETY AND ALLERGENS: every entry of the canonical recipe's food_safety reaches 
 
 RULES:
 - content_html opens on the first section's h2 heading. The title is shown by the site above the article: never repeat it as a heading, and never write the words of a plan — no heading or paragraph starts with a label such as « Introduction : », « Conclusion : », « Deuxième partie », « Second article » or « Partie 2 ». The headings are the structure.
-- Paragraphs of 2 to 4 sentences; lists reserved for ingredients, equipment and steps.
+- Paragraphs of 2 to 4 sentences; lists reserved for the key facts, ingredients, equipment and steps.
 - Respect the canonical recipe's quantities, times and temperatures exactly. Invent no figure.
 - SOURCING. You may state only what the canonical recipe contains or the research package documents. This binds the substitutions and the serving suggestions hardest, because that is where invention is easiest: offer a replacement ingredient only when a research fact names it, and an accompaniment only when a fact names that. Where there is none, offer none and do not say so: write instead what the research says the ingredient does in the dish. A section is never padded with a plausible swap.
 - The same holds for storage, reheating and food safety, which invite the most generic advice. Say how long the dish keeps, how to reheat it and what is unsafe only as the canonical recipe or a research fact says it; where they say nothing, give no duration and no method, and write nothing about the gap. No precaution is added because it sounds prudent.
@@ -41,7 +49,8 @@ RULES:
 - "categories" are chosen, never invented: when SITE CATEGORIES are supplied, only names from that list, copied exactly.
 
 OUTPUT — a valid JSON object only, no Markdown, with exactly these keys:
-- "title", "excerpt" ({{excerpt_min}} to {{excerpt_max}} characters), "seo_title" ({{seo_title_min}} to {{seo_title_max}} characters), "seo_description" ({{seo_description_min}} to {{seo_description_max}} characters), "slug", "tags", "categories"
+- "title", "excerpt" ({{excerpt_min}} to {{excerpt_max}} characters), "seo_title" ({{seo_title_min}} to {{seo_title_max}} characters, the focus keyword first), "seo_description" ({{seo_description_min}} to {{seo_description_max}} characters, the focus keyword and what the reader gets), "slug" (the focus keyword, lower case, hyphenated, without accents), "tags", "categories"
+- "focus_keyword": one phrase; "secondary_keywords": array of 4 to 6 phrases
 - "content_html": the complete article in HTML, using only h2, h3, p, ul, ol, li{{#if two_pages}}, with the {{page_break_marker}} marker in place{{/if}}
 - "faq": {{faq_minimum}} to {{faq_maximum}} objects {question, answer} matching the FAQ in the article
 - "recipe_meta": an empty object {} — recipe metadata is taken from the canonical recipe by the engine

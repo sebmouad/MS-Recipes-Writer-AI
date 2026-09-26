@@ -17,7 +17,7 @@ final class MSRWA_Quality {
 	public static function prompt_contract( $settings = null ) {
 		$settings = is_array( $settings ) ? $settings : MSRWA_Settings::get();
 		$benchmark = self::benchmark( $settings );
-		return "\nCONTRAT QUALITÉ MESURABLE : rédige entre " . (int) $benchmark['words'] . ' et ' . (int) ( class_exists( 'MSRWA_Prompt' ) ? MSRWA_Prompt::word_range( $settings )['max'] : ( $settings['quality_max_words'] ?? 4200 ) ) . ' mots utiles, avec au moins ' . (int) $benchmark['headings'] . ' titres h2/h3, ' . (int) $benchmark['paragraphs'] . ' paragraphes, ' . (int) $benchmark['ingredients'] . ' ingrédients lorsque la recette le justifie et ' . (int) $benchmark['steps'] . " étapes. Évite le remplissage, les répétitions et les promesses non étayées. Le JSON doit respecter exactement le schéma demandé et content_html doit être du HTML valide. Inclure choix des ingrédients, substitutions sûres, méthode détaillée, erreurs à éviter, conservation, variantes, service, FAQ et conclusion utile. Retourne recipe_meta comme objet vide : les métadonnées sont reprises directement de la recette canonique par le moteur. Respecte 35–70 caractères pour seo_title, 120–170 pour seo_description et 120–260 pour excerpt. Préfère le bas de la plage de longueur sans passer sous le minimum.";
+		return "\nCONTRAT QUALITÉ MESURABLE : rédige entre " . (int) $benchmark['words'] . ' et ' . (int) ( class_exists( 'MSRWA_Prompt' ) ? MSRWA_Prompt::word_range( $settings )['max'] : ( $settings['quality_max_words'] ?? 4200 ) ) . ' mots utiles, avec au moins ' . (int) $benchmark['headings'] . ' titres h2/h3, ' . (int) $benchmark['paragraphs'] . ' paragraphes, ' . (int) $benchmark['ingredients'] . ' ingrédients lorsque la recette le justifie et ' . (int) $benchmark['steps'] . " étapes. Évite le remplissage, les répétitions et les promesses non étayées. Le JSON doit respecter exactement le schéma demandé et content_html doit être du HTML valide. Inclure choix des ingrédients, substitutions sûres, méthode détaillée, erreurs à éviter, conservation, variantes, service, FAQ et conclusion utile. Retourne recipe_meta comme objet vide : les métadonnées sont reprises directement de la recette canonique par le moteur. Respecte 35–60 caractères pour seo_title, 120–155 pour seo_description et 120–260 pour excerpt. Préfère le bas de la plage de longueur sans passer sous le minimum.";
 	}
 
 	public static function evaluate( $article, $canonical, $settings = null ) {
@@ -57,8 +57,8 @@ final class MSRWA_Quality {
 		$seo_title_length = self::text_length( (string) ( $article['seo_title'] ?? '' ) );
 		$seo_description_length = self::text_length( (string) ( $article['seo_description'] ?? '' ) );
 		$excerpt_length = self::text_length( (string) ( $article['excerpt'] ?? '' ) );
-		self::score_boolean( $score, $findings, $blockers, 'seo_title', $seo_title_length >= 35 && $seo_title_length <= 70, 3, false, 'Garder le titre SEO entre 35 et 70 caractères.' );
-		self::score_boolean( $score, $findings, $blockers, 'seo_description', $seo_description_length >= 120 && $seo_description_length <= 170, 4, false, 'Garder la description SEO entre 120 et 170 caractères.' );
+		self::score_boolean( $score, $findings, $blockers, 'seo_title', $seo_title_length >= 35 && $seo_title_length <= 60, 3, false, 'Garder le titre SEO entre 35 et 60 caractères.' );
+		self::score_boolean( $score, $findings, $blockers, 'seo_description', $seo_description_length >= 120 && $seo_description_length <= 155, 4, false, 'Garder la description SEO entre 120 et 155 caractères.' );
 		self::score_boolean( $score, $findings, $blockers, 'excerpt', $excerpt_length >= 120 && $excerpt_length <= 260, 3, false, 'Fournir un extrait autonome entre 120 et 260 caractères.' );
 
 		$discovery = 0;

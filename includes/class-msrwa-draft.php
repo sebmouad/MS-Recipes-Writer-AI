@@ -74,6 +74,8 @@ final class MSRWA_Draft {
 		update_post_meta( $post_id, '_edit_last', (int) $run['owner_id'] );
 
 		self::remember( $post_id, $run_id, $canonical, (array) ( $artifacts['approval'] ?? array() ) );
+		$nutrition = self::nutrition( (array) ( ( (array) ( $artifacts['research'] ?? array() ) )['nutrition'] ?? array() ) );
+		if ( $nutrition ) { update_post_meta( $post_id, '_msrwa_nutrition', wp_slash( wp_json_encode( $nutrition ) ) ); }
 		self::describe( $post_id, $article, $canonical );
 		$batch = MSRWA_Batch::get( (int) $run['batch_id'] );
 		if ( $batch && '' !== (string) $batch['language'] ) { update_post_meta( $post_id, '_msrwa_language', sanitize_key( (string) $batch['language'] ) ); }
@@ -90,6 +92,20 @@ final class MSRWA_Draft {
 		// one: an editor corrects the post, not the row.
 		MSRWA_Run::release_stored( $run_id );
 		return (int) $post_id;
+	}
+
+	/**
+	 * Nutrition per serving as a source stated it, figures only: the research
+	 * returns null unless a page it read gave them, and nothing is estimated here.
+	 */
+	public static function nutrition( array $stated ) {
+		if ( '' === trim( (string) ( $stated['source_url'] ?? '' ) ) ) { return array(); }
+		$out = array();
+		foreach ( array( 'calories', 'protein_g', 'carbohydrates_g', 'fat_g' ) as $key ) {
+			$value = $stated[ $key ] ?? null;
+			if ( is_numeric( $value ) && (float) $value > 0 ) { $out[ $key ] = round( (float) $value, 1 ); }
+		}
+		return $out;
 	}
 
 	/** The recipe and the verdict, kept with the post an editor will read. */
@@ -121,13 +137,19 @@ final class MSRWA_Draft {
 
 		// The two SEO plugins most sites run, each only when it is there to read
 		// its own keys: writing a plugin's meta onto a site without it is litter.
+		$phrases = MSRWA_Stack::search_phrases( $article );
+		if ( $phrases ) { update_post_meta( $post_id, '_msrwa_focus_keyword', $phrases[0] ); }
+		if ( count( $phrases ) > 1 ) { update_post_meta( $post_id, '_msrwa_secondary_keywords', implode( ', ', array_slice( $phrases, 1 ) ) ); }
 		if ( defined( 'WPSEO_VERSION' ) ) {
 			if ( '' !== $seo_title ) { update_post_meta( $post_id, '_yoast_wpseo_title', $seo_title ); }
 			if ( '' !== $seo_description ) { update_post_meta( $post_id, '_yoast_wpseo_metadesc', $seo_description ); }
+			if ( $phrases ) { update_post_meta( $post_id, '_yoast_wpseo_focuskw', $phrases[0] ); }
 		}
 		if ( defined( 'RANK_MATH_VERSION' ) ) {
 			if ( '' !== $seo_title ) { update_post_meta( $post_id, 'rank_math_title', $seo_title ); }
 			if ( '' !== $seo_description ) { update_post_meta( $post_id, 'rank_math_description', $seo_description ); }
+			// Rank Math reads the first as the focus keyword and the rest as secondary.
+			if ( $phrases ) { update_post_meta( $post_id, 'rank_math_focus_keyword', implode( ',', array_slice( $phrases, 0, 5 ) ) ); }
 		}
 
 		$tags = array_values( array_filter( array_map( static function ( $tag ) { return trim( wp_strip_all_tags( (string) $tag ) ); }, self::listed( $article['tags'] ?? array() ) ) ) );

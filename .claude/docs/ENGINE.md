@@ -1020,7 +1020,19 @@ photograph, and otherwise use the photograph without the cost of a search.
     and corrects the two together.
 
 
-### Still open
+60. **Written to be found, and for advertisers (owner's request,
+    2026-09-26).** The article returns `focus_keyword` and
+    `secondary_keywords` and places the first where search engines weigh it;
+    `search_placement()` reports where it is missing, as the check "focus
+    keyword placed", which never retries (an article is one call). It opens
+    on a 40–60-word answer and a key-facts list, the one list besides the
+    ingredients, equipment and steps. Equipment is named as it is bought —
+    type, material, size from the quantities, no brand — which is what
+    contextual advertising targets. Both research prompts return
+    `appliance_versions`, `diet_adaptations` and `nutrition`, sourced like
+    every other fact (from culinary practice when researched from the
+    editor's photographs, with no nutrition then), and the article offers
+    them only from there.
 
 
 6. **The engine's `models` list is a second source of truth for prices.** The

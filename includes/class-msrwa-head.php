@@ -32,11 +32,15 @@ final class MSRWA_Head {
 	public static function another_plugin_prints_it() {
 		// The MS Recipes theme prints them itself when no SEO plugin runs, and
 		// MS SEO Plus when it does: this plugin then feeds their fields instead.
-		if ( MSRWA_Stack::owns_head( 'meta' ) ) { return true; }
+		return MSRWA_Stack::owns_head( 'meta' ) || self::seo_plugin_active();
+	}
+
+	/** A dedicated SEO plugin, which may print its own FAQ and keywords. */
+	public static function seo_plugin_active() {
 		foreach ( array( 'WPSEO_VERSION', 'RANK_MATH_VERSION', 'SEOPRESS_VERSION', 'AIOSEO_VERSION', 'SLIM_SEO_VER', 'SQ_VERSION', 'THE_SEO_FRAMEWORK_PRESENT' ) as $constant ) {
 			if ( defined( $constant ) ) { return true; }
 		}
-		return false;
+		return MSRWA_Stack::ms_seo_plus_active();
 	}
 
 	/** The document title, when the article wrote a better one than the post title. */

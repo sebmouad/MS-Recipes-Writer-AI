@@ -10,6 +10,32 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
  */
 final class MSRWA_Engine_Score {
 
+	/**
+	 * Where the article's focus keyword is missing among the places search
+	 * engines weigh it: the SEO title, the slug, the description, the opening
+	 * paragraph and an h2. Accents, case and hyphens are ignored.
+	 */
+	public static function search_placement( array $article ) {
+		$keyword = self::fold( trim( (string) ( $article['focus_keyword'] ?? '' ) ) );
+		if ( '' === $keyword ) { return array( 'every place' ); }
+		$plain = static function ( $text ) { return trim( (string) preg_replace( '/[^\p{L}\p{N}]+/u', ' ', self::fold( wp_strip_all_tags( (string) $text ) ) ) ); };
+		$keyword = $plain( $keyword );
+		$content = (string) ( $article['content_html'] ?? '' );
+		preg_match( '#<p[^>]*>(.*?)</p>#is', $content, $opening );
+		$places = array(
+			'seo_title' => $article['seo_title'] ?? '',
+			'slug' => str_replace( '-', ' ', (string) ( $article['slug'] ?? '' ) ),
+			'seo_description' => $article['seo_description'] ?? '',
+			'opening paragraph' => $opening[1] ?? '',
+			'an h2' => implode( ' | ', MSRWA_Engine_Input::headings( $content ) ),
+		);
+		$missing = array();
+		foreach ( $places as $place => $text ) {
+			if ( false === strpos( ' ' . $plain( $text ) . ' ', ' ' . $keyword . ' ' ) ) { $missing[] = $place; }
+		}
+		return $missing;
+	}
+
 	public static function fold( $text ) {
 		$text = mb_strtolower( (string) $text, 'UTF-8' );
 		$map = array( 'á'=>'a','à'=>'a','â'=>'a','ä'=>'a','é'=>'e','è'=>'e','ê'=>'e','ë'=>'e','í'=>'i','ì'=>'i','î'=>'i','ï'=>'i','ó'=>'o','ò'=>'o','ô'=>'o','ö'=>'o','ú'=>'u','ù'=>'u','û'=>'u','ü'=>'u','ç'=>'c','œ'=>'oe','æ'=>'ae' );
@@ -148,6 +174,9 @@ final class MSRWA_Engine_Score {
 			$absent = array();
 			foreach ( $fields as $field ) { if ( ! array_key_exists( $field, $json ) ) { $absent[] = $field; } }
 			$checks['fields the plugin needs'] = array( 'pass' => empty( $absent ), 'detail' => $absent ? 'missing: ' . implode( ', ', $absent ) : count( $fields ) . ' fields present' );
+			// Reported, never retried: an article costs one call.
+			$unplaced = self::search_placement( $json );
+			$checks['focus keyword placed'] = array( 'pass' => ! $unplaced, 'detail' => '' === trim( (string) ( $json['focus_keyword'] ?? '' ) ) ? 'no focus keyword' : ( $unplaced ? '"' . $json['focus_keyword'] . '" missing from ' . implode( ', ', $unplaced ) : '"' . $json['focus_keyword'] . '" in the SEO title, slug, description, first sentence and a heading' ) );
 		}
 
 		if ( 'review' === $step ) {

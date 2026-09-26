@@ -630,6 +630,17 @@ cost) in the task before changing anything.
   (2026-09-24).** The writer's photograph shows the prompt's writer the dish;
   the collage is drawn from the style reference. Real: the owner's own rôti
   photograph, drawn both ways. See ENGINE.md §7, item 40.
+- [~] **A72 — Articles written to be found, and for advertisers (2026-09-26,
+  0.29.0).** Owner's request. The article chooses a focus keyword and 4–6
+  secondary ones and places the first in the SEO title, slug, description,
+  opening sentence and an h2 (a reported check, never a retry); it opens on a
+  40–60-word answer and a key-facts list; SEO title ≤ 60 and description ≤ 155
+  characters; equipment named by type, material and size, never a brand;
+  appliance versions, diet adaptations and nutrition per serving only as the
+  research documents them, which it now collects. The plugin stores the
+  phrases for Yoast, Rank Math and the theme's keywords, prints FAQPage for
+  the questions the page shows, and adds dateModified and stated nutrition.
+  Offline: `test-seo.php`.
 - [x] **A71 — The audit's engine fixes (2026-09-26, 0.28.39).** Owner's
   approval of ENGINE.md §7, items 8–12, now decided items 55–59: the judge
   reads the image brief as context; the review's typography and the recipe's

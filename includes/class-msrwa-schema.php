@@ -17,9 +17,38 @@ final class MSRWA_Schema {
 
 	public static function print_head() {
 		if ( ! is_singular( 'post' ) ) { return; }
-		$data = self::for_post( get_queried_object_id() );
-		if ( ! $data ) { return; }
-		echo "\n<script type=\"application/ld+json\">" . wp_json_encode( $data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG ) . "</script>\n";
+		foreach ( array( self::for_post( get_queried_object_id() ), self::faq_for_post( get_queried_object_id() ) ) as $data ) {
+			if ( ! $data ) { continue; }
+			echo "\n<script type=\"application/ld+json\">" . wp_json_encode( $data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG ) . "</script>\n";
+		}
+	}
+
+	/**
+	 * The article's FAQ as FAQPage JSON-LD. Bing and the AI assistants that
+	 * read the web take question-and-answer pairs from it; Google shows it as a
+	 * rich result only on a few sites but reads it all the same. The theme prints
+	 * no FAQ markup, so this is printed beside its Recipe graph too — but not
+	 * where an SEO plugin may print its own, and only for questions the page
+	 * really shows.
+	 */
+	public static function faq_for_post( $post_id ) {
+		if ( empty( MSRWA_Settings::get()['recipe_schema'] ) || MSRWA_Head::seo_plugin_active() ) { return null; }
+		$post = get_post( $post_id );
+		if ( ! $post || 'publish' !== $post->post_status || ! get_post_meta( $post_id, '_msrwa_run_id', true ) ) { return null; }
+		return self::faq( (array) json_decode( (string) get_post_meta( $post_id, '_recipe_faq', true ), true ), (string) $post->post_content );
+	}
+
+	/** Pure: the pairs whose question the page shows, as FAQPage, or null. */
+	public static function faq( array $pairs, $content ) {
+		$shown = html_entity_decode( wp_strip_all_tags( (string) $content ), ENT_QUOTES, 'UTF-8' );
+		$entities = array();
+		foreach ( $pairs as $pair ) {
+			$question = trim( (string) ( $pair['question'] ?? '' ) );
+			$answer = trim( (string) ( $pair['answer'] ?? '' ) );
+			if ( '' === $question || '' === $answer || false === mb_strpos( $shown, $question ) ) { continue; }
+			$entities[] = array( '@type' => 'Question', 'name' => $question, 'acceptedAnswer' => array( '@type' => 'Answer', 'text' => $answer ) );
+		}
+		return $entities ? array( '@context' => 'https://schema.org', '@type' => 'FAQPage', 'mainEntity' => $entities ) : null;
 	}
 
 	/** Recipe plugins that print their own Recipe markup. */
@@ -47,6 +76,8 @@ final class MSRWA_Schema {
 			'published' => get_post_time( 'c', true, $post ),
 			// The lot's language, which may not be the site's.
 			'language' => (string) ( get_post_meta( $post_id, '_msrwa_language', true ) ?: $settings['site_language'] ),
+			'modified' => get_post_modified_time( 'c', true, $post ),
+			'nutrition' => (array) json_decode( (string) get_post_meta( $post_id, '_msrwa_nutrition', true ), true ),
 		) );
 	}
 
@@ -58,7 +89,7 @@ final class MSRWA_Schema {
 			'name' => (string) ( $post['name'] ?? $recipe['title'] ?? '' ),
 		);
 		if ( '' === $data['name'] ) { $data['name'] = (string) ( $recipe['title'] ?? '' ); }
-		foreach ( array( 'url' => 'url', 'image' => 'image', 'published' => 'datePublished', 'language' => 'inLanguage' ) as $key => $property ) {
+		foreach ( array( 'url' => 'url', 'image' => 'image', 'published' => 'datePublished', 'modified' => 'dateModified', 'language' => 'inLanguage' ) as $key => $property ) {
 			if ( ! empty( $post[ $key ] ) ) { $data[ $property ] = (string) $post[ $key ]; }
 		}
 		if ( ! empty( $post['author'] ) ) { $data['author'] = array( '@type' => 'Person', 'name' => (string) $post['author'] ); }
@@ -91,7 +122,19 @@ final class MSRWA_Schema {
 		if ( ! empty( $recipe['calories_estimate'] ) && is_numeric( $recipe['calories_estimate'] ) ) {
 			$data['nutrition'] = array( '@type' => 'NutritionInformation', 'calories' => (int) $recipe['calories_estimate'] . ' kcal' );
 		}
+		$stated = self::nutrition( (array) ( $post['nutrition'] ?? array() ) );
+		if ( $stated ) { $data['nutrition'] = array_merge( $data['nutrition'] ?? array( '@type' => 'NutritionInformation' ), $stated ); }
 		return $data;
+	}
+
+	/** Nutrition a source stated per serving, as schema.org spells it. */
+	public static function nutrition( array $stated ) {
+		$out = array();
+		if ( ! empty( $stated['calories'] ) ) { $out['calories'] = (int) round( (float) $stated['calories'] ) . ' kcal'; }
+		foreach ( array( 'protein_g' => 'proteinContent', 'carbohydrates_g' => 'carbohydrateContent', 'fat_g' => 'fatContent' ) as $key => $property ) {
+			if ( ! empty( $stated[ $key ] ) ) { $out[ $property ] = rtrim( rtrim( number_format( (float) $stated[ $key ], 1, '.', '' ), '0' ), '.' ) . ' g'; }
+		}
+		return $out;
 	}
 
 	/** ISO 8601, which is what Google reads: PT1H5M rather than "65 minutes". */

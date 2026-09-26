@@ -191,8 +191,10 @@ final class MSRWA_Stack {
 		$cuisine = self::text( $canonical['cuisine'] ?? '' );
 		if ( '' !== $cuisine ) { $out['_recipe_cuisine'] = self::capitalise( $cuisine ); }
 
-		$keywords = array_filter( array_map( array( __CLASS__, 'text' ), self::listed( $canonical['keywords'] ?? ( $article['tags'] ?? array() ) ) ) );
-		if ( $keywords ) { $out['_recipe_keywords'] = implode( ', ', array_slice( array_unique( $keywords ), 0, 12 ) ); }
+		// The phrases the article was written to be found by lead the list: the
+		// theme prints them and builds its Recipe graph's keywords from them.
+		$keywords = array_filter( array_map( array( __CLASS__, 'text' ), array_merge( self::search_phrases( $article ), self::listed( $canonical['keywords'] ?? ( $article['tags'] ?? array() ) ) ) ) );
+		if ( $keywords ) { $out['_recipe_keywords'] = implode( ', ', array_slice( array_values( array_unique( array_map( 'mb_strtolower', $keywords ) ) ), 0, 12 ) ); }
 
 		$difficulty = self::difficulty( $canonical['difficulty'] ?? '' );
 		if ( '' !== $difficulty ) { $out['_recipe_difficulty'] = $difficulty; }
@@ -216,8 +218,11 @@ final class MSRWA_Stack {
 			if ( $lines ) { $out[ $key ] = implode( "\n", $lines ); }
 		}
 
+		// The FAQ the reader sees is the article's: structured data that says
+		// otherwise is what search engines penalise. The recipe's own is the
+		// fallback for an article that wrote none.
 		$faq = array();
-		foreach ( (array) ( $canonical['faq'] ?? array() ) as $item ) {
+		foreach ( (array) ( ! empty( $article['faq'] ) ? $article['faq'] : ( $canonical['faq'] ?? array() ) ) as $item ) {
 			if ( ! is_array( $item ) ) { continue; }
 			$question = self::text( $item['question'] ?? '' );
 			$answer = self::text( $item['answer'] ?? '' );
@@ -233,6 +238,12 @@ final class MSRWA_Stack {
 		if ( '' !== $description ) { $out['_seo_description'] = $description; }
 
 		return $out;
+	}
+
+	/** The focus keyword, then the secondary ones, as the article chose them. */
+	public static function search_phrases( array $article ) {
+		$phrases = array_merge( array( (string) ( $article['focus_keyword'] ?? '' ) ), self::listed( $article['secondary_keywords'] ?? array() ) );
+		return array_values( array_unique( array_filter( array_map( array( __CLASS__, 'text' ), $phrases ) ) ) );
 	}
 
 	/** One ingredient as the card's servings scaler reads it: the quantity first. */
@@ -431,6 +442,11 @@ final class MSRWA_Stack {
 
 		$language = (string) get_post_meta( $post->ID, '_msrwa_language', true );
 		if ( '' !== $language && empty( $graph['inLanguage'] ) ) { $graph['inLanguage'] = $language; }
+
+		// Protein, carbohydrates and fat a source stated per serving, beside the
+		// theme's calories; its own figure wins where it gave one.
+		$stated = MSRWA_Schema::nutrition( (array) json_decode( (string) get_post_meta( $post->ID, '_msrwa_nutrition', true ), true ) );
+		if ( $stated ) { $graph['nutrition'] = array_merge( array( '@type' => 'NutritionInformation' ), $stated, (array) ( $graph['nutrition'] ?? array() ) ); }
 		return $graph;
 	}
 

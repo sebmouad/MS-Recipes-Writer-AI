@@ -25,6 +25,9 @@ OUTPUT — a valid JSON object only, no Markdown, with exactly these keys:
 - "preparation": array of {step, action, cue, minutes, temperature_c, source_url} — step an integer from 1 upward in the order the recipe is performed, action and cue in {{language}}, cue being the visible sign that the step is done, minutes and temperature_c integers or null
 - "substitutions": array of {ingredient, replacement, note, source_url} — only well-established replacements
 - "accompaniments": array of {name, note, source_url} — what the dish is traditionally served with
+- "appliance_versions": array of {appliance, method, minutes, setting, source_url} — at most 3, only a version established culinary practice gives for exactly this dish (multicooker, air fryer, slow cooker, food processor); an empty array otherwise
+- "diet_adaptations": array of {diet, change, source_url} — at most 3, only a well-established change (gluten-free, dairy-free, vegetarian) that keeps the dish itself
+- "nutrition": null — no page was read that states it
 - "common_failures": array of {problem, cause, remedy, source_url} — all in {{language}}
 - "storage": array of {method, duration, note, source_url}
 - "food_safety": array of {source_url, text}

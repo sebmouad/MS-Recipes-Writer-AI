@@ -5,9 +5,11 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.28.40
+## État actuel — 0.29.0
 
-La version `0.28.40` garde le plafond par recette à 0,15 $ et limite la
+La version `0.29.0` écrit chaque article pour être trouvé par Google, Bing,
+Yahoo et les assistants IA, et pour attirer les annonces les mieux payées ;
+la `0.28.40` garde le plafond par recette à 0,15 $ et limite la
 recherche à cinq appels d'outil ; la `0.28.39` appliquait les cinq corrections du moteur que l'audit
 proposait : le contrôle des images ne refuse plus pour un compte, un plat ou
 une découpe, la relecture suit la langue de l'article, les images de
@@ -93,6 +95,35 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.29.0
+
+**Des articles écrits pour être trouvés, et pour les annonceurs.**
+- **Une expression principale par article** — ce que les gens tapent pour
+  trouver la recette — placée là où les moteurs la pèsent : en tête du titre
+  SEO, dans l'adresse, la description, la première phrase et un intertitre ;
+  et 4 à 6 expressions secondaires (temps, température, conservation,
+  accompagnements…) dans les intertitres et la FAQ, une fois chacune. Le
+  rapport complet dit si elle est bien placée.
+- **La réponse d'abord** : le premier paragraphe répond seul à la recherche
+  (quoi, combien de temps, pour combien, à quelle température), suivi d'une
+  courte liste des repères — ce que reprennent les extraits de Google et les
+  assistants IA. Chaque section ouvre sur la phrase qui répond à son titre.
+- **Titre SEO de 60 caractères au plus, description de 155** : ce que Google
+  affiche sans couper.
+- **Pour les annonceurs** : le matériel nommé comme on l'achète — type,
+  matière, taille selon les quantités (moule de 28 cm, cocotte en fonte de
+  24 cm), jamais une marque ; et, quand les sources les donnent, les versions
+  aux appareils (multicuiseur, friteuse sans huile, mijoteuse, robot), les
+  adaptations sans gluten, sans lactose ou végétariennes, et les valeurs
+  nutritionnelles par part. Rien de tout cela n'est inventé : la recherche les
+  relève désormais dans les pages qu'elle lit, et l'article ne les donne que
+  de là.
+- **Données structurées** : la FAQ de l'article en FAQPage (lue par Bing et
+  les assistants IA ; seulement les questions que la page montre), la date de
+  mise à jour et les protéines, glucides et lipides quand une source les
+  donne ; l'expression principale va à Yoast, Rank Math et aux mots-clés du
+  thème.
 
 ## Version 0.28.40
 
