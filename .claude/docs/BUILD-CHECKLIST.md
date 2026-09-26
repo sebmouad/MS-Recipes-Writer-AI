@@ -630,16 +630,18 @@ cost) in the task before changing anything.
   (2026-09-24).** The writer's photograph shows the prompt's writer the dish;
   the collage is drawn from the style reference. Real: the owner's own rôti
   photograph, drawn both ways. See ENGINE.md §7, item 40.
-- [~] **A71 — The audit's engine fixes (2026-09-26, 0.28.39).** Owner's
+- [x] **A71 — The audit's engine fixes (2026-09-26, 0.28.39).** Owner's
   approval of ENGINE.md §7, items 8–12, now decided items 55–59: the judge
   reads the image brief as context; the review's typography and the recipe's
   course follow the article's language; a reference image is billed at the
   image input rate ($8 against $5 on gpt-image-2.5-flare), with the shipped
   ceiling at $0.16 so the estimate's maximum fits; a correction never leaves
   the next sentence leaning on nothing. A page a reader cannot open answers
-  404. Offline for the engine changes; real: the 404 and 200 answers as a
-  writer and an administrator, and `test-upload.php` updated to the photo
-  names of 0.28.19 and passing.
+  404. Real: `test-parallel.php`, three full recipes in 202 s, three at once,
+  all three approved by the new picture check with no finding; the 404 and
+  200 answers as a writer and an administrator; `test-upload.php` updated to
+  the photo names of 0.28.19 and passing; and run 8, failed on 0.21, resumed
+  to done with a draft for $0.0022 more, drawing nothing again.
 - [x] **A70 — Deep audit (2026-09-26, 0.28.38).** Retry clears the stored
   failure; parking touches only a waiting run with no live lease; dispatch
   claims the lot with a conditional UPDATE and the scheduler no longer undoes
