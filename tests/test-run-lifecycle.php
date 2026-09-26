@@ -6,6 +6,7 @@ msrwa_test_load( 'rights', 'i18n', 'profile', 'db' );
 require_once dirname( __DIR__ ) . '/includes/engine/load.php';
 require_once dirname( __DIR__ ) . '/includes/class-msrwa-batch.php';
 require_once dirname( __DIR__ ) . '/includes/class-msrwa-run.php';
+require_once dirname( __DIR__ ) . '/includes/class-msrwa-queue.php';
 
 msrwa_test_as_admin();
 
@@ -33,5 +34,15 @@ msrwa_test_missing( $log, 'DELETE FROM wp_msrwa_artifacts', 'What was produced i
 msrwa_test_missing( $log, 'DELETE FROM wp_msrwa_calls', 'What was billed stays on the record.' );
 msrwa_test_contains( $log, 'UPDATE wp_msrwa_runs', 'The recipe is put back in the queue.' );
 msrwa_test_contains( $log, 'msrwa_batches', 'A batch with work in it again is no longer finished.' );
+msrwa_test_contains( $log, '"result_json":"{\\"ok\\":true,\\"errors\\":[]}"', 'The failure that stopped it is cleared, or the second try ends failed too.' );
+
+// A stale cron event parks only a recipe still in the queue: a cancelled or
+// finished one stays as it is, whatever the hold or the ceilings say.
+$GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
+update_option( MSRWA_Queue::HELD, 1 );
+MSRWA_Run::tick( 12 );
+$parked = implode( "\n", $GLOBALS['wpdb']->matching( "SET status = 'queued'" ) );
+msrwa_test_contains( $parked, "status IN ('queued','running')", 'Parking never revives a cancelled or finished recipe.' );
+update_option( MSRWA_Queue::HELD, 0 );
 
 msrwa_test_done( 'resuming a stopped recipe' );

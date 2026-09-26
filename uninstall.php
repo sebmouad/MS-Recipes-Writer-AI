@@ -44,6 +44,8 @@ $msrwa_options = array_merge(
 foreach ( $msrwa_options as $msrwa_option ) {
 	delete_option( $msrwa_option );
 }
+// A redraw's lock outlives it only when its request was killed.
+if ( $msrwa_data ) { $wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE 'msrwa\\_redraw\\_%'" ); } // phpcs:ignore WordPress.DB
 
 foreach ( array( 'msrwa_run_step', 'msrwa_cleanup' ) as $msrwa_hook ) {
 	wp_clear_scheduled_hook( $msrwa_hook );

@@ -85,8 +85,8 @@ msrwa_test_settings( array( 'daily_budget_usd' => 0, 'monthly_budget_usd' => 0 )
 $GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
 MSRWA_Queue::hold();
 MSRWA_Run::tick( 12 );
-msrwa_test_contains( $GLOBALS['wpdb']->log(), '"status":"queued"', 'A held queue sends a running recipe back to waiting.' );
-msrwa_test_missing( $GLOBALS['wpdb']->log(), 'lock_token = ', 'A held queue never claims a lease.' );
+msrwa_test_contains( $GLOBALS['wpdb']->log(), "SET status = 'queued'", 'A held queue sends a running recipe back to waiting.' );
+msrwa_test_missing( $GLOBALS['wpdb']->log(), 'lock_until = DATE_ADD', 'A held queue never claims a lease.' );
 msrwa_test_missing( $GLOBALS['wpdb']->log(), '"status":"failed"', 'A hold is not a failure.' );
 
 $GLOBALS['msrwa_test_options'] = array();
@@ -94,7 +94,7 @@ msrwa_test_settings( array( 'daily_budget_usd' => 4, 'monthly_budget_usd' => 0 )
 $GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
 $GLOBALS['wpdb']->on( 'INTERVAL 1 DAY', array( array( 'spend' => 4.0, 'matching' => 0.0 ) ) )->on( 'INTERVAL 30 DAY', array( array( 'spend' => 40.0, 'matching' => 0.0 ) ) );
 MSRWA_Run::tick( 12 );
-msrwa_test_contains( $GLOBALS['wpdb']->log(), '"status":"queued"', 'A ceiling reached mid-lot parks the recipe instead of paying for another wave.' );
+msrwa_test_contains( $GLOBALS['wpdb']->log(), "SET status = 'queued'", 'A ceiling reached mid-lot parks the recipe instead of paying for another wave.' );
 msrwa_test_missing( $GLOBALS['wpdb']->log(), '"status":"failed"', 'A recipe stopped by a ceiling has not failed; it is waiting for room.' );
 msrwa_test_missing( $GLOBALS['wpdb']->log(), 'updated_at', 'Parking does not make a recipe look newer than those waiting behind it.' );
 

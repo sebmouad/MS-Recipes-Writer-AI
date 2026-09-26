@@ -603,7 +603,10 @@ final class MSRWA_Run {
 	 */
 	private static function park( $id ) {
 		global $wpdb;
-		$wpdb->update( self::table(), array( 'status' => 'queued', 'lock_token' => null, 'lock_until' => null ), array( 'id' => absint( $id ) ) );
+		// Only a recipe that was waiting or between two waves: a stale cron event
+		// for a cancelled or finished one must not put it back in the queue, and
+		// a wave in flight under another worker's lease stops on its own.
+		$wpdb->query( $wpdb->prepare( 'UPDATE ' . self::table() . " SET status = 'queued', lock_token = NULL, lock_until = NULL WHERE id = %d AND status IN ('queued','running') AND (lock_until IS NULL OR lock_until < UTC_TIMESTAMP())", absint( $id ) ) );
 	}
 
 	private static function finish( $id, $status, $message ) {
@@ -664,8 +667,11 @@ final class MSRWA_Run {
 		$t = MSRWA_DB::tables();
 		$wpdb->query( $wpdb->prepare( 'DELETE FROM ' . $t['steps'] . " WHERE run_id = %d AND error_message <> ''", absint( $id ) ) );
 
+		// The failure that stopped it is cleared with its steps: left behind, it
+		// failed the recipe again at the end however well the second try went.
 		$wpdb->update( self::table(), array(
 			'status' => 'queued', 'step' => '', 'error_message' => '',
+			'result_json' => wp_json_encode( array( 'ok' => true, 'errors' => array() ) ),
 			'lock_token' => null, 'lock_until' => null, 'updated_at' => current_time( 'mysql', true ),
 		), array( 'id' => absint( $id ) ) );
 
@@ -722,6 +728,24 @@ final class MSRWA_Run {
 		$findings = MSRWA_Engine_Score::findings_for( $approval, $step );
 		if ( 'facebook' === $kind ) { $findings = array_merge( $findings, MSRWA_Engine_Score::findings_for( $approval, 'consistency' ) ); }
 
+		// One drawing at a time per recipe: a second click while the first is
+		// on the wire would pay for a second image and count one redraw.
+		$lock = 'msrwa_redraw_' . $id;
+		if ( ! add_option( $lock, time(), '', false ) ) {
+			if ( time() - (int) get_option( $lock ) < 600 ) { return __( 'Un nouveau dessin de cette recette est déjà en cours.', 'ms-recipes-writer-ai' ); }
+			update_option( $lock, time(), false );
+		}
+		try {
+			return self::draw_again( $run, $kind, $state, $config, $step, $findings );
+		} finally {
+			delete_option( $lock );
+		}
+	}
+
+	/** The drawing itself, under the lock redraw() holds. */
+	private static function draw_again( array $run, $kind, array $state, array $config, $step, array $findings ) {
+		$id = (int) $run['id'];
+		$artifacts = (array) $state['artifacts'];
 		if ( function_exists( 'set_time_limit' ) ) { @set_time_limit( 0 ); }
 		$brief = (array) json_decode( (string) $run['brief_json'], true );
 		$result = MSRWA_Engine::run_step( $step, array_merge( $brief, array( 'artifacts' => $artifacts ) ), array(

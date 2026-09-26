@@ -181,6 +181,13 @@ if ( ! function_exists( 'get_option' ) ) {
 if ( ! function_exists( 'update_option' ) ) {
 	function update_option( $key, $value, $autoload = null ) { $GLOBALS['msrwa_test_options'][ $key ] = $value; return true; }
 }
+if ( ! function_exists( 'add_option' ) ) {
+	function add_option( $key, $value = '', $deprecated = '', $autoload = null ) {
+		if ( array_key_exists( $key, $GLOBALS['msrwa_test_options'] ) ) { return false; }
+		$GLOBALS['msrwa_test_options'][ $key ] = $value;
+		return true;
+	}
+}
 if ( ! function_exists( 'delete_option' ) ) {
 	function delete_option( $key ) { unset( $GLOBALS['msrwa_test_options'][ $key ] ); return true; }
 }

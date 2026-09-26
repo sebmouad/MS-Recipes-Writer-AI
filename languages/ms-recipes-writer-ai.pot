@@ -523,7 +523,7 @@ msgstr ""
 msgid "Catégories"
 msgstr ""
 
-#: class-msrwa-batch.php:250
+#: class-msrwa-batch.php:250 class-msrwa-batch.php:288
 msgid "Ce lot a déjà été lancé."
 msgstr ""
 
@@ -627,7 +627,7 @@ msgstr ""
 msgid "Cette heure est déjà passée."
 msgstr ""
 
-#: class-msrwa-run.php:708
+#: class-msrwa-run.php:714
 msgid "Cette image ne peut pas être redessinée."
 msgstr ""
 
@@ -1059,7 +1059,7 @@ msgstr ""
 msgid "Envoi des photographies…"
 msgstr ""
 
-#: class-msrwa-schedule.php:85
+#: class-msrwa-schedule.php:89
 msgid "Envoi programmé le %s. Rien n’est dépensé d’ici là."
 msgstr ""
 
@@ -1305,11 +1305,11 @@ msgstr ""
 msgid "Le nettoyage n’a encore jamais tourné."
 msgstr ""
 
-#: class-msrwa-run.php:736
+#: class-msrwa-run.php:760
 msgid "Le nouveau dessin a échoué. Réessayez plus tard."
 msgstr ""
 
-#: class-msrwa-run.php:719
+#: class-msrwa-run.php:725
 msgid "Le plafond de cette recette est atteint."
 msgstr ""
 
@@ -2451,6 +2451,10 @@ msgstr ""
 
 #: class-msrwa-screen-engine.php:305
 msgid "Un lot complet en compte %s, dans l’ordre où elles tournent. Une étape part dès que tout ce dont elle dépend est prêt : c’est ce qui découpe une recette en vagues, et ce qui fait qu’une reprise ne repaie pas ce qui a réussi."
+msgstr ""
+
+#: class-msrwa-run.php:735
+msgid "Un nouveau dessin de cette recette est déjà en cours."
 msgstr ""
 
 #: class-msrwa-screen-settings.php:471

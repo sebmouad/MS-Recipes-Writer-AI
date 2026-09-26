@@ -2511,3 +2511,6 @@ msgstr "دفعات الوصفات ← «استئناف الطابور» عندم
 #, php-format
 msgid "Clés enregistrées : %s. Cela ne prouve pas qu’elles fonctionnent : le bouton « Vérifier les clés », dans Réglages, teste chacune auprès de son fournisseur, sans rien facturer."
 msgstr "المفاتيح المحفوظة: %s. هذا لا يثبت أنها تعمل: زر «تحقّق من المفاتيح» في الإعدادات يختبر كل مفتاح لدى مزوّده، دون أي تكلفة."
+
+msgid "Un nouveau dessin de cette recette est déjà en cours."
+msgstr "يجري بالفعل رسم جديد لهذه الوصفة."

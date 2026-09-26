@@ -64,15 +64,19 @@ final class MSRWA_Schedule {
 			"SELECT id FROM {$t['batches']} WHERE status = 'ready' AND dispatch_at IS NOT NULL AND dispatch_at <= UTC_TIMESTAMP() ORDER BY dispatch_at ASC LIMIT 5" );
 
 		foreach ( $ids as $id ) {
+			// Only one cron run takes the hour; dispatch() then claims the lot
+			// itself, against a click on "send now" arriving at the same moment.
 			$claimed = $wpdb->query( $wpdb->prepare(
-				"UPDATE {$t['batches']} SET status = 'running', dispatch_at = NULL, updated_at = %s WHERE id = %d AND status = 'ready'",
+				"UPDATE {$t['batches']} SET dispatch_at = NULL, updated_at = %s WHERE id = %d AND status = 'ready' AND dispatch_at IS NOT NULL",
 				current_time( 'mysql', true ), absint( $id ) ) );
 			if ( ! $claimed ) { continue; }
 
-			// dispatch() expects to do the claiming itself, so it is put back
-			// to ready for the one call and left to move it on.
-			$wpdb->query( $wpdb->prepare( "UPDATE {$t['batches']} SET status = 'ready' WHERE id = %d", absint( $id ) ) );
-			MSRWA_Batch::dispatch( (int) $id );
+			$started = MSRWA_Batch::dispatch( (int) $id );
+			// A lot refused at its hour — over a ceiling, a route gone — waits
+			// on its page saying why, rather than silently losing its hour.
+			if ( is_wp_error( $started ) ) {
+				$wpdb->update( $t['batches'], array( 'error_message' => $started->get_error_message(), 'updated_at' => current_time( 'mysql', true ) ), array( 'id' => absint( $id ) ) );
+			}
 		}
 		return count( $ids );
 	}

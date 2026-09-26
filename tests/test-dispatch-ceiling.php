@@ -17,4 +17,14 @@ $refused = MSRWA_Batch::dispatch( 7 );
 msrwa_test_assert( is_wp_error( $refused ) && 'msrwa_over_ceiling' === $refused->get_error_code(), 'A lot estimated above its per-recipe ceiling is refused at dispatch; got ' . ( is_wp_error( $refused ) ? $refused->get_error_code() : 'a dispatch' ) );
 msrwa_test_missing( $GLOBALS['wpdb']->log(), 'INSERT wp_msrwa_runs', 'Nothing is started for a refused lot.' );
 
+// A lot another click or the scheduler already took is not sent twice: the
+// claim is a conditional UPDATE, and a lot it did not change is refused.
+$GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
+$GLOBALS['wpdb']->on( 'WHERE id = 7', array( array( 'id' => 7, 'status' => 'ready', 'profile' => 'article', 'recipes' => 1, 'budget_usd' => 1, 'language' => 'fr', 'owner_id' => 1, 'config_json' => '' ) ) );
+$GLOBALS['wpdb']->query_returns = 0;
+$twice = MSRWA_Batch::dispatch( 7 );
+msrwa_test_assert( is_wp_error( $twice ) && 'msrwa_not_ready' === $twice->get_error_code(), 'A lot claimed by someone else is refused; got ' . ( is_wp_error( $twice ) ? $twice->get_error_code() : 'a dispatch' ) );
+msrwa_test_contains( $GLOBALS['wpdb']->log(), "SET status = 'running', dispatch_at = NULL", 'The lot is claimed before any recipe is created.' );
+msrwa_test_missing( $GLOBALS['wpdb']->log(), 'INSERT wp_msrwa_runs', 'And no recipe is created for it.' );
+
 msrwa_test_done( 'the per-recipe ceiling refuses a lot at dispatch' );

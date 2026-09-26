@@ -2455,3 +2455,6 @@ msgstr "Recipe lots → “Release the queue” when you want them moving again.
 #, php-format
 msgid "Clés enregistrées : %s. Cela ne prouve pas qu’elles fonctionnent : le bouton « Vérifier les clés », dans Réglages, teste chacune auprès de son fournisseur, sans rien facturer."
 msgstr "Keys saved: %s. That doesn’t prove they work: the “Check the keys” button in Settings tests each one with its provider, at no charge."
+
+msgid "Un nouveau dessin de cette recette est déjà en cours."
+msgstr "This recipe is already being redrawn."

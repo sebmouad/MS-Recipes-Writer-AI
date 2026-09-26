@@ -87,7 +87,6 @@ final class MSRWA_Batch {
 		return $id;
 	}
 
-	/** A lot is known by its first recipe, and how many follow. */
 	/**
 	 * What is stored: the first recipe's title alone. The "and N others" is
 	 * said at display, in the reader's language — stored, it came out in
@@ -280,6 +279,12 @@ final class MSRWA_Batch {
 				: __( 'Ce lot dépasse le plafond par recette fixé pour le site : il s’arrêterait en route. Choisissez une sortie plus légère, ou demandez à un administrateur de relever le plafond.', 'ms-recipes-writer-ai' )
 			);
 		}
+
+		// Claimed before a single recipe is created: a second click, or the
+		// scheduler arriving at the same moment, finds the lot already gone and
+		// cannot pay for it twice.
+		$claimed = $wpdb->query( $wpdb->prepare( 'UPDATE ' . self::table() . " SET status = 'running', dispatch_at = NULL, error_message = '', updated_at = %s WHERE id = %d AND status = 'ready'", current_time( 'mysql', true ), absint( $id ) ) );
+		if ( ! $claimed ) { return new WP_Error( 'msrwa_not_ready', __( 'Ce lot a déjà été lancé.', 'ms-recipes-writer-ai' ) ); }
 
 		$matching = self::matching( $id );
 		$config = self::config_overrides( $id );

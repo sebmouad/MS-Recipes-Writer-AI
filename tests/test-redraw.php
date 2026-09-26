@@ -3,7 +3,8 @@
 // redrew one and was judged again, a quarter of its cost. The editor reads the
 // findings and decides. This is what they are offered, and what they are not.
 require __DIR__ . '/bootstrap.php';
-msrwa_test_load( 'rights', 'i18n', 'profile', 'db' );
+msrwa_test_load( 'rights', 'i18n', 'profile', 'db', 'budget', 'engine-settings', 'sources' );
+msrwa_test_settings( array( 'daily_budget_usd' => 0, 'monthly_budget_usd' => 0 ) );
 require_once dirname( __DIR__ ) . '/includes/engine/load.php';
 require_once dirname( __DIR__ ) . '/includes/class-msrwa-batch.php';
 require_once dirname( __DIR__ ) . '/includes/class-msrwa-run.php';
@@ -20,7 +21,7 @@ $refused = array(
 $GLOBALS['msrwa_test_posts'][40] = (object) array( 'ID' => 40, 'post_title' => 'Tarte', 'post_content' => '<p>x</p>' );
 $GLOBALS['msrwa_test_meta'][40]['_msrwa_judge_report'] = json_encode( $refused );
 $GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
-$GLOBALS['wpdb']->on( 'SELECT * FROM', array( array( 'id' => 12, 'batch_id' => 3, 'owner_id' => 7, 'status' => 'done', 'draft_post_id' => 40 ) ) );
+$GLOBALS['wpdb']->on( 'SELECT * FROM wp_msrwa_runs WHERE', array( array( 'id' => 12, 'batch_id' => 3, 'owner_id' => 7, 'status' => 'done', 'draft_post_id' => 40, 'result_json' => '', 'brief_json' => '', 'cost_usd' => 0 ) ) );
 $run = array( 'id' => 12, 'batch_id' => 3, 'owner_id' => 7, 'status' => 'done', 'draft_post_id' => 40 );
 
 msrwa_test_as_editor( 7 );
@@ -36,6 +37,12 @@ $called = 0;
 MSRWA_Engine_Call::$transport = static function () use ( &$called ) { $called++; return array( 'status' => 500, 'raw' => '' ); };
 msrwa_test_assert( '' !== MSRWA_Run::redraw( 12, 'featured' ), 'An image the judge accepted cannot be redrawn from here.' );
 msrwa_test_assert( 0 === $called, 'And asking costs nothing.' );
+
+// A second click while the first drawing is on the wire draws nothing more.
+update_option( 'msrwa_redraw_12', time() );
+msrwa_test_contains( MSRWA_Run::redraw( 12, 'facebook' ), 'déjà en cours', 'A redraw already running refuses a second one.' );
+msrwa_test_assert( 0 === $called, 'And the second click costs nothing.' );
+delete_option( 'msrwa_redraw_12' );
 
 // Each redraw is paid for, so each image of a recipe may be redrawn twice.
 $GLOBALS['msrwa_test_meta'][40]['_msrwa_facebook_redrawn'] = MSRWA_Run::REDRAWS;

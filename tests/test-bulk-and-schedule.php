@@ -59,8 +59,10 @@ msrwa_test_assert( is_wp_error( MSRWA_Schedule::when( 3, gmdate( 'Y-m-d H:i:s', 
 $GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
 $GLOBALS['wpdb']->on( 'dispatch_at IS NOT NULL', array( 9 ) );
 MSRWA_Schedule::due();
-msrwa_test_contains( $GLOBALS['wpdb']->log(), "SET status = 'running', dispatch_at = NULL, updated_at = ", 'The lot is claimed before it is sent.' );
-msrwa_test_contains( $GLOBALS['wpdb']->log(), "WHERE id = 9 AND status = 'ready'", 'And only if it was still waiting.' );
+msrwa_test_contains( $GLOBALS['wpdb']->log(), "SET dispatch_at = NULL, updated_at = ", 'The hour is claimed before the lot is sent.' );
+msrwa_test_contains( $GLOBALS['wpdb']->log(), "WHERE id = 9 AND status = 'ready' AND dispatch_at IS NOT NULL", 'And only if it was still waiting for it.' );
+msrwa_test_missing( $GLOBALS['wpdb']->log(), "SET status = 'ready'", 'A claimed lot is never put back to waiting, where a click could send it too.' );
+msrwa_test_contains( $GLOBALS['wpdb']->log(), 'error_message', 'A lot refused at its hour says why on its page.' );
 
 // Nothing is waiting: nothing is claimed.
 $GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();

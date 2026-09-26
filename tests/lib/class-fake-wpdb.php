@@ -10,6 +10,7 @@ class MSRWA_Fake_Wpdb {
 	public $posts = 'wp_posts';
 	public $postmeta = 'wp_postmeta';
 	public $insert_id = 0;
+	public $last_error = '';
 	public $queries = array();
 	private $handlers = array();
 	private $default_var = 0;
@@ -34,7 +35,9 @@ class MSRWA_Fake_Wpdb {
 	public function get_col( $query ) { $this->queries[] = $query; return (array) $this->resolve( $query, array() ); }
 	public function get_row( $query, $output = null ) { $this->queries[] = $query; $rows = (array) $this->resolve( $query, array() ); return $rows ? reset( $rows ) : null; }
 	public function get_results( $query, $output = null ) { $this->queries[] = $query; return (array) $this->resolve( $query, array() ); }
-	public function query( $query ) { $this->queries[] = $query; return 1; }
+	/** What query() reports as changed: 0 plays a row somebody else claimed first. */
+	public $query_returns = 1;
+	public function query( $query ) { $this->queries[] = $query; return $this->query_returns; }
 	public function delete( $table, $where, $where_formats = null ) { $this->queries[] = 'DELETE FROM ' . $table . ' ' . wp_json_encode( $where ); return 1; }
 	public $inserted = array();
 	public function insert( $table, $data, $formats = null ) { $this->queries[] = 'INSERT ' . $table; $this->inserted[] = array( $table, $data ); $this->insert_id++; return 1; }
