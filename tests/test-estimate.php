@@ -130,3 +130,8 @@ msrwa_test_assert( $provided['cost_usd'] < MSRWA_Estimate::recipe( MSRWA_Profile
 msrwa_test_assert( ! isset( MSRWA_Estimate::recipe( MSRWA_Profile::ARTICLE )['steps']['collage_reading'] ), 'An article alone reads no collage.' );
 
 msrwa_test_done( 'estimates track what runs really cost' );
+
+// The collage's prompt is written by a text call before it is drawn, and that
+// call is billed with the collage: it belongs in the estimate too.
+$drawn = MSRWA_Engine_Config::create()->price( 'openai', 'gpt-image-2.5-flare', array( 'input_tokens' => 2550, 'output_tokens' => 345 ) );
+msrwa_test_assert( $full['steps']['facebook_image']['cost_usd'] > round( $drawn, 6 ), 'The collage estimate includes the call that composes its prompt.' );

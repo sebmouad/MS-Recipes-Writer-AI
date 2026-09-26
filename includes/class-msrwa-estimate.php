@@ -37,16 +37,24 @@ final class MSRWA_Estimate {
 			'review' => array( 'input' => 11500, 'output' => 4000 ),
 			'proofread' => array( 'input' => 0, 'output' => 0 ),
 			// Images, recipe and photographs only: 7 247–7 707 in, 890–1 270 out on
-			// 0.28.0, against 16 500 in when it read the article and research too.
-			'final_approval' => array( 'input' => 8000, 'output' => 1500 ),
+			// 0.28.0, against 16 500 in when it read the article and research too;
+			// 7 468–7 880 in, 518–1 620 out over twelve runs of 0.28.36.
+			'final_approval' => array( 'input' => 7800, 'output' => 1100 ),
 			// Drawn from a reference image since 0.28.x — a photograph of the dish or
 			// the collage's last panel — which is input too: 2 054 in, 196 out on a
 			// live run of 0.28.27, against 1 450 measured before the reference.
 			'featured_image' => array( 'input' => 2100, 'output' => 440 ),
 			// The collage read panel by panel when it leads the recipe: 2 370 in,
-			// 1 227 out on a live run of 0.28.27.
-			'collage_reading' => array( 'input' => 2400, 'output' => 1250 ),
+			// 1 227 out on a live run of 0.28.27, at `low` thinking: 937–1 351 out
+			// over twelve runs of 0.28.36. The shapes are `medium` drawings, so the
+			// 500 that `low` takes off is added back here.
+			'collage_reading' => array( 'input' => 2400, 'output' => 1750 ),
 			'facebook_image' => array( 'input' => 2550, 'output' => 345 ),
+			// The text call that writes the collage's image prompt before it is
+			// drawn: 2 368–2 676 in, 937–1 193 out on 0.28.36, billed with the
+			// collage and missing from the estimate until 0.28.38. Measured at `low`,
+			// like the collage reading.
+			'image_compose' => array( 'input' => 2700, 'output' => 1700 ),
 			'corrections' => array( 'input' => 0, 'output' => 0 ),
 		);
 	}
@@ -118,6 +126,11 @@ final class MSRWA_Estimate {
 				$looks = max( 0, (int) $config->get( 'limits.web_images_inspected', 1 ) );
 				$cost += null === $look ? 0.0 : (float) $look * $looks;
 			}
+			if ( 'facebook_image' === $name ) {
+				$compose = self::compose_cost( $config, $shape['image_compose'] );
+				if ( null === $compose ) { $unknown[] = $name; continue; }
+				$cost += $compose;
+			}
 
 			$total += (float) $cost;
 			$steps[ $name ] = array(
@@ -165,6 +178,20 @@ final class MSRWA_Estimate {
 	public static function quality_factor( $quality ) {
 		$factors = array( 'low' => 0.45, 'medium' => 1.0, 'high' => 4.0, 'xhigh' => 7.2, 'max' => 16.0 );
 		return $factors[ $quality ] ?? 1.0;
+	}
+
+	/**
+	 * The prompt a composing Facebook template writes before the drawing, on the
+	 * `image_compose` route; nothing for a template that draws from its own text.
+	 */
+	private static function compose_cost( MSRWA_Engine_Config $config, array $usage ) {
+		$template = $config->facebook_template();
+		if ( '' === $template['compose'] || '' === $template['brief'] ) { return 0.0; }
+		$route = $config->model_for( 'image_compose' );
+		$thinking = $config->thinking( 'image_compose', $route['provider'] );
+		$output = min( max( (int) ( $usage['output'] / 2 ), $usage['output'] + MSRWA_Engine_Config::thinking_allowance( $thinking ) ), $config->max_output( 'image_compose' ) );
+		$cost = $config->price( $route['provider'], $route['model'], array( 'input_tokens' => $usage['input'], 'output_tokens' => $output ) );
+		return null === $cost ? null : (float) $cost;
 	}
 
 	/** One look at one photograph: the shape the matcher and research both pay. */
