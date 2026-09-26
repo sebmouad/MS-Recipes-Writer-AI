@@ -1546,9 +1546,6 @@ msgstr "This lot cannot start: the site’s model settings must be corrected by 
 msgid "Ce lot ne peut pas partir : une étape est confiée à un modèle qui ne peut pas la faire. %s Changez-le sur l’écran Moteur."
 msgstr "This lot cannot start: a step is given to a model that cannot do it. %s Change it on the Engine screen."
 
-msgid "Lecture des photographies"
-msgstr "Reading the photographs"
-
 msgid "Mesuré le 23/09/2026 : coupé au plafond sans réponse (0/14), pour 0,11 $."
 msgstr "Measured on 23/09/2026: cut at the ceiling with no answer (0/14), for $0.11."
 
@@ -2403,3 +2400,6 @@ msgstr "your Facebook collage"
 
 msgid "Éditeur"
 msgstr "Editor"
+
+msgid "Lecture des photographies et du collage"
+msgstr "Reading the photographs and the collage"

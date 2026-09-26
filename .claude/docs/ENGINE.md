@@ -971,6 +971,13 @@ photograph, and otherwise use the photograph without the cost of a search.
     before `<!--nextpage-->` does not say it, and removes a repeated title,
     part-only headings and opening labels from whatever comes back.
 
+54. **The registry lists a collage-led recipe in the order it runs
+    (2026-09-26, owner's request).** `for_lead()` placed only the reading
+    before the recipe and left the drawing where the recipe-first order had
+    it, after the article: the Moteur and Modèles screens listed the collage
+    last. It now lists research, collage, reading, then the recipe; waves are
+    unchanged, since they follow `needs`, not the list.
+
 
 ### Still open
 

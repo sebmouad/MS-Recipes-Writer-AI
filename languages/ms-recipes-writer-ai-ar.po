@@ -1570,9 +1570,6 @@ msgstr "لا يمكن لهذه الدفعة أن تنطلق: يجب أن يصح�
 msgid "Ce lot ne peut pas partir : une étape est confiée à un modèle qui ne peut pas la faire. %s Changez-le sur l’écran Moteur."
 msgstr "لا يمكن لهذه الدفعة أن تنطلق: أُسندت مرحلة إلى نموذج لا يستطيع إنجازها. %s غيّره في شاشة المحرك."
 
-msgid "Lecture des photographies"
-msgstr "قراءة الصور الفوتوغرافية"
-
 msgid "Mesuré le 23/09/2026 : coupé au plafond sans réponse (0/14), pour 0,11 $."
 msgstr "قيس في 23/09/2026: توقف عند السقف دون إجابة (0/14)، مقابل 0,11 $."
 
@@ -2459,3 +2456,6 @@ msgstr "كولاج فيسبوك الخاص بك"
 
 msgid "Éditeur"
 msgstr "محرر"
+
+msgid "Lecture des photographies et du collage"
+msgstr "قراءة الصور والكولاج"

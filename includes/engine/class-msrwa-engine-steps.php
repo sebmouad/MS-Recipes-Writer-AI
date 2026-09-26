@@ -123,13 +123,13 @@ final class MSRWA_Engine_Steps {
 		) );
 		$with = static function ( $name ) use ( $steps ) { return array_values( array_unique( array_merge( (array) ( $steps[ $name ]['needs'] ?? array() ), array( 'collage' ) ) ) ); };
 		foreach ( array( 'canonical_recipe', 'article', 'featured_image' ) as $name ) { $set( $name, array( 'needs' => $with( $name ) ) ); }
-		// Registered after the collage and before the recipe, so a list of the
-		// steps reads in the order they run.
+		// Listed in the order they run: the collage drawn and read right after
+		// the research, then the recipe written from it.
 		$ordered = array();
 		foreach ( array_keys( self::all( $overrides ) ) as $name ) {
-			if ( 'collage_reading' === $name ) { continue; }
-			if ( 'canonical_recipe' === $name ) { $ordered['collage_reading'] = true; }
+			if ( in_array( $name, array( 'facebook_image', 'collage_reading' ), true ) ) { continue; }
 			$ordered[ $name ] = true;
+			if ( 'research' === $name ) { $ordered['facebook_image'] = true; $ordered['collage_reading'] = true; }
 		}
 		$overrides['_order'] = array_keys( $ordered );
 		return $overrides;

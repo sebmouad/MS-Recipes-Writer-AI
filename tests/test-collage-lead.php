@@ -79,4 +79,8 @@ msrwa_test_assert( '' === MSRWA_Engine_Input::collage_serving( array( 'collage' 
 msrwa_test_contains( MSRWA_Engine_Input::collage_lead( $led, 'final_approval' ), 'never a finding', 'The judge does not count a drawn collage.' );
 msrwa_test_contains( MSRWA_Engine_Input::collage_lead( $led, 'canonical_recipe' ), 'a dish in its own right', 'A roast beside a gratin is not an ingredient of the gratin.' );
 
+// Listed in the order a collage-led recipe runs: the collage drawn and read
+// right after the research, before the recipe it leads.
+msrwa_test_assert( array( 'research', 'facebook_image', 'collage_reading', 'canonical_recipe' ) === array_slice( MSRWA_Engine_Steps::names( MSRWA_Engine_Steps::for_lead( array(), 'drawn' ) ), 0, 4 ), 'The collage steps come right after the research.' );
+
 msrwa_test_done( 'the collage leads the recipe: drawn first, or the writer’s own' );

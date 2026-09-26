@@ -136,13 +136,17 @@ final class MSRWA_Compat {
 
 	/** The steps that call a model, plus the photograph reading the pairing uses. */
 	public static function routed_steps( MSRWA_Engine_Config $config ) {
+		// In the order a complete recipe runs them, the collage first: its
+		// prompt written, drawn, then read — the reading, like the pairing's
+		// look at each photograph, is the `vision` route.
+		$compose = '' !== $config->facebook_template()['compose'];
 		$steps = array();
-		foreach ( (array) $config->steps() as $name => $step ) {
+		foreach ( MSRWA_Engine_Steps::all( MSRWA_Engine_Steps::for_lead( (array) $config->get( 'steps', array() ), 'drawn' ) ) as $name => $step ) {
+			if ( 'facebook_image' === $name && $compose ) { $steps[] = 'image_compose'; }
+			if ( 'collage_reading' === $name ) { $steps[] = 'vision'; continue; }
 			if ( 'none' !== (string) ( $step['capability'] ?? 'text' ) ) { $steps[] = (string) $name; }
 		}
 		$steps[] = 'vision';
-		// The model that writes the collage's prompt before it is drawn.
-		if ( '' !== $config->facebook_template()['compose'] ) { $steps[] = 'image_compose'; }
 		return array_values( array_unique( $steps ) );
 	}
 

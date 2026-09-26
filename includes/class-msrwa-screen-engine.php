@@ -295,7 +295,8 @@ final class MSRWA_Screen_Engine {
 	 */
 	private static function step_registry() {
 		$config = MSRWA_Engine_Config::create( MSRWA_Engine_Settings::stored(), array( 'settings' => MSRWA_Settings::engine_settings() ) );
-		$steps = (array) $config->steps();
+		// A complete lot as it runs today: the collage drawn and read first.
+		$steps = MSRWA_Engine_Steps::all( MSRWA_Engine_Steps::for_lead( (array) $config->get( 'steps', array() ), 'drawn' ) );
 		?>
 		<section class="ms-card">
 			<h2><?php esc_html_e( 'Ce que fait le moteur, étape par étape', 'ms-recipes-writer-ai' ); ?></h2>
@@ -318,7 +319,7 @@ final class MSRWA_Screen_Engine {
 					// An image step is routed on its own key — or the shared `image`
 					// one — and a step that asks no model has no model to show.
 					$capability = MSRWA_Engine_Steps::capability( $key, $steps );
-					$route = 'none' === $capability ? array() : $config->model_for( 'image_generation' === $capability ? $config->image_route( $key ) : $key );
+					$route = 'none' === $capability ? array() : $config->model_for( MSRWA_Estimate::route_for( $key, $capability, $config ) );
 					$has_key = ! empty( $route['model'] ) && ! empty( $config->provider( $route['provider'], $route['model'] )['has_key'] );
 					$priced = ! empty( $route['model'] ) && null !== $config->price( $route['provider'], $route['model'], array() );
 					?>

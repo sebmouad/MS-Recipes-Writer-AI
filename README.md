@@ -5,12 +5,12 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.28.31
+## État actuel — 0.28.32
 
-La version `0.28.31` fait ouvrir l'article sur sa première section et
-annoncer la page 2 à la fin de la première ; la `0.28.30` réglait le type de
-chaque lot par type d'utilisateur et ajoutait *Nouveau lot de recettes* à la
-barre d'outils ; la `0.28.29` réunissait le nouveau lot et le pass. Le détail
+La version `0.28.32` range les étapes dans l'ordre où elles tournent,
+collage d'abord, sur les écrans Moteur et Modèles ; la `0.28.31` faisait
+ouvrir l'article sur sa première section et annoncer la page 2 ; la `0.28.30`
+réglait le type de chaque lot par type d'utilisateur. Le détail
 de chaque version suit, de la plus récente à la plus ancienne.
 
 Vérifié de bout en bout sur un vrai WordPress : un rédacteur dépose un lot de
@@ -80,6 +80,16 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.28.32
+
+**Les étapes dans l'ordre où elles tournent.**
+- Écrans *Moteur* (le tableau des étapes et le choix des modèles) et
+  *Modèles* : recherche, consigne du collage, collage Facebook, lecture du
+  collage, recette de référence, rédaction, image à la une, relecture,
+  contrôle final. Le collage apparaissait jusqu'ici après l'article.
+- La lecture des images s'appelle désormais *Lecture des photographies et
+  du collage* : le même modèle lit les photographies des lots et le collage.
 
 ## Version 0.28.31
 

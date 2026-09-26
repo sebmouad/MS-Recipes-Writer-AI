@@ -630,6 +630,11 @@ cost) in the task before changing anything.
   (2026-09-24).** The writer's photograph shows the prompt's writer the dish;
   the collage is drawn from the style reference. Real: the owner's own rôti
   photograph, drawn both ways. See ENGINE.md §7, item 40.
+- [x] **A65 — Steps listed in the order they run (2026-09-26).** `for_lead()`
+  orders research, collage, reading, recipe (ENGINE.md §7, 54);
+  `MSRWA_Compat::routed_steps()` and the Moteur registry follow it.
+  `tests/test-collage-lead.php`. Real: the Moteur registry and the Modèles
+  step grid read in the browser in that order.
 - [x] **A64 — Clean article opening, page-two notice, local initials (2026-09-26).**
   `MSRWA_Article::tidy()` on the draft: repeated title, part-only headings and
   opening labels removed; a line before `<!--nextpage-->` names page two in the
