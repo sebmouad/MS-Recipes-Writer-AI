@@ -631,9 +631,9 @@ cost) in the task before changing anything.
   the collage is drawn from the style reference. Real: the owner's own rôti
   photograph, drawn both ways. See ENGINE.md §7, item 40.
 - [x] **A69 — The report in the plugin's palette (2026-09-26).**
-  `tools/report.css` rewritten on colour tokens shared with `admin.css`, with
-  a dark scheme that only redefines them. Real: run 81's report read in light
-  and dark, desktop and phone.
+  `tools/report.css` rewritten on colour tokens shared with `admin.css`; light
+  only, at the owner's request (the dark scheme of 0.28.36 was removed in
+  0.28.37). Real: run 81's report read in a dark-scheme browser, still light.
 - [x] **A68 — The full report, foldable and in order (2026-09-26).** Every
   section a numbered fold with its content on the closed line; story sections
   in the order the recipe was made (a leading collage before the recipe),

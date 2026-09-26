@@ -1,7 +1,7 @@
 /* The report shares the plugin's palette (assets/admin.css): slate ink, one
    amber accent, and the same good / warn / stop tones, so the page opened from
-   a recipe looks like the screen it came from. Every colour is a token; the
-   dark scheme only redefines the tokens. */
+   a recipe looks like the screen it came from. Light only, whatever the
+   system's scheme: every colour is a token. */
 :root{
   --ground:#eef2f3;--paper:#fbfcfc;--raised:#fff;--sunk:#f0f4f5;
   --line:#dae3e6;--line-soft:#e9eff1;
@@ -20,20 +20,6 @@
   --radius:12px;--pad:clamp(20px,5vw,52px);
   color-scheme:light;
 }
-@media(prefers-color-scheme:dark){:root{
-  --ground:#0c1519;--paper:#111d22;--raised:#16252b;--sunk:#1b2c33;
-  --line:#2a3f47;--line-soft:#22353c;
-  --ink:#e3ecef;--ink-soft:#9fb3bb;--ink-faint:#6f878f;--head:#f1f6f7;
-  --lamp:#e0a04a;--lamp-strong:#f0b566;--lamp-soft:#2c2415;
-  --live:#5cc2b6;--live-soft:#15302d;
-  --good:#6fcf97;--good-soft:#143023;--good-line:#23513a;
-  --warn:#e5b659;--warn-soft:#2e2612;--warn-line:#5a4720;
-  --stop:#f08a80;--stop-soft:#351a19;--stop-line:#5e2c29;
-  --blue:#8fb4ec;--blue-soft:#18263a;--violet:#bba2ea;--violet-soft:#241c36;
-  --hero-a:#0a1216;--hero-b:#1a3039;--code-bg:#0a1216;--code-ink:#d9e4e7;
-  --shadow:0 1px 2px #0006;
-  color-scheme:dark;
-}}
 
 *{box-sizing:border-box}
 html,body{max-width:100%;overflow-x:hidden}
