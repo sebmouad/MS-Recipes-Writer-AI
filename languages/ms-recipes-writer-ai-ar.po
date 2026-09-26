@@ -70,13 +70,13 @@ msgid "Artefact"
 msgstr "المُخرَج"
 
 msgid "Article et image à la une"
-msgstr "مقال وصورة رئيسية"
+msgstr "مقال وصورة بارزة"
 
 msgid "Article seul"
 msgstr "مقال فقط"
 
 msgid "Article, image à la une et collage Facebook"
-msgstr "مقال وصورة رئيسية وملصق فيسبوك"
+msgstr "مقال وصورة بارزة وكولاج فيسبوك"
 
 msgid "Articles"
 msgstr "المقالات"
@@ -152,9 +152,6 @@ msgstr "الفرنسية"
 
 msgid "Le juge"
 msgstr "الحَكَم"
-
-msgid "Le pass"
-msgstr "المِمَرّ"
 
 msgid "Les photographies"
 msgstr "الصور"
@@ -526,7 +523,7 @@ msgid "cohérence"
 msgstr "الاتساق"
 
 msgid "collage"
-msgstr "ملصق"
+msgstr "كولاج"
 
 msgid "coût"
 msgstr "الكلفة"
@@ -544,7 +541,7 @@ msgid "généré"
 msgstr "مولَّد"
 
 msgid "image à la une"
-msgstr "الصورة الرئيسية"
+msgstr "الصورة البارزة"
 
 msgid "inchangée"
 msgstr "دون تغيير"
@@ -755,9 +752,6 @@ msgstr "ثلاثون يومًا"
 
 msgid "%1$s sur les %2$d jours précédents"
 msgstr "%1$s مقارنةً بالـ%2$d يومًا السابقة"
-
-msgid "Les quatre postes du moteur, dépense et temps passé. Le temps n’est pas la dépense : une image coûte cher et va vite, une relecture est l’inverse."
-msgstr "بنود المحرّك الأربعة: ما أنفقه كلٌّ منها والوقت الذي استغرقه. الوقت ليس الإنفاق: الصورة مكلفة وسريعة، والمراجعة عكس ذلك."
 
 msgid "Où part l’argent"
 msgstr "إلى أين يذهب المال"
@@ -1139,9 +1133,6 @@ msgstr "مجلد الرفع غير قابل للكتابة."
 
 msgid "Le dossier est accessible en écriture."
 msgstr "المجلد قابل للكتابة."
-
-msgid "Le pass → « Reprendre la file » quand vous voulez qu’elles repartent."
-msgstr "الممرّ ← «استئناف الطابور» عندما تريد لها أن تنطلق من جديد."
 
 msgid "Le schéma enregistré est %1$d ; cette version en attend %2$d."
 msgstr "المخطّط المحفوظ هو %1$d؛ هذا الإصدار ينتظر %2$d."
@@ -2130,7 +2121,7 @@ msgid "Les mêmes modèles là où les moins chers ont été mesurés insuffisan
 msgstr "النماذج نفسها حيث ثبت بالقياس أن الأرخص غير كافية، وتفكير أقل قليلًا للبحث والفحص النهائي، والصورتان بجودة منخفضة."
 
 msgid "Plus de réflexion pour la recherche, la relecture et le contrôle final, l’image à la une en qualité moyenne et le collage en haute qualité. Les modèles les plus chers coûteraient quatre fois plus pour un article à peine différent."
-msgstr "تفكير أكثر للبحث والمراجعة والفحص النهائي، والصورة الرئيسية بجودة متوسطة والملصق بجودة عالية. النماذج الأغلى ستكلف أربعة أضعاف لمقال لا يكاد يختلف."
+msgstr "تفكير أكثر للبحث والمراجعة والفحص النهائي، والصورة البارزة بجودة متوسطة والكولاج بجودة عالية. النماذج الأغلى ستكلف أربعة أضعاف لمقال لا يكاد يختلف."
 
 msgid "Mesuré le 25/09/2026 : sur trois recettes, il perd des ingrédients (sel, poivre, beurre à « 0 »), en invente un (muscade) et oublie la FAQ deux fois sur trois."
 msgstr "قيس في 25/09/2026: على ثلاث وصفات يُسقط مكونات (الملح، الفلفل، الزبدة بـ«0») ويخترع واحدًا (جوزة الطيب) وينسى الأسئلة الشائعة مرتين من ثلاث."
@@ -2142,7 +2133,7 @@ msgid "Mesuré le 25/09/2026 : il réfléchit 13 000 à 15 000 jetons, coûte pl
 msgstr "قيس في 25/09/2026: يفكر من 13000 إلى 15000 رمز، ويكلف أكثر من GPT-5.6 Luna ويرصد من 1 إلى 3 تصحيحات حيث يرصد Luna من 3 إلى 8."
 
 msgid "Mesuré le 25/09/2026 : en désaccord avec GPT-5.6 Luna sur deux recettes sur trois — il laisse passer un collage refusé et en refuse un approuvé — pour le même coût."
-msgstr "قيس في 25/09/2026: يختلف مع GPT-5.6 Luna في وصفتين من ثلاث — يمرر ملصقًا مرفوضًا ويرفض آخر مقبولًا — بالتكلفة نفسها."
+msgstr "قيس في 25/09/2026: يختلف مع GPT-5.6 Luna في وصفتين من ثلاث — يمرر كولاجًا مرفوضًا ويرفض آخر مقبولًا — بالتكلفة نفسها."
 
 msgid "Ajouter une recette"
 msgstr "إضافة وصفة"
@@ -2454,3 +2445,71 @@ msgstr "مطابقة الصور"
 
 msgid "Vérification des faits (ancienne étape)"
 msgstr "التحقق من الحقائق (خطوة سابقة)"
+
+msgid "Les quatre postes du moteur, dépense et temps passé ; l’appariement des photographies des lots compte dans les autres étapes. Le temps n’est pas la dépense : une image coûte cher et va vite, une relecture est l’inverse."
+msgstr "بنود المحرك الأربعة، ما أنفقه كل منها والوقت الذي استغرقه؛ وتُحتسب مطابقة صور الدفعات ضمن الخطوات الأخرى. الوقت ليس الإنفاق: الصورة مكلفة وسريعة، والمراجعة عكس ذلك."
+
+msgid "Le thème MS Recipes ou MS SEO Plus l’imprime déjà, à partir des champs que cette extension remplit : rien n’est ajouté en double."
+msgstr "قالب MS Recipes أو MS SEO Plus يطبعه بالفعل، انطلاقًا من الحقول التي تملؤها هذه الإضافة: لا يُضاف شيء مرتين."
+
+#, php-format
+msgid "%1$d recette(s) en échec, %2$d terminée(s)."
+msgstr "%1$d وصفة فشلت، و%2$d اكتملت."
+
+msgid "Articles → État : « Échecs ». Chaque recette dit ce qui l’a arrêtée, et se reprend sans repayer ce qui a réussi."
+msgstr "المقالات ← الحالة: «الإخفاقات». تذكر كل وصفة ما أوقفها، وتُستأنف دون إعادة دفع ما نجح."
+
+msgid "Aucun collage de référence lisible : les collages sont dessinés sans modèle de style."
+msgstr "لا يوجد كولاج مرجعي قابل للقراءة: تُرسم الكولاجات دون نموذج للأسلوب."
+
+#, php-format
+msgid "Aucune recette en échec ; %d terminée(s)."
+msgstr "لم تفشل أي وصفة؛ %d اكتملت."
+
+msgid "Demandez à l’hébergeur GD avec WebP : les images sont enregistrées en WebP, plus légères."
+msgstr "اطلب من المستضيف GD مع WebP: تُحفظ الصور بصيغة WebP الأخف."
+
+msgid "Demandez à l’hébergeur d’activer GD : sans elle, l’image à la une n’est plus guidée par le plat du collage et les références partent en pleine taille, plus chères."
+msgstr "اطلب من المستضيف تفعيل GD: بدونها لا تعود الصورة البارزة مسترشدة بطبق الكولاج، وتُرسل المراجع بحجمها الكامل، وهو أكثر تكلفة."
+
+msgid "Dernières 24 heures"
+msgstr "آخر 24 ساعة"
+
+msgid "GD avec WebP : le collage peut guider l’image à la une, et les références partent réduites."
+msgstr "GD مع WebP: يمكن للكولاج توجيه الصورة البارزة، وتُرسل المراجع مصغّرة."
+
+msgid "GD est là, mais sans WebP."
+msgstr "GD موجودة، لكن دون WebP."
+
+msgid "Le collage de référence fourni avec l’extension donne son style aux collages."
+msgstr "الكولاج المرجعي المرفق بالإضافة يمنح الكولاجات أسلوبها."
+
+msgid "L’extension GD de PHP est absente."
+msgstr "امتداد GD الخاص بـ PHP غير موجود."
+
+msgid "Réglages → Style du collage Facebook : ajoutez un de vos collages."
+msgstr "الإعدادات ← أسلوب كولاج فيسبوك: أضف أحد كولاجاتك."
+
+msgid "Style du collage"
+msgstr "أسلوب الكولاج"
+
+msgid "Traitement des images"
+msgstr "معالجة الصور"
+
+msgid "Votre collage de référence donne son style aux collages."
+msgstr "كولاجك المرجعي يمنح الكولاجات أسلوبها."
+
+msgid "Tout est en ordre : une recette envoyée maintenant peut aller jusqu’au brouillon."
+msgstr "كل شيء على ما يرام: يمكن لوصفة تُرسل الآن أن تصل إلى المسودة."
+
+msgid "Vérifier à nouveau"
+msgstr "تحقق مرة أخرى"
+
+msgid "À faire :"
+msgstr "المطلوب:"
+
+msgid "Lots de recettes"
+msgstr "دفعات الوصفات"
+
+msgid "Lots de recettes → « Reprendre la file » quand vous voulez qu’elles repartent."
+msgstr "دفعات الوصفات ← «استئناف الطابور» عندما تريد لها أن تنطلق من جديد."

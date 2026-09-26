@@ -168,17 +168,21 @@ final class MSRWA_Screen_Settings {
 					<input type="hidden" name="msrwa_settings[recipe_schema]" value="0">
 					<label><input type="checkbox" name="msrwa_settings[recipe_schema]" value="1" <?php checked( ! empty( $settings['recipe_schema'] ) ); ?>>
 						<strong><?php esc_html_e( 'Publier la recette en données structurées (Recipe JSON-LD)', 'ms-recipes-writer-ai' ); ?></strong></label>
-					<br><small class="ms-muted"><?php echo esc_html( MSRWA_Schema::another_plugin_prints_it()
+					<br><small class="ms-muted"><?php echo esc_html( MSRWA_Stack::owns_head( 'schema' )
+						? __( 'Le thème MS Recipes ou MS SEO Plus l’imprime déjà, à partir des champs que cette extension remplit : rien n’est ajouté en double.', 'ms-recipes-writer-ai' )
+						: ( MSRWA_Schema::another_plugin_prints_it()
 						? __( 'Une extension de recettes active imprime déjà les siennes : rien n’est ajouté, pour ne pas décrire deux fois le même plat.', 'ms-recipes-writer-ai' )
-						: __( 'Sur les articles publiés seulement. Ce que Google lit pour afficher une recette enrichie : temps, portions, ingrédients, étapes, calories.', 'ms-recipes-writer-ai' ) ); ?></small>
+						: __( 'Sur les articles publiés seulement. Ce que Google lit pour afficher une recette enrichie : temps, portions, ingrédients, étapes, calories.', 'ms-recipes-writer-ai' ) ) ); ?></small>
 				</p>
 				<p>
 					<input type="hidden" name="msrwa_settings[seo_meta]" value="0">
 					<label><input type="checkbox" name="msrwa_settings[seo_meta]" value="1" <?php checked( ! empty( $settings['seo_meta'] ) ); ?>>
 						<strong><?php esc_html_e( 'Publier la description SEO et l’aperçu de partage (Open Graph)', 'ms-recipes-writer-ai' ); ?></strong></label>
-					<br><small class="ms-muted"><?php echo esc_html( MSRWA_Head::another_plugin_prints_it()
+					<br><small class="ms-muted"><?php echo esc_html( MSRWA_Stack::owns_head( 'meta' )
+						? __( 'Le thème MS Recipes ou MS SEO Plus l’imprime déjà, à partir des champs que cette extension remplit : rien n’est ajouté en double.', 'ms-recipes-writer-ai' )
+						: ( MSRWA_Head::another_plugin_prints_it()
 						? __( 'Une extension SEO active s’en charge déjà : rien n’est ajouté, pour ne pas décrire deux fois la même page.', 'ms-recipes-writer-ai' )
-						: __( 'Sur les articles publiés par ce plugin seulement. Le titre et la description écrits par l’article, et l’image de partage, pour Google, Facebook et X.', 'ms-recipes-writer-ai' ) ); ?></small>
+						: __( 'Sur les articles publiés par ce plugin seulement. Le titre et la description écrits par l’article, et l’image de partage, pour Google, Facebook et X.', 'ms-recipes-writer-ai' ) ) ); ?></small>
 				</p>
 			</section>
 

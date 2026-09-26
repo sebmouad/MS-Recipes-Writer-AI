@@ -26,7 +26,7 @@ final class MSRWA_Screen_Pass {
 
 		echo '<div class="wrap msrwa">';
 		MSRWA_UI::head(
-			__( 'Le pass', 'ms-recipes-writer-ai' ),
+			__( 'Lots de recettes', 'ms-recipes-writer-ai' ),
 			__( 'Déposez un nouveau lot, puis suivez ce qui est en cours, ce qui attend une relecture et ce qui s’est arrêté.', 'ms-recipes-writer-ai' ),
 			$money ? array(
 				__( 'aujourd’hui', 'ms-recipes-writer-ai' ) => MSRWA_I18N::money( $today['spend_usd'], 2 ),

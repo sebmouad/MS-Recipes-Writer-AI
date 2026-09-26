@@ -29,8 +29,11 @@ final class MSRWA_Diagnostics {
 			self::routing(),
 			self::cron(),
 			self::uploads(),
+			self::images(),
+			self::style(),
 			self::rights(),
 			self::budget(),
+			self::recent(),
 			self::leftovers(),
 		);
 	}
@@ -214,7 +217,7 @@ final class MSRWA_Diagnostics {
 				/* translators: %d is a number of recipes. */
 				__( 'La file est suspendue ; %d recette(s) attendent.', 'ms-recipes-writer-ai' ),
 				$state['waiting']
-			), __( 'Le pass → « Reprendre la file » quand vous voulez qu’elles repartent.', 'ms-recipes-writer-ai' ) );
+			), __( 'Lots de recettes → « Reprendre la file » quand vous voulez qu’elles repartent.', 'ms-recipes-writer-ai' ) );
 		}
 		return self::check( 'good', __( 'File', 'ms-recipes-writer-ai' ), sprintf(
 			/* translators: 1: number of running recipes, 2: number waiting, 3: how the cron is driven. */
@@ -232,6 +235,55 @@ final class MSRWA_Diagnostics {
 			return self::check( 'stop', __( 'Téléversements', 'ms-recipes-writer-ai' ), __( 'Le dossier des téléversements n’est pas accessible en écriture.', 'ms-recipes-writer-ai' ), __( 'Corrigez les droits du dossier wp-content/uploads ; sans lui, aucune image générée ne peut être enregistrée.', 'ms-recipes-writer-ai' ) );
 		}
 		return self::check( 'good', __( 'Téléversements', 'ms-recipes-writer-ai' ), __( 'Le dossier est accessible en écriture.', 'ms-recipes-writer-ai' ) );
+	}
+
+	/**
+	 * Whether PHP can work on images: the collage's last panel is cut out to
+	 * guide the featured image, references are made small before they are
+	 * sent, and drafts are saved as WebP. Without GD each of those quietly
+	 * falls back to less.
+	 */
+	private static function images() {
+		$title = __( 'Traitement des images', 'ms-recipes-writer-ai' );
+		if ( ! function_exists( 'imagecreatefromstring' ) || ! function_exists( 'imagecrop' ) ) {
+			return self::check( 'warn', $title, __( 'L’extension GD de PHP est absente.', 'ms-recipes-writer-ai' ), __( 'Demandez à l’hébergeur d’activer GD : sans elle, l’image à la une n’est plus guidée par le plat du collage et les références partent en pleine taille, plus chères.', 'ms-recipes-writer-ai' ) );
+		}
+		if ( ! function_exists( 'imagewebp' ) ) {
+			return self::check( 'warn', $title, __( 'GD est là, mais sans WebP.', 'ms-recipes-writer-ai' ), __( 'Demandez à l’hébergeur GD avec WebP : les images sont enregistrées en WebP, plus légères.', 'ms-recipes-writer-ai' ) );
+		}
+		return self::check( 'good', $title, __( 'GD avec WebP : le collage peut guider l’image à la une, et les références partent réduites.', 'ms-recipes-writer-ai' ) );
+	}
+
+	/** Whether the collage has a style reference it can actually read. */
+	private static function style() {
+		$title = __( 'Style du collage', 'ms-recipes-writer-ai' );
+		$paths = MSRWA_Sources::style_in_use();
+		$path = (string) ( $paths[0] ?? '' );
+		if ( '' === $path || ! is_readable( $path ) ) {
+			return self::check( 'warn', $title, __( 'Aucun collage de référence lisible : les collages sont dessinés sans modèle de style.', 'ms-recipes-writer-ai' ), __( 'Réglages → Style du collage Facebook : ajoutez un de vos collages.', 'ms-recipes-writer-ai' ) );
+		}
+		return self::check( 'good', $title, MSRWA_Sources::style_paths()
+			? __( 'Votre collage de référence donne son style aux collages.', 'ms-recipes-writer-ai' )
+			: __( 'Le collage de référence fourni avec l’extension donne son style aux collages.', 'ms-recipes-writer-ai' ) );
+	}
+
+	/** Recipes that failed in the last day: the symptom somebody opens this screen with. */
+	private static function recent() {
+		global $wpdb;
+		$t = MSRWA_DB::tables();
+		$title = __( 'Dernières 24 heures', 'ms-recipes-writer-ai' );
+		$failed = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$t['runs']} WHERE status = 'failed' AND updated_at >= DATE_SUB(UTC_TIMESTAMP(), INTERVAL 1 DAY)" );
+		$done = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$t['runs']} WHERE status = 'done' AND updated_at >= DATE_SUB(UTC_TIMESTAMP(), INTERVAL 1 DAY)" );
+		if ( $failed ) {
+			return self::check( 'warn', $title, sprintf(
+				/* translators: 1: recipes that failed, 2: recipes that finished. */
+				__( '%1$d recette(s) en échec, %2$d terminée(s).', 'ms-recipes-writer-ai' ), $failed, $done
+			), __( 'Articles → État : « Échecs ». Chaque recette dit ce qui l’a arrêtée, et se reprend sans repayer ce qui a réussi.', 'ms-recipes-writer-ai' ) );
+		}
+		return self::check( 'good', $title, sprintf(
+			/* translators: %d is a number of recipes. */
+			__( 'Aucune recette en échec ; %d terminée(s).', 'ms-recipes-writer-ai' ), $done
+		) );
 	}
 
 	/** Whether the roles still carry what activation granted them. */

@@ -77,7 +77,7 @@ final class MSRWA_Admin {
 		// it, this is what they open WordPress for. A fraction, so it never
 		// takes a slot another menu registered.
 		add_menu_page( $title, self::title_with_waiting( $title ), $write, 'msrwa', array( 'MSRWA_Screen_Pass', 'render' ), 'dashicons-food', 1.01 );
-		add_submenu_page( 'msrwa', __( 'Le pass', 'ms-recipes-writer-ai' ), __( 'Le pass', 'ms-recipes-writer-ai' ), $write, 'msrwa', array( 'MSRWA_Screen_Pass', 'render' ) );
+		add_submenu_page( 'msrwa', __( 'Lots de recettes', 'ms-recipes-writer-ai' ), __( 'Lots de recettes', 'ms-recipes-writer-ai' ), $write, 'msrwa', array( 'MSRWA_Screen_Pass', 'render' ) );
 		add_submenu_page( 'msrwa', __( 'Articles', 'ms-recipes-writer-ai' ), __( 'Articles', 'ms-recipes-writer-ai' ), $write, 'msrwa-articles', array( 'MSRWA_Screen_Articles', 'render' ) );
 		add_submenu_page( 'msrwa', __( 'Analyse', 'ms-recipes-writer-ai' ), __( 'Analyse', 'ms-recipes-writer-ai' ), $manage, 'msrwa-analysis', array( 'MSRWA_Screen_Analysis', 'render' ) );
 		add_submenu_page( 'msrwa', __( 'Moteur', 'ms-recipes-writer-ai' ), __( 'Moteur', 'ms-recipes-writer-ai' ), $manage, 'msrwa-engine', array( 'MSRWA_Screen_Engine', 'render' ) );
@@ -96,7 +96,7 @@ final class MSRWA_Admin {
 		// submenu afterwards takes the access check with it and returns 403.
 		add_submenu_page( 'options.php', __( 'Lot', 'ms-recipes-writer-ai' ), __( 'Lot', 'ms-recipes-writer-ai' ), $write, 'msrwa-batch', array( 'MSRWA_Screen_Batch', 'render' ) );
 		// The new-lot form now heads the pass: its old address still opens it.
-		add_submenu_page( 'options.php', __( 'Le pass', 'ms-recipes-writer-ai' ), __( 'Le pass', 'ms-recipes-writer-ai' ), $write, 'msrwa-compose', array( 'MSRWA_Screen_Pass', 'render' ) );
+		add_submenu_page( 'options.php', __( 'Lots de recettes', 'ms-recipes-writer-ai' ), __( 'Lots de recettes', 'ms-recipes-writer-ai' ), $write, 'msrwa-compose', array( 'MSRWA_Screen_Pass', 'render' ) );
 		add_submenu_page( 'options.php', __( 'Recette', 'ms-recipes-writer-ai' ), __( 'Recette', 'ms-recipes-writer-ai' ), $write, 'msrwa-run', array( 'MSRWA_Screen_Run', 'render' ) );
 	}
 

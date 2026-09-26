@@ -138,14 +138,23 @@ final class MSRWA_Stack {
 		if ( $want > 0 && $limit > 0 && $limit < $want && function_exists( 'set_time_limit' ) ) { @set_time_limit( $want ); }
 	}
 
-	public static function theme_owns_seo() {
-		return function_exists( 'ms_recipes_seo_plugin_active' ) && function_exists( 'ms_recipes_seo_singular_schema' ) && ! ms_recipes_seo_plugin_active();
+	/**
+	 * Whether the MS Recipes theme prints this itself: `meta` for the
+	 * description and the share preview, `schema` for the Recipe markup. The
+	 * theme prints each only with its own switch on and no SEO plugin active;
+	 * with its switch off nobody printed it, since this plugin stood down for
+	 * the theme whatever the switch said.
+	 */
+	public static function theme_owns_seo( $what = 'meta' ) {
+		if ( ! function_exists( 'ms_recipes_seo_plugin_active' ) || ! function_exists( 'ms_recipes_seo_singular_schema' ) || ms_recipes_seo_plugin_active() ) { return false; }
+		if ( ! function_exists( 'ms_recipes_option_bool' ) ) { return true; }
+		return (bool) ms_recipes_option_bool( 'schema' === $what ? 'recipe_schema' : 'seo_meta_tags' );
 	}
 
 	public static function ms_seo_plus_active() { return defined( 'MSSEO_PLUGIN_VERSION' ) || class_exists( 'MS_SEO_Plus' ); }
 
-	/** Somebody in the stack prints the head tags and the schema; this plugin only feeds them. */
-	public static function owns_head() { return self::theme_owns_seo() || self::ms_seo_plus_active(); }
+	/** Somebody in the stack prints the head tags (`meta`) or the schema (`schema`); this plugin only feeds them. */
+	public static function owns_head( $what = 'meta' ) { return self::theme_owns_seo( $what ) || self::ms_seo_plus_active(); }
 
 	/** Writes every stack field for one draft. */
 	public static function write( $post_id, array $canonical, array $article, $facebook_id = 0 ) {

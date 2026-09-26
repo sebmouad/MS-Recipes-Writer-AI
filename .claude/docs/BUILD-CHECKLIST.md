@@ -630,6 +630,14 @@ cost) in the task before changing anything.
   (2026-09-24).** The writer's photograph shows the prompt's writer the dish;
   the collage is drawn from the style reference. Real: the owner's own rôti
   photograph, drawn both ways. See ENGINE.md §7, item 40.
+- [x] **A67 — Recipe lots, Analysis that adds up, a fuller Diagnostic
+  (2026-09-26).** « Le pass » renamed « Lots de recettes »; the Analysis money
+  buckets include lot pairing so they equal the header spend; images, style
+  and last-24-hours checks, a re-check button and highlighted remedies;
+  `MSRWA_Stack::owns_head( $what )` reads the theme's own schema/meta switch.
+  `tests/test-stack.php`. Real: totals reconciled at $7.98 in every window,
+  one JSON-LD and one og:title in each theme switch combination, Diagnostic
+  read on desktop and phone.
 - [x] **A66 — One vocabulary on every screen (2026-09-26).** « run », « image
   Facebook », « jugement final », « profil » and « batch » replaced across the
   three catalogues; retired steps named; providers named in Diagnostic; the

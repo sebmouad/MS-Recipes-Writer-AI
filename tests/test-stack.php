@@ -63,6 +63,17 @@ if ( true ) {
 	function ms_recipes_seo_singular_schema() {}
 }
 msrwa_test_assert( MSRWA_Stack::owns_head(), 'With the MS Recipes theme owning SEO, the plugin only feeds it.' );
+// With the theme's own switches: a switch turned off in the theme leaves that
+// output to the plugin, or nobody printed it.
+if ( true ) {
+	function ms_recipes_option_bool( $key ) { return 'recipe_schema' === $key ? (bool) ( $GLOBALS['msrwa_test_theme_schema'] ?? true ) : (bool) ( $GLOBALS['msrwa_test_theme_meta'] ?? true ); }
+}
+$GLOBALS['msrwa_test_theme_meta'] = false;
+msrwa_test_assert( ! MSRWA_Stack::owns_head( 'meta' ) && MSRWA_Stack::owns_head( 'schema' ), 'The theme’s meta tags switched off: the plugin prints them, the theme keeps the schema.' );
+$GLOBALS['msrwa_test_theme_meta'] = true;
+$GLOBALS['msrwa_test_theme_schema'] = false;
+msrwa_test_assert( MSRWA_Stack::owns_head( 'meta' ) && ! MSRWA_Stack::owns_head( 'schema' ), 'Its schema switched off: the plugin prints the Recipe markup.' );
+unset( $GLOBALS['msrwa_test_theme_meta'], $GLOBALS['msrwa_test_theme_schema'] );
 
 // --- The generated images, described as MS Image Optimizer describes them --
 // Alternative text and title from the SEO title, caption and description from

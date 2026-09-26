@@ -271,7 +271,8 @@
 .ms-table .ms-key { font-family: var(--ms-mono); font-size: 12px; color: var(--ms-ink-soft); }
 .ms-table small { display: block; color: var(--ms-ink-soft); margin-block-start: 3px; }
 .ms-table tr.ms-row-quiet td { background: var(--ms-sunk); color: var(--ms-ink-soft); }
-.ms-table tr.ms-row-total td { border-block-start: 2px solid var(--ms-line); font-weight: 700; background: var(--ms-sunk); }
+.ms-table tr.ms-row-quiet th { background: var(--ms-sunk); color: var(--ms-ink-soft); font-weight: 400; }
+.ms-table tr.ms-row-total td, .ms-table tr.ms-row-total th { border-block-start: 2px solid var(--ms-line); font-weight: 700; background: var(--ms-sunk); }
 
 /* A label, a bar and its figures. The bar takes whatever the figures leave. */
 .ms-share td { vertical-align: middle; }
@@ -527,6 +528,12 @@
 .ms-check:last-child { border-block-end: 0; }
 .ms-check p { margin: 0; max-width: 84ch; }
 .ms-check p + p { margin-block-start: 4px; font-size: 12px; }
+.ms-check > .ms-state { justify-self: start; }
+/* What to do, set apart from what was measured, in the check's colour. */
+.ms-check p.ms-check-remedy { margin-block-start: 8px; padding: 8px 12px; border-radius: var(--ms-radius); font-size: 12.5px; color: var(--ms-ink); background: var(--ms-sunk); border-inline-start: var(--ms-rail) solid var(--ms-line); }
+.ms-check p.ms-check-remedy-warn { background: var(--ms-warn-soft); border-inline-start-color: var(--ms-lamp); }
+.ms-check p.ms-check-remedy-stop { background: var(--ms-stop-soft); border-inline-start-color: var(--ms-stop); }
+@media (max-width: 640px) { .ms-check { grid-template-columns: 1fr; } }
 
 /* --- Empty and notes ---------------------------------------------------
  * An empty screen is an invitation to act, so it says what to do next.
@@ -714,6 +721,12 @@
 	.ms-stack tbody tr:hover { background: none; }
 	.ms-stack td, .ms-stack tbody th { border-block-end: 0; padding: 4px 0; white-space: normal; }
 	.ms-stack tbody th { font-size: 14px; padding-block: 0 6px; }
+	/* A summary row is one line on a phone: its words, then its figure. */
+	.ms-stack tr.ms-row-quiet, .ms-stack tr.ms-row-total { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; background: var(--ms-sunk); }
+	.ms-stack.ms-table tr.ms-row-quiet > *, .ms-stack.ms-table tr.ms-row-total > * { background: none; border: 0; }
+	.ms-stack tr.ms-row-quiet th, .ms-stack tr.ms-row-total th { flex: 1 1 12rem; white-space: normal; }
+	.ms-stack tr.ms-row-quiet td:empty, .ms-stack tr.ms-row-total td:empty { display: none; }
+	.ms-stack tr.ms-row-quiet td[data-label]::before, .ms-stack tr.ms-row-total td[data-label]::before { display: none; }
 	.ms-stack td[data-label]::before { content: attr(data-label); display: block; font-size: 11px; font-weight: 650; letter-spacing: .06em; text-transform: uppercase; color: var(--ms-ink-faint); margin-block-end: 2px; }
 
 	/* A finding's text is the point of the row: it takes the whole width. */

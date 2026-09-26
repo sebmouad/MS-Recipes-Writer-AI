@@ -123,12 +123,21 @@ final class MSRWA_Screen_Analysis {
 			'facebook' => __( 'Collage Facebook', 'ms-recipes-writer-ai' ),
 			'other' => __( 'Autres étapes', 'ms-recipes-writer-ai' ),
 		);
+		// A lot pairs its photographs before any recipe exists, so no recipe
+		// step carries that cost: it is counted with the other steps, or this
+		// section ended a few cents short of the spend at the top of the page.
+		$matching = (float) MSRWA_Ledger::spend( $days )['matching_usd'];
+		if ( $matching > 0 ) {
+			$found = false;
+			foreach ( $rows as $index => $row ) { if ( 'other' === (string) $row['bucket'] ) { $rows[ $index ]['spend'] = (float) $row['spend'] + $matching; $found = true; } }
+			if ( ! $found ) { $rows[] = array( 'bucket' => 'other', 'spend' => $matching, 'seconds' => 0 ); }
+		}
 		$total = 0.0;
 		$minutes = 0.0;
 		foreach ( $rows as $row ) { $total += (float) $row['spend']; $minutes += (float) $row['seconds']; }
 
 		echo '<section class="ms-card"><h2>' . esc_html__( 'Où part l’argent', 'ms-recipes-writer-ai' ) . '</h2>';
-		echo '<p>' . esc_html__( 'Les quatre postes du moteur, dépense et temps passé. Le temps n’est pas la dépense : une image coûte cher et va vite, une relecture est l’inverse.', 'ms-recipes-writer-ai' ) . '</p>';
+		echo '<p>' . esc_html__( 'Les quatre postes du moteur, dépense et temps passé ; l’appariement des photographies des lots compte dans les autres étapes. Le temps n’est pas la dépense : une image coûte cher et va vite, une relecture est l’inverse.', 'ms-recipes-writer-ai' ) . '</p>';
 
 		// Each item keeps its colour whatever its rank: the order is the
 		// product's, not the period's.
@@ -260,7 +269,7 @@ final class MSRWA_Screen_Analysis {
 		$rows = MSRWA_Ledger::by_step( $days );
 		echo '<section class="ms-card ms-card-flush"><h2>' . esc_html__( 'Par étape', 'ms-recipes-writer-ai' ) . '</h2>';
 		if ( ! $rows ) { MSRWA_UI::nothing( __( 'Rien à analyser', 'ms-recipes-writer-ai' ), __( 'Aucune recette n’a encore tourné sur cette période.', 'ms-recipes-writer-ai' ) ); echo '</section>'; return; }
-		echo MSRWA_UI::scroll( __( 'Par étape', 'ms-recipes-writer-ai' ) ) . '<table class="ms-table"><thead><tr>' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- scroll() escapes its own.
+		echo MSRWA_UI::scroll( __( 'Par étape', 'ms-recipes-writer-ai' ) ) . '<table class="ms-table ms-stack"><thead><tr>' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- scroll() escapes its own.
 			. '<th>' . esc_html__( 'Étape', 'ms-recipes-writer-ai' ) . '</th>'
 			. '<th class="ms-num">' . esc_html__( 'Passages', 'ms-recipes-writer-ai' ) . '</th>'
 			. '<th class="ms-num">' . esc_html__( 'Durée moy.', 'ms-recipes-writer-ai' ) . '</th>'
@@ -274,15 +283,15 @@ final class MSRWA_Screen_Analysis {
 		$all = max( 0.000001, array_sum( array_map( static function ( $row ) { return (float) $row['spend']; }, $rows ) ) );
 		foreach ( $rows as $row ) {
 			$share = (int) round( 100 * (float) $row['spend'] / $all );
-			echo '<tr><td><strong>' . esc_html( MSRWA_UI::step_name( (string) $row['step'] ) ) . '</strong> <span class="ms-key">' . esc_html( $row['step'] ) . '</span></td>'
-				. '<td class="ms-num">' . esc_html( $row['runs'] ) . '</td>'
-				. '<td class="ms-num">' . esc_html( MSRWA_I18N::seconds( $row['seconds'] ) ) . '</td>'
-				. '<td class="ms-num">' . esc_html( null === $row['cost'] ? '—' : MSRWA_I18N::money( $row['cost'] ) ) . '</td>'
-				. '<td class="ms-num">' . esc_html( MSRWA_I18N::money( $row['spend'], 2 ) ) . ( $share > 0 ? '<span class="ms-costbar" style="--share:' . (int) $share . '%" title="' . esc_attr( $share . ' %' ) . '"></span>' : '' ) . '</td>'
-				. '<td class="ms-num">' . esc_html( number_format_i18n( round( (float) $row['input_tokens'] ) ) ) . '</td>'
-				. '<td class="ms-num">' . esc_html( number_format_i18n( round( (float) $row['output_tokens'] ) ) ) . '</td>'
-				. '<td class="ms-num">' . esc_html( null === $row['score'] ? '—' : round( 100 * (float) $row['score'] ) . ' %' ) . '</td>'
-				. '<td class="ms-num">' . esc_html( $row['failures'] ) . '</td></tr>';
+			echo '<tr><th scope="row"><strong>' . esc_html( MSRWA_UI::step_name( (string) $row['step'] ) ) . '</strong> <span class="ms-key">' . esc_html( $row['step'] ) . '</span></th>'
+				. '<td class="ms-num" data-label="' . esc_attr__( 'Passages', 'ms-recipes-writer-ai' ) . '">' . esc_html( $row['runs'] ) . '</td>'
+				. '<td class="ms-num" data-label="' . esc_attr__( 'Durée moy.', 'ms-recipes-writer-ai' ) . '">' . esc_html( MSRWA_I18N::seconds( $row['seconds'] ) ) . '</td>'
+				. '<td class="ms-num" data-label="' . esc_attr__( 'Coût moy.', 'ms-recipes-writer-ai' ) . '">' . esc_html( null === $row['cost'] ? '—' : MSRWA_I18N::money( $row['cost'] ) ) . '</td>'
+				. '<td class="ms-num" data-label="' . esc_attr__( 'Dépense', 'ms-recipes-writer-ai' ) . '">' . esc_html( MSRWA_I18N::money( $row['spend'], 2 ) ) . ( $share > 0 ? '<span class="ms-costbar" style="--share:' . (int) $share . '%" title="' . esc_attr( $share . ' %' ) . '"></span>' : '' ) . '</td>'
+				. '<td class="ms-num" data-label="' . esc_attr__( 'Entrée', 'ms-recipes-writer-ai' ) . '">' . esc_html( number_format_i18n( round( (float) $row['input_tokens'] ) ) ) . '</td>'
+				. '<td class="ms-num" data-label="' . esc_attr__( 'Sortie', 'ms-recipes-writer-ai' ) . '">' . esc_html( number_format_i18n( round( (float) $row['output_tokens'] ) ) ) . '</td>'
+				. '<td class="ms-num" data-label="' . esc_attr__( 'Score', 'ms-recipes-writer-ai' ) . '">' . esc_html( null === $row['score'] ? '—' : round( 100 * (float) $row['score'] ) . ' %' ) . '</td>'
+				. '<td class="ms-num" data-label="' . esc_attr__( 'Échecs', 'ms-recipes-writer-ai' ) . '">' . esc_html( $row['failures'] ) . '</td></tr>';
 		}
 		echo '</tbody></table></div></section>';
 	}
@@ -293,7 +302,7 @@ final class MSRWA_Screen_Analysis {
 		if ( ! $rows ) { return; }
 		echo '<section class="ms-card ms-card-flush"><h2>' . esc_html__( 'Par modèle', 'ms-recipes-writer-ai' ) . '</h2>';
 		echo '<p>' . esc_html__( 'Ce qui a réellement été facturé, et quelle part de l’entrée le fournisseur a servie depuis son cache.', 'ms-recipes-writer-ai' ) . '</p>';
-		echo MSRWA_UI::scroll( __( 'Par modèle', 'ms-recipes-writer-ai' ) ) . '<table class="ms-table"><thead><tr>' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- scroll() escapes its own.
+		echo MSRWA_UI::scroll( __( 'Par modèle', 'ms-recipes-writer-ai' ) ) . '<table class="ms-table ms-stack"><thead><tr>' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- scroll() escapes its own.
 			. '<th>' . esc_html__( 'Modèle', 'ms-recipes-writer-ai' ) . '</th>'
 			. '<th class="ms-num">' . esc_html__( 'Appels', 'ms-recipes-writer-ai' ) . '</th>'
 			. '<th class="ms-num">' . esc_html__( 'Entrée', 'ms-recipes-writer-ai' ) . '</th>'
@@ -304,13 +313,13 @@ final class MSRWA_Screen_Analysis {
 			. '</tr></thead><tbody>';
 		foreach ( $rows as $row ) {
 			$input = (int) $row['input_tokens'];
-			echo '<tr><td><strong>' . esc_html( $row['model'] ) . '</strong><small>' . esc_html( $row['provider'] ) . '</small></td>'
-				. '<td class="ms-num">' . esc_html( $row['calls'] ) . '</td>'
-				. '<td class="ms-num">' . esc_html( number_format_i18n( $input ) ) . '</td>'
-				. '<td class="ms-num">' . esc_html( $input ? round( 100 * (int) $row['cached_tokens'] / $input ) . ' %' : '—' ) . '</td>'
-				. '<td class="ms-num">' . esc_html( number_format_i18n( (int) $row['output_tokens'] ) ) . '</td>'
-				. '<td class="ms-num">' . esc_html( MSRWA_I18N::money( $row['spend'], 2 ) ) . '</td>'
-				. '<td class="ms-num">' . esc_html( $row['unpriced'] ? $row['unpriced'] : '—' ) . '</td></tr>';
+			echo '<tr><th scope="row"><strong>' . esc_html( $row['model'] ) . '</strong><small>' . esc_html( MSRWA_UI::provider_name( (string) $row['provider'] ) ) . '</small></th>'
+				. '<td class="ms-num" data-label="' . esc_attr__( 'Appels', 'ms-recipes-writer-ai' ) . '">' . esc_html( $row['calls'] ) . '</td>'
+				. '<td class="ms-num" data-label="' . esc_attr__( 'Entrée', 'ms-recipes-writer-ai' ) . '">' . esc_html( number_format_i18n( $input ) ) . '</td>'
+				. '<td class="ms-num" data-label="' . esc_attr__( 'Cache', 'ms-recipes-writer-ai' ) . '">' . esc_html( $input ? round( 100 * (int) $row['cached_tokens'] / $input ) . ' %' : '—' ) . '</td>'
+				. '<td class="ms-num" data-label="' . esc_attr__( 'Sortie', 'ms-recipes-writer-ai' ) . '">' . esc_html( number_format_i18n( (int) $row['output_tokens'] ) ) . '</td>'
+				. '<td class="ms-num" data-label="' . esc_attr__( 'Dépense', 'ms-recipes-writer-ai' ) . '">' . esc_html( MSRWA_I18N::money( $row['spend'], 2 ) ) . '</td>'
+				. '<td class="ms-num" data-label="' . esc_attr__( 'Sans tarif', 'ms-recipes-writer-ai' ) . '">' . esc_html( $row['unpriced'] ? $row['unpriced'] : '—' ) . '</td></tr>';
 			$itemised += (float) $row['spend'];
 		}
 		// What no call row carries — the research reading the photographs it
@@ -318,9 +327,9 @@ final class MSRWA_Screen_Analysis {
 		// spend above instead of falling a little short of it.
 		$rest = $spent - $itemised;
 		if ( $rest > 0.005 ) {
-			echo '<tr class="ms-row-quiet"><td colspan="5"><small>' . esc_html__( 'Hors appels détaillés : lecture des photographies citées par la recherche, appariement des photographies des lots', 'ms-recipes-writer-ai' ) . '</small></td><td class="ms-num">' . esc_html( MSRWA_I18N::money( $rest, 2 ) ) . '</td><td></td></tr>';
+			echo '<tr class="ms-row-quiet"><th scope="row" colspan="5"><small>' . esc_html__( 'Hors appels détaillés : lecture des photographies citées par la recherche, appariement des photographies des lots', 'ms-recipes-writer-ai' ) . '</small></th><td class="ms-num" data-label="' . esc_attr__( 'Dépense', 'ms-recipes-writer-ai' ) . '">' . esc_html( MSRWA_I18N::money( $rest, 2 ) ) . '</td><td></td></tr>';
 		}
-		echo '<tr class="ms-row-total"><td colspan="5">' . esc_html__( 'Total', 'ms-recipes-writer-ai' ) . '</td><td class="ms-num">' . esc_html( MSRWA_I18N::money( max( $spent, $itemised ), 2 ) ) . '</td><td></td></tr>';
+		echo '<tr class="ms-row-total"><th scope="row" colspan="5">' . esc_html__( 'Total', 'ms-recipes-writer-ai' ) . '</th><td class="ms-num" data-label="' . esc_attr__( 'Dépense', 'ms-recipes-writer-ai' ) . '">' . esc_html( MSRWA_I18N::money( max( $spent, $itemised ), 2 ) ) . '</td><td></td></tr>';
 		echo '</tbody></table></div></section>';
 	}
 
@@ -329,7 +338,7 @@ final class MSRWA_Screen_Analysis {
 		echo '<section class="ms-card ms-card-flush"><h2>' . esc_html__( 'Contrôles qui échouent', 'ms-recipes-writer-ai' ) . '</h2>';
 		echo '<p>' . esc_html__( 'Un contrôle qui échoue une fois sur six est du bruit ; six fois sur six, c’est un contrat que le prompt ne tient pas.', 'ms-recipes-writer-ai' ) . '</p>';
 		if ( ! $rows ) { MSRWA_UI::nothing( __( 'Aucun contrôle en échec', 'ms-recipes-writer-ai' ), __( 'Toutes les étapes ont satisfait leurs contrôles sur cette période.', 'ms-recipes-writer-ai' ) ); echo '</section>'; return; }
-		echo MSRWA_UI::scroll( __( 'Contrôles qui échouent', 'ms-recipes-writer-ai' ) ) . '<table class="ms-table"><thead><tr>' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- scroll() escapes its own.
+		echo MSRWA_UI::scroll( __( 'Contrôles qui échouent', 'ms-recipes-writer-ai' ) ) . '<table class="ms-table ms-stack"><thead><tr>' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- scroll() escapes its own.
 			. '<th>' . esc_html__( 'Étape', 'ms-recipes-writer-ai' ) . '</th><th>' . esc_html__( 'Contrôle', 'ms-recipes-writer-ai' ) . '</th>'
 			. '<th class="ms-num">' . esc_html__( 'Échecs', 'ms-recipes-writer-ai' ) . '</th><th class="ms-num">' . esc_html__( 'Sur', 'ms-recipes-writer-ai' ) . '</th>'
 			. '<th class="ms-num">' . esc_html__( 'Taux', 'ms-recipes-writer-ai' ) . '</th></tr></thead><tbody>';
@@ -338,12 +347,12 @@ final class MSRWA_Screen_Analysis {
 			if ( 10 === $index ) {
 				echo '</tbody></table></div><details class="ms-fold ms-fold-inline"><summary>' . esc_html( sprintf(
 					/* translators: %d is a number of checks. */
-					_n( '%d autre contrôle, en échec plus rarement', '%d autres contrôles, en échec plus rarement', count( $rows ) - 10, 'ms-recipes-writer-ai' ), count( $rows ) - 10 ) ) . '</summary><div class="ms-scroll"><table class="ms-table"><tbody>';
+					_n( '%d autre contrôle, en échec plus rarement', '%d autres contrôles, en échec plus rarement', count( $rows ) - 10, 'ms-recipes-writer-ai' ), count( $rows ) - 10 ) ) . '</summary><div class="ms-scroll"><table class="ms-table ms-stack"><tbody>';
 			}
 			$rate = (int) round( 100 * $row['failed'] / max( 1, $row['seen'] ) );
-			echo '<tr><td>' . esc_html( MSRWA_UI::step_name( (string) $row['step'] ) ) . '</td><td class="ms-key">' . esc_html( $row['check'] ) . '</td>'
-				. '<td class="ms-num">' . esc_html( $row['failed'] ) . '</td><td class="ms-num">' . esc_html( $row['seen'] ) . '</td>'
-				. '<td class="ms-num"><span class="ms-state ms-state-' . ( $rate >= 50 ? 'stop' : ( $rate >= 20 ? 'warn' : '' ) ) . '">' . esc_html( $rate . ' %' ) . '</span></td></tr>';
+			echo '<tr><th scope="row">' . esc_html( MSRWA_UI::step_name( (string) $row['step'] ) ) . '</th><td class="ms-key" data-label="' . esc_attr__( 'Contrôle', 'ms-recipes-writer-ai' ) . '">' . esc_html( $row['check'] ) . '</td>'
+				. '<td class="ms-num" data-label="' . esc_attr__( 'Échecs', 'ms-recipes-writer-ai' ) . '">' . esc_html( $row['failed'] ) . '</td><td class="ms-num" data-label="' . esc_attr__( 'Sur', 'ms-recipes-writer-ai' ) . '">' . esc_html( $row['seen'] ) . '</td>'
+				. '<td class="ms-num" data-label="' . esc_attr__( 'Taux', 'ms-recipes-writer-ai' ) . '"><span class="ms-state ms-state-' . ( $rate >= 50 ? 'stop' : ( $rate >= 20 ? 'warn' : '' ) ) . '">' . esc_html( $rate . ' %' ) . '</span></td></tr>';
 		}
 		echo '</tbody></table></div>' . ( count( $rows ) > 10 ? '</details>' : '' ) . '</section>';
 	}

@@ -5,9 +5,11 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.28.33
+## État actuel — 0.28.34
 
-La version `0.28.33` harmonise les mots de tous les écrans et améliore le
+La version `0.28.34` renomme *Le pass* en *Lots de recettes*, fait
+réconcilier l'analyse avec la dépense et enrichit le diagnostic ; la
+`0.28.33` harmonisait les mots de tous les écrans et améliore le
 réglage des types de lot sur téléphone ; la `0.28.32` rangeait les étapes
 dans l'ordre où elles tournent ; la `0.28.31` faisait ouvrir l'article sur sa
 première section et annoncer la page 2. Le détail
@@ -50,7 +52,7 @@ texte est validé éditorialement.
 2. *MS Recipes AI → Réglages* : enregistrer au moins une clé d’API, puis
    **Vérifier les clés**.
 3. *Moteur* : choisir quel fournisseur sert chaque étape (OpenAI par défaut).
-4. *Le pass*, en haut de la page : coller une ou plusieurs recettes,
+4. *Lots de recettes*, en haut de la page : coller une ou plusieurs recettes,
    séparées par une ligne `---`, déposer des photographies — ou votre propre
    collage Facebook —, ou les deux.
 
@@ -80,6 +82,27 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.28.34
+
+**Lots de recettes.** Le menu et la page *Le pass* s'appellent désormais
+*Lots de recettes* : le nouveau lot en haut, les lots en cours dessous.
+
+**Analyse.**
+- « Où part l'argent » compte l'appariement des photographies dans les
+  autres étapes : la somme du tableau égale la dépense de l'en-tête.
+- Les tableaux par étape, par modèle et par contrôle s'empilent sur
+  téléphone ; les fournisseurs portent leur nom.
+
+**Diagnostic.**
+- Trois contrôles de plus : le traitement d'image (GD, WebP), le style des
+  collages, les échecs des dernières 24 heures.
+- Un bouton « Vérifier à nouveau », une note quand tout est en ordre, et
+  chaque correction à faire mise en évidence.
+
+**Pas de doublon avec le thème.** Le JSON-LD Recipe et l'Open Graph ne sont
+imprimés que si le thème MS Recipes (ou MS SEO Plus) ne le fait pas : si le
+réglage correspondant du thème est coupé, l'extension prend le relais.
 
 ## Version 0.28.33
 

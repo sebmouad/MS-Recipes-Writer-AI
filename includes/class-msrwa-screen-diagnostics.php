@@ -27,13 +27,16 @@ final class MSRWA_Screen_Diagnostics {
 			array(
 				__( 'contrôles', 'ms-recipes-writer-ai' ) => number_format_i18n( count( $checks ) ),
 				__( 'à regarder', 'ms-recipes-writer-ai' ) => number_format_i18n( $blocking ),
-			)
+			),
+			'<a class="button" href="' . esc_url( admin_url( 'admin.php?page=msrwa-diagnostics' ) ) . '"><span class="dashicons dashicons-update" aria-hidden="true"></span> ' . esc_html__( 'Vérifier à nouveau', 'ms-recipes-writer-ai' ) . '</a>'
 		);
 
 		if ( 'stop' === $worst ) {
 			MSRWA_UI::note( esc_html__( 'Quelque chose empêche une recette d’aboutir. Les lignes marquées en rouge disent quoi.', 'ms-recipes-writer-ai' ), 'stop' );
 		} elseif ( 'warn' === $worst ) {
 			MSRWA_UI::note( esc_html__( 'Rien n’est bloqué, mais quelque chose mérite un regard.', 'ms-recipes-writer-ai' ), 'warn' );
+		} else {
+			MSRWA_UI::note( esc_html__( 'Tout est en ordre : une recette envoyée maintenant peut aller jusqu’au brouillon.', 'ms-recipes-writer-ai' ), 'good' );
 		}
 
 		echo '<section class="ms-card ms-card-flush"><h2>' . esc_html__( 'Contrôles', 'ms-recipes-writer-ai' ) . '</h2>';
@@ -42,7 +45,7 @@ final class MSRWA_Screen_Diagnostics {
 			echo '<div class="ms-check">';
 			echo '<span class="ms-state ms-state-' . esc_attr( $check['tone'] ) . '">' . esc_html( $check['title'] ) . '</span>';
 			echo '<div><p>' . esc_html( $check['detail'] ) . '</p>';
-			if ( '' !== $check['remedy'] ) { echo '<p class="ms-muted">' . esc_html( $check['remedy'] ) . '</p>'; }
+			if ( '' !== $check['remedy'] ) { echo '<p class="ms-check-remedy ms-check-remedy-' . esc_attr( $check['tone'] ) . '"><strong>' . esc_html__( 'À faire :', 'ms-recipes-writer-ai' ) . '</strong> ' . esc_html( $check['remedy'] ) . '</p>'; }
 			echo '</div></div>';
 		}
 		echo '</div></section>';

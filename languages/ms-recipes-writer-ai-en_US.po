@@ -153,9 +153,6 @@ msgstr "French"
 msgid "Le juge"
 msgstr "The judge"
 
-msgid "Le pass"
-msgstr "The pass"
-
 msgid "Les photographies"
 msgstr "The photographs"
 
@@ -756,9 +753,6 @@ msgstr "thirty days"
 msgid "%1$s sur les %2$d jours précédents"
 msgstr "%1$s on the previous %2$d days"
 
-msgid "Les quatre postes du moteur, dépense et temps passé. Le temps n’est pas la dépense : une image coûte cher et va vite, une relecture est l’inverse."
-msgstr "The engine’s four items, what each spent and how long it took. Time is not spend: an image is expensive and quick, a proofread is the other way round."
-
 msgid "Où part l’argent"
 msgstr "Where the money goes"
 
@@ -1127,9 +1121,6 @@ msgstr "The uploads directory is not writable."
 
 msgid "Le dossier est accessible en écriture."
 msgstr "The directory is writable."
-
-msgid "Le pass → « Reprendre la file » quand vous voulez qu’elles repartent."
-msgstr "The pass → “Release the queue” when you want them moving again."
 
 msgid "Le schéma enregistré est %1$d ; cette version en attend %2$d."
 msgstr "The stored schema is %1$d; this version expects %2$d."
@@ -2398,3 +2389,71 @@ msgstr "Pairing the photographs"
 
 msgid "Vérification des faits (ancienne étape)"
 msgstr "Fact check (former step)"
+
+msgid "Les quatre postes du moteur, dépense et temps passé ; l’appariement des photographies des lots compte dans les autres étapes. Le temps n’est pas la dépense : une image coûte cher et va vite, une relecture est l’inverse."
+msgstr "The engine's four items, what each spent and how long it took; pairing the lots' photographs counts under other steps. Time is not spend: an image is expensive and quick, a review the other way round."
+
+msgid "Le thème MS Recipes ou MS SEO Plus l’imprime déjà, à partir des champs que cette extension remplit : rien n’est ajouté en double."
+msgstr "The MS Recipes theme or MS SEO Plus already prints it, from the fields this plugin fills: nothing is added twice."
+
+#, php-format
+msgid "%1$d recette(s) en échec, %2$d terminée(s)."
+msgstr "%1$d recipe(s) failed, %2$d finished."
+
+msgid "Articles → État : « Échecs ». Chaque recette dit ce qui l’a arrêtée, et se reprend sans repayer ce qui a réussi."
+msgstr "Articles → State: “Failures”. Each recipe says what stopped it, and resumes without paying again for what succeeded."
+
+msgid "Aucun collage de référence lisible : les collages sont dessinés sans modèle de style."
+msgstr "No readable reference collage: collages are drawn without a style model."
+
+#, php-format
+msgid "Aucune recette en échec ; %d terminée(s)."
+msgstr "No recipe failed; %d finished."
+
+msgid "Demandez à l’hébergeur GD avec WebP : les images sont enregistrées en WebP, plus légères."
+msgstr "Ask your host for GD with WebP: images are saved as WebP, which is lighter."
+
+msgid "Demandez à l’hébergeur d’activer GD : sans elle, l’image à la une n’est plus guidée par le plat du collage et les références partent en pleine taille, plus chères."
+msgstr "Ask your host to enable GD: without it, the featured image is no longer guided by the collage's dish, and references are sent full size, which costs more."
+
+msgid "Dernières 24 heures"
+msgstr "Last 24 hours"
+
+msgid "GD avec WebP : le collage peut guider l’image à la une, et les références partent réduites."
+msgstr "GD with WebP: the collage can guide the featured image, and references are sent reduced."
+
+msgid "GD est là, mais sans WebP."
+msgstr "GD is there, but without WebP."
+
+msgid "Le collage de référence fourni avec l’extension donne son style aux collages."
+msgstr "The reference collage shipped with the plugin gives the collages their style."
+
+msgid "L’extension GD de PHP est absente."
+msgstr "PHP's GD extension is missing."
+
+msgid "Réglages → Style du collage Facebook : ajoutez un de vos collages."
+msgstr "Settings → Facebook collage style: add one of your collages."
+
+msgid "Style du collage"
+msgstr "Collage style"
+
+msgid "Traitement des images"
+msgstr "Image processing"
+
+msgid "Votre collage de référence donne son style aux collages."
+msgstr "Your reference collage gives the collages their style."
+
+msgid "Tout est en ordre : une recette envoyée maintenant peut aller jusqu’au brouillon."
+msgstr "All in order: a recipe sent now can go all the way to a draft."
+
+msgid "Vérifier à nouveau"
+msgstr "Check again"
+
+msgid "À faire :"
+msgstr "To do:"
+
+msgid "Lots de recettes"
+msgstr "Recipe lots"
+
+msgid "Lots de recettes → « Reprendre la file » quand vous voulez qu’elles repartent."
+msgstr "Recipe lots → “Release the queue” when you want them moving again."
