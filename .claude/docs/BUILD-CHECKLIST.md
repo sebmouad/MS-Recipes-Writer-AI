@@ -630,6 +630,18 @@ cost) in the task before changing anything.
   (2026-09-24).** The writer's photograph shows the prompt's writer the dish;
   the collage is drawn from the style reference. Real: the owner's own rôti
   photograph, drawn both ways. See ENGINE.md §7, item 40.
+- [x] **A70 — Deep audit (2026-09-26, 0.28.38).** Retry clears the stored
+  failure; parking touches only a waiting run with no live lease; dispatch
+  claims the lot with a conditional UPDATE and the scheduler no longer undoes
+  its own claim; one redraw per recipe at a time; the estimate prices the
+  collage's compose call; a tick stores only the artifacts it changed; the
+  hourly sweep removes drawings a draft already holds, folders of deleted
+  runs and stored copies of what WordPress holds; a missing recipe or lot
+  opens on the plugin's page. Real: `test-catalog.php` and `test-flow.php` on the local site —
+  one full recipe estimated at $0.0922, billed $0.0842; the sweep took
+  uploads/msrwa from 91 MB to 35 MB; the screen sweep (admin and writer, fr,
+  en, ar, 1280 and 390) found no notice, overflow or money leak. Engine
+  findings are proposals, ENGINE.md §7, items 8–12.
 - [x] **A69 — The report in the plugin's palette (2026-09-26).**
   `tools/report.css` rewritten on colour tokens shared with `admin.css`; light
   only, at the owner's request (the dark scheme of 0.28.36 was removed in

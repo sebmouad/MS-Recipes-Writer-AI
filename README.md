@@ -5,9 +5,12 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.28.37
+## État actuel — 0.28.38
 
-La version `0.28.37` garde le rapport complet en clair seulement ; la
+La version `0.28.38` corrige ce qu'un audit complet a trouvé : reprendre une
+recette arrêtée aboutit enfin, un lot ne part plus deux fois, l'estimation
+compte l'appel qui écrit le prompt du collage, et le nettoyage retire les
+fichiers que plus rien n'ouvre ; la `0.28.37` garde le rapport complet en clair seulement ; la
 `0.28.36` habillait le rapport complet aux couleurs de
 l'extension, avec un mode sombre ; la `0.28.35` refaisait le rapport complet d'une recette : sections
 repliables, dans l'ordre où la recette s'est faite ; la `0.28.34` renommait *Le pass* en *Lots de recettes*, fait
@@ -85,6 +88,33 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.28.38
+
+**Un audit complet, et ce qu'il a corrigé.**
+- **Reprendre une recette arrêtée aboutit.** L'échec de la première tentative
+  restait inscrit : même une reprise réussie finissait « en échec ».
+- **Un lot ne part plus deux fois.** Deux clics sur « Lancer », ou un clic à
+  l'heure programmée, créaient chaque recette en double et la payaient deux
+  fois. Un lot refusé à son heure (plafond, modèle retiré) le dit sur sa page.
+- **Une recette annulée reste annulée**, même si la file est mise en pause
+  pendant qu'un ancien rappel du cron la réveille.
+- **Un seul nouveau dessin à la fois** par recette : un double clic ne paie
+  plus deux images.
+- **L'estimation compte l'appel qui écrit le prompt du collage** (environ
+  0,002 $ par recette), et la lecture du collage au bon prix : étape par
+  étape, elle suit désormais ce que douze recettes réelles ont coûté ; une
+  recette complète est estimée à 0,092 $, facturée 0,084 $ au test réel.
+- **Moins de stockage.** Chaque vague ne réécrit plus toutes les productions,
+  un nouveau dessin ne recopie plus l'article, la recette et le verdict que
+  WordPress garde déjà, et le nettoyage horaire retire les dessins qu'un
+  brouillon a déjà dans la médiathèque et les dossiers de recettes supprimées :
+  91 Mo ramenés à 35 Mo sur le site d'essai.
+- **Une recette ou un lot introuvable** s'affiche dans la page de l'extension,
+  avec le bouton pour revenir, au lieu de l'écran d'erreur de WordPress. Le
+  bouton « Retour au pass » devient « Retour aux lots ».
+- Cinq corrections du moteur proposées au propriétaire (ENGINE.md §7, 8 à 12),
+  dont le contrôle des images qui refuse à tort une recette sur quatre.
 
 ## Version 0.28.37
 
