@@ -62,7 +62,7 @@ final class MSRWA_Retention {
 		$policy = self::policy();
 		$removed = array(
 			'events' => self::events( $policy['events'] ),
-			'artifacts' => self::artifacts( $policy['artifacts'] ) + self::history( $policy['artifacts'] ),
+			'artifacts' => self::artifacts( $policy['artifacts'] ) + self::history( $policy['artifacts'] ) + self::leftovers(),
 			'runs' => self::runs( $policy['runs'] ),
 		);
 		if ( class_exists( 'MSRWA_Spend' ) && MSRWA_DB::table_exists( MSRWA_DB::tables()['spend'] ) ) { MSRWA_Spend::prune(); }
@@ -150,6 +150,53 @@ final class MSRWA_Retention {
 			LIMIT %d", max( 1, (int) $days ), max( 10, (int) $limit ) ) );
 		foreach ( $lots as $lot ) { $wpdb->query( $wpdb->prepare( "DELETE FROM {$t['history']} WHERE batch_id = %d AND run_id = 0", (int) $lot ) ); }
 		return count( $runs );
+	}
+
+	/**
+	 * Files nothing will open again, whatever the ages say.
+	 *
+	 * A finished recipe's drawings live in the media library once its draft
+	 * exists; the copies the engine wrote are released then, but a redraw of
+	 * an earlier version, or a release that never ran, left them behind — some
+	 * 60 MB on a test site of eighty recipes. A folder whose recipe was
+	 * deleted is nobody's. Only what has not been written to for an hour
+	 * goes, so a drawing on its way to the library is never taken from it.
+	 */
+	public static function leftovers( $limit = 200 ) {
+		global $wpdb;
+		$t = MSRWA_DB::tables();
+		$folders = MSRWA_Sources::run_folders();
+		if ( ! $folders ) { return 0; }
+		$runs = array();
+		foreach ( array_chunk( $folders, 500 ) as $chunk ) {
+			$placeholders = implode( ',', array_fill( 0, count( $chunk ), '%d' ) );
+			$rows = $wpdb->get_results( $wpdb->prepare( "SELECT id, status, draft_post_id FROM {$t['runs']} WHERE id IN ({$placeholders})", $chunk ), ARRAY_A );
+			// Unread is not absent: without an answer, no folder is anybody's to remove.
+			if ( ! is_array( $rows ) || '' !== (string) $wpdb->last_error ) { return 0; }
+			foreach ( $rows as $row ) { $runs[ (int) $row['id'] ] = $row; }
+		}
+		$settled = time() - HOUR_IN_SECONDS;
+		$removed = 0;
+		// Copies of what a draft holds, stored again by a redraw before 0.28.38.
+		$keys = MSRWA_Run::kept_by_wordpress();
+		$placeholders = implode( ',', array_fill( 0, count( $keys ), '%s' ) );
+		$copies = (array) $wpdb->get_col( $wpdb->prepare(
+			"SELECT DISTINCT a.run_id FROM {$t['artifacts']} a INNER JOIN {$t['runs']} r ON r.id = a.run_id
+			WHERE r.draft_post_id > 0 AND r.status NOT IN ('queued','running') AND a.artifact_key IN ({$placeholders}) LIMIT 50", $keys ) );
+		foreach ( $copies as $run ) { $removed += MSRWA_Run::release_stored( (int) $run ); }
+		foreach ( $folders as $id ) {
+			if ( $removed >= $limit ) { break; }
+			$run = $runs[ $id ] ?? null;
+			if ( ! $run ) {
+				if ( MSRWA_Sources::run_folder_time( $id ) < $settled ) { MSRWA_Sources::forget_run( $id ); $removed++; }
+				continue;
+			}
+			if ( 'done' !== (string) $run['status'] || ! (int) $run['draft_post_id'] ) { continue; }
+			foreach ( MSRWA_Sources::drawn( $id ) as $file ) {
+				if ( (int) @filemtime( $file ) < $settled ) { wp_delete_file( $file ); $removed++; } // phpcs:ignore WordPress.PHP.NoSilencedErrors
+			}
+		}
+		return $removed;
 	}
 
 	/** Removes rows by their own ids, which every database agrees on. */

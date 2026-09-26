@@ -160,6 +160,28 @@ final class MSRWA_Sources {
 	/** The photographs a run was written from — the writer's and the web's — and nothing it drew. */
 	public static function forget_sources( $run ) { self::remove( self::run_dir( $run ) ); }
 
+	/** The run ids that have a folder here, whatever the tables say. */
+	public static function run_folders() {
+		$ids = array();
+		foreach ( (array) glob( self::root() . '/*', GLOB_ONLYDIR ) as $dir ) {
+			if ( ctype_digit( basename( (string) $dir ) ) ) { $ids[] = (int) basename( (string) $dir ); }
+		}
+		sort( $ids );
+		return $ids;
+	}
+
+	/** When a run's folder was last written to, or 0. */
+	public static function run_folder_time( $run ) { return (int) @filemtime( self::root() . '/' . absint( $run ) ); } // phpcs:ignore WordPress.PHP.NoSilencedErrors
+
+	/** The images the engine drew into a run's folder: not its sources, not its history. */
+	public static function drawn( $run ) {
+		$out = array();
+		foreach ( (array) glob( self::root() . '/' . absint( $run ) . '/*' ) as $file ) {
+			if ( is_file( $file ) && in_array( strtolower( (string) pathinfo( $file, PATHINFO_EXTENSION ) ), array( 'webp', 'png', 'jpg', 'jpeg' ), true ) ) { $out[] = (string) $file; }
+		}
+		return $out;
+	}
+
 	/** A run's whole folder: its sources and the images the engine drew. */
 	public static function forget_run( $run ) { self::remove( self::root() . '/' . absint( $run ) ); }
 
@@ -280,7 +302,6 @@ final class MSRWA_Sources {
 		return 'data:image/jpeg;base64,' . base64_encode( (string) ob_get_clean() );
 	}
 
-	/** Removes one directory under uploads/msrwa and everything in it, and nothing outside. */
 	/**
 	 * Every folder under uploads/msrwa but the style references: the lots, the
 	 * runs, their photographs, drawn images and history. What a data reset
@@ -295,6 +316,7 @@ final class MSRWA_Sources {
 	/** The uploaded style references, so the shipped one serves again. */
 	public static function forget_styles() { self::remove( self::style_dir() ); }
 
+	/** Removes one directory under uploads/msrwa and everything in it, and nothing outside. */
 	private static function remove( $dir ) {
 		$root = realpath( self::root() );
 		$dir = realpath( (string) $dir );

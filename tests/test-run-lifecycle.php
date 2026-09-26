@@ -36,6 +36,20 @@ msrwa_test_contains( $log, 'UPDATE wp_msrwa_runs', 'The recipe is put back in th
 msrwa_test_contains( $log, 'msrwa_batches', 'A batch with work in it again is no longer finished.' );
 msrwa_test_contains( $log, '"result_json":"{\\"ok\\":true,\\"errors\\":[]}"', 'The failure that stopped it is cleared, or the second try ends failed too.' );
 
+// Only what a tick wrote or changed is stored: the engine hands back every
+// artifact it was given, and a redraw stored again what WordPress holds.
+$GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
+$absorb = new ReflectionMethod( 'MSRWA_Run', 'absorb' );
+$absorb->setAccessible( true );
+$absorb->invoke( null, 12, array( 'ok' => true, 'artifacts' => array( 'research' => array( 'a' => 1 ), 'published' => array( 'title' => 'T' ) ) ), array(
+	'ok' => true, 'steps' => array(), 'events' => array(),
+	'artifacts' => array( 'research' => array( 'a' => 1 ), 'published' => array( 'title' => 'T' ), 'featured' => array( 'path' => '/x.webp' ) ),
+) );
+$stored = implode( "\n", $GLOBALS['wpdb']->matching( 'INSERT INTO wp_msrwa_artifacts' ) );
+msrwa_test_contains( $stored, "'featured'", 'What the tick drew is stored.' );
+msrwa_test_missing( $stored, "'research'", 'What it was handed unchanged is not written again.' );
+msrwa_test_missing( $stored, "'published'", 'The post’s own text is read from WordPress, never stored.' );
+
 // A stale cron event parks only a recipe still in the queue: a cancelled or
 // finished one stays as it is, whatever the hold or the ceilings say.
 $GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();

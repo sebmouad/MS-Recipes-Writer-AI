@@ -326,7 +326,15 @@ final class MSRWA_Run {
 		MSRWA_DB::insert_many( $t['events'], $events );
 		MSRWA_DB::insert_many( $t['calls'], $calls );
 
-		foreach ( (array) ( $tick['artifacts'] ?? array() ) as $key => $value ) { self::record_artifact( $id, (string) $key, $value, $now ); }
+		// The engine hands back every artifact it was given. Only what this tick
+		// wrote or changed is stored: rewriting the rest cost a dozen writes a
+		// wave, and a redraw stored again the article, recipe and verdict that
+		// WordPress holds — `published`, read from the post, not at all.
+		$before = (array) ( $state['artifacts'] ?? array() );
+		foreach ( (array) ( $tick['artifacts'] ?? array() ) as $key => $value ) {
+			if ( 'published' === (string) $key || ( array_key_exists( $key, $before ) && $before[ $key ] === $value ) ) { continue; }
+			self::record_artifact( $id, (string) $key, $value, $now );
+		}
 
 		$ok = ! empty( $state['ok'] ) && ! empty( $tick['ok'] );
 		$errors = array_merge( (array) ( $state['errors'] ?? array() ), (array) ( $tick['errors'] ?? array() ) );
@@ -430,8 +438,8 @@ final class MSRWA_Run {
 	 * back on every cron tick, and until the draft exists they are the only
 	 * copy there is.
 	 */
-	private static function kept_by_wordpress() {
-		return array( 'article', 'corrected', 'canonical', 'approval' );
+	public static function kept_by_wordpress() {
+		return array( 'article', 'corrected', 'canonical', 'approval', 'published' );
 	}
 
 	public static function artifacts( $id ) {
