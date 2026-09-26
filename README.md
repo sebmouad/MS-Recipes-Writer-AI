@@ -5,9 +5,10 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.28.35
+## État actuel — 0.28.36
 
-La version `0.28.35` refait le rapport complet d'une recette : sections
+La version `0.28.36` habille le rapport complet aux couleurs de
+l'extension, avec un mode sombre ; la `0.28.35` refaisait le rapport complet d'une recette : sections
 repliables, dans l'ordre où la recette s'est faite ; la `0.28.34` renommait *Le pass* en *Lots de recettes*, fait
 réconcilier l'analyse avec la dépense et enrichit le diagnostic ; la
 `0.28.33` harmonisait les mots de tous les écrans et améliore le
@@ -83,6 +84,16 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.28.36
+
+**Le rapport complet aux couleurs de l'extension.**
+- Les mêmes couleurs que les écrans : encre ardoise, un seul accent ambré,
+  vert, ambre et rouge pour ce qui va, ce qui demande un regard et ce qui
+  bloque. Les bruns et les rouges mêlés ont disparu.
+- Un mode sombre, qui suit le réglage de l'ordinateur ou du téléphone.
+- Titres de section plus nets, chiffres alignés, tableaux encadrés, en-têtes
+  de colonnes discrets ; l'article garde sa typographie de lecture.
 
 ## Version 0.28.35
 
