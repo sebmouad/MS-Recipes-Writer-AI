@@ -16,7 +16,6 @@ final class MSRWA_Editor {
 	public static function hooks() {
 		add_action( 'add_meta_boxes_post', array( __CLASS__, 'register' ) );
 		add_action( 'enqueue_block_editor_assets', array( __CLASS__, 'block_editor' ) );
-		add_filter( 'display_post_states', array( __CLASS__, 'state' ), 10, 2 );
 		add_action( 'before_delete_post', array( __CLASS__, 'forget' ) );
 	}
 
@@ -141,13 +140,6 @@ final class MSRWA_Editor {
 	}
 
 	/** A quiet marker in the posts list, so a generated draft is never a surprise. */
-	public static function state( $states, $post ) {
-		if ( get_post_meta( $post->ID, '_msrwa_run_id', true ) ) {
-			$states['msrwa'] = __( 'généré', 'ms-recipes-writer-ai' );
-		}
-		return $states;
-	}
-
 	public static function render( $post ) {
 		$verdict = self::verdict( $post->ID );
 		$run = MSRWA_Run::get( $verdict['run_id'] );

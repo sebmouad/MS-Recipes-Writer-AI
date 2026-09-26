@@ -102,6 +102,9 @@ développement, humain ou agent.
 - La ligne des clés d'API dit clairement qu'une clé enregistrée n'est pas
   forcément valide, et que « Vérifier les clés » la teste sans frais.
 
+**Plus de « — généré » dans la liste des articles** de WordPress : les
+brouillons de l'extension s'y affichent comme les autres.
+
 **Pas de doublon avec le thème.** Le JSON-LD Recipe et l'Open Graph ne sont
 imprimés que si le thème MS Recipes (ou MS SEO Plus) ne le fait pas : si le
 réglage correspondant du thème est coupé, l'extension prend le relais.

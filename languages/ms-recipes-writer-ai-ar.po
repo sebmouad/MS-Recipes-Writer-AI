@@ -537,9 +537,6 @@ msgstr "المدة"
 msgid "groupes modifiés"
 msgstr "مجموعات معدّلة"
 
-msgid "généré"
-msgstr "مولَّد"
-
 msgid "image à la une"
 msgstr "الصورة البارزة"
 

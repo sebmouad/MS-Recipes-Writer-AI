@@ -137,13 +137,13 @@ msgstr ""
 msgid "%d recettes sélectionnées"
 msgstr ""
 
-#: class-msrwa-editor.php:170
+#: class-msrwa-editor.php:162
 msgid "%d remarque bloquante"
 msgid_plural "%d remarques bloquantes"
 msgstr[0] ""
 msgstr[1] ""
 
-#: class-msrwa-editor.php:108
+#: class-msrwa-editor.php:107
 msgid "%d remarque bloquante à corriger avant publication."
 msgid_plural "%d remarques bloquantes à corriger avant publication."
 msgstr[0] ""
@@ -403,7 +403,7 @@ msgstr ""
 msgid "Aucun contrôle en échec"
 msgstr ""
 
-#: class-msrwa-editor.php:104 class-msrwa-editor.php:159
+#: class-msrwa-editor.php:103 class-msrwa-editor.php:151
 msgid "Aucun contrôle final pour cet article : son type de lot n’en prévoit pas, ou la recette s’est arrêtée avant."
 msgstr ""
 
@@ -495,7 +495,7 @@ msgstr ""
 msgid "Avertissement"
 msgstr ""
 
-#: class-msrwa-editor.php:109 class-msrwa-editor.php:183
+#: class-msrwa-editor.php:108 class-msrwa-editor.php:175
 msgid "Bloquant"
 msgstr ""
 
@@ -619,7 +619,7 @@ msgstr ""
 msgid "Ces étapes tournent sur un modèle auquel vous ne les avez pas autorisées : %s."
 msgstr ""
 
-#: class-msrwa-editor.php:103 class-msrwa-editor.php:156
+#: class-msrwa-editor.php:102 class-msrwa-editor.php:148
 msgid "Cet article a été généré. Les contrôles ci-dessous portent sur ce que la machine a produit ; ils ne remplacent pas votre relecture, et rien ici ne vaut approbation."
 msgstr ""
 
@@ -771,7 +771,7 @@ msgstr ""
 msgid "Correction de la langue"
 msgstr ""
 
-#: class-msrwa-editor.php:111 class-msrwa-editor.php:186
+#: class-msrwa-editor.php:110 class-msrwa-editor.php:178
 msgid "Correction proposée :"
 msgstr ""
 
@@ -863,7 +863,7 @@ msgstr ""
 msgid "Des recettes, des photographies, ou les deux. Les photographies sont décrites puis associées ; sans texte, chaque plat qu’elles montrent devient une recette. Vous confirmez avant que quoi que ce soit ne soit généré."
 msgstr ""
 
-#: class-msrwa-editor.php:106 class-msrwa-editor.php:175
+#: class-msrwa-editor.php:105 class-msrwa-editor.php:167
 msgid "Des remarques mineures, sans rien de bloquant."
 msgstr ""
 
@@ -1289,7 +1289,7 @@ msgstr ""
 msgid "Le juge"
 msgstr ""
 
-#: class-msrwa-editor.php:105 class-msrwa-editor.php:177
+#: class-msrwa-editor.php:104 class-msrwa-editor.php:169
 msgid "Le juge n’a rien relevé. Votre relecture reste la seule validation."
 msgstr ""
 
@@ -1501,7 +1501,7 @@ msgstr ""
 msgid "Lu sur ce que le moteur a rapporté, jamais recalculé. Un coût inconnu reste inconnu jusqu’ici."
 msgstr ""
 
-#: class-msrwa-editor.php:210
+#: class-msrwa-editor.php:202
 msgid "Légende Facebook"
 msgstr ""
 
@@ -1557,11 +1557,11 @@ msgstr ""
 msgid "L’ordre de la file est réservé aux administrateurs."
 msgstr ""
 
-#: class-msrwa-admin.php:75 class-msrwa-editor.php:102
+#: class-msrwa-admin.php:75 class-msrwa-editor.php:101
 msgid "MS Recipes AI"
 msgstr ""
 
-#: class-msrwa-editor.php:140
+#: class-msrwa-editor.php:139
 msgid "MS Recipes AI — à vérifier avant publication"
 msgstr ""
 
@@ -1593,7 +1593,7 @@ msgstr ""
 msgid "Mettre le catalogue à jour"
 msgstr ""
 
-#: class-msrwa-editor.php:110 class-msrwa-editor.php:183
+#: class-msrwa-editor.php:109 class-msrwa-editor.php:175
 msgid "Mineur"
 msgstr ""
 
@@ -1629,7 +1629,7 @@ msgstr ""
 msgid "Moteur"
 msgstr ""
 
-#: class-msrwa-editor.php:209
+#: class-msrwa-editor.php:201
 msgid "Méta-description"
 msgstr ""
 
@@ -1677,7 +1677,7 @@ msgstr ""
 msgid "Non mentionnée par l’appariement."
 msgstr ""
 
-#: class-msrwa-editor.php:112 class-msrwa-editor.php:193
+#: class-msrwa-editor.php:111 class-msrwa-editor.php:185
 msgid "Non vérifiable :"
 msgstr ""
 
@@ -2129,7 +2129,7 @@ msgstr ""
 msgid "Réflexion permise avant de répondre, par étape : `minimal`, `low`, `medium` ou `high` ; vide, le fournisseur décide. La réflexion est facturée comme de la sortie et prise sur le plafond."
 msgstr ""
 
-#: class-msrwa-editor.php:113 class-msrwa-editor.php:222
+#: class-msrwa-editor.php:112 class-msrwa-editor.php:214
 msgid "Référencement et réseaux sociaux"
 msgstr ""
 
@@ -2365,7 +2365,7 @@ msgstr ""
 msgid "Titre"
 msgstr ""
 
-#: class-msrwa-editor.php:208
+#: class-msrwa-editor.php:200
 msgid "Titre SEO"
 msgstr ""
 
@@ -2531,7 +2531,7 @@ msgstr ""
 msgid "Voir en grand"
 msgstr ""
 
-#: class-msrwa-editor.php:115 class-msrwa-editor.php:233
+#: class-msrwa-editor.php:114 class-msrwa-editor.php:225
 msgid "Voir le détail de la recette %d"
 msgstr ""
 
@@ -2833,10 +2833,6 @@ msgstr ""
 
 #: class-msrwa-screen-engine.php:31
 msgid "groupes modifiés"
-msgstr ""
-
-#: class-msrwa-editor.php:146
-msgid "généré"
 msgstr ""
 
 #: class-msrwa-screen-engine.php:227
@@ -3191,7 +3187,7 @@ msgstr ""
 msgid "à corriger"
 msgstr ""
 
-#: class-msrwa-editor.php:173
+#: class-msrwa-editor.php:165
 msgid "à corriger avant publication."
 msgstr ""
 
