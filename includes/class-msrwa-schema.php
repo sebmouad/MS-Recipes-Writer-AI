@@ -35,7 +35,16 @@ final class MSRWA_Schema {
 		if ( empty( MSRWA_Settings::get()['recipe_schema'] ) || MSRWA_Head::seo_plugin_active() ) { return null; }
 		$post = get_post( $post_id );
 		if ( ! $post || 'publish' !== $post->post_status || ! get_post_meta( $post_id, '_msrwa_run_id', true ) ) { return null; }
-		return self::faq( (array) json_decode( (string) get_post_meta( $post_id, '_recipe_faq', true ), true ), (string) $post->post_content );
+		return self::faq( (array) json_decode( (string) get_post_meta( $post_id, '_recipe_faq', true ), true ), self::page_of( (string) $post->post_content, (int) get_query_var( 'page' ) ) );
+	}
+
+	/**
+	 * One page of a post split with <!--nextpage-->: the FAQ is on the last
+	 * page of a two-page article, and page one must not claim it.
+	 */
+	public static function page_of( $content, $page ) {
+		$pages = preg_split( '/<!--nextpage-->/', (string) $content );
+		return (string) ( $pages[ max( 1, (int) $page ) - 1 ] ?? '' );
 	}
 
 	/** Pure: the pairs whose question the page shows, as FAQPage, or null. */

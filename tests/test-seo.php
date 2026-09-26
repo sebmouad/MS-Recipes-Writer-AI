@@ -37,6 +37,9 @@ $schema = MSRWA_Schema::faq( array_merge( $faq, array( array( 'question' => 'Jam
 msrwa_test_assert( 'FAQPage' === ( $schema['@type'] ?? '' ) && 1 === count( $schema['mainEntity'] ), 'FAQPage carries only the questions the page really shows.' );
 msrwa_test_assert( 'Oui, trois mois.' === $schema['mainEntity'][0]['acceptedAnswer']['text'], 'Each with its answer.' );
 msrwa_test_assert( null === MSRWA_Schema::faq( $faq, '<p>Rien.</p>' ), 'A page that shows none gets no FAQ markup.' );
+$split = '<p>Page un.</p><!--nextpage--><h3>Peut-on congeler la tarte ?</h3>';
+msrwa_test_assert( null === MSRWA_Schema::faq( $faq, MSRWA_Schema::page_of( $split, 0 ) ), 'Page one of a split article does not claim the FAQ page two shows.' );
+msrwa_test_assert( null !== MSRWA_Schema::faq( $faq, MSRWA_Schema::page_of( $split, 2 ) ), 'Page two does.' );
 
 // --- Nutrition, only as a source stated it ----------------------------------
 msrwa_test_assert( array() === MSRWA_Draft::nutrition( array( 'calories' => 320 ) ), 'Figures with no source are not kept.' );

@@ -630,7 +630,7 @@ cost) in the task before changing anything.
   (2026-09-24).** The writer's photograph shows the prompt's writer the dish;
   the collage is drawn from the style reference. Real: the owner's own rôti
   photograph, drawn both ways. See ENGINE.md §7, item 40.
-- [~] **A72 — Articles written to be found, and for advertisers (2026-09-26,
+- [x] **A72 — Articles written to be found, and for advertisers (2026-09-26,
   0.29.0).** Owner's request. The article chooses a focus keyword and 4–6
   secondary ones and places the first in the SEO title, slug, description,
   opening sentence and an h2 (a reported check, never a retry); it opens on a
@@ -640,7 +640,13 @@ cost) in the task before changing anything.
   research documents them, which it now collects. The plugin stores the
   phrases for Yoast, Rank Math and the theme's keywords, prints FAQPage for
   the questions the page shows, and adds dateModified and stated nutrition.
-  Offline: `test-seo.php`.
+  Offline: `test-seo.php`. Real: `test-flow.php`, draft #298, $0.0993
+  estimated, $0.0938 billed; "tarte aux pommes normande" in the SEO title,
+  slug, description, first sentence and an h2 (the check passed), the key
+  facts under the opening answer, a sourced alcohol-free adaptation and
+  calories per serving, quality 98/100. Published locally under the MS
+  Recipes theme, FAQPage printed on page 2 only (0.29.1: page 1 claimed the
+  FAQ page 2 shows).
 - [x] **A71 — The audit's engine fixes (2026-09-26, 0.28.39).** Owner's
   approval of ENGINE.md §7, items 8–12, now decided items 55–59: the judge
   reads the image brief as context; the review's typography and the recipe's

@@ -5,9 +5,10 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.29.0
+## État actuel — 0.29.1
 
-La version `0.29.0` écrit chaque article pour être trouvé par Google, Bing,
+La version `0.29.1` ne met la FAQ en données structurées que sur la page de
+l'article qui la montre ; la `0.29.0` écrivait chaque article pour être trouvé par Google, Bing,
 Yahoo et les assistants IA, et pour attirer les annonces les mieux payées ;
 la `0.28.40` garde le plafond par recette à 0,15 $ et limite la
 recherche à cinq appels d'outil ; la `0.28.39` appliquait les cinq corrections du moteur que l'audit
@@ -95,6 +96,12 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.29.1
+
+**La FAQ en données structurées, seulement là où on la lit.** Sur un article
+en deux pages, la FAQ est en page 2 : la page 1 la déclarait aussi aux moteurs,
+ce qu'ils considèrent comme un balisage de contenu invisible.
 
 ## Version 0.29.0
 
