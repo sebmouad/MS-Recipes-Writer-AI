@@ -630,6 +630,13 @@ cost) in the task before changing anything.
   (2026-09-24).** The writer's photograph shows the prompt's writer the dish;
   the collage is drawn from the style reference. Real: the owner's own rôti
   photograph, drawn both ways. See ENGINE.md §7, item 40.
+- [x] **A68 — The full report, foldable and in order (2026-09-26).** Every
+  section a numbered fold with its content on the closed line; story sections
+  in the order the recipe was made (a leading collage before the recipe),
+  technical ones folded after; the article folds per page; tables fit; steps
+  named, not keyed; French status in the eyebrow. `tests/test-report.php`.
+  Real: run 81's report read on desktop and phone, every fold opened, a TOC
+  link to a folded section opens it.
 - [x] **A67 — Recipe lots, Analysis that adds up, a fuller Diagnostic
   (2026-09-26).** « Le pass » renamed « Lots de recettes »; the Analysis money
   buckets include lot pairing so they equal the header spend; images, style

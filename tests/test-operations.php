@@ -33,7 +33,7 @@ msrwa_test_assert( isset( $GLOBALS['ops_options']['msrwa_watchdog_at'] ), 'Watch
 msrwa_test_contains( $GLOBALS['wpdb']->log(), "WHERE status = 'running' AND lock_until IS NULL", 'The watchdog re-arms a run whose next wave was never scheduled.' );
 require_once MSRWA_DIR . 'tools/report.php';
 $html = report_render( array( 'artifacts' => array(), 'steps' => array(), 'events' => array(), 'totals' => array(), 'ok' => false ) );
-foreach ( array( 'Recette canonique', 'SEO, publication', 'Visuels générés', 'Appels aux fournisseurs', 'Configuration de ce passage' ) as $section ) { msrwa_test_contains( $html, $section, 'Shared lab report retains ' . $section ); }
+foreach ( array( 'Recette canonique', 'SEO, publication', 'Image à la une', 'Collage Facebook', 'Appels aux fournisseurs', 'Configuration de ce passage' ) as $section ) { msrwa_test_contains( $html, $section, 'Shared lab report retains ' . $section ); }
 
 // Previewing an unsaved configuration must resolve every step that actually
 // calls a model, and none that does not: 'corrections' has no prompt file at

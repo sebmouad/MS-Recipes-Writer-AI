@@ -11,7 +11,7 @@ require_once dirname( __DIR__ ) . '/tools/report.php';
 $name = str_repeat( 'a', 32 ) . '.webp';
 $run = array(
 	'ok' => true,
-	'eyebrow' => 'Tâche #45 · done',
+	'eyebrow' => 'Recette #45 · terminée',
 	'planned' => array( 'research', 'canonical_recipe', 'article', 'review', 'fact_check', 'corrections', 'proofread' ),
 	'steps' => array( array( 'step' => 'research', 'model' => 'm', 'seconds' => 1, 'usage' => array(), 'cost_usd' => 0.004, 'passed' => 13, 'total' => 13, 'checks' => array( 'valid JSON' => array( 'pass' => true, 'detail' => '14 keys' ) ) ),
 		array( 'step' => 'review', 'model' => 'm', 'seconds' => 1, 'usage' => array(), 'cost_usd' => 0.002, 'passed' => 3, 'total' => 3, 'checks' => array() ),
@@ -37,9 +37,10 @@ $run = array(
 );
 $html = report_render( $run );
 
-msrwa_test_contains( $html, 'Tâche #45 · done', 'The page names the job, not the lab.' );
-msrwa_test_missing( $html, 'Visuels générés', 'An article-only job has no images section.' );
-msrwa_test_missing( $html, 'Approbation finale', 'Nor an approval it never planned, shown as refused.' );
+msrwa_test_contains( $html, 'Recette #45 · terminée', 'The page names the job, not the lab.' );
+msrwa_test_missing( $html, 'id="image"', 'An article-only job has no featured image section.' );
+msrwa_test_missing( $html, 'id="collage"', 'Nor a collage section.' );
+msrwa_test_missing( $html, 'Contrôle final</span>', 'Nor a final check it never planned, shown as refused.' );
 msrwa_test_missing( $html, 'Image à la une</div>', 'Nor an image cost line.' );
 msrwa_test_contains( $html, 'Historique : de ce qui a été fourni au brief', 'The history opens the page.' );
 msrwa_test_contains( $html, 'Pâte, pommes.', 'What the writer provided is shown.' );
@@ -58,7 +59,7 @@ msrwa_test_contains( $html, 'Étape prévue, non atteinte', 'A planned step that
 
 // A lab run names no plan and keeps every section, as before.
 $lab = report_render( array( 'artifacts' => array(), 'steps' => array(), 'events' => array(), 'totals' => array(), 'ok' => false ) );
-foreach ( array( 'Visuels générés', 'Approbation finale', 'Brief du rédacteur', 'Test laboratoire' ) as $section ) { msrwa_test_contains( $lab, $section, 'The lab report keeps ' . $section ); }
+foreach ( array( 'id="image"', 'id="collage"', 'Contrôle final', 'Brief du rédacteur', 'Test laboratoire' ) as $section ) { msrwa_test_contains( $lab, $section, 'The lab report keeps ' . $section ); }
 
 msrwa_test_assert( false !== strpos( report_link( 'culinary_practice' ), 'pratique culinaire' ) && false === strpos( report_link( 'brief' ), 'refusé' ), 'The engine’s source words are named, not refused.' );
 msrwa_test_contains( report_link( 'javascript:alert(1)' ), 'schéma refusé', 'Another scheme still is.' );
@@ -87,5 +88,16 @@ msrwa_test_contains( $page, 'ev ev-warn', 'A warning has its colour.' );
 msrwa_test_contains( $page, 'ev ev-bad', 'So does a failure.' );
 msrwa_test_contains( $page, 'ev ev-neutral ev-detail', 'The plumbing is one click away, not in the story.' );
 msrwa_test_contains( $page, 'Avertissement · 1', 'The legend counts each kind.' );
+
+// Every section folds, says what it holds when closed, and is read in the
+// order the recipe was made: a collage that leads comes before the recipe.
+msrwa_test_assert( substr_count( $page, '<details class="sec"' ) === substr_count( $page, '<section class="section">' ), 'Every section folds.' );
+msrwa_test_contains( $page, '<span class="sec-meta"><span class="pill warn">1 constat(s)</span>', 'A folded section says what it holds.' );
+msrwa_test_contains( $page, 'Relecture</td>', 'Steps are named as the screens name them, not by their key.' );
+$led = report_render( array( 'artifacts' => array( 'brief' => array( 'collage_lead' => 'drawn' ), 'article' => array( 'content_html' => '<p>Un.</p><!--nextpage--><h2>Suite</h2><p>Deux trois.</p>' ) ), 'steps' => array(), 'events' => array(), 'totals' => array(), 'ok' => true ) );
+msrwa_test_assert( strpos( $led, 'id="collage"' ) < strpos( $led, 'id="recette"' ), 'A collage that leads is shown before the recipe.' );
+msrwa_test_contains( $led, 'Page 2 — Suite · 3 mots', 'The article folds page by page, each named by its opening heading.' );
+$after = report_render( array( 'artifacts' => array(), 'steps' => array(), 'events' => array(), 'totals' => array(), 'ok' => true ) );
+msrwa_test_assert( strpos( $after, 'id="image"' ) < strpos( $after, 'id="collage"' ), 'Without a lead, the collage follows the featured image.' );
 
 msrwa_test_done( 'the report tells a job’s whole story, and only what it planned' );

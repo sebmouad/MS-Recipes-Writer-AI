@@ -5,9 +5,10 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.28.34
+## État actuel — 0.28.35
 
-La version `0.28.34` renomme *Le pass* en *Lots de recettes*, fait
+La version `0.28.35` refait le rapport complet d'une recette : sections
+repliables, dans l'ordre où la recette s'est faite ; la `0.28.34` renommait *Le pass* en *Lots de recettes*, fait
 réconcilier l'analyse avec la dépense et enrichit le diagnostic ; la
 `0.28.33` harmonisait les mots de tous les écrans et améliore le
 réglage des types de lot sur téléphone ; la `0.28.32` rangeait les étapes
@@ -82,6 +83,23 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.28.35
+
+**Le rapport complet, repensé.**
+- Chaque section se replie, numérotée, et dit sur sa ligne fermée ce qu'elle
+  contient : « 3 constat(s) », « 18 ingrédients · 15 étapes », « Conforme ».
+- L'ordre suit la fabrication de la recette : résumé, historique, recherche,
+  collage Facebook (avant la recette quand il la guide), recette, article,
+  image à la une, relecture, contrôle final ; puis les détails techniques,
+  repliés.
+- L'article se replie page par page, avec le nombre de mots de chacune ; ses
+  données SEO sont rangées avec lui.
+- Les tableaux tiennent dans la page (le total des appels était coupé) et les
+  étapes portent leur nom — « Lecture du collage », « Contrôle final » — au lieu
+  de leur clé.
+- L'en-tête dit « Recette #81 · terminée », avec l'issue, le temps, le coût
+  estimé et le nombre de mots.
 
 ## Version 0.28.34
 

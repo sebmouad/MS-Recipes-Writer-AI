@@ -144,7 +144,10 @@ final class MSRWA_Operations {
 		$state = MSRWA_Run::state( $id );
 		$state['artifacts']['brief'] = (array) json_decode( (string) $run['brief_json'], true );
 		$state['ok'] = 'done' === $run['status'] && ! empty( $state['ok'] );
-		$state['eyebrow'] = sprintf( 'Tâche #%d · %s', $id, (string) $run['status'] );
+		// The report is written in French whatever the screen's language, as the
+		// engine's own words are; its status reads the same way.
+		$words = array( 'queued' => 'en attente', 'running' => 'en cours', 'paused' => 'en pause', 'awaiting_decision' => 'attend une décision', 'done' => 'terminée', 'failed' => 'en échec', 'cancelled' => 'annulée' );
+		$state['eyebrow'] = sprintf( 'Recette #%d · %s', $id, $words[ (string) $run['status'] ] ?? (string) $run['status'] );
 		$state['history'] = MSRWA_History::for_run( $id );
 
 		// The working copies of the article and the recipe are released once
