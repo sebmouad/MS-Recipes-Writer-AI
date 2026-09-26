@@ -189,9 +189,6 @@ msgstr "By step"
 msgid "Recette"
 msgstr "Recipe"
 
-msgid "Retour au pass"
-msgstr "Back to the pass"
-
 msgid "Rien ne correspond"
 msgstr "Nothing matches"
 
@@ -2458,3 +2455,12 @@ msgstr "Keys saved: %s. That doesn’t prove they work: the “Check the keys”
 
 msgid "Un nouveau dessin de cette recette est déjà en cours."
 msgstr "This recipe is already being redrawn."
+
+msgid "Il a peut-être été supprimé, ou il ne vous appartient pas."
+msgstr "It may have been deleted, or it isn’t yours."
+
+msgid "Retour aux lots"
+msgstr "Back to recipe lots"
+
+msgid "Elle a peut-être été supprimée, ou elle ne vous appartient pas."
+msgstr "It may have been deleted, or it isn’t yours."

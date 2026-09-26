@@ -219,6 +219,19 @@ msrwa_test_missing( msrwa_batch_html( 'running', 1 ), 'ms-batch-delete', 'A lot 
 msrwa_test_as_editor( 7 );
 msrwa_test_missing( msrwa_batch_html( 'ready', 7 ), 'ms-batch-delete', 'A writer cannot throw away a lot, not even their own.' );
 
+// Another writer's lot, or one that is gone, opens on the plugin's own page
+// with the way back — never WordPress's bare error screen.
+msrwa_test_as_editor( 7 );
+$foreign = msrwa_batch_html( 'ready', 8 );
+msrwa_test_contains( $foreign, 'ms-empty', 'A lot this writer cannot open says so in the plugin’s page.' );
+msrwa_test_contains( $foreign, 'page=msrwa', 'And leads back to the lots.' );
+msrwa_test_missing( $foreign, 'Plats du soir', 'Without a word of what the lot holds.' );
+$GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
+$_GET = array( 'run_id' => 99 );
+$gone = msrwa_render( array( 'MSRWA_Screen_Run', 'render' ) );
+$_GET = array();
+msrwa_test_contains( $gone['html'] ?? ( $gone['error'] ?? '' ), 'page=msrwa-articles', 'A recipe that is gone leads back to Articles.' );
+
 // --- A lot that has not left is still somebody's ------------------------
 
 msrwa_test_as_editor( 7 );

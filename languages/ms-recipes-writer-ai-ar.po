@@ -189,9 +189,6 @@ msgstr "حسب الخطوة"
 msgid "Recette"
 msgstr "وصفة"
 
-msgid "Retour au pass"
-msgstr "العودة إلى المِمَرّ"
-
 msgid "Rien ne correspond"
 msgstr "لا شيء مطابق"
 
@@ -2514,3 +2511,12 @@ msgstr "المفاتيح المحفوظة: %s. هذا لا يثبت أنها ت�
 
 msgid "Un nouveau dessin de cette recette est déjà en cours."
 msgstr "يجري بالفعل رسم جديد لهذه الوصفة."
+
+msgid "Il a peut-être été supprimé, ou il ne vous appartient pas."
+msgstr "ربما حُذف، أو أنه ليس لك."
+
+msgid "Retour aux lots"
+msgstr "العودة إلى دفعات الوصفات"
+
+msgid "Elle a peut-être été supprimée, ou elle ne vous appartient pas."
+msgstr "ربما حُذفت، أو أنها ليست لك."

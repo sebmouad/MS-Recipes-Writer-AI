@@ -397,6 +397,19 @@ final class MSRWA_UI {
 		echo '</div>';
 	}
 
+	/**
+	 * A recipe or lot this reader cannot open — deleted, or someone else's —
+	 * in the plugin's own page, with the way back, rather than WordPress's bare
+	 * error screen. It says which it is not: that would tell a writer what
+	 * exists in somebody else's work.
+	 */
+	public static function not_found( $title, $text, $page, $label ) {
+		echo '<div class="wrap msrwa">';
+		self::nothing( $title, $text,
+			'<a class="button button-primary" href="' . esc_url( admin_url( 'admin.php?page=' . $page ) ) . '">' . esc_html( $label ) . '</a>' );
+		echo '</div>';
+	}
+
 	public static function note( $text, $tone = '' ) {
 		echo '<div class="ms-note' . ( $tone ? ' ms-note-' . esc_attr( $tone ) : '' ) . '"><p>' . wp_kses_post( $text ) . '</p></div>';
 	}

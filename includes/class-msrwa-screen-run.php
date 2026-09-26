@@ -15,7 +15,7 @@ final class MSRWA_Screen_Run {
 		if ( ! MSRWA_Rights::may_write() ) { wp_die( esc_html__( 'Vous n’avez pas accès à cet écran.', 'ms-recipes-writer-ai' ) ); }
 
 		$run = MSRWA_Run::get( isset( $_GET['run_id'] ) ? absint( $_GET['run_id'] ) : 0 );
-		if ( ! $run || ! MSRWA_Run::may_see( $run ) ) { wp_die( esc_html__( 'Recette introuvable.', 'ms-recipes-writer-ai' ), '', array( 'response' => 404, 'back_link' => true ) ); }
+		if ( ! $run || ! MSRWA_Run::may_see( $run ) ) { MSRWA_UI::not_found( __( 'Recette introuvable.', 'ms-recipes-writer-ai' ), __( 'Elle a peut-être été supprimée, ou elle ne vous appartient pas.', 'ms-recipes-writer-ai' ), 'msrwa-articles', __( 'Articles', 'ms-recipes-writer-ai' ) ); return; }
 
 		$id = (int) $run['id'];
 		$state = MSRWA_Run::state( $id );

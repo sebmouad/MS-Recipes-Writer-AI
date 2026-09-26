@@ -16,7 +16,7 @@ final class MSRWA_Screen_Batch {
 		if ( ! MSRWA_Rights::may_write() ) { wp_die( esc_html__( 'Vous n’avez pas accès à cet écran.', 'ms-recipes-writer-ai' ) ); }
 
 		$batch = MSRWA_Batch::get( isset( $_GET['batch_id'] ) ? absint( $_GET['batch_id'] ) : 0 );
-		if ( ! $batch || ! MSRWA_Batch::may_see( $batch ) ) { wp_die( esc_html__( 'Lot introuvable.', 'ms-recipes-writer-ai' ), '', array( 'response' => 404, 'back_link' => true ) ); }
+		if ( ! $batch || ! MSRWA_Batch::may_see( $batch ) ) { MSRWA_UI::not_found( __( 'Lot introuvable.', 'ms-recipes-writer-ai' ), __( 'Il a peut-être été supprimé, ou il ne vous appartient pas.', 'ms-recipes-writer-ai' ), 'msrwa', __( 'Lots de recettes', 'ms-recipes-writer-ai' ) ); return; }
 
 		$matching = MSRWA_Batch::matching( (int) $batch['id'] );
 		$runs = MSRWA_Run::for_batch( (int) $batch['id'] );
@@ -257,7 +257,7 @@ final class MSRWA_Screen_Batch {
 	 * are left exactly where they are.
 	 */
 	private static function head_actions( array $batch ) {
-		$out = '<a class="button" href="' . esc_url( admin_url( 'admin.php?page=msrwa' ) ) . '">' . esc_html__( 'Retour au pass', 'ms-recipes-writer-ai' ) . '</a> ';
+		$out = '<a class="button" href="' . esc_url( admin_url( 'admin.php?page=msrwa' ) ) . '">' . esc_html__( 'Retour aux lots', 'ms-recipes-writer-ai' ) . '</a> ';
 		if ( MSRWA_Rights::may_delete() && 'running' !== (string) $batch['status'] ) {
 			$out .= '<button class="button ms-danger" id="ms-batch-delete" data-batch="' . esc_attr( $batch['id'] ) . '">'
 				. esc_html__( 'Supprimer le lot', 'ms-recipes-writer-ai' ) . '</button> ';
