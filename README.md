@@ -5,12 +5,13 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.28.28
+## État actuel — 0.28.29
 
-La version `0.28.28` aligne l'estimation sur les coûts réels du collage d'abord, fait enfin servir le cache du fournisseur à l'article et à la relecture, et centre les icônes des boutons ; la `0.28.27` faisait du collage Facebook le point de départ de la recette — le vôtre, ou un collage dessiné en premier et librement ; la `0.28.26` rangeait aussi l'article au moment de sa publication s'il n'a pas encore de catégorie ; la `0.28.25` rangeait chaque article dans les catégories de votre site ; la `0.28.24` présentait les recettes en tableau sur le pass, Articles et la page d'un lot ; la `0.28.23` rangeait chaque ligne de recette en deux côtés, ce qu'elle est et où elle en est ; la `0.28.22` montrait sur chaque ligne de recette son image, son auteur et tout ce qui la décrit ; la `0.28.21` corrigeait des détails d'affichage sur tous les écrans ; la `0.28.20` ajoutait la réinitialisation — réglages seuls, ou réglages et données — et le choix de ce que la suppression de l'extension efface ; la `0.28.19` acceptait l'adresse d'une image, nomme chaque photographie `lot82-photo2` dans les rapports et redessine les clés d'API ; la `0.28.18` permettait de coller une image copiée dans un nouveau lot et place le menu en tête ; la `0.28.17` écrivait l'article pour le lecteur : plus un mot sur les sources ni sur la photographie, et tous les allergènes ; la `0.28.16` fondait les niveaux de qualité du contenu sur des mesures ; la `0.28.15` laissait l'administrateur fermer aux rédacteurs certains types de lot ; la `0.28.14` dessinait les quatorze jours en colonnes, le juge en barres et les plafonds en jauges ; la `0.28.13` dessinait « Où part l'argent » en deux barres, dépense et temps ; la `0.28.12` comptait chaque somme dépensée le jour où elle l'est, fait tomber juste les tableaux de coûts et rend plus lisibles l'écran d'une recette et l'analyse ; la `0.28.11` corrigeait ce que l'audit complet a trouvé, dont les lots publiés qui demandaient encore une relecture ; la `0.28.10` servait chaque plat comme il se sert — un gratin dans son plat, un mijoté dans sa cocotte ; la `0.28.9` allégeait la consigne de l'image à la une et n'y recopie plus que le plat ; la `0.28.8` corrigeait ce que la vérification complète du code a trouvé ; la `0.28.7` ouvrait le rapport sur ce qu'il faut regarder avant de publier et colore son déroulé ; la `0.28.6` retrouvait dans l'article les corrections citées un peu librement et supprime les phrases en double ; la `0.28.5` dessinait aussi l'image à la une avec la photographie du plat — celle du rédacteur, sinon celle de la recherche ; la `0.28.4` dessinait le collage à partir de votre collage de référence et d'une photographie du plat — celle du rédacteur, sinon celle trouvée par la recherche ; la `0.28.3` gardait le rendu du collage de référence même quand le rédacteur envoie sa photographie ; la `0.28.2` faisait tourner les recettes d'un lot en parallèle sans attendre le cron du site ; la `0.28.1` abaissait le plafond par recette à 0,15 $, fournit le collage de référence avec l'extension et met les consignes en cache ; la `0.28.0` réduisait le coût d'une recette complète d'environ 38 % — une relecture au lieu de trois, un contrôle final qui ne regarde que les images, une seule recherche web et plus de nouveau dessin automatique, remplacé par un bouton pour l'éditeur ; la `0.27.1` réduisait le coût du collage Facebook de plus de moitié et n'y montrait plus d'emballage ; la `0.27.0` dessinait le visuel Facebook comme ChatGPT le fait pour le propriétaire : la consigne est d'abord rédigée à partir de la recette et d'une image de référence, puis le collage est dessiné avec cette référence ; la `0.26.8` dessinait le visuel Facebook d'après la consigne que le propriétaire utilise lui-même ; la `0.26.7` faisait suivre à la recette le plat que décrit le rédacteur et relève le plafond par recette à 0,25 $ ; la `0.26.6` dessinait le visuel Facebook en qualité haute et ne fait plus redessiner un collage pour un aromate montré une étape trop tôt ; la `0.26.5` permettait au moteur de dessiner avec les modèles d'image de Gemini, au bon prix ; la `0.26.4` donnait au visuel Facebook le style des collages de référence du propriétaire : lumineux, net, cadré serré ; la `0.26.3` faisait ressembler le visuel Facebook à de vraies photographies plutôt qu'à des images de synthèse ; la `0.26.2` rendait le visuel Facebook plus chaleureux et plus proche du plat, et le fait toujours finir sur le plat ouvert ; la `0.26.1` retirait les copies des prompts que gardaient les réglages :
-le moteur exécute ses propres gabarits, et ce qui n’est lu par rien ne se
-périme plus en silence. Le détail de chaque version suit, de la plus récente à
-la plus ancienne.
+La version `0.28.29` réunit le nouveau lot et le pass sur une seule page, le
+formulaire en tête ; la `0.28.28` alignait l'estimation sur les coûts réels et
+faisait servir le cache du fournisseur ; la `0.28.27` faisait du collage
+Facebook le point de départ de la recette. Le détail de chaque version suit, de
+la plus récente à la plus ancienne.
 
 Vérifié de bout en bout sur un vrai WordPress : un rédacteur dépose un lot de
 texte, de photographies ou des deux ; chaque photographie est lue une fois et
@@ -19,8 +20,9 @@ celle qu’on ne reconnaît pas attend la décision du rédacteur ; le cron fait
 avancer le lot vague par vague, et chaque recette arrive en **brouillon**, en
 blocs, avec son article (2 400 mots par défaut), sa recette structurée, ses
 métadonnées SEO, son image à la une et son collage Facebook de six panneaux.
-Une recette complète approuvée coûte environ 0,07 à 0,10 $ d’après les
-estimations. Les photographies sources restent hors de la médiathèque, dans un
+Une recette complète coûte environ 0,05 $ avec votre propre collage Facebook,
+0,07 $ avec une photographie du plat et 0,09 $ à partir du texte seul, d’après
+les estimations comparées aux recettes réellement produites. Les photographies sources restent hors de la médiathèque, dans un
 dossier propre à l’extension, avec l’historique complet de chaque tâche.
 
 | Rôle | Ce qu’il voit |
@@ -29,7 +31,8 @@ dossier propre à l’extension, avec l’historique complet de chaque tâche.
 | Administrateur (`msrwa_manage`) | tout : coûts, plafonds, modèles, diagnostics, moteur, réglages |
 
 Ce qui fonctionne : lots multi-recettes avec appariement des photos, trois
-sorties (article seul, article et image à la une, chaîne complète), quatre
+sorties (article seul, article et image à la une, chaîne complète où le collage
+Facebook — le vôtre, ou dessiné d’abord — guide la recette), quatre
 langues d’article (français, anglais, espagnol, arabe), estimation avant dépense et refus
 gratuit d’un lot qui dépasserait son plafond, plafonds par recette, par jour et
 sur trente jours, file suspendable, reprise d’une recette arrêtée sans repayer
@@ -47,8 +50,9 @@ texte est validé éditorialement.
 2. *MS Recipes AI → Réglages* : enregistrer au moins une clé d’API, puis
    **Vérifier les clés**.
 3. *Moteur* : choisir quel fournisseur sert chaque étape (OpenAI par défaut).
-4. *Nouveau lot* : coller une ou plusieurs recettes, séparées par une ligne
-   `---`, déposer des photographies, ou les deux.
+4. *Le pass*, en haut de la page : coller une ou plusieurs recettes,
+   séparées par une ligne `---`, déposer des photographies — ou votre propre
+   collage Facebook —, ou les deux.
 
 Le travail avance par le cron de WordPress. Si `DISABLE_WP_CRON` est actif, un
 cron serveur doit appeler `wp-cron.php` toutes les cinq minutes.
@@ -76,6 +80,26 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.28.29
+
+**Le nouveau lot et le pass sur une seule page.**
+- *Le pass* s'ouvre sur le formulaire du nouveau lot — recettes et
+  photographies côte à côte, les trois profils sur une ligne avec leur coût,
+  puis une barre avec l'estimation et le bouton — et montre en dessous ce qui
+  est en cours, ce qui attend et ce qui s'est arrêté. L'entrée de menu
+  *Nouveau lot* disparaît ; son ancienne adresse ouvre le pass.
+- Écran d'une recette : les miniatures ont toutes la même hauteur, entières,
+  et sur téléphone le dernier verdict prend toute la ligne au lieu de laisser
+  une case vide.
+- Moins de fichiers sur le disque : l'extension ne fait plus faire que les
+  tailles qu'elle affiche — pour l'image à la une, la vignette, les tailles
+  moyennes et celle du thème ; pour le collage, la seule taille moyenne.
+- Collage d'abord : un écart entre l'image à la une et le collage se corrige
+  toujours sur l'image à la une, et un plat entier face à une part coupée
+  n'est plus un écart.
+- Nettoyage : une capture d'écran versée par erreur, deux fonctions que plus
+  rien n'appelait et 23 traductions de textes disparus.
 
 ## Version 0.28.28
 

@@ -380,32 +380,6 @@ final class MSRWA_Engine_Input {
 	}
 
 	/**
-	 * The part of the research an image model can act on.
-	 *
-	 * The whole package used to be sent, and it grew past the provider's 32,000
-	 * character limit: the collage call was rejected outright. Temperatures, source
-	 * URLs, food-safety rules and originality notes cannot change a photograph, and
-	 * the visual brief already distils what can.
-	 */
-	public static function research_for_image( $research ) {
-		$research = is_array( $research ) ? $research : array();
-		$observations = array();
-		foreach ( (array) ( $research['visual_observations'] ?? array() ) as $observation ) {
-			if ( ! is_array( $observation ) ) { continue; }
-			$observations[] = array(
-				'observable_details' => self::observation_text( $observation['observable_details'] ?? '' ),
-				'composition' => self::observation_text( $observation['composition'] ?? '' ),
-				'colours' => self::observation_text( $observation['colours'] ?? '' ),
-				'textures' => self::observation_text( $observation['textures'] ?? '' ),
-			);
-		}
-		return array(
-			'dish_identity' => $research['dish_identity'] ?? array(),
-			'visual_observations' => $observations,
-		);
-	}
-
-	/**
 	 * The research a text step can act on.
 	 *
 	 * `originality_notes` describes how the research was conducted, `visual_references`
@@ -734,7 +708,7 @@ final class MSRWA_Engine_Input {
 		if ( '' === (string) ( $brief['collage_lead'] ?? '' ) ) { return ''; }
 		$reading = (array) ( $brief['collage'] ?? array() );
 		$said = trim( trim( (string) ( $reading['serving'] ?? '' ) ) . ' ' . trim( (string) ( $reading['finished_dish'] ?? '' ) ) );
-		return '' === $said ? '' : 'as the last panel of the collage serves it — ' . $said . ' The featured photograph shows the same food served the same way; its plate or board, angle and light may differ, and a tart, gratin or cake may be shown in its baking dish or out of it.';
+		return '' === $said ? '' : 'as the last panel of the collage serves it — ' . $said . ' The featured photograph shows the same food; its plate or board, angle and light may differ, a tart, gratin or cake may be shown in its baking dish or out of it, and whole or with a piece cut — none of that makes them two different dishes.';
 	}
 
 	/**
@@ -762,7 +736,7 @@ final class MSRWA_Engine_Input {
 			if ( 'provided' === $lead ) {
 				return "\nTHE COLLAGE IS THE EDITOR'S OWN and is the reference this recipe was written from. Do not judge it: give it \"good\" with no finding. Judge the featured image, and whether it shows the same dish as the collage's last panel — same food, filling and colour; the plate, angle, light and garnish may differ.\n";
 			}
-			return "\nTHE COLLAGE WAS DRAWN FIRST, and the recipe was written from it. Judge the collage as a photograph and as a sequence (checks 1 and 4) — never against the ingredient list: every ingredient, herb, garnish, side, drink or prop a home cook would use is expected in it, and an ingredient the recipe lacks is not a finding. Nothing in it is counted against the recipe either: how many eggs, figs or potatoes a panel shows is never a finding, since the recipe was measured after the collage was drawn. How the collage serves the finished dish — in its baking dish or out of it, on a plate or a board — is the recipe's presentation, never a defect. The featured image must show the same dish as the collage's last panel; the plate, angle, light and garnish may differ.\n";
+			return "\nTHE COLLAGE WAS DRAWN FIRST, and the recipe was written from it. Judge the collage as a photograph and as a sequence (checks 1 and 4) — never against the ingredient list: every ingredient, herb, garnish, side, drink or prop a home cook would use is expected in it, and an ingredient the recipe lacks is not a finding. Nothing in it is counted against the recipe either: how many eggs, figs or potatoes a panel shows is never a finding, since the recipe was measured after the collage was drawn. How the collage serves the finished dish — in its baking dish or out of it, on a plate or a board — is the recipe's presentation, never a defect. The featured image must show the same dish as the collage's last panel; the plate, angle, light and garnish may differ, and so may whether it is whole or cut. A mismatch is the featured image's to fix, never the collage's.\n";
 		}
 		return '';
 	}

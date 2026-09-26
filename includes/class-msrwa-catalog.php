@@ -201,15 +201,6 @@ final class MSRWA_Catalog {
 		return $row['served'] ? 'yes' : 'no';
 	}
 
-	/** Model identifiers this site last saw a provider offer. */
-	public static function available( $provider ) {
-		$out = array();
-		foreach ( self::rows() as $row ) {
-			if ( $row['provider'] === sanitize_key( (string) $provider ) && $row['served'] ) { $out[] = $row['model_id']; }
-		}
-		return $out;
-	}
-
 	/** When that provider was last asked, or '' if it never was. */
 	public static function listed_at( $provider ) {
 		$latest = '';

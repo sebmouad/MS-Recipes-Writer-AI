@@ -145,8 +145,8 @@
           if (data.fits === false) {
             line += ' ' + (t.overCeiling || '').replace('%1$s', money(data.per_recipe_usd)).replace('%2$s', money(data.ceiling_usd));
           } else if (data.per_recipe_max_usd > data.per_recipe_usd) {
-            // The final approval can refuse and have the images redrawn; a real
-            // recipe refused twice cost a third more than one pass.
+            // Research may search more than it is asked to, and the final
+            // check may have to be asked again; nothing is redrawn by itself.
             line += ' ' + (t.retryMax || '').replace('%s', money(data.per_recipe_max_usd));
             if (data.ceiling_usd > 0 && data.per_recipe_max_usd > data.ceiling_usd) { line += ' ' + (t.retryOverCeiling || ''); }
           }

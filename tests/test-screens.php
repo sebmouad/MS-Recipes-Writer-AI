@@ -22,7 +22,6 @@ function msrwa_render( $callable ) {
 msrwa_test_as_editor( 7 );
 foreach ( array(
 	'MSRWA_Screen_Pass' => array( 'MSRWA_Screen_Pass', 'render' ),
-	'MSRWA_Screen_Compose' => array( 'MSRWA_Screen_Compose', 'render' ),
 	'MSRWA_Screen_Articles' => array( 'MSRWA_Screen_Articles', 'render' ),
 ) as $name => $callable ) {
 	$GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
@@ -128,7 +127,8 @@ if ( preg_match( '/id="ms-engine-routing-data">(.*?)<\/script>/s', $engine['html
 
 $first = msrwa_render( array( 'MSRWA_Screen_Pass', 'render' ) )['html'] ?? '';
 msrwa_test_contains( $first, 'ms-welcome', 'With nothing to show, the pass explains what will happen instead of showing zeros.' );
-msrwa_test_contains( $first, 'page=msrwa-compose', 'And it invites the reader to act.' );
+msrwa_test_contains( $first, 'id="ms-compose"', 'And the form to act is right there, above it.' );
+msrwa_test_assert( strpos( $first, 'id="ms-compose"' ) < strpos( $first, 'ms-welcome' ), 'The new lot comes first.' );
 msrwa_test_missing( $first, 'ms-figures', 'A first visit is not a row of zeros.' );
 
 // --- A writer is never shown money, on the way in either ----------------
@@ -137,13 +137,13 @@ $GLOBALS['msrwa_test_options'][ MSRWA_Settings::OPTION ] = array( 'per_recipe_bu
 
 msrwa_test_as_editor( 7 );
 $GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
-$html = msrwa_render( array( 'MSRWA_Screen_Compose', 'render' ) )['html'] ?? '';
+$html = msrwa_render( array( 'MSRWA_Screen_Compose', 'form' ) )['html'] ?? '';
 msrwa_test_missing( $html, 'id="ms-budget"', 'A writer is not asked for a ceiling they are not allowed to see.' );
 msrwa_test_missing( $html, 'plafond', 'A writer is not told about ceilings on the way in either.' );
 
 msrwa_test_as_admin();
 $GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
-$html = msrwa_render( array( 'MSRWA_Screen_Compose', 'render' ) )['html'] ?? '';
+$html = msrwa_render( array( 'MSRWA_Screen_Compose', 'form' ) )['html'] ?? '';
 // The ceiling is the site's, set in the settings: a lot is not asked for one,
 // and the screen says which one applies and where it is changed.
 msrwa_test_missing( $html, 'id="ms-budget"', 'A lot does not carry a ceiling of its own.' );
@@ -160,13 +160,13 @@ $pass = msrwa_render( array( 'MSRWA_Screen_Pass', 'render' ) )['html'] ?? '';
 msrwa_test_missing( $pass, ' $<', 'A writer’s pass shows no amount.' );
 msrwa_test_missing( $GLOBALS['wpdb']->log(), 'SUM(r.cost_usd)', 'A writer’s pass does not even ask for the spend.' );
 $GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
-msrwa_test_missing( msrwa_render( array( 'MSRWA_Screen_Compose', 'render' ) )['html'] ?? '', 'ms-choice-cost', 'A writer is not shown a price per profile.' );
+msrwa_test_missing( msrwa_render( array( 'MSRWA_Screen_Compose', 'form' ) )['html'] ?? '', 'ms-choice-cost', 'A writer is not shown a price per profile.' );
 
 // A lot defaults to the site's article language, not always French.
 msrwa_test_as_admin();
 $GLOBALS['msrwa_test_options'][ MSRWA_Settings::OPTION ] = array( 'site_language' => 'en' );
 $GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
-$compose = msrwa_render( array( 'MSRWA_Screen_Compose', 'render' ) )['html'] ?? '';
+$compose = msrwa_render( array( 'MSRWA_Screen_Compose', 'form' ) )['html'] ?? '';
 msrwa_test_contains( $compose, 'Article en Anglais', 'The site language is the one a lot is written in.' );
 msrwa_test_missing( $compose, 'id="ms-language"', 'A lot does not choose a language of its own.' );
 
@@ -178,7 +178,7 @@ $GLOBALS['msrwa_test_options'][ MSRWA_Engine_Settings::OPTION ] = array( 'images
 	'ghost' => array( 'label' => 'Fantôme', 'prompt' => 'missing.tpl.txt' ),
 ) ) );
 $GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
-$compose = msrwa_render( array( 'MSRWA_Screen_Compose', 'render' ) )['html'] ?? '';
+$compose = msrwa_render( array( 'MSRWA_Screen_Compose', 'form' ) )['html'] ?? '';
 msrwa_test_contains( $compose, 'value="hero"', 'A second template is offered on the lot.' );
 msrwa_test_assert( (bool) preg_match( '/value="collage"\s+checked/', $compose ) && strpos( $compose, 'value="collage"' ) < strpos( $compose, 'value="hero"' ), 'The site’s default comes first, checked.' );
 msrwa_test_missing( $compose, 'value="ghost"', 'A template without its prompt file is never offered.' );

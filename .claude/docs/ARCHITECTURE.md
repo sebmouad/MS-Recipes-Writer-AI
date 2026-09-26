@@ -195,8 +195,7 @@ act, never a model name or an HTTP status.
 
 | screen | who | what |
 |---|---|---|
-| Le pass | writer | what is running, what waits to be read, what stopped |
-| Nouveau lot | writer | recipes, photographs, profile, language, ceiling |
+| Le pass | writer | the new lot first (recipes, photographs, profile, the estimate), then what is running, what waits to be read, what stopped; `msrwa-compose` still opens it |
 | Lot | writer | the pairing to confirm, then its recipes |
 | Recette | writer | where it stands in one sentence, the verdict, the steps by name; scores, models, calls and timeline for managers only |
 | Articles | writer | every run, filtered, with bulk actions |

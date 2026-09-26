@@ -195,13 +195,25 @@ final class MSRWA_Draft {
 		foreach ( array( 'featured', 'facebook' ) as $kind ) { self::attach( $post_id, $kind, (array) ( $artifacts[ $kind ] ?? array() ), $title ); }
 	}
 
+	/**
+	 * The sizes WordPress may make of each image, and no others: every size is
+	 * a file on disk. The featured image keeps what a theme shows a post with
+	 * and what this plugin's screens show; the collage is shared on Facebook
+	 * at its own size and only ever previewed here, at `medium`. Anything
+	 * another plugin or the theme registers beyond these is not made for them.
+	 */
+	const SIZES = array(
+		'featured' => array( 'thumbnail', 'medium', 'medium_large', 'post-thumbnail' ),
+		'facebook' => array( 'medium' ),
+	);
+
 	/** One generated image into the library, named as this post's image of that kind. */
 	private static function attach( $post_id, $kind, array $image, $title ) {
 		$labels = array( 'featured' => __( 'Image à la une', 'ms-recipes-writer-ai' ), 'facebook' => __( 'Image Facebook', 'ms-recipes-writer-ai' ) );
 		$path = (string) ( $image['path'] ?? '' );
 		if ( ! isset( $labels[ $kind ] ) || '' === $path || ! is_readable( $path ) ) { return 0; }
 
-		$attachment = self::sideload( $path, $post_id, $title . ' — ' . $labels[ $kind ], (string) ( $image['mime'] ?? 'image/webp' ), self::file_base( $post_id, $title, $kind ) );
+		$attachment = self::sideload( $path, $post_id, $title . ' — ' . $labels[ $kind ], (string) ( $image['mime'] ?? 'image/webp' ), self::file_base( $post_id, $title, $kind ), self::SIZES[ $kind ] );
 		if ( ! $attachment ) { return 0; }
 		// What the photograph is of, which is what a screen reader needs. The
 		// generation prompt is art direction, not a description, so the dish
@@ -290,7 +302,7 @@ final class MSRWA_Draft {
 	 * optimisation and WebP plugins hook into, names and moves the file,
 	 * builds its sizes and credits the current user — the writer.
 	 */
-	private static function sideload( $path, $post_id, $title, $mime, $base = '' ) {
+	private static function sideload( $path, $post_id, $title, $mime, $base = '', array $sizes = array() ) {
 		require_once ABSPATH . 'wp-admin/includes/file.php';
 		require_once ABSPATH . 'wp-admin/includes/media.php';
 		require_once ABSPATH . 'wp-admin/includes/image.php';
@@ -302,6 +314,9 @@ final class MSRWA_Draft {
 		$copy = wp_tempnam( $name );
 		if ( ! $copy || false === file_put_contents( $copy, self::lossy( $path, $mime ) ) ) { return 0; }
 
+		// Only removes: a size an optimisation plugin already dropped stays dropped.
+		$keep = static function ( $wanted ) use ( $sizes ) { return $sizes ? array_intersect_key( (array) $wanted, array_flip( $sizes ) ) : $wanted; };
+		add_filter( 'intermediate_image_sizes_advanced', $keep, 99 );
 		$attachment = media_handle_sideload(
 			array( 'name' => $name, 'tmp_name' => $copy ),
 			$post_id,
@@ -311,6 +326,7 @@ final class MSRWA_Draft {
 				'post_author' => (int) get_post_field( 'post_author', $post_id ),
 			) )
 		);
+		remove_filter( 'intermediate_image_sizes_advanced', $keep, 99 );
 		if ( is_file( $copy ) ) { wp_delete_file( $copy ); }
 		if ( is_wp_error( $attachment ) || ! $attachment ) { return 0; }
 		return (int) $attachment;

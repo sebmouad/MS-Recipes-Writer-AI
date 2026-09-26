@@ -87,9 +87,6 @@ msgstr "لا فحص فاشل"
 msgid "Aucune clé d’API n’est enregistrée, donc rien ne peut être généré. %s"
 msgstr "لا مفتاح واجهة برمجية محفوظ، فلا شيء يمكن توليده. %s"
 
-msgid "Aucune clé d’API n’est enregistrée. Un lot lancé maintenant échouerait à la première étape."
-msgstr "لا مفتاح واجهة برمجية محفوظ. أي دفعة تُطلق الآن ستفشل عند الخطوة الأولى."
-
 msgid "Aucune recette n’a encore tourné sur cette période."
 msgstr "لم تُنفَّذ أي وصفة في هذه الفترة بعد."
 
@@ -104,9 +101,6 @@ msgstr "من الذاكرة"
 
 msgid "Ce qui a réellement été facturé, et quelle part de l’entrée le fournisseur a servie depuis son cache."
 msgstr "ما جرت فوترته فعلاً، وكم من المُدخل قدّمه المزوّد من ذاكرته."
-
-msgid "Ce qui est en cours, ce qui attend une relecture, et ce qui s’est arrêté."
-msgstr "ما يجري تنفيذه، وما ينتظر المراجعة، وما توقّف."
 
 msgid "Ce qu’il faut produire"
 msgstr "ما المطلوب إنتاجه"
@@ -138,9 +132,6 @@ msgstr "صِف واقرن"
 msgid "Dépense"
 msgstr "الإنفاق"
 
-msgid "Déposez des recettes et des photographies pour lancer un lot."
-msgstr "أضف وصفات وصوراً لإطلاق دفعة."
-
 msgid "Déposez des recettes et des photographies pour lancer un premier lot."
 msgstr "أضف وصفات وصوراً لإطلاق دفعتك الأولى."
 
@@ -153,9 +144,6 @@ msgstr "جارٍ الحفظ…"
 msgid "Entrée"
 msgstr "المُدخل"
 
-msgid "Environ %1$s pour %3$d recette(s), et au maximum %2$s : le plafond arrête un run avant de le dépasser."
-msgstr "نحو %1$s لـ %3$d وصفة، وبحد أقصى %2$s: السقف يوقف التنفيذ قبل تجاوزه."
-
 msgid "Envoi au moteur…"
 msgstr "جارٍ الإرسال إلى المحرك…"
 
@@ -167,7 +155,6 @@ msgstr "تصفية"
 
 msgid "Français"
 msgstr "الفرنسية"
-
 
 msgid "Le juge"
 msgstr "الحَكَم"
@@ -451,7 +438,6 @@ msgstr "المفاتيح، وحال ما يدفع العمل إلى الأمام
 msgid "Les photographies sont en cours de description. Rechargez dans un instant."
 msgstr "يجري وصف الصور. أعد التحميل بعد لحظات."
 
-
 msgid "Lot %d"
 msgstr "دفعة %d"
 
@@ -616,7 +602,6 @@ msgstr "للتصحيح قبل النشر."
 
 msgid "étapes"
 msgstr "خطوات"
-
 
 msgid "Texte uniquement, relu et vérifié. Aucune image n’est générée, et le jugement final n’aurait rien à regarder."
 msgstr "نص فقط، مُدقَّق ومُتحقَّق منه. لا تُولَّد أي صورة، ولن يكون لدى الحكم النهائي ما ينظر إليه."
@@ -1029,7 +1014,6 @@ msgstr "الوصفة المرجعية"
 msgid "Recherche"
 msgstr "البحث"
 
-
 msgid "Rédaction"
 msgstr "التحرير"
 
@@ -1053,7 +1037,6 @@ msgstr "تُقدَّر وصفة في هذه الدفعة بـ %1$s، أي فوق
 
 msgid "Vos recettes passées par le moteur, avec leur état et leur brouillon."
 msgstr "وصفاتك التي مرّت عبر المحرك، مع حالتها ومسودتها."
-
 
 msgid "Vérification…"
 msgstr "جارٍ التحقق…"
@@ -1210,9 +1193,6 @@ msgstr "المخطّط المحفوظ هو %1$d؛ هذا الإصدار ينتظ
 
 msgid "Les mêmes constats en un bloc, à coller dans une demande d’aide. Il ne porte ni clé, ni chemin, ni adresse du site."
 msgstr "المعاينات نفسها في كتلة واحدة، لتلصقها في طلب مساعدة. لا يحمل مفتاحًا ولا مسارًا ولا عنوان الموقع."
-
-msgid "Les six tables sont là, schéma %d."
-msgstr "الجداول الستة موجودة، المخطّط %d."
 
 msgid "Plafonds"
 msgstr "السقوف"
@@ -1494,17 +1474,11 @@ msgstr "لم يُستلم %s كاملًا."
 msgid "%s n’est pas une photographie JPEG, PNG ou WebP."
 msgstr "%s ليس صورة بصيغة JPEG أو PNG أو WebP."
 
-msgid "Choisir sur mon ordinateur"
-msgstr "اختيار من حاسوبي"
-
 msgid "Ensemble, ces photographies dépassent les %s Mo que ce serveur accepte en un envoi."
 msgstr "مجموع هذه الصور يتجاوز %s ميغابايت، وهو أقصى ما يقبله هذا الخادم في إرسال واحد."
 
 msgid "Envoi des photographies…"
 msgstr "جارٍ إرسال الصور…"
-
-msgid "JPEG, PNG ou WebP, %1$d au plus, %2$s Mo chacune. Elles sont ajoutées à la médiathèque quand le lot est créé."
-msgstr "بصيغة JPEG أو PNG أو WebP، %1$d صورة على الأكثر، و%2$s ميغابايت لكل صورة. تُضاف إلى مكتبة الوسائط عند إنشاء الدفعة."
 
 msgid "Un lot accepte au plus %d photographies."
 msgstr "تقبل الدفعة %d صورة على الأكثر."
@@ -1578,9 +1552,6 @@ msgstr "تُطابَق كل صورة مع وصفتها. صحّح ذلك إن ل�
 msgid "Chaque recette devient un brouillon WordPress avec son article, ses images et les remarques du contrôle final. Rien n’est jamais publié sans vous."
 msgstr "تصبح كل وصفة مسودة ووردبريس مع مقالها وصورها وملاحظات الفحص النهائي. لا يُنشر شيء أبدًا من دونك."
 
-msgid "Collez une ou plusieurs recettes, séparées par une ligne de tirets, et ajoutez leurs photographies depuis votre ordinateur, sans dire laquelle va avec quoi."
-msgstr "الصق وصفة أو أكثر، يفصل بينها سطر من الشرطات، وأضف صورها من حاسوبك دون تحديد أيها لأي وصفة."
-
 msgid "Comment ça marche"
 msgstr "كيف يعمل"
 
@@ -1592,9 +1563,6 @@ msgstr "تحقق من المطابقة"
 
 msgid "Relisez les brouillons"
 msgstr "راجع المسودات"
-
-msgid "Déposer mon premier lot"
-msgstr "إرسال دفعتي الأولى"
 
 msgid "Article en %1$s · plafond de %2$s par recette."
 msgstr "المقال باللغة %1$s · سقف %2$s لكل وصفة."
@@ -1611,14 +1579,8 @@ msgstr "يُطبَّق على كل وصفة في كل دفعة: لم يعد نم
 msgid "La langue de chaque article, pour tous les lots : le formulaire de lot n’en propose plus."
 msgstr "لغة كل مقال في جميع الدفعات: لم يعد نموذج الدفعة يعرضها."
 
-msgid "Déposez vos photographies ici"
-msgstr "أفلت صورك هنا"
-
 msgid "Retirer %s"
 msgstr "إزالة %s"
-
-msgid "ou"
-msgstr "أو"
 
 msgid "%s — ne convient pas à cette étape"
 msgstr "%s — لا يناسب هذه المرحلة"
@@ -1857,12 +1819,6 @@ msgstr "الأقسام المطلوبة وعنوان الصفحة الثانية
 msgid "Choisit d’un coup le modèle, la réflexion et la qualité d’image de chaque étape. Changer une étape à la main fait passer à « Personnalisé »."
 msgstr "يضبط النموذج والتفكير وجودة الصورة لكل مرحلة دفعة واحدة. تغيير مرحلة يدويًا ينقل إلى « مخصص »."
 
-msgid "Les modèles les moins chers là où ils suffisent, peu de réflexion, images en qualité basse."
-msgstr "أرخص النماذج حيث تكفي، تفكير قليل، صور بجودة منخفضة."
-
-msgid "Les modèles les plus avancés, plus de réflexion, images en haute qualité."
-msgstr "أكثر النماذج تقدمًا، تفكير أكثر، صور بجودة عالية."
-
 msgid "Les réglages livrés, mesurés : chaque recette approuvée, le meilleur rapport qualité-prix."
 msgstr "الإعدادات المرفقة، وقد قيست: كل وصفة معتمدة، وأفضل قيمة مقابل السعر."
 
@@ -1937,12 +1893,6 @@ msgstr "المحذوفة من ووردبريس"
 
 msgid "Voir"
 msgstr "عرض"
-
-msgid "le %s"
-msgstr "في %s"
-
-msgid "modifié le %s"
-msgstr "عُدّل في %s"
 
 msgid "État dans WordPress"
 msgstr "الحالة في ووردبريس"
@@ -2287,20 +2237,8 @@ msgstr "قيس في 25/09/2026: يختلف مع GPT-5.6 Luna في وصفتين �
 msgid "Ajouter une recette"
 msgstr "إضافة وصفة"
 
-msgid "Coller une image"
-msgstr "لصق صورة"
-
-msgid "Le navigateur ne laisse pas lire le presse-papiers depuis ce bouton : collez avec Ctrl+V (⌘V sur Mac)."
-msgstr "لا يسمح المتصفح لهذا الزر بقراءة الحافظة: الصق باستخدام Ctrl+V (أو ⌘V على Mac)."
-
-msgid "Le presse-papiers ne contient pas d’image."
-msgstr "لا تحتوي الحافظة على صورة."
-
 msgid "Tout retirer"
 msgstr "إزالة الكل"
-
-msgid "Une image copiée — une capture d’écran, une photographie copiée depuis une page — se colle aussi avec Ctrl+V (⌘V sur Mac), n’importe où sur cette page."
-msgstr "يمكن أيضًا لصق صورة منسوخة — لقطة شاشة أو صورة منسوخة من صفحة — باستخدام Ctrl+V (أو ⌘V على Mac) في أي مكان من هذه الصفحة."
 
 msgid "avec des précisions"
 msgstr "مع تفاصيل"
@@ -2315,21 +2253,12 @@ msgstr "الاسم فقط"
 msgid "Image collée %d"
 msgstr "صورة ملصوقة %d"
 
-msgid "Ce n’est pas l’adresse d’une image."
-msgstr "هذا ليس عنوان صورة."
-
 msgid "L’adresse doit commencer par https://."
 msgstr "يجب أن يبدأ العنوان بـ https://."
 
 #, php-format
 msgid "L’image à l’adresse %s n’a pas pu être récupérée. Vérifiez que l’adresse mène directement à une image JPEG, PNG ou WebP, qu’elle commence par https:// et qu’elle s’ouvre dans un navigateur."
 msgstr "تعذّر جلب الصورة من العنوان %s. تحقّق من أن العنوان يؤدي مباشرة إلى صورة JPEG أو PNG أو WebP، وأنه يبدأ بـ https://، وأنه يُفتح في المتصفح."
-
-msgid "Ou l’adresse d’une image"
-msgstr "أو عنوان صورة"
-
-msgid "Une image copiée — une capture d’écran, une photographie copiée depuis une page — ou l’adresse d’une image se colle aussi avec Ctrl+V (⌘V sur Mac), n’importe où sur cette page."
-msgstr "يمكن أيضًا لصق صورة منسوخة — لقطة شاشة أو صورة منسوخة من صفحة — أو عنوان صورة باستخدام Ctrl+V (أو ⌘V على Mac) في أي مكان من هذه الصفحة."
 
 msgid "aperçu indisponible — le site vérifiera à l’envoi"
 msgstr "لا توجد معاينة — سيتحقق الموقع منها عند الإرسال"
@@ -2348,9 +2277,6 @@ msgstr "الحصول على مفتاح"
 
 msgid "collez la clé ici"
 msgstr "الصق المفتاح هنا"
-
-msgid "inchangée — collez une nouvelle clé pour la remplacer"
-msgstr "دون تغيير — الصق مفتاحًا جديدًا لاستبداله"
 
 msgid "Choisir des photographies sur mon ordinateur"
 msgstr "اختيار صور من حاسوبي"
@@ -2454,10 +2380,6 @@ msgstr "لا يطرح ووردبريس أي سؤال عند حذف إضافة: �
 msgid "Les %1$d tables sont là, schéma %2$d."
 msgstr "الجداول (%1$d) كلها موجودة، المخطط %2$d."
 
-#, php-format
-msgid "%1$d/%2$d étapes"
-msgstr "%1$d/%2$d خطوات"
-
 msgid "Article et image"
 msgstr "مقال وصورة"
 
@@ -2498,8 +2420,19 @@ msgstr "السلسلة الكاملة: كولاج فيسبوك أولًا — ك
 msgid "Aucun collage n’est dessiné ; le vôtre, s’il est joint, est publié tel quel et sert de référence. Le texte est relu et vérifié, et l’image à la une est jugée face à la recette."
 msgstr "لا يُرسم أي كولاج؛ وإن أرفقت كولاجك يُنشر كما هو ويكون المرجع. يُراجَع النص ويُدقَّق، وتُقيَّم الصورة البارزة مقارنةً بالوصفة."
 
-msgid "Si la recherche utilise toutes les recherches permises et que le contrôle final doit être redemandé, une recette peut coûter jusqu’à %s. Une image refusée n’est jamais redessinée d’office."
-msgstr "إذا استخدم البحث كل عمليات البحث المسموح بها واحتاج الفحص النهائي إلى إعادة الطلب، فقد تصل تكلفة الوصفة إلى %s. لا يُعاد رسم الصورة المرفوضة تلقائيًا أبدًا."
-
 msgid "Un de vos collages dont le rendu doit être repris : lumière, couleurs, cadrage, plan de travail. Seul son style est repris, jamais son plat. Quand le rédacteur a envoyé une photographie du plat, elle montre le plat et ce collage garde le style."
 msgstr "أحد كولاجاتك التي يُراد اعتماد مظهرها: الإضاءة والألوان والتأطير وسطح العمل. يُؤخذ أسلوبه فقط، لا طبقه أبدًا. وإذا أرسل المحرر صورة للطبق، فهي تُظهر الطبق ويحافظ هذا الكولاج على الأسلوب."
+
+msgid "Ci-dessus : collez une ou plusieurs recettes, séparées par une ligne de tirets, et ajoutez leurs photographies — ou votre propre collage Facebook — sans dire laquelle va avec quoi."
+msgstr "في الأعلى: الصق وصفة أو أكثر، تفصل بينها سطر من الشرطات، وأضف صورها — أو كولاج فيسبوك الخاص بك — دون تحديد أيّها يخص أيّ وصفة."
+
+msgid "Déposez un nouveau lot, puis suivez ce qui est en cours, ce qui attend une relecture et ce qui s’est arrêté."
+msgstr "أودِع دفعة جديدة، ثم تابع ما يجري تنفيذه، وما ينتظر المراجعة، وما توقّف."
+
+#, php-format
+msgid "Environ %1$s pour %3$d recette(s) · jamais plus de %2$s : le plafond arrête une recette avant de le dépasser."
+msgstr "حوالي %1$s لـ %3$d وصفة · لا أكثر من %2$s أبدًا: يوقف السقف الوصفة قبل تجاوزه."
+
+#, php-format
+msgid "Au pire %s par recette, si la recherche use de toutes ses recherches permises."
+msgstr "في أسوأ الأحوال %s للوصفة، إذا استخدم البحث كل عمليات البحث المسموح بها."

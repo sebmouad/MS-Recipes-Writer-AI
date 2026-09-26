@@ -2,34 +2,30 @@
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
 /**
- * Submitting work: recipes, photographs, what to produce, in which language.
+ * Submitting work: recipes, photographs, what to produce.
  *
  * Numbered, because it genuinely is a sequence — nothing can be paired before
  * the photographs are chosen, and nothing dispatched before the pairing is
- * settled. The estimate is shown before the button, because the first thing a
+ * settled. The estimate sits beside the button, because the first thing a
  * person deserves to know is what this will cost.
  */
 final class MSRWA_Screen_Compose {
 
-	public static function render() {
-		if ( ! MSRWA_Rights::may_write() ) { wp_die( esc_html__( 'Vous n’avez pas accès à cet écran.', 'ms-recipes-writer-ai' ) ); }
-
-		echo '<div class="wrap msrwa">';
-		MSRWA_UI::head(
-			__( 'Nouveau lot', 'ms-recipes-writer-ai' ),
-			__( 'Des recettes, des photographies, ou les deux. Les photographies sont décrites puis associées ; sans texte, chaque plat qu’elles montrent devient une recette. Vous confirmez avant que quoi que ce soit ne soit généré.', 'ms-recipes-writer-ai' ),
-			array(),
-			'<a class="button" href="' . esc_url( admin_url( 'admin.php?page=msrwa' ) ) . '">' . esc_html__( 'Retour au pass', 'ms-recipes-writer-ai' ) . '</a>'
-		);
-
-		if ( ! MSRWA_Settings::configured_providers() ) {
-			MSRWA_UI::note( __( 'Aucune clé d’API n’est enregistrée. Un lot lancé maintenant échouerait à la première étape.', 'ms-recipes-writer-ai' ), 'stop' );
-		}
-		$refusal = MSRWA_Budget::refusal();
-		if ( '' !== $refusal ) { MSRWA_UI::note( esc_html( $refusal ), 'stop' ); }
+	/**
+	 * The form, at the top of the pass: a new lot is the first thing anyone
+	 * comes to do, and what is already cooking reads best right under it.
+	 * The site's warnings — no key, a ceiling reached — are the pass's, above.
+	 */
+	public static function form() {
 		?>
+		<section class="ms-new" id="ms-new" aria-labelledby="ms-new-title">
+			<div class="ms-new-head">
+				<h2 id="ms-new-title"><?php esc_html_e( 'Nouveau lot', 'ms-recipes-writer-ai' ); ?></h2>
+				<p><?php esc_html_e( 'Des recettes, des photographies, ou les deux. Les photographies sont décrites puis associées ; sans texte, chaque plat qu’elles montrent devient une recette. Vous confirmez avant que quoi que ce soit ne soit généré.', 'ms-recipes-writer-ai' ); ?></p>
+			</div>
 		<form id="ms-compose" class="ms-steps">
 
+			<div class="ms-new-inputs">
 			<section class="ms-step">
 				<h3><?php esc_html_e( 'Les recettes', 'ms-recipes-writer-ai' ); ?> <span class="ms-optional"><?php esc_html_e( 'facultatif avec des photographies', 'ms-recipes-writer-ai' ); ?></span></h3>
 				<p><?php esc_html_e( 'Une ligne de trois tirets ou plus sépare deux recettes. La première ligne de chaque bloc en devient le titre. Le nom du plat suffit : le reste est établi d’après les sources.', 'ms-recipes-writer-ai' ); ?></p>
@@ -67,6 +63,8 @@ final class MSRWA_Screen_Compose {
 				</div>
 				<ul class="ms-photo-grid" id="ms-thumbs"></ul>
 			</section>
+
+			</div>
 
 			<section class="ms-step">
 				<h3><?php esc_html_e( 'Ce qu’il faut produire', 'ms-recipes-writer-ai' ); ?></h3>
@@ -111,29 +109,30 @@ final class MSRWA_Screen_Compose {
 			$languages = MSRWA_Profile::languages();
 			$language = $languages[ (string) $settings['site_language'] ] ?? (string) $settings['site_language'];
 			?>
-			<p class="ms-muted ms-lot-defaults" id="ms-lot-defaults">
-				<?php
-				echo esc_html( MSRWA_Rights::may_see_money()
-					/* translators: 1: a language name, 2: an amount in US dollars. */
-					? sprintf( __( 'Article en %1$s · plafond de %2$s par recette.', 'ms-recipes-writer-ai' ), $language, MSRWA_I18N::money( (float) $settings['per_recipe_budget_usd'], 2 ) )
-					/* translators: %s is a language name. */
-					: sprintf( __( 'Article en %s.', 'ms-recipes-writer-ai' ), $language ) );
-				if ( MSRWA_Rights::may_manage() ) {
-					echo ' <a href="' . esc_url( admin_url( 'admin.php?page=msrwa-settings' ) ) . '">' . esc_html__( 'Modifier dans les réglages', 'ms-recipes-writer-ai' ) . '</a>';
-				}
-				?>
-			</p>
-
-			<div class="ms-card">
-				<p id="ms-estimate" class="ms-muted" aria-live="polite"></p>
-				<p>
+			<div class="ms-new-go">
+				<div class="ms-new-go-text">
+					<p id="ms-estimate" class="ms-new-estimate" aria-live="polite"></p>
+					<p class="ms-muted ms-lot-defaults" id="ms-lot-defaults">
+						<?php
+						echo esc_html( MSRWA_Rights::may_see_money()
+							/* translators: 1: a language name, 2: an amount in US dollars. */
+							? sprintf( __( 'Article en %1$s · plafond de %2$s par recette.', 'ms-recipes-writer-ai' ), $language, MSRWA_I18N::money( (float) $settings['per_recipe_budget_usd'], 2 ) )
+							/* translators: %s is a language name. */
+							: sprintf( __( 'Article en %s.', 'ms-recipes-writer-ai' ), $language ) );
+						if ( MSRWA_Rights::may_manage() ) {
+							echo ' <a href="' . esc_url( admin_url( 'admin.php?page=msrwa-settings' ) ) . '">' . esc_html__( 'Modifier dans les réglages', 'ms-recipes-writer-ai' ) . '</a>';
+						}
+						?>
+					</p>
+					<p class="ms-muted"><?php esc_html_e( 'Rien n’est écrit à cette étape : seules les photographies sont décrites. Vous verrez les recettes et l’appariement avant de lancer quoi que ce soit.', 'ms-recipes-writer-ai' ); ?></p>
+				</div>
+				<div class="ms-new-go-action">
 					<button type="submit" class="button button-primary button-hero" id="ms-submit"><?php esc_html_e( 'Décrire et apparier', 'ms-recipes-writer-ai' ); ?></button>
-					<span id="ms-compose-status" class="ms-muted"></span>
-				</p>
-				<p class="ms-muted"><?php esc_html_e( 'Rien n’est écrit à cette étape : seules les photographies sont décrites. Vous verrez les recettes et l’appariement avant de lancer quoi que ce soit.', 'ms-recipes-writer-ai' ); ?></p>
+					<span id="ms-compose-status" class="ms-muted" aria-live="polite"></span>
+				</div>
 			</div>
 		</form>
+		</section>
 		<?php
-		echo '</div>';
 	}
 }

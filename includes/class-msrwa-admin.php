@@ -32,7 +32,7 @@ final class MSRWA_Admin {
 	 */
 	private static function hidden_parent() {
 		$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification
-		return array( 'msrwa-batch' => 'msrwa', 'msrwa-run' => 'msrwa-articles' )[ $page ] ?? '';
+		return array( 'msrwa-batch' => 'msrwa', 'msrwa-run' => 'msrwa-articles', 'msrwa-compose' => 'msrwa' )[ $page ] ?? '';
 	}
 
 	/**
@@ -49,7 +49,7 @@ final class MSRWA_Admin {
 
 	public static function submenu_file( $file ) { return '' !== self::hidden_parent() ? self::hidden_parent() : $file; }
 
-	/** In the order the work happens: the pass, submitting, the record, the levers. */
+	/** In the order the work happens: the pass with its new lot, the record, the levers. */
 	public static function menu() {
 		// No upload rights, no plugin: a contributor does not see the menu at
 		// all, and a page that was never registered cannot be opened by URL.
@@ -63,7 +63,6 @@ final class MSRWA_Admin {
 		// takes a slot another menu registered.
 		add_menu_page( $title, self::title_with_waiting( $title ), $write, 'msrwa', array( 'MSRWA_Screen_Pass', 'render' ), 'dashicons-food', 1.01 );
 		add_submenu_page( 'msrwa', __( 'Le pass', 'ms-recipes-writer-ai' ), __( 'Le pass', 'ms-recipes-writer-ai' ), $write, 'msrwa', array( 'MSRWA_Screen_Pass', 'render' ) );
-		add_submenu_page( 'msrwa', __( 'Nouveau lot', 'ms-recipes-writer-ai' ), __( 'Nouveau lot', 'ms-recipes-writer-ai' ), $write, 'msrwa-compose', array( 'MSRWA_Screen_Compose', 'render' ) );
 		add_submenu_page( 'msrwa', __( 'Articles', 'ms-recipes-writer-ai' ), __( 'Articles', 'ms-recipes-writer-ai' ), $write, 'msrwa-articles', array( 'MSRWA_Screen_Articles', 'render' ) );
 		add_submenu_page( 'msrwa', __( 'Analyse', 'ms-recipes-writer-ai' ), __( 'Analyse', 'ms-recipes-writer-ai' ), $manage, 'msrwa-analysis', array( 'MSRWA_Screen_Analysis', 'render' ) );
 		add_submenu_page( 'msrwa', __( 'Moteur', 'ms-recipes-writer-ai' ), __( 'Moteur', 'ms-recipes-writer-ai' ), $manage, 'msrwa-engine', array( 'MSRWA_Screen_Engine', 'render' ) );
@@ -81,6 +80,8 @@ final class MSRWA_Admin {
 		// deprecation notice across the top of every such screen; removing the
 		// submenu afterwards takes the access check with it and returns 403.
 		add_submenu_page( 'options.php', __( 'Lot', 'ms-recipes-writer-ai' ), __( 'Lot', 'ms-recipes-writer-ai' ), $write, 'msrwa-batch', array( 'MSRWA_Screen_Batch', 'render' ) );
+		// The new-lot form now heads the pass: its old address still opens it.
+		add_submenu_page( 'options.php', __( 'Le pass', 'ms-recipes-writer-ai' ), __( 'Le pass', 'ms-recipes-writer-ai' ), $write, 'msrwa-compose', array( 'MSRWA_Screen_Pass', 'render' ) );
 		add_submenu_page( 'options.php', __( 'Recette', 'ms-recipes-writer-ai' ), __( 'Recette', 'ms-recipes-writer-ai' ), $write, 'msrwa-run', array( 'MSRWA_Screen_Run', 'render' ) );
 	}
 
@@ -171,7 +172,7 @@ final class MSRWA_Admin {
 				'recipeTitleOnly' => __( 'le nom seul', 'ms-recipes-writer-ai' ),
 				'recipeWithDetails' => __( 'avec des précisions', 'ms-recipes-writer-ai' ),
 				/* translators: 1: likely cost, 2: the ceiling, 3: number of recipes. */
-				'estimate' => __( 'Environ %1$s pour %3$d recette(s), et au maximum %2$s : le plafond arrête un run avant de le dépasser.', 'ms-recipes-writer-ai' ),
+				'estimate' => __( 'Environ %1$s pour %3$d recette(s) · jamais plus de %2$s : le plafond arrête une recette avant de le dépasser.', 'ms-recipes-writer-ai' ),
 				'noRecipes' => __( 'Collez au moins une recette ou ajoutez au moins une photographie.', 'ms-recipes-writer-ai' ),
 				'describing' => __( 'Description des photographies…', 'ms-recipes-writer-ai' ),
 				'saving' => __( 'Enregistrement…', 'ms-recipes-writer-ai' ),
@@ -222,7 +223,7 @@ final class MSRWA_Admin {
 				'previewCost' => __( 'Coût estimé', 'ms-recipes-writer-ai' ),
 				'previewThinking' => __( 'Réflexion', 'ms-recipes-writer-ai' ),
 				/* translators: %s is an amount in US dollars. */
-				'retryMax' => __( 'Si la recherche utilise toutes les recherches permises et que le contrôle final doit être redemandé, une recette peut coûter jusqu’à %s. Une image refusée n’est jamais redessinée d’office.', 'ms-recipes-writer-ai' ),
+				'retryMax' => __( 'Au pire %s par recette, si la recherche use de toutes ses recherches permises.', 'ms-recipes-writer-ai' ),
 				'retryOverCeiling' => __( 'Le plafond par recette est plus bas : il arrête les nouvelles tentatives avant de le franchir, la recette se termine et le dernier verdict va au rédacteur.', 'ms-recipes-writer-ai' ),
 				/* translators: %s is an amount in US dollars. */
 				'previewTotal' => __( 'Une recette complète est estimée à %s — une estimation, jamais une facture.', 'ms-recipes-writer-ai' ),

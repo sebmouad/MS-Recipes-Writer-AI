@@ -123,7 +123,7 @@ function lab_image_prompt( $kind, $brief, $options = array(), $findings = array(
 	// The provider refuses anything over 32000 characters, and did once the
 	// research package grew. Fail here, where the cause is visible, not there.
 	if ( strlen( $prompt ) > 30000 ) {
-		fwrite( STDERR, 'The ' . $kind . ' image prompt is ' . strlen( $prompt ) . " characters; the provider refuses anything over 32000. Trim what research_for_image() forwards.\n" );
+		fwrite( STDERR, 'The ' . $kind . ' image prompt is ' . strlen( $prompt ) . " characters; the provider refuses anything over 32000. Trim what reaches it.\n" );
 		exit( 1 );
 	}
 	return $prompt;

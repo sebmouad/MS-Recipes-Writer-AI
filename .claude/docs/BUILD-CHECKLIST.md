@@ -630,6 +630,17 @@ cost) in the task before changing anything.
   (2026-09-24).** The writer's photograph shows the prompt's writer the dish;
   the collage is drawn from the style reference. Real: the owner's own rôti
   photograph, drawn both ways. See ENGINE.md §7, item 40.
+- [x] **A62 — One page for the new lot and the pass (2026-09-26).**
+  `MSRWA_Screen_Compose::form()` heads `MSRWA_Screen_Pass::render()`; the
+  *Nouveau lot* menu entry is gone and `msrwa-compose` still opens the pass.
+  Verdict thumbnails share one height; the plugin makes only the image sizes it
+  shows (`MSRWA_Draft::SIZES`); consistency findings under a lead target the
+  featured image (ENGINE.md §7, 52); dead code, a stray screenshot and 23 unused
+  translations removed. `tests/test-screens.php`. Real: the form driven in a
+  browser as admin and writer (old address, menu, estimate per profile, submit
+  to pairing); 72 page views swept in three languages, two roles, two widths;
+  run 80 on the test site — sizes made: collage `medium` only, featured
+  `thumbnail`, `medium` and the two Google crops; approved at $0.083.
 - [x] **A61 — Estimate, cache and texts after the collage lead (2026-09-25).**
   `MSRWA_Estimate` plans the steps a lead runs (`collage_reading`, no
   drawing for a provided collage) and prices the featured image with its

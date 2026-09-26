@@ -952,6 +952,15 @@ photograph, and otherwise use the photograph without the cost of a search.
     under the 1 024-token minimum and stay uncached. Claude's breakpoints
     are unchanged.
 
+52. **A consistency finding under a lead targets the featured image
+    (2026-09-26).** Live run 79 was refused because the featured image showed
+    the clafoutis whole and the collage's last panel a slice, and the redraw
+    offered was the collage's — the image the recipe had been written from.
+    Under any lead, drawn or provided, `decide()` now retargets consistency
+    findings to `featured_image`, and the judge is told that whole or cut,
+    in its dish or out of it, is not a mismatch. `research_for_image()`, which
+    nothing had called since the visual brief replaced it, is removed.
+
 
 ### Still open
 

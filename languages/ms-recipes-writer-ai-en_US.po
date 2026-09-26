@@ -87,9 +87,6 @@ msgstr "No failing checks"
 msgid "Aucune clé d’API n’est enregistrée, donc rien ne peut être généré. %s"
 msgstr "No API key is stored, so nothing can be generated. %s"
 
-msgid "Aucune clé d’API n’est enregistrée. Un lot lancé maintenant échouerait à la première étape."
-msgstr "No API key is stored. A lot started now would fail at the first step."
-
 msgid "Aucune recette n’a encore tourné sur cette période."
 msgstr "No recipe has run in this period yet."
 
@@ -104,9 +101,6 @@ msgstr "Cached"
 
 msgid "Ce qui a réellement été facturé, et quelle part de l’entrée le fournisseur a servie depuis son cache."
 msgstr "What was actually billed, and how much of the input the provider served from its cache."
-
-msgid "Ce qui est en cours, ce qui attend une relecture, et ce qui s’est arrêté."
-msgstr "What is running, what is waiting to be read, and what stopped."
 
 msgid "Ce qu’il faut produire"
 msgstr "What to produce"
@@ -138,9 +132,6 @@ msgstr "Describe and pair"
 msgid "Dépense"
 msgstr "Spend"
 
-msgid "Déposez des recettes et des photographies pour lancer un lot."
-msgstr "Drop in recipes and photographs to start a lot."
-
 msgid "Déposez des recettes et des photographies pour lancer un premier lot."
 msgstr "Drop in recipes and photographs to start your first lot."
 
@@ -153,9 +144,6 @@ msgstr "Saving…"
 msgid "Entrée"
 msgstr "Input"
 
-msgid "Environ %1$s pour %3$d recette(s), et au maximum %2$s : le plafond arrête un run avant de le dépasser."
-msgstr "About %1$s for %3$d recipe(s), and at most %2$s: the ceiling stops a run before it goes over."
-
 msgid "Envoi au moteur…"
 msgstr "Sending to the engine…"
 
@@ -167,7 +155,6 @@ msgstr "Filter"
 
 msgid "Français"
 msgstr "French"
-
 
 msgid "Le juge"
 msgstr "The judge"
@@ -451,7 +438,6 @@ msgstr "The keys, and the state of what moves the work along."
 msgid "Les photographies sont en cours de description. Rechargez dans un instant."
 msgstr "The photographs are being described. Reload in a moment."
 
-
 msgid "Lot %d"
 msgstr "Lot %d"
 
@@ -616,7 +602,6 @@ msgstr "to fix before publishing."
 
 msgid "étapes"
 msgstr "steps"
-
 
 msgid "Texte uniquement, relu et vérifié. Aucune image n’est générée, et le jugement final n’aurait rien à regarder."
 msgstr "Text only, proofread and checked. No image is generated, and the final judgement would have nothing to look at."
@@ -1017,7 +1002,6 @@ msgstr "Reference recipe"
 msgid "Recherche"
 msgstr "Research"
 
-
 msgid "Rédaction"
 msgstr "Writing"
 
@@ -1041,7 +1025,6 @@ msgstr "One recipe in this lot is estimated at %1$s, above its %2$s ceiling: it 
 
 msgid "Vos recettes passées par le moteur, avec leur état et leur brouillon."
 msgstr "Your recipes that went through the engine, with their state and their draft."
-
 
 msgid "Vérification…"
 msgstr "Checking…"
@@ -1198,9 +1181,6 @@ msgstr "The stored schema is %1$d; this version expects %2$d."
 
 msgid "Les mêmes constats en un bloc, à coller dans une demande d’aide. Il ne porte ni clé, ni chemin, ni adresse du site."
 msgstr "The same findings as one block, to paste into a request for help. It carries no key, no path and no site address."
-
-msgid "Les six tables sont là, schéma %d."
-msgstr "All six tables are there, schema %d."
 
 msgid "Plafonds"
 msgstr "Ceilings"
@@ -1474,17 +1454,11 @@ msgstr "%s was not received in full."
 msgid "%s n’est pas une photographie JPEG, PNG ou WebP."
 msgstr "%s is not a JPEG, PNG or WebP photograph."
 
-msgid "Choisir sur mon ordinateur"
-msgstr "Choose from my computer"
-
 msgid "Ensemble, ces photographies dépassent les %s Mo que ce serveur accepte en un envoi."
 msgstr "Together, these photographs exceed the %s MB this server accepts in one upload."
 
 msgid "Envoi des photographies…"
 msgstr "Uploading the photographs…"
-
-msgid "JPEG, PNG ou WebP, %1$d au plus, %2$s Mo chacune. Elles sont ajoutées à la médiathèque quand le lot est créé."
-msgstr "JPEG, PNG or WebP, at most %1$d, %2$s MB each. They are added to the media library when the lot is created."
 
 msgid "Un lot accepte au plus %d photographies."
 msgstr "A lot accepts at most %d photographs."
@@ -1554,9 +1528,6 @@ msgstr "Each photograph is matched to its recipe. Correct it if needed, then lau
 msgid "Chaque recette devient un brouillon WordPress avec son article, ses images et les remarques du contrôle final. Rien n’est jamais publié sans vous."
 msgstr "Each recipe becomes a WordPress draft with its article, its images and the final check's remarks. Nothing is ever published without you."
 
-msgid "Collez une ou plusieurs recettes, séparées par une ligne de tirets, et ajoutez leurs photographies depuis votre ordinateur, sans dire laquelle va avec quoi."
-msgstr "Paste one or more recipes, separated by a line of dashes, and add their photographs from your computer, without saying which goes with which."
-
 msgid "Comment ça marche"
 msgstr "How it works"
 
@@ -1568,9 +1539,6 @@ msgstr "Check the pairing"
 
 msgid "Relisez les brouillons"
 msgstr "Review the drafts"
-
-msgid "Déposer mon premier lot"
-msgstr "Submit my first lot"
 
 msgid "Article en %1$s · plafond de %2$s par recette."
 msgstr "Article in %1$s · ceiling of %2$s per recipe."
@@ -1587,14 +1555,8 @@ msgstr "Applies to every recipe of every lot: the lot form no longer offers one.
 msgid "La langue de chaque article, pour tous les lots : le formulaire de lot n’en propose plus."
 msgstr "The language of every article, for all lots: the lot form no longer offers one."
 
-msgid "Déposez vos photographies ici"
-msgstr "Drop your photographs here"
-
 msgid "Retirer %s"
 msgstr "Remove %s"
-
-msgid "ou"
-msgstr "or"
 
 msgid "%s — ne convient pas à cette étape"
 msgstr "%s — not suited to this step"
@@ -1825,12 +1787,6 @@ msgstr "The required sections, the page-two heading and the language tag follow 
 msgid "Choisit d’un coup le modèle, la réflexion et la qualité d’image de chaque étape. Changer une étape à la main fait passer à « Personnalisé »."
 msgstr "Sets the model, thinking and image quality of every step at once. Changing one step by hand switches to “Custom”."
 
-msgid "Les modèles les moins chers là où ils suffisent, peu de réflexion, images en qualité basse."
-msgstr "The cheapest models where they are good enough, little thinking, low-quality images."
-
-msgid "Les modèles les plus avancés, plus de réflexion, images en haute qualité."
-msgstr "The most advanced models, more thinking, high-quality images."
-
 msgid "Les réglages livrés, mesurés : chaque recette approuvée, le meilleur rapport qualité-prix."
 msgstr "The shipped settings, measured: every recipe approved, the best value for money."
 
@@ -1905,12 +1861,6 @@ msgstr "Deleted from WordPress"
 
 msgid "Voir"
 msgstr "View"
-
-msgid "le %s"
-msgstr "on %s"
-
-msgid "modifié le %s"
-msgstr "modified on %s"
 
 msgid "État dans WordPress"
 msgstr "State in WordPress"
@@ -2243,20 +2193,8 @@ msgstr "Measured 25/09/2026: disagrees with GPT-5.6 Luna on two recipes in three
 msgid "Ajouter une recette"
 msgstr "Add a recipe"
 
-msgid "Coller une image"
-msgstr "Paste an image"
-
-msgid "Le navigateur ne laisse pas lire le presse-papiers depuis ce bouton : collez avec Ctrl+V (⌘V sur Mac)."
-msgstr "The browser does not let this button read the clipboard: paste with Ctrl+V (⌘V on a Mac)."
-
-msgid "Le presse-papiers ne contient pas d’image."
-msgstr "The clipboard holds no image."
-
 msgid "Tout retirer"
 msgstr "Remove all"
-
-msgid "Une image copiée — une capture d’écran, une photographie copiée depuis une page — se colle aussi avec Ctrl+V (⌘V sur Mac), n’importe où sur cette page."
-msgstr "A copied image — a screenshot, a photograph copied from a page — can also be pasted with Ctrl+V (⌘V on a Mac), anywhere on this page."
 
 msgid "avec des précisions"
 msgstr "with details"
@@ -2271,21 +2209,12 @@ msgstr "name only"
 msgid "Image collée %d"
 msgstr "Pasted image %d"
 
-msgid "Ce n’est pas l’adresse d’une image."
-msgstr "That is not an image address."
-
 msgid "L’adresse doit commencer par https://."
 msgstr "The address must start with https://."
 
 #, php-format
 msgid "L’image à l’adresse %s n’a pas pu être récupérée. Vérifiez que l’adresse mène directement à une image JPEG, PNG ou WebP, qu’elle commence par https:// et qu’elle s’ouvre dans un navigateur."
 msgstr "The image at %s could not be retrieved. Check that the address leads straight to a JPEG, PNG or WebP image, starts with https:// and opens in a browser."
-
-msgid "Ou l’adresse d’une image"
-msgstr "Or an image address"
-
-msgid "Une image copiée — une capture d’écran, une photographie copiée depuis une page — ou l’adresse d’une image se colle aussi avec Ctrl+V (⌘V sur Mac), n’importe où sur cette page."
-msgstr "A copied image — a screenshot, a photograph copied from a page — or an image address can also be pasted with Ctrl+V (⌘V on a Mac), anywhere on this page."
 
 msgid "aperçu indisponible — le site vérifiera à l’envoi"
 msgstr "no preview — the site will check it when sending"
@@ -2304,9 +2233,6 @@ msgstr "Get a key"
 
 msgid "collez la clé ici"
 msgstr "paste the key here"
-
-msgid "inchangée — collez une nouvelle clé pour la remplacer"
-msgstr "unchanged — paste a new key to replace it"
 
 msgid "Choisir des photographies sur mon ordinateur"
 msgstr "Choose photographs on my computer"
@@ -2406,10 +2332,6 @@ msgstr "WordPress asks nothing when an extension is deleted: what goes is chosen
 msgid "Les %1$d tables sont là, schéma %2$d."
 msgstr "All %1$d tables are there, schema %2$d."
 
-#, php-format
-msgid "%1$d/%2$d étapes"
-msgstr "%1$d/%2$d steps"
-
 msgid "Article et image"
 msgstr "Article and image"
 
@@ -2450,8 +2372,19 @@ msgstr "The full chain: the Facebook collage first — yours, or drawn freely af
 msgid "Aucun collage n’est dessiné ; le vôtre, s’il est joint, est publié tel quel et sert de référence. Le texte est relu et vérifié, et l’image à la une est jugée face à la recette."
 msgstr "No collage is drawn; yours, if attached, is published as it is and serves as the reference. The text is reviewed and fact-checked, and the featured image is judged against the recipe."
 
-msgid "Si la recherche utilise toutes les recherches permises et que le contrôle final doit être redemandé, une recette peut coûter jusqu’à %s. Une image refusée n’est jamais redessinée d’office."
-msgstr "If the research uses every search it is allowed and the final check has to be asked again, a recipe can cost up to %s. A refused image is never redrawn automatically."
-
 msgid "Un de vos collages dont le rendu doit être repris : lumière, couleurs, cadrage, plan de travail. Seul son style est repris, jamais son plat. Quand le rédacteur a envoyé une photographie du plat, elle montre le plat et ce collage garde le style."
 msgstr "One of your collages whose look is to be kept: light, colours, framing, worktop. Only its style is taken, never its dish. When the writer sent a photograph of the dish, it shows the dish and this collage keeps the style."
+
+msgid "Ci-dessus : collez une ou plusieurs recettes, séparées par une ligne de tirets, et ajoutez leurs photographies — ou votre propre collage Facebook — sans dire laquelle va avec quoi."
+msgstr "Above: paste one or more recipes, separated by a line of dashes, and add their photographs — or your own Facebook collage — without saying which goes with which."
+
+msgid "Déposez un nouveau lot, puis suivez ce qui est en cours, ce qui attend une relecture et ce qui s’est arrêté."
+msgstr "Drop in a new lot, then follow what is running, what is waiting to be read and what stopped."
+
+#, php-format
+msgid "Environ %1$s pour %3$d recette(s) · jamais plus de %2$s : le plafond arrête une recette avant de le dépasser."
+msgstr "About %1$s for %3$d recipe(s) · never more than %2$s: the ceiling stops a recipe before it goes over."
+
+#, php-format
+msgid "Au pire %s par recette, si la recherche use de toutes ses recherches permises."
+msgstr "At worst %s per recipe, if the research uses every search it is allowed."

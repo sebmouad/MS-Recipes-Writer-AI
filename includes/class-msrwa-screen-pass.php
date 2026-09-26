@@ -2,11 +2,13 @@
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
 /**
- * The pass: what is cooking, what is waiting to be read, what went wrong.
+ * The pass: a new lot first, then what is cooking, what is waiting to be
+ * read, what went wrong.
  *
- * The first screen anyone opens, and the only one designed to be read at a
- * glance rather than studied. What needs a person comes first; the ledger comes
- * after, because money spent is never as urgent as work stuck.
+ * The first screen anyone opens. Sending a lot used to be a screen of its
+ * own, one click away from the only place its progress shows; the form now
+ * heads the pass, and what needs a person follows it. The ledger comes last,
+ * because money spent is never as urgent as work stuck.
  */
 final class MSRWA_Screen_Pass {
 
@@ -25,18 +27,18 @@ final class MSRWA_Screen_Pass {
 		echo '<div class="wrap msrwa">';
 		MSRWA_UI::head(
 			__( 'Le pass', 'ms-recipes-writer-ai' ),
-			__( 'Ce qui est en cours, ce qui attend une relecture, et ce qui s’est arrêté.', 'ms-recipes-writer-ai' ),
+			__( 'Déposez un nouveau lot, puis suivez ce qui est en cours, ce qui attend une relecture et ce qui s’est arrêté.', 'ms-recipes-writer-ai' ),
 			$money ? array(
 				__( 'aujourd’hui', 'ms-recipes-writer-ai' ) => MSRWA_I18N::money( $today['spend_usd'], 2 ),
 				__( '30 jours', 'ms-recipes-writer-ai' ) => MSRWA_I18N::money( $month['spend_usd'], 2 ),
-			) : array(),
-			'<a class="button button-primary" href="' . esc_url( admin_url( 'admin.php?page=msrwa-compose' ) ) . '">' . esc_html__( 'Nouveau lot', 'ms-recipes-writer-ai' ) . '</a>'
+			) : array()
 		);
 
 		self::warnings();
+		MSRWA_Screen_Compose::form();
 
 		// Somebody who has never sent a recipe learns nothing from four zeros.
-		// They get the three things that will happen instead, and the button.
+		// They get the three things that will happen instead.
 		if ( ! $moving['total'] && ! $attention['total'] && ! MSRWA_Ledger::runs( array( 'per_page' => 1 ) )['total'] ) {
 			self::queue();
 			self::welcome();
@@ -65,10 +67,10 @@ final class MSRWA_Screen_Pass {
 
 		self::queue();
 		self::waiting();
-		self::rail( __( 'En cours', 'ms-recipes-writer-ai' ), $moving['runs'], __( 'Rien ne tourne.', 'ms-recipes-writer-ai' ), __( 'Déposez des recettes et des photographies pour lancer un lot.', 'ms-recipes-writer-ai' ), true );
+		self::rail( __( 'En cours', 'ms-recipes-writer-ai' ), $moving['runs'], __( 'Rien ne tourne.', 'ms-recipes-writer-ai' ), true );
 
 		if ( $attention['runs'] ) {
-			self::rail( __( 'Demande une décision', 'ms-recipes-writer-ai' ), $attention['runs'], '', '', false );
+			self::rail( __( 'Demande une décision', 'ms-recipes-writer-ai' ), $attention['runs'], '', false );
 		}
 
 		echo '</div>';
@@ -77,7 +79,7 @@ final class MSRWA_Screen_Pass {
 	/** The first visit: what a lot is, in the order it happens. */
 	private static function welcome() {
 		$steps = array(
-			array( __( 'Déposez un lot', 'ms-recipes-writer-ai' ), __( 'Collez une ou plusieurs recettes, séparées par une ligne de tirets, et ajoutez leurs photographies depuis votre ordinateur, sans dire laquelle va avec quoi.', 'ms-recipes-writer-ai' ) ),
+			array( __( 'Déposez un lot', 'ms-recipes-writer-ai' ), __( 'Ci-dessus : collez une ou plusieurs recettes, séparées par une ligne de tirets, et ajoutez leurs photographies — ou votre propre collage Facebook — sans dire laquelle va avec quoi.', 'ms-recipes-writer-ai' ) ),
 			array( __( 'Vérifiez l’appariement', 'ms-recipes-writer-ai' ), __( 'Chaque photographie est rapprochée de sa recette. Corrigez si besoin, puis lancez : rien n’est écrit avant.', 'ms-recipes-writer-ai' ) ),
 			array( __( 'Relisez les brouillons', 'ms-recipes-writer-ai' ), __( 'Chaque recette devient un brouillon WordPress avec son article, ses images et les remarques du contrôle final. Rien n’est jamais publié sans vous.', 'ms-recipes-writer-ai' ) ),
 		);
@@ -89,7 +91,6 @@ final class MSRWA_Screen_Pass {
 					<li><strong><?php echo esc_html( $step[0] ); ?></strong><span><?php echo esc_html( $step[1] ); ?></span></li>
 				<?php endforeach; ?>
 			</ol>
-			<p><a class="button button-primary button-hero" href="<?php echo esc_url( admin_url( 'admin.php?page=msrwa-compose' ) ); ?>"><?php esc_html_e( 'Déposer mon premier lot', 'ms-recipes-writer-ai' ); ?></a></p>
 		</section>
 		<?php
 	}
@@ -188,13 +189,14 @@ final class MSRWA_Screen_Pass {
 		echo '</tbody></table></div></section>';
 	}
 
-	private static function rail( $title, array $runs, $empty_title, $empty_text, $live ) {
-		echo '<section class="ms-card ms-card-flush"' . ( $live ? ' id="ms-live-rail"' : '' ) . '><h2>' . esc_html( $title ) . '</h2>';
+	private static function rail( $title, array $runs, $empty, $live ) {
+		// Nothing running is one quiet line: the form to start something is
+		// right above it.
 		if ( ! $runs ) {
-			MSRWA_UI::nothing( $empty_title, $empty_text, '<a class="button button-primary" href="' . esc_url( admin_url( 'admin.php?page=msrwa-compose' ) ) . '">' . esc_html__( 'Nouveau lot', 'ms-recipes-writer-ai' ) . '</a>' );
-			echo '</section>';
+			echo '<section class="ms-card ms-card-quiet"' . ( $live ? ' id="ms-live-rail"' : '' ) . '><h2>' . esc_html( $title ) . '</h2><p class="ms-muted">' . esc_html( $empty ) . '</p></section>';
 			return;
 		}
+		echo '<section class="ms-card ms-card-flush"' . ( $live ? ' id="ms-live-rail"' : '' ) . '><h2>' . esc_html( $title ) . '</h2>';
 		MSRWA_UI::run_table( $runs );
 		echo '</section>';
 	}
