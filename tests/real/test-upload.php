@@ -37,7 +37,9 @@ msrwa_real_spend( 0.01 );
 $media = msrwa_real_request( 'GET', '/wp/v2/media?per_page=1&orderby=id&order=desc&context=edit' );
 msrwa_real_assert( $last === (int) ( $media['body'][0]['id'] ?? 0 ), 'Nothing was added to the media library.' );
 $lot = (int) $sent['body']['id'];
-$name = substr( hash_file( 'sha256', $photo ), 0, 32 ) . '.jpg';
+// Named by its lot, its place in it and its bytes (0.28.19).
+$stored = static function ( $lot ) use ( $photo ) { return 'lot' . (int) $lot . '-photo1-' . substr( hash_file( 'sha256', $photo ), 0, 24 ) . '.jpg'; };
+$name = $stored( $lot );
 $shown = msrwa_real_request( 'GET', '/msrwa/v1/batches/' . $lot . '/photos/' . $name );
 msrwa_real_assert( 200 === $shown['status'] && 0 === strpos( $shown['raw'], "\xFF\xD8" ), 'Its writer sees it through the REST API (got ' . $shown['status'] . ').' );
 $stranger = (string) shell_exec( 'curl -s -o /dev/null -w "%{http_code}" ' . escapeshellarg( msrwa_real_rest_url( '/msrwa/v1/batches/' . $lot . '/photos/' . $name ) ) );
@@ -52,10 +54,11 @@ msrwa_real_spend( 0.01 );
 
 // A lot deleted before it was sent takes its photograph with it.
 msrwa_real_request( 'DELETE', '/msrwa/v1/batches/' . $lot );
-$gone = msrwa_real_request( 'GET', '/msrwa/v1/batches/' . (int) ( $again['body']['id'] ?? 0 ) . '/photos/' . $name );
+$other = $stored( (int) ( $again['body']['id'] ?? 0 ) );
+$gone = msrwa_real_request( 'GET', '/msrwa/v1/batches/' . (int) ( $again['body']['id'] ?? 0 ) . '/photos/' . $other );
 msrwa_real_assert( 200 === $gone['status'], 'The other lot keeps its own copy.' );
 msrwa_real_request( 'DELETE', '/msrwa/v1/batches/' . (int) ( $again['body']['id'] ?? 0 ) );
-$gone = msrwa_real_request( 'GET', '/msrwa/v1/batches/' . (int) ( $again['body']['id'] ?? 0 ) . '/photos/' . $name );
+$gone = msrwa_real_request( 'GET', '/msrwa/v1/batches/' . (int) ( $again['body']['id'] ?? 0 ) . '/photos/' . $other );
 msrwa_real_assert( 404 === $gone['status'], 'Deleting the lot removed its photograph (got ' . $gone['status'] . ').' );
 // Photographs without any text: each dish they show becomes a recipe. Needs
 // real photographs of food — a drawn disc names no dish — so it runs only

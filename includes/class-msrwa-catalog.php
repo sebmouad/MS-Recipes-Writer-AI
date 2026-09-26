@@ -488,7 +488,10 @@ final class MSRWA_Catalog {
 		foreach ( null === $rows ? self::rows() : $rows as $row ) {
 			if ( null === $row['input_usd'] || null === $row['output_usd'] ) { continue; }
 			$models[ $row['provider'] ][ $row['model_id'] ] = array( (float) $row['input_usd'], (float) $row['output_usd'] );
-			if ( isset( $shipped[ $row['provider'] ][ $row['model_id'] ][2] ) ) { $models[ $row['provider'] ][ $row['model_id'] ][] = (float) $shipped[ $row['provider'] ][ $row['model_id'] ][2]; }
+			// So is its image input rate, the fourth.
+			foreach ( array( 2, 3 ) as $extra ) {
+				if ( isset( $shipped[ $row['provider'] ][ $row['model_id'] ][ $extra ] ) ) { $models[ $row['provider'] ][ $row['model_id'] ][ $extra ] = (float) $shipped[ $row['provider'] ][ $row['model_id'] ][ $extra ]; }
+			}
 			if ( ! isset( $row['enabled'] ) || $row['enabled'] ) { $priced[ $row['provider'] ][ $row['model_id'] ] = $row; }
 		}
 		return array( 'models' => $models, 'tiers' => self::tiers( $priced ) );

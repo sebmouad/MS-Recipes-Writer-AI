@@ -43,13 +43,16 @@ final class MSRWA_Estimate {
 			// Drawn from a reference image since 0.28.x — a photograph of the dish or
 			// the collage's last panel — which is input too: 2 054 in, 196 out on a
 			// live run of 0.28.27, against 1 450 measured before the reference.
-			'featured_image' => array( 'input' => 2100, 'output' => 440 ),
+			'featured_image' => array( 'input' => 2100, 'output' => 440, 'image_input' => 900 ),
 			// The collage read panel by panel when it leads the recipe: 2 370 in,
 			// 1 227 out on a live run of 0.28.27, at `low` thinking: 937–1 351 out
 			// over twelve runs of 0.28.36. The shapes are `medium` drawings, so the
 			// 500 that `low` takes off is added back here.
 			'collage_reading' => array( 'input' => 2400, 'output' => 1750 ),
-			'facebook_image' => array( 'input' => 2550, 'output' => 345 ),
+			// Of the drawings' input, the reference image is 900 tokens for the
+			// featured photograph and 1 472 for the collage, billed at the image
+			// input rate (runs 82 and 83, 0.28.38).
+			'facebook_image' => array( 'input' => 2550, 'output' => 345, 'image_input' => 1472 ),
 			// The text call that writes the collage's image prompt before it is
 			// drawn: 2 368–2 676 in, 937–1 193 out on 0.28.36, billed with the
 			// collage and missing from the estimate until 0.28.38. Measured at `low`,
@@ -113,7 +116,7 @@ final class MSRWA_Estimate {
 			$usage['output'] = min( max( (int) ( $usage['output'] / 2 ), (int) $usage['output'] + MSRWA_Engine_Config::thinking_allowance( $thinking ) ), $config->max_output( $name ) );
 
 			$searches = 'web_search' === $capability && ! $from_photographs ? min( (int) ( $usage['searches'] ?? 2 ), $config->web_searches( $route['provider'] ) ) : 0;
-			$cost = $config->price( $route['provider'], $route['model'], array( 'input_tokens' => $usage['input'], 'output_tokens' => $usage['output'], 'web_searches' => $searches ) );
+			$cost = $config->price( $route['provider'], $route['model'], array( 'input_tokens' => $usage['input'], 'output_tokens' => $usage['output'], 'web_searches' => $searches, 'image_input_tokens' => (int) ( $usage['image_input'] ?? 0 ) ) );
 			if ( null === $cost ) { $unknown[] = $name; continue; }
 
 			// Research also reads up to `limits.images_inspected` of the photographs

@@ -630,6 +630,16 @@ cost) in the task before changing anything.
   (2026-09-24).** The writer's photograph shows the prompt's writer the dish;
   the collage is drawn from the style reference. Real: the owner's own rôti
   photograph, drawn both ways. See ENGINE.md §7, item 40.
+- [~] **A71 — The audit's engine fixes (2026-09-26, 0.28.39).** Owner's
+  approval of ENGINE.md §7, items 8–12, now decided items 55–59: the judge
+  reads the image brief as context; the review's typography and the recipe's
+  course follow the article's language; a reference image is billed at the
+  image input rate ($8 against $5 on gpt-image-2.5-flare), with the shipped
+  ceiling at $0.16 so the estimate's maximum fits; a correction never leaves
+  the next sentence leaning on nothing. A page a reader cannot open answers
+  404. Offline for the engine changes; real: the 404 and 200 answers as a
+  writer and an administrator, and `test-upload.php` updated to the photo
+  names of 0.28.19 and passing.
 - [x] **A70 — Deep audit (2026-09-26, 0.28.38).** Retry clears the stored
   failure; parking touches only a waiting run with no live lease; dispatch
   claims the lot with a conditional UPDATE and the scheduler no longer undoes
@@ -641,7 +651,7 @@ cost) in the task before changing anything.
   one full recipe estimated at $0.0922, billed $0.0842; the sweep took
   uploads/msrwa from 91 MB to 35 MB; the screen sweep (admin and writer, fr,
   en, ar, 1280 and 390) found no notice, overflow or money leak. Engine
-  findings are proposals, ENGINE.md §7, items 8–12.
+  findings were proposals, ENGINE.md §7, items 8–12, applied in A71.
 - [x] **A69 — The report in the plugin's palette (2026-09-26).**
   `tools/report.css` rewritten on colour tokens shared with `admin.css`; light
   only, at the owner's request (the dark scheme of 0.28.36 was removed in

@@ -46,6 +46,29 @@ msrwa_test_assert( $html === (string) ( $clean->artifacts['proofread']['content_
 msrwa_test_assert( true === ( $clean->artifacts['proofread']['clean'] ?? null ), 'And says it was clean.' );
 
 MSRWA_Engine_Call::$transport = null;
+// A correction never leaves the next sentence leaning on nothing (ENGINE.md
+// §7, 12): in #81 a copy was removed and "Leur quantité…" opened a section.
+msrwa_test_assert( MSRWA_Engine::leaned_on( '<p>A est rouge. Leur goût est doux.</p>', 'A est rouge.' ), 'A sentence opening on "Leur" leans on the one before.' );
+msrwa_test_assert( ! MSRWA_Engine::leaned_on( '<p>A est rouge.</p><p>Leur goût.</p>', 'A est rouge.' ), 'Not across a paragraph.' );
+msrwa_test_assert( ! MSRWA_Engine::leaned_on( '<p>A est rouge. Le goût est doux.</p>', 'A est rouge.' ), 'Nor a sentence that stands on its own.' );
+$html = '<h2>Substitution</h2><p>Les poivrons peuvent rester non pelés.</p><h2>Variantes</h2><p>La première adaptation consiste à laisser les poivrons non pelés. Leur quantité reste identique.</p><p>Retirez ceci. Le four reste chaud.</p><p>Et cela aussi. Ce geste compte.</p>';
+$result = MSRWA_Engine::run_step( 'corrections', array( 'title' => 'Poulet', 'artifacts' => array(
+	'research' => array( 'facts' => array() ),
+	'canonical' => array( 'title' => 'Poulet', 'ingredients' => array(), 'steps' => array() ),
+	'article' => array( 'title' => 'Poulet', 'content_html' => $html ),
+	'review' => array( 'pass' => true, 'findings' => array(), 'changes' => array(), 'corrections' => array(
+		array( 'before' => 'La première adaptation consiste à laisser les poivrons non pelés.', 'after' => 'Les poivrons peuvent rester non pelés.', 'source' => 'canonical recipe' ),
+		array( 'before' => 'Retirez ceci.', 'after' => '', 'source' => 'canonical recipe' ),
+		array( 'before' => 'Et cela aussi.', 'after' => '', 'source' => 'canonical recipe' ),
+	) ),
+) ), array( 'config' => array( 'settings' => array( 'keys' => array( 'openai' => 'k' ) ) ) ) );
+$corrected = (array) ( $result->artifacts['corrected'] ?? array() );
+$body = (string) ( $corrected['content_html'] ?? '' );
+msrwa_test_contains( $body, '<p>Les poivrons peuvent rester non pelés. Leur quantité', 'A copy the next sentence leans on is kept, not removed.' );
+msrwa_test_missing( $body, 'Retirez ceci.', 'A sentence nothing leans on is removed as asked.' );
+msrwa_test_contains( $body, 'Et cela aussi. Ce geste compte.', 'A removal that would orphan its neighbour is left in place…' );
+msrwa_test_assert( 1 === count( (array) ( $corrected['corrections_for_the_editor'] ?? array() ) ), '…and handed to the editor.' );
+
 msrwa_test_done( 'the review returns its language changes and the engine applies them' );
 
 // The article repeated a sentence; removing the copy drops its figures but

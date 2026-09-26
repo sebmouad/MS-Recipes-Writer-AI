@@ -44,10 +44,11 @@ msrwa_test_assert( $article_only['cost_usd'] >= 0.0418 && $article_only['cost_us
 // refusal no longer redraws anything by itself.
 msrwa_test_assert( $full['max_usd'] > $full['cost_usd'] && $full['max_usd'] < $full['cost_usd'] + 0.08, 'The maximum is the expected figure plus every search and a second verdict; got ' . $full['max_usd'] );
 // The shipped per-recipe ceiling (owner, 2026-09-24): a full recipe billed
-// $0.0736 on the site, and each redraw an editor asks for $0.020. $0.15 lets
-// the recipe, its two allowed collage redraws and the estimate's maximum through.
+// $0.0736 on the site, and each redraw an editor asks for $0.020. $0.15 let
+// the recipe, its two allowed collage redraws and the estimate's maximum through
+// until 0.28.39 priced the reference images at their own rate: $0.16 since.
 $ceiling = (float) MSRWA_Settings_Defaults_For_Test::ceiling();
-msrwa_test_assert( 0.15 === $ceiling, 'The shipped per-recipe ceiling is $0.15.' );
+msrwa_test_assert( 0.16 === $ceiling, 'The shipped per-recipe ceiling is $0.16.' );
 msrwa_test_assert( MSRWA_Estimate::fits( $full['cost_usd'], $ceiling ), 'A full recipe fits under the shipped ceiling; estimated ' . $full['cost_usd'] );
 msrwa_test_assert( $full['max_usd'] < $ceiling, 'So does its maximum; got ' . $full['max_usd'] );
 msrwa_test_assert( 0.0736 + 2 * 0.020 < $ceiling, 'With room for the two redraws an editor may ask for.' );
@@ -130,6 +131,11 @@ msrwa_test_assert( $provided['cost_usd'] < MSRWA_Estimate::recipe( MSRWA_Profile
 msrwa_test_assert( ! isset( MSRWA_Estimate::recipe( MSRWA_Profile::ARTICLE )['steps']['collage_reading'] ), 'An article alone reads no collage.' );
 
 msrwa_test_done( 'estimates track what runs really cost' );
+
+// A reference image is billed at the image input rate, above the prompt's text.
+$reference = MSRWA_Engine_Config::create()->price( 'openai', 'gpt-image-2.5-flare', array( 'input_tokens' => 2000, 'output_tokens' => 0, 'input_tokens_details' => array( 'image_tokens' => 1000 ) ) );
+msrwa_test_assert( abs( $reference - ( 1000 * 5 + 1000 * 8 ) / 1000000 ) < 1e-12, 'The image tokens of the input are priced at the image input rate; got ' . $reference );
+msrwa_test_assert( abs( MSRWA_Engine_Config::create()->price( 'openai', 'gpt-image-2', array( 'input_tokens' => 2000, 'output_tokens' => 0, 'input_tokens_details' => array( 'image_tokens' => 1000 ) ) ) - 0.01 ) < 1e-12, 'A model without an image input rate prices all of it at the text rate.' );
 
 // The collage's prompt is written by a text call before it is drawn, and that
 // call is billed with the collage: it belongs in the estimate too.

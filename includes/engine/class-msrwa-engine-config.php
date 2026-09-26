@@ -243,9 +243,12 @@ final class MSRWA_Engine_Config {
 					'gpt-5.6-sol' => array( 4.00, 20.00 ),
 					'gpt-5.6-terra' => array( 2.00, 12.00 ),
 					'gpt-5.4-mini' => array( 0.75, 4.50 ),
-					'gpt-image-1-mini' => array( 2.00, 8.00 ),
+					// [text input, output, image output, image input]: a reference image is
+					// billed above the prompt's text. Read from each model's own page on
+					// 2026-09-26; gpt-image-2's page states no image input rate.
+					'gpt-image-1-mini' => array( 2.00, 8.00, 8.00, 2.50 ),
 					'gpt-image-2' => array( 5.00, 30.00 ),
-					'gpt-image-2.5-flare' => array( 5.00, 30.00 ),
+					'gpt-image-2.5-flare' => array( 5.00, 30.00, 30.00, 8.00 ),
 				),
 				'gemini' => array(
 					'gemini-3.1-flash-lite' => array( 0.25, 1.50 ),
@@ -514,7 +517,10 @@ final class MSRWA_Engine_Config {
 		// A third rate prices the image tokens of the output; the rest of it is text.
 		$output = (int) ( $usage['output_tokens'] ?? 0 );
 		$image = isset( $rate[2] ) ? min( $output, (int) ( $usage['image_tokens'] ?? 0 ) ) : 0;
-		return ( ( $input - $cached + $cached * $ratio + $written * ( $write_ratio - 1 ) ) * (float) $rate[0] + ( $output - $image ) * (float) $rate[1] + $image * (float) ( $rate[2] ?? 0 ) ) / 1000000 + $searches;
+		// A fourth prices a reference image read as input, which OpenAI's image
+		// models bill above the text of the prompt and report apart.
+		$seen = isset( $rate[3] ) ? min( $input - $cached, (int) ( $usage['image_input_tokens'] ?? $usage['input_tokens_details']['image_tokens'] ?? 0 ) ) : 0;
+		return ( ( $input - $cached - $seen + $cached * $ratio + $written * ( $write_ratio - 1 ) ) * (float) $rate[0] + $seen * (float) ( $rate[3] ?? 0 ) + ( $output - $image ) * (float) $rate[1] + $image * (float) ( $rate[2] ?? 0 ) ) / 1000000 + $searches;
 	}
 
 	public function max_output( $step ) { return (int) $this->get( 'max_output.' . $step, 4000 ); }

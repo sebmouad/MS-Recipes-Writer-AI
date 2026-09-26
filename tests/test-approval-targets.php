@@ -52,5 +52,10 @@ msrwa_test_missing( $template, '{{images_received}}', 'Not through a placeholder
 $built = MSRWA_Engine_Input::build( 'final_approval', 'PROMPT', array( 'title' => 'Tarte', 'images_received' => '- the Facebook image, 1024x1536, a 6-panel preparation collage;' ) );
 msrwa_test_contains( $built, "IMAGES RECEIVED:\n- the Facebook image", 'The manifest reaches the judge with the data.' );
 msrwa_test_contains( $template, 'WHAT YOU WERE NOT SENT', 'And it is told not to judge what it was not sent.' );
+// What the image model was asked for reaches the judge as context: headed
+// "binding", its counts and its one vessel refused five recipes in twenty.
+msrwa_test_contains( $built, 'not a checklist', 'The judge reads the image brief as context.' );
+msrwa_test_missing( $built, 'derived from this recipe and binding', 'Never as rules of its own.' );
+msrwa_test_contains( MSRWA_Engine_Input::visual_brief( array(), array() ), 'binding', 'The image model is still bound by it.' );
 
 msrwa_test_done( 'the judge is asked only about what it saw' );

@@ -317,7 +317,12 @@ final class MSRWA_Engine {
 			// same thing twice. What the article already says is removed instead.
 			// Only a copy elsewhere counts: a correction that keeps the first of
 			// two sentences finds its replacement inside the passage itself.
-			if ( '' !== $after && false !== mb_strpos( str_replace( $found, '', $html ), $after ) ) { $after = ''; }
+			// Unless the next sentence leans on it: in #81 the Variants section was
+			// left opening on "Leur quantité…", its "leur" pointing at nothing
+			// (ENGINE.md §7, 12). A copy is kept then, and a sentence the review
+			// asked to remove goes to the editor, who can rewrite the pair.
+			if ( '' !== $after && false !== mb_strpos( str_replace( $found, '', $html ), $after ) && ! self::leaned_on( $html, $found ) ) { $after = ''; }
+			if ( '' === $after && self::leaned_on( $html, $found ) ) { $unapplied[] = $correction; continue; }
 			$html = self::substitute( $html, $found, self::same_case( $found, $before, $after ) );
 			$applied[] = $found === $before ? $correction : array_merge( $correction, array( 'quoted' => $before, 'before' => $found ) );
 		}
@@ -440,6 +445,22 @@ final class MSRWA_Engine {
 			}
 		}
 		return $best;
+	}
+
+	/**
+	 * Whether the sentence after a passage, in the same paragraph, opens on a
+	 * word that points back at it — a pronoun or a demonstrative — so that
+	 * removing the passage would leave it pointing at nothing.
+	 */
+	public static function leaned_on( $html, $passage ) {
+		$at = mb_strpos( (string) $html, (string) $passage );
+		if ( false === $at ) { return false; }
+		$rest = mb_substr( (string) $html, $at + mb_strlen( (string) $passage ), 80 );
+		if ( ! preg_match( '/^[\s\x{00A0}]*([^\s<.,;:!?]+)/u', $rest, $next ) ) { return false; }
+		$words = array( 'il', 'elle', 'ils', 'elles', 'leur', 'leurs', 'ce', 'cet', 'cette', 'ces', 'cela', 'ça', 'celui', 'celle', 'ceux', 'celles', 'son', 'sa', 'ses', 'y', 'en',
+			'it', 'its', 'they', 'their', 'them', 'this', 'these', 'those', 'that',
+			'su', 'sus', 'este', 'esta', 'estos', 'estas', 'ello', 'eso', 'esto' );
+		return in_array( mb_strtolower( $next[1] ), $words, true );
 	}
 
 	/**

@@ -5,9 +5,13 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.28.38
+## État actuel — 0.28.39
 
-La version `0.28.38` corrige ce qu'un audit complet a trouvé : reprendre une
+La version `0.28.39` applique les cinq corrections du moteur que l'audit
+proposait : le contrôle des images ne refuse plus pour un compte, un plat ou
+une découpe, la relecture suit la langue de l'article, les images de
+référence sont facturées à leur vrai prix, et une correction ne laisse plus
+une phrase orpheline ; la `0.28.38` corrige ce qu'un audit complet a trouvé : reprendre une
 recette arrêtée aboutit enfin, un lot ne part plus deux fois, l'estimation
 compte l'appel qui écrit le prompt du collage, et le nettoyage retire les
 fichiers que plus rien n'ouvre ; la `0.28.37` garde le rapport complet en clair seulement ; la
@@ -88,6 +92,29 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.28.39
+
+**Les cinq corrections du moteur, appliquées.**
+- **Le contrôle des images refuse moins à tort.** Il lisait les consignes
+  données au modèle d'image comme des règles : le nombre d'œufs, le plat de
+  service ou une part découpée suffisaient à refuser une recette sur quatre,
+  et invitaient à un nouveau dessin payant. Ces consignes lui sont désormais
+  données comme contexte ; un compte, un plat ou une découpe ne bloquent plus.
+- **La relecture suit la langue de l'article** : un article en anglais ou en
+  arabe n'est plus relu pour des accents français.
+- **La catégorie de la recette** (plat principal, dessert…) est écrite dans la
+  langue de l'article, pour les données structurées et le classement.
+- **Les images de référence au vrai prix.** Le modèle d'image facture une
+  image reçue plus cher que le texte (8 $ contre 5 $ par million de jetons) :
+  environ 0,007 $ par recette étaient comptés trop bas. L'estimation d'une
+  recette complète passe à 0,099 $ ; le plafond par recette livré passe de
+  0,15 $ à 0,16 $ pour que le pire cas y tienne. Un site qui a déjà enregistré
+  son plafond le garde.
+- **Une correction ne laisse plus de phrase orpheline** : quand retirer une
+  phrase laisserait la suivante commencer par « Leur » ou « Cette » sans rien
+  à quoi se rapporter, la phrase est gardée ou laissée au rédacteur.
+- Une recette ou un lot introuvable répond désormais « 404 ».
 
 ## Version 0.28.38
 

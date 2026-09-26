@@ -11,6 +11,7 @@ final class MSRWA_Admin {
 
 	public static function hooks() {
 		add_action( 'admin_menu', array( __CLASS__, 'menu' ), 30 );
+		add_action( 'admin_init', array( __CLASS__, 'not_found_status' ) );
 		add_action( 'admin_post_msrwa_save_settings', array( __CLASS__, 'save_settings' ) );
 		add_action( 'admin_post_msrwa_save_engine', array( __CLASS__, 'save_engine' ) );
 		add_action( 'admin_post_msrwa_reset', array( __CLASS__, 'reset' ) );
@@ -62,6 +63,22 @@ final class MSRWA_Admin {
 			'href' => admin_url( 'admin.php?page=msrwa#ms-new' ),
 			'meta' => array( 'class' => 'msrwa-toolbar-new', 'title' => __( 'Nouveau lot de recettes', 'ms-recipes-writer-ai' ) ),
 		) );
+	}
+
+	/**
+	 * A recipe or lot page this reader cannot open answers 404, like the REST
+	 * route does. The screen draws its message after WordPress has sent the
+	 * headers, so the status is set here, before any of them go.
+	 */
+	public static function not_found_status() {
+		$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification -- read-only.
+		if ( 'msrwa-run' === $page ) {
+			$run = MSRWA_Run::get( isset( $_GET['run_id'] ) ? absint( $_GET['run_id'] ) : 0 ); // phpcs:ignore WordPress.Security.NonceVerification
+			if ( ! $run || ! MSRWA_Run::may_see( $run ) ) { status_header( 404 ); }
+		} elseif ( 'msrwa-batch' === $page ) {
+			$batch = MSRWA_Batch::get( isset( $_GET['batch_id'] ) ? absint( $_GET['batch_id'] ) : 0 ); // phpcs:ignore WordPress.Security.NonceVerification
+			if ( ! $batch || ! MSRWA_Batch::may_see( $batch ) ) { status_header( 404 ); }
+		}
 	}
 
 	/** In the order the work happens: the pass with its new lot, the record, the levers. */

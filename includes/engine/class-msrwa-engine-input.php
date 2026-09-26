@@ -153,7 +153,7 @@ final class MSRWA_Engine_Input {
 	 * cooling rack and a serving board that appear in no step, and a final panel
 	 * browner than the photographs of the real dish.
 	 */
-	public static function visual_brief( $canonical, $research, $single = false, $garnish_rule = true, $serving = '' ) {
+	public static function visual_brief( $canonical, $research, $single = false, $garnish_rule = true, $serving = '', $for_judge = false ) {
 		// Led by a collage, how the dish is served is what its last panel shows,
 		// and a mise en place drawn before the recipe owes it no count (ENGINE.md §7, 50).
 		$led = '' !== trim( (string) $serving );
@@ -173,7 +173,13 @@ final class MSRWA_Engine_Input {
 			}
 		}
 
-		$lines = array( 'VISUAL BRIEF — derived from this recipe and binding. Each line below exists because a real image failed on it.' );
+		// The judge reads what the image model was told, to know what it aimed
+		// at — never as rules of its own. Headed "binding", with exact counts and
+		// one vessel, it refused five recipes in twenty for a count, a plate or a
+		// cut its own checks call minor (ENGINE.md §7, 8).
+		$lines = array( $for_judge
+			? 'WHAT THE IMAGE MODEL WAS ASKED TO DRAW — context for your checks, not a checklist. The checks above decide every severity: a count, a vessel, a plate, and whether the dish is shown whole or cut are never blocking, whatever the lines below say.'
+			: 'VISUAL BRIEF — derived from this recipe and binding. Each line below exists because a real image failed on it.' );
 		if ( $garnish_rule ) { $lines[] = '• NO GARNISH THAT IS NOT AN INGREDIENT. The most common defect in these images, across every dish tried, is a sprig of herb laid on the finished plate — rosemary, thyme, parsley, coriander, a bay leaf — because that is how this kind of dish is usually photographed. If the ingredient list below does not contain it, it does not go in the picture, in any panel, however conventional it looks. The same applies to a citrus wedge, a grind of visible spice, a drizzle, a dusting or a scattering of seeds. Serve the dish bare rather than garnish it with something the cook was never told to buy.'; }
 		// One photograph of the finished dish has no mise en place and no panels:
 		// the counts stay, and the cookware and the display rules — a sixth of its
@@ -694,7 +700,7 @@ final class MSRWA_Engine_Input {
 			return $prompt . "\n\nIMAGES RECEIVED:\n" . ( '' !== $received ? $received : '- none.' )
 				. "\n\nCANONICAL RECIPE: " . $encode( $canonical )
 				. "\n\n" . self::visual_evidence( $research )
-				. "\n" . self::visual_brief( $canonical, $research, false, '' === (string) ( $brief['collage_lead'] ?? '' ), self::collage_serving( $brief ) )
+				. "\n" . self::visual_brief( $canonical, $research, false, '' === (string) ( $brief['collage_lead'] ?? '' ), self::collage_serving( $brief ), true )
 				. self::collage_lead( $brief, $step );
 		}
 		return $prompt;

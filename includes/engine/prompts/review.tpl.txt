@@ -17,10 +17,11 @@ TASK: read the article once against the canonical recipe and the supplied RESEAR
 - A statement the sources do not cover is not automatically wrong: list it under "unsupported" only when it is a checkable claim the reader would act on.
 - An explanation no source gives — a flavour, an effect, a purpose, a consequence or a comparison attributed to an ingredient, a substitution or a step — is a correction: its "after" is the same sentence without the unsupported part, or an empty string when nothing documented remains. Descriptions of appearance and presentation are not explanations; leave them to "unsupported".
 - A sentence about where the text comes from rather than about the dish — what is "documenté", what "les sources" say or do not say, a mention of research, a photograph or an image — and a photography direction presented as advice — a plate, a camera angle, "sans garniture" — are corrections: "after" is the sentence without that part, or an empty string. Their "source" is "canonical recipe".
+- When "after" removes or shortens a sentence, the sentences around it must still read without it: if the next one leans on it — a pronoun, "ce", "cette", "leur" — include that sentence in "before" too and correct the two together.
 - Each correction cites in "source" the URL that justifies it. Never introduce a fact no source supports.
 
 3. CHANGES — the language, never the content.
-- Fix spelling, agreement, conjugation, and above all missing accents: é, è, ê, à, â, ù, û, ô, ç, œ; typographic apostrophes ’ instead of straight ones and the {{language}} spacing rules before : ; ! ?; repeated words, broken sentences, anglicisms that have a common {{language}} equivalent in cooking; inconsistent terms for the same thing.
+- Fix spelling, agreement, conjugation{{#if french}}, and above all missing accents: é, è, ê, à, â, ù, û, ô, ç, œ; typographic apostrophes ’ instead of straight ones and the {{language}} spacing rules before : ; ! ?{{/if}}{{#unless french}}, the accents and punctuation {{language}} requires{{/unless}}; repeated words, broken sentences, anglicisms that have a common {{language}} equivalent in cooking; inconsistent terms for the same thing.
 - Never change a quantity, time, temperature, ingredient name, the order of steps or any figure. A sentence listed under corrections is not listed here again.
 
 QUOTING, for corrections and changes alike — the engine substitutes each one into the article itself:
