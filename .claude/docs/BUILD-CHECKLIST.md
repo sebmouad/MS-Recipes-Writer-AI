@@ -630,6 +630,13 @@ cost) in the task before changing anything.
   (2026-09-24).** The writer's photograph shows the prompt's writer the dish;
   the collage is drawn from the style reference. Real: the owner's own rôti
   photograph, drawn both ways. See ENGINE.md §7, item 40.
+- [x] **A64 — Clean article opening, page-two notice, local initials (2026-09-26).**
+  `MSRWA_Article::tidy()` on the draft: repeated title, part-only headings and
+  opening labels removed; a line before `<!--nextpage-->` names page two in the
+  article's language. `article.tpl.txt` asks for the same (ENGINE.md §7, 53).
+  Initials replace Gravatar in `MSRWA_UI::facts()`. `tests/test-article-tidy.php`.
+  Real: run 81 (poulet basquaise) — first heading a real section, no label,
+  page one ends on the article’s own « continue en page 2 » paragraph.
 - [x] **A63 — Lot type by kind of user; toolbar button; recipe facts (2026-09-26).**
   `lot_profiles` replaces `editor_profiles` (migrated in `MSRWA_Settings::get()`);
   `MSRWA_Profile::for_user()`; the form drops type, language and ceiling;

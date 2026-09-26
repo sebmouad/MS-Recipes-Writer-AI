@@ -62,7 +62,7 @@ final class MSRWA_Draft {
 			'post_title' => wp_strip_all_tags( $title ),
 			// Blocks, not one Classic block: the article is what an editor came
 			// here to work on, and they cannot work on a wall of HTML.
-			'post_content' => MSRWA_Blocks::from_html( $html ),
+			'post_content' => MSRWA_Blocks::from_html( MSRWA_Article::tidy( $html, $title, self::language( $run ) ) ),
 			'post_excerpt' => wp_strip_all_tags( (string) ( $article['excerpt'] ?? '' ) ),
 			'post_author' => (int) $run['owner_id'],
 		);
@@ -193,6 +193,13 @@ final class MSRWA_Draft {
 	 */
 	private static function attach_images( $post_id, $run_id, array $artifacts, $title ) {
 		foreach ( array( 'featured', 'facebook' ) as $kind ) { self::attach( $post_id, $kind, (array) ( $artifacts[ $kind ] ?? array() ), $title ); }
+	}
+
+	/** The article's language: its lot's, else the site's. */
+	public static function language( array $run ) {
+		$batch = class_exists( 'MSRWA_Batch' ) ? MSRWA_Batch::get( (int) ( $run['batch_id'] ?? 0 ) ) : null;
+		$language = (string) ( $batch['language'] ?? '' );
+		return '' !== $language ? $language : (string) ( MSRWA_Settings::get()['site_language'] ?? 'fr' );
 	}
 
 	/**

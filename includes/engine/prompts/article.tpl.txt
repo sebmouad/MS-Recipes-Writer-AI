@@ -13,7 +13,7 @@ LENGTH: {{words_total}} words minimum in total, {{words_maximum}} maximum.{{#if 
 REQUIRED PLAN — {{sections_count}} sections, in this order, each under an h2 heading phrased the way people search on Google. At least {{headings_minimum}} headings and {{paragraphs_minimum}} paragraphs across the article.
 {{required_sections}}
 
-{{#if two_pages}}PAGE BREAK: after the section that precedes the step-by-step method, write one transition paragraph, then insert exactly this marker alone on its line: {{page_break_marker}}
+{{#if two_pages}}PAGE BREAK: after the section that precedes the step-by-step method, end page one with a short paragraph that announces page two: it tells the reader, in so many words, that the step-by-step preparation continues on page 2 (« page 2 »), and invites them to turn the page. Then insert exactly this marker alone on its line: {{page_break_marker}}
 The second page must begin EXACTLY with <h2>{{page2_opening}}</h2>. It does not reintroduce the full ingredient list or the equipment.
 {{/if}}{{#unless two_pages}}Write the article as a single continuous page, with no page-break marker.
 {{/unless}}
@@ -28,6 +28,7 @@ CONSISTENCY: same ingredients, same quantities, same promise throughout. Each he
 SAFETY AND ALLERGENS: every entry of the canonical recipe's food_safety reaches the article, in the section where the cook needs it — allergens stated plainly beside the ingredients or in storage and safety, a raw-egg, raw-fish or core-temperature rule at the step it concerns, cooling and reheating limits under storage. None of them is softened or left out.
 
 RULES:
+- content_html opens on the first section's h2 heading. The title is shown by the site above the article: never repeat it as a heading, and never write the words of a plan — no heading or paragraph starts with a label such as « Introduction : », « Conclusion : », « Deuxième partie », « Second article » or « Partie 2 ». The headings are the structure.
 - Paragraphs of 2 to 4 sentences; lists reserved for ingredients, equipment and steps.
 - Respect the canonical recipe's quantities, times and temperatures exactly. Invent no figure.
 - SOURCING. You may state only what the canonical recipe contains or the research package documents. This binds the substitutions and the serving suggestions hardest, because that is where invention is easiest: offer a replacement ingredient only when a research fact names it, and an accompaniment only when a fact names that. Where there is none, offer none and do not say so: write instead what the research says the ingredient does in the dish. A section is never padded with a plausible swap.

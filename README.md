@@ -5,14 +5,13 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.28.30
+## État actuel — 0.28.31
 
-La version `0.28.30` règle le type de chaque lot dans les réglages, par type
-d'utilisateur, et ajoute *Nouveau lot de recettes* à la barre d'outils ; la
-`0.28.29` réunissait le nouveau lot et le pass sur une seule page ; la `0.28.28` alignait l'estimation sur les coûts réels et
-faisait servir le cache du fournisseur ; la `0.28.27` faisait du collage
-Facebook le point de départ de la recette. Le détail de chaque version suit, de
-la plus récente à la plus ancienne.
+La version `0.28.31` fait ouvrir l'article sur sa première section et
+annoncer la page 2 à la fin de la première ; la `0.28.30` réglait le type de
+chaque lot par type d'utilisateur et ajoutait *Nouveau lot de recettes* à la
+barre d'outils ; la `0.28.29` réunissait le nouveau lot et le pass. Le détail
+de chaque version suit, de la plus récente à la plus ancienne.
 
 Vérifié de bout en bout sur un vrai WordPress : un rédacteur dépose un lot de
 texte, de photographies ou des deux ; chaque photographie est lue une fois et
@@ -81,6 +80,20 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.28.31
+
+**L'article commence par l'article, et annonce sa page 2.**
+- Il ne répète plus son titre en premier intertitre, et aucun paragraphe ni
+  intertitre ne commence par une étiquette comme « Introduction : »,
+  « Deuxième partie » ou « Second article » : la consigne l'interdit, et
+  l'extension les retire du brouillon si elles reviennent.
+- La première page se termine par un paragraphe qui annonce la page 2 : la
+  consigne le demande à l'article, et si ce paragraphe manque, l'extension
+  ajoute « La suite de la recette, « Préparation de la recette étape par
+  étape », vous attend à la page 2. », dans la langue de l'article.
+- L'écran d'une recette montre les initiales de la personne, dessinées sur
+  place : plus d'appel à Gravatar.
 
 ## Version 0.28.30
 

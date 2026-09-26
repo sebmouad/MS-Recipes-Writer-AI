@@ -43,7 +43,7 @@ final class MSRWA_Screen_Run {
 			), 'warn' );
 		}
 
-		self::edited( $state['artifacts'] );
+		self::edited( $state['artifacts'], $run );
 		self::redrawn();
 		self::verdict( $approval, $run, ! empty( $state['artifacts']['facebook']['provided'] ) );
 		if ( MSRWA_Rights::may_read_diagnostics() ) { self::steps( $state['steps'] ); } else { self::progress( $state['steps'] ); }
@@ -113,8 +113,11 @@ final class MSRWA_Screen_Run {
 	 * paragraph an editor added afterwards, and this is the only place that
 	 * distinction is visible.
 	 */
-	private static function edited( array $artifacts ) {
+	private static function edited( array $artifacts, array $run ) {
 		$machine = (string) ( ( (array) ( $artifacts['proofread'] ?? array() ) )['content_html'] ?? '' );
+		// The draft holds the machine's text as the plugin tidied it, and that
+		// tidying is not an editor's hand.
+		if ( '' !== $machine ) { $machine = MSRWA_Article::tidy( $machine, (string) ( ( (array) ( $artifacts['canonical'] ?? array() ) )['title'] ?? $run['label'] ?? '' ), MSRWA_Draft::language( $run ) ); }
 		$published = (string) ( ( (array) ( $artifacts['published'] ?? array() ) )['content_html'] ?? '' );
 		if ( '' === $machine || '' === $published ) { return; }
 		// The draft stores the machine's HTML as blocks: their comments and

@@ -412,7 +412,12 @@ final class MSRWA_UI {
 		$person = static function ( $user_id ) {
 			$user = get_userdata( (int) $user_id );
 			if ( ! $user ) { return '<span class="ms-muted">—</span>'; }
-			return '<span class="ms-fact-person">' . get_avatar( $user->ID, 24, '', '', array( 'class' => 'ms-fact-avatar' ) ) . esc_html( $user->display_name ) . '</span>';
+			// Initials drawn here, not a Gravatar: no request to another site
+			// for every name on the screen, and nothing that fails offline.
+			$words = preg_split( '/\s+/u', trim( (string) $user->display_name ) );
+			$initials = mb_strtoupper( mb_substr( (string) ( $words[0] ?? '' ), 0, 1 ) . ( count( $words ) > 1 ? mb_substr( (string) end( $words ), 0, 1 ) : '' ) );
+			$hue = abs( crc32( (string) $user->ID ) ) % 360;
+			return '<span class="ms-fact-person"><span class="ms-fact-avatar" style="--ms-hue:' . esc_attr( (string) $hue ) . '" aria-hidden="true">' . esc_html( '' !== $initials ? $initials : '?' ) . '</span>' . esc_html( $user->display_name ) . '</span>';
 		};
 		$date = static function ( $gmt ) {
 			if ( empty( $gmt ) || '0000-00-00 00:00:00' === $gmt ) { return '<span class="ms-muted">—</span>'; }

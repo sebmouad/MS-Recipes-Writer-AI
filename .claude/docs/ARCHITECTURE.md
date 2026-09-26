@@ -219,6 +219,11 @@ the one thing an editor came to work on. `MSRWA_Blocks` converts the tags the
 article contract allows (headings, paragraphs, lists with each item its own
 block, the page break) and wraps anything else in an HTML block rather than
 dropping it.
+Before that, `MSRWA_Article::tidy()` removes a first heading that repeats the
+title, headings that only name a part and labels such as « Introduction : »
+opening a heading or a paragraph, and adds before the page break the line that
+sends the reader to page two, in the article's language. The run screen tidies
+the machine's text the same way before saying whether the draft was edited.
 
 On the public site, `MSRWA_Schema` prints the recipe as schema.org Recipe
 JSON-LD on published posts that carry `_msrwa_recipe`, unless a recipe plugin

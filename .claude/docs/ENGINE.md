@@ -961,6 +961,16 @@ photograph, and otherwise use the photograph without the cost of a search.
     in its dish or out of it, is not a mismatch. `research_for_image()`, which
     nothing had called since the visual brief replaced it, is removed.
 
+53. **The article opens on its first section, and the site announces page two
+    (2026-09-26, owner's request).** Drafts sometimes repeated the title as
+    their first heading or opened paragraphs on « Introduction : » or
+    « Deuxième partie ». `article.tpl.txt` now forbids both, and asks page one to
+    end on a paragraph announcing that the preparation continues on page 2.
+    The plugin's `MSRWA_Article::tidy()` adds such a line, in the article's
+    language and naming page two's heading, only when the last paragraph
+    before `<!--nextpage-->` does not say it, and removes a repeated title,
+    part-only headings and opening labels from whatever comes back.
+
 
 ### Still open
 
