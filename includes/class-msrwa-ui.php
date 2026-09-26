@@ -138,6 +138,9 @@ final class MSRWA_UI {
 			'final_approval' => __( 'Contrôle final', 'ms-recipes-writer-ai' ),
 			'vision' => __( 'Lecture des photographies et du collage', 'ms-recipes-writer-ai' ),
 			'image_compose' => __( 'Consigne du collage', 'ms-recipes-writer-ai' ),
+			// Retired, but still in the history and the analysis of older recipes.
+			'fact_check' => __( 'Vérification des faits (ancienne étape)', 'ms-recipes-writer-ai' ),
+			'matching' => __( 'Appariement des photographies', 'ms-recipes-writer-ai' ),
 		);
 		return $names[ (string) $step ] ?? (string) $step;
 	}

@@ -38,7 +38,7 @@ final class MSRWA_Profile {
 			),
 			self::ARTICLE => array(
 				'label' => __( 'Article seul', 'ms-recipes-writer-ai' ),
-				'description' => __( 'Texte uniquement, relu et vérifié. Aucune image n’est générée, et le jugement final n’aurait rien à regarder.', 'ms-recipes-writer-ai' ),
+				'description' => __( 'Texte uniquement, relu et vérifié. Aucune image n’est générée, donc pas de contrôle final des images.', 'ms-recipes-writer-ai' ),
 				'drop' => array( 'featured_image', 'facebook_image', 'final_approval' ),
 			),
 		);

@@ -216,7 +216,7 @@ final class MSRWA_Draft {
 
 	/** One generated image into the library, named as this post's image of that kind. */
 	private static function attach( $post_id, $kind, array $image, $title ) {
-		$labels = array( 'featured' => __( 'Image à la une', 'ms-recipes-writer-ai' ), 'facebook' => __( 'Image Facebook', 'ms-recipes-writer-ai' ) );
+		$labels = array( 'featured' => __( 'Image à la une', 'ms-recipes-writer-ai' ), 'facebook' => __( 'Collage Facebook', 'ms-recipes-writer-ai' ) );
 		$path = (string) ( $image['path'] ?? '' );
 		if ( ! isset( $labels[ $kind ] ) || '' === $path || ! is_readable( $path ) ) { return 0; }
 

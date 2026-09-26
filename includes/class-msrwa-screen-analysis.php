@@ -118,10 +118,10 @@ final class MSRWA_Screen_Analysis {
 		if ( count( $rows ) < 2 ) { return; }
 
 		$labels = array(
-			'article' => __( 'l’article', 'ms-recipes-writer-ai' ),
-			'featured' => __( 'l’image à la une', 'ms-recipes-writer-ai' ),
-			'facebook' => __( 'l’image Facebook', 'ms-recipes-writer-ai' ),
-			'other' => __( 'le reste', 'ms-recipes-writer-ai' ),
+			'article' => __( 'Article', 'ms-recipes-writer-ai' ),
+			'featured' => __( 'Image à la une', 'ms-recipes-writer-ai' ),
+			'facebook' => __( 'Collage Facebook', 'ms-recipes-writer-ai' ),
+			'other' => __( 'Autres étapes', 'ms-recipes-writer-ai' ),
 		);
 		$total = 0.0;
 		$minutes = 0.0;
@@ -262,7 +262,7 @@ final class MSRWA_Screen_Analysis {
 		if ( ! $rows ) { MSRWA_UI::nothing( __( 'Rien à analyser', 'ms-recipes-writer-ai' ), __( 'Aucune recette n’a encore tourné sur cette période.', 'ms-recipes-writer-ai' ) ); echo '</section>'; return; }
 		echo MSRWA_UI::scroll( __( 'Par étape', 'ms-recipes-writer-ai' ) ) . '<table class="ms-table"><thead><tr>' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- scroll() escapes its own.
 			. '<th>' . esc_html__( 'Étape', 'ms-recipes-writer-ai' ) . '</th>'
-			. '<th class="ms-num">' . esc_html__( 'Exéc.', 'ms-recipes-writer-ai' ) . '</th>'
+			. '<th class="ms-num">' . esc_html__( 'Passages', 'ms-recipes-writer-ai' ) . '</th>'
 			. '<th class="ms-num">' . esc_html__( 'Durée moy.', 'ms-recipes-writer-ai' ) . '</th>'
 			. '<th class="ms-num">' . esc_html__( 'Coût moy.', 'ms-recipes-writer-ai' ) . '</th>'
 			. '<th class="ms-num">' . esc_html__( 'Dépense', 'ms-recipes-writer-ai' ) . '</th>'

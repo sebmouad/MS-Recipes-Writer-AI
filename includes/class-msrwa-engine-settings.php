@@ -35,7 +35,7 @@ final class MSRWA_Engine_Settings {
 	public static function structural() {
 		return array(
 			'providers' => __( 'Points d’entrée, en-têtes et variable d’environnement par fournisseur.', 'ms-recipes-writer-ai' ),
-			'models'    => __( 'Tarifs par million de tokens : `[entrée, sortie]`. Un modèle sans tarif rend la dépense invérifiable et arrête le run.', 'ms-recipes-writer-ai' ),
+			'models'    => __( 'Tarifs par million de jetons : `[entrée, sortie]`. Un modèle sans tarif rend la dépense invérifiable et arrête la recette.', 'ms-recipes-writer-ai' ),
 			'tiers'     => __( 'Quel modèle répond derrière `low`, `medium` et `high`.', 'ms-recipes-writer-ai' ),
 			'steps'     => __( 'Le registre des étapes : dépendances, capacité, gabarit, poste de dépense.', 'ms-recipes-writer-ai' ),
 			'prompts'   => __( 'Gabarits de prompt qui remplacent ceux livrés avec le moteur.', 'ms-recipes-writer-ai' ),

@@ -5,12 +5,12 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.28.32
+## État actuel — 0.28.33
 
-La version `0.28.32` range les étapes dans l'ordre où elles tournent,
-collage d'abord, sur les écrans Moteur et Modèles ; la `0.28.31` faisait
-ouvrir l'article sur sa première section et annoncer la page 2 ; la `0.28.30`
-réglait le type de chaque lot par type d'utilisateur. Le détail
+La version `0.28.33` harmonise les mots de tous les écrans et améliore le
+réglage des types de lot sur téléphone ; la `0.28.32` rangeait les étapes
+dans l'ordre où elles tournent ; la `0.28.31` faisait ouvrir l'article sur sa
+première section et annoncer la page 2. Le détail
 de chaque version suit, de la plus récente à la plus ancienne.
 
 Vérifié de bout en bout sur un vrai WordPress : un rédacteur dépose un lot de
@@ -80,6 +80,27 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.28.33
+
+**Les mêmes mots partout.**
+- Plus de « run » à l'écran : on parle de recettes partout, dans l'analyse,
+  la rétention et les messages d'erreur.
+- « Collage Facebook » partout, au lieu d'« image Facebook » par endroits.
+- « Contrôle final » partout, au lieu de « jugement final » ou « approbation
+  finale » ; « type de lot » au lieu de « profil ».
+- L'aide du plafond par recette ne parle plus de nouvelles tentatives, qui
+  n'existent plus.
+- Analyse : « Où part l'argent » nomme ses postes Article, Image à la une,
+  Collage Facebook et Autres étapes ; la colonne « Exéc. » devient « Passages » ;
+  l'ancienne vérification des faits porte son nom au lieu de `fact_check`.
+- Diagnostic : les fournisseurs sont nommés (OpenAI, Google Gemini,
+  Anthropic Claude), plus leurs identifiants.
+- Moteur : le collage est décrit comme dessiné avant la recette, l'image à la
+  une comme le plat fini du collage.
+- En anglais, « lot » partout, plus « batch ».
+- Réglages sur téléphone : *Ce que produit un lot* devient une carte par type
+  d'utilisateur, avec les trois types nommés, au lieu d'un tableau coupé.
 
 ## Version 0.28.32
 

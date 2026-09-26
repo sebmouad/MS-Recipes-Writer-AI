@@ -144,9 +144,6 @@ msgstr "المُدخل"
 msgid "Envoi au moteur…"
 msgstr "جارٍ الإرسال إلى المحرك…"
 
-msgid "Exéc."
-msgstr "مرات"
-
 msgid "Filtrer"
 msgstr "تصفية"
 
@@ -347,9 +344,6 @@ msgstr "اقتران مرجّح — تحقّق"
 
 msgid "Association sûre"
 msgstr "اقتران مؤكّد"
-
-msgid "Aucun jugement final n’a été rendu pour cet article — le profil choisi ne l’exécutait pas, ou la recette s’est arrêtée avant."
-msgstr "لم يصدر حكم نهائي لهذا المقال — إما أن النمط المختار لا ينفّذه، أو أن الوصفة توقفت قبله."
 
 msgid "Aucune photographie"
 msgstr "لا صور"
@@ -597,9 +591,6 @@ msgstr "للتصحيح قبل النشر."
 msgid "étapes"
 msgstr "خطوات"
 
-msgid "Texte uniquement, relu et vérifié. Aucune image n’est générée, et le jugement final n’aurait rien à regarder."
-msgstr "نص فقط، مُدقَّق ومُتحقَّق منه. لا تُولَّد أي صورة، ولن يكون لدى الحكم النهائي ما ينظر إليه."
-
 msgid "Le total est incomplet : %s tourne(nt) sur un modèle sans tarif publié."
 msgstr "المجموع ناقص: %s تجري على نموذج بلا تسعيرة منشورة."
 
@@ -687,9 +678,6 @@ msgstr "الكل"
 msgid "Le brouillon a été modifié depuis sa génération : %s caractères d’écart. Les contrôles ci-dessous portent sur ce que la machine a écrit, pas sur la version actuelle."
 msgstr "عُدّلت المسودة منذ توليدها: فارق %s حرف. والفحوص أدناه تخصّ ما كتبته الآلة، لا النسخة الحالية."
 
-msgid "%1$s run(s), %2$s lignes de déroulé"
-msgstr "‏%1$s تنفيذ، %2$s سطر مسار"
-
 msgid "Ce qui est conservé"
 msgstr "ما يُحتفظ به"
 
@@ -774,18 +762,6 @@ msgstr "بنود المحرّك الأربعة: ما أنفقه كلٌّ منه�
 msgid "Où part l’argent"
 msgstr "إلى أين يذهب المال"
 
-msgid "le reste"
-msgstr "الباقي"
-
-msgid "l’article"
-msgstr "المقال"
-
-msgid "l’image Facebook"
-msgstr "صورة فيسبوك"
-
-msgid "l’image à la une"
-msgstr "الصورة البارزة"
-
 msgid "plafond %s"
 msgstr "السقف %s"
 
@@ -810,9 +786,6 @@ msgstr "إعادته إلى ترتيبه"
 msgid "passe devant"
 msgstr "مقدَّمة في الصف"
 
-msgid "Dernier passage il y a %1$s : %2$s lignes de déroulé, %3$s productions, %4$s runs."
-msgstr "آخر تمريرة قبل %1$s: %2$s من سطور المسار، و%3$s من المخرجات، و%4$s من عمليات التشغيل."
-
 msgid "La narration minute par minute. La table qui grossit le plus vite, et celle que personne ne relit."
 msgstr "السرد دقيقة بدقيقة. أسرع الجداول نموًّا، وأقلّها قراءةً من جديد."
 
@@ -831,9 +804,6 @@ msgstr "نظّف الآن"
 msgid "Productions lourdes"
 msgstr "المخرجات الثقيلة"
 
-msgid "Runs entiers"
-msgstr "عمليات التشغيل كاملةً"
-
 msgid "Trois durées, parce que trois choses vieillissent différemment. À zéro, rien de cette sorte n’est jamais supprimé."
 msgstr "ثلاث مدد، لأن ثلاثة أشياء تتقادم بوتائر مختلفة. عند الصفر، لا يُحذف شيء من هذا النوع أبدًا."
 
@@ -842,9 +812,6 @@ msgstr "يفرض فلتر مدةً أخرى لـ: %s. الفلتر هو ما ي�
 
 msgid "Un passage est borné : il retire ce qu’il peut sans faire tomber la requête, et reprend au suivant. Chaque durée est aussi un filtre — msrwa_retention_events_days, msrwa_retention_artifacts_days, msrwa_retention_runs_days."
 msgstr "التمريرة محدودة: تزيل ما تستطيع دون إسقاط الطلب، وتستأنف من حيث توقّفت في التمريرة التالية. وكل مدة هي أيضًا فلتر — msrwa_retention_events_days و msrwa_retention_artifacts_days و msrwa_retention_runs_days."
-
-msgid "Y compris les chiffres. Laissé à zéro par défaut : une ligne d’étape est le seul témoignage de ce qu’un run a coûté. Un run qui a produit un brouillon n’est jamais supprimé."
-msgstr "بما في ذلك الأرقام. يُترك عند الصفر افتراضيًّا: سطر الخطوة هو السجل الوحيد لما كلّفته عملية التشغيل. وعملية أنتجت مسودة لا تُحذف أبدًا."
 
 msgid "Enregistrer les durées"
 msgstr "حفظ المدد"
@@ -1257,9 +1224,6 @@ msgstr "في انتظار: %s، وهو ما لم يصل قط."
 msgid "Fixez un plafond de dépense par recette."
 msgstr "حدّد سقف إنفاق لكل وصفة."
 
-msgid "Image Facebook"
-msgstr "صورة فيسبوك"
-
 msgid "JSON invalide : %s."
 msgstr "JSON غير صالح: %s."
 
@@ -1268,9 +1232,6 @@ msgstr "تعذّر حفظ الدفعة."
 
 msgid "Le service d’écriture refuse d’en traiter davantage pour le moment : c’est une limite de son côté, pas du site. Reprendre la recette plus tard suffit souvent ; si cela se répète, la limite du compte doit être relevée chez le fournisseur."
 msgstr "خدمة الكتابة لا تقبل المزيد في الوقت الحالي: هذا حدّ من جهتها، لا من جهة الموقع. استئناف الوصفة لاحقًا يكفي غالبًا؛ وإن تكرّر ذلك فلا بدّ من رفع حدّ الحساب لدى المزوّد."
-
-msgid "Run introuvable."
-msgstr "التنفيذ غير موجود."
 
 msgid "Simulation locale : aucune sauvegarde, aucun appel API. Vérifiez les routes et les valeurs effectives ci-dessous."
 msgstr "محاكاة محلية: لا حفظ ولا استدعاء API. تحقّق من المسارات والقيم الفعلية أدناه."
@@ -1316,9 +1277,6 @@ msgstr "المفتاح صالح، لكن حصة الحساب استُنفدت: �
 
 msgid "$%1$s entrée / $%2$s sortie par million de jetons"
 msgstr "%1$s دولار للإدخال / %2$s دولار للإخراج لكل مليون رمز"
-
-msgid "Le profil complet en compte %s. Une étape part dès que tout ce dont elle dépend est prêt : c’est ce qui découpe une recette en vagues, et ce qui fait qu’une reprise ne repaie pas ce qui a réussi."
-msgstr "يضم الملف الكامل %s منها. تنطلق الخطوة فور جهوز كل ما تعتمد عليه: هذا ما يقسّم الوصفة إلى موجات، وما يجعل الاستئناف لا يدفع ثانيةً ثمن ما نجح."
 
 msgid "Attend"
 msgstr "ينتظر"
@@ -1471,9 +1429,6 @@ msgstr "جارٍ إرسال الصور…"
 msgid "Un lot accepte au plus %d photographies."
 msgstr "تقبل الدفعة %d صورة على الأكثر."
 
-msgid "Avec le routage actuel, une recette complète est estimée à %1$s, et jusqu’à %2$s si l’approbation finale refuse à chaque tentative. Un plafond sous la première valeur refuse le lot au lancement ; sous la seconde, il arrête les nouvelles tentatives avant de le franchir, et la recette se termine avec le dernier verdict."
-msgstr "مع التوجيه الحالي، تُقدَّر الوصفة الكاملة بـ %1$s، وحتى %2$s إذا رفضت الموافقة النهائية في كل محاولة. سقف أقل من القيمة الأولى يرفض الدفعة عند الإطلاق؛ وسقف أقل من الثانية يوقف المحاولات الإضافية قبل تجاوزه، وتكتمل الوصفة بآخر حكم."
-
 msgid "Choisir…"
 msgstr "اختر…"
 
@@ -1515,9 +1470,6 @@ msgstr "أي نموذج يجيب خلف `low` و`medium` و`high`."
 
 msgid "Réflexion permise avant de répondre, par étape : `minimal`, `low`, `medium` ou `high` ; vide, le fournisseur décide. La réflexion est facturée comme de la sortie et prise sur le plafond."
 msgstr "التفكير المسموح قبل الإجابة لكل خطوة: `minimal` أو `low` أو `medium` أو `high`؛ وإن تُرك فارغًا يقرر المزوّد. يُحتسب التفكير كمخرجات ويُقتطع من السقف."
-
-msgid "Tarifs par million de tokens : `[entrée, sortie]`. Un modèle sans tarif rend la dépense invérifiable et arrête le run."
-msgstr "الأسعار لكل مليون رمز: `[إدخال، إخراج]`. النموذج بلا سعر يجعل الإنفاق غير قابل للتحقق ويوقف التشغيل."
 
 msgid "%d groupe en JSON, pour une modification à la main"
 msgid_plural "%d groupes en JSON, pour une modification à la main"
@@ -2459,3 +2411,46 @@ msgstr "محرر"
 
 msgid "Lecture des photographies et du collage"
 msgstr "قراءة الصور والكولاج"
+
+#, php-format
+msgid "%1$s recette(s), %2$s lignes de déroulé"
+msgstr "%1$s وصفة، %2$s سطر من السجل"
+
+msgid "Aucun contrôle final pour cet article : son type de lot n’en prévoit pas, ou la recette s’est arrêtée avant."
+msgstr "لا فحص نهائي لهذا المقال: نوع دفعته لا يتضمنه، أو توقفت الوصفة قبله."
+
+#, php-format
+msgid "Avec le routage actuel, une recette complète est estimée à %1$s, et jusqu’à %2$s au pire, si la recherche use de toutes ses recherches permises. Un plafond sous la première valeur refuse le lot au lancement ; sous la seconde, il peut arrêter une recette en route."
+msgstr "مع التوجيه الحالي، تُقدَّر الوصفة الكاملة بـ %1$s، وحتى %2$s في أسوأ الأحوال إذا استخدم البحث كل عمليات البحث المسموح بها. سقف أقل من القيمة الأولى يرفض الدفعة عند الإطلاق؛ وأقل من الثانية قد يوقف وصفة في منتصف الطريق."
+
+#, php-format
+msgid "Dernier passage il y a %1$s : %2$s lignes de déroulé, %3$s productions, %4$s recettes."
+msgstr "آخر مرور منذ %1$s: %2$s سطر من السجل، %3$s مُخرَج، %4$s وصفة."
+
+#, php-format
+msgid "Un lot complet en compte %s, dans l’ordre où elles tournent. Une étape part dès que tout ce dont elle dépend est prêt : c’est ce qui découpe une recette en vagues, et ce qui fait qu’une reprise ne repaie pas ce qui a réussi."
+msgstr "تتضمن الدفعة الكاملة %s خطوة، بترتيب تنفيذها. تبدأ الخطوة حالما يجهز كل ما تعتمد عليه: هذا ما يقسم الوصفة إلى موجات، ويجعل الاستئناف لا يعيد دفع ما نجح."
+
+msgid "Recettes entières"
+msgstr "الوصفات كاملة"
+
+msgid "Tarifs par million de jetons : `[entrée, sortie]`. Un modèle sans tarif rend la dépense invérifiable et arrête la recette."
+msgstr "الأسعار لكل مليون رمز: `[إدخال، إخراج]`. نموذج بلا سعر يجعل الإنفاق غير قابل للتحقق ويوقف الوصفة."
+
+msgid "Texte uniquement, relu et vérifié. Aucune image n’est générée, donc pas de contrôle final des images."
+msgstr "نص فقط، مُراجَع ومُدقَّق. لا تُولَّد أي صورة، لذا لا يوجد فحص نهائي للصور."
+
+msgid "Y compris les chiffres. Laissé à zéro par défaut : une ligne d’étape est le seul témoignage de ce qu’une recette a coûté. Une recette qui a produit un brouillon n’est jamais supprimée."
+msgstr "بما في ذلك الأرقام. يُترك صفرًا افتراضيًا: سطر الخطوة هو الشاهد الوحيد على تكلفة الوصفة. لا تُحذف أبدًا وصفة أنتجت مسودة."
+
+msgid "Passages"
+msgstr "مرات التنفيذ"
+
+msgid "Autres étapes"
+msgstr "خطوات أخرى"
+
+msgid "Appariement des photographies"
+msgstr "مطابقة الصور"
+
+msgid "Vérification des faits (ancienne étape)"
+msgstr "التحقق من الحقائق (خطوة سابقة)"

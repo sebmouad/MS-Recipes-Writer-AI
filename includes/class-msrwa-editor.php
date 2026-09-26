@@ -101,7 +101,7 @@ final class MSRWA_Editor {
 		$verdict['text'] = array(
 			'title' => __( 'MS Recipes AI', 'ms-recipes-writer-ai' ),
 			'lead' => __( 'Cet article a été généré. Les contrôles ci-dessous portent sur ce que la machine a produit ; ils ne remplacent pas votre relecture, et rien ici ne vaut approbation.', 'ms-recipes-writer-ai' ),
-			'unjudged' => __( 'Aucun jugement final n’a été rendu pour cet article — le profil choisi ne l’exécutait pas, ou la recette s’est arrêtée avant.', 'ms-recipes-writer-ai' ),
+			'unjudged' => __( 'Aucun contrôle final pour cet article : son type de lot n’en prévoit pas, ou la recette s’est arrêtée avant.', 'ms-recipes-writer-ai' ),
 			'clean' => __( 'Le juge n’a rien relevé. Votre relecture reste la seule validation.', 'ms-recipes-writer-ai' ),
 			'minor' => __( 'Des remarques mineures, sans rien de bloquant.', 'ms-recipes-writer-ai' ),
 			/* translators: %d is a number of findings. */
@@ -156,7 +156,7 @@ final class MSRWA_Editor {
 		echo '<p>' . esc_html__( 'Cet article a été généré. Les contrôles ci-dessous portent sur ce que la machine a produit ; ils ne remplacent pas votre relecture, et rien ici ne vaut approbation.', 'ms-recipes-writer-ai' ) . '</p>';
 
 		if ( ! $verdict['judged'] ) {
-			echo '<p class="ms-muted">' . esc_html__( 'Aucun jugement final n’a été rendu pour cet article — le profil choisi ne l’exécutait pas, ou la recette s’est arrêtée avant.', 'ms-recipes-writer-ai' ) . '</p>';
+			echo '<p class="ms-muted">' . esc_html__( 'Aucun contrôle final pour cet article : son type de lot n’en prévoit pas, ou la recette s’est arrêtée avant.', 'ms-recipes-writer-ai' ) . '</p>';
 			self::extras( $verdict['seo'] );
 			self::link( $verdict['run_id'], $run );
 			echo '</div>';

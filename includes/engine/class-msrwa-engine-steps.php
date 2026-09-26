@@ -115,7 +115,7 @@ final class MSRWA_Engine_Steps {
 		$set = static function ( $name, array $changes ) use ( &$overrides ) {
 			$overrides[ $name ] = array_merge( (array) ( $overrides[ $name ] ?? array() ), $changes );
 		};
-		$set( 'facebook_image', array( 'needs' => array( 'research' ) ) );
+		$set( 'facebook_image', array( 'needs' => array( 'research' ), 'expects' => 'a step-by-step collage of the dish as a home cook makes it, drawn before the recipe' ) );
 		$set( 'collage_reading', array(
 			'label' => 'Lecture du collage', 'bucket' => 'facebook', 'capability' => 'read', 'prompt' => 'collage_reading.tpl.txt',
 			'needs' => array( 'facebook' ), 'produces' => 'collage',
@@ -123,6 +123,7 @@ final class MSRWA_Engine_Steps {
 		) );
 		$with = static function ( $name ) use ( $steps ) { return array_values( array_unique( array_merge( (array) ( $steps[ $name ]['needs'] ?? array() ), array( 'collage' ) ) ) ); };
 		foreach ( array( 'canonical_recipe', 'article', 'featured_image' ) as $name ) { $set( $name, array( 'needs' => $with( $name ) ) ); }
+		$set( 'featured_image', array( 'expects' => 'a photograph of the collage’s finished dish, plated its own way' ) );
 		// Listed in the order they run: the collage drawn and read right after
 		// the research, then the recipe written from it.
 		$ordered = array();

@@ -81,7 +81,7 @@ final class MSRWA_Screen_Settings {
 					<br><small class="ms-muted<?php echo MSRWA_Estimate::fits( (float) $recipe['cost_usd'], (float) $settings['per_recipe_budget_usd'] ) ? '' : ' ms-warn'; ?>"><?php
 						echo esc_html( sprintf(
 							/* translators: 1: the expected cost of one complete recipe, 2: the most it can cost when every final approval refuses. */
-							__( 'Avec le routage actuel, une recette complète est estimée à %1$s, et jusqu’à %2$s si l’approbation finale refuse à chaque tentative. Un plafond sous la première valeur refuse le lot au lancement ; sous la seconde, il arrête les nouvelles tentatives avant de le franchir, et la recette se termine avec le dernier verdict.', 'ms-recipes-writer-ai' ),
+							__( 'Avec le routage actuel, une recette complète est estimée à %1$s, et jusqu’à %2$s au pire, si la recherche use de toutes ses recherches permises. Un plafond sous la première valeur refuse le lot au lancement ; sous la seconde, il peut arrêter une recette en route.', 'ms-recipes-writer-ai' ),
 							MSRWA_I18N::money( (float) $recipe['cost_usd'], 4 ),
 							MSRWA_I18N::money( (float) $recipe['max_usd'], 4 )
 						) );
@@ -101,8 +101,7 @@ final class MSRWA_Screen_Settings {
 				<h2><?php esc_html_e( 'Ce que produit un lot', 'ms-recipes-writer-ai' ); ?></h2>
 				<p><?php esc_html_e( 'Le type de chaque lot, selon qui l’envoie. Le formulaire du nouveau lot ne le demande pas : ce choix vaut pour tous les lots de ce type d’utilisateur, avec la langue et le plafond ci-dessus. Montants estimés par recette.', 'ms-recipes-writer-ai' ); ?></p>
 				<?php $msrwa_profiles = MSRWA_Profile::all(); ?>
-				<?php echo MSRWA_UI::scroll( __( 'Ce que produit un lot', 'ms-recipes-writer-ai' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- scroll() escapes its own. ?>
-				<table class="ms-table ms-lot-types">
+				<table class="ms-table ms-stack ms-lot-types">
 					<thead><tr>
 						<th scope="col"><?php esc_html_e( 'Utilisateur', 'ms-recipes-writer-ai' ); ?></th>
 						<?php foreach ( $msrwa_profiles as $key => $profile ) : ?>
@@ -122,7 +121,7 @@ final class MSRWA_Screen_Settings {
 							</tr>
 						<?php endforeach; ?>
 					</tbody>
-				</table></div>
+				</table>
 				<dl class="ms-lot-type-notes">
 					<?php foreach ( $msrwa_profiles as $profile ) : ?>
 						<dt><?php echo esc_html( $profile['label'] ); ?></dt><dd><?php echo esc_html( $profile['description'] ); ?></dd>
@@ -401,7 +400,7 @@ final class MSRWA_Screen_Settings {
 		$ages = array(
 			'events' => array( 'retention_events_days', __( 'Déroulé', 'ms-recipes-writer-ai' ), __( 'La narration minute par minute. La table qui grossit le plus vite, et celle que personne ne relit.', 'ms-recipes-writer-ai' ) ),
 			'artifacts' => array( 'retention_artifacts_days', __( 'Productions lourdes', 'ms-recipes-writer-ai' ), __( 'Le dossier de recherche, l’article tel que la machine l’a écrit, les prompts d’image. Le verdict, la revue et la recette restent quoi qu’il arrive.', 'ms-recipes-writer-ai' ) ),
-			'runs' => array( 'retention_runs_days', __( 'Runs entiers', 'ms-recipes-writer-ai' ), __( 'Y compris les chiffres. Laissé à zéro par défaut : une ligne d’étape est le seul témoignage de ce qu’un run a coûté. Un run qui a produit un brouillon n’est jamais supprimé.', 'ms-recipes-writer-ai' ) ),
+			'runs' => array( 'retention_runs_days', __( 'Recettes entières', 'ms-recipes-writer-ai' ), __( 'Y compris les chiffres. Laissé à zéro par défaut : une ligne d’étape est le seul témoignage de ce qu’une recette a coûté. Une recette qui a produit un brouillon n’est jamais supprimée.', 'ms-recipes-writer-ai' ) ),
 		);
 
 		echo '<section class="ms-card"><h2>' . esc_html__( 'Ce qui est conservé', 'ms-recipes-writer-ai' ) . '</h2>';
@@ -441,7 +440,7 @@ final class MSRWA_Screen_Settings {
 				'value' => size_format( $weight['artifact_bytes'] ),
 				'note' => sprintf(
 					/* translators: 1: number of runs, 2: number of timeline entries. */
-					__( '%1$s run(s), %2$s lignes de déroulé', 'ms-recipes-writer-ai' ),
+					__( '%1$s recette(s), %2$s lignes de déroulé', 'ms-recipes-writer-ai' ),
 					number_format_i18n( $weight['runs'] ),
 					number_format_i18n( $weight['events'] )
 				),
@@ -452,7 +451,7 @@ final class MSRWA_Screen_Settings {
 		if ( $last['at'] ) {
 			echo '<span class="ms-muted">' . esc_html( sprintf(
 				/* translators: 1: how long ago, 2: timeline rows removed, 3: heavy outputs removed, 4: whole runs removed. */
-				__( 'Dernier passage il y a %1$s : %2$s lignes de déroulé, %3$s productions, %4$s runs.', 'ms-recipes-writer-ai' ),
+				__( 'Dernier passage il y a %1$s : %2$s lignes de déroulé, %3$s productions, %4$s recettes.', 'ms-recipes-writer-ai' ),
 				human_time_diff( (int) strtotime( $last['at'] . ' UTC' ), time() ),
 				number_format_i18n( $last['events'] ),
 				number_format_i18n( $last['artifacts'] ),

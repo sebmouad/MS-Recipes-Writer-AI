@@ -144,9 +144,6 @@ msgstr "Input"
 msgid "Envoi au moteur…"
 msgstr "Sending to the engine…"
 
-msgid "Exéc."
-msgstr "Runs"
-
 msgid "Filtrer"
 msgstr "Filter"
 
@@ -347,9 +344,6 @@ msgstr "Probable match — check it"
 
 msgid "Association sûre"
 msgstr "Confident match"
-
-msgid "Aucun jugement final n’a été rendu pour cet article — le profil choisi ne l’exécutait pas, ou la recette s’est arrêtée avant."
-msgstr "No final judgement was made for this article — the chosen profile did not run it, or the recipe stopped first."
 
 msgid "Aucune photographie"
 msgstr "No photographs"
@@ -597,9 +591,6 @@ msgstr "to fix before publishing."
 msgid "étapes"
 msgstr "steps"
 
-msgid "Texte uniquement, relu et vérifié. Aucune image n’est générée, et le jugement final n’aurait rien à regarder."
-msgstr "Text only, proofread and checked. No image is generated, and the final judgement would have nothing to look at."
-
 msgid "Le total est incomplet : %s tourne(nt) sur un modèle sans tarif publié."
 msgstr "The total is incomplete: %s run(s) on a model with no published rate."
 
@@ -687,9 +678,6 @@ msgstr "all"
 msgid "Le brouillon a été modifié depuis sa génération : %s caractères d’écart. Les contrôles ci-dessous portent sur ce que la machine a écrit, pas sur la version actuelle."
 msgstr "The draft has been edited since it was generated: %s characters apart. The checks below are about what the machine wrote, not the current version."
 
-msgid "%1$s run(s), %2$s lignes de déroulé"
-msgstr "%1$s run(s), %2$s timeline entries"
-
 msgid "Ce qui est conservé"
 msgstr "What is kept"
 
@@ -709,16 +697,16 @@ msgid "%1$s sur %2$s"
 msgstr "%1$s of %2$s"
 
 msgid "Ce lot a déjà été lancé."
-msgstr "This batch has already been started."
+msgstr "This lot has already been started."
 
 msgid "Ce lot est estimé à %1$s et il ne reste que %2$s sous le plafond. Réduisez le lot, ou relevez le plafond dans les réglages."
-msgstr "This batch is estimated at %1$s and only %2$s is left under the ceiling. Make the batch smaller, or raise the ceiling in the settings."
+msgstr "This lot is estimated at %1$s and only %2$s is left under the ceiling. Make the lot smaller, or raise the ceiling in the settings."
 
 msgid "Faire passer devant"
 msgstr "Move to the front"
 
 msgid "La dépense du site entier, pas celle d’un rédacteur : un plafond appartient au site, et quelqu’un qui n’en verrait que sa part ne comprendrait jamais pourquoi son lot a été refusé."
-msgstr "The whole site’s spend, not one writer’s: a ceiling belongs to the site, and someone shown only their own share would never understand why their batch was refused."
+msgstr "The whole site’s spend, not one writer’s: a ceiling belongs to the site, and someone shown only their own share would never understand why their lot was refused."
 
 msgid "La file"
 msgstr "The queue"
@@ -760,7 +748,7 @@ msgid "Suspension…"
 msgstr "Holding…"
 
 msgid "Trois plafonds, pour trois craintes différentes. Celui par recette arrête un article emballé ; celui du jour arrête un mauvais après-midi ; celui du mois arrête un mauvais mois que personne n’a vu venir. Ils sont vérifiés avant qu’un lot parte et avant chaque vague de chaque recette, parce qu’un lot qui tenait au départ peut cesser de tenir en cours de route. À zéro, aucun plafond."
-msgstr "Three ceilings, for three different fears. The per-recipe one stops a runaway article; the daily one stops a bad afternoon; the monthly one stops a bad month nobody saw coming. They are checked before a batch starts and before every wave of every recipe, because a batch that fit at the start can stop fitting along the way. At zero, no ceiling."
+msgstr "Three ceilings, for three different fears. The per-recipe one stops a runaway article; the daily one stops a bad afternoon; the monthly one stops a bad month nobody saw coming. They are checked before a lot starts and before every wave of every recipe, because a lot that fit at the start can stop fitting along the way. At zero, no ceiling."
 
 msgid "trente jours"
 msgstr "thirty days"
@@ -773,18 +761,6 @@ msgstr "The engine’s four items, what each spent and how long it took. Time is
 
 msgid "Où part l’argent"
 msgstr "Where the money goes"
-
-msgid "le reste"
-msgstr "the rest"
-
-msgid "l’article"
-msgstr "the article"
-
-msgid "l’image Facebook"
-msgstr "the Facebook image"
-
-msgid "l’image à la une"
-msgstr "the featured image"
 
 msgid "plafond %s"
 msgstr "ceiling %s"
@@ -810,9 +786,6 @@ msgstr "Put back in order"
 msgid "passe devant"
 msgstr "moved to the front"
 
-msgid "Dernier passage il y a %1$s : %2$s lignes de déroulé, %3$s productions, %4$s runs."
-msgstr "Last pass %1$s ago: %2$s timeline rows, %3$s outputs, %4$s runs."
-
 msgid "La narration minute par minute. La table qui grossit le plus vite, et celle que personne ne relit."
 msgstr "The minute-by-minute narration. The fastest-growing table there is, and the one nobody rereads."
 
@@ -831,9 +804,6 @@ msgstr "Clean now"
 msgid "Productions lourdes"
 msgstr "Heavy output"
 
-msgid "Runs entiers"
-msgstr "Whole runs"
-
 msgid "Trois durées, parce que trois choses vieillissent différemment. À zéro, rien de cette sorte n’est jamais supprimé."
 msgstr "Three ages, because three things decay at different rates. At zero, nothing of that kind is ever removed."
 
@@ -842,9 +812,6 @@ msgstr "A filter imposes a different age for: %s. The filter is what applies, no
 
 msgid "Un passage est borné : il retire ce qu’il peut sans faire tomber la requête, et reprend au suivant. Chaque durée est aussi un filtre — msrwa_retention_events_days, msrwa_retention_artifacts_days, msrwa_retention_runs_days."
 msgstr "A pass is bounded: it removes what it can without bringing the request down, and picks up where it left off on the next one. Each age is also a filter — msrwa_retention_events_days, msrwa_retention_artifacts_days, msrwa_retention_runs_days."
-
-msgid "Y compris les chiffres. Laissé à zéro par défaut : une ligne d’étape est le seul témoignage de ce qu’un run a coûté. Un run qui a produit un brouillon n’est jamais supprimé."
-msgstr "Including the figures. Left at zero by default: a step row is the only record of what a run cost. A run that produced a draft is never removed."
 
 msgid "Enregistrer les durées"
 msgstr "Save these ages"
@@ -1241,9 +1208,6 @@ msgstr "Waiting for: %s, which never arrived."
 msgid "Fixez un plafond de dépense par recette."
 msgstr "Set a spending ceiling per recipe."
 
-msgid "Image Facebook"
-msgstr "Facebook image"
-
 msgid "JSON invalide : %s."
 msgstr "Invalid JSON: %s."
 
@@ -1252,9 +1216,6 @@ msgstr "The lot could not be saved."
 
 msgid "Le service d’écriture refuse d’en traiter davantage pour le moment : c’est une limite de son côté, pas du site. Reprendre la recette plus tard suffit souvent ; si cela se répète, la limite du compte doit être relevée chez le fournisseur."
 msgstr "The writing service will not take any more for now: that is a limit on its side, not the site’s. Resuming the recipe later is usually enough; if it keeps happening, the account’s limit has to be raised with the provider."
-
-msgid "Run introuvable."
-msgstr "Run not found."
 
 msgid "Simulation locale : aucune sauvegarde, aucun appel API. Vérifiez les routes et les valeurs effectives ci-dessous."
 msgstr "Local simulation: nothing saved, no API call. Check the routes and the effective values below."
@@ -1296,9 +1257,6 @@ msgstr "key valid, but the account quota is exhausted: the last real call was re
 
 msgid "$%1$s entrée / $%2$s sortie par million de jetons"
 msgstr "$%1$s in / $%2$s out per million tokens"
-
-msgid "Le profil complet en compte %s. Une étape part dès que tout ce dont elle dépend est prêt : c’est ce qui découpe une recette en vagues, et ce qui fait qu’une reprise ne repaie pas ce qui a réussi."
-msgstr "The full profile has %s of them. A step starts as soon as everything it depends on is ready: that is what cuts a recipe into waves, and what makes a resume avoid paying again for what succeeded."
 
 msgid "Attend"
 msgstr "Waits for"
@@ -1451,9 +1409,6 @@ msgstr "Uploading the photographs…"
 msgid "Un lot accepte au plus %d photographies."
 msgstr "A lot accepts at most %d photographs."
 
-msgid "Avec le routage actuel, une recette complète est estimée à %1$s, et jusqu’à %2$s si l’approbation finale refuse à chaque tentative. Un plafond sous la première valeur refuse le lot au lancement ; sous la seconde, il arrête les nouvelles tentatives avant de le franchir, et la recette se termine avec le dernier verdict."
-msgstr "With the current routing, a complete recipe is estimated at %1$s, and up to %2$s if the final approval refuses at every attempt. A ceiling below the first figure refuses the lot at launch; below the second, it stops further attempts before crossing it, and the recipe finishes with the last verdict."
-
 msgid "Choisir…"
 msgstr "Choose…"
 
@@ -1495,9 +1450,6 @@ msgstr "Which model answers behind `low`, `medium` and `high`."
 
 msgid "Réflexion permise avant de répondre, par étape : `minimal`, `low`, `medium` ou `high` ; vide, le fournisseur décide. La réflexion est facturée comme de la sortie et prise sur le plafond."
 msgstr "Thinking allowed before answering, per step: `minimal`, `low`, `medium` or `high`; empty, the provider decides. Thinking is billed as output and taken from the ceiling."
-
-msgid "Tarifs par million de tokens : `[entrée, sortie]`. Un modèle sans tarif rend la dépense invérifiable et arrête le run."
-msgstr "Rates per million tokens: `[input, output]`. A model without a rate makes spending unverifiable and stops the run."
 
 msgid "%d groupe en JSON, pour une modification à la main"
 msgid_plural "%d groupes en JSON, pour une modification à la main"
@@ -2403,3 +2355,46 @@ msgstr "Editor"
 
 msgid "Lecture des photographies et du collage"
 msgstr "Reading the photographs and the collage"
+
+#, php-format
+msgid "%1$s recette(s), %2$s lignes de déroulé"
+msgstr "%1$s recipe(s), %2$s timeline lines"
+
+msgid "Aucun contrôle final pour cet article : son type de lot n’en prévoit pas, ou la recette s’est arrêtée avant."
+msgstr "No final check for this article: its lot type has none, or the recipe stopped before it."
+
+#, php-format
+msgid "Avec le routage actuel, une recette complète est estimée à %1$s, et jusqu’à %2$s au pire, si la recherche use de toutes ses recherches permises. Un plafond sous la première valeur refuse le lot au lancement ; sous la seconde, il peut arrêter une recette en route."
+msgstr "With the current routing, a complete recipe is estimated at %1$s, and up to %2$s at worst, if the research uses every search it is allowed. A ceiling below the first figure refuses the lot at launch; below the second, it may stop a recipe on the way."
+
+#, php-format
+msgid "Dernier passage il y a %1$s : %2$s lignes de déroulé, %3$s productions, %4$s recettes."
+msgstr "Last pass %1$s ago: %2$s timeline lines, %3$s outputs, %4$s recipes."
+
+#, php-format
+msgid "Un lot complet en compte %s, dans l’ordre où elles tournent. Une étape part dès que tout ce dont elle dépend est prêt : c’est ce qui découpe une recette en vagues, et ce qui fait qu’une reprise ne repaie pas ce qui a réussi."
+msgstr "A complete lot has %s, in the order they run. A step starts as soon as everything it depends on is ready: that is what splits a recipe into waves, and why a resume never pays again for what succeeded."
+
+msgid "Recettes entières"
+msgstr "Whole recipes"
+
+msgid "Tarifs par million de jetons : `[entrée, sortie]`. Un modèle sans tarif rend la dépense invérifiable et arrête la recette."
+msgstr "Rates per million tokens: `[input, output]`. A model with no rate makes spending unverifiable and stops the recipe."
+
+msgid "Texte uniquement, relu et vérifié. Aucune image n’est générée, donc pas de contrôle final des images."
+msgstr "Text only, reviewed and fact-checked. No image is generated, so there is no final check of images."
+
+msgid "Y compris les chiffres. Laissé à zéro par défaut : une ligne d’étape est le seul témoignage de ce qu’une recette a coûté. Une recette qui a produit un brouillon n’est jamais supprimée."
+msgstr "Figures included. Left at zero by default: a step's row is the only record of what a recipe cost. A recipe that produced a draft is never deleted."
+
+msgid "Passages"
+msgstr "Times run"
+
+msgid "Autres étapes"
+msgstr "Other steps"
+
+msgid "Appariement des photographies"
+msgstr "Pairing the photographs"
+
+msgid "Vérification des faits (ancienne étape)"
+msgstr "Fact check (former step)"

@@ -630,6 +630,11 @@ cost) in the task before changing anything.
   (2026-09-24).** The writer's photograph shows the prompt's writer the dish;
   the collage is drawn from the style reference. Real: the owner's own rôti
   photograph, drawn both ways. See ENGINE.md §7, item 40.
+- [x] **A66 — One vocabulary on every screen (2026-09-26).** « run », « image
+  Facebook », « jugement final », « profil » and « batch » replaced across the
+  three catalogues; retired steps named; providers named in Diagnostic; the
+  collage-led step descriptions; the lot-type table stacked on phones.
+  Real: every screen reviewed on desktop and phone, 72 page views swept.
 - [x] **A65 — Steps listed in the order they run (2026-09-26).** `for_lead()`
   orders research, collage, reading, recipe (ENGINE.md §7, 54);
   `MSRWA_Compat::routed_steps()` and the Moteur registry follow it.

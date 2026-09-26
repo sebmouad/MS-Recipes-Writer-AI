@@ -302,7 +302,7 @@ final class MSRWA_Screen_Engine {
 			<h2><?php esc_html_e( 'Ce que fait le moteur, étape par étape', 'ms-recipes-writer-ai' ); ?></h2>
 			<p><?php echo esc_html( sprintf(
 				/* translators: %s is a number of steps. */
-				__( 'Le profil complet en compte %s. Une étape part dès que tout ce dont elle dépend est prêt : c’est ce qui découpe une recette en vagues, et ce qui fait qu’une reprise ne repaie pas ce qui a réussi.', 'ms-recipes-writer-ai' ),
+				__( 'Un lot complet en compte %s, dans l’ordre où elles tournent. Une étape part dès que tout ce dont elle dépend est prêt : c’est ce qui découpe une recette en vagues, et ce qui fait qu’une reprise ne repaie pas ce qui a réussi.', 'ms-recipes-writer-ai' ),
 				number_format_i18n( count( $steps ) )
 			) ); ?></p>
 			<table class="ms-table ms-stack ms-registry">

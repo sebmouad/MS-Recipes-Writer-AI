@@ -335,7 +335,7 @@ final class MSRWA_REST {
 
 	public static function cancel( WP_REST_Request $request ) {
 		$run = MSRWA_Run::get( absint( $request['id'] ) );
-		if ( ! $run || ! MSRWA_Run::may_see( $run ) ) { return new WP_Error( 'msrwa_not_found', __( 'Run introuvable.', 'ms-recipes-writer-ai' ), array( 'status' => 404 ) ); }
+		if ( ! $run || ! MSRWA_Run::may_see( $run ) ) { return new WP_Error( 'msrwa_not_found', __( 'Recette introuvable.', 'ms-recipes-writer-ai' ), array( 'status' => 404 ) ); }
 		return rest_ensure_response( array( 'cancelled' => MSRWA_Run::cancel( (int) $run['id'] ) ) );
 	}
 
