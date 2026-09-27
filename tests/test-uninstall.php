@@ -79,9 +79,11 @@ if ( ! function_exists( 'get_role' ) ) { function get_role( $role ) { return nul
 $all = $scope_of( 'all' );
 msrwa_test_contains( $all['log'], 'DROP TABLE IF EXISTS wp_msrwa_runs', 'All: the work goes.' );
 msrwa_test_assert( ! isset( $all['options']['msrwa_settings'] ) && ! isset( $all['options']['msrwa_uninstall'] ), 'All: nothing of the plugin’s options stays.' );
+msrwa_test_contains( $all['log'], "DELETE FROM wp_options WHERE option_name LIKE 'msrwa\\_redraw\\_%'", 'All: a redraw lock left by a killed request goes too.' );
 $settings = $scope_of( 'settings' );
 msrwa_test_contains( $settings['log'], 'wp_msrwa_catalog', 'Settings: the catalogue goes.' );
 msrwa_test_missing( $settings['log'], 'wp_msrwa_runs', 'Settings: the work stays.' );
+msrwa_test_missing( $settings['log'], 'msrwa\\_redraw', 'Settings: the redraw locks belong to the work and stay with it.' );
 msrwa_test_assert( ! isset( $settings['options']['msrwa_settings'] ) && isset( $settings['options']['msrwa_schema'] ) && ! $settings['meta'], 'Settings: the settings go, what describes the work stays, the drafts keep their link.' );
 $nothing = $scope_of( 'nothing' );
 msrwa_test_missing( $nothing['log'], 'DROP TABLE', 'Nothing: not a table.' );
