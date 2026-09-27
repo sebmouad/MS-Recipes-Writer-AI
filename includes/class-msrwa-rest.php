@@ -27,6 +27,7 @@ final class MSRWA_REST {
 		register_rest_route( 'msrwa/v1', '/catalog/prices', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_manage' ), 'callback' => array( __CLASS__, 'fetch_prices' ) ) );
 		register_rest_route( 'msrwa/v1', '/retention', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_manage' ), 'callback' => array( __CLASS__, 'prune' ) ) );
 		register_rest_route( 'msrwa/v1', '/batches/(?P<id>\d+)/nudge', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'nudge' ) ) );
+		register_rest_route( 'msrwa/v1', '/runs/live', array( 'methods' => 'GET', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'live' ) ) );
 		register_rest_route( 'msrwa/v1', '/runs/bulk', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'bulk' ) ) );
 		register_rest_route( 'msrwa/v1', '/runs/(?P<id>\d+)/redraw', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'redraw' ) ) );
 		register_rest_route( 'msrwa/v1', '/runs/(?P<id>\d+)/retry', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'retry' ) ) );
@@ -189,6 +190,40 @@ final class MSRWA_REST {
 			}
 		}
 		return rest_ensure_response( array( 'status' => (string) $batch['status'], 'runs' => $out, 'stalled' => $stalled ) );
+	}
+
+	/**
+	 * The Articles screen, kept current: every run still moving, and each run
+	 * it showed as moving that has since settled, drawn by the same PHP that
+	 * drew the page. The rows go through MSRWA_Ledger, so the reader's scope
+	 * and what they may see of money apply exactly as on the page.
+	 */
+	public static function live( WP_REST_Request $request ) {
+		$filters = array(
+			'owner' => absint( $request->get_param( 'owner' ) ),
+			'search' => sanitize_text_field( (string) $request->get_param( 's' ) ),
+			'post' => sanitize_key( (string) $request->get_param( 'post_state' ) ),
+		);
+		$moving = MSRWA_Ledger::runs( $filters + array( 'status' => 'moving', 'per_page' => 100 ) );
+		$moving_ids = array_map( 'intval', array_column( $moving['runs'], 'id' ) );
+		$shown = array_slice( array_filter( array_map( 'absint', explode( ',', (string) $request->get_param( 'shown' ) ) ) ), 0, 100 );
+		$gone = array_values( array_diff( $shown, $moving_ids ) );
+		$settled = $gone ? MSRWA_Ledger::runs( $filters + array( 'status' => 'settled', 'ids' => $gone, 'per_page' => 100 ) ) : array( 'runs' => array() );
+
+		$row = static function ( array $run ) {
+			$html = MSRWA_UI::run_row_html( $run, true );
+			return array( 'id' => (int) $run['id'], 'sig' => md5( $html ), 'html' => $html );
+		};
+		return rest_ensure_response( array(
+			'moving' => array_map( $row, $moving['runs'] ),
+			// Oldest last on the page, so the one that finished first lands lowest.
+			'settled' => array_map( $row, array_reverse( $settled['runs'] ) ),
+			'totals' => array(
+				'moving' => (int) $moving['total'],
+				'settled' => (int) MSRWA_Ledger::runs( $filters + array( 'status' => 'settled', 'per_page' => 5 ) )['total'],
+			),
+			'post_counts' => MSRWA_Ledger::post_counts( $filters ),
+		) );
 	}
 
 	/** What the queue is doing, for the screen that watches it. */

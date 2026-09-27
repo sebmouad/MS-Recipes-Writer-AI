@@ -2520,3 +2520,42 @@ msgstr "العودة إلى دفعات الوصفات"
 
 msgid "Elle a peut-être été supprimée, ou elle ne vous appartient pas."
 msgstr "ربما حُذفت، أو أنها ليست لك."
+
+msgid "Aucune recette terminée pour l’instant."
+msgstr "لا توجد وصفة منتهية بعد."
+
+msgid "Avancement"
+msgstr "التقدّم"
+
+msgid "Créé"
+msgstr "أُنشئ"
+
+msgid "Départ prévu"
+msgstr "الانطلاق المبرمج"
+
+msgid "Formule"
+msgstr "الباقة"
+
+
+msgid "Rien ne tourne en ce moment."
+msgstr "لا شيء قيد التشغيل حاليًا."
+
+msgid "arrêtées"
+msgstr "متوقفة"
+
+
+msgid "lecture des photographies"
+msgstr "قراءة الصور"
+
+msgid "mis à jour en direct"
+msgstr "يُحدَّث مباشرة"
+
+
+msgid "terminé"
+msgstr "منتهٍ"
+
+msgid "terminé, avec des échecs"
+msgstr "منتهٍ مع إخفاقات"
+
+msgid "terminées"
+msgstr "منتهية"

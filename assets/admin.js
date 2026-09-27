@@ -20,7 +20,10 @@
    */
   function endpoint(path, params) {
     var url = MSRWA.api + path;
-    var query = Object.keys(params || {}).map(function (key) {
+    // WordPress answers the REST API in the site's language unless asked for
+    // the reader's: a row redrawn live read "published" on a French screen.
+    params = Object.assign({ _locale: 'user' }, params || {});
+    var query = Object.keys(params).map(function (key) {
       return encodeURIComponent(key) + '=' + encodeURIComponent(params[key]);
     }).join('&');
     if (!query) return url;
@@ -1275,6 +1278,121 @@
     });
   }
 
+  // --- The Articles screen, live ------------------------------------------
+  //
+  // Running above, done below. Every few seconds /runs/live answers with each
+  // run still moving and each one this page showed as moving that has since
+  // settled, drawn by the same PHP that drew the page: a row is swapped only
+  // when it changed, a finished one moves down, one started elsewhere
+  // appears. It rests while the tab is hidden and catches up when it returns.
+
+  var articles = document.querySelector('[data-live-articles]');
+  if (articles) {
+    var runningRail = document.getElementById('ms-running-rail');
+    var doneRail = document.getElementById('ms-done-rail');
+    var liveFilters = {};
+    try { liveFilters = JSON.parse(articles.getAttribute('data-live-articles') || '{}') || {}; } catch (e) { liveFilters = {}; }
+    var firstPage = '1' === articles.getAttribute('data-page');
+    var liveTimer = null;
+    var liveBusy = false;
+
+    var rowOf = function (id) { return articles.querySelector('tr[data-run="' + id + '"]'); };
+    var build = function (item) {
+      var holder = document.createElement('tbody');
+      holder.innerHTML = item.html;
+      var row = holder.querySelector('tr');
+      if (row) row.setAttribute('data-sig', item.sig);
+      return row;
+    };
+    // A box somebody ticked stays ticked when its row is redrawn.
+    var keepPick = function (from, to) {
+      var was = from && from.querySelector('.ms-pick-run');
+      var now = to.querySelector('.ms-pick-run');
+      if (was && now) now.checked = was.checked;
+    };
+    var arrive = function (row) {
+      row.classList.add('ms-run-arrived');
+      window.setTimeout(function () { row.classList.remove('ms-run-arrived'); }, 2400);
+    };
+    var showIf = function (tbody) {
+      var section = tbody.closest('section');
+      var has = !!tbody.querySelector('tr');
+      section.querySelector('.ms-articles-table').hidden = !has;
+      section.querySelector('.ms-articles-empty').hidden = has;
+    };
+    var setCount = function (key, value) {
+      var node = articles.querySelector('[data-count="' + key + '"]');
+      if (node && undefined !== value) node.textContent = Number(value).toLocaleString(document.documentElement.lang || undefined);
+    };
+
+    var liveApply = function (data) {
+      var keep = {};
+      (data.moving || []).forEach(function (item, index) {
+        keep[item.id] = true;
+        var old = rowOf(item.id);
+        if (old && old.parentNode === runningRail && old.getAttribute('data-sig') === item.sig) return;
+        var row = build(item);
+        if (!row) return;
+        keepPick(old, row);
+        if (old && old.parentNode === runningRail) { runningRail.replaceChild(row, old); return; }
+        if (old) old.parentNode.removeChild(old);
+        // A newcomer takes its place in the server's order, newest first.
+        runningRail.insertBefore(row, runningRail.children[index] || null);
+        arrive(row);
+      });
+      (data.settled || []).forEach(function (item) {
+        keep[item.id] = true;
+        var old = rowOf(item.id);
+        var row = build(item);
+        if (!row) return;
+        keepPick(old, row);
+        if (old && old.parentNode === runningRail) runningRail.removeChild(old);
+        // Past the first page, the list below starts elsewhere: the finished
+        // recipe is counted there rather than dropped into the middle of it.
+        if (firstPage && !rowOf(item.id)) { doneRail.insertBefore(row, doneRail.firstChild); arrive(row); }
+      });
+      // Gone from both answers: deleted, or no longer matching the filter.
+      Array.prototype.slice.call(runningRail.querySelectorAll('tr[data-run]')).forEach(function (row) {
+        if (!keep[row.getAttribute('data-run')]) runningRail.removeChild(row);
+      });
+      showIf(runningRail);
+      showIf(doneRail);
+      if (data.totals) { setCount('moving', data.totals.moving); setCount('settled', data.totals.settled); }
+      if (data.post_counts) {
+        var sum = 0;
+        Object.keys(data.post_counts).forEach(function (bucket) {
+          sum += Number(data.post_counts[bucket]) || 0;
+          var tab = articles.ownerDocument.querySelector('.ms-post-tab-' + bucket + ' .ms-count');
+          if (tab) tab.textContent = Number(data.post_counts[bucket]).toLocaleString(document.documentElement.lang || undefined);
+        });
+        var all = document.querySelector('.ms-post-tab-all .ms-count');
+        if (all) all.textContent = sum.toLocaleString(document.documentElement.lang || undefined);
+      }
+    };
+
+    var liveSchedule = function () {
+      window.clearTimeout(liveTimer);
+      if (document.hidden) return;
+      // Quick while something runs, slow while it only waits for a new lot.
+      liveTimer = window.setTimeout(liveRefresh, runningRail.querySelector('tr[data-run]') ? 4000 : 15000);
+    };
+    var liveRefresh = function () {
+      if (liveBusy) return;
+      liveBusy = true;
+      var shown = Array.prototype.map.call(runningRail.querySelectorAll('tr[data-run]'), function (row) { return row.getAttribute('data-run'); });
+      var params = Object.assign({ shown: shown.join(',') }, liveFilters);
+      call('/runs/live', { method: 'GET' }, params)
+        .then(liveApply)
+        .catch(function () {})
+        .then(function () { liveBusy = false; liveSchedule(); });
+    };
+
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) { window.clearTimeout(liveTimer); } else { liveRefresh(); }
+    });
+    liveRefresh();
+  }
+
   // --- Keeping a rail honest ---------------------------------------------
 
   var rail = document.querySelector('[data-batch] .ms-rail') || document.querySelector('#ms-live-rail .ms-rail');
@@ -1315,9 +1433,34 @@
     }
   }
 
+  // The lot's summary follows its recipes: how many finished, how many run.
+  var summary = document.querySelector('.ms-lot-summary');
+  function paintLot(runs) {
+    if (!summary) return;
+    var tally = { done: 0, running: 0, queued: 0, failed: 0, cancelled: 0 };
+    runs.forEach(function (run) { if (run.status in tally) tally[run.status]++; });
+    var total = Number(summary.getAttribute('data-lot-total')) || runs.length;
+    var settled = tally.done + tally.failed + tally.cancelled;
+    var lang = document.documentElement.lang || undefined;
+    Object.keys(tally).forEach(function (key) {
+      var node = summary.querySelector('[data-lot="' + key + '"]');
+      if (!node) return;
+      node.textContent = tally[key].toLocaleString(lang);
+      node.parentNode.hidden = !tally[key];
+    });
+    var count = summary.querySelector('[data-lot="settled"]');
+    if (count) count.textContent = settled.toLocaleString(lang);
+    var bar = summary.querySelector('[data-lot="bar"]');
+    if (bar) {
+      bar.firstElementChild.style.inlineSize = Math.min(100, Math.round(100 * settled / Math.max(1, total))) + '%';
+      bar.classList.toggle('ms-progress-done', settled >= total);
+    }
+  }
+
   function refresh() {
     return call('/batches/' + batch + '/runs').then(function (data) {
       if (data.stalled) nudge(Number(data.stalled));
+      paintLot(data.runs || []);
       var moving = data.runs.map(paint).some(Boolean);
       if (moving && !timer) { timer = window.setInterval(refresh, 5000); }
       // A settled batch has drafts that were not there when the page loaded,

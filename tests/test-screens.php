@@ -218,6 +218,13 @@ msrwa_test_missing( msrwa_batch_html( 'running', 1 ), 'ms-batch-delete', 'A lot 
 
 msrwa_test_as_editor( 7 );
 msrwa_test_missing( msrwa_batch_html( 'ready', 7 ), 'ms-batch-delete', 'A writer cannot throw away a lot, not even their own.' );
+$lot = msrwa_batch_html( 'ready', 7 );
+msrwa_test_contains( $lot, 'ms-lot-summary', 'A lot opens on its summary.' );
+msrwa_test_contains( $lot, 'Éditeur 7', 'It names whose lot it is.' );
+msrwa_test_contains( $lot, 'attend votre confirmation', 'And where it stands.' );
+msrwa_test_missing( $lot, 'plafond', 'A writer’s lot shows no ceiling.' );
+msrwa_test_as_admin( 1 );
+msrwa_test_contains( msrwa_batch_html( 'ready', 7 ), 'Éditeur 7', 'An administrator sees whose lot it is too.' );
 
 // Another writer's lot, or one that is gone, opens on the plugin's own page
 // with the way back — never WordPress's bare error screen.

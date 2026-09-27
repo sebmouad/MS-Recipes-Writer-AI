@@ -919,3 +919,32 @@
 .ms-gauge-warn { background: var(--ms-cat-4); }
 .ms-gauge-stop { background: var(--ms-stop); }
 @media (max-width: 640px) { .ms-gauges .ms-split-row { grid-template-columns: 1fr; } }
+
+/* Articles: running above, done below. The dot says the upper list is live. */
+.ms-articles-running h2, .ms-articles-done h2 { display: flex; align-items: center; gap: 8px; }
+.ms-articles-running .ms-count, .ms-articles-done .ms-count { font-family: var(--ms-mono); font-size: 11px; font-weight: 600; padding: 1px 8px; border-radius: 999px; background: var(--ms-sunk); color: var(--ms-ink-soft); }
+.ms-articles-running .ms-count { background: var(--ms-live-soft); color: var(--ms-live); }
+.ms-live-dot { inline-size: 8px; block-size: 8px; border-radius: 50%; background: var(--ms-live); animation: ms-breathe 1.8s ease-in-out infinite; }
+.ms-articles-empty { padding: 4px 20px 18px; margin: 0; }
+.ms-articles-table[hidden], .ms-articles-empty[hidden] { display: none; }
+.ms-runs tr.ms-run-arrived > * { animation: ms-arrive 2.4s ease-out; }
+@keyframes ms-arrive { from { background: var(--ms-live-soft); } to { background: transparent; } }
+@media (prefers-reduced-motion: reduce) { .ms-live-dot, .ms-runs tr.ms-run-arrived > * { animation: none; } }
+
+/* A lot at a glance: whose, when, what, and how far along. */
+.ms-lot-summary { display: grid; gap: 16px; }
+.ms-lot-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px 20px; margin: 0; }
+.ms-lot-facts > div { min-width: 0; }
+.ms-lot-facts dt { color: var(--ms-ink-soft); font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+.ms-lot-facts dd { display: flex; align-items: center; gap: 6px; margin: 3px 0 0; font-weight: 600; overflow-wrap: anywhere; }
+.ms-lot-avatar { border-radius: 50%; flex: 0 0 auto; }
+.ms-lot-progress { display: grid; gap: 8px; padding-block-start: 14px; border-block-start: 1px solid var(--ms-line-soft); }
+.ms-lot-progress-head { display: flex; justify-content: space-between; gap: 12px; }
+.ms-lot-progress .ms-progress { inline-size: 100%; }
+.ms-lot-tally { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 0; padding: 0; list-style: none; color: var(--ms-ink-soft); font-size: 12px; }
+.ms-lot-tally li { margin: 0; }
+.ms-lot-tally li[hidden] { display: none; }
+.ms-lot-tally strong { color: var(--ms-ink); font-family: var(--ms-mono); }
+.ms-lot-tally-running strong { color: var(--ms-live); }
+.ms-lot-tally-done strong { color: var(--ms-good); }
+.ms-lot-tally-failed strong { color: var(--ms-stop); }

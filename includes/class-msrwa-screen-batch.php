@@ -22,6 +22,9 @@ final class MSRWA_Screen_Batch {
 		$runs = MSRWA_Run::for_batch( (int) $batch['id'] );
 		$settling = 'ready' === $batch['status'];
 		$profile = MSRWA_Profile::get( $batch['profile'] );
+		// The reader may see this lot, so they may see whose it is: their own,
+		// or anyone's for somebody who sees everything.
+		$owner = get_userdata( (int) $batch['owner_id'] );
 
 		echo '<div class="wrap msrwa" data-batch="' . esc_attr( $batch['id'] ) . '">';
 		MSRWA_UI::head(
@@ -39,7 +42,7 @@ final class MSRWA_Screen_Batch {
 			self::head_actions( $batch )
 		);
 
-		echo '<p class="ms-muted">' . esc_html( $profile['label'] ) . ' — ' . esc_html( $profile['description'] ) . '</p>';
+		echo '<p class="ms-muted">' . esc_html( $profile['description'] ) . '</p>';
 
 		if ( '' !== (string) $batch['error_message'] ) {
 			MSRWA_UI::note( esc_html( $batch['error_message'] ), 'warn' );
@@ -57,6 +60,7 @@ final class MSRWA_Screen_Batch {
 			if ( $stamp ) { $scheduled = wp_date( 'Y-m-d\TH:i', $stamp ); }
 		}
 
+		self::summary( $batch, $runs, $owner );
 		self::pairing( $matching, $settling, (int) $batch['recipes'], $scheduled );
 		self::runs( $runs );
 		echo '</div>';
@@ -292,6 +296,74 @@ final class MSRWA_Screen_Batch {
 				(int) $recipe_count
 			) ); ?></button>
 		</div>
+		<?php
+	}
+
+	/**
+	 * Where the lot stands, at a glance: whose it is, when it was made, what
+	 * it produces, when it leaves, and how far its recipes are. The header
+	 * above keeps the counts, the language and, for an operator, the money. The
+	 * counts carry data-lot hooks that admin.js keeps current while it runs.
+	 */
+	private static function summary( array $batch, array $runs, $owner ) {
+		$tally = array( 'done' => 0, 'running' => 0, 'queued' => 0, 'failed' => 0, 'cancelled' => 0 );
+		foreach ( $runs as $run ) {
+			$status = (string) $run['status'];
+			if ( isset( $tally[ $status ] ) ) { $tally[ $status ]++; }
+		}
+		$total = count( $runs );
+		$settled = $tally['done'] + $tally['failed'] + $tally['cancelled'];
+
+		if ( 'matching' === $batch['status'] ) {
+			$state = array( 'live', __( 'lecture des photographies', 'ms-recipes-writer-ai' ) );
+		} elseif ( 'ready' === $batch['status'] ) {
+			$state = empty( $batch['dispatch_at'] )
+				? array( 'warn', __( 'attend votre confirmation', 'ms-recipes-writer-ai' ) )
+				: array( 'live', __( 'programmé', 'ms-recipes-writer-ai' ) );
+		} elseif ( $total && $settled < $total ) {
+			$state = array( 'live', __( 'en cours', 'ms-recipes-writer-ai' ) );
+		} elseif ( $total && $tally['failed'] ) {
+			$state = array( 'warn', __( 'terminé, avec des échecs', 'ms-recipes-writer-ai' ) );
+		} elseif ( $total ) {
+			$state = array( 'good', __( 'terminé', 'ms-recipes-writer-ai' ) );
+		} else {
+			$state = array( 'stop', __( 'arrêté', 'ms-recipes-writer-ai' ) );
+		}
+
+		$labels = array(
+			'done' => __( 'terminées', 'ms-recipes-writer-ai' ),
+			'running' => __( 'en cours', 'ms-recipes-writer-ai' ),
+			'queued' => __( 'en attente', 'ms-recipes-writer-ai' ),
+			'failed' => __( 'échecs', 'ms-recipes-writer-ai' ),
+			'cancelled' => __( 'arrêtées', 'ms-recipes-writer-ai' ),
+		);
+		$profile = MSRWA_Profile::get( (string) $batch['profile'] );
+		?>
+		<section class="ms-card ms-lot-summary" data-lot-total="<?php echo esc_attr( $total ); ?>">
+			<dl class="ms-lot-facts">
+				<div><dt><?php esc_html_e( 'Rédacteur', 'ms-recipes-writer-ai' ); ?></dt><dd><?php echo $owner ? get_avatar( $owner->ID, 24, '', '', array( 'class' => 'ms-lot-avatar' ) ) . esc_html( $owner->display_name ) : '—'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- get_avatar escapes. ?></dd></div>
+				<div><dt><?php esc_html_e( 'Créé', 'ms-recipes-writer-ai' ); ?></dt><dd><time datetime="<?php echo esc_attr( gmdate( 'c', (int) strtotime( $batch['created_at'] . ' UTC' ) ) ); ?>"><?php echo esc_html( MSRWA_I18N::when( (string) $batch['created_at'] ) ); ?></time></dd></div>
+				<div><dt><?php esc_html_e( 'Formule', 'ms-recipes-writer-ai' ); ?></dt><dd><?php echo esc_html( (string) $profile['label'] ); ?></dd></div>
+				<?php if ( ! empty( $batch['dispatch_at'] ) ) : ?>
+					<div><dt><?php esc_html_e( 'Départ prévu', 'ms-recipes-writer-ai' ); ?></dt><dd><?php echo esc_html( MSRWA_I18N::when( (string) $batch['dispatch_at'] ) ); ?></dd></div>
+				<?php endif; ?>
+				<div><dt><?php esc_html_e( 'État', 'ms-recipes-writer-ai' ); ?></dt><dd><span class="ms-state ms-state-<?php echo esc_attr( $state[0] ); ?>" data-lot="state"><?php echo esc_html( $state[1] ); ?></span></dd></div>
+			</dl>
+			<?php if ( $total ) : ?>
+				<div class="ms-lot-progress">
+					<div class="ms-lot-progress-head">
+						<strong><?php esc_html_e( 'Avancement', 'ms-recipes-writer-ai' ); ?></strong>
+						<span class="ms-muted"><span data-lot="settled"><?php echo esc_html( number_format_i18n( $settled ) ); ?></span>/<?php echo esc_html( number_format_i18n( $total ) ); ?></span>
+					</div>
+					<span class="ms-progress<?php echo $settled >= $total ? ' ms-progress-done' : ''; ?>" data-lot="bar"><i style="inline-size:<?php echo (int) round( 100 * $settled / $total ); ?>%"></i></span>
+					<ul class="ms-lot-tally">
+						<?php foreach ( $labels as $key => $label ) : ?>
+							<li class="ms-lot-tally-<?php echo esc_attr( $key ); ?>"<?php echo $tally[ $key ] ? '' : ' hidden'; ?>><strong data-lot="<?php echo esc_attr( $key ); ?>"><?php echo esc_html( number_format_i18n( $tally[ $key ] ) ); ?></strong> <?php echo esc_html( $label ); ?></li>
+						<?php endforeach; ?>
+					</ul>
+				</div>
+			<?php endif; ?>
+		</section>
 		<?php
 	}
 

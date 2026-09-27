@@ -268,6 +268,13 @@ final class MSRWA_UI {
 		<?php
 	}
 
+	/** One row as run_table() draws it, for a screen that swaps rows in place. */
+	public static function run_row_html( array $run, $selectable = false ) {
+		ob_start();
+		self::run_row( $run, $selectable, MSRWA_Rights::may_see_everything(), MSRWA_Rights::may_see_money() );
+		return (string) ob_get_clean();
+	}
+
 	private static function run_row( array $run, $selectable, $author, $money ) {
 		$url = admin_url( 'admin.php?page=msrwa-run&run_id=' . (int) $run['id'] );
 		$state = self::state_of( $run );

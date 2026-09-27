@@ -960,6 +960,7 @@ Measured on the live site: 293s of provider work inside a 10-minute wall clock,
 - [x] **T5.1 — Editor surface** with no cost, models, tokens, stages or
   diagnostics, on every screen including statistics and job detail.
 - [x] *(`MSRWA_UI::reason()`, verified on the recipe screen as an author)* **T5.2 — Plain-language reasons** for every internal status and error.
+- [x] *(`tests/test-articles-live.php`, `tests/real/test-live.php`; verified in the browser on a local site, 0.30.0)* **T5.3 — Live Articles and lot screens.** Running recipes apart from finished ones and kept current without a reload, in the reader's scope and language; each lot names its author and where it stands. Plain JavaScript only, no jQuery.
 
 ## B7 — Site language
 

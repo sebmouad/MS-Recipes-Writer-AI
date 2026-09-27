@@ -5,9 +5,11 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.29.2
+## État actuel — 0.30.0
 
-La version `0.29.2` garde un article protégé par mot de passe muet dans
+La version `0.30.0` sépare, dans Articles, les recettes en cours des
+terminées et tient les premières à jour en direct ; chaque lot nomme son
+rédacteur et dit où il en est ; la `0.29.2` garde un article protégé par mot de passe muet dans
 l'en-tête et raccourcit la légende Facebook ; la `0.29.1` ne met la FAQ en données structurées que sur la page de
 l'article qui la montre ; la `0.29.0` écrivait chaque article pour être trouvé par Google, Bing,
 Yahoo et les assistants IA, et pour attirer les annonces les mieux payées ;
@@ -97,6 +99,29 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.30.0
+
+**Articles : en cours en haut, terminées en bas, en direct.** Sans filtre
+d'état, l'écran montre deux listes : les recettes en attente ou en cours,
+tenues à jour toutes les quatre secondes sans recharger la page, et les
+recettes terminées, paginées. Une recette qui se termine descend d'elle-même
+dans la seconde liste, une recette lancée ailleurs apparaît, les compteurs et
+les onglets suivent, et une case cochée le reste. L'onglet caché, rien n'est
+demandé au serveur ; il reprend en revenant. Chaque ligne est dessinée par le
+même PHP que la page, dans le périmètre du lecteur : un rédacteur ne voit que
+ses recettes, jamais un montant. Les réponses arrivent dans la langue du
+lecteur (une ligne redessinée lisait « published » sur un écran en français).
+
+**Un lot dit à qui il est et où il en est.** Sa page ouvre sur une fiche :
+rédacteur, date de création, formule, départ programmé, état du lot
+(lecture des photographies, attend votre confirmation, programmé, en cours,
+terminé, terminé avec des échecs) et l'avancement de ses recettes — terminées,
+en cours, en attente, échecs, arrêtées — tenu à jour en direct. Sur l'accueil,
+les lots pas encore partis montrent leur rédacteur et leur date.
+
+**Aucun jQuery.** Tout le JavaScript du plugin est natif ; un test échoue si
+un script en appelle ou en dépend.
 
 ## Version 0.29.2
 

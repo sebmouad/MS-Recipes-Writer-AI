@@ -293,12 +293,20 @@ final class MSRWA_Ledger {
 
 		$status = (string) ( $filters['status'] ?? '' );
 		if ( 'moving' === $status ) { $where[] = "r.status IN ('queued','running')"; }
+		// Everything the engine has let go of, whichever way it ended.
+		elseif ( 'settled' === $status ) { $where[] = "r.status NOT IN ('queued','running')"; }
 		// A refused article stops asking for a decision once its post is
 		// published, scheduled, binned or deleted: somebody decided.
 		elseif ( 'attention' === $status ) { $where[] = "(r.status = 'failed' OR (r.status = 'done' AND r.approved = 0 AND (r.draft_post_id = 0 OR p.post_status IN ('draft','pending'))))"; }
 		elseif ( '' !== $status ) { $where[] = $wpdb->prepare( 'r.status = %s', $status ); }
 
 		if ( ! empty( $filters['batch'] ) ) { $where[] = $wpdb->prepare( 'r.batch_id = %d', (int) $filters['batch'] ); }
+		// Named runs, for a screen asking after the rows it already shows. The
+		// scope above still applies: naming someone else's run returns nothing.
+		if ( ! empty( $filters['ids'] ) ) {
+			$ids = array_slice( array_unique( array_filter( array_map( 'absint', (array) $filters['ids'] ) ) ), 0, 100 );
+			$where[] = $ids ? 'r.id IN (' . implode( ',', $ids ) . ')' : '1 = 0';
+		}
 		if ( ! empty( $filters['owner'] ) && MSRWA_Rights::may_see_everything() ) { $where[] = $wpdb->prepare( 'r.owner_id = %d', (int) $filters['owner'] ); }
 		// An editor renames the post; the search finds it by either name.
 		if ( ! empty( $filters['search'] ) ) {

@@ -23,10 +23,15 @@ final class MSRWA_Screen_Articles {
 			'page' => isset( $_GET['paged'] ) ? absint( $_GET['paged'] ) : 1,
 			'per_page' => 25,
 		);
-		$found = MSRWA_Ledger::runs( $filters );
+		// With no state asked for, what is still moving and what has settled are
+		// two different questions, asked in two places: the first is watched,
+		// the second is read. A state picked in the filter gets one list.
+		$split = '' === $filters['status'];
+		$moving = $split ? MSRWA_Ledger::runs( array( 'status' => 'moving', 'page' => 1, 'per_page' => 100 ) + $filters ) : null;
+		$found = MSRWA_Ledger::runs( $split ? array( 'status' => 'settled' ) + $filters : $filters );
 		$counts = MSRWA_Ledger::post_counts( $filters );
 		// One query for every post the page shows, rather than one per row.
-		$ids = array_filter( array_map( 'intval', array_column( $found['runs'], 'draft_post_id' ) ) );
+		$ids = array_filter( array_map( 'intval', array_column( array_merge( $found['runs'], $moving ? $moving['runs'] : array() ), 'draft_post_id' ) ) );
 		if ( $ids && function_exists( '_prime_post_caches' ) ) { _prime_post_caches( $ids, false, false ); }
 
 		echo '<div class="wrap msrwa">';
@@ -35,7 +40,7 @@ final class MSRWA_Screen_Articles {
 			MSRWA_Rights::may_see_everything()
 				? __( 'Toutes les recettes passées par le moteur, avec leur état et ce qu’elles ont coûté.', 'ms-recipes-writer-ai' )
 				: __( 'Vos recettes passées par le moteur, avec leur état et leur brouillon.', 'ms-recipes-writer-ai' ),
-			array( __( 'résultats', 'ms-recipes-writer-ai' ) => number_format_i18n( $found['total'] ) ),
+			array( __( 'résultats', 'ms-recipes-writer-ai' ) => number_format_i18n( $found['total'] + ( $moving ? $moving['total'] : 0 ) ) ),
 			'<a class="button button-primary" href="' . esc_url( admin_url( 'admin.php?page=msrwa#ms-new' ) ) . '">' . esc_html__( 'Nouveau lot de recettes', 'ms-recipes-writer-ai' ) . '</a>'
 		);
 		?>
@@ -70,6 +75,12 @@ final class MSRWA_Screen_Articles {
 				<div><button class="button"><?php esc_html_e( 'Filtrer', 'ms-recipes-writer-ai' ); ?></button></div>
 			</form>
 
+			<?php if ( $split && ( $moving['runs'] || $found['runs'] ) ) : ?>
+				<?php self::bulk_bar(); ?>
+			<?php endif; ?>
+		</section>
+		<?php if ( $split && ( $moving['runs'] || $found['runs'] ) ) { self::split( $moving, $found, $filters ); echo '</div>'; return; } ?>
+		<section class="ms-card ms-card-flush">
 			<?php if ( ! $found['runs'] ) : ?>
 				<?php
 				MSRWA_UI::nothing(
@@ -88,6 +99,38 @@ final class MSRWA_Screen_Articles {
 		</section>
 		<?php
 		echo '</div>';
+	}
+
+	/**
+	 * Running, then done. The first list is kept current by admin.js through
+	 * /runs/live: a recipe that finishes moves from one list to the other
+	 * without a reload, and one started elsewhere appears. Both sit in
+	 * #ms-bulk-rail, so the bulk bar reaches either.
+	 */
+	private static function split( array $moving, array $found, array $filters ) {
+		$live = array_filter( array(
+			'owner' => $filters['owner'] ? (string) $filters['owner'] : '',
+			's' => $filters['search'],
+			'post_state' => $filters['post'],
+		), 'strlen' );
+		echo '<div id="ms-bulk-rail" data-live-articles="' . esc_attr( (string) wp_json_encode( $live ) ) . '" data-page="' . esc_attr( max( 1, $found['page'] ) ) . '">';
+		echo '<section class="ms-card ms-card-flush ms-articles-running"><h2>' . esc_html__( 'En cours', 'ms-recipes-writer-ai' )
+			. ' <span class="ms-count" data-count="moving">' . esc_html( number_format_i18n( $moving['total'] ) ) . '</span>'
+			. ' <span class="ms-live-dot" aria-hidden="true"></span><span class="screen-reader-text">' . esc_html__( 'mis à jour en direct', 'ms-recipes-writer-ai' ) . '</span></h2>';
+		echo '<div class="ms-articles-table"' . ( $moving['runs'] ? '' : ' hidden' ) . '>';
+		MSRWA_UI::run_table( $moving['runs'], true, 'ms-running-rail' );
+		echo '</div>';
+		echo '<p class="ms-muted ms-articles-empty"' . ( $moving['runs'] ? ' hidden' : '' ) . '>' . esc_html__( 'Rien ne tourne en ce moment.', 'ms-recipes-writer-ai' ) . '</p>';
+		echo '</section>';
+
+		echo '<section class="ms-card ms-card-flush ms-articles-done"><h2>' . esc_html__( 'Terminés', 'ms-recipes-writer-ai' )
+			. ' <span class="ms-count" data-count="settled">' . esc_html( number_format_i18n( $found['total'] ) ) . '</span></h2>';
+		echo '<div class="ms-articles-table"' . ( $found['runs'] ? '' : ' hidden' ) . '>';
+		MSRWA_UI::run_table( $found['runs'], true, 'ms-done-rail' );
+		echo '</div>';
+		echo '<p class="ms-muted ms-articles-empty"' . ( $found['runs'] ? ' hidden' : '' ) . '>' . esc_html__( 'Aucune recette terminée pour l’instant.', 'ms-recipes-writer-ai' ) . '</p>';
+		self::pages( $found, $filters );
+		echo '</section></div>';
 	}
 
 	/**

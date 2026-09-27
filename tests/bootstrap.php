@@ -78,6 +78,7 @@ if ( ! function_exists( 'human_time_diff' ) ) { function human_time_diff( $from,
 if ( ! function_exists( 'current_user_can' ) ) { function current_user_can( $capability ) { return in_array( $capability, (array) $GLOBALS['msrwa_test_caps'], true ); } }
 if ( ! function_exists( 'get_current_user_id' ) ) { function get_current_user_id() { return (int) $GLOBALS['msrwa_test_user']; } }
 if ( ! function_exists( 'user_can' ) ) { function user_can( $user, $capability ) { return current_user_can( $capability ); } }
+if ( ! function_exists( 'get_avatar' ) ) { function get_avatar( $id, $size = 96, $default = '', $alt = '', $args = array() ) { return '<img class="avatar" alt="" width="' . (int) $size . '">'; } }
 if ( ! function_exists( 'get_userdata' ) ) { function get_userdata( $user_id ) { return (object) array( 'ID' => (int) $user_id, 'display_name' => 'Éditeur ' . (int) $user_id ); } }
 if ( ! function_exists( 'wp_die' ) ) { function wp_die( $message = '' ) { throw new RuntimeException( (string) $message ); } }
 if ( ! function_exists( 'admin_url' ) ) { function admin_url( $path = '' ) { return 'https://example.test/wp-admin/' . ltrim( (string) $path, '/' ); } }

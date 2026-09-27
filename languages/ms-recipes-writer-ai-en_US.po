@@ -2464,3 +2464,42 @@ msgstr "Back to recipe lots"
 
 msgid "Elle a peut-être été supprimée, ou elle ne vous appartient pas."
 msgstr "It may have been deleted, or it isn’t yours."
+
+msgid "Aucune recette terminée pour l’instant."
+msgstr "No finished recipe yet."
+
+msgid "Avancement"
+msgstr "Progress"
+
+msgid "Créé"
+msgstr "Created"
+
+msgid "Départ prévu"
+msgstr "Scheduled start"
+
+msgid "Formule"
+msgstr "Package"
+
+
+msgid "Rien ne tourne en ce moment."
+msgstr "Nothing is running right now."
+
+msgid "arrêtées"
+msgstr "stopped"
+
+
+msgid "lecture des photographies"
+msgstr "reading the photographs"
+
+msgid "mis à jour en direct"
+msgstr "updated live"
+
+
+msgid "terminé"
+msgstr "finished"
+
+msgid "terminé, avec des échecs"
+msgstr "finished, with failures"
+
+msgid "terminées"
+msgstr "finished"

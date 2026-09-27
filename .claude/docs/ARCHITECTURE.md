@@ -196,9 +196,9 @@ act, never a model name or an HTTP status.
 | screen | who | what |
 |---|---|---|
 | Le pass | writer | the new lot first (recipes, photographs, profile, the estimate), then what is running, what waits to be read, what stopped; `msrwa-compose` still opens it |
-| Lot | writer | the pairing to confirm, then its recipes |
+| Lot | writer | whose lot it is, when it was made, its package, its departure and where it stands, with a progress summary kept live; then the pairing to confirm and its recipes |
 | Recette | writer | where it stands in one sentence, the verdict, the steps by name; scores, models, calls and timeline for managers only |
-| Articles | writer | every run, filtered, with bulk actions |
+| Articles | writer | every run, filtered, with bulk actions: running recipes above, kept live by `GET /runs/live` (plain JavaScript, no reload, paused in a hidden tab), finished ones below and paged; a state picked in the filter gives one list |
 | Analyse | manager | cost by step, by model, by day; failing checks; CSV export |
 | Moteur | manager | every engine parameter, and where each step would route |
 | Diagnostic | manager | the eight things that must be true for a recipe to finish, each with its remedy, and a report to paste into a request for help |
@@ -302,9 +302,11 @@ compiles the catalogues, because there is no gettext toolchain and no build step
 
 Namespace `msrwa/v1`, WordPress cookies and nonce, every response `no-store`
 (a page cache once served an application-password response to the public).
+The screens call it with `_locale=user`, so what they redraw speaks the
+reader's language rather than the site's. No script uses jQuery.
 
 `GET|POST /batches`, `DELETE /batches/{id}`, `POST /batches/{id}/{pairs|schedule|dispatch}`,
-`GET /batches/{id}/runs`, `POST /batches/{id}/nudge`, `POST /runs/bulk`, `POST /runs/{id}/{retry|cancel|redraw}`,
+`GET /batches/{id}/runs`, `POST /batches/{id}/nudge`, `GET /runs/live`, `POST /runs/bulk`, `POST /runs/{id}/{retry|cancel|redraw}`,
 `GET /estimate`, `GET /health`, `GET|POST /queue`, `POST /retention`,
 `POST /keys/check`, `POST /diagnostics/config`.
 

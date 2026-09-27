@@ -167,9 +167,12 @@ final class MSRWA_Screen_Pass {
 		$batches = MSRWA_Batch::waiting( 10 );
 		if ( ! $batches ) { return; }
 
+		$everyone = MSRWA_Rights::may_see_everything();
 		echo '<section class="ms-card ms-card-flush"><h2>' . esc_html__( 'Pas encore parti', 'ms-recipes-writer-ai' ) . '</h2>';
 		echo MSRWA_UI::scroll( __( 'Pas encore parti', 'ms-recipes-writer-ai' ) ) . '<table class="ms-table"><thead><tr>' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- scroll() escapes its own.
 			. '<th>' . esc_html__( 'Lot', 'ms-recipes-writer-ai' ) . '</th>'
+			. ( $everyone ? '<th>' . esc_html__( 'Rédacteur', 'ms-recipes-writer-ai' ) . '</th>' : '' )
+			. '<th>' . esc_html__( 'Créé', 'ms-recipes-writer-ai' ) . '</th>'
 			. '<th class="ms-num">' . esc_html__( 'Recettes', 'ms-recipes-writer-ai' ) . '</th>'
 			. '<th>' . esc_html__( 'Départ', 'ms-recipes-writer-ai' ) . '</th>'
 			. '<th></th></tr></thead><tbody>';
@@ -178,7 +181,9 @@ final class MSRWA_Screen_Pass {
 			$url = admin_url( 'admin.php?page=msrwa-batch&batch_id=' . (int) $batch['id'] );
 			echo '<tr><td><strong>#' . esc_html( $batch['id'] ) . '</strong>'
 				. ( '' !== (string) $batch['label'] ? ' ' . esc_html( MSRWA_Batch::title( $batch ) ) : '' )
-				. '<small>' . esc_html( (string) MSRWA_Profile::get( (string) $batch['profile'] )['label'] ) . '</small></td>'
+				. '<small>' . esc_html( (string) MSRWA_Profile::get( (string) $batch['profile'] )['label'] ) . ' · ' . esc_html( MSRWA_I18N::language_name( (string) $batch['language'] ) ) . '</small></td>'
+				. ( $everyone ? '<td>' . esc_html( MSRWA_UI::owner( (int) $batch['owner_id'] ) ) . '</td>' : '' )
+				. '<td><time datetime="' . esc_attr( gmdate( 'c', (int) strtotime( $batch['created_at'] . ' UTC' ) ) ) . '" title="' . esc_attr( MSRWA_I18N::when( (string) $batch['created_at'] ) ) . '">' . esc_html( MSRWA_I18N::ago( (string) $batch['created_at'] ) ) . '</time></td>'
 				. '<td class="ms-num">' . esc_html( number_format_i18n( (int) $batch['recipes'] ) ) . '</td>'
 				. '<td>' . ( empty( $batch['dispatch_at'] )
 					? '<span class="ms-state ms-state-warn">' . esc_html__( 'attend votre confirmation', 'ms-recipes-writer-ai' ) . '</span>'
