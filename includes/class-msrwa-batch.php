@@ -94,13 +94,13 @@ final class MSRWA_Batch {
 	 * whichever language saved the lot last, English on an Arabic screen.
 	 */
 	private static function label( array $recipes ) {
-		return mb_substr( (string) ( $recipes[0]['title'] ?? '' ), 0, 190 );
+		return mb_substr( MSRWA_Intake::plain_title( (string) ( $recipes[0]['title'] ?? '' ) ), 0, 190 );
 	}
 
 	/** A lot's name as a reader sees it: its first recipe, and how many follow. */
 	public static function title( array $batch ) {
 		// Lots named before 0.25.3 carry the count in their stored label.
-		$first = (string) preg_replace( '/\\s+(?:et|and)\\s+\\d+\\s+(?:autres?|others?)$|\\s+و\\S*(?:\\s+\\S+)?\\s+أخر\\S*$/u', '', (string) ( $batch['label'] ?? '' ) );
+		$first = MSRWA_Intake::plain_title( (string) preg_replace( '/\\s+(?:et|and)\\s+\\d+\\s+(?:autres?|others?)$|\\s+و\\S*(?:\\s+\\S+)?\\s+أخر\\S*$/u', '', (string) ( $batch['label'] ?? '' ) ) );
 		$more = max( 0, (int) ( $batch['recipes'] ?? 1 ) - 1 );
 		if ( '' === $first ) { return ''; }
 		return $first . ( $more ? sprintf( /* translators: %d is how many further recipes the lot carries. */ _n( ' et %d autre', ' et %d autres', $more, 'ms-recipes-writer-ai' ), $more ) : '' );
@@ -224,7 +224,7 @@ final class MSRWA_Batch {
 		global $wpdb;
 		$matching = self::matching( $id );
 		$recipes = array_values( (array) ( $matching['recipes'] ?? array() ) );
-		$title = mb_substr( trim( wp_strip_all_tags( (string) $title ) ), 0, 180 );
+		$title = mb_substr( MSRWA_Intake::plain_title( wp_strip_all_tags( (string) $title ) ), 0, 180 );
 		$text = mb_substr( trim( str_replace( "\r\n", "\n", (string) $text ) ), 0, 20000 );
 		$index = (int) $index;
 		if ( in_array( $action, array( 'edit', 'remove' ), true ) && ! isset( $recipes[ $index ] ) ) {

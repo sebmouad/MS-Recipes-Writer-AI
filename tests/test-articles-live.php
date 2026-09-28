@@ -5,7 +5,7 @@
 // their own rows and never a figure in dollars. And nothing in the plugin
 // reaches for jQuery: every script is plain JavaScript.
 require __DIR__ . '/bootstrap.php';
-msrwa_test_load( 'rights', 'i18n', 'ui', 'ledger', 'profile', 'rest' );
+msrwa_test_load( 'rights', 'i18n', 'intake', 'ui', 'ledger', 'profile', 'rest' );
 if ( true ) {
 	if ( ! function_exists( 'rest_ensure_response' ) ) { function rest_ensure_response( $data ) { return $data; } }
 	if ( ! class_exists( 'WP_REST_Request' ) ) {

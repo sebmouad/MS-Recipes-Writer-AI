@@ -67,9 +67,22 @@ final class MSRWA_Intake {
 			$line = trim( wp_strip_all_tags( $line ) );
 			$line = trim( preg_replace( '/^(?:#{1,6}|\d+[.)]|[-*•])\s*/u', '', $line ) );
 			$line = trim( $line, "*_ \t" );
+			$line = self::plain_title( $line );
 			if ( '' !== $line ) { return mb_substr( $line, 0, 180 ); }
 		}
 		return '';
+	}
+
+	/**
+	 * A recipe's title as plain words: no emoji or pictograph. Writers paste
+	 * titles from Facebook with "✨😋" on them; a dish's name does not carry
+	 * them into a post, and WordPress's admin drew each as a broken image
+	 * wherever its emoji styles were removed. Letters of every script, digits
+	 * and ordinary punctuation stay.
+	 */
+	public static function plain_title( $title ) {
+		$title = (string) preg_replace( '/[\x{1F000}-\x{1FAFF}\x{1F1E6}-\x{1F1FF}\x{2600}-\x{27BF}\x{2B00}-\x{2BFF}\x{2300}-\x{23FF}\x{2190}-\x{21FF}\x{25A0}-\x{25FF}\x{2900}-\x{297F}\x{3030}\x{303D}\x{3297}\x{3299}\x{FE00}-\x{FE0F}\x{200D}\x{20E3}\x{E0020}-\x{E007F}]/u', '', (string) $title );
+		return trim( (string) preg_replace( '/\s{2,}/u', ' ', $title ), " \t\n\r\0\x0B-–—|·,;:" );
 	}
 
 	/** How many photographs one lot may carry. Each is described by a paid call. */

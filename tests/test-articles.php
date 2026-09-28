@@ -3,7 +3,7 @@
 // scheduled, in the bin or deleted there, and renamed on the way. The state is
 // read from the post, never remembered by the plugin.
 require __DIR__ . '/bootstrap.php';
-msrwa_test_load( 'rights', 'i18n', 'ui', 'ledger', 'profile' );
+msrwa_test_load( 'rights', 'i18n', 'intake', 'ui', 'ledger', 'profile' );
 if ( true ) {
 	if ( ! function_exists( 'get_preview_post_link' ) ) { function get_preview_post_link( $post ) { return 'https://example.test/?p=' . (int) $post->ID . '&preview=true'; } }
 }

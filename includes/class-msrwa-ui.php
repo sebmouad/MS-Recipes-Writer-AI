@@ -290,14 +290,14 @@ final class MSRWA_UI {
 		<tr class="ms-run ms-run-<?php echo esc_attr( $tone ); ?>" data-run="<?php echo esc_attr( $run['id'] ); ?>">
 			<?php if ( $selectable ) : ?>
 				<td class="ms-runs-pick"><input type="checkbox" class="ms-pick-run" value="<?php echo esc_attr( $run['id'] ); ?>"
-					aria-label="<?php echo esc_attr( sprintf( /* translators: %s is a recipe title. */ __( 'Sélectionner %s', 'ms-recipes-writer-ai' ), $run['label'] ) ); ?>"></td>
+					aria-label="<?php echo esc_attr( sprintf( /* translators: %s is a recipe title. */ __( 'Sélectionner %s', 'ms-recipes-writer-ai' ), MSRWA_Intake::plain_title( $run['label'] ) ) ); ?>"></td>
 			<?php endif; ?>
 			<th scope="row" class="ms-run-recipe">
 				<a class="ms-run-thumb<?php echo $thumb ? '' : ' is-empty'; ?>" href="<?php echo esc_url( $url ); ?>" tabindex="-1" aria-hidden="true">
 					<?php echo $thumb ? wp_get_attachment_image( $thumb, 'thumbnail', false, array( 'alt' => '', 'loading' => 'lazy' ) ) : '<span class="dashicons dashicons-' . esc_attr( $icon ) . '"></span>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 				</a>
 				<span class="ms-run-id">
-					<a class="ms-run-name" href="<?php echo esc_url( $url ); ?>"><?php echo esc_html( $run['label'] ); ?></a>
+					<a class="ms-run-name" href="<?php echo esc_url( $url ); ?>"><?php echo esc_html( MSRWA_Intake::plain_title( $run['label'] ) ); ?></a>
 					<span class="ms-run-about">
 						<span class="ms-run-no">#<?php echo esc_html( $run['id'] ); ?></span>
 						<?php if ( (int) ( $run['batch_id'] ?? 0 ) ) : ?>
@@ -306,7 +306,7 @@ final class MSRWA_UI {
 						<?php if ( '' !== MSRWA_Profile::short( $lot['profile'] ) ) : ?><span title="<?php echo esc_attr( (string) ( MSRWA_Profile::all()[ $lot['profile'] ]['label'] ?? '' ) ); ?>"><?php echo esc_html( MSRWA_Profile::short( $lot['profile'] ) ); ?></span><?php endif; ?>
 						<?php if ( '' !== $lot['language'] ) : ?><span><?php echo esc_html( (string) ( $languages[ $lot['language'] ] ?? strtoupper( $lot['language'] ) ) ); ?></span><?php endif; ?>
 					</span>
-					<?php if ( '' !== $wp_title && $wp_title !== (string) $run['label'] ) : ?>
+					<?php if ( '' !== $wp_title && $wp_title !== MSRWA_Intake::plain_title( $run['label'] ) ) : ?>
 						<span class="ms-run-wptitle"><?php echo esc_html( sprintf( /* translators: %s is the article's current title in WordPress. */ __( 'Intitulé dans WordPress : « %s »', 'ms-recipes-writer-ai' ), $wp_title ) ); ?></span>
 					<?php endif; ?>
 				</span>

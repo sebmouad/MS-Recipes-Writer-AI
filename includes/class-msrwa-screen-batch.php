@@ -119,7 +119,7 @@ final class MSRWA_Screen_Batch {
 			if ( $dropped ) { $recipe_count--; }
 			echo '<tr class="ms-dish' . ( $mine ? ' has-photos' : '' ) . ( $dropped ? ' is-dropped' : '' ) . '" data-recipe="' . esc_attr( $recipe_index ) . '"' . ( $from_photographs ? ' data-from-photographs="1"' : '' ) . '>';
 			echo '<td class="ms-num">' . esc_html( number_format_i18n( $recipe_index + 1 ) ) . '</td>';
-			echo '<td class="ms-dish-main"><strong class="ms-dish-title">' . esc_html( (string) $recipe['title'] ) . '</strong>';
+			echo '<td class="ms-dish-main"><strong class="ms-dish-title">' . esc_html( MSRWA_Intake::plain_title( (string) $recipe['title'] ) ) . '</strong>';
 			if ( $from_photographs ) { echo ' <span class="ms-state ms-state-idle ms-dish-origin">' . esc_html__( 'd’après vos photographies', 'ms-recipes-writer-ai' ) . '</span>'; }
 			echo '<small class="ms-dish-excerpt">' . esc_html( self::excerpt( $recipe ) ) . '</small></td>';
 			echo '<td><span class="ms-dish-thumbs">';
@@ -231,7 +231,7 @@ final class MSRWA_Screen_Batch {
 						<select id="ms-pair-<?php echo esc_attr( $index ); ?>" class="ms-pair-choice" data-image="<?php echo esc_attr( $index ); ?>" data-url="<?php echo esc_url( (string) ( $image['url'] ?? '' ) ); ?>">
 							<?php if ( $pending ) : ?><option value="" selected><?php esc_html_e( '— à décider —', 'ms-recipes-writer-ai' ); ?></option><?php endif; ?>
 							<?php foreach ( $recipes as $recipe_index => $recipe ) : ?>
-								<option value="<?php echo esc_attr( $recipe_index ); ?>" <?php selected( null !== $pair['recipe'] && (int) $recipe_index === (int) $pair['recipe'] ); ?>><?php echo esc_html( $recipe['title'] ); ?></option>
+								<option value="<?php echo esc_attr( $recipe_index ); ?>" <?php selected( null !== $pair['recipe'] && (int) $recipe_index === (int) $pair['recipe'] ); ?>><?php echo esc_html( MSRWA_Intake::plain_title( $recipe['title'] ) ); ?></option>
 							<?php endforeach; ?>
 							<option value="new"><?php esc_html_e( 'Nouvelle recette…', 'ms-recipes-writer-ai' ); ?></option>
 							<option value="aside" <?php selected( $aside ); ?>><?php esc_html_e( 'Écarter cette photographie', 'ms-recipes-writer-ai' ); ?></option>

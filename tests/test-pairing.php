@@ -4,7 +4,7 @@
 // Marking every row confirmed on each save erased the model's doubts about
 // the photographs nobody had looked at yet.
 require __DIR__ . '/bootstrap.php';
-msrwa_test_load( 'rights', 'profile', 'batch', 'db', 'sources', 'history', 'match' );
+msrwa_test_load( 'rights', 'profile', 'batch', 'db', 'sources', 'history', 'match', 'intake' );
 msrwa_test_as_admin();
 
 $matching = array(

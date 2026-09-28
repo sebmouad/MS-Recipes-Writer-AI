@@ -668,6 +668,15 @@ cost) in the task before changing anything.
   the brief on each; « seulement les desserts » → 2 recipes, 2 set aside; one
   sentence naming six dishes → 6. `tests/test-match.php`,
   `tests/test-intake.php`. ARCHITECTURE invariants 19 and 25.
+- [x] **A78 — Recipe titles without emoji (2026-09-28, 0.31.3).** Owner's
+  screenshot: titles pasted from Facebook showed a broken image beside each
+  emoji in Articles. `MSRWA_Intake::plain_title()` removes emoji and
+  pictographs where a title is read, named, edited or given to a run, and
+  where a stored one is shown (Articles rows, the run's page, the lot, the
+  REST rows). The broken images came from MS Turbo Cache leaving the admin's
+  emoji script with no image address, fixed in its 1.0.16. Real: a run
+  titled with the screenshot's emoji shows plain words in Articles.
+  `tests/test-intake.php`.
 - [x] **A77 — Versions of a dish are recipes of their own (2026-09-28,
   0.31.2).** Owner's rule: photographs are grouped only when they show the
   very same preparation. The reading and the photographs-only grouping say

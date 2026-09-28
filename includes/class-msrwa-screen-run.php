@@ -23,7 +23,7 @@ final class MSRWA_Screen_Run {
 
 		echo '<div class="wrap msrwa">';
 		MSRWA_UI::head(
-			$run['label'],
+			MSRWA_Intake::plain_title( $run['label'] ),
 			'',
 			self::figures( $run, $state ),
 			self::actions( $run )

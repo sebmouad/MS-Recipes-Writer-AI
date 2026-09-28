@@ -40,7 +40,7 @@ final class MSRWA_Run {
 		$now = current_time( 'mysql', true );
 		$wpdb->insert( self::table(), array(
 			'batch_id' => absint( $batch_id ), 'owner_id' => absint( $owner_id ),
-			'label' => mb_substr( (string) ( $brief['title'] ?? 'Sans titre' ), 0, 190 ),
+			'label' => mb_substr( MSRWA_Intake::plain_title( (string) ( $brief['title'] ?? '' ) ) ?: 'Sans titre', 0, 190 ),
 			'brief_json' => wp_json_encode( $brief ),
 			'result_json' => wp_json_encode( array( 'ok' => true, 'errors' => array() ) ),
 			'status' => 'queued', 'step' => '', 'steps_done' => 0,

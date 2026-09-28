@@ -116,7 +116,7 @@ final class MSRWA_Match {
 		$asked = array();
 		foreach ( array_values( (array) ( $decoded['recipes'] ?? array() ) ) as $key => $recipe ) {
 			if ( ! is_array( $recipe ) ) { continue; }
-			$title = $plain( $recipe['title'] ?? '', 180 );
+			$title = MSRWA_Intake::plain_title( $plain( $recipe['title'] ?? '', 180 ) );
 			if ( '' === $title ) { continue; }
 			$asked[ $key ] = array( 'title' => $title, 'photos' => 'photos' === ( $recipe['from'] ?? '' ), 'brief' => $plain( $recipe['brief'] ?? '', 20000 ) );
 		}
@@ -301,7 +301,7 @@ final class MSRWA_Match {
 		$titles = array();
 		// Model output is data: a title is plain text, and a dish nobody photographed is not a recipe.
 		foreach ( (array) ( $decoded['recipes'] ?? array() ) as $recipe ) {
-			$titles[] = mb_substr( trim( wp_strip_all_tags( (string) ( is_array( $recipe ) ? ( $recipe['title'] ?? '' ) : $recipe ) ) ), 0, 180 );
+			$titles[] = mb_substr( MSRWA_Intake::plain_title( wp_strip_all_tags( (string) ( is_array( $recipe ) ? ( $recipe['title'] ?? '' ) : $recipe ) ) ), 0, 180 );
 		}
 		$pairs = array_values( array_filter( (array) ( $decoded['pairs'] ?? array() ), 'is_array' ) );
 		$used = array();
@@ -324,7 +324,7 @@ final class MSRWA_Match {
 
 	/** A recipe the writer named for a photograph, on the pairing screen. */
 	public static function named( $title, array $image ) {
-		$title = mb_substr( trim( wp_strip_all_tags( (string) $title ) ), 0, 180 );
+		$title = mb_substr( MSRWA_Intake::plain_title( wp_strip_all_tags( (string) $title ) ), 0, 180 );
 		return '' === $title ? null : self::from_photographs( $title, array( $image ), array( array( 'image' => 0, 'recipe' => 0 ) ), 0, true );
 	}
 
