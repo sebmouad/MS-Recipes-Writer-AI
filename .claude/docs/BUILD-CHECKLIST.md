@@ -668,6 +668,12 @@ cost) in the task before changing anything.
   the brief on each; « seulement les desserts » → 2 recipes, 2 set aside; one
   sentence naming six dishes → 6. `tests/test-match.php`,
   `tests/test-intake.php`. ARCHITECTURE invariants 19 and 25.
+- [x] **A76 — The collage through the brief (2026-09-28, 0.31.1).** The
+  reading is told which photograph is a step-by-step collage and that it goes
+  with its dish, never a recipe alone. Real: a tart collage with a tart and a
+  chicken photograph went to the tart, flagged and ticked as the writer's
+  Facebook collage; a collage of a dish the brief did not name became one more
+  recipe. `tests/test-match.php`.
 - [x] **A75 — The pairing as tables (2026-09-28, 0.31.0).** Recipes in a
   table — title, the writer's words, photographs, what it is written from —
   each renamed, rewritten or removed in place, and one added; the photographs

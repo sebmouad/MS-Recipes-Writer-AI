@@ -400,7 +400,8 @@ final class MSRWA_Match {
 		if ( $images ) {
 			$out[] = 'PHOTOGRAPHIES, décrites depuis leurs propres pixels :';
 			foreach ( $images as $index => $image ) {
-				$out[] = sprintf( '%d. fichier « %s » — plat reconnu : %s — %s', $index, self::file_label( $image ), '' !== (string) ( $image['dish'] ?? '' ) ? $image['dish'] : 'non identifié', (string) ( $image['describes'] ?? '' ) );
+				// A step-by-step collage is one more view of its dish, never a dish of its own.
+				$out[] = sprintf( '%d. fichier « %s »%s — plat reconnu : %s — %s', $index, self::file_label( $image ), empty( $image['collage'] ) ? '' : ' (collage étape par étape)', '' !== (string) ( $image['dish'] ?? '' ) ? $image['dish'] : 'non identifié', (string) ( $image['describes'] ?? '' ) );
 			}
 			$out[] = '';
 		}
@@ -414,6 +415,7 @@ final class MSRWA_Match {
 			$out[] = '- Il peut y avoir moins de photographies que de recettes : des recettes restent sans photographie, c’est normal. Plusieurs photographies du même plat vont à la même recette ; deux plats différents ne vont pas à la même recette.';
 			$out[] = '- Un plat photographié que la consigne ne demande pas devient une recette de plus ("from": "photos", "brief": ""), nommée d’après le plat ; toutes ses photographies vont à elle. Si la consigne ne nomme aucun plat (par exemple « des recettes légères pour ces photos »), les recettes sont les plats des photographies et la consigne va dans "general". Si la consigne exclut un plat photographié, n’en fais pas une recette : "recipe": null et "excluded": true.';
 			$out[] = '- Le nom du fichier est un indice faible ; ce que montre la photographie prime.';
+			$out[] = '- Un collage étape par étape montre la préparation d’un plat : il va à la recette de ce plat, comme une photographie de plus, et ne fait jamais une recette à lui seul.';
 			$out[] = '- Si tu hésites entre deux recettes, choisis la plus probable avec "confidence": "basse". "recipe": null est réservé à une photographie où aucun plat n’est visible, ou exclue par la consigne.';
 		}
 		$out[] = '';

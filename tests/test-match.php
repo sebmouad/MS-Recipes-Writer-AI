@@ -149,6 +149,9 @@ msrwa_test_assert( 1 === count( $asked ), 'One call reads the brief and pairs th
 $prompt = json_encode( $asked[0], JSON_UNESCAPED_UNICODE );
 msrwa_test_contains( $prompt, 'clafoutis aux cerises, soupe à l’oignon', 'The brief is handed over whole, as written.' );
 msrwa_test_contains( $prompt, 'LA CONSIGNE PRIME', 'And the reading is told it comes first.' );
+$collage_prompt = new ReflectionMethod( MSRWA_Match::class, 'read_prompt' );
+$collage_prompt->setAccessible( true );
+msrwa_test_contains( $collage_prompt->invoke( null, 'Tarte', array( array( 'file' => 'grille.jpg', 'dish' => 'Tarte', 'describes' => 'Six étapes.', 'collage' => true ) ) ), '(collage étape par étape)', 'The reading is told which photograph is the writer’s collage.' );
 msrwa_test_assert( $out['cost_usd'] > 0, 'What the reading cost is counted.' );
 
 // A recipe the reading names from photographs that is plainly a dish of the

@@ -5,9 +5,9 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.31.0
+## État actuel — 0.31.1
 
-La version `0.31.0` lit le texte du rédacteur comme une consigne : plus de
+La version `0.31.1` dit à la lecture du lot quelle photographie est un collage ; la `0.31.0` lit le texte du rédacteur comme une consigne : plus de
 tirets entre les recettes, le texte décide des recettes et prime pour associer
 les photographies, et l'appariement se corrige dans des tableaux ; la `0.30.0` sépare, dans Articles, les recettes en cours des
 terminées et tient les premières à jour en direct ; chaque lot nomme son
@@ -101,6 +101,16 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.31.1
+
+**Le collage Facebook du rédacteur reste reconnu.** La lecture du lot sait
+désormais quelle photographie est un collage étape par étape : il va à la
+recette de son plat comme une photographie de plus et n'en fait jamais une à
+lui seul. Vérifié sur le site de test : un collage de tarte envoyé avec une
+tarte et un poulet va à la tarte, reste coché comme « Votre collage Facebook »
+et mène la recette ; un collage d'un plat que le texte ne cite pas devient une
+recette de plus, jamais celle d'un autre plat.
 
 ## Version 0.31.0
 
