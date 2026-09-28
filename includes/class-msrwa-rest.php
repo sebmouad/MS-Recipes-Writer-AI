@@ -13,6 +13,7 @@ final class MSRWA_REST {
 		register_rest_route( 'msrwa/v1', '/estimate', array( 'methods' => 'GET', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'estimate' ) ) );
 		register_rest_route( 'msrwa/v1', '/batches', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'create' ) ) );
 		register_rest_route( 'msrwa/v1', '/batches/(?P<id>\d+)/pairs', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'pairs' ) ) );
+		register_rest_route( 'msrwa/v1', '/batches/(?P<id>\d+)/recipes', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'recipes' ) ) );
 		register_rest_route( 'msrwa/v1', '/batches/(?P<id>\d+)/schedule', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'schedule' ) ) );
 		register_rest_route( 'msrwa/v1', '/batches/(?P<id>\d+)/dispatch', array( 'methods' => 'POST', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'dispatch' ) ) );
 		register_rest_route( 'msrwa/v1', '/batches/(?P<id>\d+)/runs', array( 'methods' => 'GET', 'permission_callback' => array( __CLASS__, 'can_create' ), 'callback' => array( __CLASS__, 'runs' ) ) );
@@ -83,7 +84,10 @@ final class MSRWA_REST {
 	public static function create( WP_REST_Request $request ) {
 		// A text, photographs, or both. Without text, each dish the photographs
 		// show becomes a recipe, and the writer confirms it with the pairing.
-		$recipes = MSRWA_Intake::recipes( (string) $request->get_param( 'recipes' ) );
+		// The text as the writer laid it out: the lot's reading finds its
+		// recipes; this first cut is what it falls back on.
+		$text = MSRWA_Intake::text( (string) $request->get_param( 'recipes' ) );
+		$recipes = MSRWA_Intake::recipes( $text );
 
 		// Photographs come from the writer's computer, never from the media
 		// library: a lot can only carry pictures its writer actually sent, and
@@ -110,7 +114,8 @@ final class MSRWA_REST {
 			$recipes, $files, $budget,
 			MSRWA_Profile::for_user(),
 			sanitize_key( (string) MSRWA_Settings::get()['site_language'] ),
-			array()
+			array(),
+			$text
 		);
 		MSRWA_Intake::discard( $files );
 		if ( is_wp_error( $id ) ) { return new WP_Error( $id->get_error_code(), $id->get_error_message(), array( 'status' => 400 ) ); }
@@ -147,6 +152,16 @@ final class MSRWA_REST {
 		if ( 'ready' !== $batch['status'] ) { return new WP_Error( 'msrwa_locked', __( 'Ce lot est déjà lancé ; son appariement ne change plus.', 'ms-recipes-writer-ai' ), array( 'status' => 409 ) ); }
 		MSRWA_Batch::repair( (int) $batch['id'], (array) $request->get_param( 'pairs' ) );
 		return rest_ensure_response( array( 'saved' => true ) );
+	}
+
+	/** Renames, rewrites, removes or adds one of a lot's recipes before it leaves. */
+	public static function recipes( WP_REST_Request $request ) {
+		$batch = self::batch( $request['id'] );
+		if ( ! $batch ) { return new WP_Error( 'msrwa_not_found', __( 'Lot introuvable.', 'ms-recipes-writer-ai' ), array( 'status' => 404 ) ); }
+		if ( 'ready' !== $batch['status'] ) { return new WP_Error( 'msrwa_locked', __( 'Ce lot est déjà lancé ; ses recettes ne changent plus.', 'ms-recipes-writer-ai' ), array( 'status' => 409 ) ); }
+		$done = MSRWA_Batch::recipe( (int) $batch['id'], (string) $request->get_param( 'action' ), (int) $request->get_param( 'index' ), (string) $request->get_param( 'title' ), (string) $request->get_param( 'text' ) );
+		if ( is_wp_error( $done ) ) { return self::refused( $done ); }
+		return rest_ensure_response( array( 'saved' => true, 'recipes' => $done ) );
 	}
 
 	/** Sets, or clears, the hour a lot is sent at. */

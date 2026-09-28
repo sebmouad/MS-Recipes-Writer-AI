@@ -372,21 +372,12 @@
 .ms-recipes-text { display: block; inline-size: 100%; min-block-size: 11rem; padding: 12px 14px; font-size: 14px; line-height: 1.6; color: var(--ms-ink); background: var(--ms-raised); border: 1px solid var(--ms-line); border-radius: var(--ms-radius); resize: vertical; }
 .ms-recipes-text:focus { border-color: var(--ms-lamp); box-shadow: 0 0 0 1px var(--ms-lamp); outline: none; }
 .ms-recipes-text::placeholder { color: var(--ms-ink-faint); }
-.ms-recipes-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin-block-start: 10px; }
-.ms-recipes-bar p { margin: 0; }
 .ms-step .button .dashicons { inline-size: 16px; block-size: 16px; font-size: 16px; }
 /* WordPress 7 sets a button icon's line-height to 1.9, the button's height,
    so a glyph sized smaller sat at the bottom of its box: every icon here is
    centred by its button instead, whatever the WordPress version. */
 .wp-core-ui .msrwa .button .dashicons { line-height: 1; margin: 0; vertical-align: middle; }
 .wp-core-ui .msrwa .button:has(> .dashicons) { display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
-.ms-recipe-list { list-style: none; counter-reset: ms-recipe; margin: 12px 0 0; padding: 0; display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr)); }
-.ms-recipe-list[hidden] { display: none; }
-.ms-recipe-list li { counter-increment: ms-recipe; position: relative; margin: 0; padding: 9px 12px 9px 44px; display: grid; gap: 1px; min-inline-size: 0; background: var(--ms-sunk); border: 1px solid var(--ms-line-soft); border-radius: var(--ms-radius); }
-.ms-recipe-list li::before { content: counter(ms-recipe); position: absolute; inset-inline-start: 12px; inset-block-start: 50%; transform: translateY(-50%); inline-size: 22px; block-size: 22px; display: grid; place-items: center; border-radius: 50%; background: var(--ms-lamp-soft); color: var(--ms-lamp); font-family: var(--ms-mono); font-size: 11px; font-weight: 700; }
-[dir="rtl"] .ms-recipe-list li { padding: 9px 44px 9px 12px; }
-.ms-recipe-list strong { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.ms-recipe-list small { font-size: 11px; color: var(--ms-ink-soft); }
 
 /* The photographs: a drop zone, then a grid of what was picked. */
 .ms-drop { position: relative; display: grid; justify-items: center; gap: 6px; padding: 30px 20px; cursor: pointer; text-align: center; border: 2px dashed var(--ms-line); border-radius: var(--ms-radius); background: var(--ms-sunk); transition: border-color .15s ease, background-color .15s ease; }
@@ -433,28 +424,50 @@
 .ms-pairing > p, .ms-pairing > .ms-note { margin-inline: 20px; }
 .ms-pairing-sub { margin: 22px 20px 10px; font-size: 13px; font-weight: 650; }
 
-.ms-dishes { list-style: none; margin: 0 20px 6px; padding: 0; display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); }
-.ms-dish { margin: 0; padding: 14px 16px; display: grid; gap: 8px; align-content: start; background: var(--ms-raised); border: 1px solid var(--ms-line); border-inline-start: var(--ms-rail) solid var(--ms-line); border-radius: var(--ms-radius); }
-.ms-dish.has-photos { border-inline-start-color: var(--ms-good); }
-.ms-dish.is-dropped { opacity: .55; }
-.ms-dish.is-dropped .ms-dish-title { text-decoration: line-through; }
-.ms-dish-title { font-size: 14px; line-height: 1.35; }
-.ms-dish-thumbs { display: flex; flex-wrap: wrap; gap: 6px; min-block-size: 0; }
-.ms-dish-thumbs:empty { display: none; }
-.ms-dish-thumbs img { inline-size: 44px; block-size: 44px; object-fit: cover; border-radius: 5px; border: 1px solid var(--ms-line); }
-.ms-dish-with { font-size: 12px; color: var(--ms-ink-soft); }
-.ms-dish.has-photos .ms-dish-with { color: var(--ms-good); }
+.ms-table-scroll { overflow-x: auto; }
+.ms-pairing .ms-table { border-block-start: 1px solid var(--ms-line-soft); }
+.ms-pairing .ms-table th:first-child, .ms-pairing .ms-table td:first-child { padding-inline-start: 20px; }
+.ms-pairing .ms-table th:last-child, .ms-pairing .ms-table td:last-child { padding-inline-end: 20px; }
 
-.ms-pairs { list-style: none; margin: 0; padding: 0; border-block-start: 1px solid var(--ms-line-soft); }
-.ms-pair { margin: 0; display: grid; grid-template-columns: 128px minmax(0, 1fr) 15rem; gap: 18px; align-items: start; padding: 16px 20px; border-block-end: 1px solid var(--ms-line-soft); border-inline-start: var(--ms-rail) solid transparent; }
-/* Unsure pairings carry the warning's rail: they are the ones to look at. */
-.ms-pair-warn { border-inline-start-color: var(--ms-warn); }
+.ms-brief { margin: 0 20px 14px; border: 1px solid var(--ms-line-soft); border-radius: var(--ms-radius); background: var(--ms-sunk); }
+.ms-brief > summary { cursor: pointer; padding: 9px 14px; font-weight: 600; }
+.ms-brief-text { padding: 0 14px 12px; max-block-size: 16rem; overflow: auto; line-height: 1.55; overflow-wrap: anywhere; }
+
+/* The recipes: a rail says whether each is written from photographs. */
+.ms-recipes-table td { vertical-align: middle; }
+.ms-recipes-table td:first-child { border-inline-start: var(--ms-rail) solid var(--ms-line); }
+.ms-dish.has-photos td:first-child { border-inline-start-color: var(--ms-good); }
+.ms-dish.is-dropped td { opacity: .55; }
+.ms-dish.is-dropped .ms-dish-title { text-decoration: line-through; }
+.ms-dish-main { min-inline-size: 16rem; }
+.ms-dish-title { font-size: 14px; line-height: 1.35; }
+.ms-dish-origin { margin-inline-start: 6px; font-size: 11px; }
+.ms-dish-excerpt { max-inline-size: 42rem; overflow-wrap: anywhere; }
+.ms-dish-thumbs { display: flex; flex-wrap: wrap; gap: 6px; }
+.ms-dish-thumbs img { inline-size: 44px; block-size: 44px; object-fit: cover; border-radius: 5px; border: 1px solid var(--ms-line); }
+.ms-dish-with { font-size: 12px; color: var(--ms-ink-soft); margin: 0 !important; }
+.ms-dish.has-photos .ms-dish-with { color: var(--ms-good); }
+.ms-dish-actions { white-space: nowrap; text-align: end !important; }
+.ms-recipes-table tr.ms-recipe-editor-row:hover { background: none; }
+.ms-recipe-editor-row > td { background: var(--ms-sunk); }
+.ms-recipe-editor { display: grid; gap: 10px; max-inline-size: 48rem; }
+.ms-recipe-editor label { display: grid; gap: 4px; font-weight: 600; }
+.ms-recipe-editor label small { display: inline; font-weight: 400; }
+.ms-recipe-editor input, .ms-recipe-editor textarea { inline-size: 100%; }
+.ms-recipe-editor-actions { display: flex; align-items: center; gap: 12px; margin: 0; }
+.ms-recipes-add { margin: 12px 20px 4px; display: grid; gap: 10px; justify-items: start; }
+.ms-recipes-add > div { inline-size: 100%; padding: 14px 16px; background: var(--ms-sunk); border: 1px solid var(--ms-line-soft); border-radius: var(--ms-radius); box-sizing: border-box; }
+
+/* The photographs: each with what was seen, how sure the pairing is, and
+   the one choice a person makes. Unsure pairings carry the warning's rail. */
+.ms-pairs td { vertical-align: top; }
+.ms-pairs td:first-child { border-inline-start: var(--ms-rail) solid transparent; inline-size: 128px; }
+.ms-pair-good td:first-child { border-inline-start-color: var(--ms-good); }
+.ms-pair-warn td:first-child { border-inline-start-color: var(--ms-warn); }
+.ms-pair-stop td { background: var(--ms-stop-soft); }
+.ms-pair-stop td:first-child { border-inline-start-color: var(--ms-stop); }
 .ms-pair-idle .ms-pair-photo { opacity: .6; }
-.ms-pair-stop { border-inline-start-color: var(--ms-stop); background: linear-gradient(to right, var(--ms-stop-soft), transparent 40%); }
-/* A photograph with no preview leaves no column: an empty gutter down
-   the page reads as something that failed to load. */
-.ms-pair-blind { grid-template-columns: minmax(0, 1fr) 15rem; }
-.ms-pair-photo { display: block; border-radius: 8px; overflow: hidden; border: 1px solid var(--ms-line); }
+.ms-pair-photo { display: block; inline-size: 112px; border-radius: 8px; overflow: hidden; border: 1px solid var(--ms-line); }
 .ms-pair-photo img { inline-size: 100%; aspect-ratio: 1; object-fit: cover; display: block; transition: transform .2s ease; }
 .ms-pair-photo:hover img, .ms-pair-photo:focus-visible img { transform: scale(1.04); }
 .ms-pair-body p { margin: 0; }
@@ -462,9 +475,13 @@
 .ms-pair-says { margin-block-start: 4px !important; color: var(--ms-ink); line-height: 1.5; }
 .ms-pair-why { margin-block-start: 8px !important; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; font-size: 12px; color: var(--ms-ink-soft); }
 .ms-pair-file { font-family: var(--ms-mono); font-size: 11px; color: var(--ms-ink-faint); margin-block-start: 6px !important; overflow-wrap: anywhere; }
-.ms-pair-pick { display: grid; gap: 5px; }
-.ms-pair-pick label { font-size: 11px; font-weight: 650; letter-spacing: .06em; text-transform: uppercase; color: var(--ms-ink-faint); }
+td.ms-pair-pick { inline-size: 15rem; }
+.ms-pair-pick label { display: block; margin-block-end: 5px; font-size: 11px; font-weight: 650; letter-spacing: .06em; text-transform: uppercase; color: var(--ms-ink-faint); }
 .ms-pair-pick select { inline-size: 100%; max-inline-size: 100%; min-block-size: 36px; }
+/* The column says it already; on a phone, where the header is hidden, the label does. */
+@media (min-width: 783px) { .ms-pairs .ms-pair-pick label span[aria-hidden] { display: none; } .ms-pairs .ms-pair-pick label { margin: 0; } }
+.ms-pair-new { display: flex; gap: 6px; margin-block-start: 6px; }
+.ms-pair-new[hidden] { display: none; }
 .ms-pair-fixed { font-weight: 600; }
 
 /* Launching: one clear action, the rest folded beside it. */
@@ -477,10 +494,25 @@
 .ms-later-body label { font-weight: 600; }
 
 @media (max-width: 782px) {
-	.ms-pair, .ms-pair-blind { grid-template-columns: 88px minmax(0, 1fr); gap: 12px; padding-inline: 14px; }
-	.ms-pair-pick { grid-column: 1 / -1; }
+	/* On a phone each row is a card: the columns stack, no sideways scroll. */
+	.ms-recipes-table thead, .ms-pairs thead { display: none; }
+	.ms-recipes-table, .ms-recipes-table tbody, .ms-recipes-table tr, .ms-recipes-table td,
+	.ms-pairs, .ms-pairs tbody, .ms-pairs tr, .ms-pairs td { display: block; inline-size: auto; }
+	.ms-recipes-table tr.ms-dish, .ms-pairs tr { padding: 12px 14px; border-block-end: 1px solid var(--ms-line-soft); border-inline-start: var(--ms-rail) solid var(--ms-line); }
+	.ms-recipes-table tr.ms-dish.has-photos, .ms-pair-good { border-inline-start-color: var(--ms-good) !important; }
+	.ms-pair-warn { border-inline-start-color: var(--ms-warn) !important; }
+	.ms-pair-stop { border-inline-start-color: var(--ms-stop) !important; background: var(--ms-stop-soft); }
+	.ms-pairing .ms-table td, .ms-pairing .ms-table td:first-child, .ms-pairing .ms-table td:last-child { padding: 4px 0; border: 0; }
+	.ms-recipes-table td.ms-num { display: none; }
+	.ms-recipes-table tr[hidden] { display: none; }
+	.ms-dish-main { min-inline-size: 0; }
+	.ms-dish-actions { text-align: start !important; padding-block-start: 8px !important; }
+	.ms-dish-actions .button { min-block-size: 40px; }
+	.ms-recipe-editor-row > td { padding: 12px 14px !important; }
+	td.ms-pair-pick { inline-size: auto; }
+	.ms-pair-photo { inline-size: 88px; }
 	.ms-pair-pick select { font-size: 16px; min-block-size: 42px; }
-	.ms-dishes { margin-inline: 14px; grid-template-columns: minmax(0, 1fr); }
+	.ms-recipes-add, .ms-brief { margin-inline: 14px; }
 	.ms-pairing > p, .ms-pairing > .ms-note { margin-inline: 14px; }
 	.ms-launch { padding: 12px 14px; }
 	.ms-launch #ms-dispatch { flex: 1 1 100%; justify-content: center; text-align: center; }

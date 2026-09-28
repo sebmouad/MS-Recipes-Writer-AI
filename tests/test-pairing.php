@@ -78,4 +78,56 @@ msrwa_test_assert( 'Poulet yassa et 1 autre' === MSRWA_Batch::title( array( 'lab
 msrwa_test_assert( 'Poulet yassa' === MSRWA_Batch::title( array( 'label' => 'Poulet yassa ووصفة أخرى', 'recipes' => 1 ) ), 'An old Arabic one too.' );
 msrwa_test_assert( 'Tarte et crème' === MSRWA_Batch::title( array( 'label' => 'Tarte et crème', 'recipes' => 1 ) ), 'A title with "et" in it is left alone.' );
 
+// --- The writer corrects the recipes themselves --------------------------
+// Removing a recipe gives its photographs back to the writer and moves the
+// later recipes' photographs with them; the last recipe of a lot is kept.
+$recipes_lot = array(
+	'recipes' => array( array( 'title' => 'Tarte', 'text' => 'Tarte' ), array( 'title' => 'Yassa', 'text' => 'Yassa' ), array( 'title' => 'Daube', 'text' => 'Daube' ), array( 'title' => 'Crème brûlée', 'text' => "Crème brûlée\n\nAucun texte fourni.", 'from_photographs' => true ) ),
+	'images' => array( array( 'file' => 'a.jpg' ), array( 'file' => 'b.jpg' ), array( 'file' => 'c.jpg' ) ),
+	'pairs' => array( array( 'image' => 0, 'recipe' => 1, 'confidence' => 'haute' ), array( 'image' => 1, 'recipe' => 2, 'confidence' => 'haute' ), array( 'image' => 2, 'recipe' => 3, 'confidence' => 'moyenne' ) ),
+);
+$saved_lot = static function () {
+	$update = $GLOBALS['wpdb']->matching( 'UPDATE ' );
+	$row = json_decode( substr( end( $update ), strpos( end( $update ), '{' ) ), true );
+	return array( json_decode( $row['matching_json'], true ), $row );
+};
+$fresh = static function ( $lot ) {
+	$GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
+	$GLOBALS['wpdb']->on( 'WHERE id = 7', array( array( 'id' => 7, 'owner_id' => 1, 'status' => 'ready', 'matching_json' => wp_json_encode( $lot ) ) ) );
+};
+
+$fresh( $recipes_lot );
+msrwa_test_assert( 3 === MSRWA_Batch::recipe( 7, 'remove', 1 ), 'Removing a recipe leaves the others.' );
+list( $lot, $row ) = $saved_lot();
+msrwa_test_assert( array( 'Tarte', 'Daube', 'Crème brûlée' ) === array_column( $lot['recipes'], 'title' ) && 3 === $row['recipes'], 'The removed recipe is gone and the lot counts three.' );
+msrwa_test_assert( null === $lot['pairs'][0]['recipe'] && ! empty( $lot['pairs'][0]['pending'] ), 'Its photograph waits for the writer again.' );
+msrwa_test_assert( 1 === $lot['pairs'][1]['recipe'] && 2 === $lot['pairs'][2]['recipe'], 'The later recipes keep their photographs.' );
+
+$fresh( array( 'recipes' => array( array( 'title' => 'Seule', 'text' => 'Seule' ) ), 'images' => array(), 'pairs' => array() ) );
+msrwa_test_assert( is_wp_error( MSRWA_Batch::recipe( 7, 'remove', 0 ) ), 'The last recipe of a lot is not removed: the lot is deleted instead.' );
+msrwa_test_assert( is_wp_error( MSRWA_Batch::recipe( 7, 'edit', 4, 'X' ) ), 'A recipe that is not there is not edited.' );
+
+// Editing: the title and the text are the writer's; a recipe named after
+// photographs becomes theirs once they write its text, and renamed only,
+// keeps what the photographs showed.
+$fresh( $recipes_lot );
+MSRWA_Batch::recipe( 7, 'edit', 0, '<b>Tarte fine</b>', "Tarte fine\nPâte feuilletée, pommes." );
+list( $lot ) = $saved_lot();
+msrwa_test_assert( 'Tarte fine' === $lot['recipes'][0]['title'] && false !== strpos( $lot['recipes'][0]['text'], 'feuilletée' ), 'A title is plain text, and the text is the writer’s.' );
+$fresh( $recipes_lot );
+MSRWA_Batch::recipe( 7, 'edit', 3, 'Crème catalane', '' );
+list( $lot ) = $saved_lot();
+msrwa_test_assert( ! empty( $lot['recipes'][3]['from_photographs'] ) && 0 === strpos( $lot['recipes'][3]['text'], 'Crème catalane' ), 'Renamed only, it is still written from the photographs, under its new name.' );
+$fresh( $recipes_lot );
+MSRWA_Batch::recipe( 7, 'edit', 3, 'Crème brûlée', "Crème, sucre, vanille." );
+list( $lot ) = $saved_lot();
+msrwa_test_assert( empty( $lot['recipes'][3]['from_photographs'] ) && 'Crème, sucre, vanille.' === $lot['recipes'][3]['text'], 'With a text of the writer’s, it is theirs.' );
+
+// Adding: a name is enough.
+$fresh( $recipes_lot );
+msrwa_test_assert( is_wp_error( MSRWA_Batch::recipe( 7, 'add', 0, '   ' ) ), 'A recipe needs a name.' );
+msrwa_test_assert( 5 === MSRWA_Batch::recipe( 7, 'add', 0, 'Ratatouille' ), 'A named recipe is added to the lot.' );
+list( $lot ) = $saved_lot();
+msrwa_test_assert( 'Ratatouille' === $lot['recipes'][4]['text'], 'Its name is its text until the writer writes more.' );
+
 msrwa_test_done( 'the pairing keeps the model’s word on what the writer did not change' );

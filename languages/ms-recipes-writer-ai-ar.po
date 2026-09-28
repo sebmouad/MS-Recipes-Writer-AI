@@ -2559,3 +2559,77 @@ msgstr "منتهٍ مع إخفاقات"
 
 msgid "terminées"
 msgstr "منتهية"
+
+msgid "Annuler"
+msgstr "إلغاء"
+
+msgid "Aucun texte : établie d’après les photographies et les sources."
+msgstr "بلا نص: تُكتب انطلاقًا من الصور والمصادر."
+
+msgid "Ce lot est déjà lancé ; ses recettes ne changent plus."
+msgstr "أُطلقت هذه الدفعة بالفعل؛ لم تعد وصفاتها قابلة للتغيير."
+
+msgid "Ce qu’elle montre"
+msgstr "ما تُظهره"
+
+msgid "Cette recette n’existe plus dans le lot. Rechargez la page."
+msgstr "لم تعد هذه الوصفة في الدفعة. أعد تحميل الصفحة."
+
+msgid "Donnez un nom à la recette."
+msgstr "أعطِ الوصفة اسمًا."
+
+#, php-format
+msgid "Environ %d recettes — repérées pour de bon à l’étape suivante."
+msgstr "نحو %d وصفات — تُحدَّد نهائيًا في الخطوة التالية."
+
+msgid "Environ 1 recette — repérée pour de bon à l’étape suivante."
+msgstr "نحو وصفة واحدة — تُحدَّد نهائيًا في الخطوة التالية."
+
+msgid "Le nom du plat seul : le reste est établi d’après les sources."
+msgstr "اسم الطبق فقط: يُستكمل الباقي من المصادر."
+
+msgid "Photographie"
+msgstr "الصورة"
+
+msgid "Photographies"
+msgstr "الصور"
+
+#, php-format
+msgid "Retirer « %s » du lot ? Ses photographies attendront votre décision."
+msgstr "إزالة «%s» من الدفعة؟ ستنتظر صورها قرارك."
+
+msgid "Tarte aux pommes normande\nPoulet yassa\nDaube provençale\n\nClafoutis aux cerises\n500 g de cerises, 3 œufs, 50 cl de lait…"
+msgstr "تارت التفاح النورماندية\nدجاج ياسا\nيخنة لحم بروفنسالية\n\nكلافوتي الكرز\n500 غ كرز، 3 بيضات، 500 مل حليب…"
+
+msgid "Texte"
+msgstr "النص"
+
+msgid "Un lot garde au moins une recette : supprimez le lot pour tout abandonner."
+msgstr "تحتفظ الدفعة بوصفة واحدة على الأقل: احذف الدفعة للتخلي عن كل شيء."
+
+msgid "d’après vos photographies"
+msgstr "من صورك"
+
+msgid "facultatif : ingrédients, étapes, précisions"
+msgstr "اختياري: المكونات والخطوات والتفاصيل"
+
+msgid "Écrite d’après"
+msgstr "تُكتب انطلاقًا من"
+
+msgid "Écrivez comme vous voulez : un plat par ligne, ou chaque recette avec ses ingrédients et ses étapes, avec ou sans titre. Les recettes sont repérées et associées aux photographies à l’étape suivante, où vous pouvez tout corriger. Le nom du plat suffit : le reste est établi d’après les sources."
+msgstr "اكتب كما تشاء: طبق في كل سطر، أو كل وصفة بمكوناتها وخطواتها، بعنوان أو بدونه. تُحدَّد الوصفات وتُطابق مع الصور في الخطوة التالية، حيث يمكنك تصحيح كل شيء. يكفي اسم الطبق: يُستكمل الباقي من المصادر."
+
+msgid "Votre consigne"
+msgstr "تعليماتك"
+
+msgid "Tarte aux pommes normande, poulet yassa et daube provençale, en version sans gluten.\n\nClafoutis aux cerises : 500 g de cerises, 3 œufs, 50 cl de lait…"
+msgstr "تارت التفاح النورماندية ودجاج ياسا ويخنة اللحم البروفنسالية، بدون غلوتين.\n\nكلافوتي الكرز: 500 غ كرز، 3 بيضات، 500 مل حليب…"
+
+msgid "Écrivez-le comme une consigne, librement : des noms de plats, des recettes complètes ou en partie, des demandes pour tout le lot (« sans gluten », « version légère »…). Le texte est lu en entier et il prime : il décide des recettes, puis chaque photographie va au plat qu’elle montre. Sans texte, les recettes sont choisies d’après les photographies. Vous vérifiez et corrigez tout à l’étape suivante."
+msgstr "اكتبه كتعليمات، بحرية: أسماء أطباق، أو وصفات كاملة أو جزئية، أو طلبات للدفعة كلها («بدون غلوتين»، «نسخة خفيفة»…). يُقرأ النص كاملًا وله الأولوية: يحدد الوصفات، ثم تذهب كل صورة إلى الطبق الذي تُظهره. بلا نص، تُختار الوصفات انطلاقًا من الصور. تتحقق من كل شيء وتصححه في الخطوة التالية."
+
+msgid "Écartée selon votre consigne."
+msgstr "استُبعدت حسب تعليماتك."
+
+msgid "Les recettes sont décidées à l’étape suivante, d’après votre consigne et vos photographies."
+msgstr "تُحدَّد الوصفات في الخطوة التالية، انطلاقًا من تعليماتك وصورك."

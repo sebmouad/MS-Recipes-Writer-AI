@@ -654,6 +654,27 @@ cost) in the task before changing anything.
   is 200–280 characters, under MS FB Posts' 300. Offline: `test-seo.php`.
   Real: on the test site, a locked post rendered for an anonymous visitor
   carries none of its text, and the password holder still sees it.
+- [x] **A74 — The writer's text is a brief (2026-09-28, 0.31.0).** Owner's
+  request: six recipes and four photographs came back as eight or ten, the
+  text was cut on lines of dashes, and a photograph the pairing doubted became
+  a recipe. Now one call reads the whole text as a brief and decides the
+  recipes, the brief first; photographs go to the dish they show, a dish the
+  brief does not name is one more recipe, one it rules out is set aside, and
+  a doubt never adds a recipe. No separator is asked of the writer. Real, on
+  the local site with the live provider: six dishes in a messy text and four
+  photographs → 6 recipes, 4 illustrated ($0.0043); a dense numbered text and
+  five photographs → its 6 recipes plus the apple tart it did not name;
+  « des recettes légères… pour ces photos » → 3 recipes from the photographs,
+  the brief on each; « seulement les desserts » → 2 recipes, 2 set aside; one
+  sentence naming six dishes → 6. `tests/test-match.php`,
+  `tests/test-intake.php`. ARCHITECTURE invariants 19 and 25.
+- [x] **A75 — The pairing as tables (2026-09-28, 0.31.0).** Recipes in a
+  table — title, the writer's words, photographs, what it is written from —
+  each renamed, rewritten or removed in place, and one added; the photographs
+  in a table beside it; the brief folded above. Real: in the browser, a
+  title edited, a recipe added and one removed, the launch count following;
+  1280 and 390 px, Arabic right to left, no script error.
+  `tests/test-pairing.php`.
 - [x] **A71 — The audit's engine fixes (2026-09-26, 0.28.39).** Owner's
   approval of ENGINE.md §7, items 8–12, now decided items 55–59: the judge
   reads the image brief as context; the review's typography and the recipe's

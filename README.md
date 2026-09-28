@@ -5,9 +5,11 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.30.0
+## État actuel — 0.31.0
 
-La version `0.30.0` sépare, dans Articles, les recettes en cours des
+La version `0.31.0` lit le texte du rédacteur comme une consigne : plus de
+tirets entre les recettes, le texte décide des recettes et prime pour associer
+les photographies, et l'appariement se corrige dans des tableaux ; la `0.30.0` sépare, dans Articles, les recettes en cours des
 terminées et tient les premières à jour en direct ; chaque lot nomme son
 rédacteur et dit où il en est ; la `0.29.2` garde un article protégé par mot de passe muet dans
 l'en-tête et raccourcit la légende Facebook ; la `0.29.1` ne met la FAQ en données structurées que sur la page de
@@ -99,6 +101,27 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.31.0
+
+**Votre texte est une consigne.** Plus besoin de séparer les recettes par des
+tirets : écrivez librement — des noms de plats, des recettes complètes ou en
+partie, une phrase qui en cite plusieurs, des demandes pour tout le lot
+(« sans gluten », « ton chaleureux »). Le texte est lu en entier et il prime :
+chaque plat demandé devient une recette, avec vos propres mots, et ce que vous
+demandez pour tout le lot accompagne chacune. Chaque photographie va au plat
+qu'elle montre — le même plat, pas seulement le même ingrédient : une tarte aux
+pommes n'est pas des pommes au four. Six recettes et quatre photographies
+donnent six recettes, dont quatre illustrées. Un plat photographié que le texte
+ne cite pas devient une recette de plus ; un plat que le texte exclut
+(« seulement les desserts ») est écarté ; un doute n'ajoute jamais de recette.
+Sans texte, les recettes sont choisies d'après les photographies.
+
+**L'appariement en tableaux.** Les recettes dans un tableau : titre, vos mots,
+photographies, ce d'après quoi elle sera écrite. Chacune se renomme, se
+réécrit ou se retire sur place, et on en ajoute une. Les photographies dans un
+second tableau, votre consigne repliée au-dessus pour comparer. Sur téléphone,
+chaque ligne devient une fiche.
 
 ## Version 0.30.0
 

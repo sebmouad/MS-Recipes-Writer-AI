@@ -81,9 +81,27 @@
     return (format.pattern || '%s $').replace('%s', parts.join(format.decimal || '.'));
   }
 
-  /** The separator the writer types, mirrored from MSRWA_Intake so the count agrees. */
+  /**
+   * How many recipes the text probably holds, for the estimate only:
+   * MSRWA_Intake's first guess, mirrored. The lot's reading decides them
+   * from the brief once it is sent.
+   */
   function countRecipes(text) {
-    return text.split(/^\s*-{3,}\s*$/m).filter(function (block) { return block.trim() !== ''; }).length;
+    text = text.replace(/\r\n/g, '\n').trim();
+    if (!text) { return 0; }
+    var ruled = /^\s*-{3,}\s*$/m.test(text);
+    var blocks = ruled ? text.split(/^\s*-{3,}\s*$/m) : text.split(/\n\s*\n/);
+    var count = 0;
+    blocks.forEach(function (block) {
+      var lines = block.split('\n').map(function (line) { return line.trim(); }).filter(Boolean);
+      if (!lines.length) { return; }
+      var names = !ruled && lines.length > 2 && lines.every(function (line) {
+        line = line.replace(/^(?:#{1,6}|\d+[.)]|[-*•])\s*/, '');
+        return line.length <= 60 && !/[,;:]|\d/.test(line);
+      });
+      count += names ? lines.length : 1;
+    });
+    return count;
   }
 
   // --- Composing a lot ---------------------------------------------------
@@ -106,12 +124,11 @@
 
     function refreshEstimate() {
       var typed = countRecipes(recipes.value);
-      // Without text, each dish the photographs show becomes a recipe: at most
-      // one per photograph, which is the figure the estimate has to hold.
-      var count = typed || chosen.length;
-      say(recipeCount, typed
-        ? (typed === 1 ? t.oneRecipe : (t.manyRecipes || '').replace('%d', typed))
-        : (chosen.length ? (t.fromPhotos || '').replace('%d', chosen.length) : ''));
+      // The brief decides the recipes once it is read; until then the estimate
+      // holds a guess, and at least one recipe per photograph. Without text,
+      // each dish the photographs show becomes a recipe.
+      var count = Math.max(typed, chosen.length);
+      say(recipeCount, typed ? (t.fromBrief || '') : (chosen.length ? (t.fromPhotos || '').replace('%d', chosen.length) : ''));
       if (!count) { say(estimate, ''); return; }
 
       // The figure comes from the server, because it is worked out from the
@@ -149,41 +166,7 @@
       }, 400);
     }
 
-    // The recipes as they will be read: one line per block, its title and
-    // whether it says more than the dish's name. What the separator rule
-    // means is shown rather than explained.
-    var recipeList = document.getElementById('ms-recipe-list');
-    function renderRecipes() {
-      var blocks = recipes.value.split(/^\s*-{3,}\s*$/m).map(function (block) {
-        return block.split(/\r?\n/).map(function (line) { return line.trim(); }).filter(Boolean);
-      }).filter(function (lines) { return lines.length; });
-      recipeList.innerHTML = '';
-      recipeList.hidden = blocks.length < 1;
-      blocks.forEach(function (lines) {
-        var item = document.createElement('li');
-        var title = document.createElement('strong');
-        title.textContent = lines[0];
-        title.title = lines[0];
-        var more = document.createElement('small');
-        more.textContent = lines.length > 1 ? (t.recipeWithDetails || '') : (t.recipeTitleOnly || '');
-        item.appendChild(title);
-        item.appendChild(more);
-        recipeList.appendChild(item);
-      });
-    }
-
-    recipes.addEventListener('input', function () { renderRecipes(); refreshEstimate(); });
-    var recipeAdd = document.getElementById('ms-recipe-add');
-    if (recipeAdd) {
-      recipeAdd.addEventListener('click', function () {
-        var text = recipes.value.replace(/\s+$/, '');
-        recipes.value = text ? text + '\n\n---\n\n' : '';
-        recipes.focus();
-        recipes.setSelectionRange(recipes.value.length, recipes.value.length);
-        recipes.scrollTop = recipes.scrollHeight;
-        renderRecipes(); refreshEstimate();
-      });
-    }
+    recipes.addEventListener('input', refreshEstimate);
 
     function megabytes(bytes) { return String(Math.floor(bytes / 1000000)); }
 
@@ -557,6 +540,56 @@
           .then(function () { say(batchStatus, t.pairsSaved || t.saved || ''); })
           .catch(function (error) { say(batchStatus, error.message); });
       }, 300);
+    });
+  });
+
+  // Correcting the recipes themselves: a title or a text, one removed, one
+  // added. Each change is saved at once and the page drawn again, since every
+  // "goes with" list names the recipes.
+  function editRecipe(body) {
+    say(batchStatus, t.saving || '');
+    window.clearTimeout(pairTimer);
+    return savePairs()
+      .then(function () { return call('/batches/' + batch + '/recipes', { method: 'POST', body: JSON.stringify(body) }); })
+      .then(function () { window.location.reload(); })
+      .catch(function (error) { say(batchStatus, error.message); throw error; });
+  }
+  function toggleEditor(button, open) {
+    var editor = document.getElementById(button.getAttribute('aria-controls'));
+    if (!editor) { return; }
+    editor.hidden = !open;
+    button.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (open) { editor.querySelector('.ms-edit-title').focus(); }
+  }
+  document.querySelectorAll('.ms-recipe-edit, #ms-recipe-add').forEach(function (button) {
+    button.addEventListener('click', function () { toggleEditor(button, button.getAttribute('aria-expanded') !== 'true'); });
+  });
+  document.querySelectorAll('.ms-recipe-editor').forEach(function (editor) {
+    var key = editor.dataset.recipe;
+    var opener = document.querySelector('[aria-controls="' + (editor.closest('[id^="ms-recipe-editor-"]') || {}).id + '"]');
+    var title = editor.querySelector('.ms-edit-title');
+    var save = editor.querySelector('.ms-edit-save');
+    function submit() {
+      if (!title.value.trim()) { title.focus(); say(batchStatus, t.recipeNeedsName || ''); return; }
+      save.disabled = true;
+      editRecipe({
+        action: 'new' === key ? 'add' : 'edit',
+        index: 'new' === key ? 0 : parseInt(key, 10),
+        title: title.value.trim(),
+        text: editor.querySelector('.ms-edit-text').value
+      }).catch(function () { save.disabled = false; });
+    }
+    save.addEventListener('click', submit);
+    title.addEventListener('keydown', function (event) { if ('Enter' === event.key) { event.preventDefault(); submit(); } });
+    editor.querySelector('.ms-edit-cancel').addEventListener('click', function () { if (opener) { toggleEditor(opener, false); opener.focus(); } });
+  });
+  document.querySelectorAll('.ms-recipe-remove').forEach(function (button) {
+    button.addEventListener('click', function () {
+      var row = button.closest('.ms-dish');
+      var name = row ? row.querySelector('.ms-dish-title').textContent : '';
+      if (!window.confirm((t.recipeRemove || '').replace('%s', name))) { return; }
+      button.disabled = true;
+      editRecipe({ action: 'remove', index: parseInt(button.dataset.recipe, 10) }).catch(function () { button.disabled = false; });
     });
   });
 

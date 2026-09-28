@@ -12,34 +12,57 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
 final class MSRWA_Intake {
 
 	/**
-	 * Splits one submission into recipes.
+	 * Splits one submission into recipes, as a first guess.
 	 *
-	 * Writers separate recipes the way writers do: a blank line and a rule, a
-	 * row of dashes, a numbered heading. Rather than guess at prose, the
-	 * separator is explicit — a line of three or more dashes — and anything
-	 * before the first one is a recipe too. A single recipe with no separator
-	 * comes back as one recipe, which is the common case and must not need
-	 * ceremony.
+	 * Writers lay recipes out as they please: one dish per line, each recipe
+	 * with its ingredients and steps, a blank line between them or none. The
+	 * lot's reading (MSRWA_Match) finds them properly; this guess is what the
+	 * estimate counts before anything is sent, and what the lot falls back on
+	 * when the reading cannot be had. A line of dashes still separates, as it
+	 * did; otherwise blank lines do, and a block of three short lines or more
+	 * without punctuation is a list of dish names, one recipe each.
 	 */
 	public static function recipes( $text ) {
-		$text = trim( (string) wp_unslash( $text ) );
+		$text = self::text( $text );
 		if ( '' === $text ) { return array(); }
 
-		$blocks = preg_split( '/^\s*-{3,}\s*$/m', $text );
+		$ruled = (bool) preg_match( '/^\s*-{3,}\s*$/m', $text );
+		$blocks = $ruled ? preg_split( '/^\s*-{3,}\s*$/m', $text ) : preg_split( '/\n\s*\n/', $text );
 		$out = array();
 		foreach ( (array) $blocks as $block ) {
 			$block = trim( $block );
 			if ( '' === $block ) { continue; }
+			$lines = array_values( array_filter( array_map( 'trim', preg_split( '/\r?\n/', $block ) ), 'strlen' ) );
+			if ( ! $ruled && count( $lines ) > 2 && self::names_only( $lines ) ) {
+				foreach ( $lines as $line ) { $out[] = array( 'title' => self::title_of( $line ), 'text' => $line ); }
+				continue;
+			}
 			$out[] = array( 'title' => self::title_of( $block ), 'text' => $block );
 		}
 		return $out;
 	}
 
+	/** The submission as typed, without the slashes WordPress may have added. */
+	public static function text( $text ) { return trim( str_replace( "\r\n", "\n", (string) wp_unslash( $text ) ) ); }
+
+	/**
+	 * Whether these lines read as a list of dish names: each short, none with
+	 * the comma, colon or quantity of an ingredient line or a step.
+	 */
+	private static function names_only( array $lines ) {
+		foreach ( $lines as $line ) {
+			$line = preg_replace( '/^(?:#{1,6}|\d+[.)]|[-*•])\s*/u', '', $line );
+			if ( mb_strlen( $line ) > 60 || preg_match( '/[,;:]|\d/u', $line ) ) { return false; }
+		}
+		return true;
+	}
+
 	/**
 	 * The recipe's title: its first non-empty line, stripped of the decoration
-	 * writers put around a heading.
+	 * writers put around a heading. The reading names the dish itself; this is
+	 * the title when it does not.
 	 */
-	private static function title_of( $block ) {
+	public static function title_of( $block ) {
 		foreach ( preg_split( '/\r?\n/', $block ) as $line ) {
 			$line = trim( wp_strip_all_tags( $line ) );
 			$line = trim( preg_replace( '/^(?:#{1,6}|\d+[.)]|[-*•])\s*/u', '', $line ) );

@@ -170,11 +170,13 @@ final class MSRWA_Admin {
 			),
 			'text' => array(
 				'failed' => __( 'Une erreur est survenue.', 'ms-recipes-writer-ai' ),
-				'oneRecipe' => __( '1 recette détectée', 'ms-recipes-writer-ai' ),
+				'fromBrief' => __( 'Les recettes sont décidées à l’étape suivante, d’après votre consigne et vos photographies.', 'ms-recipes-writer-ai' ),
 				/* translators: %d is a number of photographs. */
 				'fromPhotos' => __( 'Aucun texte : chaque plat reconnu sur les photographies deviendra une recette (%d au plus).', 'ms-recipes-writer-ai' ),
 				/* translators: %d is a number of recipes. */
-				'manyRecipes' => __( '%d recettes détectées', 'ms-recipes-writer-ai' ),
+				'recipeNeedsName' => __( 'Donnez un nom à la recette.', 'ms-recipes-writer-ai' ),
+				/* translators: %s is a recipe's title. */
+				'recipeRemove' => __( 'Retirer « %s » du lot ? Ses photographies attendront votre décision.', 'ms-recipes-writer-ai' ),
 				'noImage' => __( 'aucune photographie', 'ms-recipes-writer-ai' ),
 				'oneImage' => __( '1 photographie', 'ms-recipes-writer-ai' ),
 				/* translators: %d is a number of photographs. */
@@ -200,8 +202,6 @@ final class MSRWA_Admin {
 				'linkUnseen' => __( 'aperçu indisponible — le site vérifiera à l’envoi', 'ms-recipes-writer-ai' ),
 				/* translators: %d is the number of the pasted image, counting from 1. */
 				'pastedName' => __( 'Image collée %d', 'ms-recipes-writer-ai' ),
-				'recipeTitleOnly' => __( 'le nom seul', 'ms-recipes-writer-ai' ),
-				'recipeWithDetails' => __( 'avec des précisions', 'ms-recipes-writer-ai' ),
 				/* translators: 1: likely cost, 2: number of recipes. */
 				'estimate' => __( 'Environ %1$s pour %2$d recette(s).', 'ms-recipes-writer-ai' ),
 				/* translators: %s is an amount in US dollars. */

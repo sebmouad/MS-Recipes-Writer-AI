@@ -86,8 +86,7 @@ msrwa_test_assert( null === $blur[0]['recipe'], 'A photograph with no recognised
 $nothing = $proposal->invoke( null, array( 'recipes' => array( array( 'title' => 'Tarte' ) ), 'pairs' => array() ), $shots );
 msrwa_test_assert( array() === $nothing['recipes'], 'A title no photograph was given yields no recipe at all.' );
 
-// Text alone pays for no pairing call; photographs alone ask for recipes.
-msrwa_test_contains( $source, "if ( ! \$seen['images'] ) {", 'Without photographs, nothing is paired or billed.' );
+// Photographs alone ask for recipes.
 msrwa_test_contains( $source, '$decision = self::propose( $seen[\'images\'], $config );', 'Without text, the photographs propose the recipes.' );
 
 // The dish names become titles when there is no text, and the reasons are
@@ -102,47 +101,112 @@ msrwa_test_assert( 2 === substr_count( $instruction->invoke( null, 'anglais' ), 
 // One look serves the pairing and the research: the engine's own observation
 // instruction, and the engine is handed the reading so it does not look again.
 msrwa_test_contains( $instruction->invoke( null, 'anglais' ), 'observable_details', 'The pairing asks for the engine’s observation in the same call.' );
-msrwa_test_contains( $source, "1 === count( \$recipes )", 'A lot of one recipe is paired without a paid call.' );
+msrwa_test_contains( $source, "self::all_of( array( 'title' => \$text ), \$seen['images'] )", 'A one-line brief naming the one dish photographed is paired without a paid call.' );
 $proposal_prompt = new ReflectionMethod( MSRWA_Match::class, 'proposal_prompt' );
 $proposal_prompt->setAccessible( true );
 msrwa_test_missing( $proposal_prompt->invoke( null, $shots, 'espagnol' ), 'en français', 'Nor are the titles or the reasons French on a Spanish site.' );
 
-// --- A photograph of a dish the text does not name ---------------------
-// The owner's rule: it is not thrown away. It becomes a recipe of its own, as
-// in a lot with no text; photographs of one dish become one recipe; one with
-// no dish on it waits for the writer.
-$strays = new ReflectionMethod( MSRWA_Match::class, 'strays' );
-$strays->setAccessible( true );
+// --- Reading the lot: the writer's text is a brief, read whole -----------
+// Nothing cuts it by lines or separators. One call decides the recipes, the
+// brief first: every dish it asks for is a recipe, photographed or not; a dish
+// photographed that it does not name is one more; and what it asks of every
+// recipe travels with each.
+$read = new ReflectionMethod( MSRWA_Match::class, 'read' );
+$read->setAccessible( true );
+$asked = array();
+$answer_with = static function ( array $answer ) use ( &$asked ) {
+	MSRWA_Engine_Call::$transport = static function ( $url, $payload ) use ( &$asked, $answer ) {
+		$asked[] = $payload;
+		return array( 'status' => 200, 'raw' => json_encode( array( 'status' => 'completed', 'output' => array( array( 'type' => 'message', 'content' => array( array( 'text' => json_encode( $answer, JSON_UNESCAPED_UNICODE ) ) ) ) ), 'usage' => array( 'input_tokens' => 900, 'output_tokens' => 120 ) ) ) );
+	};
+};
+$config = MSRWA_Engine_Config::create( array( 'settings' => array( 'keys' => array( 'openai' => 'k' ) ) ) );
+
+// Six dishes asked for, four photographs of four of them.
+$six = "Pour la semaine, sans gluten : tarte normande, poulet yassa, daube provençale, clafoutis aux cerises, soupe à l’oignon et ratatouille.";
+$four = array(
+	array( 'file' => 'a.jpg', 'dish' => 'Tarte aux pommes', 'describes' => 'Une tarte aux pommes dorée.' ),
+	array( 'file' => 'b.jpg', 'dish' => 'Yassa au poulet', 'describes' => 'Poulet aux oignons confits.' ),
+	array( 'file' => 'c.jpg', 'dish' => 'Clafoutis', 'describes' => 'Un clafoutis aux cerises.' ),
+	array( 'file' => 'd.jpg', 'dish' => 'Ratatouille', 'describes' => 'Légumes du soleil mijotés.' ),
+);
+$answer_with( array(
+	'recipes' => array_map( static function ( $t ) { return array( 'title' => $t, 'from' => 'text', 'brief' => mb_strtolower( $t ) ); }, array( 'Tarte normande', 'Poulet yassa', 'Daube provençale', 'Clafoutis aux cerises', 'Soupe à l’oignon', 'Ratatouille' ) ),
+	'general' => 'sans gluten',
+	'pairs' => array(
+		array( 'image' => 0, 'recipe' => 0, 'confidence' => 'haute', 'why' => 'Tarte de pommes.' ),
+		array( 'image' => 1, 'recipe' => 1, 'confidence' => 'haute', 'why' => 'Yassa.' ),
+		array( 'image' => 2, 'recipe' => 3, 'confidence' => 'haute', 'why' => 'Clafoutis.' ),
+		array( 'image' => 3, 'recipe' => 5, 'confidence' => 'haute', 'why' => 'Ratatouille.' ),
+	),
+	'reasoning' => 'Six recettes, quatre photographiées.',
+) );
+$out = $read->invoke( null, $six, $four, $config, MSRWA_Intake::recipes( $six ) );
+msrwa_test_assert( 6 === count( $out['recipes'] ), 'Six dishes asked for are six recipes, whatever the photographs: got ' . count( $out['recipes'] ) );
+msrwa_test_assert( array( 0, 1, 3, 5 ) === array_column( $out['pairs'], 'recipe' ), 'Each photograph goes with its dish; two recipes stay without one.' );
+msrwa_test_contains( $out['recipes'][2]['text'], 'sans gluten', 'What the brief asks of every recipe travels with each, photographed or not.' );
+msrwa_test_assert( 1 === count( $asked ), 'One call reads the brief and pairs the photographs; got ' . count( $asked ) );
+$prompt = json_encode( $asked[0], JSON_UNESCAPED_UNICODE );
+msrwa_test_contains( $prompt, 'clafoutis aux cerises, soupe à l’oignon', 'The brief is handed over whole, as written.' );
+msrwa_test_contains( $prompt, 'LA CONSIGNE PRIME', 'And the reading is told it comes first.' );
+msrwa_test_assert( $out['cost_usd'] > 0, 'What the reading cost is counted.' );
+
+// A recipe the reading names from photographs that is plainly a dish of the
+// brief is that dish; two shots of a dish the brief does not name make one
+// recipe; one the reading made up with no photograph is dropped.
+$asked = array();
+$answer_with( array(
+	'recipes' => array(
+		array( 'title' => 'Poulet yassa', 'from' => 'text', 'brief' => "Poulet yassa\nMariner le poulet au citron." ),
+		array( 'title' => '<b>Tarte normande</b>', 'from' => 'text', 'brief' => 'Tarte normande : pâte, pommes, crème.' ),
+		array( 'title' => 'Yassa au poulet', 'from' => 'photos', 'brief' => '' ),
+		array( 'title' => 'Crème brûlée', 'from' => 'photos', 'brief' => '' ),
+		array( 'title' => 'Soupe inventée', 'from' => 'photos', 'brief' => '' ),
+	),
+	'pairs' => array(
+		array( 'image' => 0, 'recipe' => 2, 'confidence' => 'basse' ),
+		array( 'image' => 1, 'recipe' => 3, 'confidence' => 'haute' ),
+		array( 'image' => 2, 'recipe' => 3, 'confidence' => 'haute' ),
+		array( 'image' => 3, 'recipe' => null ),
+	),
+) );
+$text = "Poulet yassa\nMariner le poulet au citron.\nTarte normande : pâte, pommes, crème.";
 $shots = array(
-	array( 'file' => 'yassa.jpg', 'dish' => 'Poulet yassa', 'describes' => 'Poulet aux oignons.' ),
-	array( 'file' => 'tarte.jpg', 'dish' => 'Tarte aux pommes', 'describes' => 'Une tarte dorée.' ),
-	array( 'file' => 'tarte-2.jpg', 'dish' => 'tarte normande', 'describes' => 'Une part de tarte.' ),
+	array( 'file' => 'y.jpg', 'dish' => 'Yassa au poulet', 'describes' => 'Poulet aux oignons.' ),
+	array( 'file' => 'c1.jpg', 'dish' => 'Crème brûlée', 'describes' => 'Une crème caramélisée.' ),
+	array( 'file' => 'c2.jpg', 'dish' => 'Crème brûlée', 'describes' => 'Une autre vue.' ),
 	array( 'file' => 'flou.jpg', 'dish' => '', 'describes' => 'Image floue.' ),
 );
-$asked = array();
-MSRWA_Engine_Call::$transport = static function ( $url, $payload ) use ( &$asked ) {
-	$asked[] = $payload;
-	$answer = array( 'recipes' => array( array( 'title' => 'Tarte aux pommes' ) ), 'pairs' => array( array( 'image' => 0, 'recipe' => 0 ), array( 'image' => 1, 'recipe' => 0 ) ), 'reasoning' => 'Deux vues d’une même tarte.' );
-	return array( 'status' => 200, 'raw' => json_encode( array( 'status' => 'completed', 'output' => array( array( 'type' => 'message', 'content' => array( array( 'text' => json_encode( $answer ) ) ) ) ), 'usage' => array( 'input_tokens' => 300, 'output_tokens' => 60 ) ) ) );
-};
-$decision = array( 'pairs' => array( array( 'image' => 0, 'recipe' => 0, 'confidence' => 'haute' ), array( 'image' => 1, 'recipe' => null ), array( 'image' => 2, 'recipe' => null ), array( 'image' => 3, 'recipe' => null ) ), 'reasoning' => '', 'cost_usd' => 0.001, 'seconds' => 1, 'errors' => array() );
-$config = MSRWA_Engine_Config::create( array( 'settings' => array( 'keys' => array( 'openai' => 'k' ) ) ) );
-$out = $strays->invoke( null, array( array( 'title' => 'Poulet yassa', 'text' => 'Poulet, oignons.' ) ), $shots, $decision, $config );
-MSRWA_Engine_Call::$transport = null;
+$out = $read->invoke( null, $text, $shots, $config, MSRWA_Intake::recipes( $text ) );
+$paired = $normalise->invoke( null, $out['pairs'], count( $out['recipes'] ), $shots );
 $by = array();
-foreach ( $out['pairs'] as $pair ) { $by[ $pair['image'] ] = $pair; }
-msrwa_test_assert( 2 === count( $out['recipes'] ) && 'Tarte aux pommes' === $out['recipes'][1]['title'] && ! empty( $out['recipes'][1]['from_photographs'] ), 'The tart the text did not name becomes a recipe of its own: ' . json_encode( array_column( $out['recipes'], 'title' ), JSON_UNESCAPED_UNICODE ) );
-msrwa_test_assert( 1 === $by[1]['recipe'] && 1 === $by[2]['recipe'] && ! empty( $by[1]['new_recipe'] ), 'Both photographs of it go with it, marked as a new recipe.' );
-msrwa_test_assert( 0 === $by[0]['recipe'], 'The yassa stays with the yassa.' );
-msrwa_test_assert( null === $by[3]['recipe'] && ! empty( $by[3]['pending'] ), 'The photograph nobody can name waits for the writer.' );
-msrwa_test_assert( 1 === count( $asked ) && false === strpos( json_encode( $asked[0], JSON_UNESCAPED_UNICODE ), 'flou.jpg' ), 'One grouping call, about the named strays only.' );
-msrwa_test_assert( $out['cost_usd'] > 0.001, 'And its cost is counted with the pairing.' );
+foreach ( $paired as $pair ) { $by[ $pair['image'] ] = $pair; }
+msrwa_test_assert( array( 'Poulet yassa', 'Tarte normande', 'Crème brûlée' ) === array_column( $out['recipes'], 'title' ), 'Two recipes of the brief and one new dish, no more: ' . json_encode( array_column( $out['recipes'], 'title' ), JSON_UNESCAPED_UNICODE ) );
+msrwa_test_assert( 0 === $by[0]['recipe'] && empty( $by[0]['new_recipe'] ), 'The yassa the reading named from its photograph goes with the yassa of the brief.' );
+msrwa_test_assert( 2 === $by[1]['recipe'] && 2 === $by[2]['recipe'] && ! empty( $by[1]['new_recipe'] ), 'Two photographs of a dish the brief does not name make one recipe of their own.' );
+msrwa_test_assert( ! empty( $out['recipes'][2]['from_photographs'] ), 'That recipe is written from the photographs and says so.' );
+msrwa_test_assert( null === $by[3]['recipe'] && ! empty( $by[3]['pending'] ), 'A photograph with no dish waits for the writer.' );
+$ruled = $normalise->invoke( null, array( array( 'image' => 0, 'recipe' => null, 'reason' => 'excluded' ) ), 1, $shots );
+msrwa_test_assert( ! empty( $ruled[0]['set_aside'] ) && empty( $ruled[0]['pending'] ), 'A photograph the brief itself rules out is set aside, not left waiting.' );
+msrwa_test_assert( "Poulet yassa\nMariner le poulet au citron." === $out['recipes'][0]['text'], 'A recipe carries the writer’s own words about it.' );
 
-// No grouping answer: one recipe per dish name, so none is lost.
+// An answer that cannot be read: the plain first cut, and every photograph
+// waits for the writer.
 MSRWA_Engine_Call::$transport = static function () { return array( 'status' => 500, 'raw' => '' ); };
-$out = $strays->invoke( null, array( array( 'title' => 'Poulet yassa', 'text' => 'x' ) ), $shots, $decision, $config );
+$text = "Tarte\npâte, pommes\n\nDaube\nbœuf, vin";
+$out = $read->invoke( null, $text, $shots, $config, MSRWA_Intake::recipes( $text ) );
+$paired = $normalise->invoke( null, $out['pairs'], count( $out['recipes'] ), $shots );
+msrwa_test_assert( 2 === count( $out['recipes'] ) && ! empty( $out['errors'] ), 'Unreadable: the plain cut, and the error said.' );
+msrwa_test_assert( 4 === count( array_filter( $paired, static function ( $pair ) { return ! empty( $pair['pending'] ); } ) ), 'And every photograph waits for the writer.' );
+
+// Text alone is read as a brief too: only the reading can tell a list of
+// dishes from one recipe's steps, or from a word for the whole lot.
+$asked = array();
+$answer_with( array( 'recipes' => array( array( 'title' => 'Tarte', 'from' => 'text', 'brief' => "Tarte\nPâte, pommes, crème." ) ), 'general' => '' ) );
+$two = MSRWA_Match::run( array(), array(), $config, '', "Tarte\nPâte, pommes, crème." );
+msrwa_test_assert( 1 === count( $asked ) && 1 === count( $two['recipes'] ) && 'Tarte' === $two['recipes'][0]['title'], 'A title and its ingredients are one recipe.' );
+msrwa_test_assert( false === strpos( json_encode( $asked[0], JSON_UNESCAPED_UNICODE ), 'PHOTOGRAPHIES' ), 'Without photographs, nothing is paired.' );
 MSRWA_Engine_Call::$transport = null;
-msrwa_test_assert( 3 === count( $out['recipes'] ), 'Without the grouping, each dish name is a recipe: ' . json_encode( array_column( $out['recipes'], 'title' ), JSON_UNESCAPED_UNICODE ) );
 
 // One recipe skips the pairing call only when every photograph plainly shows
 // it; a photograph of another dish must reach the pairing, where it becomes a

@@ -24,7 +24,7 @@ final class MSRWA_Batch {
 	 * once, here, and its result is stored. Correcting a pairing afterwards is
 	 * free because nothing is described twice.
 	 */
-	public static function create( array $recipes, array $files, $budget_per_recipe, $profile = MSRWA_Profile::FULL, $language = 'fr', array $config_overrides = array() ) {
+	public static function create( array $recipes, array $files, $budget_per_recipe, $profile = MSRWA_Profile::FULL, $language = 'fr', array $config_overrides = array(), $text = '' ) {
 		global $wpdb;
 		// A text, photographs, or both: photographs alone name their recipes once described.
 		if ( ! $recipes && ! $files ) { return new WP_Error( 'msrwa_no_recipes', __( 'Collez au moins une recette ou ajoutez au moins une photographie.', 'ms-recipes-writer-ai' ) ); }
@@ -52,10 +52,11 @@ final class MSRWA_Batch {
 		MSRWA_History::lot( $id, 'provided', array(
 			'owner' => get_current_user_id(), 'language' => $language, 'profile' => $profile,
 			'facebook_template' => (string) ( $config_overrides['images']['facebook_template'] ?? '' ),
+			'text' => (string) $text,
 			'recipes' => $recipes,
 			'photos' => array_map( static function ( $image ) { return array( 'file' => $image['id'], 'ref' => $image['ref'], 'origin' => $image['origin'], 'source' => $image['source'], 'name' => $image['file'], 'mime' => $image['mime'] ); }, $images ),
 		) );
-		$match = MSRWA_Match::run( $recipes, $images, self::engine_config( self::config_overrides( $id ) ), MSRWA_Sources::lot_dir( $id ) );
+		$match = MSRWA_Match::run( $recipes, $images, self::engine_config( self::config_overrides( $id ) ), MSRWA_Sources::lot_dir( $id ), $text );
 		$recipes = $match['recipes'];
 		// Counted before anything else can happen to the lot: a lot in which no
 		// dish is recognised is deleted, and what reading it cost is not.
@@ -78,7 +79,7 @@ final class MSRWA_Batch {
 			'recipes' => count( $recipes ),
 			'images' => count( $images ),
 			'matching_json' => wp_json_encode( MSRWA_DB::sanitize( array(
-				'recipes' => $recipes, 'images' => $match['images'], 'pairs' => $match['pairs'],
+				'text' => (string) $text, 'recipes' => $recipes, 'images' => $match['images'], 'pairs' => $match['pairs'],
 				'reasoning' => $match['reasoning'], 'cost_usd' => $match['cost_usd'], 'seconds' => $match['seconds'],
 			) ) ),
 			'error_message' => $match['errors'] ? implode( ' | ', array_slice( $match['errors'], 0, 5 ) ) : '',
@@ -211,6 +212,71 @@ final class MSRWA_Batch {
 		), array( 'id' => absint( $id ) ) );
 		MSRWA_History::lot( $id, 'pairing', array( 'by' => get_current_user_id(), 'pairs' => $clean ) );
 		return true;
+	}
+
+	/**
+	 * One change to a lot's recipes, by its writer, before it leaves: a title
+	 * or a text corrected, a recipe removed, or one added. The pairing follows:
+	 * a removed recipe's photographs wait for the writer again, and the
+	 * recipes after it keep theirs. Returns the lot's recipe count.
+	 */
+	public static function recipe( $id, $action, $index, $title = '', $text = '' ) {
+		global $wpdb;
+		$matching = self::matching( $id );
+		$recipes = array_values( (array) ( $matching['recipes'] ?? array() ) );
+		$title = mb_substr( trim( wp_strip_all_tags( (string) $title ) ), 0, 180 );
+		$text = mb_substr( trim( str_replace( "\r\n", "\n", (string) $text ) ), 0, 20000 );
+		$index = (int) $index;
+		if ( in_array( $action, array( 'edit', 'remove' ), true ) && ! isset( $recipes[ $index ] ) ) {
+			return new WP_Error( 'msrwa_no_recipe', __( 'Cette recette n’existe plus dans le lot. Rechargez la page.', 'ms-recipes-writer-ai' ), array( 'status' => 404 ) );
+		}
+		if ( in_array( $action, array( 'edit', 'add' ), true ) && '' === $title ) {
+			return new WP_Error( 'msrwa_no_title', __( 'Donnez un nom à la recette.', 'ms-recipes-writer-ai' ), array( 'status' => 400 ) );
+		}
+		$pairs = (array) ( $matching['pairs'] ?? array() );
+		if ( 'edit' === $action ) {
+			$was = $recipes[ $index ];
+			$recipes[ $index ]['title'] = $title;
+			// A recipe named after photographs becomes the writer's once they
+			// write its text; renamed only, its text follows the new name.
+			if ( ! empty( $was['from_photographs'] ) && '' !== $text && $text !== trim( (string) $was['text'] ) ) {
+				unset( $recipes[ $index ]['from_photographs'] );
+				$recipes[ $index ]['text'] = $text;
+			} elseif ( ! empty( $was['from_photographs'] ) ) {
+				$lines = explode( "\n", (string) $was['text'] );
+				$lines[0] = $title;
+				$recipes[ $index ]['text'] = implode( "\n", $lines );
+			} else {
+				$recipes[ $index ]['text'] = '' !== $text ? $text : $title;
+			}
+		} elseif ( 'remove' === $action ) {
+			if ( 1 === count( $recipes ) ) {
+				return new WP_Error( 'msrwa_last_recipe', __( 'Un lot garde au moins une recette : supprimez le lot pour tout abandonner.', 'ms-recipes-writer-ai' ), array( 'status' => 409 ) );
+			}
+			array_splice( $recipes, $index, 1 );
+			foreach ( $pairs as $key => $pair ) {
+				if ( ! is_array( $pair ) || null === ( $pair['recipe'] ?? null ) ) { continue; }
+				if ( (int) $pair['recipe'] === $index ) {
+					$pairs[ $key ] = array( 'image' => (int) $pair['image'], 'recipe' => null, 'confidence' => 'basse', 'why' => '', 'pending' => true );
+				} elseif ( (int) $pair['recipe'] > $index ) {
+					$pairs[ $key ]['recipe'] = (int) $pair['recipe'] - 1;
+				}
+			}
+		} elseif ( 'add' === $action ) {
+			$recipes[] = array( 'title' => $title, 'text' => '' !== $text ? $text : $title );
+		} else {
+			return new WP_Error( 'msrwa_bad_action', __( 'Action inconnue.', 'ms-recipes-writer-ai' ), array( 'status' => 400 ) );
+		}
+		$matching['recipes'] = $recipes;
+		$matching['pairs'] = $pairs;
+		$wpdb->update( self::table(), array(
+			'matching_json' => wp_json_encode( $matching ),
+			'recipes' => count( $recipes ),
+			'label' => self::label( $recipes ),
+			'updated_at' => current_time( 'mysql', true ),
+		), array( 'id' => absint( $id ) ) );
+		MSRWA_History::lot( $id, 'pairing', array( 'by' => get_current_user_id(), 'recipe' => array( 'action' => $action, 'index' => $index, 'title' => $title ), 'recipes' => $recipes, 'pairs' => $pairs ) );
+		return count( $recipes );
 	}
 
 	/** How many of a lot's photographs still wait for the writer's decision. */

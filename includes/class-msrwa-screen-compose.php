@@ -29,13 +29,9 @@ final class MSRWA_Screen_Compose {
 			<div class="ms-new-inputs">
 			<section class="ms-step">
 				<h3><?php esc_html_e( 'Les recettes', 'ms-recipes-writer-ai' ); ?> <span class="ms-optional"><?php esc_html_e( 'facultatif avec des photographies', 'ms-recipes-writer-ai' ); ?></span></h3>
-				<p><?php esc_html_e( 'Une ligne de trois tirets ou plus sépare deux recettes. La première ligne de chaque bloc en devient le titre. Le nom du plat suffit : le reste est établi d’après les sources.', 'ms-recipes-writer-ai' ); ?></p>
-				<textarea id="ms-recipes" name="recipes" rows="10" class="large-text ms-recipes-text" spellcheck="true" placeholder="<?php echo esc_attr( __( "Tarte aux pommes normande\nPâte brisée, pommes, crème, calvados…\n\n---\n\nPoulet yassa\nPoulet, oignons, citron…", 'ms-recipes-writer-ai' ) ); ?>"></textarea>
-				<div class="ms-recipes-bar">
-					<button type="button" class="button" id="ms-recipe-add"><span class="dashicons dashicons-plus-alt2" aria-hidden="true"></span> <?php esc_html_e( 'Ajouter une recette', 'ms-recipes-writer-ai' ); ?></button>
-					<p class="ms-muted" id="ms-recipe-count" aria-live="polite"></p>
-				</div>
-				<ol class="ms-recipe-list" id="ms-recipe-list" hidden></ol>
+				<p><?php esc_html_e( 'Écrivez-le comme une consigne, librement : des noms de plats, des recettes complètes ou en partie, des demandes pour tout le lot (« sans gluten », « version légère »…). Le texte est lu en entier et il prime : il décide des recettes, puis chaque photographie va au plat qu’elle montre. Sans texte, les recettes sont choisies d’après les photographies. Vous vérifiez et corrigez tout à l’étape suivante.', 'ms-recipes-writer-ai' ); ?></p>
+				<textarea id="ms-recipes" name="recipes" rows="10" class="large-text ms-recipes-text" spellcheck="true" placeholder="<?php echo esc_attr( __( "Tarte aux pommes normande, poulet yassa et daube provençale, en version sans gluten.\n\nClafoutis aux cerises : 500 g de cerises, 3 œufs, 50 cl de lait…", 'ms-recipes-writer-ai' ) ); ?>"></textarea>
+				<p class="ms-muted" id="ms-recipe-count" aria-live="polite"></p>
 			</section>
 
 			<section class="ms-step">

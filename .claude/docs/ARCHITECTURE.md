@@ -13,7 +13,7 @@ under `includes/engine/`.
 
 ```
 Composer  ── POST /msrwa/v1/batches
-   │          recipes split, photographs described, pairing proposed
+   │          photographs described, the brief read, recipes and pairing proposed
    ▼
 batch row (status: matching → ready)
    │
@@ -111,12 +111,28 @@ its own. Nothing in `includes/engine/` knows it exists.
 
 Two passes, because they cost differently. Every photograph is described once,
 concurrently — the expensive half, billed per image. Then one cheap text call
-reads the descriptions against the recipe titles. Describing a photograph twice
-for two candidate recipes would pay twice for the same photograph, and correcting
-a pairing afterwards is therefore free.
+(`MSRWA_Match::read()`) reads the writer's text and the descriptions together.
+Describing a photograph twice for two candidate recipes would pay twice for the
+same photograph, and correcting a pairing afterwards is therefore free.
 
-In doubt the model does not pair. A photograph left aside costs less than one
-attached to the wrong dish, which would illustrate a whole article.
+The writer's text is a **brief**, never cut by lines or separators: the reading
+decides the recipes from it, the brief first. Every dish it asks for is a
+recipe, photographed or not, carrying the writer's own words about it copied
+out; what it asks of every recipe ("sans gluten", a tone, a public) is added to
+each. A photograph goes with the dish of the brief it shows — the same
+preparation, not a shared ingredient. A dish photographed that the brief does
+not name is a recipe of its own, unless the brief rules it out; a brief that
+names no dish is applied to the dishes the photographs show. Without text, the
+recipes are the dishes the photographs show (`propose()`). The plugin checks
+the answer: titles and texts are plain text, a dish named from photographs
+that is plainly one of the brief's is that recipe (`closest()`), and one no
+photograph went to is dropped. An unreadable answer falls back on
+`MSRWA_Intake::recipes()`, a plain first cut, with every photograph waiting for
+the writer.
+
+In doubt between recipes of the brief, the most probable is chosen and marked
+unsure; a doubt never adds a recipe. A photograph with no recognisable dish is
+not paired.
 
 ## Data model
 
@@ -397,10 +413,15 @@ Break these and the plugin misreports itself.
     the same `MSRWA_Compat::steps()` and `choices()`: one list of steps, one
     family rule, one catalogue.
 
-19. **A lot is text, photographs, or both.** Without text, `MSRWA_Match`
-    names one recipe per dish the photographs show (`propose()`), marked
-    `from_photographs`; a lot in which no dish is recognised is refused and
-    its uploads discarded. Without photographs, nothing is paired or billed.
+19. **A lot is text, photographs, or both.** The text is a brief, read whole
+    by one call that decides the recipes (`MSRWA_Match::read()`), even without
+    photographs; it is kept with the lot and shown beside the pairing.
+    Without text, `MSRWA_Match` names one recipe per dish the photographs show
+    (`propose()`), marked `from_photographs`; a lot in which no recipe is found
+    is refused and its uploads discarded. Before a lot leaves, its writer may
+    rename, rewrite, remove or add a recipe (`MSRWA_Batch::recipe()`,
+    `POST /batches/{id}/recipes`); a removed recipe's photographs wait for
+    them again, and the last recipe of a lot is never removed.
 
 20. **A recipe with the writer's photographs is researched from them.** With
     `research.web_search` at `without_images`, the engine writes the research
@@ -445,10 +466,11 @@ Break these and the plugin misreports itself.
     compose screen offers the choice only when there is more than one.
 
 25. **No photograph is dropped without the writer.** A photograph of a dish
-    the text does not name becomes a recipe of its own (`MSRWA_Match::strays()`,
-    grouped by one call like a lot with no text, one recipe per dish name if
-    that call fails), marked `from_photographs`. Any photograph no recipe took
-    — no dish recognised, or not mentioned — is `pending`, and
+    the brief does not name becomes a recipe of its own, one per dish, marked
+    `from_photographs`, decided by the same reading. One the brief itself rules
+    out ("only the desserts") is set aside with the reason `excluded`, which
+    the writer can undo. Any other photograph no recipe took — no dish
+    recognised, or not mentioned — is `pending`, and
     `MSRWA_Batch::dispatch()` and `MSRWA_Schedule::when()` refuse the lot
     until the writer pairs it, names a new recipe for it or sets it aside
     (`set_aside`). A recipe named after photographs that were all set aside is

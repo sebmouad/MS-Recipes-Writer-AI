@@ -2503,3 +2503,77 @@ msgstr "finished, with failures"
 
 msgid "terminées"
 msgstr "finished"
+
+msgid "Annuler"
+msgstr "Cancel"
+
+msgid "Aucun texte : établie d’après les photographies et les sources."
+msgstr "No text: written from the photographs and sources."
+
+msgid "Ce lot est déjà lancé ; ses recettes ne changent plus."
+msgstr "This batch has already been launched; its recipes can no longer change."
+
+msgid "Ce qu’elle montre"
+msgstr "What it shows"
+
+msgid "Cette recette n’existe plus dans le lot. Rechargez la page."
+msgstr "This recipe is no longer in the batch. Reload the page."
+
+msgid "Donnez un nom à la recette."
+msgstr "Give the recipe a name."
+
+#, php-format
+msgid "Environ %d recettes — repérées pour de bon à l’étape suivante."
+msgstr "About %d recipes — identified for certain at the next step."
+
+msgid "Environ 1 recette — repérée pour de bon à l’étape suivante."
+msgstr "About 1 recipe — identified for certain at the next step."
+
+msgid "Le nom du plat seul : le reste est établi d’après les sources."
+msgstr "Just the dish’s name: the rest comes from the sources."
+
+msgid "Photographie"
+msgstr "Photograph"
+
+msgid "Photographies"
+msgstr "Photographs"
+
+#, php-format
+msgid "Retirer « %s » du lot ? Ses photographies attendront votre décision."
+msgstr "Remove “%s” from the batch? Its photographs will wait for your decision."
+
+msgid "Tarte aux pommes normande\nPoulet yassa\nDaube provençale\n\nClafoutis aux cerises\n500 g de cerises, 3 œufs, 50 cl de lait…"
+msgstr "Normandy apple tart\nChicken yassa\nProvençal beef stew\n\nCherry clafoutis\n500 g cherries, 3 eggs, 500 ml milk…"
+
+msgid "Texte"
+msgstr "Text"
+
+msgid "Un lot garde au moins une recette : supprimez le lot pour tout abandonner."
+msgstr "A batch keeps at least one recipe: delete the batch to drop everything."
+
+msgid "d’après vos photographies"
+msgstr "from your photographs"
+
+msgid "facultatif : ingrédients, étapes, précisions"
+msgstr "optional: ingredients, steps, details"
+
+msgid "Écrite d’après"
+msgstr "Written from"
+
+msgid "Écrivez comme vous voulez : un plat par ligne, ou chaque recette avec ses ingrédients et ses étapes, avec ou sans titre. Les recettes sont repérées et associées aux photographies à l’étape suivante, où vous pouvez tout corriger. Le nom du plat suffit : le reste est établi d’après les sources."
+msgstr "Write it however you like: one dish per line, or each recipe with its ingredients and steps, with or without a title. The recipes are identified and matched with the photographs at the next step, where you can correct everything. The dish’s name is enough: the rest comes from the sources."
+
+msgid "Votre consigne"
+msgstr "Your brief"
+
+msgid "Tarte aux pommes normande, poulet yassa et daube provençale, en version sans gluten.\n\nClafoutis aux cerises : 500 g de cerises, 3 œufs, 50 cl de lait…"
+msgstr "Normandy apple tart, chicken yassa and Provençal beef stew, gluten-free.\n\nCherry clafoutis: 500 g cherries, 3 eggs, 500 ml milk…"
+
+msgid "Écrivez-le comme une consigne, librement : des noms de plats, des recettes complètes ou en partie, des demandes pour tout le lot (« sans gluten », « version légère »…). Le texte est lu en entier et il prime : il décide des recettes, puis chaque photographie va au plat qu’elle montre. Sans texte, les recettes sont choisies d’après les photographies. Vous vérifiez et corrigez tout à l’étape suivante."
+msgstr "Write it as a brief, however you like: dish names, full or partial recipes, requests for the whole batch (“gluten-free”, “lighter version”…). The text is read as a whole and comes first: it decides the recipes, then each photograph goes to the dish it shows. Without text, the recipes are chosen from the photographs. You check and correct everything at the next step."
+
+msgid "Écartée selon votre consigne."
+msgstr "Set aside as your brief asks."
+
+msgid "Les recettes sont décidées à l’étape suivante, d’après votre consigne et vos photographies."
+msgstr "The recipes are decided at the next step, from your brief and your photographs."

@@ -11,9 +11,10 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
  *
  * It works in two passes because they cost differently. Every photograph is
  * described once, concurrently — that is the expensive half, billed per image.
- * Then one text call reads the descriptions beside the recipe titles and says
- * which goes with which, which is cheap. Describing an image twice for two
- * recipes would pay twice for the same photograph.
+ * Then one text call reads the writer's text and the descriptions together: it
+ * finds the recipes in the text, however the writer laid them out, and says
+ * which photograph goes with which, which is cheap. Describing an image twice
+ * for two recipes would pay twice for the same photograph.
  */
 final class MSRWA_Match {
 
@@ -25,26 +26,28 @@ final class MSRWA_Match {
 	 * finished article, and a decision nobody can see the reason for is a
 	 * decision nobody can correct.
 	 */
-	public static function run( array $recipes, array $images, MSRWA_Engine_Config $config, $dir = '' ) {
+	public static function run( array $recipes, array $images, MSRWA_Engine_Config $config, $dir = '', $text = '' ) {
 		$seen = self::describe( $images, $config, $dir );
-		// Text alone has nothing to pair; photographs alone name their own
-		// recipes, one per dish they show.
-		if ( ! $seen['images'] ) {
-			$decision = array( 'pairs' => array(), 'reasoning' => '', 'cost_usd' => 0.0, 'seconds' => 0.0, 'errors' => array() );
-		} elseif ( 1 === count( $recipes ) && self::all_of( $recipes[0], $seen['images'] ) ) {
-			// One recipe, and every photograph shows a dish that shares a word
-			// with its title: the writer sent them for it, and there is nothing
-			// for a paid call to decide. A photograph with no dish on it still
-			// waits for the writer, as normalise() promises. A photograph of
-			// something else goes through the pairing below, and becomes a
-			// recipe of its own rather than illustrate the wrong one.
-			$decision = array( 'pairs' => array(), 'reasoning' => '', 'cost_usd' => 0.0, 'seconds' => 0.0, 'errors' => array() );
-			foreach ( array_keys( $seen['images'] ) as $index ) { $decision['pairs'][] = array( 'image' => $index, 'recipe' => 0, 'confidence' => 'haute', 'why' => 'Seule recette du lot.', 'reason' => 'only_recipe' ); }
-		} elseif ( ! $recipes ) {
+		// The writer's text is a brief; callers that hand recipes already cut
+		// are read the same way, their texts one after the other.
+		$text = '' !== trim( (string) $text ) ? trim( (string) $text ) : trim( implode( "\n\n", array_map( static function ( $recipe ) { return (string) ( $recipe['text'] ?? '' ); }, $recipes ) ) );
+		$none = array( 'pairs' => array(), 'reasoning' => '', 'cost_usd' => 0.0, 'seconds' => 0.0, 'errors' => array() );
+		if ( '' === $text && ! $seen['images'] ) {
+			$decision = $none;
+			$recipes = array();
+		} elseif ( '' === $text ) {
+			// No brief: the recipes are the dishes the photographs show.
 			$decision = self::propose( $seen['images'], $config );
 			$recipes = $decision['recipes'];
+		} elseif ( $seen['images'] && false === strpos( $text, "\n" ) && self::all_of( array( 'title' => $text ), $seen['images'] ) ) {
+			// A brief of one line naming the one dish every photograph shows:
+			// there is nothing for a paid call to decide. A photograph with no
+			// dish on it still waits for the writer, as normalise() promises.
+			$recipes = array( array( 'title' => MSRWA_Intake::title_of( $text ), 'text' => $text ) );
+			$decision = $none;
+			foreach ( array_keys( $seen['images'] ) as $index ) { $decision['pairs'][] = array( 'image' => $index, 'recipe' => 0, 'confidence' => 'haute', 'why' => 'Seule recette du lot.', 'reason' => 'only_recipe' ); }
 		} else {
-			$decision = self::strays( $recipes, $seen['images'], self::pair( $recipes, $seen['images'], $config ), $config );
+			$decision = self::read( $text, $seen['images'], $config, $recipes ? $recipes : MSRWA_Intake::recipes( $text ) );
 			$recipes = $decision['recipes'];
 		}
 
@@ -59,6 +62,127 @@ final class MSRWA_Match {
 			'seconds' => round( (float) $seen['seconds'] + (float) $decision['seconds'], 1 ),
 			'errors' => array_merge( $seen['errors'], $decision['errors'] ),
 		);
+	}
+
+	/** Characters of a brief the reading is handed: a prompt has a size. */
+	const MAX_BRIEF = 30000;
+
+	/**
+	 * One text call that reads the writer's brief and the photographs
+	 * together, and decides the lot's recipes.
+	 *
+	 * The text is never cut by lines or separators: it is a brief, read as a
+	 * whole. Every dish it asks for is a recipe, with the writer's own words
+	 * about it copied out, and what it asks of every recipe travels with each.
+	 * The brief comes first in the pairing too: a photograph goes with the dish
+	 * the brief asks for that it shows; a dish photographed that the brief
+	 * does not name is a recipe of its own, unless the brief rules it out; and
+	 * a brief that names no dish is applied to the dishes the photographs show.
+	 */
+	private static function read( $text, array $images, MSRWA_Engine_Config $config, array $fallback ) {
+		$out = array( 'recipes' => $fallback, 'pairs' => array(), 'reasoning' => '', 'cost_usd' => 0.0, 'seconds' => 0.0, 'errors' => array() );
+		$route = $config->model_for( 'canonical_recipe' );
+		$wire = $config->provider( $route['provider'], $route['model'], 'canonical_recipe' );
+		$started = microtime( true );
+		$brief = mb_substr( (string) $text, 0, self::MAX_BRIEF );
+		// The answer copies the brief out, recipe by recipe: room for all of it.
+		$room = (int) min( 16000, 2000 + mb_strlen( $brief ) );
+		$answer = MSRWA_Engine_Call::text( $route['provider'], $route['model'], self::read_prompt( $brief, $images, self::language( $config ) ), $room, true, false, $wire );
+		$out['cost_usd'] = (float) $config->price( $route['provider'], $route['model'], (array) ( $answer['usage'] ?? array() ) );
+		$out['seconds'] = round( microtime( true ) - $started, 1 );
+		$decoded = MSRWA_Json::decode( (string) ( $answer['text'] ?? '' ) );
+		$read = is_array( $decoded ) ? self::understood( $decoded, $images ) : null;
+		if ( ! $read ) {
+			// Unreadable, or no dish in it: the plain first cut, and every
+			// photograph waits for the writer rather than go where nobody decided.
+			$out['errors'][] = 'Lecture du lot illisible : ' . mb_substr( (string) ( $answer['error'] ?? $answer['text'] ?? '' ), 0, 200 );
+			return $out;
+		}
+		return array_merge( $out, $read );
+	}
+
+	/**
+	 * The reading's answer, checked: titles and texts are plain text, a recipe
+	 * the answer named from photographs that no photograph went to is dropped,
+	 * one named from photographs that is plainly a dish of the brief is that
+	 * recipe, and what the brief asks of every recipe is added to each. Null
+	 * when no recipe is left.
+	 */
+	private static function understood( array $decoded, array $images ) {
+		// Model output is data, never markup.
+		$plain = static function ( $value, $max ) { return mb_substr( trim( wp_strip_all_tags( (string) $value ) ), 0, $max ); };
+		$general = $plain( $decoded['general'] ?? '', 4000 );
+		$asked = array();
+		foreach ( array_values( (array) ( $decoded['recipes'] ?? array() ) ) as $key => $recipe ) {
+			if ( ! is_array( $recipe ) ) { continue; }
+			$title = $plain( $recipe['title'] ?? '', 180 );
+			if ( '' === $title ) { continue; }
+			$asked[ $key ] = array( 'title' => $title, 'photos' => 'photos' === ( $recipe['from'] ?? '' ), 'brief' => $plain( $recipe['brief'] ?? '', 20000 ) );
+		}
+		$text_recipes = array_filter( $asked, static function ( $recipe ) { return ! $recipe['photos']; } );
+		$pairs = array();
+		$taken = array();
+		foreach ( (array) ( $decoded['pairs'] ?? array() ) as $pair ) {
+			if ( ! is_array( $pair ) || ! isset( $pair['image'] ) || ! isset( $images[ (int) $pair['image'] ] ) ) { continue; }
+			$recipe = isset( $pair['recipe'] ) && is_numeric( $pair['recipe'] ) && isset( $asked[ (int) $pair['recipe'] ] ) ? (int) $pair['recipe'] : null;
+			$one = array( 'image' => (int) $pair['image'], 'recipe' => $recipe, 'confidence' => (string) ( $pair['confidence'] ?? 'basse' ), 'why' => $plain( $pair['why'] ?? '', 300 ) );
+			// A dish said to be new that is plainly one the brief asks for is that one.
+			if ( null !== $recipe && $asked[ $recipe ]['photos'] ) {
+				$known = self::closest( $asked[ $recipe ]['title'], $text_recipes );
+				if ( null !== $known ) {
+					$one['recipe'] = $known;
+					$one['confidence'] = 'moyenne';
+				} else {
+					$one = array_merge( $one, array( 'confidence' => 'moyenne', 'why' => 'Plat absent du texte : une recette de plus, d’après la photographie.', 'reason' => 'new_recipe', 'new_recipe' => true ) );
+				}
+			}
+			// Ruled out by the brief itself: set aside, which the writer asked for
+			// and can still undo on the pairing screen.
+			if ( null === $recipe && ! empty( $pair['excluded'] ) ) { $one['reason'] = 'excluded'; }
+			if ( null !== $one['recipe'] ) { $taken[ $one['recipe'] ] = true; }
+			$pairs[] = $one;
+		}
+		$recipes = array();
+		$shift = array();
+		foreach ( $asked as $key => $recipe ) {
+			// A dish from photographs no photograph went to was never shown.
+			if ( $recipe['photos'] && ! isset( $taken[ $key ] ) ) { continue; }
+			$shift[ $key ] = count( $recipes );
+			if ( $recipe['photos'] ) {
+				$local = array();
+				foreach ( $pairs as $pair ) { if ( $key === $pair['recipe'] ) { $local[] = array( 'image' => $pair['image'], 'recipe' => 0 ); } }
+				$one = self::from_photographs( $recipe['title'], $images, $local, 0, true );
+			} else {
+				$one = array( 'title' => $recipe['title'], 'text' => '' !== $recipe['brief'] ? $recipe['brief'] : $recipe['title'] );
+			}
+			if ( '' !== $general ) { $one['text'] .= "\n\n" . 'Consignes du rédacteur pour tout le lot : ' . $general; }
+			$recipes[] = $one;
+		}
+		if ( ! $recipes ) { return null; }
+		foreach ( $pairs as $key => $pair ) {
+			if ( null !== $pair['recipe'] ) { $pairs[ $key ]['recipe'] = $shift[ $pair['recipe'] ] ?? null; }
+		}
+		return array( 'recipes' => $recipes, 'pairs' => $pairs, 'reasoning' => $plain( $decoded['reasoning'] ?? '', 400 ), 'general' => $general );
+	}
+
+	/**
+	 * The brief's recipe a dish name plainly is, or null: every word of four
+	 * letters or more of one is in the other, accents and case aside, and only
+	 * one recipe answers. "Yassa au poulet" is the "Poulet yassa"; a "Poulet
+	 * yassa" is not the "Tajine de poulet".
+	 */
+	private static function closest( $dish, array $recipes ) {
+		$words = static function ( $text ) {
+			return array_values( array_filter( preg_split( '/[^\p{L}\p{N}]+/u', MSRWA_Engine_Score::fold( (string) $text ) ), static function ( $word ) { return mb_strlen( $word ) >= 4; } ) );
+		};
+		$named = $words( $dish );
+		if ( ! $named ) { return null; }
+		$found = array();
+		foreach ( $recipes as $index => $recipe ) {
+			$title = $words( (string) ( $recipe['title'] ?? '' ) );
+			if ( $title && ( ! array_diff( $named, $title ) || ! array_diff( $title, $named ) ) ) { $found[] = $index; }
+		}
+		return 1 === count( $found ) ? $found[0] : null;
 	}
 
 	/**
@@ -121,25 +245,6 @@ final class MSRWA_Match {
 		return $out;
 	}
 
-	/** One cheap text call that reads the descriptions against the recipe titles. */
-	private static function pair( array $recipes, array $images, MSRWA_Engine_Config $config ) {
-		$route = $config->model_for( 'canonical_recipe' );
-		$wire = $config->provider( $route['provider'], $route['model'], 'canonical_recipe' );
-		$started = microtime( true );
-
-		$answer = MSRWA_Engine_Call::text( $route['provider'], $route['model'], self::prompt( $recipes, $images, self::language( $config ) ), 1500, true, false, $wire );
-		$cost = $config->price( $route['provider'], $route['model'], (array) ( $answer['usage'] ?? array() ) );
-		$decoded = MSRWA_Json::decode( (string) ( $answer['text'] ?? '' ) );
-
-		return array(
-			'pairs' => is_array( $decoded ) ? (array) ( $decoded['pairs'] ?? array() ) : array(),
-			'reasoning' => is_array( $decoded ) ? (string) ( $decoded['reasoning'] ?? '' ) : '',
-			'cost_usd' => (float) $cost,
-			'seconds' => round( microtime( true ) - $started, 1 ),
-			'errors' => is_array( $decoded ) ? array() : array( 'Appariement illisible : ' . mb_substr( (string) ( $answer['error'] ?? $answer['text'] ?? '' ), 0, 200 ) ),
-		);
-	}
-
 	/**
 	 * Whether every recognised photograph plainly shows this recipe: each word
 	 * of four letters or more in its dish name is in the title, accents and
@@ -159,60 +264,6 @@ final class MSRWA_Match {
 			if ( ! $named || array_diff( $named, $title ) ) { return false; }
 		}
 		return true;
-	}
-
-	/**
-	 * A photograph of a dish the text does not name is not thrown away: it
-	 * becomes a recipe of its own, as it would in a lot with no text, and the
-	 * writer can still set it aside. The owner's rule, 2026-09-24: a live lot
-	 * sent a tart with a yassa and a clafoutis, and the tart was left out.
-	 * Photographs of one dish become one recipe; a photograph with no dish on
-	 * it is not a recipe anyone can name, and waits for the writer.
-	 */
-	private static function strays( array $recipes, array $images, array $decision, MSRWA_Engine_Config $config ) {
-		$pairs = self::normalise( $decision['pairs'], count( $recipes ), $images );
-		$loose = array();
-		foreach ( $pairs as $pair ) {
-			if ( null === $pair['recipe'] && '' !== trim( (string) ( $images[ $pair['image'] ]['dish'] ?? '' ) ) ) { $loose[] = (int) $pair['image']; }
-		}
-		$decision['recipes'] = $recipes;
-		if ( ! $loose ) { return $decision; }
-
-		$subset = array();
-		foreach ( $loose as $index ) { $subset[] = $images[ $index ]; }
-		$grouped = self::propose( $subset, $config );
-		// No grouping came back: one recipe per dish name, so none is lost.
-		if ( ! $grouped['recipes'] ) {
-			$grouped['pairs'] = array();
-			$titles = array();
-			foreach ( $subset as $key => $image ) {
-				$title = mb_substr( trim( wp_strip_all_tags( (string) $image['dish'] ) ), 0, 180 );
-				$fold = MSRWA_Engine_Score::fold( $title );
-				if ( ! isset( $titles[ $fold ] ) ) { $titles[ $fold ] = count( $grouped['recipes'] ); $grouped['recipes'][] = null; }
-				$grouped['pairs'][] = array( 'image' => $key, 'recipe' => $titles[ $fold ], 'confidence' => 'moyenne', 'why' => '' );
-				$grouped['recipes'][ $titles[ $fold ] ] = $title;
-			}
-			foreach ( $grouped['recipes'] as $index => $title ) { $grouped['recipes'][ $index ] = self::from_photographs( $title, $subset, $grouped['pairs'], $index, true ); }
-		}
-
-		$offset = count( $recipes );
-		$moved = array();
-		foreach ( (array) $grouped['pairs'] as $pair ) {
-			if ( ! is_array( $pair ) || ! isset( $pair['image'], $pair['recipe'], $loose[ (int) $pair['image'] ] ) || null === $pair['recipe'] ) { continue; }
-			$moved[ $loose[ (int) $pair['image'] ] ] = array(
-				'image' => $loose[ (int) $pair['image'] ], 'recipe' => $offset + (int) $pair['recipe'],
-				'confidence' => 'moyenne', 'why' => 'Plat absent du texte : une recette de plus, d’après la photographie.', 'reason' => 'new_recipe', 'new_recipe' => true,
-			);
-		}
-		foreach ( $pairs as $key => $pair ) {
-			if ( isset( $moved[ $pair['image'] ] ) ) { $pairs[ $key ] = $moved[ $pair['image'] ]; }
-		}
-		$decision['recipes'] = array_merge( $recipes, array_values( (array) $grouped['recipes'] ) );
-		$decision['pairs'] = $pairs;
-		$decision['cost_usd'] = (float) $decision['cost_usd'] + (float) $grouped['cost_usd'];
-		$decision['seconds'] = (float) $decision['seconds'] + (float) $grouped['seconds'];
-		$decision['errors'] = array_merge( $decision['errors'], $grouped['errors'] );
-		return $decision;
 	}
 
 	/**
@@ -333,33 +384,45 @@ final class MSRWA_Match {
 			. 'Describe only what is visible; never invent a hidden ingredient, a quantity or an origin.';
 	}
 
-	/** What the pairing call is asked, with the recipes and the photographs numbered. */
-	private static function prompt( array $recipes, array $images, $language = 'français' ) {
-		$lines = array(
-			'Un rédacteur a fourni plusieurs recettes et plusieurs photographies, sans dire lesquelles vont ensemble.',
-			'Associe chaque photographie à la recette qu’elle illustre.',
-			'',
-			'RECETTES :',
-		);
-		foreach ( $recipes as $index => $recipe ) {
-			$lines[] = sprintf( '%d. %s', $index, $recipe['title'] );
+	/**
+	 * What the reading is asked: the writer's brief as they wrote it, the
+	 * photographs as they were described, and how to decide the recipes.
+	 */
+	private static function read_prompt( $brief, array $images, $language = 'français' ) {
+		$out = array( 'Un rédacteur a écrit la consigne ci-dessous, librement : des noms de plats, des recettes complètes ou en partie, des consignes pour tout le lot, dans n’importe quelle mise en forme. Lis-la comme un brief, en entier.' );
+		if ( $images ) { $out[] = 'Il a aussi fourni ' . count( $images ) . ' photographie(s), sans dire lesquelles vont avec quoi.'; }
+		$out[] = '';
+		$out[] = 'CONSIGNE DU RÉDACTEUR :';
+		$out[] = '<<<';
+		$out[] = $brief;
+		$out[] = '>>>';
+		$out[] = '';
+		if ( $images ) {
+			$out[] = 'PHOTOGRAPHIES, décrites depuis leurs propres pixels :';
+			foreach ( $images as $index => $image ) {
+				$out[] = sprintf( '%d. fichier « %s » — plat reconnu : %s — %s', $index, self::file_label( $image ), '' !== (string) ( $image['dish'] ?? '' ) ? $image['dish'] : 'non identifié', (string) ( $image['describes'] ?? '' ) );
+			}
+			$out[] = '';
 		}
-		$lines[] = '';
-		$lines[] = 'PHOTOGRAPHIES, décrites depuis leurs propres pixels :';
-		foreach ( $images as $index => $image ) {
-			$lines[] = sprintf( '%d. fichier « %s » — plat reconnu : %s — %s', $index, self::file_label( $image ), '' !== $image['dish'] ? $image['dish'] : 'non identifié', $image['describes'] );
+		$out[] = 'DÉCIDE LES RECETTES DU LOT — LA CONSIGNE PRIME :';
+		$out[] = '- Chaque plat que la consigne demande est une recette ("from": "text"), avec ou sans photographie. N’en oublie aucun, n’en fusionne pas deux, n’en invente aucun. Une liste de plats est autant de recettes ; un plat suivi de ses ingrédients, étapes ou remarques est une seule recette.';
+		$out[] = '- "brief" : recopie mot pour mot tout ce que la consigne dit de ce plat — son nom, ses ingrédients, ses étapes, ses remarques —, sans résumer ni reformuler.';
+		$out[] = '- "general" : recopie mot pour mot ce que la consigne demande pour toutes les recettes (régime, public, ton, contraintes), ou "". Une simple phrase d’introduction n’est pas une consigne.';
+		$out[] = '- Le titre est le nom usuel du plat en ' . $language . ', sans numéro ni décoration.';
+		if ( $images ) {
+			$out[] = '- Associe chaque photographie à la recette de la consigne dont elle montre le plat, en comparant ce qu’elle montre au nom ET au contenu de la recette : une « tarte normande » faite de pommes est la photographie d’une tarte aux pommes. Partager l’ingrédient principal ne suffit pas : ce doit être la même préparation ; une tarte aux pommes n’est pas des pommes au four.';
+			$out[] = '- Il peut y avoir moins de photographies que de recettes : des recettes restent sans photographie, c’est normal. Plusieurs photographies du même plat vont à la même recette ; deux plats différents ne vont pas à la même recette.';
+			$out[] = '- Un plat photographié que la consigne ne demande pas devient une recette de plus ("from": "photos", "brief": ""), nommée d’après le plat ; toutes ses photographies vont à elle. Si la consigne ne nomme aucun plat (par exemple « des recettes légères pour ces photos »), les recettes sont les plats des photographies et la consigne va dans "general". Si la consigne exclut un plat photographié, n’en fais pas une recette : "recipe": null et "excluded": true.';
+			$out[] = '- Le nom du fichier est un indice faible ; ce que montre la photographie prime.';
+			$out[] = '- Si tu hésites entre deux recettes, choisis la plus probable avec "confidence": "basse". "recipe": null est réservé à une photographie où aucun plat n’est visible, ou exclue par la consigne.';
 		}
-		$lines[] = '';
-		$lines[] = 'RÈGLES :';
-		$lines[] = '- Une photographie appartient à une seule recette, ou à aucune.';
-		$lines[] = '- Une recette peut recevoir plusieurs photographies, ou aucune.';
-		$lines[] = '- Le nom du fichier est un indice faible ; ce que montre la photographie prime sur lui.';
-		$lines[] = '- Dans le doute, n’associe pas. Une photographie laissée de côté coûte moins qu’une photographie attribuée au mauvais plat, qui illustrera un article entier.';
-		$lines[] = '';
-		$lines[] = 'RÉPONSE — un objet JSON valide, sans Markdown, avec exactement ces clés :';
-		$lines[] = '- "pairs" : tableau de {"image": entier, "recipe": entier ou null, "confidence": "haute"|"moyenne"|"basse", "why": une phrase en ' . $language . '}';
-		$lines[] = '- "reasoning" : une phrase sur la façon dont l’ensemble se répartit';
-		return implode( "\n", $lines );
+		$out[] = '';
+		$out[] = 'RÉPONSE — un objet JSON valide, sans Markdown, avec exactement ces clés :';
+		$out[] = '- "recipes" : tableau de {"title": le nom du plat, "from": "text" ou "photos", "brief": les passages recopiés}';
+		$out[] = '- "general" : les consignes pour toutes les recettes, recopiées, ou ""';
+		if ( $images ) { $out[] = '- "pairs" : tableau de {"image": numéro de la photographie, "recipe": indice dans "recipes" (à partir de 0) ou null, "excluded": true si la consigne l’exclut, "confidence": "haute"|"moyenne"|"basse", "why": une phrase en ' . $language . '}'; }
+		$out[] = '- "reasoning" : une phrase sur la façon dont le lot se répartit';
+		return implode( "\n", $out );
 	}
 
 	/**
@@ -384,7 +447,7 @@ final class MSRWA_Match {
 			// A reason the plugin gives itself travels as a code, so the screen
 			// can say it in the reader's language; the model's own reasons are
 			// written in the lot's.
-			$reason = in_array( (string) ( $pair['reason'] ?? '' ), array( 'only_recipe', 'new_recipe', 'no_dish', 'not_mentioned' ), true ) ? (string) $pair['reason'] : '';
+			$reason = in_array( (string) ( $pair['reason'] ?? '' ), array( 'only_recipe', 'new_recipe', 'no_dish', 'not_mentioned', 'excluded' ), true ) ? (string) $pair['reason'] : '';
 			// "In doubt, do not pair" is a promise on screen, so it is kept here
 			// and not left to the model: a live pairing gave a plain brown square
 			// to a tart "with confidence" while saying no dish was visible. A
@@ -402,7 +465,8 @@ final class MSRWA_Match {
 			if ( ! empty( $pair['new_recipe'] ) ) { $one['new_recipe'] = true; }
 			// A photograph no recipe took is the writer's to decide — none is
 			// dropped without them — and the lot does not leave until they have.
-			if ( null === $recipe ) { $one['pending'] = true; }
+			// Unless their brief itself ruled it out: set aside, and theirs to undo.
+			if ( null === $recipe && 'excluded' === $reason ) { $one['set_aside'] = true; } elseif ( null === $recipe ) { $one['pending'] = true; }
 			$out[] = $one;
 		}
 		// A photograph the answer never mentioned is unassigned, not missing.
