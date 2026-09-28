@@ -2581,3 +2581,10 @@ msgstr "The recipes are decided at the next step, from your brief and your photo
 #, php-format
 msgid "Titre demandé : « %s »"
 msgstr "Title asked for: “%s”"
+
+msgid "Publier les brouillons"
+msgstr "Publish the drafts"
+
+#, php-format
+msgid "Publier les brouillons de %d recette(s), comme le bouton Publier de WordPress ? Seuls les brouillons sont publiés ; les autres articles restent tels quels."
+msgstr "Publish the drafts of %d recipe(s), as WordPress’s Publish button does? Only drafts are published; other articles are left as they are."

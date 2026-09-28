@@ -239,6 +239,8 @@ final class MSRWA_Admin {
 				'pruning' => __( 'Nettoyage…', 'ms-recipes-writer-ai' ),
 				'checkingKeys' => __( 'Vérification…', 'ms-recipes-writer-ai' ),
 				/* translators: %d is a number of recipes. */
+				/* translators: %d is a number of articles. */
+				'confirmPublish' => __( 'Publier les brouillons de %d recette(s), comme le bouton Publier de WordPress ? Seuls les brouillons sont publiés ; les autres articles restent tels quels.', 'ms-recipes-writer-ai' ),
 				'confirmDelete' => __( 'Supprimer %d recette(s) et tout ce que le moteur en a rapporté ? C’est irréversible.', 'ms-recipes-writer-ai' ),
 				'confirmBatchDelete' => __( 'Supprimer ce lot et tout ce que le moteur en a rapporté ? Les brouillons déjà produits sont conservés. C’est irréversible.', 'ms-recipes-writer-ai' ),
 				'passUrl' => admin_url( 'admin.php?page=msrwa' ),

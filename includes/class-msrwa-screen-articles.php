@@ -154,6 +154,9 @@ final class MSRWA_Screen_Articles {
 					<option value="" selected><?php esc_html_e( 'Choisir…', 'ms-recipes-writer-ai' ); ?></option>
 					<option value="cancel"><?php esc_html_e( 'Arrêter', 'ms-recipes-writer-ai' ); ?></option>
 					<option value="retry"><?php esc_html_e( 'Reprendre', 'ms-recipes-writer-ai' ); ?></option>
+					<?php if ( current_user_can( 'publish_posts' ) ) : ?>
+						<option value="publish"><?php esc_html_e( 'Publier les brouillons', 'ms-recipes-writer-ai' ); ?></option>
+					<?php endif; ?>
 					<?php if ( MSRWA_Rights::may_manage() ) : ?>
 						<option value="prioritise"><?php esc_html_e( 'Faire passer devant', 'ms-recipes-writer-ai' ); ?></option>
 					<?php endif; ?>

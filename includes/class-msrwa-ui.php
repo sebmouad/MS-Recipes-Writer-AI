@@ -252,8 +252,8 @@ final class MSRWA_UI {
 					<?php if ( $author ) : ?><th><?php esc_html_e( 'Rédacteur', 'ms-recipes-writer-ai' ); ?></th><?php endif; ?>
 					<th><?php esc_html_e( 'État', 'ms-recipes-writer-ai' ); ?></th>
 					<th><?php esc_html_e( 'Article', 'ms-recipes-writer-ai' ); ?></th>
-					<th><?php esc_html_e( 'Créée', 'ms-recipes-writer-ai' ); ?></th>
-					<th class="ms-runs-num"><?php esc_html_e( 'Étapes', 'ms-recipes-writer-ai' ); ?></th>
+					<th class="ms-runs-created"><?php esc_html_e( 'Créée', 'ms-recipes-writer-ai' ); ?></th>
+					<th class="ms-runs-num ms-runs-steps"><?php esc_html_e( 'Étapes', 'ms-recipes-writer-ai' ); ?></th>
 					<?php if ( $money ) : ?>
 						<th class="ms-runs-num"><?php esc_html_e( 'Durée', 'ms-recipes-writer-ai' ); ?></th>
 						<th class="ms-runs-num"><?php esc_html_e( 'Coût', 'ms-recipes-writer-ai' ); ?></th>
@@ -330,12 +330,12 @@ final class MSRWA_UI {
 				<?php if ( 'queued' === $run['status'] && (int) ( $run['priority'] ?? 0 ) > 0 ) : ?><small><?php esc_html_e( 'passe devant', 'ms-recipes-writer-ai' ); ?></small><?php endif; ?>
 			</td>
 			<td data-label="<?php esc_attr_e( 'Article', 'ms-recipes-writer-ai' ); ?>"><?php self::post_badge( $run, $post ); ?></td>
-			<td data-label="<?php esc_attr_e( 'Créée', 'ms-recipes-writer-ai' ); ?>">
+			<td data-label="<?php esc_attr_e( 'Créée', 'ms-recipes-writer-ai' ); ?>" class="ms-runs-when ms-runs-created">
 				<?php if ( ! empty( $run['created_at'] ) ) : ?><time datetime="<?php echo esc_attr( gmdate( 'c', (int) strtotime( $run['created_at'] . ' UTC' ) ) ); ?>" title="<?php echo esc_attr( MSRWA_I18N::when( $run['created_at'] ) ); ?>"><?php echo esc_html( MSRWA_I18N::ago( $run['created_at'] ) ); ?></time><?php endif; ?>
 			</td>
-			<td data-label="<?php esc_attr_e( 'Étapes', 'ms-recipes-writer-ai' ); ?>" class="ms-runs-num"><span data-field="steps"><?php echo esc_html( (int) $run['steps_done'] . '/' . (int) $run['steps_total'] ); ?></span></td>
+			<td data-label="<?php esc_attr_e( 'Étapes', 'ms-recipes-writer-ai' ); ?>" class="ms-runs-num ms-runs-steps"><span data-field="steps"><?php echo esc_html( (int) $run['steps_done'] . '/' . (int) $run['steps_total'] ); ?></span></td>
 			<?php if ( $money ) : ?>
-				<td data-label="<?php esc_attr_e( 'Durée', 'ms-recipes-writer-ai' ); ?>" class="ms-runs-num"><span data-field="seconds"><?php echo isset( $run['seconds'] ) ? esc_html( MSRWA_I18N::seconds( $run['seconds'] ) ) : '—'; ?></span></td>
+				<td data-label="<?php esc_attr_e( 'Durée', 'ms-recipes-writer-ai' ); ?>" class="ms-runs-num ms-runs-when"><span data-field="seconds"><?php echo isset( $run['seconds'] ) ? esc_html( MSRWA_I18N::seconds( $run['seconds'] ) ) : '—'; ?></span></td>
 				<td data-label="<?php esc_attr_e( 'Coût', 'ms-recipes-writer-ai' ); ?>" class="ms-runs-num ms-run-cost"><span data-field="cost"><?php echo isset( $run['cost_usd'] ) ? esc_html( MSRWA_I18N::money( $run['cost_usd'] ) ) : '—'; ?></span></td>
 			<?php endif; ?>
 			<td class="ms-runs-act"><?php self::post_links( $post_id, $post ); ?></td>

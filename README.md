@@ -5,9 +5,9 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.32.0
+## État actuel — 0.33.0
 
-La version `0.32.0` donne aux articles des titres plus attrayants et ne répète plus le titre dans le premier intertitre ; la `0.31.3` gardait les titres propres ; la `0.31.2` ne regroupe des photographies que si elles montrent exactement la même préparation ; la `0.31.1` dit à la lecture du lot quelle photographie est un collage ; la `0.31.0` lit le texte du rédacteur comme une consigne : plus de
+La version `0.33.0` publie plusieurs brouillons d'un coup depuis Articles, comme le bouton Publier de WordPress ; la `0.32.0` donnait aux articles des titres plus attrayants et ne répète plus le titre dans le premier intertitre ; la `0.31.3` gardait les titres propres ; la `0.31.2` ne regroupe des photographies que si elles montrent exactement la même préparation ; la `0.31.1` dit à la lecture du lot quelle photographie est un collage ; la `0.31.0` lit le texte du rédacteur comme une consigne : plus de
 tirets entre les recettes, le texte décide des recettes et prime pour associer
 les photographies, et l'appariement se corrige dans des tableaux ; la `0.30.0` sépare, dans Articles, les recettes en cours des
 terminées et tient les premières à jour en direct ; chaque lot nomme son
@@ -101,6 +101,22 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.33.0
+
+**Publier plusieurs brouillons d'un coup.** Dans Articles, l'action groupée
+« Publier les brouillons » publie les articles cochés exactement comme le
+bouton Publier de WordPress : seul le statut change, un brouillon sans date
+prend la date du moment, un brouillon daté garde la sienne. MS Image
+Optimization renomme et optimise les images comme à chaque publication, et MS
+Facebook Posts Schedule attribue son créneau. Seuls les brouillons sont
+publiés : un article en attente, déjà publié, planifié ou à la corbeille reste
+tel quel. L'action n'apparaît qu'à qui peut publier et demande confirmation.
+
+**Une colonne d'actions qui respire.** Les boutons de fin de ligne ne collent
+plus au bord du tableau, et le tableau tient dans sa carte jusqu'à 1024 pixels
+de large : dates sur deux lignes, colonnes Étapes et Créée masquées sur les
+écrans étroits.
 
 ## Version 0.32.0
 

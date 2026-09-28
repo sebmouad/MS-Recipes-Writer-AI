@@ -2637,3 +2637,10 @@ msgstr "تُحدَّد الوصفات في الخطوة التالية، انط�
 #, php-format
 msgid "Titre demandé : « %s »"
 msgstr "العنوان المطلوب: «%s»"
+
+msgid "Publier les brouillons"
+msgstr "نشر المسودات"
+
+#, php-format
+msgid "Publier les brouillons de %d recette(s), comme le bouton Publier de WordPress ? Seuls les brouillons sont publiés ; les autres articles restent tels quels."
+msgstr "نشر مسودات %d وصفة كما يفعل زر النشر في ووردبريس؟ تُنشر المسودات فقط وتبقى المقالات الأخرى كما هي."

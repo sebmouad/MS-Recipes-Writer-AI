@@ -1295,6 +1295,8 @@
       // Deleting destroys the record of what was spent and cannot be undone,
       // so it is the one action that asks first.
       if ('delete' === action && !window.confirm((t.confirmDelete || '').replace('%d', runs.length))) return;
+      // Publishing puts articles in front of readers: said, and asked, first.
+      if ('publish' === action && !window.confirm((t.confirmPublish || '').replace('%d', runs.length))) return;
 
       go.disabled = true;
       say(bulkStatus, t.applying || '');

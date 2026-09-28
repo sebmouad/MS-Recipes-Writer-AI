@@ -159,7 +159,24 @@
 .ms-runs .ms-runs-num { text-align: end; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .ms-runs .ms-runs-pick { inline-size: 1%; padding-inline-end: 0; }
 .ms-runs .ms-runs-pick input { margin: 0; }
-.ms-runs .ms-runs-act { inline-size: 1%; white-space: nowrap; text-align: end; }
+.ms-runs .ms-runs-act { inline-size: 1%; white-space: nowrap; text-align: end; padding-inline-end: 20px; }
+.ms-runs thead th:last-child { padding-inline-end: 20px; }
+/* Between a phone and a wide screen the table fits its card: tighter cells,
+   and dates and durations may take two lines, so the actions never leave
+   the screen on the right. */
+@media (min-width: 783px) and (max-width: 1439px) {
+	.ms-runs td, .ms-runs tbody th, .ms-runs thead th { padding-inline: 10px; }
+	.ms-runs .ms-runs-act, .ms-runs thead th:last-child { padding-inline-end: 16px; }
+	.ms-runs td.ms-runs-when { white-space: normal; min-inline-size: 4.5rem; }
+	.ms-runs td.ms-runs-when time { white-space: normal; }
+}
+/* Narrower still, the steps count and the creation date give way (the
+   recipe's page keeps both; the article column dates the article) and
+   the recipe's column may narrow. */
+@media (min-width: 783px) and (max-width: 1180px) {
+	.ms-runs .ms-runs-steps, .ms-runs .ms-runs-created { display: none; }
+	.ms-run-recipe { min-inline-size: 12rem; }
+}
 .ms-runs small { display: block; margin-block-start: 4px; font-size: 12px; color: var(--ms-ink-soft); }
 .ms-runs time { color: var(--ms-ink-soft); white-space: nowrap; }
 
@@ -182,7 +199,7 @@
 .ms-run-about { display: flex; flex-wrap: wrap; gap: 2px 12px; margin-block-start: 5px; font-size: 12px; color: var(--ms-ink-soft); }
 .ms-run-about a { color: var(--ms-ink); font-weight: 600; text-decoration: none; }
 .ms-run-about a:hover, .ms-run-about a:focus { color: var(--ms-lamp); text-decoration: underline; }
-.ms-run-wptitle { display: block; margin-block-start: 4px; font-size: 12px; color: var(--ms-ink-soft); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-inline-size: 34rem; }
+.ms-run-wptitle { display: block; margin-block-start: 4px; font-size: 12px; color: var(--ms-ink-soft); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; inline-size: 0; min-inline-size: 100%; max-inline-size: 34rem; }
 
 /* Where it stands. */
 .ms-run-state .ms-progress { display: block; margin-block-start: 8px; }

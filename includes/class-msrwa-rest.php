@@ -316,7 +316,7 @@ final class MSRWA_REST {
 	 */
 	public static function bulk( WP_REST_Request $request ) {
 		$action = sanitize_key( (string) $request->get_param( 'do' ) );
-		if ( ! in_array( $action, array( 'cancel', 'retry', 'delete', 'prioritise' ), true ) ) {
+		if ( ! in_array( $action, array( 'cancel', 'retry', 'delete', 'prioritise', 'publish' ), true ) ) {
 			return new WP_Error( 'msrwa_unknown_action', __( 'Action inconnue.', 'ms-recipes-writer-ai' ), array( 'status' => 400 ) );
 		}
 		// Order across the queue is a decision over other people's work, so it
@@ -350,6 +350,10 @@ final class MSRWA_REST {
 				if ( MSRWA_Run::may_retry( $run ) && MSRWA_Run::retry( $id ) ) { $done++; } else { $skipped[] = $id; }
 				continue;
 			}
+			if ( 'publish' === $action ) {
+				if ( self::publish( $run ) ) { $done++; } else { $skipped[] = $id; }
+				continue;
+			}
 			// Deleting destroys the evidence of what was spent, so a recipe
 			// still moving is never deleted out from under its own worker.
 			if ( in_array( (string) $run['status'], array( 'queued', 'running' ), true ) ) { $skipped[] = $id; continue; }
@@ -357,6 +361,25 @@ final class MSRWA_REST {
 		}
 
 		return rest_ensure_response( array( 'done' => $done, 'skipped' => array_values( $skipped ) ) );
+	}
+
+	/**
+	 * Publishes one recipe's article exactly as WordPress's own bulk edit does
+	 * (the owner's rule, 2026-09-28): the status set through wp_update_post,
+	 * nothing else — so the date follows WordPress's rule (a draft with no date
+	 * of its own is published now, one given a date keeps it) and everything
+	 * that listens for a publication hears it: MS FB Posts gives it its
+	 * Facebook slot, MS Image Optimizer processes its images. Drafts only (the
+	 * owner's rule): a post pending review, published, scheduled or in the bin
+	 * is left as it is. And only one this person may publish.
+	 */
+	private static function publish( array $run ) {
+		$post_id = (int) ( $run['draft_post_id'] ?? 0 );
+		$post = $post_id ? get_post( $post_id ) : null;
+		if ( ! $post || 'draft' !== (string) $post->post_status ) { return false; }
+		if ( ! current_user_can( 'publish_post', $post_id ) ) { return false; }
+		$done = wp_update_post( array( 'ID' => $post_id, 'post_status' => 'publish' ), true );
+		return ! is_wp_error( $done ) && $done;
 	}
 
 	/** Runs an overdue recipe's next wave from the page that watches it, when cron did not. */

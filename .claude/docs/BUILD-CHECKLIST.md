@@ -668,6 +668,18 @@ cost) in the task before changing anything.
   the brief on each; « seulement les desserts » → 2 recipes, 2 set aside; one
   sentence naming six dishes → 6. `tests/test-match.php`,
   `tests/test-intake.php`. ARCHITECTURE invariants 19 and 25.
+- [x] **A80 — Publish several drafts from Articles (2026-09-28, 0.33.0).**
+  Owner's request. The bulk action « Publier les brouillons » (shown to those
+  who can `publish_posts`, confirmed first) calls `wp_update_post()` with the
+  status only, as WordPress's Publish button does, so `transition_post_status`
+  and `save_post` run MS Image Optimization and MS FB Posts slots. Drafts only
+  (owner's rule): pending, published, future and trashed posts are skipped,
+  and `publish_post` is checked per post. The actions column gets 20px end
+  padding (16px under 1440px) and the table fits its card down to 1024px.
+  Real: runs 90/88 published drafts 499 (date kept) and 289 (floating date →
+  now), skipped 298 (published) and 286 (pending); MSIMG renamed 289's
+  thumbnail; both got a FB slot 2026-09-29 12:00; no overflow at 1024–1700px.
+  `tests/test-bulk-publish.php`.
 - [x] **A79 — Attractive titles, no title in the first heading (2026-09-28,
   0.32.0).** Owner's request. The article's "title" is a 45–70-character
   headline naming the dish with a concrete promise, used as the post's title
