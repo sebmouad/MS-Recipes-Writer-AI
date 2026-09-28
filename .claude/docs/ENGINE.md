@@ -1040,6 +1040,19 @@ photograph, and otherwise use the photograph without the cost of a search.
     took the closing question off a long caption. The captions written so far
     measured 234 to 265.
 
+62. **An attractive title, and a first heading that does not repeat it
+    (owner's request, 2026-09-28).** `article.tpl.txt` now defines "title":
+    the headline above the article, 45 to 70 characters, the dish's usual name
+    then a concrete promise the recipe keeps (texture, flavour, ease,
+    occasion), sentence case, no exclamation mark, year or clickbait, not the
+    words of "seo_title". The first h2 neither names the dish nor restates the
+    title, and no h1 is written. The plugin makes that headline the post's
+    title when it names the dish (`MSRWA_Article::headline()`), the canonical
+    title staying the recipe's name, and removes an h1 or the dish's name a
+    first heading opens on (`MSRWA_Article::tidy()`). Real: « Tarte aux
+    pommes normande, fondante et croustillante », opening on « Pourquoi
+    préparer cette tarte aux pommes normande aujourd'hui ? », $0.0925.
+
 
 6. **The engine's `models` list is a second source of truth for prices.** The
    plugin now owns the catalogue — models, rates and per-step compatibility in

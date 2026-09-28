@@ -5,9 +5,9 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.31.3
+## État actuel — 0.32.0
 
-La version `0.31.3` retire les émojis des titres de recettes ; la `0.31.2` ne regroupe des photographies que si elles montrent exactement la même préparation ; la `0.31.1` dit à la lecture du lot quelle photographie est un collage ; la `0.31.0` lit le texte du rédacteur comme une consigne : plus de
+La version `0.32.0` donne aux articles des titres plus attrayants et ne répète plus le titre dans le premier intertitre ; la `0.31.3` gardait les titres propres ; la `0.31.2` ne regroupe des photographies que si elles montrent exactement la même préparation ; la `0.31.1` dit à la lecture du lot quelle photographie est un collage ; la `0.31.0` lit le texte du rédacteur comme une consigne : plus de
 tirets entre les recettes, le texte décide des recettes et prime pour associer
 les photographies, et l'appariement se corrige dans des tableaux ; la `0.30.0` sépare, dans Articles, les recettes en cours des
 terminées et tient les premières à jour en direct ; chaque lot nomme son
@@ -101,6 +101,30 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.32.0
+
+**Des titres qui donnent envie.** Le titre de l'article publié n'est plus le
+seul nom du plat : l'article écrit un vrai titre de 45 à 70 caractères, le nom
+du plat puis ce qui rend la recette désirable — texture, goût, rapidité,
+occasion — sans point d'exclamation ni formule racoleuse (« Tarte aux pommes
+normande, fondante et croustillante »). Il est retenu quand il nomme bien le
+plat ; sinon le nom du plat reste le titre. La fiche recette garde le nom
+simple du plat.
+
+**Le titre n'est plus répété dans le premier intertitre.** Le premier
+intertitre ne reprend ni le titre ni le nom du plat ; aucun h1 n'est écrit dans
+le texte, le thème affichant déjà le titre. Si un article le fait quand même,
+le nom est retiré de son début (« La tarte aux pommes normande : quelle texture
+et quand la servir ? » devient « Quelle texture et quand la servir ? ») et un
+intertitre qui n'a plus rien à dire disparaît.
+
+**Articles : le vrai titre d'abord.** Chaque ligne montre le titre de l'article
+tel qu'il est dans WordPress, sur deux lignes au plus, et le titre demandé
+dessous seulement s'il dit autre chose — plus pour une majuscule ou un accent.
+
+**Les émojis restent dans les titres.** Ils s'affichent correctement avec
+MS Turbo Cache 1.0.16 ; ils ne sont plus retirés.
 
 ## Version 0.31.3
 

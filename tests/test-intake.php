@@ -29,13 +29,10 @@ $decorated = MSRWA_Intake::recipes( "**Daube provençale**\nviande" );
 msrwa_test_assert( 'Daube provençale' === $decorated[0]['title'], 'Emphasis marks are stripped; got ' . $decorated[0]['title'] );
 
 
-// Titles pasted from Facebook carry emoji; a dish's name does not, and the
-// admin drew each one as a broken image where its emoji styles were removed.
-msrwa_test_assert( 'Pommes de Terre à l’Ail et au Beurre au Four – fondant et plein de saveurs' === MSRWA_Intake::plain_title( 'Pommes de Terre à l’Ail et au Beurre au Four – fondant et plein de saveurs 😋✨' ), 'Emoji leave a title: ' . MSRWA_Intake::plain_title( 'Pommes de Terre à l’Ail et au Beurre au Four – fondant et plein de saveurs 😋✨' ) );
-msrwa_test_assert( 'Cassolettes de Gambas & Saint-Jacques' === MSRWA_Intake::plain_title( '🦐🧀 Cassolettes de Gambas & Saint-Jacques ✨💛' ), 'Before the name too, and joined emoji with them.' );
-msrwa_test_assert( 'Mousse Chocolat & Mascarpone' === MSRWA_Intake::plain_title( 'Mousse Chocolat & Mascarpone 🤎🥄' ), 'Whatever the colour.' );
-msrwa_test_assert( 'طاجين الدجاج 2 أشخاص' === MSRWA_Intake::plain_title( 'طاجين الدجاج 2 أشخاص ❤️' ), 'Letters of every script and digits stay.' );
-msrwa_test_assert( 'Tarte' === MSRWA_Intake::recipes( "Tarte 😋\npommes" )[0]['title'], 'A title read from the text is plain words.' );
+// Titles pasted from Facebook keep their emoji (the owner's call): only the
+// spacing and stray separators are tidied.
+msrwa_test_assert( 'Mousse Chocolat & Mascarpone 🤎🥄' === MSRWA_Intake::plain_title( '  Mousse Chocolat  & Mascarpone 🤎🥄 – ' ), 'Emoji stay in a title, its spacing is tidied.' );
+msrwa_test_assert( 'طاجين الدجاج 2 أشخاص ❤️' === MSRWA_Intake::plain_title( 'طاجين الدجاج 2 أشخاص ❤️' ), 'Letters of every script, digits and emoji stay.' );
 
 // --- Photographs sent from the writer's computer --------------------------
 if ( ! function_exists( 'sanitize_file_name' ) ) { function sanitize_file_name( $name ) { return preg_replace( '/[^A-Za-z0-9._-]/', '', basename( (string) $name ) ); } }

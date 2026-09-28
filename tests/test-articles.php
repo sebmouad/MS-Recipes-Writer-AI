@@ -28,7 +28,16 @@ $binned = $render( array( 'label' => 'Poulet yassa', 'draft_post_id' => 202 ) );
 msrwa_test_contains( $binned, 'Dans la corbeille', 'A post in the bin says so.' );
 msrwa_test_contains( $binned, 'action=untrash', 'And offers to restore it.' );
 msrwa_test_missing( $binned, 'action=edit', 'A post in the bin is not edited.' );
-msrwa_test_missing( $binned, 'Intitulé dans WordPress', 'A title the post still shares is not repeated.' );
+msrwa_test_missing( $binned, 'Titre demandé', 'A title the post still shares is not repeated.' );
+
+// The article's own title leads; the writer's follows only when it says
+// something else — not when it differs by capitals, accents or an emoji.
+$renamed = $render( array( 'label' => 'Tarte aux pommes normande', 'draft_post_id' => 201 ) );
+msrwa_test_assert( 1 === preg_match( '#class="ms-run-name"[^>]*>Tarte normande au calvados<#', $renamed ), 'The link names the article as it is in WordPress.' );
+msrwa_test_contains( $renamed, 'Titre demandé : « Tarte aux pommes normande »', 'The title asked for follows, when it differs.' );
+$GLOBALS['msrwa_test_posts'][204] = (object) array( 'ID' => 204, 'post_status' => 'publish', 'post_title' => 'Osso buco de veau classique', 'post_date_gmt' => '2026-09-24 08:00:00', 'post_modified_gmt' => '2026-09-24 08:00:00' );
+msrwa_test_missing( $render( array( 'label' => 'Osso Buco de Veau Classique ✨', 'draft_post_id' => 204 ) ), 'Titre demandé', 'Capitals and an emoji do not make another title.' );
+msrwa_test_contains( $render( array( 'label' => 'Tarte 😋', 'draft_post_id' => 0, 'status' => 'running' ) ), '>Tarte 😋<', 'Before its article, a recipe is named as the writer asked, emoji included.' );
 
 $draft = $render( array( 'label' => 'Daube', 'draft_post_id' => 203 ) );
 msrwa_test_contains( $draft, 'Brouillon', 'A draft says so.' );

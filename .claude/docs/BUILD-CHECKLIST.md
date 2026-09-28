@@ -668,6 +668,17 @@ cost) in the task before changing anything.
   the brief on each; « seulement les desserts » → 2 recipes, 2 set aside; one
   sentence naming six dishes → 6. `tests/test-match.php`,
   `tests/test-intake.php`. ARCHITECTURE invariants 19 and 25.
+- [x] **A79 — Attractive titles, no title in the first heading (2026-09-28,
+  0.32.0).** Owner's request. The article's "title" is a 45–70-character
+  headline naming the dish with a concrete promise, used as the post's title
+  when it names the dish (`MSRWA_Article::headline()`); the first h2 neither
+  names the dish nor restates the title, and `tidy()` removes any h1 and the
+  name a first heading opens on. Articles lead with the WordPress title and
+  show the requested one only when its words differ. Emoji stay in titles
+  (owner's call), displayed by MS Turbo Cache 1.0.16. Real: `test-flow.php`,
+  « Tarte aux pommes normande, fondante et croustillante », $0.0925; the
+  Articles screen with emoji in both titles, no broken image. ENGINE.md §7,
+  item 62. `tests/test-article-tidy.php`, `tests/test-articles.php`.
 - [x] **A78 — Recipe titles without emoji (2026-09-28, 0.31.3).** Owner's
   screenshot: titles pasted from Facebook showed a broken image beside each
   emoji in Articles. `MSRWA_Intake::plain_title()` removes emoji and

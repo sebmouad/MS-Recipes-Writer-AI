@@ -275,6 +275,12 @@ final class MSRWA_UI {
 		return (string) ob_get_clean();
 	}
 
+	/** A title's words alone: no case, accent or punctuation to tell two apart. */
+	private static function same_words( $title ) {
+		$title = function_exists( 'remove_accents' ) ? remove_accents( (string) $title ) : (string) $title;
+		return trim( (string) preg_replace( '/[^\p{L}\p{N}]+/u', ' ', mb_strtolower( $title ) ) );
+	}
+
 	private static function run_row( array $run, $selectable, $author, $money ) {
 		$url = admin_url( 'admin.php?page=msrwa-run&run_id=' . (int) $run['id'] );
 		$state = self::state_of( $run );
@@ -284,20 +290,25 @@ final class MSRWA_UI {
 		$thumb = $post_id ? (int) get_post_thumbnail_id( $post_id ) : 0;
 		$icon = array( MSRWA_Profile::ARTICLE => 'media-text', MSRWA_Profile::FEATURED => 'format-image', MSRWA_Profile::FULL => 'images-alt2' )[ $lot['profile'] ] ?? 'food';
 		$post = $post_id ? get_post( $post_id ) : null;
-		$wp_title = $post ? trim( (string) $post->post_title ) : '';
+		$wp_title = $post ? trim( wp_strip_all_tags( (string) $post->post_title ) ) : '';
+		// The article's own title leads once it has one; what the writer asked
+		// for follows only when it says something else, not another capital.
+		$asked = MSRWA_Intake::plain_title( (string) $run['label'] );
+		$name = '' !== $wp_title ? $wp_title : $asked;
+		$other = '' !== $wp_title && '' !== $asked && self::same_words( $wp_title ) !== self::same_words( $asked );
 		$languages = MSRWA_Profile::languages();
 		?>
 		<tr class="ms-run ms-run-<?php echo esc_attr( $tone ); ?>" data-run="<?php echo esc_attr( $run['id'] ); ?>">
 			<?php if ( $selectable ) : ?>
 				<td class="ms-runs-pick"><input type="checkbox" class="ms-pick-run" value="<?php echo esc_attr( $run['id'] ); ?>"
-					aria-label="<?php echo esc_attr( sprintf( /* translators: %s is a recipe title. */ __( 'Sélectionner %s', 'ms-recipes-writer-ai' ), MSRWA_Intake::plain_title( $run['label'] ) ) ); ?>"></td>
+					aria-label="<?php echo esc_attr( sprintf( /* translators: %s is a recipe title. */ __( 'Sélectionner %s', 'ms-recipes-writer-ai' ), $name ) ); ?>"></td>
 			<?php endif; ?>
 			<th scope="row" class="ms-run-recipe">
 				<a class="ms-run-thumb<?php echo $thumb ? '' : ' is-empty'; ?>" href="<?php echo esc_url( $url ); ?>" tabindex="-1" aria-hidden="true">
 					<?php echo $thumb ? wp_get_attachment_image( $thumb, 'thumbnail', false, array( 'alt' => '', 'loading' => 'lazy' ) ) : '<span class="dashicons dashicons-' . esc_attr( $icon ) . '"></span>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 				</a>
 				<span class="ms-run-id">
-					<a class="ms-run-name" href="<?php echo esc_url( $url ); ?>"><?php echo esc_html( MSRWA_Intake::plain_title( $run['label'] ) ); ?></a>
+					<a class="ms-run-name" href="<?php echo esc_url( $url ); ?>" title="<?php echo esc_attr( $name ); ?>"><?php echo esc_html( $name ); ?></a>
 					<span class="ms-run-about">
 						<span class="ms-run-no">#<?php echo esc_html( $run['id'] ); ?></span>
 						<?php if ( (int) ( $run['batch_id'] ?? 0 ) ) : ?>
@@ -306,8 +317,8 @@ final class MSRWA_UI {
 						<?php if ( '' !== MSRWA_Profile::short( $lot['profile'] ) ) : ?><span title="<?php echo esc_attr( (string) ( MSRWA_Profile::all()[ $lot['profile'] ]['label'] ?? '' ) ); ?>"><?php echo esc_html( MSRWA_Profile::short( $lot['profile'] ) ); ?></span><?php endif; ?>
 						<?php if ( '' !== $lot['language'] ) : ?><span><?php echo esc_html( (string) ( $languages[ $lot['language'] ] ?? strtoupper( $lot['language'] ) ) ); ?></span><?php endif; ?>
 					</span>
-					<?php if ( '' !== $wp_title && $wp_title !== MSRWA_Intake::plain_title( $run['label'] ) ) : ?>
-						<span class="ms-run-wptitle"><?php echo esc_html( sprintf( /* translators: %s is the article's current title in WordPress. */ __( 'Intitulé dans WordPress : « %s »', 'ms-recipes-writer-ai' ), $wp_title ) ); ?></span>
+					<?php if ( $other ) : ?>
+						<span class="ms-run-wptitle" title="<?php echo esc_attr( $asked ); ?>"><?php echo esc_html( sprintf( /* translators: %s is the title the writer asked for. */ __( 'Titre demandé : « %s »', 'ms-recipes-writer-ai' ), $asked ) ); ?></span>
 					<?php endif; ?>
 				</span>
 			</th>

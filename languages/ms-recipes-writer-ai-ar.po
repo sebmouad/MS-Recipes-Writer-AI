@@ -2633,3 +2633,7 @@ msgstr "استُبعدت حسب تعليماتك."
 
 msgid "Les recettes sont décidées à l’étape suivante, d’après votre consigne et vos photographies."
 msgstr "تُحدَّد الوصفات في الخطوة التالية، انطلاقًا من تعليماتك وصورك."
+
+#, php-format
+msgid "Titre demandé : « %s »"
+msgstr "العنوان المطلوب: «%s»"

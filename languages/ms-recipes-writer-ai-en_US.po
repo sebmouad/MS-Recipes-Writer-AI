@@ -2577,3 +2577,7 @@ msgstr "Set aside as your brief asks."
 
 msgid "Les recettes sont décidées à l’étape suivante, d’après votre consigne et vos photographies."
 msgstr "The recipes are decided at the next step, from your brief and your photographs."
+
+#, php-format
+msgid "Titre demandé : « %s »"
+msgstr "Title asked for: “%s”"

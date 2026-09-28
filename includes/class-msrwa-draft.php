@@ -55,14 +55,17 @@ final class MSRWA_Draft {
 
 		$canonical = (array) ( $artifacts['canonical'] ?? array() );
 		$brief = (array) json_decode( (string) $run['brief_json'], true );
-		$title = (string) ( $canonical['title'] ?? $article['title'] ?? $brief['title'] ?? 'Recette' );
+		// The dish's plain name stays the recipe's; the post carries the
+		// headline the article wrote for readers when it names that dish.
+		$dish = (string) ( $canonical['title'] ?? $brief['title'] ?? 'Recette' );
+		$title = MSRWA_Article::headline( (string) ( $article['title'] ?? '' ), $dish );
 
 		$post = array(
 			'post_type' => 'post', 'post_status' => 'draft',
 			'post_title' => wp_strip_all_tags( $title ),
 			// Blocks, not one Classic block: the article is what an editor came
 			// here to work on, and they cannot work on a wall of HTML.
-			'post_content' => MSRWA_Blocks::from_html( MSRWA_Article::tidy( $html, $title, self::language( $run ) ) ),
+			'post_content' => MSRWA_Blocks::from_html( MSRWA_Article::tidy( $html, $title, self::language( $run ), $dish ) ),
 			'post_excerpt' => wp_strip_all_tags( (string) ( $article['excerpt'] ?? '' ) ),
 			'post_author' => (int) $run['owner_id'],
 		);

@@ -176,13 +176,13 @@
 .ms-run-thumb img { inline-size: 100%; block-size: 100%; object-fit: cover; display: block; }
 .ms-run-thumb.is-empty .dashicons { inline-size: 24px; block-size: 24px; font-size: 24px; color: var(--ms-ink-faint); }
 .ms-run-id { display: block; overflow: hidden; }
-.ms-run-name { font-size: 14px; font-weight: 650; line-height: 1.35; color: var(--ms-ink); text-decoration: none; overflow-wrap: anywhere; }
+.ms-run-name { font-size: 14px; font-weight: 650; line-height: 1.35; color: var(--ms-ink); text-decoration: none; overflow-wrap: anywhere; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
 .ms-run-name:hover, .ms-run-name:focus { color: var(--ms-lamp); text-decoration: underline; text-underline-offset: 3px; }
 .ms-run-no { color: var(--ms-ink-faint); font-variant-numeric: tabular-nums; }
 .ms-run-about { display: flex; flex-wrap: wrap; gap: 2px 12px; margin-block-start: 5px; font-size: 12px; color: var(--ms-ink-soft); }
 .ms-run-about a { color: var(--ms-ink); font-weight: 600; text-decoration: none; }
 .ms-run-about a:hover, .ms-run-about a:focus { color: var(--ms-lamp); text-decoration: underline; }
-.ms-run-wptitle { display: block; margin-block-start: 4px; font-size: 12px; font-style: italic; color: var(--ms-ink-soft); }
+.ms-run-wptitle { display: block; margin-block-start: 4px; font-size: 12px; color: var(--ms-ink-soft); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-inline-size: 34rem; }
 
 /* Where it stands. */
 .ms-run-state .ms-progress { display: block; margin-block-start: 8px; }
