@@ -152,6 +152,22 @@ msrwa_test_contains( $prompt, 'LA CONSIGNE PRIME', 'And the reading is told it c
 $collage_prompt = new ReflectionMethod( MSRWA_Match::class, 'read_prompt' );
 $collage_prompt->setAccessible( true );
 msrwa_test_contains( $collage_prompt->invoke( null, 'Tarte', array( array( 'file' => 'grille.jpg', 'dish' => 'Tarte', 'describes' => 'Six étapes.', 'collage' => true ) ) ), '(collage étape par étape)', 'The reading is told which photograph is the writer’s collage.' );
+
+// The owner's rule, 2026-09-28: photographs are one recipe only when they show
+// the very same preparation. Two versions of a dish — with or without almonds,
+// with chicken or goat's cheese — are two recipes, whatever their name.
+$versions = $collage_prompt->invoke( null, 'Tarte aux pommes', array(
+	array( 'file' => 'a.jpg', 'dish' => 'Tarte aux pommes', 'describes' => 'Une tarte.', 'observation' => array( 'observable_details' => array( 'lamelles de pommes', 'amandes effilées' ) ) ),
+	array( 'file' => 'b.jpg', 'dish' => 'Tarte aux pommes', 'describes' => 'Une tarte.', 'observation' => array( 'observable_details' => 'lamelles de pommes nappées' ) ),
+) );
+msrwa_test_contains( $versions, 'exactement la même préparation', 'The reading is told to group only the very same preparation.' );
+msrwa_test_contains( $versions, 'amandes effilées', 'And is given each photograph’s details to tell versions apart.' );
+msrwa_test_contains( $proposal_prompt->invoke( null, $shots, 'français' ), 'exactement la même préparation', 'The same rule holds without text.' );
+$closest = new ReflectionMethod( MSRWA_Match::class, 'closest' );
+$closest->setAccessible( true );
+msrwa_test_assert( 0 === $closest->invoke( null, 'Yassa au poulet', array( array( 'title' => 'Poulet yassa' ) ) ), 'The same dish in other words is the brief’s recipe.' );
+msrwa_test_assert( null === $closest->invoke( null, 'Tarte aux pommes et amandes', array( array( 'title' => 'Tarte aux pommes' ) ) ), 'Another version of it is not merged into it.' );
+msrwa_test_contains( $source, "1 === count( \$seen['images'] ) && false === strpos( \$text, \"\\n\" )", 'Two photographs are always read, never grouped on a name alone.' );
 msrwa_test_assert( $out['cost_usd'] > 0, 'What the reading cost is counted.' );
 
 // A recipe the reading names from photographs that is plainly a dish of the

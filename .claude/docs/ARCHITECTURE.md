@@ -120,7 +120,13 @@ decides the recipes from it, the brief first. Every dish it asks for is a
 recipe, photographed or not, carrying the writer's own words about it copied
 out; what it asks of every recipe ("sans gluten", a tone, a public) is added to
 each. A photograph goes with the dish of the brief it shows — the same
-preparation, not a shared ingredient. A dish photographed that the brief does
+preparation, not a shared ingredient. Photographs are one recipe only when
+they show the very same preparation — the same visible ingredients, garnish
+and cooking, which the reading is given from each photograph's observation;
+two versions of a dish are two recipes, whatever their name, and
+`closest()` merges a name into the brief's only when the words are the same.
+A lot of one line and one photograph is paired without a call; two
+photographs are always read. A dish photographed that the brief does
 not name is a recipe of its own, unless the brief rules it out; a brief that
 names no dish is applied to the dishes the photographs show. Without text, the
 recipes are the dishes the photographs show (`propose()`). The plugin checks

@@ -5,9 +5,9 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.31.1
+## État actuel — 0.31.2
 
-La version `0.31.1` dit à la lecture du lot quelle photographie est un collage ; la `0.31.0` lit le texte du rédacteur comme une consigne : plus de
+La version `0.31.2` ne regroupe des photographies que si elles montrent exactement la même préparation ; la `0.31.1` dit à la lecture du lot quelle photographie est un collage ; la `0.31.0` lit le texte du rédacteur comme une consigne : plus de
 tirets entre les recettes, le texte décide des recettes et prime pour associer
 les photographies, et l'appariement se corrige dans des tableaux ; la `0.30.0` sépare, dans Articles, les recettes en cours des
 terminées et tient les premières à jour en direct ; chaque lot nomme son
@@ -101,6 +101,18 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.31.2
+
+**Deux versions d'un plat, deux recettes.** Des photographies ne vont à la même
+recette que si elles montrent exactement la même préparation : mêmes
+ingrédients visibles, même garniture, même cuisson. Une tarte aux pommes nature
+et une tarte aux pommes aux amandes, une quiche aux courgettes au chèvre et une
+au poulet, deux gratins différents sont des recettes distinctes, même sous le
+même nom ; la version qui correspond à votre texte va à sa recette, l'autre en
+devient une de plus, avec un titre qui dit ce qui la distingue. La lecture
+compare pour cela les détails vus sur chaque photographie, et plus seulement
+le nom du plat. Vérifié sur le site de test avec des photographies réelles.
 
 ## Version 0.31.1
 

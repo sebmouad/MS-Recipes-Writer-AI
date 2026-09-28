@@ -668,6 +668,16 @@ cost) in the task before changing anything.
   the brief on each; « seulement les desserts » → 2 recipes, 2 set aside; one
   sentence naming six dishes → 6. `tests/test-match.php`,
   `tests/test-intake.php`. ARCHITECTURE invariants 19 and 25.
+- [x] **A77 — Versions of a dish are recipes of their own (2026-09-28,
+  0.31.2).** Owner's rule: photographs are grouped only when they show the
+  very same preparation. The reading and the photographs-only grouping say
+  so and are given each photograph's observed details; `closest()` needs the
+  same words; one line with two photographs is always read. Real: « Gratin
+  dauphinois » and three gratins → three recipes; « Tarte aux pommes » with a
+  plain, an almond and a second plain tart → the almond one apart; a brief
+  of a courgette quiche and an apple tart with the chicken quiche and the
+  almond tart → four recipes; the collage still joins its tart.
+  `tests/test-match.php`.
 - [x] **A76 — The collage through the brief (2026-09-28, 0.31.1).** The
   reading is told which photograph is a step-by-step collage and that it goes
   with its dish, never a recipe alone. Real: a tart collage with a tart and a

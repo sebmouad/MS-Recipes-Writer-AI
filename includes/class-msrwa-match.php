@@ -39,10 +39,11 @@ final class MSRWA_Match {
 			// No brief: the recipes are the dishes the photographs show.
 			$decision = self::propose( $seen['images'], $config );
 			$recipes = $decision['recipes'];
-		} elseif ( $seen['images'] && false === strpos( $text, "\n" ) && self::all_of( array( 'title' => $text ), $seen['images'] ) ) {
-			// A brief of one line naming the one dish every photograph shows:
-			// there is nothing for a paid call to decide. A photograph with no
-			// dish on it still waits for the writer, as normalise() promises.
+		} elseif ( 1 === count( $seen['images'] ) && false === strpos( $text, "\n" ) && self::all_of( array( 'title' => $text ), $seen['images'] ) ) {
+			// A brief of one line naming the dish its one photograph shows:
+			// there is nothing for a paid call to decide. Two photographs are
+			// always read: two versions of one dish are two recipes. A photograph
+			// with no dish on it still waits for the writer, as normalise() promises.
 			$recipes = array( array( 'title' => MSRWA_Intake::title_of( $text ), 'text' => $text ) );
 			$decision = $none;
 			foreach ( array_keys( $seen['images'] ) as $index ) { $decision['pairs'][] = array( 'image' => $index, 'recipe' => 0, 'confidence' => 'haute', 'why' => 'Seule recette du lot.', 'reason' => 'only_recipe' ); }
@@ -166,10 +167,11 @@ final class MSRWA_Match {
 	}
 
 	/**
-	 * The brief's recipe a dish name plainly is, or null: every word of four
-	 * letters or more of one is in the other, accents and case aside, and only
-	 * one recipe answers. "Yassa au poulet" is the "Poulet yassa"; a "Poulet
-	 * yassa" is not the "Tajine de poulet".
+	 * The brief's recipe a dish name plainly is, or null: the same words of
+	 * four letters or more, in any order, accents and case aside, and only one
+	 * recipe answers. "Yassa au poulet" is the "Poulet yassa"; a "Tarte aux
+	 * pommes et amandes" is another version of the "Tarte aux pommes", which
+	 * the owner wants as a recipe of its own (2026-09-28).
 	 */
 	private static function closest( $dish, array $recipes ) {
 		$words = static function ( $text ) {
@@ -180,7 +182,7 @@ final class MSRWA_Match {
 		$found = array();
 		foreach ( $recipes as $index => $recipe ) {
 			$title = $words( (string) ( $recipe['title'] ?? '' ) );
-			if ( $title && ( ! array_diff( $named, $title ) || ! array_diff( $title, $named ) ) ) { $found[] = $index; }
+			if ( $title && ! array_diff( $named, $title ) && ! array_diff( $title, $named ) ) { $found[] = $index; }
 		}
 		return 1 === count( $found ) ? $found[0] : null;
 	}
@@ -359,11 +361,12 @@ final class MSRWA_Match {
 			'PHOTOGRAPHIES, décrites depuis leurs propres pixels :',
 		);
 		foreach ( $images as $index => $image ) {
-			$lines[] = sprintf( '%d. fichier « %s » — plat reconnu : %s — %s', $index, self::file_label( $image ), '' !== $image['dish'] ? $image['dish'] : 'non identifié', $image['describes'] );
+			$lines[] = sprintf( '%d. fichier « %s »%s — plat reconnu : %s — %s', $index, self::file_label( $image ), empty( $image['collage'] ) ? '' : ' (collage étape par étape)', '' !== $image['dish'] ? $image['dish'] : 'non identifié', $image['describes'] ) . self::details( $image );
 		}
 		$lines[] = '';
 		$lines[] = 'RÈGLES :';
-		$lines[] = '- Deux photographies du même plat vont à la même recette, même si le nom reconnu diffère un peu.';
+		$lines[] = '- Plusieurs photographies vont à la même recette seulement si elles montrent exactement la même préparation : mêmes ingrédients visibles, même garniture, même cuisson, même présentation du plat. Deux versions d’un même plat (avec ou sans amandes, au poulet ou au chèvre, gratinée ou non) sont deux recettes, même si leur nom est le même ; donne-leur alors des titres qui les distinguent.';
+		$lines[] = '- Un collage étape par étape va à la recette du plat qu’il prépare, comme une photographie de plus.';
 		$lines[] = '- Le titre est le nom usuel du plat, en ' . $language . ', sans adjectif publicitaire.';
 		$lines[] = '- Une photographie où aucun plat n’est reconnu n’appartient à aucune recette.';
 		$lines[] = '- N’invente aucun plat qu’aucune photographie ne montre.';
@@ -401,7 +404,7 @@ final class MSRWA_Match {
 			$out[] = 'PHOTOGRAPHIES, décrites depuis leurs propres pixels :';
 			foreach ( $images as $index => $image ) {
 				// A step-by-step collage is one more view of its dish, never a dish of its own.
-				$out[] = sprintf( '%d. fichier « %s »%s — plat reconnu : %s — %s', $index, self::file_label( $image ), empty( $image['collage'] ) ? '' : ' (collage étape par étape)', '' !== (string) ( $image['dish'] ?? '' ) ? $image['dish'] : 'non identifié', (string) ( $image['describes'] ?? '' ) );
+				$out[] = sprintf( '%d. fichier « %s »%s — plat reconnu : %s — %s', $index, self::file_label( $image ), empty( $image['collage'] ) ? '' : ' (collage étape par étape)', '' !== (string) ( $image['dish'] ?? '' ) ? $image['dish'] : 'non identifié', (string) ( $image['describes'] ?? '' ) ) . self::details( $image );
 			}
 			$out[] = '';
 		}
@@ -412,7 +415,8 @@ final class MSRWA_Match {
 		$out[] = '- Le titre est le nom usuel du plat en ' . $language . ', sans numéro ni décoration.';
 		if ( $images ) {
 			$out[] = '- Associe chaque photographie à la recette de la consigne dont elle montre le plat, en comparant ce qu’elle montre au nom ET au contenu de la recette : une « tarte normande » faite de pommes est la photographie d’une tarte aux pommes. Partager l’ingrédient principal ne suffit pas : ce doit être la même préparation ; une tarte aux pommes n’est pas des pommes au four.';
-			$out[] = '- Il peut y avoir moins de photographies que de recettes : des recettes restent sans photographie, c’est normal. Plusieurs photographies du même plat vont à la même recette ; deux plats différents ne vont pas à la même recette.';
+			$out[] = '- Il peut y avoir moins de photographies que de recettes : des recettes restent sans photographie, c’est normal. Deux plats différents ne vont pas à la même recette.';
+			$out[] = '- Plusieurs photographies vont à la même recette seulement si elles montrent exactement la même préparation : mêmes ingrédients visibles, même garniture, même cuisson. Deux versions d’un même plat (avec ou sans amandes, au poulet ou au chèvre, gratinée ou non) ne vont pas ensemble, même sous le même nom : la version qui correspond à la recette de la consigne va à elle, l’autre devient une recette de plus ("from": "photos") dont le titre dit ce qui la distingue.';
 			$out[] = '- Un plat photographié que la consigne ne demande pas devient une recette de plus ("from": "photos", "brief": ""), nommée d’après le plat ; toutes ses photographies vont à elle. Si la consigne ne nomme aucun plat (par exemple « des recettes légères pour ces photos »), les recettes sont les plats des photographies et la consigne va dans "general". Si la consigne exclut un plat photographié, n’en fais pas une recette : "recipe": null et "excluded": true.';
 			$out[] = '- Le nom du fichier est un indice faible ; ce que montre la photographie prime.';
 			$out[] = '- Un collage étape par étape montre la préparation d’un plat : il va à la recette de ce plat, comme une photographie de plus, et ne fait jamais une recette à lui seul.';
@@ -476,6 +480,21 @@ final class MSRWA_Match {
 			if ( ! isset( $taken[ $image ] ) ) { $out[] = array( 'image' => (int) $image, 'recipe' => null, 'confidence' => 'basse', 'why' => 'Non mentionnée par l’appariement.', 'reason' => 'not_mentioned', 'pending' => true ); }
 		}
 		return $out;
+	}
+
+	/**
+	 * What a photograph shows in detail — its ingredients, garnish, cooking —
+	 * from its reading: two versions of one dish are told apart on these, not
+	 * on a name.
+	 */
+	private static function details( array $image ) {
+		$seen = array();
+		foreach ( array( 'observable_details', 'composition' ) as $key ) {
+			$value = $image['observation'][ $key ] ?? '';
+			$value = is_array( $value ) ? implode( ' ; ', array_map( static function ( $one ) { return is_scalar( $one ) ? (string) $one : wp_json_encode( $one ); }, $value ) ) : (string) $value;
+			if ( '' !== trim( $value ) ) { $seen[] = trim( $value ); }
+		}
+		return $seen ? ' — détails : ' . mb_substr( implode( ' ; ', $seen ), 0, 600 ) : '';
 	}
 
 	/**
