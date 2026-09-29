@@ -246,6 +246,9 @@ msgstr "اجتازت كل الخطوات فحوصها في هذه الفترة."
 msgid "Un contrôle qui échoue une fois sur six est du bruit ; six fois sur six, c’est un contrat que le prompt ne tient pas."
 msgstr "فحص يفشل مرة من ست هو ضجيج؛ وستاً من ست فهو التزام لا يفي به الموجّه."
 
+msgid "Le suivi du lot s’est arrêté : le site n’a pas répondu. Rechargez la page pour reprendre."
+msgstr "توقّف تتبّع هذه الدفعة: لم يستجب الموقع. أعد تحميل الصفحة لمتابعتها."
+
 msgid "Une erreur est survenue."
 msgstr "حدث خطأ."
 

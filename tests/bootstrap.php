@@ -90,6 +90,7 @@ if ( ! function_exists( 'selected' ) ) { function selected( $selected, $current 
 if ( ! function_exists( 'checked' ) ) { function checked( $checked, $current = true, $echo = true ) { $result = (string) $checked === (string) $current ? " checked='checked'" : ''; if ( $echo ) { echo $result; } return $result; } }
 if ( ! function_exists( 'submit_button' ) ) { function submit_button( $text = '' ) { echo '<button type="submit">' . esc_html( $text ) . '</button>'; } }
 if ( ! function_exists( 'wp_nonce_field' ) ) { function wp_nonce_field( $action = '' ) { echo '<input type="hidden" name="_wpnonce" value="test">'; } }
+if ( ! function_exists( 'wp_create_nonce' ) ) { function wp_create_nonce( $action = -1 ) { return 'test-nonce'; } }
 if ( ! function_exists( 'paginate_links' ) ) {
 	function paginate_links( $args ) {
 		$out = '';

@@ -170,6 +170,7 @@ final class MSRWA_Admin {
 			),
 			'text' => array(
 				'failed' => __( 'Une erreur est survenue.', 'ms-recipes-writer-ai' ),
+				'lostTouch' => __( 'Le suivi du lot s’est arrêté : le site n’a pas répondu. Rechargez la page pour reprendre.', 'ms-recipes-writer-ai' ),
 				'fromBrief' => __( 'Les recettes sont décidées à l’étape suivante, d’après votre consigne et vos photographies.', 'ms-recipes-writer-ai' ),
 				/* translators: %d is a number of photographs. */
 				'fromPhotos' => __( 'Aucun texte : chaque plat reconnu sur les photographies deviendra une recette (%d au plus).', 'ms-recipes-writer-ai' ),

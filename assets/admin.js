@@ -1498,7 +1498,7 @@
     window.clearTimeout(retry);
     retry = null;
     return call('/batches/' + batch + '/runs').then(function (data) {
-      misses = 0;
+      if (misses) { misses = 0; say(batchStatus, ''); }
       var runs = data.runs || [];
       if (data.stalled) nudge(Number(data.stalled));
       paintLot(runs);
@@ -1514,7 +1514,9 @@
       // off and come back, and only give up after about a minute of failures.
       if (timer) { window.clearInterval(timer); timer = null; }
       misses++;
-      if (misses <= 6) { retry = window.setTimeout(refresh, Math.min(20000, 2000 * misses)); }
+      if (misses <= 6) { retry = window.setTimeout(refresh, Math.min(20000, 2000 * misses)); return; }
+      // Out of tries: say so rather than leaving a page that looks alive.
+      say(batchStatus, t.lostTouch || t.failed || '');
     });
   }
 

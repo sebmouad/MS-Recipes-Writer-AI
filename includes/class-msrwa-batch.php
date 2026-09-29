@@ -166,9 +166,11 @@ final class MSRWA_Batch {
 			if ( $image < 0 || $image >= count( (array) $matching['images'] ) || isset( $taken[ $image ] ) ) { continue; }
 			$choice = (string) ( $pair['recipe'] ?? '' );
 			$taken[ $image ] = true;
-			// Unticked, a collage is an ordinary photograph of the dish, and the
-			// recipe's collage is drawn again.
-			if ( array_key_exists( 'collage', $pair ) && ! empty( $matching['images'][ $image ]['collage'] ) ) {
+			// The writer's answer is kept for any photograph, not only for one the
+			// engine read as a collage: they may have made one it did not
+			// recognise, and they are the one who knows. Unticked, it is an
+			// ordinary photograph of the dish and the recipe's collage is drawn.
+			if ( array_key_exists( 'collage', $pair ) ) {
 				$matching['images'][ $image ]['collage_off'] = ! $pair['collage'];
 			}
 			$was = $before[ $image ] ?? null;
@@ -375,7 +377,7 @@ final class MSRWA_Batch {
 			// (ENGINE.md §7, 50).
 			$collage = null;
 			foreach ( $images as $image ) {
-				if ( ! empty( $image['collage'] ) && empty( $image['collage_off'] ) ) { $collage = $image; break; }
+				if ( self::is_collage( $image ) ) { $collage = $image; break; }
 			}
 			$brief['collage_lead'] = MSRWA_Profile::lead( $batch['profile'], null !== $collage );
 			$run = MSRWA_Run::create( (int) $id, (int) $batch['owner_id'], $brief, $config, MSRWA_Profile::run_steps( $batch['profile'], (array) ( $config['steps'] ?? array() ), $brief['collage_lead'] ) );
@@ -391,6 +393,16 @@ final class MSRWA_Batch {
 
 		$wpdb->update( self::table(), array( 'status' => $started ? 'running' : 'failed', 'updated_at' => current_time( 'mysql', true ) ), array( 'id' => absint( $id ) ) );
 		return $started;
+	}
+
+	/**
+	 * Whether a photograph leads its recipe as the Facebook collage: the
+	 * writer's answer when they gave one, the engine's reading otherwise. A lot
+	 * settled before the tick was offered on every photograph carries no answer,
+	 * and keeps reading as it did.
+	 */
+	public static function is_collage( array $image ) {
+		return array_key_exists( 'collage_off', $image ) ? empty( $image['collage_off'] ) : ! empty( $image['collage'] );
 	}
 
 	/**

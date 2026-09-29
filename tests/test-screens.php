@@ -222,12 +222,12 @@ msrwa_test_contains( MSRWA_UI::reason( array( 'status' => 'done', 'draft_post_id
 
 // --- Throwing a lot away is an administrator's, and never mid-flight ----
 
-function msrwa_batch_html( $status, $owner ) {
+function msrwa_batch_html( $status, $owner, $matching = '' ) {
 	$GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
 	$GLOBALS['wpdb']->on( 'FROM wp_msrwa_batches WHERE id', array(
 		array( 'id' => 4, 'owner_id' => $owner, 'label' => 'Plats du soir', 'status' => $status, 'recipes' => 2, 'images' => 0,
 			'budget_usd' => 0.2, 'profile' => 'article', 'language' => 'fr', 'dispatch_at' => null,
-			'config_json' => '', 'matching_json' => '', 'error_message' => '', 'created_at' => '2026-09-01 00:00:00', 'updated_at' => '2026-09-01 00:00:00' ),
+			'config_json' => '', 'matching_json' => $matching, 'error_message' => '', 'created_at' => '2026-09-01 00:00:00', 'updated_at' => '2026-09-01 00:00:00' ),
 	) );
 	$_GET = array( 'batch_id' => 4 );
 	$out = msrwa_render( array( 'MSRWA_Screen_Batch', 'render' ) );
@@ -243,6 +243,25 @@ msrwa_test_as_editor( 7 );
 msrwa_test_missing( msrwa_batch_html( 'ready', 7 ), 'ms-batch-delete', 'A writer cannot throw away a lot, not even their own.' );
 $lot = msrwa_batch_html( 'ready', 7 );
 msrwa_test_contains( $lot, 'ms-lot-summary', 'A lot opens on its summary.' );
+
+// The collage tick is offered on every photograph while a lot is still being
+// settled, unticked on an ordinary one: a writer whose collage the engine read
+// as a plain photograph used to have nothing to click.
+$plain = wp_json_encode( array(
+	'recipes' => array( array( 'title' => 'Flan aux pommes', 'text' => 'Mélanger, cuire.' ) ),
+	'images' => array( array( 'name' => 'photo.jpg', 'url' => 'https://example.test/photo.jpg', 'dish' => 'flan', 'describes' => 'le plat fini', 'collage' => false ) ),
+	'pairs' => array( array( 'image' => 0, 'recipe' => 0, 'confidence' => 'haute', 'why' => '' ) ),
+) );
+$ordinary = msrwa_batch_html( 'ready', 7, $plain );
+msrwa_test_contains( $ordinary, 'ms-pair-collage-use', 'An ordinary photograph is offered the collage tick.' );
+msrwa_test_missing( $ordinary, 'ms-pair-collage-use" data-image="0" checked', 'And it is offered unticked.' );
+
+$read = wp_json_encode( array(
+	'recipes' => array( array( 'title' => 'Flan aux pommes', 'text' => 'Mélanger, cuire.' ) ),
+	'images' => array( array( 'name' => 'collage.jpg', 'url' => 'https://example.test/collage.jpg', 'dish' => 'flan', 'describes' => 'les étapes', 'collage' => true ) ),
+	'pairs' => array( array( 'image' => 0, 'recipe' => 0, 'confidence' => 'haute', 'why' => '' ) ),
+) );
+msrwa_test_contains( msrwa_batch_html( 'ready', 7, $read ), "checked='checked'", 'A collage the engine recognised arrives ticked.' );
 msrwa_test_contains( $lot, 'Éditeur 7', 'It names whose lot it is.' );
 msrwa_test_contains( $lot, 'attend votre confirmation', 'And where it stands.' );
 msrwa_test_missing( $lot, 'plafond', 'A writer’s lot shows no ceiling.' );

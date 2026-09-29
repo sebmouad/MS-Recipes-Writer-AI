@@ -93,4 +93,15 @@ msrwa_test_contains( MSRWA_Engine_Input::collage_lead( $led, 'canonical_recipe' 
 // right after the research, before the recipe it leads.
 msrwa_test_assert( array( 'research', 'facebook_image', 'collage_reading', 'canonical_recipe' ) === array_slice( MSRWA_Engine_Steps::names( MSRWA_Engine_Steps::for_lead( array(), 'drawn' ) ), 0, 4 ), 'The collage steps come right after the research.' );
 
+// Which photograph leads as the writer's own collage. The tick is offered on
+// every one of them now, so the answer they gave outranks what the engine read.
+msrwa_test_load( 'batch' );
+msrwa_test_assert( MSRWA_Batch::is_collage( array( 'collage' => true ) ), 'A collage the engine recognised leads, with nothing said.' );
+msrwa_test_assert( ! MSRWA_Batch::is_collage( array( 'collage' => false ) ), 'An ordinary photograph does not, with nothing said.' );
+msrwa_test_assert( ! MSRWA_Batch::is_collage( array( 'collage' => true, 'collage_off' => true ) ), 'Unticked, a recognised collage steps aside.' );
+msrwa_test_assert( MSRWA_Batch::is_collage( array( 'collage' => true, 'collage_off' => false ) ), 'Ticked, it leads.' );
+// The point of offering the tick everywhere: a collage the engine missed.
+msrwa_test_assert( MSRWA_Batch::is_collage( array( 'collage' => false, 'collage_off' => false ) ), 'Ticked on a photograph the engine read as ordinary, it leads all the same.' );
+msrwa_test_assert( ! MSRWA_Batch::is_collage( array() ), 'A photograph with neither answer nor reading leads nothing.' );
+
 msrwa_test_done( 'the collage leads the recipe: drawn first, or the writer’s own' );

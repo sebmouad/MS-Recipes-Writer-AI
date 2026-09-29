@@ -246,6 +246,9 @@ msgstr "Every step satisfied its checks in this period."
 msgid "Un contrôle qui échoue une fois sur six est du bruit ; six fois sur six, c’est un contrat que le prompt ne tient pas."
 msgstr "A check that fails once in six is noise; six times in six is a contract the prompt is not keeping."
 
+msgid "Le suivi du lot s’est arrêté : le site n’a pas répondu. Rechargez la page pour reprendre."
+msgstr "This lot stopped updating: the site did not answer. Reload the page to pick it up again."
+
 msgid "Une erreur est survenue."
 msgstr "Something went wrong."
 
