@@ -233,7 +233,8 @@ final class MSRWA_Match {
 			$out['images'][ $index ] = array_merge( $images[ $index ], array(
 				'dish' => is_array( $seen ) ? (string) ( $seen['dish'] ?? '' ) : '',
 				'describes' => is_array( $seen ) ? (string) ( $seen['description'] ?? '' ) : '',
-				// A step-by-step collage the writer made is offered as the recipe's
+				// A collage the writer made (steps, or ingredients and the finished
+				// dish) is offered as the recipe's
 				// Facebook image and its reference (ENGINE.md §7, 50).
 				'collage' => is_array( $seen ) && true === ( $seen['collage'] ?? null ),
 				'observation' => $observation,
@@ -361,12 +362,12 @@ final class MSRWA_Match {
 			'PHOTOGRAPHIES, décrites depuis leurs propres pixels :',
 		);
 		foreach ( $images as $index => $image ) {
-			$lines[] = sprintf( '%d. fichier « %s »%s — plat reconnu : %s — %s', $index, self::file_label( $image ), empty( $image['collage'] ) ? '' : ' (collage étape par étape)', '' !== $image['dish'] ? $image['dish'] : 'non identifié', $image['describes'] ) . self::details( $image );
+			$lines[] = sprintf( '%d. fichier « %s »%s — plat reconnu : %s — %s', $index, self::file_label( $image ), empty( $image['collage'] ) ? '' : ' (collage Facebook)', '' !== $image['dish'] ? $image['dish'] : 'non identifié', $image['describes'] ) . self::details( $image );
 		}
 		$lines[] = '';
 		$lines[] = 'RÈGLES :';
 		$lines[] = '- Plusieurs photographies vont à la même recette seulement si elles montrent exactement la même préparation : mêmes ingrédients visibles, même garniture, même cuisson, même présentation du plat. Deux versions d’un même plat (avec ou sans amandes, au poulet ou au chèvre, gratinée ou non) sont deux recettes, même si leur nom est le même ; donne-leur alors des titres qui les distinguent.';
-		$lines[] = '- Un collage étape par étape va à la recette du plat qu’il prépare, comme une photographie de plus.';
+		$lines[] = '- Un collage Facebook (étapes en photographies, ou ingrédients et plat fini) va à la recette du plat qu’il montre, comme une photographie de plus.';
 		$lines[] = '- Le titre est le nom usuel du plat, en ' . $language . ', sans adjectif publicitaire.';
 		$lines[] = '- Une photographie où aucun plat n’est reconnu n’appartient à aucune recette.';
 		$lines[] = '- N’invente aucun plat qu’aucune photographie ne montre.';
@@ -383,7 +384,7 @@ final class MSRWA_Match {
 		return ( '' !== trim( $engine ) ? $engine : MSRWA_Engine_Call::default_vision_instruction() )
 			. ' Add two keys to the same JSON object: "dish", the name of the dish as a cook would recognise it, in ' . $language . ', or "" if you cannot name it; '
 			. '"description", one sentence in ' . $language . ' saying what is visible — main ingredients, colour, doneness, presentation; '
-			. '"collage", true when the image is a grid of several photographs showing a recipe being made step by step, false for a single photograph. '
+			. '"collage", true when the image is a recipe post made of several pictures — a grid of photographs of the recipe being made step by step, or a recipe card that sets pictures of the ingredients, often with their quantities, beside the finished dish, usually under the recipe\'s title — and false for a single photograph of a dish, even with a caption or a watermark. '
 			. 'Describe only what is visible; never invent a hidden ingredient, a quantity or an origin.';
 	}
 
@@ -403,8 +404,8 @@ final class MSRWA_Match {
 		if ( $images ) {
 			$out[] = 'PHOTOGRAPHIES, décrites depuis leurs propres pixels :';
 			foreach ( $images as $index => $image ) {
-				// A step-by-step collage is one more view of its dish, never a dish of its own.
-				$out[] = sprintf( '%d. fichier « %s »%s — plat reconnu : %s — %s', $index, self::file_label( $image ), empty( $image['collage'] ) ? '' : ' (collage étape par étape)', '' !== (string) ( $image['dish'] ?? '' ) ? $image['dish'] : 'non identifié', (string) ( $image['describes'] ?? '' ) ) . self::details( $image );
+				// A collage is one more view of its dish, never a dish of its own.
+				$out[] = sprintf( '%d. fichier « %s »%s — plat reconnu : %s — %s', $index, self::file_label( $image ), empty( $image['collage'] ) ? '' : ' (collage Facebook)', '' !== (string) ( $image['dish'] ?? '' ) ? $image['dish'] : 'non identifié', (string) ( $image['describes'] ?? '' ) ) . self::details( $image );
 			}
 			$out[] = '';
 		}
@@ -419,7 +420,7 @@ final class MSRWA_Match {
 			$out[] = '- Plusieurs photographies vont à la même recette seulement si elles montrent exactement la même préparation : mêmes ingrédients visibles, même garniture, même cuisson. Deux versions d’un même plat (avec ou sans amandes, au poulet ou au chèvre, gratinée ou non) ne vont pas ensemble, même sous le même nom : la version qui correspond à la recette de la consigne va à elle, l’autre devient une recette de plus ("from": "photos") dont le titre dit ce qui la distingue.';
 			$out[] = '- Un plat photographié que la consigne ne demande pas devient une recette de plus ("from": "photos", "brief": ""), nommée d’après le plat ; toutes ses photographies vont à elle. Si la consigne ne nomme aucun plat (par exemple « des recettes légères pour ces photos »), les recettes sont les plats des photographies et la consigne va dans "general". Si la consigne exclut un plat photographié, n’en fais pas une recette : "recipe": null et "excluded": true.';
 			$out[] = '- Le nom du fichier est un indice faible ; ce que montre la photographie prime.';
-			$out[] = '- Un collage étape par étape montre la préparation d’un plat : il va à la recette de ce plat, comme une photographie de plus, et ne fait jamais une recette à lui seul.';
+			$out[] = '- Un collage Facebook — les étapes en photographies, ou les ingrédients et le plat fini — montre un seul plat : il va à la recette de ce plat, comme une photographie de plus, et ne fait jamais une recette à lui seul ; son titre imprimé est le nom de ce plat.';
 			$out[] = '- Si tu hésites entre deux recettes, choisis la plus probable avec "confidence": "basse". "recipe": null est réservé à une photographie où aucun plat n’est visible, ou exclue par la consigne.';
 		}
 		$out[] = '';

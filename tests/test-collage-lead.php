@@ -46,6 +46,16 @@ msrwa_test_contains( MSRWA_Engine_Input::collage_lead( $brief, 'article' ), 'Des
 msrwa_test_contains( MSRWA_Engine_Input::collage_lead( $brief, 'final_approval' ), 'never against the ingredient list', 'The judge does not hold a drawn collage to the list it was written before.' );
 msrwa_test_contains( MSRWA_Engine_Input::collage_lead( array( 'collage_lead' => 'provided', 'collage' => $reading ), 'final_approval' ), 'Do not judge it', 'The writer’s own collage is not judged.' );
 msrwa_test_assert( '' === MSRWA_Engine_Input::collage_lead( array( 'collage' => $reading ), 'canonical_recipe' ), 'Without a lead nothing is said.' );
+// A recipe card prints its quantities: the recipe published beside it keeps them (ENGINE.md §7, 63).
+$card = array( 'title_printed' => 'Gratin de butternut aux lardons et reblochon', 'ingredients_seen' => array( 'butternut', 'lardons fumés', 'reblochon' ), 'printed_quantities' => array( array( 'ingredient' => 'Butternut', 'quantity' => '1 kg' ), array( 'ingredient' => 'Lardons fumés', 'quantity' => '200 g' ) ), 'finished_dish' => 'Un gratin doré.' );
+$told = MSRWA_Engine_Input::collage_lead( array( 'collage_lead' => 'provided', 'collage' => $card ), 'canonical_recipe' );
+msrwa_test_contains( $told, '"quantity":"1 kg"', 'The printed quantities reach the recipe.' );
+msrwa_test_contains( $told, 'takes exactly that quantity and unit', 'The recipe keeps the card’s quantities.' );
+msrwa_test_contains( $told, "the editor's own Facebook collage", 'A card is the editor’s Facebook collage, not only a grid of steps.' );
+msrwa_test_missing( MSRWA_Engine_Input::collage_lead( $brief, 'canonical_recipe' ), 'takes exactly that quantity', 'A collage that prints no quantity leaves them to the research.' );
+$reading_prompt = (string) file_get_contents( dirname( __DIR__ ) . '/includes/engine/prompts/collage_reading.tpl.txt' );
+msrwa_test_contains( $reading_prompt, 'or a recipe card', 'The reading knows the recipe-card layout.' );
+msrwa_test_contains( $reading_prompt, '"printed_quantities"', 'The reading copies printed quantities.' );
 
 // The free collage has no recipe to obey, and keeps the research as knowledge.
 $free = MSRWA_Engine_Input::collage_brief_free( array( 'title' => 'Crêpes jambon fromage', 'text' => '', 'research' => array( 'ingredients' => array( array( 'name' => 'farine' ), array( 'name' => 'jambon' ) ), 'preparation' => array( array( 'action' => 'Préparer la pâte.' ) ) ) ), 'facebook_brief.tpl.txt' );

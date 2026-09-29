@@ -726,12 +726,16 @@ final class MSRWA_Engine_Input {
 		$lead = (string) ( $brief['collage_lead'] ?? '' );
 		if ( '' === $lead ) { return ''; }
 		$reading = (array) ( $brief['collage'] ?? array() );
-		$whose = 'provided' === $lead ? "the editor's own step-by-step collage of this dish" : 'a step-by-step collage of this dish, drawn before this recipe';
-		$seen = array_intersect_key( $reading, array_flip( array( 'panels', 'ingredients_seen', 'garnish_and_sides', 'finished_dish', 'serving' ) ) );
+		$whose = 'provided' === $lead ? "the editor's own Facebook collage of this dish" : 'a step-by-step collage of this dish, drawn before this recipe';
+		$seen = array_intersect_key( $reading, array_flip( array( 'title_printed', 'panels', 'ingredients_seen', 'printed_quantities', 'garnish_and_sides', 'finished_dish', 'serving' ) ) );
+		// A recipe card prints its quantities; the recipe published with it
+		// must not contradict it (ENGINE.md §7, 63).
+		$printed = array_filter( (array) ( $reading['printed_quantities'] ?? array() ), static function ( $one ) { return is_array( $one ) && '' !== trim( (string) ( $one['quantity'] ?? '' ) ); } );
 		$encoded = json_encode( $seen, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
 		if ( 'canonical_recipe' === $step ) {
 			return "\nTHE COLLAGE — this recipe is written from " . $whose . '. What it shows is the dish: ' . $encoded
-				. "\nEvery ingredient it shows, and every garnish and side it is served with, is in the recipe's ingredient list — a garnish as an ingredient \"pour servir\". A drink standing beside the plate is not an ingredient: it goes in the notes as what the dish is served with, unless a panel shows it going into the food. Nor is a side that is a dish in its own right — a roast, a stew, another gratin, a dish that needs its own recipe: it too goes in the notes as what the dish is served with; a salad, bread, fresh herbs or a simple vegetable stay ingredients. Its steps follow the order of the panels and its equipment names the vessels they show. This overrides any instruction to list only what the research names. What the collage never decides is how much: the quantities, times, temperatures and food-safety rules come from the research, and for an ingredient the research does not measure, the usual quantity a home cook would use. A collage shows a kitchen, not a weighing: never count what a panel shows.\n";
+				. "\nEvery ingredient it shows, and every garnish and side it is served with, is in the recipe's ingredient list — a garnish as an ingredient \"pour servir\". A drink standing beside the plate is not an ingredient: it goes in the notes as what the dish is served with, unless a panel shows it going into the food. Nor is a side that is a dish in its own right — a roast, a stew, another gratin, a dish that needs its own recipe: it too goes in the notes as what the dish is served with; a salad, bread, fresh herbs or a simple vegetable stay ingredients. Where its panels show steps, the recipe's steps follow their order, and its equipment names the vessels they show. This overrides any instruction to list only what the research names. What the collage never decides is how much, unless it prints it: the quantities, times, temperatures and food-safety rules come from the research, and for an ingredient the research does not measure, the usual quantity a home cook would use. A collage shows a kitchen, not a weighing: never count what a panel shows.\n"
+				. ( $printed ? "The collage prints quantities, and it is published beside this recipe: each ingredient in printed_quantities takes exactly that quantity and unit, and the number of servings is the one those quantities feed. The research still gives what is not printed — the other quantities, the times, the temperatures.\n" : '' );
 		}
 		if ( 'article' === $step ) {
 			return "\nTHE DISH AS ITS COLLAGE SHOWS IT — the recipe was written from " . $whose . ', and the article describes the same dish: '

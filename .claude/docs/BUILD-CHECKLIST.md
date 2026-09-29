@@ -668,6 +668,14 @@ cost) in the task before changing anything.
   the brief on each; « seulement les desserts » → 2 recipes, 2 set aside; one
   sentence naming six dishes → 6. `tests/test-match.php`,
   `tests/test-intake.php`. ARCHITECTURE invariants 19 and 25.
+- [~] **A81 — A recipe card is the writer's Facebook collage (2026-09-29,
+  0.34.0).** Owner's request, with his « Gratin de butternut aux lardons et
+  reblochon » card. The photo reading flags a card (title, ingredients with
+  quantities, finished dish) as a collage as well as a step grid, never a
+  single captioned photograph; the collage reading copies the printed title
+  and quantities, and the recipe keeps them. ENGINE.md §7, item 63.
+  `tests/test-match.php`, `tests/test-collage-lead.php`. Real test pending:
+  no provider key in the test container.
 - [x] **A80 — Publish several drafts from Articles (2026-09-28, 0.33.0).**
   Owner's request. The bulk action « Publier les brouillons » (shown to those
   who can `publish_posts`, confirmed first) calls `wp_update_post()` with the

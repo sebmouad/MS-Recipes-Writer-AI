@@ -151,7 +151,11 @@ msrwa_test_contains( $prompt, 'clafoutis aux cerises, soupe à l’oignon', 'The
 msrwa_test_contains( $prompt, 'LA CONSIGNE PRIME', 'And the reading is told it comes first.' );
 $collage_prompt = new ReflectionMethod( MSRWA_Match::class, 'read_prompt' );
 $collage_prompt->setAccessible( true );
-msrwa_test_contains( $collage_prompt->invoke( null, 'Tarte', array( array( 'file' => 'grille.jpg', 'dish' => 'Tarte', 'describes' => 'Six étapes.', 'collage' => true ) ) ), '(collage étape par étape)', 'The reading is told which photograph is the writer’s collage.' );
+msrwa_test_contains( $collage_prompt->invoke( null, 'Tarte', array( array( 'file' => 'grille.jpg', 'dish' => 'Tarte', 'describes' => 'Six étapes.', 'collage' => true ) ) ), '(collage Facebook)', 'The reading is told which photograph is the writer’s collage.' );
+$vision = new ReflectionMethod( MSRWA_Match::class, 'vision_instruction' );
+$vision->setAccessible( true );
+msrwa_test_contains( $vision->invoke( null, 'français', 'Observe.' ), 'a recipe card that sets pictures of the ingredients', 'An ingredient card with the finished dish is a collage too, not only a grid of steps.' );
+msrwa_test_contains( $vision->invoke( null, 'français', 'Observe.' ), 'false for a single photograph of a dish, even with a caption', 'A captioned photograph is not a collage.' );
 
 // The owner's rule, 2026-09-28: photographs are one recipe only when they show
 // the very same preparation. Two versions of a dish — with or without almonds,

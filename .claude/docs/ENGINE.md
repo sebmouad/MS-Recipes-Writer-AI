@@ -1053,6 +1053,22 @@ photograph, and otherwise use the photograph without the cost of a search.
     pommes normande, fondante et croustillante », opening on « Pourquoi
     préparer cette tarte aux pommes normande aujourd'hui ? », $0.0925.
 
+63. **A recipe card is a Facebook collage too, and its quantities hold
+    (owner's request, 2026-09-29).** The owner's Facebook posts are not only
+    step-by-step grids: a recipe card sets the title, the ingredients with
+    their printed quantities and the finished dish on one image (« Gratin de
+    butternut aux lardons et reblochon » : butternut 1 kg, lardons fumés
+    200 g…). The plugin's photo reading now flags such a card as a collage
+    (`MSRWA_Match::vision_instruction()`), so it leads the recipe as item 50
+    describes. `collage_reading.tpl.txt` knows both layouts, reads a card's
+    panels as its ingredients, and copies what is printed into two new keys,
+    "title_printed" and "printed_quantities", never estimating a quantity
+    that is not printed. `MSRWA_Engine_Input::collage_lead()` passes them to
+    the recipe: each printed quantity is kept exactly, the servings are the
+    ones those quantities feed, and the research gives the rest; a grid that
+    prints nothing is told nothing new. Offline tests only: no provider key
+    was available for a real reading.
+
 
 6. **The engine's `models` list is a second source of truth for prices.** The
    plugin now owns the catalogue — models, rates and per-step compatibility in

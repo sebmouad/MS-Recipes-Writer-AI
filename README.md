@@ -5,9 +5,9 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.33.0
+## État actuel — 0.34.0
 
-La version `0.33.0` publie plusieurs brouillons d'un coup depuis Articles, comme le bouton Publier de WordPress ; la `0.32.0` donnait aux articles des titres plus attrayants et ne répète plus le titre dans le premier intertitre ; la `0.31.3` gardait les titres propres ; la `0.31.2` ne regroupe des photographies que si elles montrent exactement la même préparation ; la `0.31.1` dit à la lecture du lot quelle photographie est un collage ; la `0.31.0` lit le texte du rédacteur comme une consigne : plus de
+La version `0.34.0` reconnaît une fiche recette Facebook — titre, ingrédients avec leurs quantités, plat fini — comme votre collage ; la `0.33.0` publiait plusieurs brouillons d'un coup depuis Articles, comme le bouton Publier de WordPress ; la `0.32.0` donnait aux articles des titres plus attrayants et ne répète plus le titre dans le premier intertitre ; la `0.31.3` gardait les titres propres ; la `0.31.2` ne regroupe des photographies que si elles montrent exactement la même préparation ; la `0.31.1` dit à la lecture du lot quelle photographie est un collage ; la `0.31.0` lit le texte du rédacteur comme une consigne : plus de
 tirets entre les recettes, le texte décide des recettes et prime pour associer
 les photographies, et l'appariement se corrige dans des tableaux ; la `0.30.0` sépare, dans Articles, les recettes en cours des
 terminées et tient les premières à jour en direct ; chaque lot nomme son
@@ -101,6 +101,22 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.34.0
+
+**Votre fiche recette Facebook est reconnue comme votre collage.** Jusqu'ici,
+seule une grille de photographies étape par étape était reconnue comme votre
+collage Facebook. Une fiche recette — le titre, les ingrédients illustrés avec
+leurs quantités, et le plat fini — l'est aussi désormais : elle est proposée
+comme image Facebook de la recette, publiée telle quelle, et sert de référence
+à la recette, à l'article et à l'image à la une. Une photographie seule, même
+légendée, n'est pas un collage.
+
+**Les quantités imprimées sur la fiche sont reprises.** La fiche est publiée
+à côté de la recette : la recette garde exactement les quantités qu'elle
+affiche (1 kg de butternut, 200 g de lardons…) et le nombre de parts qu'elles
+donnent. Les autres quantités, les temps et les températures viennent toujours
+de la recherche.
 
 ## Version 0.33.0
 
