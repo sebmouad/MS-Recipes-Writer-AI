@@ -415,6 +415,8 @@
   var batch = wrap ? wrap.dataset.batch : null;
   var batchStatus = document.getElementById('ms-batch-status');
   var timer = null;
+  // A poll that fails must not end the page: see refresh() below.
+  var retry = null, misses = 0;
 
   // A recipe index, "aside", or nothing yet: a photograph whose new recipe
   // has no name is still undecided.
@@ -1493,16 +1495,26 @@
   }
 
   function refresh() {
+    window.clearTimeout(retry);
+    retry = null;
     return call('/batches/' + batch + '/runs').then(function (data) {
+      misses = 0;
+      var runs = data.runs || [];
       if (data.stalled) nudge(Number(data.stalled));
-      paintLot(data.runs || []);
-      var moving = data.runs.map(paint).some(Boolean);
+      paintLot(runs);
+      var moving = runs.map(paint).some(Boolean);
       if (moving && !timer) { timer = window.setInterval(refresh, 5000); }
       // A settled batch has drafts that were not there when the page loaded,
       // so it is reloaded once rather than leaving stale links behind.
       if (!moving && timer) { window.clearInterval(timer); timer = null; window.location.reload(); }
     }).catch(function () {
+      // One blip used to stop the page for good: the interval was cleared and
+      // nothing wound it again, so the lot sat there looking frozen — and on a
+      // site whose cron cannot call back, this page is what carries it. Back
+      // off and come back, and only give up after about a minute of failures.
       if (timer) { window.clearInterval(timer); timer = null; }
+      misses++;
+      if (misses <= 6) { retry = window.setTimeout(refresh, Math.min(20000, 2000 * misses)); }
     });
   }
 

@@ -22,7 +22,9 @@ final class MSRWA_Screen_Pass {
 		$today = $money ? MSRWA_Ledger::spend( 1 ) : null;
 		$month = $money ? MSRWA_Ledger::spend( 30 ) : null;
 		$moving = MSRWA_Ledger::runs( array( 'status' => 'moving', 'per_page' => 12 ) );
-		$attention = MSRWA_Ledger::runs( array( 'status' => 'attention', 'per_page' => 8 ) );
+		// Only the count is used, to tell a first visit from an empty screen:
+		// runs awaiting a decision are listed on Articles, under their own filter.
+		$attention = MSRWA_Ledger::runs( array( 'status' => 'attention', 'per_page' => 1 ) );
 
 		echo '<div class="wrap msrwa">';
 		MSRWA_UI::head(
@@ -68,10 +70,6 @@ final class MSRWA_Screen_Pass {
 		self::queue();
 		self::waiting();
 		self::rail( __( 'En cours', 'ms-recipes-writer-ai' ), $moving['runs'], __( 'Rien ne tourne.', 'ms-recipes-writer-ai' ), true );
-
-		if ( $attention['runs'] ) {
-			self::rail( __( 'Demande une décision', 'ms-recipes-writer-ai' ), $attention['runs'], '', false );
-		}
 
 		echo '</div>';
 	}

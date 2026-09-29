@@ -5,9 +5,9 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.34.0
+## État actuel — 0.34.1
 
-La version `0.34.0` reconnaît une fiche recette Facebook — titre, ingrédients avec leurs quantités, plat fini — comme votre collage ; la `0.33.0` publiait plusieurs brouillons d'un coup depuis Articles, comme le bouton Publier de WordPress ; la `0.32.0` donnait aux articles des titres plus attrayants et ne répète plus le titre dans le premier intertitre ; la `0.31.3` gardait les titres propres ; la `0.31.2` ne regroupe des photographies que si elles montrent exactement la même préparation ; la `0.31.1` dit à la lecture du lot quelle photographie est un collage ; la `0.31.0` lit le texte du rédacteur comme une consigne : plus de
+La version `0.34.1` sort « Demande une décision » de la page des lots et empêche une page de lot de se figer après une coupure réseau ; la `0.34.0` reconnaît une fiche recette Facebook — titre, ingrédients avec leurs quantités, plat fini — comme votre collage ; la `0.33.0` publiait plusieurs brouillons d'un coup depuis Articles, comme le bouton Publier de WordPress ; la `0.32.0` donnait aux articles des titres plus attrayants et ne répète plus le titre dans le premier intertitre ; la `0.31.3` gardait les titres propres ; la `0.31.2` ne regroupe des photographies que si elles montrent exactement la même préparation ; la `0.31.1` dit à la lecture du lot quelle photographie est un collage ; la `0.31.0` lit le texte du rédacteur comme une consigne : plus de
 tirets entre les recettes, le texte décide des recettes et prime pour associer
 les photographies, et l'appariement se corrige dans des tableaux ; la `0.30.0` sépare, dans Articles, les recettes en cours des
 terminées et tient les premières à jour en direct ; chaque lot nomme son
@@ -101,6 +101,22 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.34.1
+
+**« Demande une décision » quitte la page des lots.** Les recettes qui
+attendent votre décision y étaient listées une seconde fois, sous la liste de
+ce qui tourne. Elles restent sur la page Articles, sous leur propre filtre et
+avec leur compteur : c'est là qu'on les traite. La page des lots redevient ce
+qu'elle annonce — déposer un lot et suivre ce qui avance.
+
+**Une page de lot ne se fige plus après une coupure.** Elle interroge le site
+toutes les cinq secondes pendant que les recettes tournent. Un seul appel
+manqué — réseau, hébergement qui bronche — arrêtait cette boucle
+définitivement : plus rien ne bougeait jusqu'à ce que vous rechargiez, et sur
+un site dont le cron n'arrive pas à se rappeler lui-même, c'est cette page qui
+fait avancer le lot. Elle réessaie maintenant en espaçant les tentatives, et
+reprend dès que le site répond.
 
 ## Version 0.34.0
 

@@ -33,6 +33,29 @@ foreach ( array(
 	msrwa_test_missing( $out['html'], 'page=msrwa-settings&', $name . ' does not link a writer to administrator screens.' );
 }
 
+// Runs awaiting a decision belong to Articles, under their own filter: the lots
+// screen is where a lot is dropped and watched, and a second list of the same
+// runs on it only asked the reader which one to believe. Seeded so the screen
+// really has one to draw — with none, this would pass whatever the screen does.
+$waiting = array(
+	'id' => 41, 'batch_id' => 9, 'owner_id' => 7, 'label' => 'Flan aux pommes', 'status' => 'done',
+	'step' => '', 'steps_done' => 3, 'steps_total' => 3, 'approved' => 0, 'priority' => 0,
+	'draft_post_id' => 0, 'error_message' => '', 'created_at' => '2026-09-29 10:00:00',
+);
+$GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
+$GLOBALS['wpdb']->posts = 'wp_posts';
+$GLOBALS['wpdb']->on( 'r.approved = 0 AND (r.draft_post_id = 0', array( $waiting ) );
+$_GET = array();
+$pass = msrwa_render( array( 'MSRWA_Screen_Pass', 'render' ) );
+msrwa_test_assert( isset( $pass['html'] ), 'The lots screen must render; got: ' . ( $pass['error'] ?? '' ) );
+msrwa_test_missing( (string) ( $pass['html'] ?? '' ), 'Demande une décision', 'The lots screen draws no decision rail, even with a run waiting on one.' );
+
+$GLOBALS['wpdb'] = new MSRWA_Fake_Wpdb();
+$GLOBALS['wpdb']->posts = 'wp_posts';
+$_GET = array();
+$list = msrwa_render( array( 'MSRWA_Screen_Articles', 'render' ) );
+msrwa_test_contains( (string) ( $list['html'] ?? '' ), 'Demande une décision', 'Articles still offers the decision filter, so nothing is stranded.' );
+
 // The screens a writer may not reach refuse before touching the database.
 foreach ( array(
 	'MSRWA_Screen_Analysis' => array( 'MSRWA_Screen_Analysis', 'render' ),
