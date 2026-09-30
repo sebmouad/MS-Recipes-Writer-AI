@@ -2318,8 +2318,8 @@ msgstr "لا يُرسم أي كولاج؛ وإن أرفقت كولاجك يُن�
 msgid "Un de vos collages dont le rendu doit être repris : lumière, couleurs, cadrage, plan de travail. Seul son style est repris, jamais son plat. Quand le rédacteur a envoyé une photographie du plat, elle montre le plat et ce collage garde le style."
 msgstr "أحد كولاجاتك التي يُراد اعتماد مظهرها: الإضاءة والألوان والتأطير وسطح العمل. يُؤخذ أسلوبه فقط، لا طبقه أبدًا. وإذا أرسل المحرر صورة للطبق، فهي تُظهر الطبق ويحافظ هذا الكولاج على الأسلوب."
 
-msgid "Ci-dessus : collez une ou plusieurs recettes, séparées par une ligne de tirets, et ajoutez leurs photographies — ou votre propre collage Facebook — sans dire laquelle va avec quoi."
-msgstr "في الأعلى: الصق وصفة أو أكثر، تفصل بينها سطر من الشرطات، وأضف صورها — أو كولاج فيسبوك الخاص بك — دون تحديد أيّها يخص أيّ وصفة."
+msgid "Ci-dessus : écrivez vos recettes comme vous voulez — des noms de plats, des recettes complètes ou en partie — et ajoutez leurs photographies, ou votre propre collage Facebook, sans dire laquelle va avec quoi."
+msgstr "في الأعلى: اكتب وصفاتك كما تشاء — أسماء أطباق، أو وصفات كاملة أو جزئية — وأضف صورها، أو كولاج فيسبوك الخاص بك، دون تحديد أيّها يخص أيّ وصفة."
 
 msgid "Déposez un nouveau lot, puis suivez ce qui est en cours, ce qui attend une relecture et ce qui s’est arrêté."
 msgstr "أودِع دفعة جديدة، ثم تابع ما يجري تنفيذه، وما ينتظر المراجعة، وما توقّف."

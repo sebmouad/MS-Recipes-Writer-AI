@@ -152,6 +152,8 @@ $first = msrwa_render( array( 'MSRWA_Screen_Pass', 'render' ) )['html'] ?? '';
 msrwa_test_contains( $first, 'ms-welcome', 'With nothing to show, the pass explains what will happen instead of showing zeros.' );
 msrwa_test_contains( $first, 'id="ms-compose"', 'And the form to act is right there, above it.' );
 msrwa_test_assert( strpos( $first, 'id="ms-compose"' ) < strpos( $first, 'ms-welcome' ), 'The new lot comes first.' );
+// Since 0.31.0 the text is read as a whole: nobody separates recipes any more.
+msrwa_test_missing( $first, 'tirets', 'The welcome no longer asks for recipes separated by dashes.' );
 msrwa_test_missing( $first, 'ms-figures', 'A first visit is not a row of zeros.' );
 
 // --- A writer is never shown money, on the way in either ----------------

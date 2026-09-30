@@ -704,7 +704,7 @@ msgid "Choisit d’un coup le modèle, la réflexion et la qualité d’image de
 msgstr ""
 
 #: class-msrwa-screen-pass.php:80
-msgid "Ci-dessus : collez une ou plusieurs recettes, séparées par une ligne de tirets, et ajoutez leurs photographies — ou votre propre collage Facebook — sans dire laquelle va avec quoi."
+msgid "Ci-dessus : écrivez vos recettes comme vous voulez — des noms de plats, des recettes complètes ou en partie — et ajoutez leurs photographies, ou votre propre collage Facebook, sans dire laquelle va avec quoi."
 msgstr ""
 
 #: class-msrwa-admin.php:257

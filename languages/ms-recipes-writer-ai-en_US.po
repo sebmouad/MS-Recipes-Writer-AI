@@ -2270,8 +2270,8 @@ msgstr "No collage is drawn; yours, if attached, is published as it is and serve
 msgid "Un de vos collages dont le rendu doit être repris : lumière, couleurs, cadrage, plan de travail. Seul son style est repris, jamais son plat. Quand le rédacteur a envoyé une photographie du plat, elle montre le plat et ce collage garde le style."
 msgstr "One of your collages whose look is to be kept: light, colours, framing, worktop. Only its style is taken, never its dish. When the writer sent a photograph of the dish, it shows the dish and this collage keeps the style."
 
-msgid "Ci-dessus : collez une ou plusieurs recettes, séparées par une ligne de tirets, et ajoutez leurs photographies — ou votre propre collage Facebook — sans dire laquelle va avec quoi."
-msgstr "Above: paste one or more recipes, separated by a line of dashes, and add their photographs — or your own Facebook collage — without saying which goes with which."
+msgid "Ci-dessus : écrivez vos recettes comme vous voulez — des noms de plats, des recettes complètes ou en partie — et ajoutez leurs photographies, ou votre propre collage Facebook, sans dire laquelle va avec quoi."
+msgstr "Above: write your recipes however you like — dish names, full or partial recipes — and add their photographs, or your own Facebook collage, without saying which goes with which."
 
 msgid "Déposez un nouveau lot, puis suivez ce qui est en cours, ce qui attend une relecture et ce qui s’est arrêté."
 msgstr "Drop in a new lot, then follow what is running, what is waiting to be read and what stopped."

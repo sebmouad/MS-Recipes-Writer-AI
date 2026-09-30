@@ -77,7 +77,7 @@ final class MSRWA_Screen_Pass {
 	/** The first visit: what a lot is, in the order it happens. */
 	private static function welcome() {
 		$steps = array(
-			array( __( 'Déposez un lot', 'ms-recipes-writer-ai' ), __( 'Ci-dessus : collez une ou plusieurs recettes, séparées par une ligne de tirets, et ajoutez leurs photographies — ou votre propre collage Facebook — sans dire laquelle va avec quoi.', 'ms-recipes-writer-ai' ) ),
+			array( __( 'Déposez un lot', 'ms-recipes-writer-ai' ), __( 'Ci-dessus : écrivez vos recettes comme vous voulez — des noms de plats, des recettes complètes ou en partie — et ajoutez leurs photographies, ou votre propre collage Facebook, sans dire laquelle va avec quoi.', 'ms-recipes-writer-ai' ) ),
 			array( __( 'Vérifiez l’appariement', 'ms-recipes-writer-ai' ), __( 'Chaque photographie est rapprochée de sa recette. Corrigez si besoin, puis lancez : rien n’est écrit avant.', 'ms-recipes-writer-ai' ) ),
 			array( __( 'Relisez les brouillons', 'ms-recipes-writer-ai' ), __( 'Chaque recette devient un brouillon WordPress avec son article, ses images et les remarques du contrôle final. Rien n’est jamais publié sans vous.', 'ms-recipes-writer-ai' ) ),
 		);
