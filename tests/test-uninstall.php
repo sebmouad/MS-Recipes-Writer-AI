@@ -62,6 +62,13 @@ foreach ( array_keys( MSRWA_DB::tables() ) as $table ) {
 }
 
 // How much goes is the site's choice, made beforehand: by default everything.
+// WP-CLI runs uninstall.php with no user logged in: a capability check there
+// ended it before anything was removed, silently, exit status 0. Reported at
+// once, since that exit would also end the runs below before any report.
+if ( ! msrwa_test_missing( $uninstall, 'current_user_can', 'Uninstalling does not depend on who runs it: WP-CLI has no user.' ) ) {
+	msrwa_test_done( 'uninstall' );
+}
+
 msrwa_test_contains( $uninstall, "get_option( 'msrwa_uninstall', 'all' )", 'uninstall.php follows the choice made on the settings screen, all by default.' );
 msrwa_test_contains( $uninstall, "delete_post_meta_by_key( '_msrwa_run_id' )", 'With the runs gone, the drafts lose their link to them, and only that.' );
 $scope_of = static function ( $choice ) use ( $uninstall ) {
@@ -70,7 +77,7 @@ $scope_of = static function ( $choice ) use ( $uninstall ) {
 	$GLOBALS['msrwa_test_options'] = array( 'msrwa_uninstall' => $choice, 'msrwa_settings' => array( 'site_language' => 'en' ), 'msrwa_schema' => 11 );
 	$GLOBALS['msrwa_test_meta_dropped'] = array();
 	if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) { define( 'WP_UNINSTALL_PLUGIN', 'ms-recipes-writer-ai' ); }
-	$GLOBALS['msrwa_test_caps'] = array( 'activate_plugins' );
+	$GLOBALS['msrwa_test_caps'] = array();
 	include MSRWA_DIR . 'uninstall.php';
 	return array( 'log' => $GLOBALS['wpdb']->log(), 'options' => $GLOBALS['msrwa_test_options'], 'meta' => $GLOBALS['msrwa_test_meta_dropped'] );
 };

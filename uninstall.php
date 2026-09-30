@@ -19,7 +19,6 @@
  */
 
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) { exit; }
-if ( ! current_user_can( 'activate_plugins' ) ) { exit; }
 
 global $wpdb;
 $msrwa_prefix = $wpdb->prefix . 'msrwa_';
