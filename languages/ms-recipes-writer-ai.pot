@@ -3359,3 +3359,7 @@ msgstr ""
 msgid "≈ %s par recette"
 msgstr ""
 
+#. Description of the plugin
+#: ms-recipes-writer-ai.php
+msgid "Le rédacteur fournit plusieurs recettes et plusieurs photographies ; le plugin les apparie, construit un brief par recette et les envoie toutes au moteur."
+msgstr ""

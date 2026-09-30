@@ -318,7 +318,6 @@ final class MSRWA_Screen_Engine {
 					<tr>
 						<th scope="row">
 							<?php echo esc_html( MSRWA_UI::step_name( $key ) !== $key ? MSRWA_UI::step_name( $key ) : (string) ( $step['label'] ?? $key ) ); ?>
-							<br><small class="ms-muted"><?php echo esc_html( (string) ( $step['expects'] ?? '' ) ); ?></small>
 						</th>
 						<td data-label="<?php esc_attr_e( 'Attend', 'ms-recipes-writer-ai' ); ?>"><?php echo esc_html( $step['needs'] ? implode( ', ', (array) $step['needs'] ) : '—' ); ?></td>
 						<td data-label="<?php esc_attr_e( 'Produit', 'ms-recipes-writer-ai' ); ?>"><code class="ms-key"><?php echo esc_html( (string) ( $step['produces'] ?? '' ) ); ?></code></td>

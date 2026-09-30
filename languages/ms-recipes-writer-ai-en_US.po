@@ -2591,3 +2591,8 @@ msgstr "Publish the drafts"
 #, php-format
 msgid "Publier les brouillons de %d recette(s), comme le bouton Publier de WordPress ? Seuls les brouillons sont publiés ; les autres articles restent tels quels."
 msgstr "Publish the drafts of %d recipe(s), as WordPress’s Publish button does? Only drafts are published; other articles are left as they are."
+
+#. Description of the plugin
+#: ms-recipes-writer-ai.php
+msgid "Le rédacteur fournit plusieurs recettes et plusieurs photographies ; le plugin les apparie, construit un brief par recette et les envoie toutes au moteur."
+msgstr "The writer provides several recipes and several photographs; the plugin pairs them, builds a brief for each recipe and sends them all to the engine."

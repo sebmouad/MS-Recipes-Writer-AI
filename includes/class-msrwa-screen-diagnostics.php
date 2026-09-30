@@ -52,7 +52,7 @@ final class MSRWA_Screen_Diagnostics {
 
 		echo '<section class="ms-card"><h2>' . esc_html__( 'Rapport', 'ms-recipes-writer-ai' ) . '</h2>';
 		echo '<p>' . esc_html__( 'Les mêmes constats en un bloc, à coller dans une demande d’aide. Il ne porte ni clé, ni chemin, ni adresse du site.', 'ms-recipes-writer-ai' ) . '</p>';
-		echo '<p><textarea id="ms-diagnostic-report" class="large-text ms-code" rows="' . esc_attr( count( $checks ) + 3 ) . '" readonly>'
+		echo '<p><textarea id="ms-diagnostic-report" class="large-text ms-code" rows="' . esc_attr( count( $checks ) + 3 ) . '" aria-label="' . esc_attr__( 'Rapport', 'ms-recipes-writer-ai' ) . '" readonly>'
 			. esc_textarea( MSRWA_Diagnostics::report( $checks ) ) . '</textarea></p>';
 		echo '<p class="ms-row"><button type="button" class="button" id="ms-copy-report">' . esc_html__( 'Copier le rapport', 'ms-recipes-writer-ai' ) . '</button>'
 			. '<span class="ms-muted" id="ms-copy-status" aria-live="polite"></span></p>';

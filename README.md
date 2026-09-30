@@ -5,9 +5,9 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.34.4
+## État actuel — 0.34.5
 
-La version `0.34.4` fait tout le ménage prévu à la désinstallation, aussi depuis WP-CLI ; la `0.34.3` ne demandait plus de séparer les recettes par des tirets dans « Comment ça marche » ; la `0.34.2` proposait la case « Votre collage Facebook » sur chaque photographie et disait quand le suivi d'un lot abandonne ; la `0.34.1` sort « Demande une décision » de la page des lots et empêche une page de lot de se figer après une coupure réseau ; la `0.34.0` reconnaît une fiche recette Facebook — titre, ingrédients avec leurs quantités, plat fini — comme votre collage ; la `0.33.0` publiait plusieurs brouillons d'un coup depuis Articles, comme le bouton Publier de WordPress ; la `0.32.0` donnait aux articles des titres plus attrayants et ne répète plus le titre dans le premier intertitre ; la `0.31.3` gardait les titres propres ; la `0.31.2` ne regroupe des photographies que si elles montrent exactement la même préparation ; la `0.31.1` dit à la lecture du lot quelle photographie est un collage ; la `0.31.0` lit le texte du rédacteur comme une consigne : plus de
+La version `0.34.5` rend les écrans lisibles et nomme chaque champ pour un lecteur d'écran ; la `0.34.4` faisait tout le ménage prévu à la désinstallation, aussi depuis WP-CLI ; la `0.34.3` ne demandait plus de séparer les recettes par des tirets dans « Comment ça marche » ; la `0.34.2` proposait la case « Votre collage Facebook » sur chaque photographie et disait quand le suivi d'un lot abandonne ; la `0.34.1` sort « Demande une décision » de la page des lots et empêche une page de lot de se figer après une coupure réseau ; la `0.34.0` reconnaît une fiche recette Facebook — titre, ingrédients avec leurs quantités, plat fini — comme votre collage ; la `0.33.0` publiait plusieurs brouillons d'un coup depuis Articles, comme le bouton Publier de WordPress ; la `0.32.0` donnait aux articles des titres plus attrayants et ne répète plus le titre dans le premier intertitre ; la `0.31.3` gardait les titres propres ; la `0.31.2` ne regroupe des photographies que si elles montrent exactement la même préparation ; la `0.31.1` dit à la lecture du lot quelle photographie est un collage ; la `0.31.0` lit le texte du rédacteur comme une consigne : plus de
 tirets entre les recettes, le texte décide des recettes et prime pour associer
 les photographies, et l'appariement se corrige dans des tableaux ; la `0.30.0` sépare, dans Articles, les recettes en cours des
 terminées et tient les premières à jour en direct ; chaque lot nomme son
@@ -101,6 +101,20 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.34.5
+
+**Les écrans se lisent, et chaque champ a un nom.** Le gris des libellés, des
+en-têtes de tableau et des légendes mesurait 2,4 à 2,7:1 sur les fonds de
+l'administration, loin des 4,5:1 qu'il faut pour du texte ; il passe à 4,7:1
+au moins, le gris secondaire plus foncé encore pour garder l'écart, et le texte
+ambré prend une nuance plus sombre (5,3:1). Une mesure de tous les écrans ne
+relève plus aucun contraste insuffisant. Les 44 champs de prix de l'écran
+Modèles se présentent à un lecteur d'écran par leur colonne et leur modèle
+(« Entrée $/M — claude-opus-5 ») au lieu d'un champ numérique sans nom, comme le
+rapport des Diagnostics. L'écran Moteur n'affiche plus, sous chaque étape, les
+notes de conception en anglais qui citaient des classes du code. Et la
+description de l'extension est traduite en anglais et en arabe.
 
 ## Version 0.34.4
 

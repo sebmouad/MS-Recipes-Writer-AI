@@ -109,8 +109,8 @@ final class MSRWA_Screen_Models {
 									<br><small class="ms-muted"><?php esc_html_e( 'jamais relevé', 'ms-recipes-writer-ai' ); ?></small>
 								<?php endif; ?>
 							</th>
-							<td><input type="number" step="0.000001" min="0" class="small-text ms-num" name="model[<?php echo esc_attr( $name ); ?>][input]" value="<?php echo esc_attr( null === $row['input_usd'] ? '' : $row['input_usd'] ); ?>"></td>
-							<td><input type="number" step="0.000001" min="0" class="small-text ms-num" name="model[<?php echo esc_attr( $name ); ?>][output]" value="<?php echo esc_attr( null === $row['output_usd'] ? '' : $row['output_usd'] ); ?>"></td>
+							<td><input type="number" step="0.000001" min="0" class="small-text ms-num" name="model[<?php echo esc_attr( $name ); ?>][input]" aria-label="<?php echo esc_attr( __( 'Entrée $/M', 'ms-recipes-writer-ai' ) . ' — ' . $row['model_id'] ); ?>" value="<?php echo esc_attr( null === $row['input_usd'] ? '' : $row['input_usd'] ); ?>"></td>
+							<td><input type="number" step="0.000001" min="0" class="small-text ms-num" name="model[<?php echo esc_attr( $name ); ?>][output]" aria-label="<?php echo esc_attr( __( 'Sortie $/M', 'ms-recipes-writer-ai' ) . ' — ' . $row['model_id'] ); ?>" value="<?php echo esc_attr( null === $row['output_usd'] ? '' : $row['output_usd'] ); ?>"></td>
 							<td><?php self::provenance( $row ); ?></td>
 							<td class="ms-grid-cell">
 								<?php

@@ -2647,3 +2647,8 @@ msgstr "نشر المسودات"
 #, php-format
 msgid "Publier les brouillons de %d recette(s), comme le bouton Publier de WordPress ? Seuls les brouillons sont publiés ; les autres articles restent tels quels."
 msgstr "نشر مسودات %d وصفة كما يفعل زر النشر في ووردبريس؟ تُنشر المسودات فقط وتبقى المقالات الأخرى كما هي."
+
+#. Description of the plugin
+#: ms-recipes-writer-ai.php
+msgid "Le rédacteur fournit plusieurs recettes et plusieurs photographies ; le plugin les apparie, construit un brief par recette et les envoie toutes au moteur."
+msgstr "يقدّم المحرّر عدة وصفات وعدة صور، فتطابق الإضافة بينها وتُعِدّ موجزًا لكل وصفة ثم ترسلها كلها إلى المحرّك."
