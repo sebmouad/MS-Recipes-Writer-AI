@@ -28,12 +28,20 @@ $last = $GLOBALS['msrwa_test_options']['msrwa_cleanup_last'] ?? array();
 msrwa_test_assert( isset( $last['seconds'], $last['parts']['prune'] ), 'How long the tick and each part took is written down.' );
 
 // WP-Cron that stopped: late by more than two ticks, and only then.
+unset( $GLOBALS['msrwa_test_options']['msrwa_cleanup_last'] );
 $GLOBALS['msrwa_test_next_scheduled'] = time() - 30 * 60;
 msrwa_test_assert( 30 === MSRWA_Plugin::cron_stalled_minutes(), 'A tick due half an hour ago means WP-Cron has stopped.' );
 $GLOBALS['msrwa_test_next_scheduled'] = time() - 5 * 60;
 msrwa_test_assert( 0 === MSRWA_Plugin::cron_stalled_minutes(), 'Five minutes late is a quiet site, not a stopped cron.' );
 $GLOBALS['msrwa_test_next_scheduled'] = time() + 60;
 msrwa_test_assert( 0 === MSRWA_Plugin::cron_stalled_minutes(), 'A tick still to come is not late.' );
+// A tick run from the server's cron (wp msrwa tick) counts, late event or not.
+$GLOBALS['msrwa_test_next_scheduled'] = time() - 30 * 60;
+$GLOBALS['msrwa_test_options']['msrwa_cleanup_last'] = array( 'at' => gmdate( 'Y-m-d H:i:s', time() - 2 * 60 ) );
+msrwa_test_assert( 0 === MSRWA_Plugin::cron_stalled_minutes(), 'A tick two minutes ago, run another way, is a running cron.' );
+$GLOBALS['msrwa_test_options']['msrwa_cleanup_last'] = array( 'at' => gmdate( 'Y-m-d H:i:s', time() - 20 * 60 ) );
+msrwa_test_assert( 20 === MSRWA_Plugin::cron_stalled_minutes(), 'Stopped since the last run, whichever way it ran.' );
+unset( $GLOBALS['msrwa_test_options']['msrwa_cleanup_last'] );
 $GLOBALS['msrwa_test_next_scheduled'] = 1789003600;
 
 // The search filters from three letters; shorter matches nearly everything.

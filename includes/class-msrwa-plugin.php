@@ -71,11 +71,15 @@ final class MSRWA_Plugin {
 	/**
 	 * Minutes the five-minute tick has been due without running: 0 while
 	 * WP-Cron runs it. WP-Cron runs only when the site is visited, and never
-	 * with DISABLE_WP_CRON and no server cron.
+	 * with DISABLE_WP_CRON and no server cron. A tick run another way
+	 * (wp msrwa tick from the server's cron) counts as a run.
 	 */
 	public static function cron_stalled_minutes() {
 		$next = wp_next_scheduled( 'msrwa_cleanup' );
 		$late = $next ? time() - (int) $next : 0;
+		$last = get_option( 'msrwa_cleanup_last', array() );
+		$at   = is_array( $last ) && ! empty( $last['at'] ) ? strtotime( $last['at'] . ' UTC' ) : 0;
+		if ( $at ) { $late = min( $late, time() - $at ); }
 		return $late > 10 * MINUTE_IN_SECONDS ? (int) floor( $late / MINUTE_IN_SECONDS ) : 0;
 	}
 

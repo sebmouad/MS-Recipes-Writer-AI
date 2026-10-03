@@ -5,9 +5,9 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.34.6
+## État actuel — 0.34.7
 
-La version `0.34.6` signale quand WP-Cron ne tourne plus, avec les commandes à lancer depuis le serveur, et fait sa tâche des cinq minutes sous un verrou ; la `0.34.5` rendait les écrans lisibles et nommait chaque champ pour un lecteur d'écran ; la `0.34.4` faisait tout le ménage prévu à la désinstallation, aussi depuis WP-CLI ; la `0.34.3` ne demandait plus de séparer les recettes par des tirets dans « Comment ça marche » ; la `0.34.2` proposait la case « Votre collage Facebook » sur chaque photographie et disait quand le suivi d'un lot abandonne ; la `0.34.1` sort « Demande une décision » de la page des lots et empêche une page de lot de se figer après une coupure réseau ; la `0.34.0` reconnaît une fiche recette Facebook — titre, ingrédients avec leurs quantités, plat fini — comme votre collage ; la `0.33.0` publiait plusieurs brouillons d'un coup depuis Articles, comme le bouton Publier de WordPress ; la `0.32.0` donnait aux articles des titres plus attrayants et ne répète plus le titre dans le premier intertitre ; la `0.31.3` gardait les titres propres ; la `0.31.2` ne regroupe des photographies que si elles montrent exactement la même préparation ; la `0.31.1` dit à la lecture du lot quelle photographie est un collage ; la `0.31.0` lit le texte du rédacteur comme une consigne : plus de
+La version `0.34.7` ne signale plus un WP-Cron arrêté quand la tâche des cinq minutes tourne depuis le cron du serveur avec `wp msrwa tick` ; la `0.34.6` signalait quand WP-Cron ne tourne plus, avec les commandes à lancer depuis le serveur, et fait sa tâche des cinq minutes sous un verrou ; la `0.34.5` rendait les écrans lisibles et nommait chaque champ pour un lecteur d'écran ; la `0.34.4` faisait tout le ménage prévu à la désinstallation, aussi depuis WP-CLI ; la `0.34.3` ne demandait plus de séparer les recettes par des tirets dans « Comment ça marche » ; la `0.34.2` proposait la case « Votre collage Facebook » sur chaque photographie et disait quand le suivi d'un lot abandonne ; la `0.34.1` sort « Demande une décision » de la page des lots et empêche une page de lot de se figer après une coupure réseau ; la `0.34.0` reconnaît une fiche recette Facebook — titre, ingrédients avec leurs quantités, plat fini — comme votre collage ; la `0.33.0` publiait plusieurs brouillons d'un coup depuis Articles, comme le bouton Publier de WordPress ; la `0.32.0` donnait aux articles des titres plus attrayants et ne répète plus le titre dans le premier intertitre ; la `0.31.3` gardait les titres propres ; la `0.31.2` ne regroupe des photographies que si elles montrent exactement la même préparation ; la `0.31.1` dit à la lecture du lot quelle photographie est un collage ; la `0.31.0` lit le texte du rédacteur comme une consigne : plus de
 tirets entre les recettes, le texte décide des recettes et prime pour associer
 les photographies, et l'appariement se corrige dans des tableaux ; la `0.30.0` sépare, dans Articles, les recettes en cours des
 terminées et tient les premières à jour en direct ; chaque lot nomme son
@@ -101,6 +101,15 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.34.7
+
+**`wp msrwa tick` compte comme une exécution.** L'avis « WP-Cron ne s'est pas
+exécuté » regardait seulement le retard de l'événement WP-Cron. Un serveur qui
+lance `wp msrwa tick` chaque minute, sans WP-Cron, faisait bien le travail mais
+gardait l'avis affiché, puisque cette commande ne replanifie pas l'événement.
+Le retard compte maintenant depuis la dernière tâche des cinq minutes, quelle
+que soit la façon dont elle a tourné (`msrwa_cleanup_last`).
 
 ## Version 0.34.6
 
