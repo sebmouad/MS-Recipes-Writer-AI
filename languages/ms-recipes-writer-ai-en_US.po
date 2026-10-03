@@ -2596,3 +2596,13 @@ msgstr "Publish the drafts of %d recipe(s), as WordPress’s Publish button does
 #: ms-recipes-writer-ai.php
 msgid "Le rédacteur fournit plusieurs recettes et plusieurs photographies ; le plugin les apparie, construit un brief par recette et les envoie toutes au moteur."
 msgstr "The writer provides several recipes and several photographs; the plugin pairs them, builds a brief for each recipe and sends them all to the engine."
+
+msgid "WP-Cron ne s’est pas exécuté depuis %d minute : les recettes en file et les lots programmés attendent. WP-Cron ne s’exécute que lorsque le site est visité, et jamais avec DISABLE_WP_CRON. Lancez-le depuis le serveur chaque minute avec l’une de ces commandes :"
+msgid_plural "WP-Cron ne s’est pas exécuté depuis %d minutes : les recettes en file et les lots programmés attendent. WP-Cron ne s’exécute que lorsque le site est visité, et jamais avec DISABLE_WP_CRON. Lancez-le depuis le serveur chaque minute avec l’une de ces commandes :"
+msgstr[0] "WP-Cron has not run for %d minute: queued recipes and scheduled lots are waiting. WP-Cron runs only when the site is visited, and never with DISABLE_WP_CRON. Run it from the server every minute with one of these commands:"
+msgstr[1] "WP-Cron has not run for %d minutes: queued recipes and scheduled lots are waiting. WP-Cron runs only when the site is visited, and never with DISABLE_WP_CRON. Run it from the server every minute with one of these commands:"
+
+msgid "Tick terminé : %d étape de recette lancée."
+msgid_plural "Tick terminé : %d étapes de recettes lancées."
+msgstr[0] "Tick complete: %d recipe step started."
+msgstr[1] "Tick complete: %d recipe steps started."

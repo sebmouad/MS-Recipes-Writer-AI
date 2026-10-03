@@ -65,6 +65,18 @@ live lot sat forever that way. The watchdog therefore re-arms every leaseless
 `running` run as well as every `queued` one; `queue()` skips a run already
 armed and the claim stops a duplicate from spending anything.
 
+The watchdog is one part of the five-minute `msrwa_cleanup` tick
+(`MSRWA_Plugin::cleanup()`): stuck runs back in the queue, the lots whose hour
+has come, then retention, each bounded on its own. The tick takes a
+`GET_LOCK` named after the site, so one that outlasts five minutes is not
+joined by the next; a part that would start after `CLEANUP_SECONDS` (60 s)
+waits for the next tick; `msrwa_cleanup_last` records what each part took and
+a tick past its budget goes to the PHP error log. When that tick has been due
+for more than ten minutes, WP-Cron has stopped (no visits, or
+`DISABLE_WP_CRON` without a server cron): administrators see a notice naming
+`wp cron event run --due-now` and `wp msrwa tick`, which runs the tick and then
+the due recipe steps, one after another, for a server cron.
+
 Two things can stop a tick before it claims anything: an operator hold
 (`MSRWA_Queue`) and a spending ceiling the site has reached (`MSRWA_Budget`).
 Either one parks the run — back to `queued`, lease released, `updated_at`

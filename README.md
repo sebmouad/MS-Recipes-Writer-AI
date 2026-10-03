@@ -5,9 +5,9 @@ recettes et plusieurs photographies ; le plugin apparie chaque photo à sa
 recette, fait rechercher, écrire, relire, vérifier et illustrer chaque article
 par le moteur, puis livre un **brouillon** WordPress — jamais une publication.
 
-## État actuel — 0.34.5
+## État actuel — 0.34.6
 
-La version `0.34.5` rend les écrans lisibles et nomme chaque champ pour un lecteur d'écran ; la `0.34.4` faisait tout le ménage prévu à la désinstallation, aussi depuis WP-CLI ; la `0.34.3` ne demandait plus de séparer les recettes par des tirets dans « Comment ça marche » ; la `0.34.2` proposait la case « Votre collage Facebook » sur chaque photographie et disait quand le suivi d'un lot abandonne ; la `0.34.1` sort « Demande une décision » de la page des lots et empêche une page de lot de se figer après une coupure réseau ; la `0.34.0` reconnaît une fiche recette Facebook — titre, ingrédients avec leurs quantités, plat fini — comme votre collage ; la `0.33.0` publiait plusieurs brouillons d'un coup depuis Articles, comme le bouton Publier de WordPress ; la `0.32.0` donnait aux articles des titres plus attrayants et ne répète plus le titre dans le premier intertitre ; la `0.31.3` gardait les titres propres ; la `0.31.2` ne regroupe des photographies que si elles montrent exactement la même préparation ; la `0.31.1` dit à la lecture du lot quelle photographie est un collage ; la `0.31.0` lit le texte du rédacteur comme une consigne : plus de
+La version `0.34.6` signale quand WP-Cron ne tourne plus, avec les commandes à lancer depuis le serveur, et fait sa tâche des cinq minutes sous un verrou ; la `0.34.5` rendait les écrans lisibles et nommait chaque champ pour un lecteur d'écran ; la `0.34.4` faisait tout le ménage prévu à la désinstallation, aussi depuis WP-CLI ; la `0.34.3` ne demandait plus de séparer les recettes par des tirets dans « Comment ça marche » ; la `0.34.2` proposait la case « Votre collage Facebook » sur chaque photographie et disait quand le suivi d'un lot abandonne ; la `0.34.1` sort « Demande une décision » de la page des lots et empêche une page de lot de se figer après une coupure réseau ; la `0.34.0` reconnaît une fiche recette Facebook — titre, ingrédients avec leurs quantités, plat fini — comme votre collage ; la `0.33.0` publiait plusieurs brouillons d'un coup depuis Articles, comme le bouton Publier de WordPress ; la `0.32.0` donnait aux articles des titres plus attrayants et ne répète plus le titre dans le premier intertitre ; la `0.31.3` gardait les titres propres ; la `0.31.2` ne regroupe des photographies que si elles montrent exactement la même préparation ; la `0.31.1` dit à la lecture du lot quelle photographie est un collage ; la `0.31.0` lit le texte du rédacteur comme une consigne : plus de
 tirets entre les recettes, le texte décide des recettes et prime pour associer
 les photographies, et l'appariement se corrige dans des tableaux ; la `0.30.0` sépare, dans Articles, les recettes en cours des
 terminées et tient les premières à jour en direct ; chaque lot nomme son
@@ -101,6 +101,22 @@ développement, humain ou agent.
   (`tools/`), ses commandes et ses règles de provenance d’images.
 - [`.claude/docs/LAB-RESULTS.md`](.claude/docs/LAB-RESULTS.md) — ce que les
   mesures du laboratoire ont établi, pour ne pas les refaire.
+
+## Version 0.34.6
+
+**Les tâches de fond se voient quand elles ne tournent plus.** WP-Cron ne
+s'exécute que lorsque le site est visité, et jamais avec `DISABLE_WP_CRON` : un
+site sans visite ou sans tâche planifiée côté serveur laissait les recettes en
+file et les lots programmés attendre sans rien dire. Quand la tâche des cinq
+minutes a plus de dix minutes de retard, les administrateurs voient un avis qui
+donne les deux commandes à lancer chaque minute depuis le serveur :
+`wp cron event run --due-now`, ou la nouvelle `wp msrwa tick`, qui fait la tâche
+puis les étapes de recettes dues, l'une après l'autre. Cette tâche tourne sous
+un verrou, pour qu'une tâche qui dépasse cinq minutes ne soit pas rejointe par
+la suivante, dans une minute au plus (ce qui reste attend la suivante) ; la
+durée de chaque partie est notée, et un dépassement est écrit dans le journal
+d'erreurs PHP. La recherche de l'écran Articles ne filtre qu'à partir de trois
+lettres : une ou deux trouvent presque tous les titres, sans index possible.
 
 ## Version 0.34.5
 

@@ -2652,3 +2652,21 @@ msgstr "نشر مسودات %d وصفة كما يفعل زر النشر في و�
 #: ms-recipes-writer-ai.php
 msgid "Le rédacteur fournit plusieurs recettes et plusieurs photographies ; le plugin les apparie, construit un brief par recette et les envoie toutes au moteur."
 msgstr "يقدّم المحرّر عدة وصفات وعدة صور، فتطابق الإضافة بينها وتُعِدّ موجزًا لكل وصفة ثم ترسلها كلها إلى المحرّك."
+
+msgid "WP-Cron ne s’est pas exécuté depuis %d minute : les recettes en file et les lots programmés attendent. WP-Cron ne s’exécute que lorsque le site est visité, et jamais avec DISABLE_WP_CRON. Lancez-le depuis le serveur chaque minute avec l’une de ces commandes :"
+msgid_plural "WP-Cron ne s’est pas exécuté depuis %d minutes : les recettes en file et les lots programmés attendent. WP-Cron ne s’exécute que lorsque le site est visité, et jamais avec DISABLE_WP_CRON. Lancez-le depuis le serveur chaque minute avec l’une de ces commandes :"
+msgstr[0] "لم يُشغَّل WP-Cron منذ %d دقيقة: الوصفات في قائمة الانتظار والدفعات المجدولة تنتظر. لا يعمل WP-Cron إلا عند زيارة الموقع، ولا يعمل أبدًا مع DISABLE_WP_CRON. شغّله من الخادم كل دقيقة بأحد هذه الأوامر:"
+msgstr[1] "لم يُشغَّل WP-Cron منذ دقيقة واحدة: الوصفات في قائمة الانتظار والدفعات المجدولة تنتظر. لا يعمل WP-Cron إلا عند زيارة الموقع، ولا يعمل أبدًا مع DISABLE_WP_CRON. شغّله من الخادم كل دقيقة بأحد هذه الأوامر:"
+msgstr[2] "لم يُشغَّل WP-Cron منذ دقيقتين: الوصفات في قائمة الانتظار والدفعات المجدولة تنتظر. لا يعمل WP-Cron إلا عند زيارة الموقع، ولا يعمل أبدًا مع DISABLE_WP_CRON. شغّله من الخادم كل دقيقة بأحد هذه الأوامر:"
+msgstr[3] "لم يُشغَّل WP-Cron منذ %d دقائق: الوصفات في قائمة الانتظار والدفعات المجدولة تنتظر. لا يعمل WP-Cron إلا عند زيارة الموقع، ولا يعمل أبدًا مع DISABLE_WP_CRON. شغّله من الخادم كل دقيقة بأحد هذه الأوامر:"
+msgstr[4] "لم يُشغَّل WP-Cron منذ %d دقيقة: الوصفات في قائمة الانتظار والدفعات المجدولة تنتظر. لا يعمل WP-Cron إلا عند زيارة الموقع، ولا يعمل أبدًا مع DISABLE_WP_CRON. شغّله من الخادم كل دقيقة بأحد هذه الأوامر:"
+msgstr[5] "لم يُشغَّل WP-Cron منذ %d دقيقة: الوصفات في قائمة الانتظار والدفعات المجدولة تنتظر. لا يعمل WP-Cron إلا عند زيارة الموقع، ولا يعمل أبدًا مع DISABLE_WP_CRON. شغّله من الخادم كل دقيقة بأحد هذه الأوامر:"
+
+msgid "Tick terminé : %d étape de recette lancée."
+msgid_plural "Tick terminé : %d étapes de recettes lancées."
+msgstr[0] "اكتملت الدورة: لم تُشغَّل أي خطوة."
+msgstr[1] "اكتملت الدورة: تم تشغيل خطوة وصفة واحدة."
+msgstr[2] "اكتملت الدورة: تم تشغيل خطوتي وصفة."
+msgstr[3] "اكتملت الدورة: تم تشغيل %d خطوات وصفات."
+msgstr[4] "اكتملت الدورة: تم تشغيل %d خطوة وصفة."
+msgstr[5] "اكتملت الدورة: تم تشغيل %d خطوة وصفة."

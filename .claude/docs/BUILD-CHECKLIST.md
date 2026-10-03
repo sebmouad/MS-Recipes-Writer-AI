@@ -1068,6 +1068,10 @@ Measured on the live site: 293s of provider work inside a 10-minute wall clock,
 - [ ] **C3 — Performance verified live:** article plus featured image ≤ 90s.
 - [ ] **C4 — Quality verified live** against the benchmark: complete sections,
   faithful to sources, no writing mistakes, cost inside the estimate.
+- [~] *(offline: `test-cron-tick.php`)* **C5 — Cron on a fresh server.** The
+  five-minute tick runs under one lock within a budget and records each part;
+  administrators see when WP-Cron has stopped, with `wp msrwa tick` for a
+  server cron; the list search filters from three letters.
 
 ---
 

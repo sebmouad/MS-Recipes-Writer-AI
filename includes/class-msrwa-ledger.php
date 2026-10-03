@@ -15,6 +15,9 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
  */
 final class MSRWA_Ledger {
 
+	/** The shortest search the list filters on. */
+	const SEARCH_MIN = 3;
+
 	private static function tables() { return MSRWA_DB::tables(); }
 
 	/** The state of play right now: what is moving, what is waiting to be read. */
@@ -309,8 +312,9 @@ final class MSRWA_Ledger {
 		}
 		if ( ! empty( $filters['owner'] ) && MSRWA_Rights::may_see_everything() ) { $where[] = $wpdb->prepare( 'r.owner_id = %d', (int) $filters['owner'] ); }
 		// An editor renames the post; the search finds it by either name.
-		if ( ! empty( $filters['search'] ) ) {
-			$like = '%' . $wpdb->esc_like( (string) $filters['search'] ) . '%';
+		// Fewer than three letters match nearly every title, and the search cannot use an index.
+		if ( self::SEARCH_MIN <= mb_strlen( trim( (string) ( $filters['search'] ?? '' ) ) ) ) {
+			$like = '%' . $wpdb->esc_like( trim( (string) $filters['search'] ) ) . '%';
 			$where[] = $wpdb->prepare( '(r.label LIKE %s OR p.post_title LIKE %s)', $like, $like );
 		}
 		$post = (string) ( $filters['post'] ?? '' );

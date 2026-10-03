@@ -38,7 +38,7 @@ foreach ( $msrwa_tables as $msrwa_table ) {
 // at stays while they do.
 $msrwa_options = array_merge(
 	$msrwa_settings ? array( 'msrwa_settings', 'msrwa_engine_config' ) : array(),
-	$msrwa_data ? array( 'msrwa_schema', 'msrwa_db_version', 'msrwa_superseded_dropped', 'msrwa_duplicates_reclaimed', 'msrwa_watchdog_at', 'msrwa_queue_held', 'msrwa_prune_last', 'msrwa_uninstall' ) : array()
+	$msrwa_data ? array( 'msrwa_schema', 'msrwa_db_version', 'msrwa_superseded_dropped', 'msrwa_duplicates_reclaimed', 'msrwa_watchdog_at', 'msrwa_queue_held', 'msrwa_prune_last', 'msrwa_cleanup_last', 'msrwa_uninstall' ) : array()
 );
 foreach ( $msrwa_options as $msrwa_option ) {
 	delete_option( $msrwa_option );
